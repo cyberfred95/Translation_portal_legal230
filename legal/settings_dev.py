@@ -1,0 +1,19 @@
+from .settings import *
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'legal',
+        'USER': 'legal',
+        'PASSWORD': 'datasvitend',
+        'HOST': 'postgres',
+        'PORT': '5432',
+    }
+}
+
+DEBUG = True
+
+DEV_MODE = True
+
+STATISTIC_EMAIL = 'vjxzebra@gmail.com'

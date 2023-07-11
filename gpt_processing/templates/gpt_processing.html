@@ -1,0 +1,166 @@
+{% load i18n %}
+{% load static %}
+{% block content %}
+<section class="main gpt_processing" style="width: calc(100% - 6.4rem)">
+    <div class="ttl templates__ttl">
+        <h1>GPT Processing</h1>
+    </div>
+    <div class="tmx-cleaner__block">
+        <div class="gpt_processing__block modal__gpt">
+            <div class="gpt_processing__upload modal__btn">
+                <label tabindex="2" class="upload_label btn btn--green">Upload file <input type="file" data-maxsize="2" accept=".txt" required></label>
+                <p class="upload_result btn"></p>
+                <div class="upload_remove">
+                    <img src="{% static 'images/ico-trash.svg' %}" alt="Remove" role="presentation">
+                </div>
+                <div class="modal__btn-text modal__btn-text--error">
+                    <p></p>
+                </div>
+                <div class="modal__btn-text">
+                    <p>.txt max 2Mb</p>
+                </div>
+            </div>
+
+            <div class="gpt_processing__row">
+                <div class="gpt_processing__action">
+                    <div class="gpt_processing__select">
+                        <label>Action</label>
+                        <div class="select new-design select--with-desc">
+                            <input class="output_text" type="text" tabindex="0" placeholder="Select from the list">
+                            <input class="output_value" type="hidden" name="Action" required>
+                            <div class="select__dropdown">
+                                <ul>
+                                    <li data-value="Translate">
+                                        <span class="select__item-title">Translate</span>
+                                        <span>Translate into different language</span>
+                                    </li>
+                                    <li data-value="RewriteForGenderNeutrality">
+                                        <span class="select__item-title">Rewrite for gender neutrality</span>
+                                        <span>Make text gender-neutral</span>
+                                    </li>
+                                    <li data-value="RewriteForOtherGender">
+                                        <span class="select__item-title">Rewrite for other gender</span>
+                                        <span>Adjust for specific gender/pronouns</span>
+                                    </li>
+                                    <li data-value="RewriteForSimplicity">
+                                        <span class="select__item-title">Rewrite for simplicity</span>
+                                        <span>Simplify text</span>
+                                    </li>
+                                    <li data-value="RewriteInOtherPerson">
+                                        <span class="select__item-title">Rewrite in other person</span>
+                                        <span>Rewrite in other person ('you', 'I' or 'he/she/other')</span>
+                                    </li>
+                                    <li data-value="CleanOutObscenities">
+                                        <span class="select__item-title">Clean out obscenities</span>
+                                        <span>Remove offensive language</span>
+                                    </li>
+                                    <li data-value="Summarize">
+                                        <span class="select__item-title">Summarize</span>
+                                        <span>Generate a brief summary</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gpt_processing__additional" data-action="Translate">
+                    <div class="gpt_processing__select">
+                        <label>Input language</label>
+                        <div class="select new-design">
+                            <input class="output_text" type="text" tabindex="0" placeholder="Select from the list">
+                            <input class="output_value" type="hidden" name="source_language" required>
+                            <div class="select__dropdown">
+                                <ul>
+                                    {% for lang in langs %}
+                                    <li data-value="{{ lang.abbreviation|lower }}">{{ lang.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gpt_processing__select">
+                        <label>Target language</label>
+                        <div class="select new-design">
+                            <input class="output_text" type="text" tabindex="0" placeholder="Select from the list">
+                            <input class="output_value" type="hidden" name="target_language" required>
+                            <div class="select__dropdown">
+                                <ul>
+                                    {% for lang in langs %}
+                                    <li data-value="{{ lang.abbreviation|lower }}">{{ lang.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="gpt_processing__additional" data-action="RewriteForOtherGender">
+                    <div class="gpt_processing__select">
+                        <label>Preferred pronouns</label>
+                        <div class="select new-design">
+                            <input class="output_text" type="text" tabindex="0" placeholder="Select from the list">
+                            <input class="output_value" type="hidden" required>
+                            <input type="hidden" name="gender" required>
+                            <input type="hidden" name="pronouns" required>
+                            <div class="select__dropdown">
+                                <ul>
+                                    <li data-value="male,He/him">Male (He/him)</li>
+                                    <li data-value="female,She/her">Female (She/her)</li>
+                                    <li data-value="other,They/them">Other (They/them)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="gpt_processing__additional" data-action="RewriteInOtherPerson">
+                    <div class="gpt_processing__select">
+                        <label>Option</label>
+                        <div class="select new-design">
+                            <input class="output_text" type="text" tabindex="0" placeholder="Select from the list">
+                            <input class="output_value" type="hidden" name="person" required>
+                            <div class="select__dropdown">
+                                <ul>
+                                    <li data-value="first">1st person</li>
+                                    <li data-value="second">2nd person</li>
+                                    <li data-value="third">3rd person</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gpt_processing__bottom">
+                <a href="" download="" class="gpt_processing__download btn btn--green is-hidden">Download</a>
+                <button type="button" class="gpt_processing__submit btn">
+                    <span>Process</span>
+                    <div class="preloader"></div>
+                </button>
+                <div class="gpt_processing__error is-hidden">
+                    <span>
+                        <img src="{% static 'images/ico-btn-cancel.svg' %}" alt="Error">
+                        <span>The task failed at some point</span>
+                    </span>
+                    <span class="gpt_processing__error-restart">
+                        <span>Restart</span>
+                        <img src="{% static 'images/ico-btn-cancel.svg' %}" alt="Error">
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<div class="modal__wrapper">
+
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/download.js' %}"></script>
+    <script src="{% static 'js/get-cookie.js' %}"></script>
+    <script src="{% static 'js/common-func.js' %}"></script>
+    <script src="{% static 'js/gpt_processing.js' %}"></script>
+{% endblock extra_js %}

@@ -1,0 +1,78 @@
+version: "3.2"
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./docker/django/dev.Dockerfile
+    depends_on:
+      - postgres
+    volumes:
+      - type: bind
+        source: ./
+        target: /home/django/app/
+    environment:
+      - POSTGRES_USER=legal
+      - DJANGO_PG_PASSWOR=datasvitend
+      - DJANGO_PG_HOST=postgres
+      - USE_DOCKER=yes
+      - DJANGO_SETTINGS_MODULE=legal.settings_dev
+      - DOCKER=true
+
+  dockerize:
+    image: jwilder/dockerize
+    command: dockerize -wait tcp://postgres:5432 -timeout 10s
+    depends_on:
+      - postgres
+
+  celery:
+    <<: *django
+    command: celery -A legal worker -l info
+    environment:
+      - POSTGRES_USER=legal
+      - DJANGO_PG_PASSWOR=datasvitend
+      - CELERY_REDIS=redis://redis:6379
+    depends_on:
+      - dockerize
+      - redis
+
+  runserver:
+    <<: *django
+    command: [ "bash", "./docker/django/start-dev.sh" ]
+    ports:
+      - 8000:8000
+    depends_on:
+      - dockerize
+      - celery
+      - redis
+
+  postgres:
+    build: ./docker/postgres
+    environment:
+      - POSTGRES_USER=legal
+      - DJANGO_PG_PASSWOR=datasvitend
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - "5432:5432"
+    volumes:
+    - type: bind
+      source: ./postgres
+      target: /tmp/
+
+  pgadmin:
+    image: dpage/pgadmin4:4.14
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "vjxzebra@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "datasvitend"
+    ports:
+      - "8888:80"
+    depends_on:
+      - postgres
+    volumes:
+    - type: bind
+      source: ./postgres
+      target: /var/lib/pgadmin/storage/vjxzebra_gmail.com
+
+  redis:
+    image: redis:6
+    ports:
+      - 6379:6379

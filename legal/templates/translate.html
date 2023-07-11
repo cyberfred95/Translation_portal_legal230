@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Legal230</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link href="{% static 'css/jquery.fancybox.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+</head>
+<body class="bg-light">
+    <div class="global_wrapper">
+        <header class="header">
+{#            <a class="logo" href="/" title="Home">#}
+{#                <div class="logo-img">#}
+{#                    <img src="{% static 'images/logo.png' %}" alt="Home">#}
+{#                </div>#}
+{#                <div class="logo-t">#}
+{#                    <div class="logo-t1">World Meteorological Organization</div>#}
+{#                    <div class="logo-t4">Weather · Climate · Water</div>#}
+{#                </div>#}
+{#            </a>#}
+            <a style="float: right; color: #FFFFFF; margin-right: 10px; margin-top: 40px;" href="/accounts/logout/">Logout</a>
+        </header>
+        <div class="translate wrapper">
+            <div class="translate__title">
+                <h1>Translator</h1>
+            </div>
+            <div class="translate__tabs" id="tabs">
+                <ul class="translate__nav">
+                    <li><a href="#tabs-1">Text translate</a></li>
+                    <li><a href="#tabs-2">Document translate</a></li>
+                </ul>
+                <div class="translate__tab" id="tabs-1">
+                    <form method="post" action="{% url 'main_index' %}" class="translate__form needs-validation" id="text_translate_form">
+                        <input type="hidden" name="action" value="text_translate">
+                        {% csrf_token %}
+                        <div class="translate__form__head">
+                            <p>Select language pair</p>
+                            <div class="translate__pair">
+                                <div class="translate__select">
+                                    <select class="form-select" name="source_language" required>
+                                        <option value="">None</option>
+                                        {% for item in languages %}
+                                        <option value="{{ item.language }}">{{ item.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="translate__select">
+                                    <select class="form-select" name="target_language" required>
+                                        <option value="">None</option>
+                                        {% for item in languages %}
+                                        <option selected value="{{ item.language }}">{{ item.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <input type="hidden" name="provider" value="ms">
+                            </div>
+                            <div class="invalid-feedback">
+                                <span>Valid language pair is required.</span>
+                            </div>
+                        </div>
+                        <div class="translate__form__content">
+                            <div class="translate__form__text">
+                                <div class="translate__form__text-btn btn_clear">
+                                    <img src="{% static 'images/ico-close.svg' %}" alt="Clear">
+                                </div>
+                                <textarea required id="translation_text" maxlength="2400" name="text"></textarea>
+                                <div class="invalid-feedback">
+                                    Text is required.
+                                </div>
+                            </div>
+                            <div class="translate__form__text result">
+                                <div class="translate__form__text-btn btn_copy">
+                                    <img src="{% static 'images/ico-copy.svg' %}" alt="Copy">
+                                </div>
+                                <textarea readonly id="result_text"></textarea>
+                            </div>
+                        </div>
+                        <div class="translate__form__submit">
+                            <button type="submit">Translate</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="translate__tab" id="tabs-2">
+                    <form method="post"  action="{% url 'main_index' %}" class="needs-validation"  id="file_translate_form">
+                        <input type="hidden" name="action" value="file_translate">
+                        {% csrf_token %}
+
+                        <div class="translate__form__head">
+                          <p>Select language pair</p>
+                          <div class="translate__pair">
+                              <div class="translate__select">
+                                  <select class="form-select" name="source_language" required>
+                                      <option value="">None</option>
+                                      {% for item in languages %}
+                                      <option value="{{ item.language }}">{{ item.name }}</option>
+                                      {% endfor %}
+                                  </select>
+                              </div>
+                              <div class="translate__select">
+                                  <select class="form-select" name="target_language" required>
+                                      <option value="">None</option>
+                                      {% for item in languages %}
+                                      <option selected value="{{ item.language }}">{{ item.name }}</option>
+                                      {% endfor %}
+                                  </select>
+                              </div>
+                              <input type="hidden" name="provider" value="ms">
+                          <div class="invalid-feedback">
+                              <span>Valid language pair is required.</span>
+                          </div>
+                      </div>
+                        <div class="translate__form__content">
+                            <div class="translate__form__file" id="upload">
+                                <p>drag and drop</p>
+
+                                <div class="translate__form__file-block input">
+                                    <p>Plain text, .docx, .xlsx, .pptx</p>
+                                    <label>
+                                        Add file
+                                        <input type="file" id="document" data-maxsize="32"
+                                               accept="text/plain, application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+                                                application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                                               name="document">
+                                    </label>
+                                    <div class="invalid-feedback">
+                                        Choose the document.
+                                    </div>
+                                </div>
+
+                                <div class="translate__form__file-block uploaded">
+                                    <p>File added</p>
+                                    <div class="translate__form__file-ico">
+                                        <img src="{% static 'images/ico-uploaded.svg' %}" alt="File uploaded">
+                                    </div>
+                                </div>
+
+                                <div class="translate__form__file-block trans-progress">
+                                    <p>Translation in progress...</p>
+                                    <div class="translate__form__file-ico">
+                                        <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+                                    </div>
+                                </div>
+
+                                <div class="translate__form__file-block complete">
+                                    <p>Translation is completed!</p>
+                                    <div class="translate__form__file-btn" id="download_result">
+                                        <img src="{% static 'images/ico-download.svg' %}">
+                                        <span>Download the translated document</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="translate__form__submit">
+                            <button type="submit">Translate</button>
+                        </div>
+                  </form>
+                </div>
+            </div>
+        </div>
+        <footer class="footer">
+{#            <p>Created by <a href="https://custom.mt" target="_blank">Custom.MT</a><br>Contact us for support</p>#}
+        </footer>
+    </div>
+    <div class="modal__wrapper">
+        <div class="preloader">
+            <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+        </div>
+        <div class="popup" id="error_popup">
+            <div class="popup__inner">
+                <div class="popup__title">
+                    <p>Something went wrong</p>
+                </div>
+                <p>Please try again later.</p>
+                <div class="translate__form__submit">
+                    <button type="button" data-fancybox-close="">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var languages = {{ languages|safe }};
+        var providers = {{ providers|safe }};
+        var base_lang_code = 'en';
+    </script>
+
+    <script src="{% static 'js/jquery.fancybox.min.js' %}"></script>
+    <script src="{% static 'js/upload.js' %}"></script>
+    <script src="{% static 'js/download.js' %}"></script>
+    <script src="{% static 'js/get-cookie.js' %}"></script>
+    <script src="{% static 'js/translate.js' %}"></script>
+</body>
+</html>
