@@ -28,7 +28,7 @@ class MicrosoftCustomProvider:
     def translate(self, data):
         micro_headers = {
             'Ocp-Apim-Subscription-Key': self.__key,
-            'Ocp-Apim-Subscription-Region': 'global'
+            'Ocp-Apim-Subscription-Region': 'francecentral'
         }
         params = {
             'api-version': '3.0',

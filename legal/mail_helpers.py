@@ -1,10 +1,45 @@
-def send_text_translation():
-    pass
+from sendgrid import SendGridAPIClient
+from django.contrib.auth.models import User
+from django.conf import settings
+from django.template.loader import render_to_string
+from sendgrid.helpers.mail import (Mail, Attachment, FileContent, FileName, FileType, Disposition)
 
 
-def send_file_translation():
-    pass
+def send_text_translation(user_id, text=None, theme='Text translation', attachment=None, file_name=None):
+    user = User.objects.get(pk=user_id)
+    users_to_send = User.objects.filter(is_staff=True).all()
+    message_html = render_to_string(
+        "text_email.html",
+        {
+            "user_name": user.username,
+            "text": text
+        }
+    )
+    sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+
+    emails = []
+    for item in users_to_send:
+        emails.append(item.email)
+    message = Mail(
+        from_email='support@custom.mt',
+        to_emails=emails,
+        subject=theme,
+        html_content=message_html
+    )
+    if attachment and file_name:
+        attachedFile = Attachment(
+            file_content=FileContent(attachment),
+            file_name=FileName(file_name),
+            # FileType('application/pdf'),
+            disposition=Disposition('attachment')
+        )
+        message.attachment = attachedFile
+    sg.send(message)
 
 
-def send_gpt_processing():
-    pass
+def send_file_translation(user_id, base64_attachment, file_name):
+    send_text_translation(user_id=user_id, theme='File translation', attachment=base64_attachment, file_name=file_name)
+
+
+def send_gpt_processing(user_id, text):
+    send_text_translation(user_id=user_id, text=text, theme='GPT Processing')
