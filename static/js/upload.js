@@ -1,63 +1,95 @@
 var Upload = {
 
 	init: function() {
-		let isValid = false;
-		let upload = $("#upload");
-		let fileTypes = $("#upload").find('input[type=file]').attr('accept').replaceAll(' ', '').split(',')
-		let maxFileSize = parseInt($("#upload").find('input[type=file]').attr('data-maxsize')) * 1024 * 1024;
+		let thisContainer = $("#upload");
 
-		upload.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
+		thisContainer.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
 			e.preventDefault();
 			e.stopPropagation();
 		})
-		.on('dragover dragenter', function() { upload.addClass('is-dragover'); })
-		.on('dragleave dragend drop', function() { upload.removeClass('is-dragover'); })
+		.on('dragover dragenter', function() { thisContainer.addClass('is-dragover'); })
+		.on('dragleave dragend drop', function() { thisContainer.removeClass('is-dragover'); })
 		.on('drop', validateFile);
 
-		function validateFile(e, inp){
-			let files = e ? e.originalEvent.dataTransfer.files : inp.files;
-			let input = upload.find('input');
-			let errorBlock = input.closest('.input').find('.invalid-feedback')
+		$(document).on('click', '.upload-remove', function () {
+			thisContainer.find('input').val('')
+			thisContainer.removeClass('upload-success')
+			$('.uploaded').hide();
+			$('.translate__file-block.input').css('display', 'flex')
+		})
 
-			$.each(fileTypes, function (_, type) {
-				if(type.indexOf(files[0].type) !== -1)
-					isValid = true;
-			})
+		function validateFile(e, inp){
+			let thisInput = thisContainer.find('input')
+			let fileTypes = false;
+			if(thisInput[0].hasAttribute('accept') && thisInput.attr('accept')) {
+				fileTypes = thisInput.attr('accept').replaceAll(' ', '').split(',')
+			}
+			let maxFileSize = parseInt(thisInput.attr('data-maxsize')) * 1024 * 1024;
+			let isValid = false;
+			let files = e ? e.originalEvent.dataTransfer.files : inp.files;
+			let resultBlock = thisContainer.find('.output-name')
+			let errorBlock = thisInput.closest('.input').find('.invalid-feedback')
+			let fileName = ''
+			let thisName = files[0].name.split('.')
+			let thisExt = thisName[thisName.length-1]
+
+			thisName.pop()
+
+			if(thisName.length > 1) {
+				thisName = thisName.join('.')
+			} else {
+				thisName = thisName[0]
+			}
+
+			if(thisName.length > 22)
+				thisName = thisName.substring(0, 22) + '... '
+
+			fileName = thisName + '.' + thisExt
+
+			if(fileTypes) {
+				$.each(fileTypes, function (_, type) {
+					if(type.indexOf(files[0].type) !== -1)
+						isValid = true;
+				})
+			} else {
+				isValid = true
+			}
 
 			if(!isValid){
-				upload.addClass('error')
-				input.val('');
+				errorBlock.html('Allowed extensions: ' + fileTypes.join(', '))
+				thisInput.val('');
+				thisContainer.removeClass('upload-success')
+				thisContainer.addClass('is-error')
+
 				return false;
 			}
 
 			if(files[0].size > maxFileSize){
 				isValid = false;
-				errorBlock.text('Maximum file size is '+(maxFileSize / 1024 / 1024)+'mb').show()
-				input.val('');
+				errorBlock.html('Maximum file size is ' + (maxFileSize / 1024 / 1024)+'mb')
+				thisInput.val('');
+				thisContainer.removeClass('upload-success')
+				thisContainer.addClass('is-error')
+
 				return false;
-			} else {
-				isValid = true;
 			}
 
-			errorBlock.hide();
-			upload.removeClass('error')
+			thisContainer.addClass('upload-success').removeClass('is-error')
+
+			resultBlock.text(fileName)
 			if(e)
-				input[0].files = files;
-			input.trigger('change')
+				thisInput[0].files = files;
+			Upload.submit();
 		}
 
-		upload.on('change', 'input', function(e) {
-			if(isValid) {
-				Upload.submit();
-			} else {
-				validateFile(false, this)
-			}
+		thisContainer.on('change', 'input', function(e) {
+			validateFile(false, this)
 		});
 	},
 
 	// Check the uploaded file
 	submit: function() {
-		$('.translate__form__file-block').hide();
-		$('.translate__form__file-block.uploaded').css('display', 'flex')
+		$('.translate__file-block').hide();
+		$('.uploaded').css('display', 'flex')
 	}
 }
