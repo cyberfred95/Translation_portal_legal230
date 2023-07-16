@@ -1,9 +1,9 @@
 
 
 function gpt_processing() {
-    let requestProcessAction = '/gpt_process/'
+    let requestProcessAction = '/gpt-processing/gpt_process/'
     let requestProcessMethod = 'POST'
-    let requestCheckAction = '/gpt_check/'
+    let requestCheckAction = '/gpt-processing/gpt_process/'
     let requestCheckMethod = 'POST'
     let gptBtnDownload = '.gpt_processing__download'
     let gptBtnSubmit = '.gpt_processing__submit'
@@ -298,6 +298,7 @@ function gpt_processing() {
                                     }
                                 } else {
                                     clearInterval(checkInterval)
+                                    onError()
                                 }
                             })
                     }

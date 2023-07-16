@@ -165,6 +165,7 @@ function selects() {
   }
   function arrows(e) {
     e = e || window.event;
+    if(!e.target.closest('.select')) return;
     let currentOpen = $('.select.open li:not(.hidden)')
     let currentHover = $('.select.open li:not(.hidden).hover')
     let topPos = 0;
