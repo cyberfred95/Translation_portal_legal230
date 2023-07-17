@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 import openai
 from preferences import preferences
 import time
-from django.conf import settings
 
 
 def retry_on_error(func, max_retries=5, delay=3):
@@ -29,7 +28,7 @@ class Processor(ABC):
         self.text = text
         self.prompt = None
         self.openai = openai
-        self.openai.api_key = settings['OPENAI_GPT_API_KEY']
+        self.openai.api_key = 'REMOVED_OPENAI_KEY_2'
         self.openai.api_base = 'https://api.openai.com/v1'
         self.openai.api_type = 'open_ai'
         self.result = []

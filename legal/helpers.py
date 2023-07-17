@@ -28,7 +28,7 @@ class MicrosoftCustomProvider:
     def translate(self, data):
         micro_headers = {
             'Ocp-Apim-Subscription-Key': self.__key,
-            'Ocp-Apim-Subscription-Region': 'francecentral'
+            'Ocp-Apim-Subscription-Region': 'global'
         }
         params = {
             'api-version': '3.0',
@@ -66,9 +66,9 @@ class MicrosoftCustomProvider:
 
         blob_client.upload_blob(file)
         key = self.__key
-        endpoint = "https://custommt.cognitiveservices.azure.com/"
+        endpoint = "https://binance-en-fr.cognitiveservices.azure.com/"
         sourcer_sas = '?' + generate_container_sas(
-            'vjxzebra',
+            'storageenfr-secondary',
             container_name=container_name,
             account_key=access_token,
             permission=ContainerSasPermissions(read=True, write=True, list=True),
@@ -77,15 +77,15 @@ class MicrosoftCustomProvider:
         )
 
         target_sas = '?' + generate_container_sas(
-            'vjxzebra',
+            'storageenfr-secondary',
             container_name=container_name + '-trans',
             account_key=access_token,
             permission=ContainerSasPermissions(read=True, write=True, list=True),
             expiry='2032-05-25T14:35:12Z',
             start='2022-05-25T14:35:12Z'
         )
-        sourceUrl = 'https://vjxzebra.blob.core.windows.net/' + container_name + sourcer_sas
-        targetUrl = 'https://vjxzebra.blob.core.windows.net/' + container_name + '-trans' + target_sas
+        sourceUrl = 'https://storageenfr-secondary.blob.core.windows.net/' + container_name + sourcer_sas
+        targetUrl = 'https://storageenfr-secondary.blob.core.windows.net/' + container_name + '-trans' + target_sas
         client = DocumentTranslationClient(endpoint, AzureKeyCredential(key))
         poller = client.begin_translation(sourceUrl, targetUrl, self.target_lang, category_id=self.__category)
         poller.result()

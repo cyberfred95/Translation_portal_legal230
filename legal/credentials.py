@@ -15,8 +15,8 @@ providers = {
     'ms_en_fr': {
         'title': 'ms EN-FR',
         'provider': 'ms',
-        'category_id': 'e9f5fab9-df3e-4dac-8d13-6159642c531c-LAW',
-        'key': 'ca8b415515464c2c96fb8fee04682adf',
+        'category_id': 'cb8306b3-8de1-4c4d-9d0a-04b56564fca8-GENERAL',
+        'key': '1553e25b8bfd4bd3ab84b40a404e5286',
         'source_lng': 'en',
         'target_lng': 'fr'
     }
