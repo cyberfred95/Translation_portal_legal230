@@ -718,6 +718,7 @@ body{
     font-weight: 600;
     line-height: 17px;
     color: #CACACA;
+    flex-direction: column;
 }
 .translate__file-block>a{
     font-size: 16px;

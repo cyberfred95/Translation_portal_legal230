@@ -1,9 +1,9 @@
 
 
 function gpt_processing() {
-    let requestProcessAction = '/gpt-processing/gpt_process/'
+    let requestProcessAction = gpt_process || '/gpt-processing/gpt_process/'
     let requestProcessMethod = 'POST'
-    let requestCheckAction = '/gpt-processing/gpt_process/'
+    let requestCheckAction = gpt_process_status_check || '/gpt-processing/gpt_check/'
     let requestCheckMethod = 'POST'
     let gptBtnDownload = '.gpt_processing__download'
     let gptBtnSubmit = '.gpt_processing__submit'
@@ -204,7 +204,7 @@ function gpt_processing() {
         e.preventDefault()
         let action = $(gptInputAction).val()
         if($(gptUploadTextSwitch).is(':checked')){
-            fileData = $(gptTranslationText).val()
+            fileData = $(gptTranslationText).val().split('\n')
             if (!fileData) {
                 isInvalid(gptTranslationText)
             } else {
@@ -254,6 +254,7 @@ function gpt_processing() {
         $(gptBtnSubmit).attr('disabled', 'disabled')
         requestData["prompt"] = additional
 
+        console.log('creating ' + requestProcessAction)
         fetch(requestProcessAction, {
             method: requestProcessMethod,
             credentials: 'same-origin',
@@ -284,17 +285,29 @@ function gpt_processing() {
                             },
                             body: JSON.stringify([taskId])
                         })
-                            .then(response => response.json())
+                            .then(function (response) {
+                                if(response.ok) {
+                                    return response.json()
+                                } else {
+                                    clearInterval(checkInterval)
+                                    return false;
+                                }
+                            })
                             .then(function (data) {
                                 if(data[0]){
-                                    if(data[0]['task_status'] !== 'PENDING') {
-                                        clearInterval(checkInterval)
+                                    if(data[0]['task_status']){
+                                        if(data[0]['task_status'] !== 'PENDING') {
+                                            clearInterval(checkInterval)
 
-                                        if (data[0]['task_status'] === 'SUCCESS') {
-                                            onSuccess(data[0]['result'])
-                                        } else {
-                                            onError()
+                                            if (data[0]['task_status'] === 'SUCCESS') {
+                                                onSuccess(data[0]['result'])
+                                            } else {
+                                                onError()
+                                            }
                                         }
+                                    } else {
+                                        clearInterval(checkInterval)
+                                        onError()
                                     }
                                 } else {
                                     clearInterval(checkInterval)
@@ -302,7 +315,7 @@ function gpt_processing() {
                                 }
                             })
                     }
-
+                    console.log('checking ' + requestCheckAction)
                     checkInterval = setInterval(sendCheckRequest, 1000)
                 } else {
                     onError()
