@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from celery.result import AsyncResult
 from .tasks import start_gpt_process
+from legal.mail_helpers import send_file_translation, send_text_translation, send_gpt_processing
 
 
 class GPTProcessingView(TemplateView):
@@ -22,6 +23,7 @@ class GPTProcessingView(TemplateView):
 def gpt_process(request):
     data = request.data
     if 'action' in data:
+        send_gpt_processing(user_id=request.user.id, text=data['text'])
         task = start_gpt_process.delay(
             action=data['action'],
             text=data['text'],
