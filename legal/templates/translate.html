@@ -427,6 +427,8 @@
         var languages = {{ languages|safe }};
         var providers = {{ providers|safe }};
         var base_lang_code = 'en';
+        var gpt_process = "{% url 'gpt_process' %}"
+        var gpt_process_status_check = "{% url 'gpt_process_status_check' %}"
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.4/lottie.min.js"></script>
     <script>
