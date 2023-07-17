@@ -1,0 +1,220 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-07-17 12:14+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: legal/settings.py:132 legal/templates/translate.html:100
+msgid "English"
+msgstr "English"
+
+#: legal/settings.py:133 legal/templates/translate.html:103
+msgid "French"
+msgstr "French"
+
+#: legal/templates/translate.html:33
+msgid "Logout"
+msgstr "Logout"
+
+#: legal/templates/translate.html:42
+msgid "Translator"
+msgstr "Translator"
+
+#: legal/templates/translate.html:61
+msgid "Text translate"
+msgstr "Text translate"
+
+#: legal/templates/translate.html:70
+msgid "Document translate"
+msgstr "Document translate"
+
+#: legal/templates/translate.html:120
+msgid "Start typing"
+msgstr "Start typing"
+
+#: legal/templates/translate.html:122 legal/templates/translate.html:275
+msgid "Text is required."
+msgstr "Text is required."
+
+#: legal/templates/translate.html:147 legal/templates/translate.html:228
+#: legal/templates/translate.html:311
+msgid "Translate"
+msgstr "Translate"
+
+#: legal/templates/translate.html:162 legal/templates/translate.html:183
+msgid "Drag and drop"
+msgstr "Drag and drop"
+
+#: legal/templates/translate.html:164 legal/templates/translate.html:185
+msgid "Plain text"
+msgstr "Plain text"
+
+#: legal/templates/translate.html:169
+msgid "Add file"
+msgstr "Add file"
+
+#: legal/templates/translate.html:177
+msgid "Choose the document."
+msgstr "Choose the document."
+
+#: legal/templates/translate.html:188
+msgid "File added"
+msgstr "File added"
+
+#: legal/templates/translate.html:198
+msgid "Translation in progress..."
+msgstr "Translation in progress..."
+
+#: legal/templates/translate.html:206
+msgid "Translation is completed!"
+msgstr "Translation is completed!"
+
+#: legal/templates/translate.html:221
+msgid "Download the translated document"
+msgstr "Download the translated document"
+
+#: legal/templates/translate.html:224
+msgid "Translate another file"
+msgstr "Translate another file"
+
+#: legal/templates/translate.html:238
+msgid "Document"
+msgstr "Document"
+
+#: legal/templates/translate.html:240
+msgid "Text"
+msgstr "Text"
+
+#: legal/templates/translate.html:246
+msgid "Upload file"
+msgstr "Upload file"
+
+#: legal/templates/translate.html:304
+msgid "Action"
+msgstr "Action"
+
+#: legal/templates/translate.html:312
+msgid "Translate into different language"
+msgstr "Translate into different language"
+
+#: legal/templates/translate.html:315
+msgid "Rewrite for gender neutrality"
+msgstr "Rewrite for gender neutrality"
+
+#: legal/templates/translate.html:316
+msgid "Make text gender-neutral"
+msgstr "Make text gender-neutral"
+
+#: legal/templates/translate.html:319
+msgid "Rewrite for other gender"
+msgstr "Rewrite for other gender"
+
+#: legal/templates/translate.html:320
+msgid "Adjust for specific gender/pronouns"
+msgstr "Adjust for specific gender/pronouns"
+
+#: legal/templates/translate.html:323
+msgid "Rewrite for simplicity"
+msgstr "Rewrite for simplicity"
+
+#: legal/templates/translate.html:324
+msgid "Simplify text"
+msgstr "Simplify text"
+
+#: legal/templates/translate.html:327
+msgid "Rewrite in other person"
+msgstr "Rewrite in other person"
+
+#: legal/templates/translate.html:328
+msgid "Rewrite in other person ('you', 'I' or 'he/she/other')"
+msgstr "Rewrite in other person ('you', 'I' or 'he/she/other')"
+
+#: legal/templates/translate.html:331
+msgid "Clean out obscenities"
+msgstr "Clean out obscenities"
+
+#: legal/templates/translate.html:332
+msgid "Remove offensive language"
+msgstr "Remove offensive language"
+
+#: legal/templates/translate.html:335
+msgid "Summarize"
+msgstr "Summarize"
+
+#: legal/templates/translate.html:336
+msgid "Generate a brief summary"
+msgstr "Generate a brief summary"
+
+#: legal/templates/translate.html:350
+msgid "Preferred pronouns"
+msgstr "Preferred pronouns"
+
+#: legal/templates/translate.html:358
+msgid "Male (He/him)"
+msgstr "Male (He/him)"
+
+#: legal/templates/translate.html:359
+msgid "Female (She/her)"
+msgstr "Female (She/her)"
+
+#: legal/templates/translate.html:360
+msgid "Other (They/them)"
+msgstr "Other (They/them)"
+
+#: legal/templates/translate.html:368
+msgid "Option"
+msgstr "Option"
+
+#: legal/templates/translate.html:374
+msgid "1st person"
+msgstr "1st person"
+
+#: legal/templates/translate.html:375
+msgid "2nd person"
+msgstr "2st person"
+
+#: legal/templates/translate.html:376
+msgid "3nd person"
+msgstr "3st person"
+
+#: legal/templates/translate.html:384
+msgid "Download"
+msgstr "Download"
+
+#: legal/templates/translate.html:386
+msgid "Process"
+msgstr "Process"
+
+#: legal/templates/translate.html:391
+msgid "The task failed at some point"
+msgstr "The task failed at some point"
+
+#: legal/templates/translate.html:394
+msgid "Restart"
+msgstr "Restart"
+
+#: legal/templates/translate.html:417
+msgid "Something went wrong"
+msgstr "Something went wrong"
+
+#: legal/templates/translate.html:419
+msgid "Please try again later."
+msgstr "Please try again later."
+
+#: legal/templates/translate.html:421
+msgid "Close"
+msgstr "Close"
