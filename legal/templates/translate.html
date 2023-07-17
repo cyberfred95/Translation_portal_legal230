@@ -21,15 +21,16 @@
             <div class="wrapper">
                 <div class="header__container">
                     <a href="/" class="header__logo">
+                        {% get_current_language as LANGUAGE_CODE %}
                         <img src="{% static 'images/logo.png' %}" alt="Logo">
                     </a>
                     <div class="header__btn">
                         <ul class="header__lang">
-                            <li class="is-active"><a href="">en</a></li>
-                            <li><a href="">fr</a></li>
+                            <li class="{% if LANGUAGE_CODE == 'en' %}is-active{% endif %}"><a href="/en">en</a></li>
+                            <li class="{% if LANGUAGE_CODE == 'fr' %}is-active{% endif %}"><a href="/fr">fr</a></li>
                         </ul>
                         <a class="button" href="/accounts/logout/">
-                            <span>Logout</span>
+                            <span>{% trans "Logout" %}</span>
                         </a>
                     </div>
                 </div>
@@ -38,7 +39,7 @@
         <div class="translate">
             <div class="wrapper">
                 <div class="translate__title page-title">
-                    <h1>Translator</h1>
+                    <h1>{% trans "Translator" %}</h1>
                 </div>
                 <div class="translate__tabs" id="tabs">
                     <ul class="translate__nav">
@@ -57,7 +58,7 @@
                                         </clipPath>
                                     </defs>
                                 </svg>
-                                <span>Text translate</span>
+                                <span>{% trans "Text translate" %}</span>
                             </a>
                         </li>
                         <li>
@@ -66,7 +67,7 @@
                                     <path d="M21.2442 11.05L22.8583 9.43584C23.4822 8.81035 23.8325 7.963 23.8325 7.07959C23.8325 6.19618 23.4822 5.34883 22.8583 4.72334L21.2767 3.14167C20.6512 2.51784 19.8038 2.16751 18.9204 2.16751C18.037 2.16751 17.1897 2.51784 16.5642 3.14167L14.95 4.75584L21.2442 11.05Z" fill="#9EAAB3"/>
                                     <path d="M13.4225 6.28333L3.33668 16.3692C2.99956 16.7053 2.78255 17.1432 2.71918 17.615L2.16668 21.32C2.11605 21.6321 2.13437 21.9516 2.22035 22.2559C2.30632 22.5602 2.45787 22.842 2.66434 23.0815C2.87082 23.3211 3.12723 23.5125 3.41555 23.6423C3.70388 23.7722 4.01714 23.8374 4.33334 23.8333H4.64751L8.35251 23.3025C8.82435 23.2391 9.26218 23.0221 9.59834 22.685L19.6842 12.5992L13.4225 6.28333Z" fill="#9EAAB3"/>
                                 </svg>
-                                <span>Document translate</span>
+                                <span>{% trans "Document translate" %}</span>
                             </a>
                         </li>
                         <li>
@@ -96,10 +97,10 @@
 
                             <div class="translate__form-row">
                                 <div class="translate__form-title">
-                                    <span>English</span>
+                                    <span>{% trans "English" %}</span>
                                 </div>
                                 <div class="translate__form-title">
-                                    <span>French</span>
+                                    <span>{% trans "French" %}</span>
                                 </div>
                             </div>
                             <div class="translate__form-row">
@@ -116,9 +117,9 @@
                                             </defs>
                                         </svg>
                                     </div>
-                                    <textarea required id="translation_text" maxlength="2400" name="text" placeholder="Start typing"></textarea>
+                                    <textarea required id="translation_text" maxlength="2400" name="text" placeholder="{% trans "Start typing" %}"></textarea>
                                     <div class="invalid-feedback">
-                                        Text is required.
+                                        {% trans "Text is required." %}
                                     </div>
                                 </div>
                                 <div class="translate__form-text result">
@@ -143,7 +144,7 @@
                                 </div>
                             </div>
                             <div class="translate__form-submit">
-                                <button type="submit" class="button">Translate</button>
+                                <button type="submit" class="button">{% trans "Translate" %}</button>
                             </div>
                         </form>
                     </div>
@@ -158,14 +159,14 @@
                             <div class="translate__file" id="upload">
                                 <div class="translate__file-block input">
                                     <div class="translate__file-title">
-                                        <span>Drag and drop</span>
+                                        <span>{% trans "Drag and drop" %}</span>
                                     </div>
-                                    <p>Plain text, .docx, .xlsx, .pptx</p>
+                                    <p>{% trans "Plain text" %}, .docx, .xlsx, .pptx</p>
                                     <div class="translate__file-ico">
                                         <img src="{% static 'images/ico-upload.svg' %}" alt="Add file">
                                     </div>
                                     <label class="button button--transparent">
-                                        Add file
+                                        {% trans "Add file" %}
                                         <input type="file" id="document" data-maxsize="32"
                                                accept="text/plain, application/vnd.openxmlformats-officedocument.wordprocessingml.document,
                                                 application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
@@ -173,18 +174,18 @@
                                                name="document">
                                     </label>
                                     <div class="invalid-feedback">
-                                        Choose the document.
+                                        {% trans "Choose the document." %}
                                     </div>
                                 </div>
 
                                 <div class="translate__file-block uploaded">
                                     <div class="translate__file-title">
-                                        <span>Drag and drop</span>
+                                        <span>{% trans "Drag and drop" %}</span>
                                     </div>
-                                    <p>Plain text, .docx, .xlsx, .pptx</p>
+                                    <p>{% trans "Plain text" %}, .docx, .xlsx, .pptx</p>
                                     <div class="translate__file-ico">
                                         <img src="{% static 'images/ico-uploaded.svg' %}" alt="Add file">
-                                        <span>File added</span>
+                                        <span>{% trans "File added" %}</span>
                                     </div>
                                     <div class="translate__file-review">
                                         <span class="output-name">hhhh</span>
@@ -194,7 +195,7 @@
 
                                 <div class="translate__file-block trans-progress">
                                     <div class="translate__file-title">
-                                        <span>Translation in progress...</span>
+                                        <span>{% trans "Translation in progress..." %}</span>
                                     </div>
                                     <div class="translate__file-ico">
                                     </div>
@@ -202,7 +203,7 @@
 
                                 <div class="translate__file-block complete">
                                     <div class="translate__file-title">
-                                        <span>Translation is completed!</span>
+                                        <span>{% trans "Translation is completed!" %}</span>
                                     </div>
                                     <div class="translate__file-ico">
                                         <button type="button" id="download_result" class="button button--secondary button--transparent button--ico">
@@ -217,14 +218,14 @@
                                                     </clipPath>
                                                 </defs>
                                             </svg>
-                                            <span>Download the translated document</span>
+                                            <span>{% trans "Download the translated document" %}</span>
                                         </button>
                                     </div>
-                                    <a href="" class="btn_reset">Translate another file</a>
+                                    <a href="" class="btn_reset">{% trans "Translate another file" %}</a>
                                 </div>
                             </div>
                             <div class="translate__form-submit uploaded">
-                                <button type="submit" class="button">Translate</button>
+                                <button type="submit" class="button">{% trans "Translate" %}</button>
                             </div>
                         </form>
                     </div>
@@ -234,15 +235,15 @@
                                 <div class="modal__switch">
                                     <input type="checkbox" id="modal_switch_1" class="gpt_upload_text_switch">
                                     <label for="modal_switch_1">
-                                        <span>Document</span>
+                                        <span>{% trans "Document" %}</span>
                                         <span class="modal__switch-inner"></span>
-                                        <span>Text</span>
+                                        <span>{% trans "Text" %}</span>
                                     </label>
                                 </div>
                             </div>
                             <div class="gpt_processing__block modal__gpt">
                                 <div class="gpt_processing__upload modal__btn">
-                                    <label tabindex="2" class="upload_label button button--transparent">Upload file <input type="file" data-maxsize="2" accept=".txt" required></label>
+                                    <label tabindex="2" class="upload_label button button--transparent">{% trans "Upload file" %} <input type="file" data-maxsize="2" accept=".txt" required></label>
                                     <p class="upload_result btn"></p>
                                     <div class="upload_remove">
                                         <img src="{% static 'images/ico-trash.svg' %}" alt="Remove" role="presentation">
@@ -271,7 +272,7 @@
                                             </div>
                                             <textarea required id="gpt_translation_text" maxlength="2400" name="text" placeholder="Start typing"></textarea>
                                             <div class="invalid-feedback">
-                                                Text is required.
+                                                {% trans "Text is required." %}
                                             </div>
                                         </div>
                                         <div class="translate__form-text result">
@@ -300,39 +301,39 @@
                                 <div class="gpt_processing__row">
                                     <div class="gpt_processing__action">
                                         <div class="gpt_processing__select">
-                                            <label>Action</label>
+                                            <label>{% trans "Action" %}</label>
                                             <div class="select new-design select--with-desc">
                                                 <input class="output_text" type="text" tabindex="0" placeholder="Select from the list">
                                                 <input class="output_value" type="hidden" name="Action" required>
                                                 <div class="select__dropdown">
                                                     <ul>
                                                         <li data-value="Translate">
-                                                            <span class="select__item-title">Translate</span>
-                                                            <span>Translate into different language</span>
+                                                            <span class="select__item-title">{% trans "Translate" %}</span>
+                                                            <span>{% trans "Translate into different language" %}</span>
                                                         </li>
                                                         <li data-value="RewriteForGenderNeutrality">
-                                                            <span class="select__item-title">Rewrite for gender neutrality</span>
-                                                            <span>Make text gender-neutral</span>
+                                                            <span class="select__item-title">{% trans "Rewrite for gender neutrality" %}</span>
+                                                            <span>{% trans "Make text gender-neutral" %}</span>
                                                         </li>
                                                         <li data-value="RewriteForOtherGender">
-                                                            <span class="select__item-title">Rewrite for other gender</span>
-                                                            <span>Adjust for specific gender/pronouns</span>
+                                                            <span class="select__item-title">{% trans "Rewrite for other gender" %}</span>
+                                                            <span>{% trans "Adjust for specific gender/pronouns" %}</span>
                                                         </li>
                                                         <li data-value="RewriteForSimplicity">
-                                                            <span class="select__item-title">Rewrite for simplicity</span>
-                                                            <span>Simplify text</span>
+                                                            <span class="select__item-title">{% trans "Rewrite for simplicity" %}</span>
+                                                            <span>{% trans "Simplify text" %}</span>
                                                         </li>
                                                         <li data-value="RewriteInOtherPerson">
-                                                            <span class="select__item-title">Rewrite in other person</span>
-                                                            <span>Rewrite in other person ('you', 'I' or 'he/she/other')</span>
+                                                            <span class="select__item-title">{% trans "Rewrite in other person" %}</span>
+                                                            <span>{% trans "Rewrite in other person ('you', 'I' or 'he/she/other')" %}</span>
                                                         </li>
                                                         <li data-value="CleanOutObscenities">
-                                                            <span class="select__item-title">Clean out obscenities</span>
-                                                            <span>Remove offensive language</span>
+                                                            <span class="select__item-title">{% trans "Clean out obscenities" %}</span>
+                                                            <span>{% trans "Remove offensive language" %}</span>
                                                         </li>
                                                         <li data-value="Summarize">
-                                                            <span class="select__item-title">Summarize</span>
-                                                            <span>Generate a brief summary</span>
+                                                            <span class="select__item-title">{% trans "Summarize" %}</span>
+                                                            <span>{% trans "Generate a brief summary" %}</span>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -346,7 +347,7 @@
                                     </div>
                                     <div class="gpt_processing__additional" data-action="RewriteForOtherGender">
                                         <div class="gpt_processing__select">
-                                            <label>Preferred pronouns</label>
+                                            <label>{% trans "Preferred pronouns" %}</label>
                                             <div class="select new-design">
                                                 <input class="output_text" type="text" tabindex="0" placeholder="Select from the list">
                                                 <input class="output_value" type="hidden" required>
@@ -354,9 +355,9 @@
                                                 <input type="hidden" name="pronouns" required>
                                                 <div class="select__dropdown">
                                                     <ul>
-                                                        <li data-value="male,He/him">Male (He/him)</li>
-                                                        <li data-value="female,She/her">Female (She/her)</li>
-                                                        <li data-value="other,They/them">Other (They/them)</li>
+                                                        <li data-value="male,He/him">{% trans "Male (He/him)" %}</li>
+                                                        <li data-value="female,She/her">{% trans "Female (She/her)" %}</li>
+                                                        <li data-value="other,They/them">{% trans "Other (They/them)" %}</li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -364,15 +365,15 @@
                                     </div>
                                     <div class="gpt_processing__additional" data-action="RewriteInOtherPerson">
                                         <div class="gpt_processing__select">
-                                            <label>Option</label>
+                                            <label>{% trans "Option" %}</label>
                                             <div class="select new-design">
                                                 <input class="output_text" type="text" tabindex="0" placeholder="Select from the list">
                                                 <input class="output_value" type="hidden" name="person" required>
                                                 <div class="select__dropdown">
                                                     <ul>
-                                                        <li data-value="first">1st person</li>
-                                                        <li data-value="second">2nd person</li>
-                                                        <li data-value="third">3rd person</li>
+                                                        <li data-value="first">{% trans "1st person" %}</li>
+                                                        <li data-value="second">{% trans "2nd person" %}</li>
+                                                        <li data-value="third">{% trans "3nd person" %}</li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -380,17 +381,17 @@
                                     </div>
                                 </div>
                                 <div class="gpt_processing__bottom">
-                                    <a href="" download="" class="gpt_processing__download button button--secondary is-hidden">Download</a>
+                                    <a href="" download="" class="gpt_processing__download button button--secondary is-hidden">{% trans "Download" %}</a>
                                     <button type="button" class="gpt_processing__submit button">
-                                        <span>Process</span>
+                                        <span>{% trans "Process" %}</span>
                                     </button>
                                     <div class="gpt_processing__error is-hidden">
                                         <span>
                                             <img src="{% static 'images/ico-btn-cancel.svg' %}" alt="Error">
-                                            <span>The task failed at some point</span>
+                                            <span>{% trans "The task failed at some point" %}</span>
                                         </span>
                                         <span class="gpt_processing__error-restart">
-                                            <span>Restart</span>
+                                            <span>{% trans "Restart" %}</span>
                                             <img src="{% static 'images/ico-btn-cancel.svg' %}" alt="Error">
                                         </span>
                                     </div>
@@ -403,7 +404,7 @@
             </div>
         </div>
         <footer class="footer">
-{#            <p>Created by <a href="https://custom.mt" target="_blank">Custom.MT</a><br>Contact us for support</p>#}
+{#            <p>{% trans "Created by" %} <a href="https://custom.mt" target="_blank">Custom.MT</a><br>{% trans "Contact us for support" %}</p>#}
         </footer>
     </div>
     <div class="modal__wrapper">
@@ -413,11 +414,11 @@
         <div class="popup" id="error_popup">
             <div class="popup__inner">
                 <div class="popup__title">
-                    <p>Something went wrong</p>
+                    <p>{% trans "Something went wrong" %}</p>
                 </div>
-                <p>Please try again later.</p>
+                <p>{% trans "Please try again later." %}</p>
                 <div class="translate__form__submit">
-                    <button type="button" data-fancybox-close="">Close</button>
+                    <button type="button" data-fancybox-close="">{% trans "Close" %}</button>
                 </div>
             </div>
         </div>
