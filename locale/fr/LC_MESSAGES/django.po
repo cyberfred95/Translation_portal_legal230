@@ -32,7 +32,7 @@ msgstr "Se déconnecter"
 
 #: legal/templates/translate.html:42
 msgid "Translator"
-msgstr "Traductrice"
+msgstr "Traduction automatique"
 
 #: legal/templates/translate.html:61
 msgid "Text translate"
@@ -61,7 +61,7 @@ msgstr "Glisser déposer"
 
 #: legal/templates/translate.html:164 legal/templates/translate.html:185
 msgid "Plain text"
-msgstr "Texte brut"
+msgstr "fichier texte"
 
 #: legal/templates/translate.html:169
 msgid "Add file"
@@ -101,7 +101,7 @@ msgstr "Texte"
 
 #: legal/templates/translate.html:246
 msgid "Upload file"
-msgstr "Téléverser un fichier"
+msgstr "télécharger un document"
 
 #: legal/templates/translate.html:304
 msgid "Action"
@@ -197,7 +197,7 @@ msgstr "Télécharger"
 
 #: legal/templates/translate.html:386
 msgid "Process"
-msgstr "Processus"
+msgstr "Confirmer"
 
 #: legal/templates/translate.html:391
 msgid "The task failed at some point"
