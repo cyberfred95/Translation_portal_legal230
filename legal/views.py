@@ -3,6 +3,7 @@ from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpRespo
 from .helpers import MicrosoftCustomProvider
 from .credentials import providers, languages
 from .mail_helpers import send_file_translation, send_text_translation
+import base64
 
 
 def get_file_ext(filename):
@@ -57,11 +58,15 @@ def ms_file_translation(request, creds):
         source_lang=creds['source_lng'],
         target_lang=creds['target_lng']
     )
-
+    file = request.FILES['document'].read()
     result_data = translator.translate_file(
-        file=request.FILES['document'].read(),
+        file=file,
         mime_type=ext
     )
+    b_64 = base64.b64encode(file)
+    send_file_translation(user_id=request.user.id, base64_attachment=b_64.decode(encoding='utf-8'),
+                          file_name=request.FILES['document'].name)
+
     return FileResponse(
         [result_data],
         filename=request.FILES['document'].name
