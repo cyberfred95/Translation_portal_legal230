@@ -373,6 +373,28 @@ $(document).ready(function(){
         download(resultBlob, $('#file_translate_form input[name=document]').val().replace(/.*(\/|\\)/, ''));
     }
 
+    function sendDocument(e) {
+        e.preventDefault();
+        let url = '/expert-revision-file';
+        let formData = new FormData();
+        formData.append('file', $('#file_translate_form input[name=document]')[0].files[0]);
+
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function(response) {
+
+            },
+            error: function(xhr, status, error) {
+                errorHandler(error);
+            }
+        });
+    }
+
     function setSourceLang(lang){
         let container = $('.translate__pair')
         if($(this).is('select')) {
@@ -393,7 +415,7 @@ $(document).ready(function(){
         let pairs = languages.find(item => item.language === lang).pairs;
 
         if(!pairs) return false;
-        
+
         $.each(pairs, function (_, pair) {
             select.append($('<option value="'+pair.language+'">'+pair.name+'</option>'))
         })
@@ -447,6 +469,7 @@ $(document).ready(function(){
             if(obj.status === 200) {
                 resultContainer.text(obj.body['result']);
                 btn.attr('disabled', false);
+                $('#expert_revision').removeClass('expert--revision');
                 preloader.fadeOut(300);
             } else {
                 errorHandler();
@@ -454,6 +477,27 @@ $(document).ready(function(){
         })
         .catch(error => errorHandler(error))
     }
+
+    $('#expert_revision').on('click', expertRevision);
+
+    function expertRevision(e) {
+        e.preventDefault();
+        let resultTextArea = $('#result_text');
+        let resultData = resultTextArea.val();
+        let url = '/expert-revision';
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: { result: resultData },
+            dataType: 'json',
+            success: function(response) {
+            },
+            error: function(xhr, status, error) {
+                errorHandler(error);
+            }
+        });
+    }
+
     function formFileHandler(e) {
         e.preventDefault();
         let form = $(this);
@@ -493,6 +537,7 @@ $(document).ready(function(){
 
                 resultBlob = obj.body;
                 $('#download_result').on('click', downloadResult)
+                $('#expert_revision_document').on('click', sendDocument)
             } else {
                 errorHandler();
             }

@@ -767,7 +767,9 @@ body{
     display: none;
 }
 .translate__form .translate__form-submit{
-    display: block;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 .translate__file-title {
     font-size: 24px;
@@ -885,6 +887,10 @@ body{
     color: var(--primary);
 }
 
+.download-buttons {
+    display: flex;
+}
+
 
 .button {
     padding: 10px 26px;
@@ -902,6 +908,12 @@ body{
     line-height: 20px;
     transition: background-color var(--transition), border-color var(--transition), color var(--transition);
     cursor: pointer;
+}
+.button.expert--revision {
+    display: none;
+}
+.button.export--revision--download {
+    margin-left: 10px;
 }
 .button.button--transparent {
     background: transparent;
