@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-17 12:14+0300\n"
+"POT-Creation-Date: 2023-08-14 04:41+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,203 +18,219 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: legal/settings.py:132 legal/templates/translate.html:100
+#: legal/settings.py:132 legal/templates/translate.html:101
 msgid "English"
 msgstr "Anglaise"
 
-#: legal/settings.py:133 legal/templates/translate.html:103
+#: legal/settings.py:133 legal/templates/translate.html:104
 msgid "French"
 msgstr "Français"
 
-#: legal/templates/translate.html:33
+#: legal/templates/translate.html:34
 msgid "Logout"
 msgstr "Se déconnecter"
 
-#: legal/templates/translate.html:42
+#: legal/templates/translate.html:43
 msgid "Translator"
 msgstr "Traduction automatique"
 
-#: legal/templates/translate.html:61
+#: legal/templates/translate.html:62
 msgid "Text translate"
 msgstr "Traduction de texte"
 
-#: legal/templates/translate.html:70
+#: legal/templates/translate.html:71
 msgid "Document translate"
 msgstr "Traduction de documents"
 
-#: legal/templates/translate.html:120
+#: legal/templates/translate.html:121
 msgid "Start typing"
 msgstr "Commencer à écrire"
 
-#: legal/templates/translate.html:122 legal/templates/translate.html:275
+#: legal/templates/translate.html:123 legal/templates/translate.html:299
 msgid "Text is required."
 msgstr "Le texte est requis."
 
-#: legal/templates/translate.html:147 legal/templates/translate.html:228
-#: legal/templates/translate.html:311
-msgid "Translate"
-msgstr "Traduire"
+#: legal/templates/translate.html:148
+#, fuzzy
+#| msgid "Translate"
+msgid "Translate_text_btn"
+msgstr "Traduire un texte"
 
-#: legal/templates/translate.html:162 legal/templates/translate.html:183
+#: legal/templates/translate.html:150 legal/templates/translate.html:232
+msgid "Expert Revision"
+msgstr "Demande de post-édition"
+
+#: legal/templates/translate.html:169 legal/templates/translate.html:190
 msgid "Drag and drop"
 msgstr "Glisser déposer"
 
-#: legal/templates/translate.html:164 legal/templates/translate.html:185
+#: legal/templates/translate.html:171 legal/templates/translate.html:192
 msgid "Plain text"
 msgstr "fichier texte"
 
-#: legal/templates/translate.html:169
+#: legal/templates/translate.html:176
 msgid "Add file"
 msgstr "Ajouter le fichier"
 
-#: legal/templates/translate.html:177
+#: legal/templates/translate.html:184
 msgid "Choose the document."
 msgstr "Choisissez le document."
 
-#: legal/templates/translate.html:188
+#: legal/templates/translate.html:195
 msgid "File added"
 msgstr "Fichier ajouté"
 
-#: legal/templates/translate.html:198
+#: legal/templates/translate.html:205
 msgid "Translation in progress..."
 msgstr "Traduction en cours..."
 
-#: legal/templates/translate.html:206
+#: legal/templates/translate.html:213
 msgid "Translation is completed!"
 msgstr "La traduction est terminée !"
 
-#: legal/templates/translate.html:221
+#: legal/templates/translate.html:229
 msgid "Download the translated document"
 msgstr "Télécharger le document traduit"
 
-#: legal/templates/translate.html:224
+#: legal/templates/translate.html:248
 msgid "Translate another file"
 msgstr "Traduire un autre fichier"
 
-#: legal/templates/translate.html:238
+#: legal/templates/translate.html:252
+#, fuzzy
+#| msgid "Translate"
+msgid "Translate_file_btn"
+msgstr "Traduire un document"
+
+#: legal/templates/translate.html:262
 msgid "Document"
 msgstr "Document"
 
-#: legal/templates/translate.html:240
+#: legal/templates/translate.html:264
 msgid "Text"
 msgstr "Texte"
 
-#: legal/templates/translate.html:246
+#: legal/templates/translate.html:270
 msgid "Upload file"
 msgstr "télécharger un document"
 
-#: legal/templates/translate.html:304
+#: legal/templates/translate.html:328
 msgid "Action"
 msgstr "Action"
 
-#: legal/templates/translate.html:312
+#: legal/templates/translate.html:335
+msgid "Translate"
+msgstr "Traduire"
+
+#: legal/templates/translate.html:336
 msgid "Translate into different language"
 msgstr "Traduire dans différentes langues"
 
-#: legal/templates/translate.html:315
+#: legal/templates/translate.html:339
 msgid "Rewrite for gender neutrality"
 msgstr "Réécrire pour la neutralité de genre"
 
-#: legal/templates/translate.html:316
+#: legal/templates/translate.html:340
 msgid "Make text gender-neutral"
 msgstr "Rendre le texte non sexiste"
 
-#: legal/templates/translate.html:319
+#: legal/templates/translate.html:343
 msgid "Rewrite for other gender"
 msgstr "Réécrire pour un autre sexe"
 
-#: legal/templates/translate.html:320
+#: legal/templates/translate.html:344
 msgid "Adjust for specific gender/pronouns"
 msgstr "Ajuster pour un genre/pronoms spécifiques"
 
-#: legal/templates/translate.html:323
+#: legal/templates/translate.html:347
 msgid "Rewrite for simplicity"
 msgstr "Réécrire pour plus de simplicité"
 
-#: legal/templates/translate.html:324
+#: legal/templates/translate.html:348
 msgid "Simplify text"
 msgstr "Simplifier le texte"
 
-#: legal/templates/translate.html:327
+#: legal/templates/translate.html:351
 msgid "Rewrite in other person"
 msgstr "Réécrire dans une autre personne"
 
-#: legal/templates/translate.html:328
+#: legal/templates/translate.html:352
 msgid "Rewrite in other person ('you', 'I' or 'he/she/other')"
-msgstr "Réécrivez dans une autre personne (\"vous\", \"je\" ou \"il/elle/autre\")"
+msgstr ""
+"Réécrivez dans une autre personne (\"vous\", \"je\" ou \"il/elle/autre\")"
 
-#: legal/templates/translate.html:331
+#: legal/templates/translate.html:355
 msgid "Clean out obscenities"
 msgstr "Nettoyer les obscénités"
 
-#: legal/templates/translate.html:332
+#: legal/templates/translate.html:356
 msgid "Remove offensive language"
 msgstr "Supprimer le langage offensant"
 
-#: legal/templates/translate.html:335
+#: legal/templates/translate.html:359
 msgid "Summarize"
 msgstr "Résumer"
 
-#: legal/templates/translate.html:336
+#: legal/templates/translate.html:360
 msgid "Generate a brief summary"
 msgstr "Générer un bref résumé"
 
-#: legal/templates/translate.html:350
+#: legal/templates/translate.html:374
 msgid "Preferred pronouns"
 msgstr "Pronoms préférés"
 
-#: legal/templates/translate.html:358
+#: legal/templates/translate.html:382
 msgid "Male (He/him)"
 msgstr "Homme (il/elle)"
 
-#: legal/templates/translate.html:359
+#: legal/templates/translate.html:383
 msgid "Female (She/her)"
 msgstr "Féminin (Elle/elle)"
 
-#: legal/templates/translate.html:360
+#: legal/templates/translate.html:384
 msgid "Other (They/them)"
 msgstr "Autre (ils/elles)"
 
-#: legal/templates/translate.html:368
+#: legal/templates/translate.html:392
 msgid "Option"
 msgstr "Option"
 
-#: legal/templates/translate.html:374
+#: legal/templates/translate.html:398
 msgid "1st person"
 msgstr "1ère personne"
 
-#: legal/templates/translate.html:375
+#: legal/templates/translate.html:399
 msgid "2nd person"
 msgstr "2ème personne"
 
-#: legal/templates/translate.html:376
+#: legal/templates/translate.html:400
 msgid "3nd person"
 msgstr "3ème personne"
 
-#: legal/templates/translate.html:384
+#: legal/templates/translate.html:408
 msgid "Download"
 msgstr "Télécharger"
 
-#: legal/templates/translate.html:386
+#: legal/templates/translate.html:410
 msgid "Process"
 msgstr "Confirmer"
 
-#: legal/templates/translate.html:391
+#: legal/templates/translate.html:415
 msgid "The task failed at some point"
 msgstr "La tâche a échoué à un moment donné"
 
-#: legal/templates/translate.html:394
+#: legal/templates/translate.html:418
 msgid "Restart"
 msgstr "Redémarrage"
 
-#: legal/templates/translate.html:417
+#: legal/templates/translate.html:441
 msgid "Something went wrong"
 msgstr "Quelque chose s'est mal passé"
 
-#: legal/templates/translate.html:419
+#: legal/templates/translate.html:443
 msgid "Please try again later."
 msgstr "Veuillez réessayer plus tard."
 
-#: legal/templates/translate.html:421
+#: legal/templates/translate.html:445
 msgid "Close"
 msgstr "Fermer"

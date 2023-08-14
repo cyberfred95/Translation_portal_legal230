@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-17 12:14+0300\n"
+"POT-Creation-Date: 2023-08-14 04:41+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,203 +18,218 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: legal/settings.py:132 legal/templates/translate.html:100
+#: legal/settings.py:132 legal/templates/translate.html:101
 msgid "English"
 msgstr "English"
 
-#: legal/settings.py:133 legal/templates/translate.html:103
+#: legal/settings.py:133 legal/templates/translate.html:104
 msgid "French"
 msgstr "French"
 
-#: legal/templates/translate.html:33
+#: legal/templates/translate.html:34
 msgid "Logout"
 msgstr "Logout"
 
-#: legal/templates/translate.html:42
+#: legal/templates/translate.html:43
 msgid "Translator"
 msgstr "Translator"
 
-#: legal/templates/translate.html:61
+#: legal/templates/translate.html:62
 msgid "Text translate"
 msgstr "Text translate"
 
-#: legal/templates/translate.html:70
+#: legal/templates/translate.html:71
 msgid "Document translate"
 msgstr "Document translate"
 
-#: legal/templates/translate.html:120
+#: legal/templates/translate.html:121
 msgid "Start typing"
 msgstr "Start typing"
 
-#: legal/templates/translate.html:122 legal/templates/translate.html:275
+#: legal/templates/translate.html:123 legal/templates/translate.html:299
 msgid "Text is required."
 msgstr "Text is required."
 
-#: legal/templates/translate.html:147 legal/templates/translate.html:228
-#: legal/templates/translate.html:311
-msgid "Translate"
+#: legal/templates/translate.html:148
+#, fuzzy
+#| msgid "Translate"
+msgid "Translate_text_btn"
 msgstr "Translate"
 
-#: legal/templates/translate.html:162 legal/templates/translate.html:183
+#: legal/templates/translate.html:150 legal/templates/translate.html:232
+msgid "Expert Revision"
+msgstr "Expert Revision"
+
+#: legal/templates/translate.html:169 legal/templates/translate.html:190
 msgid "Drag and drop"
 msgstr "Drag and drop"
 
-#: legal/templates/translate.html:164 legal/templates/translate.html:185
+#: legal/templates/translate.html:171 legal/templates/translate.html:192
 msgid "Plain text"
 msgstr "Plain text"
 
-#: legal/templates/translate.html:169
+#: legal/templates/translate.html:176
 msgid "Add file"
 msgstr "Add file"
 
-#: legal/templates/translate.html:177
+#: legal/templates/translate.html:184
 msgid "Choose the document."
 msgstr "Choose the document."
 
-#: legal/templates/translate.html:188
+#: legal/templates/translate.html:195
 msgid "File added"
 msgstr "File added"
 
-#: legal/templates/translate.html:198
+#: legal/templates/translate.html:205
 msgid "Translation in progress..."
 msgstr "Translation in progress..."
 
-#: legal/templates/translate.html:206
+#: legal/templates/translate.html:213
 msgid "Translation is completed!"
 msgstr "Translation is completed!"
 
-#: legal/templates/translate.html:221
+#: legal/templates/translate.html:229
 msgid "Download the translated document"
 msgstr "Download the translated document"
 
-#: legal/templates/translate.html:224
+#: legal/templates/translate.html:248
 msgid "Translate another file"
 msgstr "Translate another file"
 
-#: legal/templates/translate.html:238
+#: legal/templates/translate.html:252
+#, fuzzy
+#| msgid "Translate"
+msgid "Translate_file_btn"
+msgstr "Translate"
+
+#: legal/templates/translate.html:262
 msgid "Document"
 msgstr "Document"
 
-#: legal/templates/translate.html:240
+#: legal/templates/translate.html:264
 msgid "Text"
 msgstr "Text"
 
-#: legal/templates/translate.html:246
+#: legal/templates/translate.html:270
 msgid "Upload file"
 msgstr "Upload file"
 
-#: legal/templates/translate.html:304
+#: legal/templates/translate.html:328
 msgid "Action"
 msgstr "Action"
 
-#: legal/templates/translate.html:312
+#: legal/templates/translate.html:335
+msgid "Translate"
+msgstr "Translate"
+
+#: legal/templates/translate.html:336
 msgid "Translate into different language"
 msgstr "Translate into different language"
 
-#: legal/templates/translate.html:315
+#: legal/templates/translate.html:339
 msgid "Rewrite for gender neutrality"
 msgstr "Rewrite for gender neutrality"
 
-#: legal/templates/translate.html:316
+#: legal/templates/translate.html:340
 msgid "Make text gender-neutral"
 msgstr "Make text gender-neutral"
 
-#: legal/templates/translate.html:319
+#: legal/templates/translate.html:343
 msgid "Rewrite for other gender"
 msgstr "Rewrite for other gender"
 
-#: legal/templates/translate.html:320
+#: legal/templates/translate.html:344
 msgid "Adjust for specific gender/pronouns"
 msgstr "Adjust for specific gender/pronouns"
 
-#: legal/templates/translate.html:323
+#: legal/templates/translate.html:347
 msgid "Rewrite for simplicity"
 msgstr "Rewrite for simplicity"
 
-#: legal/templates/translate.html:324
+#: legal/templates/translate.html:348
 msgid "Simplify text"
 msgstr "Simplify text"
 
-#: legal/templates/translate.html:327
+#: legal/templates/translate.html:351
 msgid "Rewrite in other person"
 msgstr "Rewrite in other person"
 
-#: legal/templates/translate.html:328
+#: legal/templates/translate.html:352
 msgid "Rewrite in other person ('you', 'I' or 'he/she/other')"
 msgstr "Rewrite in other person ('you', 'I' or 'he/she/other')"
 
-#: legal/templates/translate.html:331
+#: legal/templates/translate.html:355
 msgid "Clean out obscenities"
 msgstr "Clean out obscenities"
 
-#: legal/templates/translate.html:332
+#: legal/templates/translate.html:356
 msgid "Remove offensive language"
 msgstr "Remove offensive language"
 
-#: legal/templates/translate.html:335
+#: legal/templates/translate.html:359
 msgid "Summarize"
 msgstr "Summarize"
 
-#: legal/templates/translate.html:336
+#: legal/templates/translate.html:360
 msgid "Generate a brief summary"
 msgstr "Generate a brief summary"
 
-#: legal/templates/translate.html:350
+#: legal/templates/translate.html:374
 msgid "Preferred pronouns"
 msgstr "Preferred pronouns"
 
-#: legal/templates/translate.html:358
+#: legal/templates/translate.html:382
 msgid "Male (He/him)"
 msgstr "Male (He/him)"
 
-#: legal/templates/translate.html:359
+#: legal/templates/translate.html:383
 msgid "Female (She/her)"
 msgstr "Female (She/her)"
 
-#: legal/templates/translate.html:360
+#: legal/templates/translate.html:384
 msgid "Other (They/them)"
 msgstr "Other (They/them)"
 
-#: legal/templates/translate.html:368
+#: legal/templates/translate.html:392
 msgid "Option"
 msgstr "Option"
 
-#: legal/templates/translate.html:374
+#: legal/templates/translate.html:398
 msgid "1st person"
 msgstr "1st person"
 
-#: legal/templates/translate.html:375
+#: legal/templates/translate.html:399
 msgid "2nd person"
 msgstr "2st person"
 
-#: legal/templates/translate.html:376
+#: legal/templates/translate.html:400
 msgid "3nd person"
 msgstr "3st person"
 
-#: legal/templates/translate.html:384
+#: legal/templates/translate.html:408
 msgid "Download"
 msgstr "Download"
 
-#: legal/templates/translate.html:386
+#: legal/templates/translate.html:410
 msgid "Process"
 msgstr "Process"
 
-#: legal/templates/translate.html:391
+#: legal/templates/translate.html:415
 msgid "The task failed at some point"
 msgstr "The task failed at some point"
 
-#: legal/templates/translate.html:394
+#: legal/templates/translate.html:418
 msgid "Restart"
 msgstr "Restart"
 
-#: legal/templates/translate.html:417
+#: legal/templates/translate.html:441
 msgid "Something went wrong"
 msgstr "Something went wrong"
 
-#: legal/templates/translate.html:419
+#: legal/templates/translate.html:443
 msgid "Please try again later."
 msgstr "Please try again later."
 
-#: legal/templates/translate.html:421
+#: legal/templates/translate.html:445
 msgid "Close"
 msgstr "Close"

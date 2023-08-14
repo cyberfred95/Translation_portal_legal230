@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static, serve
-from .views import TranslateView
+from .views import TranslateView, expert_revision, expert_revision_file
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
 
@@ -12,6 +12,8 @@ urlpatterns = i18n_patterns(
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
     path('gpt-processing/', include('gpt_processing.urls')),
+    path("expert-revision", login_required(expert_revision), name='expert_revision'),
+    path('expert-revision-file', login_required(expert_revision_file), name='expert_revision_file'),
     re_path(r'^rosetta/', include('rosetta.urls'))
 )+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)\
 + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
