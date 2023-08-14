@@ -375,7 +375,7 @@ $(document).ready(function(){
 
     function sendDocument(e) {
         e.preventDefault();
-        let url = '/expert-revision-file';
+        let url = expert_revision_file_url;
         let formData = new FormData();
         formData.append('file', $('#file_translate_form input[name=document]')[0].files[0]);
 
@@ -385,6 +385,11 @@ $(document).ready(function(){
             data: formData,
             processData: false,
             contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Accept': 'application/json',
+            },
             dataType: 'json',
             success: function(response) {
 
@@ -484,12 +489,17 @@ $(document).ready(function(){
         e.preventDefault();
         let resultTextArea = $('#result_text');
         let resultData = resultTextArea.val();
-        let url = '/expert-revision';
+        let url = expert_revision_url;
         $.ajax({
             type: 'POST',
             url: url,
             data: { result: resultData },
             dataType: 'json',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Accept': 'application/json',
+            },
             success: function(response) {
             },
             error: function(xhr, status, error) {

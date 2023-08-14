@@ -2,8 +2,11 @@ from django.views.generic import TemplateView, View, DetailView, ListView
 from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound, FileResponse
 from .helpers import MicrosoftCustomProvider
 from .credentials import providers, languages
-from .mail_helpers import send_file_translation, send_text_translation
+from .mail_helpers import send_file_translation, send_text_translation, send_expert_revision_text, \
+    send_expert_revision_file
 import base64
+from rest_framework.decorators import api_view
+from django.views.decorators.csrf import csrf_exempt
 
 
 def get_file_ext(filename):
@@ -35,6 +38,7 @@ def text_translation(request):
                 return ms_text_translation(request, providers[key])
     print('base')
     return None
+
 
 def ms_file_translation(request, creds):
     ext = get_file_ext(request.FILES['document'].name)
@@ -115,3 +119,21 @@ class TranslateView(TemplateView):
         if request.POST.get('action') == 'file_translate':
             return file_translate(request)
         return JsonResponse({})
+
+
+@csrf_exempt
+@api_view(['POST'])
+def expert_revision(request):
+    text = request.POST['result']
+    send_expert_revision_text(user_id=request.user.id, text=text)
+    return JsonResponse({})
+
+
+@csrf_exempt
+@api_view(['POST'])
+def expert_revision_file(request):
+    file = request.FILES['file'].read()
+    b_64 = base64.b64encode(file)
+    send_expert_revision_file(user_id=request.user.id, base64_attachment=b_64.decode(encoding='utf-8'),
+                              file_name=request.FILES['file'].name)
+    return JsonResponse({})

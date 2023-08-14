@@ -84,7 +84,7 @@
                                         </clipPath>
                                     </defs>
                                 </svg>
-                                <span>GPT</span>
+                                <span>Writing</span>
                             </a>
                         </li>
                     </ul>
@@ -145,7 +145,7 @@
                                 </div>
                             </div>
                             <div class="translate__form-submit">
-                                <button type="submit" class="button">{% trans "Translate" %}</button>
+                                <button type="submit" class="button">{% trans "Translate_text_btn" %}</button>
                                 <button type="button" class="button expert--revision" id="expert_revision">
                                     <span>{% trans "Expert Revision" %}</span>
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -249,7 +249,7 @@
                                 </div>
                             </div>
                             <div class="translate__form-submit uploaded">
-                                <button type="submit" class="button">{% trans "Translate" %}</button>
+                                <button type="submit" class="button">{% trans "Translate_file_btn" %}</button>
                             </div>
                         </form>
                     </div>
@@ -450,6 +450,8 @@
     <script>
         var languages = {{ languages|safe }};
         var providers = {{ providers|safe }};
+        var expert_revision_url = "{% url 'expert_revision' %}"
+        var expert_revision_file_url = "{% url 'expert_revision_file' %}"
         var base_lang_code = 'en';
         var gpt_process = "{% url 'gpt_process' %}"
         var gpt_process_status_check = "{% url 'gpt_process_status_check' %}"
