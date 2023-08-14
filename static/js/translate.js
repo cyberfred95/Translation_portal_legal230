@@ -365,6 +365,7 @@ $(document).ready(function(){
     let sourceLangSelect = $('[name=source_language]')
     let preloader = $('.modal__wrapper, .preloader');
     let errorPopup = '#error_popup'
+    let successPopup = '#success_modal'
 
     if(tabs.length)
         tabs.tabs();
@@ -376,8 +377,12 @@ $(document).ready(function(){
     function sendDocument(e) {
         e.preventDefault();
         let url = expert_revision_file_url;
+        var file = new File([resultBlob], $('#file_translate_form input[name=document]').val().replace(/.*(\/|\\)/, ''));
         let formData = new FormData();
-        formData.append('file', $('#file_translate_form input[name=document]')[0].files[0]);
+        formData.append('file', file);
+
+        $('.translate__file-block').hide();
+        $('.translate__file-block.trans-progress').css('display', 'flex')
 
         $.ajax({
             type: 'POST',
@@ -391,8 +396,11 @@ $(document).ready(function(){
                 'Accept': 'application/json',
             },
             dataType: 'json',
-            success: function(response) {
-
+            success: function() {
+                $('.translate__file-block').hide();
+                $('.translate__file-block.complete').css('display', 'flex')
+                $('#expert_revision_document').addClass('expert--revision');
+                successHandler();
             },
             error: function(xhr, status, error) {
                 errorHandler(error);
@@ -437,6 +445,16 @@ $(document).ready(function(){
             afterClose: function() {
                 location.reload()
             }
+        }).click()
+    }
+
+    function successHandler(){
+        $('<a href='+successPopup+'></a>').fancybox({
+            arrows : false,
+            padding: 0,
+            overlay: {
+                locked: false
+            },
         }).click()
     }
 
@@ -490,6 +508,9 @@ $(document).ready(function(){
         let resultTextArea = $('#result_text');
         let resultData = resultTextArea.val();
         let url = expert_revision_url;
+
+        preloader.fadeIn(300);
+
         $.ajax({
             type: 'POST',
             url: url,
@@ -500,7 +521,10 @@ $(document).ready(function(){
                 'X-CSRFToken': getCookie('csrftoken'),
                 'Accept': 'application/json',
             },
-            success: function(response) {
+            success: function() {
+                $('#expert_revision').addClass('expert--revision');
+                preloader.fadeOut(300);
+                successHandler();
             },
             error: function(xhr, status, error) {
                 errorHandler(error);

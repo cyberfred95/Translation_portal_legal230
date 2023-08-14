@@ -447,6 +447,22 @@
             </div>
         </div>
     </div>
+    <div class="modal__wrapper">
+        <div class="preloader">
+            <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+        </div>
+        <div class="popup" id="success_modal">
+            <div class="popup__inner">
+                <div class="popup__title">
+                    <p>{% trans "Success" %}</p>
+                </div>
+                <p>{% trans "Request has been successfully" %}</p>
+                <div class="translate__form__submit">
+                    <button type="button" data-fancybox-close="">{% trans "Close" %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         var languages = {{ languages|safe }};
         var providers = {{ providers|safe }};
