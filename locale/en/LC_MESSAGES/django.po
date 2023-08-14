@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-14 04:41+0300\n"
+"POT-Creation-Date: 2023-08-14 12:53+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,9 +51,7 @@ msgid "Text is required."
 msgstr "Text is required."
 
 #: legal/templates/translate.html:148
-#, fuzzy
-#| msgid "Translate"
-msgid "Translate_text_btn"
+msgid "Translate text btn"
 msgstr "Translate"
 
 #: legal/templates/translate.html:150 legal/templates/translate.html:232
@@ -97,10 +95,8 @@ msgid "Translate another file"
 msgstr "Translate another file"
 
 #: legal/templates/translate.html:252
-#, fuzzy
-#| msgid "Translate"
-msgid "Translate_file_btn"
-msgstr "Translate"
+msgid "Translate file btn"
+msgstr "Translate another file"
 
 #: legal/templates/translate.html:262
 msgid "Document"
@@ -230,6 +226,14 @@ msgstr "Something went wrong"
 msgid "Please try again later."
 msgstr "Please try again later."
 
-#: legal/templates/translate.html:445
+#: legal/templates/translate.html:445 legal/templates/translate.html:461
 msgid "Close"
 msgstr "Close"
+
+#: legal/templates/translate.html:457
+msgid "Success"
+msgstr ""
+
+#: legal/templates/translate.html:459
+msgid "Request has been successfully"
+msgstr ""
