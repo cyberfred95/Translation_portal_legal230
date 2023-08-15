@@ -20,7 +20,7 @@ msgstr ""
 
 #: legal/settings.py:132 legal/templates/translate.html:101
 msgid "English"
-msgstr "Anglaise"
+msgstr "Anglais"
 
 #: legal/settings.py:133 legal/templates/translate.html:104
 msgid "French"
@@ -36,11 +36,11 @@ msgstr "Traduction automatique"
 
 #: legal/templates/translate.html:62
 msgid "Text translate"
-msgstr "Traduction de texte"
+msgstr "Traduire un texte"
 
 #: legal/templates/translate.html:71
 msgid "Document translate"
-msgstr "Traduction de documents"
+msgstr "Traduire un document"
 
 #: legal/templates/translate.html:121
 msgid "Start typing"
@@ -233,8 +233,8 @@ msgstr "Fermer"
 
 #: legal/templates/translate.html:457
 msgid "Success"
-msgstr ""
+msgstr "Succès"
 
 #: legal/templates/translate.html:459
 msgid "Request has been successfully"
-msgstr ""
+msgstr "Votre demande à été envoyé"

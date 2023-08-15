@@ -232,8 +232,8 @@ msgstr "Close"
 
 #: legal/templates/translate.html:457
 msgid "Success"
-msgstr ""
+msgstr "Success"
 
 #: legal/templates/translate.html:459
 msgid "Request has been successfully"
-msgstr ""
+msgstr "Request has been successfully"
