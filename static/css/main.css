@@ -520,6 +520,7 @@ label {
     --primary: #176C77;
     --primary-hover: #2697a7;
     --secondary: #0D2B40;
+    --error: #b44b4a;;
 
     --gray-text: #9EAAB3;
     --gray-bg: #EBEFF0;
@@ -956,6 +957,30 @@ body{
     font-weight: 500;
     line-height: 17px;
     text-align: left;
+}
+
+.button.button--error {
+    color: var(--white)!important;
+    border-color: var(--error);
+    background-color: var(--error);
+}
+
+.button.button--error:hover {
+    background: transparent;
+    color: var(--secondary)!important;
+    border-color: var(--secondary);
+}
+
+.button.button--success {
+    color: var(--white)!important;
+    border-color: var(--primary);
+    background-color: var(--primary);
+}
+
+.button.button--success:hover {
+    background: transparent;
+    color: var(--secondary)!important;
+    border-color: var(--secondary);
 }
 
 
