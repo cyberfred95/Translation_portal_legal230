@@ -96,7 +96,7 @@ msgstr "Traduire un autre fichier"
 
 #: legal/templates/translate.html:252
 msgid "Translate file btn"
-msgstr "Traduire un autre fichier"
+msgstr "Traduire"
 
 #: legal/templates/translate.html:262
 msgid "Document"
