@@ -84,7 +84,8 @@
                                         </clipPath>
                                     </defs>
                                 </svg>
-                                <span>Writing</span>
+
+                                <span>{% trans "Writing" %}</span>
                             </a>
                         </li>
                     </ul>
@@ -257,12 +258,12 @@
                         <div class="gpt_processing">
                             <div class="gpt_processing__block">
                                 <div class="modal__switch">
-                                    <input type="checkbox" id="modal_switch_1" class="gpt_upload_text_switch">
-                                    <label for="modal_switch_1">
-                                        <span>{% trans "Document" %}</span>
-                                        <span class="modal__switch-inner"></span>
-                                        <span>{% trans "Text" %}</span>
-                                    </label>
+                                    <input type="checkbox" id="modal_switch_1" class="gpt_upload_text_switch" checked="checked">
+{#                                    <label for="modal_switch_1">#}
+{#                                        <span>{% trans "Document" %}</span>#}
+{#                                        <span class="modal__switch-inner"></span>#}
+{#                                        <span>{% trans "Text" %}</span>#}
+{#                                    </label>#}
                                 </div>
                             </div>
                             <div class="gpt_processing__block modal__gpt">

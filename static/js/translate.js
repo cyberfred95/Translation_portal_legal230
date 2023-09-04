@@ -338,6 +338,7 @@ function gpt_processing() {
         }
     }
     toggleModalStock()
+    toggleModalStock()
     $(document).on('change', gptUploadTextSwitch, toggleModalStock)
 
     $(document).on('change', gptUploads, modalUpload)
