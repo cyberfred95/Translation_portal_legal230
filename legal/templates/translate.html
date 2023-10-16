@@ -95,6 +95,26 @@
                             <input type="hidden" name="source_language" value="en">
                             <input type="hidden" name="target_language" value="fr">
                             <input type="hidden" name="provider" value="ms">
+                            <select name="provider_key">
+                                <option value="des" selected>
+                                    Droit des Sociétés
+                                </option>
+                                <option value="immobilier">
+                                    Droit Immobilier
+                                </option>
+                                <option value="social">
+                                    Droit social
+                                </option>
+                                <option value="financier">
+                                    Droit financier
+                                </option>
+                                <option value="commercial">
+                                    Droit commercial
+                                </option>
+                                <option value="litiges">
+                                    Litiges
+                                </option>
+                            </select>
                             {% csrf_token %}
 
                             <div class="translate__form-row">
@@ -162,6 +182,26 @@
                             <input type="hidden" name="source_language" value="en">
                             <input type="hidden" name="target_language" value="fr">
                             <input type="hidden" name="provider" value="ms">
+                            <select name="provider_key">
+                                <option value="des" selected>
+                                    Droit des Sociétés
+                                </option>
+                                <option value="immobilier">
+                                    Droit Immobilier
+                                </option>
+                                <option value="social">
+                                    Droit social
+                                </option>
+                                <option value="financier">
+                                    Droit financier
+                                </option>
+                                <option value="commercial">
+                                    Droit commercial
+                                </option>
+                                <option value="litiges">
+                                    Litiges
+                                </option>
+                            </select>
                             {% csrf_token %}
 
                             <div class="translate__file" id="upload">
@@ -359,6 +399,26 @@
                                                         <li data-value="Summarize">
                                                             <span class="select__item-title">{% trans "Summarize" %}</span>
                                                             <span>{% trans "Generate a brief summary" %}</span>
+                                                        </li>
+                                                        <li data-value="Summary">
+                                                            <span class="select__item-title">{% trans "Summary" %}</span>
+                                                            <span>{% trans "Summary" %}</span>
+                                                        </li>
+                                                        <li data-value="SimplifyAText">
+                                                            <span class="select__item-title">{% trans "Simplify a text" %}</span>
+                                                            <span>{% trans "Simplify a text" %}</span>
+                                                        </li>
+                                                        <li data-value="ReplaceHateSpeech">
+                                                            <span class="select__item-title">{% trans "Replace hate speech with non violent communication" %}</span>
+                                                            <span>{% trans "Replace hate speech with non violent communication" %}</span>
+                                                        </li>
+                                                        <li data-value="HidePersonalData">
+                                                            <span class="select__item-title">{% trans "Hide personal data" %}</span>
+                                                            <span>{% trans "Hide personal data" %}</span>
+                                                        </li>
+                                                        <li data-value="ChangeTheGender">
+                                                            <span class="select__item-title">{% trans "Change the gender" %}</span>
+                                                            <span>{% trans "Change the gender" %}</span>
                                                         </li>
                                                     </ul>
                                                 </div>

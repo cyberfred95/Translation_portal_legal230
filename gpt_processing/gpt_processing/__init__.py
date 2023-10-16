@@ -1,5 +1,6 @@
 from .processor import Translate, RewriteForGenderNeutrality, RewriteForOtherGender, RewriteForSimplicity, \
-    RewriteInOtherPerson, CleanOutObscenities, Summarize
+    RewriteInOtherPerson, CleanOutObscenities, Summarize, Summary, SimplifyAText, ReplaceHateSpeech, HidePersonalData, \
+    ChangeTheGender
 
 
 __all__ = [
@@ -9,5 +10,10 @@ __all__ = [
     'RewriteForSimplicity',
     'RewriteInOtherPerson',
     'CleanOutObscenities',
-    'Summarize'
+    'Summarize',
+    'Summary',
+    'SimplifyAText',
+    'ReplaceHateSpeech',
+    'HidePersonalData',
+    'ChangeTheGender'
 ]

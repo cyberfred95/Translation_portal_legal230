@@ -26,16 +26,9 @@ def ms_text_translation(request, creds):
 
 
 def text_translation(request):
-    source_language = request.POST.get('source_language')
-    target_language = request.POST.get('target_language')
-    provider = request.POST.get('provider')
-    for key in providers:
-        if providers[key]['source_lng'] == source_language and \
-                providers[key]['target_lng'] == target_language and \
-                providers[key]['provider'] == provider:
-            print(key)
-            if providers[key]['provider'] == 'ms':
-                return ms_text_translation(request, providers[key])
+    provider_key = request.POST.get('provider_key')
+    if providers[provider_key]['provider'] == 'ms':
+        return ms_text_translation(request, providers[provider_key])
     print('base')
     return None
 
@@ -78,16 +71,9 @@ def ms_file_translation(request, creds):
 
 
 def file_translate(request):
-    source_language = request.POST.get('source_language')
-    target_language = request.POST.get('target_language')
-    provider = request.POST.get('provider')
-    for key in providers:
-        if providers[key]['source_lng'] == source_language and \
-                providers[key]['target_lng'] == target_language and \
-                providers[key]['provider'] == provider:
-            print(key)
-            if providers[key]['provider'] == 'ms':
-                return ms_file_translation(request, providers[key])
+    provider_key = request.POST.get('provider_key')
+    if providers[provider_key]['provider'] == 'ms':
+        return ms_file_translation(request, providers[provider_key])
 
     print('base')
     return None

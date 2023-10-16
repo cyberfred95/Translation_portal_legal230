@@ -1,5 +1,6 @@
 from .gpt_processing import Translate, RewriteForGenderNeutrality, RewriteForOtherGender, \
-        RewriteForSimplicity, RewriteInOtherPerson, CleanOutObscenities, Summarize
+        RewriteForSimplicity, RewriteInOtherPerson, CleanOutObscenities, Summarize, Summary, SimplifyAText, \
+        ReplaceHateSpeech, HidePersonalData, ChangeTheGender
 from legal.celery import app
 
 

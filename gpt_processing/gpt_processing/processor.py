@@ -28,11 +28,12 @@ class Processor(ABC):
         self.text = text
         self.prompt = None
         self.openai = openai
-        self.openai.api_key = ''
+        self.openai.api_key = 'REMOVED_OPENAI_KEY_2'
         self.openai.api_base = 'https://api.openai.com/v1'
         self.openai.api_type = 'open_ai'
         self.result = []
         self.set_prompt(**kwargs)
+        self.is_wrap = False
 
     def process(self):
         for message in self.text:
@@ -54,6 +55,13 @@ class Processor(ABC):
                     "content": "{prompt} {message}".format(prompt=self.prompt, message=message)
                 }
             ]
+            if self.is_wrap:
+                messages = [
+                    {
+                        "role": "user",
+                        "content": "{prompt} ###start of text###\n {message} \n###endof text###".format(prompt=self.prompt, message=message)
+                    }
+                ]
             response = self.openai.ChatCompletion.create(
                 model="gpt-3.5-turbo-0301",
                 messages=messages,
@@ -130,3 +138,106 @@ class Summarize(Processor):
 
     def set_prompt(self, **kwargs):
         self.prompt = "Provide a brief summary of the following text:"
+
+class Summary(Processor):
+    def set_prompt(self, **kwargs):
+        self.is_wrap = True
+        self.prompt = "You will provide a summary of the text. The size of the summary must be 20% of the original document.\n"\
+                        "You will answer in the language of the text. I want you to act as a lawyer. "\
+                         "I want you to start your summary with a short introduction explaining the context and parties involved, "\
+                         "then you will develop the main ideas of the document. Your last sentence is a conclusion\n"
+
+class SimplifyAText(Processor):
+
+    def set_prompt(self, **kwargs):
+        self.is_wrap = True
+        self.prompt = "Simplify the text. Answer in the language of the text. Act as if you were explaining to a kid.\n"
+
+class ReplaceHateSpeech(Processor):
+
+    def set_prompt(self, **kwargs):
+        self.is_wrap = True
+        self.prompt = "Rephrase the text in the same language by replacing any obscenities"\
+                       " with appropriate wording or hate speach with non-violent communication. The tone should remain professional.\n"\
+                        "Example input 1 \nHe is an asshole."\
+                        "Example output 1 \nHe is a bad person."\
+                        "Example input 2 \nLook at that nigger."\
+                        "Example output 2 \nLook at that black person."\
+                        "Example input 3 \nYou’re always late and that upset me."\
+                        "Example output 3 \nI’m upset that you were late.\n"
+
+class  HidePersonalData(Processor):
+
+    def set_prompt(self, **kwargs):
+        self.is_wrap = True
+        self.prompt = """
+You will replace data in the text following the instructions described in each option.
+
+[VARIABLE1:Data to be removed::|Only names|Any figures|Dates]
+
+###Option 1:Personnal data###
+Remove all types of personnal data and replace with "XXX". This includes first name, last name, company names, personal addresses, email addresses, telephone number, social security number.
+
+###Example Option 1 input###
+Mr Lewinston works at Bain & Company. The Company is the biggest firm of New-York. He was fired on 12/12/2023. He lives at 2, Villa Delmore, Los Angeles. His phone number is 01 23 42 33 43. His social security number is 2910186113878. Last year him and his colleague, Enzo Moretti, earned 2,5 million dollars working as as agents.
+
+###Example Option 1 output###
+Mr XXX works at XXX. The Company is the biggest firm of New-York. He was fired on 12/12/2023. He lives at XXX. His phone number is XXX. His social security number is XXXX. Last year him and his colleague, XXX, earned XX million dollars working as agents.
+
+###Option 2:Only names###
+Replace all names such as first names and last names by "XXX".
+
+###Example Option 2 input###
+Mr Lewinston works at Bain & Company. The Company is the biggest firm of New-York. He was fired on 12/12/2023. He lives at 2, Villa Delmore, Los Angeles. His phone number is 01 23 42 33 43. His social security number is 2910186113878. Last year he earned 2,5 million dollars working as a director. Last year him and his colleague, Enzo Moretti, earned 2,5 million dollars working as agents.
+
+###Example Option 2 output###
+Mr XXX works at Bain & Company. The Company is the biggest firm of New-York. He was fired on 12/12/2023. He lives at 2, Villa Delmore, Los Angeles. His phone number is 01 23 42 33 43. His social security number is 2910186113878. Last year him and his colleague, XXX, earned 2,5 million dollars working as agents.
+
+###Option 3: Financial data###
+Replace all financial information by "XXX". Other figures such as telephone numbers or part of addresses can be left out.
+
+###Example Option 3 input###
+Mr Lewinston works at Bain & Company. The Company is the biggest firm of New-York. He was fired on 12/12/2023. He lives at 2, Villa Delmore, Los Angeles. His phone number is 01 23 42 33 43. His social security number is 2910186113878. His 2014 bonus was of €250,0000. Last year him and his colleague, Enzo Moretti, earned 2,5 million dollars working as agents.
+
+###Example Option 3 output###
+Mr Lewinston works at Bain & Company. The Company is the biggest firm of New-York. He was fired on 12/12/2023. He lives at 2, Villa Delmore, Los Angeles. His phone number is 01 23 42 33 43. His social security number is 2910186113878. His 2014 bonus was of €XXX. Last year him and his colleague, Enzo Moretti, earned XXX million dollars working as agents.
+
+###Option 4: Dates###
+Replace any date by XXX but keep the format of the source text.
+
+###Example Option 4 input###
+Mr Lewinston works at Bain & Company. He was fired on 12/12/2023. He lives at 2, Villa Delmore, Los Angeles. His phone number is 01 23 42 33 43. His social security number is 2910186113878. On Thursday, 4 December he asked for a bonus.
+
+###Example Option 4 output###
+Mr Lewinston works at Bain & Company. He was fired on XX/XX/XX. He lives at 2, Villa Delmore, Los Angeles. His phone number is 01 23 42 33 43. His social security number is 2910186113878. On XX, X XX he asked for a bonus.
+\n"""
+
+
+class ChangeTheGender(Processor):
+    def set_prompt(self, **kwargs):
+        self.is_wrap = True
+        self.prompt = """
+Change the gender in the text and adapt pronouns and adjectives when necessary. You will make the changes in the language of the text.
+
+Style
+Mr should be changed to Mrs
+Mrs should be changed to Mr
+M. should be changed to Mme
+Mme should be changed to M.
+Monsieur should be changed to Madame
+Madame should be changed to Monsieur
+Family names must not be changed
+
+Style
+Example input
+Chang Yue, you should go with him
+
+Example output
+Chang Yue, you should go with her
+
+Example input
+Mrs Lindt is a very beautiful women.
+
+Example output
+Mr Lindt is a very handsome men.\n
+"""
