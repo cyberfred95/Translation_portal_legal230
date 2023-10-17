@@ -691,6 +691,7 @@ body{
 .translate__form-row{
     display: flex;
     margin-bottom: 10px;
+    gap: 16px
 }
 .translate__form-row>*{
     flex-grow: 1;
@@ -699,6 +700,33 @@ body{
 }
 .translate__form-title{
     font-weight: 600;
+    margin-left: 10px;
+    flex:1;
+}
+.translate__form-title.target {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.translate__form-title.document-select {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.translate__form-title.document {
+    display: flex;
+    align-items: center;
+    margin-left: 0;
+}
+.translate__form-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.translate__form-header.document{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 .translate__file{
     padding: 30px;
@@ -750,6 +778,18 @@ body{
     align-items: center;
     color: var(--black);
 }
+
+.swap__language-ico>img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+.swap__language-ico.document>img {
+   margin: 0 10px;
+}
+
 .translate__file-ico>*:not(:last-child){
     margin-bottom: 10px;
 }

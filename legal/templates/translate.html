@@ -95,34 +95,20 @@
                             <input type="hidden" name="source_language" value="en">
                             <input type="hidden" name="target_language" value="fr">
                             <input type="hidden" name="provider" value="ms">
-                            <select name="provider_key">
-                                <option value="des" selected>
-                                    Droit des Sociétés
-                                </option>
-                                <option value="immobilier">
-                                    Droit Immobilier
-                                </option>
-                                <option value="social">
-                                    Droit social
-                                </option>
-                                <option value="financier">
-                                    Droit financier
-                                </option>
-                                <option value="commercial">
-                                    Droit commercial
-                                </option>
-                                <option value="litiges">
-                                    Litiges
-                                </option>
-                            </select>
                             {% csrf_token %}
 
                             <div class="translate__form-row">
-                                <div class="translate__form-title">
-                                    <span>{% trans "English" %}</span>
-                                </div>
-                                <div class="translate__form-title">
-                                    <span>{% trans "French" %}</span>
+                                <div class="translate__form-header">
+                                    <div class="translate__form-title">
+                                        <span>{% trans "English" %}</span>
+                                    </div>
+                                    <div class="swap__language-ico">
+                                        <img src="{% static 'images/ico-swap-language.svg' %}" alt="Swap language">
+                                    </div>
+                                    <div class="translate__form-title target">
+                                        <span>{% trans "French" %}</span>
+                                        <select name="provider_key"></select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="translate__form-row">
@@ -182,28 +168,21 @@
                             <input type="hidden" name="source_language" value="en">
                             <input type="hidden" name="target_language" value="fr">
                             <input type="hidden" name="provider" value="ms">
-                            <select name="provider_key">
-                                <option value="des" selected>
-                                    Droit des Sociétés
-                                </option>
-                                <option value="immobilier">
-                                    Droit Immobilier
-                                </option>
-                                <option value="social">
-                                    Droit social
-                                </option>
-                                <option value="financier">
-                                    Droit financier
-                                </option>
-                                <option value="commercial">
-                                    Droit commercial
-                                </option>
-                                <option value="litiges">
-                                    Litiges
-                                </option>
-                            </select>
                             {% csrf_token %}
-
+                            <div class="translate__form-row">
+                                <div class="translate__form-header">
+                                    <div class="translate__form-title document">
+                                        <span>{% trans "English" %}</span>
+                                        <div class="swap__language-ico document">
+                                            <img src="{% static 'images/ico-swap-language.svg' %}" alt="Swap language">
+                                        </div>
+                                        <span>{% trans "French" %}</span>
+                                    </div>
+                                    <div class="translate__form-title document-select">
+                                        <select name="provider_key"></select>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="translate__file" id="upload">
                                 <div class="translate__file-block input">
                                     <div class="translate__file-title">

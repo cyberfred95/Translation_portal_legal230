@@ -367,6 +367,7 @@ $(document).ready(function(){
     let preloader = $('.modal__wrapper, .preloader');
     let errorPopup = '#error_popup'
     let successPopup = '#success_modal'
+    const languageSite = document.documentElement.lang
 
     if(tabs.length)
         tabs.tabs();
@@ -418,7 +419,22 @@ $(document).ready(function(){
             sourceLangSelect.val(lang)
         }
         let targetSelect = container.find('[name="target_language"]')
+        let providerOptions = providers.filter(item => item.source_lng === lang);
+        let selectElements = document.querySelectorAll('select[name="provider_key"]');
 
+        selectElements.innerHTML = '';
+
+        selectElements.forEach(function(selectElement) {
+            selectElement.innerHTML = '';
+
+            providerOptions.forEach(function(provider) {
+                let option = document.createElement("option");
+                option.value = provider.key;
+                option.text =  languageSite === 'fr' ? provider.title_fr : provider.title;
+
+                selectElement.appendChild(option);
+            });
+        });
         setTargetLang(lang, targetSelect)
     }
     function setTargetLang(lang, select){
@@ -599,6 +615,55 @@ $(document).ready(function(){
         textarea[0].select();
         document.execCommand('copy');
     }
+
+    var swapIcon = document.querySelector('.swap__language-ico');
+
+    swapIcon.addEventListener('click', function() {
+        var englishTitle = document.querySelector('.translate__form-title span');
+        var frenchTitle = document.querySelector('.translate__form-title.target span');
+        var inputText = document.querySelector('#translation_text');
+        var resultText = document.querySelector('#result_text');
+
+        var sourceLanguageInput = document.querySelector('input[name="source_language"]');
+        var targetLanguageInput = document.querySelector('input[name="target_language"]');
+        var currentSourceLang = sourceLanguageInput.value;
+        var currentTargetLang = targetLanguageInput.value;
+
+        var tempLang = currentSourceLang;
+        sourceLanguageInput.value = currentTargetLang;
+        targetLanguageInput.value = tempLang;
+
+        var tempText = inputText.value;
+        inputText.value = resultText.value;
+        resultText.value = tempText;
+
+        var tempTitle = englishTitle.textContent;
+        englishTitle.textContent = frenchTitle.textContent;
+        frenchTitle.textContent = tempTitle;
+
+        setSourceLang(currentTargetLang);
+    });
+
+    var swapIconDocument = document.querySelector('.translate__tab#tabs-2 .swap__language-ico.document');
+
+    swapIconDocument.addEventListener('click', function() {
+        var englishTitle = document.querySelector('.translate__tab#tabs-2 .translate__form-title span');
+        var frenchTitle = document.querySelector('.translate__tab#tabs-2 .translate__form-title.document span:last-child');
+        var sourceLanguageInput = document.querySelector('#tabs-2 input[name="source_language"]');
+        var targetLanguageInput = document.querySelector('#tabs-2 input[name="target_language"]');
+
+        var currentTargetLang = targetLanguageInput.value;
+
+        var tempLang = sourceLanguageInput.value;
+        sourceLanguageInput.value = targetLanguageInput.value;
+        targetLanguageInput.value = tempLang;
+
+        var tempTitle = englishTitle.textContent;
+        englishTitle.textContent = frenchTitle.textContent;
+        frenchTitle.textContent = tempTitle;
+
+        setSourceLang(currentTargetLang);
+    });
 
     formText.on('submit', formTextHandler);
     formFile.on('submit', formFileHandler);
