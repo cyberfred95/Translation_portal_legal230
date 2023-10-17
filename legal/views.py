@@ -89,6 +89,7 @@ class TranslateView(TemplateView):
             provs.append({
                 'key': key,
                 'title': providers[key]['title'],
+                'title_fr': providers[key]['title_fr'],
                 'source_lng': providers[key]['source_lng'],
                 'target_lng': providers[key]['target_lng'],
                 'provider': providers[key]['provider']
