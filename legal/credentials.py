@@ -31,7 +31,7 @@ providers = {
         'title_fr': 'Droit des Sociétés',
         'provider': 'ms',
         'category_id': '4aaaeeba-cf81-4c57-8d82-ab5cec9aa4ca-LAW',
-        'key': 'c6cfd5b5-955b-415c-8f06-6064a4900fc3',
+        'key': 'REMOVED_MS_KEY',
         'source_lng': 'en',
         'target_lng': 'fr'
     },
@@ -40,7 +40,7 @@ providers = {
         'title_fr': 'Droit des Sociétés',
         'provider': 'ms',
         'category_id': '4aaaeeba-cf81-4c57-8d82-ab5cec9aa4ca-LAW',
-        'key': 'c6cfd5b5-955b-415c-8f06-6064a4900fc3',
+        'key': 'REMOVED_MS_KEY',
         'source_lng': 'fr',
         'target_lng': 'en'
     },
@@ -49,7 +49,7 @@ providers = {
         'title_fr': 'Droit Immobilier',
         'provider': 'ms',
         'category_id': '3823a279-8776-4b21-a7ed-c0d6d83379b3-LAW',
-        'key': 'c6cfd5b5-955b-415c-8f06-6064a4900fc3',
+        'key': 'REMOVED_MS_KEY',
         'source_lng': 'en',
         'target_lng': 'fr'
     },
@@ -58,7 +58,7 @@ providers = {
         'title_fr': 'Droit social',
         'provider': 'ms',
         'category_id': '67bd74ac-cd32-4455-8749-efe8c9ce6698-LAW',
-        'key': 'c6cfd5b5-955b-415c-8f06-6064a4900fc3',
+        'key': 'REMOVED_MS_KEY',
         'source_lng': 'en',
         'target_lng': 'fr'
     },
@@ -67,7 +67,7 @@ providers = {
         'title_fr': 'Droit social',
         'provider': 'ms',
         'category_id': '67bd74ac-cd32-4455-8749-efe8c9ce6698-LAW',
-        'key': 'c6cfd5b5-955b-415c-8f06-6064a4900fc3',
+        'key': 'REMOVED_MS_KEY',
         'source_lng': 'fr',
         'target_lng': 'en'
     },
@@ -76,7 +76,7 @@ providers = {
         'title_fr': 'Droit financier',
         'provider': 'ms',
         'category_id': '1f67a0ef-c4d0-425c-a2d4-2c83f0213ce6-LAW',
-        'key': 'c6cfd5b5-955b-415c-8f06-6064a4900fc3',
+        'key': 'REMOVED_MS_KEY',
         'source_lng': 'en',
         'target_lng': 'fr'
     },
@@ -85,7 +85,7 @@ providers = {
         'title_fr': 'Droit financier',
         'provider': 'ms',
         'category_id': '1f67a0ef-c4d0-425c-a2d4-2c83f0213ce6-LAW',
-        'key': 'c6cfd5b5-955b-415c-8f06-6064a4900fc3',
+        'key': 'REMOVED_MS_KEY',
         'source_lng': 'fr',
         'target_lng': 'en'
     },
@@ -94,7 +94,7 @@ providers = {
         'title_fr': 'Droit commercial',
         'provider': 'ms',
         'category_id': '3749e601-f2e4-4c58-aee5-40ab57cfea3d-LAW',
-        'key': 'c6cfd5b5-955b-415c-8f06-6064a4900fc3',
+        'key': 'REMOVED_MS_KEY',
         'source_lng': 'en',
         'target_lng': 'fr'
     },
@@ -103,7 +103,7 @@ providers = {
         'title_fr': 'Droit commercial',
         'provider': 'ms',
         'category_id': '3749e601-f2e4-4c58-aee5-40ab57cfea3d-LAW',
-        'key': 'c6cfd5b5-955b-415c-8f06-6064a4900fc3',
+        'key': 'REMOVED_MS_KEY',
         'source_lng': 'fr',
         'target_lng': 'en'
     },
@@ -112,7 +112,7 @@ providers = {
         'title_fr': 'Litiges',
         'provider': 'ms',
         'category_id': 'c8e195f8-55ca-407d-906d-b52201cd219d-LAW',
-        'key': 'c6cfd5b5-955b-415c-8f06-6064a4900fc3',
+        'key': 'REMOVED_MS_KEY',
         'source_lng': 'en',
         'target_lng': 'fr'
     },
@@ -120,8 +120,8 @@ providers = {
         'title': 'Litiges',
         'title_fr': 'Litiges',
         'provider': 'ms',
-        'category_id': 'c8e195f8-55ca-407d-906d-b52201cd219d-LAW',
-        'key': 'c6cfd5b5-955b-415c-8f06-6064a4900fc3',
+        'category_id': '4aaaeeba-cf81-4c57-8d82-ab5cec9aa4ca-LAW',
+        'key': 'REMOVED_MS_KEY',
         'source_lng': 'fr',
         'target_lng': 'en'
     }

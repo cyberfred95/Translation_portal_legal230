@@ -28,7 +28,7 @@ class MicrosoftCustomProvider:
     def translate(self, data):
         micro_headers = {
             'Ocp-Apim-Subscription-Key': self.__key,
-            'Ocp-Apim-Subscription-Region': 'francecentral'
+            'Ocp-Apim-Subscription-Region': 'global'
         }
         params = {
             'api-version': '3.0',
@@ -37,6 +37,9 @@ class MicrosoftCustomProvider:
             'category': self.__category
         }
         body = [{'text': data}]
+        print(micro_headers)
+        print(body)
+        print(params)
         result = requests.post(url=self.micro_url, params=params, headers=micro_headers, json=body)
         result_json = result.json()
         print(result_json)
