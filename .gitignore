@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Venv
+.venv/
+
+# Django stuff:
+*.log
+
+# db
+db*
+
+# Caches
+static/scss/CACHE/
+
+# Ignore modules
+.idea/
+
+# Ignore media
+/media/
+/files/
+
+# Ignore staticfiles
+/staticfiles/
+
+# Secret
+.env
+.env_dev
+/Script/
