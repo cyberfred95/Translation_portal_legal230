@@ -1,2 +1,2 @@
-# Legal230
+# Translation_portal_legal230
 
