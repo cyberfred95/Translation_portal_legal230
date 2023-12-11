@@ -506,6 +506,7 @@
     <script>
         var languages = {{ languages|safe }};
         var providers = {{ providers|safe }};
+        var provider_models = {{ provider_models|safe }}
         var expert_revision_url = "{% url 'expert_revision' %}"
         var expert_revision_file_url = "{% url 'expert_revision_file' %}"
         var base_lang_code = 'en';

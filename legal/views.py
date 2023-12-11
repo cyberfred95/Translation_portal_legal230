@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView, View, DetailView, ListView
 from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound, FileResponse
 from .helpers import MicrosoftCustomProvider
-from .credentials import providers, languages
+from .credentials import providers, languages, provider_models
 from .mail_helpers import send_file_translation, send_text_translation, send_expert_revision_text, \
     send_expert_revision_file
 import base64
@@ -96,6 +96,7 @@ class TranslateView(TemplateView):
             })
         context['providers'] = provs
         context['languages'] = languages
+        context['provider_models'] = provider_models
         return context
 
     def post(self, request):
