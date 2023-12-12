@@ -15,7 +15,7 @@ SECRET_KEY = 'tyjpz-hu3tt6!9u6)g&pf4r%9)d-o3%ggxz0!&)b8gc0k_v3g0'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'legal230.console.custom.mt']
+ALLOWED_HOSTS = ['localhost', '0.0.0.0', 'legal230.console.custom.mt']
 
 
 # Application definition

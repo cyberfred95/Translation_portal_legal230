@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView, View, DetailView, ListView
 from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound, FileResponse
 from .helpers import MicrosoftCustomProvider
-from .credentials import providers, languages
+from .credentials import providers, languages, provider_models
 from .mail_helpers import send_file_translation, send_text_translation, send_expert_revision_text, \
     send_expert_revision_file
 import base64
@@ -84,16 +84,20 @@ class TranslateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        provs = []
-        for key in providers:
-            provs.append({
-                'key': key,
-                'title': providers[key]['title'],
-                'title_fr': providers[key]['title_fr'],
-                'source_lng': providers[key]['source_lng'],
-                'target_lng': providers[key]['target_lng'],
-                'provider': providers[key]['provider']
-            })
+        provs = {}
+        for provider in provider_models:
+            provider_data = provider_models.get(provider)
+            provs[f'{provider}'] = []
+            for key in provider_data:
+                provs[f'{provider}'].append({
+                    'key': key,
+                    'title': provider_data[key]['title'],
+                    'title_fr': provider_data[key]['title_fr'],
+                    'source_lng': provider_data[key]['source_lng'],
+                    'target_lng': provider_data[key]['target_lng'],
+                    'provider': provider_data[key]['provider']
+                })
+        print(provs)
         context['providers'] = provs
         context['languages'] = languages
         return context
