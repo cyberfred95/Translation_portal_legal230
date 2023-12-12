@@ -10,11 +10,13 @@ from datetime import datetime
 from azure.core.credentials import AzureKeyCredential, AccessToken
 from azure.ai.translation.document import DocumentTranslationClient
 from azure.storage.blob import ContainerClient, \
-    BlobServiceClient, PublicAccess, generate_blob_sas, BlobSasPermissions, generate_container_sas, ContainerSasPermissions
+    BlobServiceClient, PublicAccess, generate_blob_sas, BlobSasPermissions, generate_container_sas, \
+    ContainerSasPermissions
 import uuid
+import modernmt
+
 
 class MicrosoftCustomProvider:
-
     micro_url = 'https://api.cognitive.microsofttranslator.com/translate'
 
     def __init__(self, key, category, source_lang, target_lang):
@@ -92,7 +94,44 @@ class MicrosoftCustomProvider:
         client = DocumentTranslationClient(endpoint, AzureKeyCredential(key))
         poller = client.begin_translation(sourceUrl, targetUrl, self.target_lang, category_id=self.__category)
         poller.result()
-        result = target_container_client.download_blob(container_name + '.'+mime_type).readall()
+        result = target_container_client.download_blob(container_name + '.' + mime_type).readall()
         target_container_client.delete_container()
         source_container_client.delete_container()
         return result
+
+
+class ModernMTProvider:
+
+    def __init__(self, data, credentials, source_lang=None, target_lang=None, custom_model=None, project=None):
+        self.__memory_id = None
+        self.__api_key = None
+        self.__data = data
+        self.__creds = credentials
+        self.project = project
+        self.source_lang = source_lang
+        self.target_lang = target_lang
+        self.is_user_creds_stock_provider = False
+        self.custom_model = custom_model
+        self.set_credentials()
+
+    def set_credentials(self):
+        self.__api_key = self.__creds['api_key']
+        self.__memory_id = self.__creds['memory_id']
+
+
+    def translate(self):
+        mmt = modernmt.ModernMT(self.__api_key)
+        translated_text = []
+        source_text = [x for x in self.__data if x != '']
+        hints = [
+            int(self.__memory_id)
+        ]
+        for sentence in source_text:
+            result = mmt.translate(self.source_lang, self.target_lang, sentence, hints,)
+            translated_text.append(result.translation)
+        return translated_text
+
+    @staticmethod
+    def get_memories_list(api_key: str):
+        mmt = modernmt.ModernMT(api_key)
+        return mmt.memories.list()

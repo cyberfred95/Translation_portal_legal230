@@ -128,24 +128,211 @@ provider_models = {
         }
     },
     'ModernMT': {
-        'mmt_fr_en_litiges': {
-            'title': 'Litiges',
-            'title_fr': 'Litiges',
+        'mmt_en_fr_des': {
+            'title': 'Droit des sociétés',
+            'title_fr': 'Droit des sociétés',
             'provider': 'mmt',
-            'category_id': 'c8e195f8-55ca-407d-906d-b52201cd219d-LAW',
+            'category_id': '325817',
             'key': 'REMOVED_MMT_KEY',
             'source_lng': 'en',
             'target_lng': 'fr'
+        },
+        'mmt_fr_en_des': {
+            'title': 'Droit des sociétés',
+            'title_fr': 'Droit des sociétés',
+            'provider': 'mmt',
+            'category_id': '325817',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'fr',
+            'target_lng': 'en'
+        },
+        'mmt_en_fr_commercial': {
+            'title': 'Droit commercial',
+            'title_fr': 'Droit commercial',
+            'provider': 'mmt',
+            'category_id': '325638',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'en',
+            'target_lng': 'fr'
+        },
+        'mmt_fr_en_commercial': {
+            'title': 'Droit commercial',
+            'title_fr': 'Droit commercial',
+            'provider': 'mmt',
+            'category_id': '325638',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'fr',
+            'target_lng': 'en'
+        },
+        'mmt_en_fr_social': {
+            'title': 'Droit social',
+            'title_fr': 'Droit social',
+            'provider': 'mmt',
+            'category_id': '328505',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'en',
+            'target_lng': 'fr'
+        },
+        'mmt_fr_en_social': {
+            'title': 'Droit social',
+            'title_fr': 'Droit social',
+            'provider': 'mmt',
+            'category_id': '328505',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'fr',
+            'target_lng': 'en'
+
+        },
+        'mmt_en_fr_financier': {
+            'title': 'Droit financier',
+            'title_fr': 'Droit financier',
+            'provider': 'mmt',
+            'category_id': '326013',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'en',
+            'target_lng': 'fr'
+        },
+        'mmt_fr_en_financier': {
+            'title': 'Droit financier',
+            'title_fr': 'Droit financier',
+            'provider': 'mmt',
+            'category_id': '326013',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'fr',
+            'target_lng': 'en'
+
+        },
+        'mmt_en_fr_fiscalité': {
+            'title': 'Droit de la fiscalité',
+            'title_fr': 'Droit de la fiscalité',
+            'provider': 'mmt',
+            'category_id': '326075',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'en',
+            'target_lng': 'fr'
+        },
+        'mmt_fr_en_fiscalité': {
+            'title': 'Droit de la fiscalité',
+            'title_fr': 'Droit de la fiscalité',
+            'provider': 'mmt',
+            'category_id': '326075',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'fr',
+            'target_lng': 'en'
+
+        },
+        'mmt_en_fr_immobilier': {
+            'title': 'Droit immobilier',
+            'title_fr': 'Droit immobilier',
+            'provider': 'mmt',
+            'category_id': '328309',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'en',
+            'target_lng': 'fr'
+        },
+        'mmt_fr_en_immobilier': {
+            'title': 'Droit immobilier',
+            'title_fr': 'Droit immobilier',
+            'provider': 'mmt',
+            'category_id': '328309',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'fr',
+            'target_lng': 'en'
+
         },
         'mmt_en_fr_litiges': {
             'title': 'Litiges',
             'title_fr': 'Litiges',
             'provider': 'mmt',
-            'category_id': 'c8e195f8-55ca-407d-906d-b52201cd219d-LAW',
+            'category_id': '328379',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'en',
+            'target_lng': 'fr'
+        },
+        'mmt_fr_en_litiges': {
+            'title': 'Litiges',
+            'title_fr': 'Litiges',
+            'provider': 'mmt',
+            'category_id': '328379',
             'key': 'REMOVED_MMT_KEY',
             'source_lng': 'fr',
             'target_lng': 'en'
-        }
+
+        },
+        'mmt_en_fr_pi_it': {
+            'title': 'PI-IT',
+            'title_fr': 'PI-IT',
+            'provider': 'mmt',
+            'category_id': '328806',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'en',
+            'target_lng': 'fr'
+        },
+        'mmt_fr_en_pi_it': {
+            'title': 'PI-IT',
+            'title_fr': 'PI-IT',
+            'provider': 'mmt',
+            'category_id': '328806',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'fr',
+            'target_lng': 'en'
+
+        },
+        'mmt_en_fr_finance': {
+            'title': 'FINANCE',
+            'title_fr': 'FINANCE',
+            'provider': 'mmt',
+            'category_id': '329012',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'en',
+            'target_lng': 'fr'
+        },
+        'mmt_fr_en_finance': {
+            'title': 'FINANCE',
+            'title_fr': 'FINANCE',
+            'provider': 'mmt',
+            'category_id': '329012',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'fr',
+            'target_lng': 'en'
+        },
+        'mmt_en_fr_brevets': {
+            'title': 'BREVETS',
+            'title_fr': 'BREVETS',
+            'provider': 'mmt',
+            'category_id': '329071',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'en',
+            'target_lng': 'fr'
+        },
+        'mmt_fr_en_brevets': {
+            'title': 'BREVETS',
+            'title_fr': 'BREVETS',
+            'provider': 'mmt',
+            'category_id': '329071',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'fr',
+            'target_lng': 'en'
+        },
+        'mmt_en_fr_generique': {
+            'title': 'GENERIQUE',
+            'title_fr': 'GENERIQUE',
+            'provider': 'mmt',
+            'category_id': '95966',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'en',
+            'target_lng': 'fr'
+        },
+        'mmt_fr_en_generique': {
+            'title': 'GENERIQUE',
+            'title_fr': 'GENERIQUE',
+            'provider': 'mmt',
+            'category_id': '95966',
+            'key': 'REMOVED_MMT_KEY',
+            'source_lng': 'fr',
+            'target_lng': 'en'
+        },
+
     }
 
 }
