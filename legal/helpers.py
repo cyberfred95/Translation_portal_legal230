@@ -122,6 +122,20 @@ class ModernMTProvider:
             translated_text.append(result.translation)
         return translated_text
 
+    def translate_file(self, file):
+        mmt = modernmt.ModernMT(self.__api_key)
+        file_content = file.readlines()
+        translated_text = []
+        source_text = [x for x in file_content if x != '']
+        for sentence in source_text:
+            result = mmt.translate(self.source_lang, self.target_lang, sentence)
+            translated_text.append(result.translation)
+        with open ('translated_' + file, 'w') as translated_file:
+            for line in translated_text:
+                translated_file.write(line + '\n')
+        return translated_file
+
+
     @staticmethod
     def get_memories_list(api_key: str):
         mmt = modernmt.ModernMT(api_key)
