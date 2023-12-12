@@ -102,32 +102,24 @@ class MicrosoftCustomProvider:
 
 class ModernMTProvider:
 
-    def __init__(self, data, credentials, source_lang=None, target_lang=None, custom_model=None, project=None):
-        self.__memory_id = None
+    def __init__(self, credentials, source_lang, target_lang):
         self.__api_key = None
-        self.__data = data
         self.__creds = credentials
-        self.project = project
         self.source_lang = source_lang
         self.target_lang = target_lang
         self.is_user_creds_stock_provider = False
-        self.custom_model = custom_model
         self.set_credentials()
 
     def set_credentials(self):
         self.__api_key = self.__creds['api_key']
-        self.__memory_id = self.__creds['memory_id']
 
 
-    def translate(self):
+    def translate(self, data):
         mmt = modernmt.ModernMT(self.__api_key)
         translated_text = []
-        source_text = [x for x in self.__data if x != '']
-        hints = [
-            int(self.__memory_id)
-        ]
+        source_text = [x for x in data if x != '']
         for sentence in source_text:
-            result = mmt.translate(self.source_lang, self.target_lang, sentence, hints,)
+            result = mmt.translate(self.source_lang, self.target_lang, sentence)
             translated_text.append(result.translation)
         return translated_text
 

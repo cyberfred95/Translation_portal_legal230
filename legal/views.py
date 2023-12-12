@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView, View, DetailView, ListView
 from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound, FileResponse
-from .helpers import MicrosoftCustomProvider
+from .helpers import MicrosoftCustomProvider, ModernMTProvider
 from .credentials import providers, languages, provider_models
 from .mail_helpers import send_file_translation, send_text_translation, send_expert_revision_text, \
     send_expert_revision_file
@@ -12,6 +12,17 @@ from django.views.decorators.csrf import csrf_exempt
 def get_file_ext(filename):
     split = filename.split('.')
     return split[-1]
+
+
+def mmt_text_translation(request, creds):
+    translator = ModernMTProvider().set_credentials(creds)
+    print(creds['key'])
+    print(creds['category_id'])
+    print(creds['source_lng'])
+    print(creds['target_lng'])
+
+    send_text_translation(user_id=request.user.id, text=request.POST.get('text'))
+    return translator.translate(data=request.POST.get('text'))
 
 
 def ms_text_translation(request, creds):
