@@ -94,9 +94,8 @@ class TranslateView(TemplateView):
                 'target_lng': providers[key]['target_lng'],
                 'provider': providers[key]['provider']
             })
-        context['providers'] = provs
+        context['providers'] = provider_models
         context['languages'] = languages
-        context['provider_models'] = provider_models
         return context
 
     def post(self, request):
