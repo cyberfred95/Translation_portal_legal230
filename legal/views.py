@@ -15,11 +15,11 @@ def get_file_ext(filename):
 
 
 def mmt_text_translation(request, creds):
-    translator = ModernMTProvider().set_credentials(creds)
-    print(creds['key'])
-    print(creds['category_id'])
-    print(creds['source_lng'])
-    print(creds['target_lng'])
+    translator = ModernMTProvider(
+        credentials=creds,
+        source_lang=creds['source_lng'],
+        target_lang=creds['target_lng']
+    ).set_credentials()
 
     send_text_translation(user_id=request.user.id, text=request.POST.get('text'))
     return translator.translate(data=request.POST.get('text'))

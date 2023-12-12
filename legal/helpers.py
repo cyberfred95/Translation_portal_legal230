@@ -111,8 +111,7 @@ class ModernMTProvider:
         self.set_credentials()
 
     def set_credentials(self):
-        self.__api_key = self.__creds['api_key']
-
+        self.__api_key = self.__creds['key']
 
     def translate(self, data):
         mmt = modernmt.ModernMT(self.__api_key)
