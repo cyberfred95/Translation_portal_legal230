@@ -107,9 +107,9 @@ def mmt_file_translation(request, creds):
 def file_translate(request):
     provider_key = request.POST.get('provider_key')
     provider_model = provider_models[request.POST.get('provider_model')]
-    if provider_model == 'Microsoft' and provider_key[provider_key]['provider'] == 'ms':
+    if provider_model == 'Microsoft' and provider_model[provider_key]['provider'] == 'ms':
         return ms_file_translation(request, providers[provider_key])
-    if provider_model == 'ModernMt' and provider_key[provider_key]['provider'] == 'mmt':
+    if provider_model == 'ModernMt' and provider_model[provider_key]['provider'] == 'mmt':
         return mmt_file_translation(request, providers[provider_key])
 
     print('base')
