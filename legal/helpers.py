@@ -100,7 +100,7 @@ class MicrosoftCustomProvider:
         return result
 
 
-class ModernMTAutoMLProvider:
+class ModernMTProvider:
 
     def __init__(self, data, credentials, source_lang=None, target_lang=None, custom_model=None, project=None):
         self.__memory_id = None
