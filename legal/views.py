@@ -84,11 +84,33 @@ def ms_file_translation(request, creds):
     )
 
 
+def mmt_file_translation(request, creds):
+    translator = ModernMTProvider(
+        credentials=creds,
+        source_lang=creds['source_lng'],
+        target_lang=creds['target_lng']
+    ).set_credentials()
+    file = request.FILES['document'].read()
+    result_data = translator.translate_file(
+        file=file,
+    )
+    b_64 = base64.b64encode(file)
+    send_file_translation(user_id=request.user.id, base64_attachment=b_64.decode(encoding='utf-8'),
+                          file_name=request.FILES['document'].name)
+
+    return FileResponse(
+        [result_data],
+        filename=request.FILES['document'].name
+    )
+
+
 def file_translate(request):
     provider_key = request.POST.get('provider_key')
     provider_model = provider_models[request.POST.get('provider_model')]
     if provider_model == 'Microsoft' and provider_key[provider_key]['provider'] == 'ms':
         return ms_file_translation(request, providers[provider_key])
+    if provider_model == 'ModernMt' and provider_key[provider_key]['provider'] == 'mmt':
+        return mmt_file_translation(request, providers[provider_key])
 
     print('base')
     return None
