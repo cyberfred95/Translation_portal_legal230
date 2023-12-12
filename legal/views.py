@@ -38,8 +38,11 @@ def ms_text_translation(request, creds):
 
 def text_translation(request):
     provider_key = request.POST.get('provider_key')
-    if providers[provider_key]['provider'] == 'ms':
+    provider_model = provider_models[request.POST.get('provider_model')]
+    if provider_model == 'Microsoft' and provider_key[provider_key]['provider'] == 'ms':
         return ms_text_translation(request, providers[provider_key])
+    if provider_model == 'ModernMt' and provider_key[provider_key]['provider'] == 'mmt':
+        return mmt_text_translation(request, providers[provider_key])
     print('base')
     return None
 
@@ -83,7 +86,8 @@ def ms_file_translation(request, creds):
 
 def file_translate(request):
     provider_key = request.POST.get('provider_key')
-    if providers[provider_key]['provider'] == 'ms':
+    provider_model = provider_models[request.POST.get('provider_model')]
+    if provider_model == 'Microsoft' and provider_key[provider_key]['provider'] == 'ms':
         return ms_file_translation(request, providers[provider_key])
 
     print('base')
