@@ -5,6 +5,7 @@ from google.cloud.translate_v3.types import DocumentInputConfig
 from google.cloud import translate_v2 as translate
 import html
 import requests
+import ast
 import os
 from datetime import datetime
 from azure.core.credentials import AzureKeyCredential, AccessToken
@@ -116,6 +117,8 @@ class ModernMTProvider:
     def translate(self, data):
         mmt = modernmt.ModernMT(self.__api_key)
         translated_text = []
+        data = ast.literal_eval(data)
+        print(type(data))
         source_text = [x for x in data if x != '']
         for sentence in source_text:
             result = mmt.translate(self.source_lang, self.target_lang, sentence)
