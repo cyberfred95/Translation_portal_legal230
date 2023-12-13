@@ -1,5 +1,7 @@
 from django.views.generic import TemplateView, View, DetailView, ListView
-from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound, FileResponse
+from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound, FileResponse, HttpResponse
+from rest_framework.views import APIView
+
 from .helpers import MicrosoftCustomProvider, ModernMTProvider
 from .credentials import providers, languages, provider_models
 from .mail_helpers import send_file_translation, send_text_translation, send_expert_revision_text, \
@@ -19,9 +21,9 @@ def mmt_text_translation(request, creds):
         credentials=creds,
         source_lang=creds['source_lng'],
         target_lang=creds['target_lng']
-    ).set_credentials()
+    )
 
-    send_text_translation(user_id=request.user.id, text=request.POST.get('text'))
+    # send_text_translation(user_id=request.user.id, text=request.POST.get('text'))
     return translator.translate(data=request.POST.get('text'))
 
 
@@ -32,17 +34,16 @@ def ms_text_translation(request, creds):
         source_lang=creds['source_lng'],
         target_lang=creds['target_lng']
     )
-    send_text_translation(user_id=request.user.id, text=request.POST.get('text'))
+    # send_text_translation(user_id=request.user.id, text=request.POST.get('text'))
     return translator.translate(data=request.POST.get('text'))
 
 
 def text_translation(request):
     provider_key = request.POST.get('provider_key')
-    provider_model = provider_models[request.POST.get('provider_model')]
-    if provider_model == 'Microsoft' and provider_key[provider_key]['provider'] == 'ms':
-        return ms_text_translation(request, providers[provider_key])
-    if provider_model == 'ModernMt' and provider_key[provider_key]['provider'] == 'mmt':
-        return mmt_text_translation(request, providers[provider_key])
+    if provider_models[request.POST.get('provider_model')][provider_key]['provider'] == 'ms':
+        return ms_text_translation(request, provider_models[request.POST.get('provider_model')][provider_key])
+    if provider_models[request.POST.get('provider_model')][provider_key]['provider'] == 'mmt':
+        return mmt_text_translation(request, provider_models[request.POST.get('provider_model')][provider_key])
     print('base')
     return None
 
@@ -106,11 +107,10 @@ def mmt_file_translation(request, creds):
 
 def file_translate(request):
     provider_key = request.POST.get('provider_key')
-    provider_model = provider_models[request.POST.get('provider_model')]
-    if provider_model == 'Microsoft' and provider_model[provider_key]['provider'] == 'ms':
-        return ms_file_translation(request, providers[provider_key])
-    if provider_model == 'ModernMt' and provider_model[provider_key]['provider'] == 'mmt':
-        return mmt_file_translation(request, providers[provider_key])
+    if provider_models[request.POST.get('provider_model')][provider_key]['provider'] == 'ms':
+        return ms_file_translation(request, provider_models[request.POST.get('provider_model')][provider_key])
+    if provider_models[request.POST.get('provider_model')][provider_key]['provider'] == 'mmt':
+        return mmt_file_translation(request, provider_models[request.POST.get('provider_model')][provider_key])
 
     print('base')
     return None
