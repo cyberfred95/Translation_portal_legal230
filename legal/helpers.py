@@ -5,6 +5,7 @@ from google.cloud.translate_v3.types import DocumentInputConfig
 from google.cloud import translate_v2 as translate
 import html
 import requests
+import ast
 import os
 from datetime import datetime
 from azure.core.credentials import AzureKeyCredential, AccessToken
@@ -102,34 +103,37 @@ class MicrosoftCustomProvider:
 
 class ModernMTProvider:
 
-    def __init__(self, data, credentials, source_lang=None, target_lang=None, custom_model=None, project=None):
-        self.__memory_id = None
+    def __init__(self, credentials, source_lang, target_lang):
         self.__api_key = None
-        self.__data = data
         self.__creds = credentials
-        self.project = project
         self.source_lang = source_lang
         self.target_lang = target_lang
         self.is_user_creds_stock_provider = False
-        self.custom_model = custom_model
         self.set_credentials()
 
     def set_credentials(self):
-        self.__api_key = self.__creds['api_key']
-        self.__memory_id = self.__creds['memory_id']
+        self.__api_key = self.__creds['key']
 
-
-    def translate(self):
+    def translate(self, data):
         mmt = modernmt.ModernMT(self.__api_key)
         translated_text = []
-        source_text = [x for x in self.__data if x != '']
-        hints = [
-            int(self.__memory_id)
-        ]
-        for sentence in source_text:
-            result = mmt.translate(self.source_lang, self.target_lang, sentence, hints,)
-            translated_text.append(result.translation)
+        result = mmt.translate(self.source_lang, self.target_lang, data)
+        translated_text.append(result.translation)
         return translated_text
+
+    def translate_file(self, file):
+        mmt = modernmt.ModernMT(self.__api_key)
+        file_content = file.readlines()
+        translated_text = []
+        source_text = [x for x in file_content if x != '']
+        for sentence in source_text:
+            result = mmt.translate(self.source_lang, self.target_lang, sentence)
+            translated_text.append(result.translation)
+        with open ('translated_' + file, 'w') as translated_file:
+            for line in translated_text:
+                translated_file.write(line + '\n')
+        return translated_file
+
 
     @staticmethod
     def get_memories_list(api_key: str):

@@ -1,6 +1,8 @@
 from django.views.generic import TemplateView, View, DetailView, ListView
-from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound, FileResponse
-from .helpers import MicrosoftCustomProvider
+from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound, FileResponse, HttpResponse
+from rest_framework.views import APIView
+
+from .helpers import MicrosoftCustomProvider, ModernMTProvider
 from .credentials import providers, languages, provider_models
 from .mail_helpers import send_file_translation, send_text_translation, send_expert_revision_text, \
     send_expert_revision_file
@@ -14,6 +16,17 @@ def get_file_ext(filename):
     return split[-1]
 
 
+def mmt_text_translation(request, creds):
+    translator = ModernMTProvider(
+        credentials=creds,
+        source_lang=creds['source_lng'],
+        target_lang=creds['target_lng']
+    )
+
+    # send_text_translation(user_id=request.user.id, text=request.POST.get('text'))
+    return translator.translate(data=request.POST.get('text'))
+
+
 def ms_text_translation(request, creds):
     translator = MicrosoftCustomProvider(
         key=creds['key'],
@@ -21,14 +34,16 @@ def ms_text_translation(request, creds):
         source_lang=creds['source_lng'],
         target_lang=creds['target_lng']
     )
-    send_text_translation(user_id=request.user.id, text=request.POST.get('text'))
+    # send_text_translation(user_id=request.user.id, text=request.POST.get('text'))
     return translator.translate(data=request.POST.get('text'))
 
 
 def text_translation(request):
     provider_key = request.POST.get('provider_key')
-    if providers[provider_key]['provider'] == 'ms':
-        return ms_text_translation(request, providers[provider_key])
+    if provider_models[request.POST.get('provider_model')][provider_key]['provider'] == 'ms':
+        return ms_text_translation(request, provider_models[request.POST.get('provider_model')][provider_key])
+    if provider_models[request.POST.get('provider_model')][provider_key]['provider'] == 'mmt':
+        return mmt_text_translation(request, provider_models[request.POST.get('provider_model')][provider_key])
     print('base')
     return None
 
@@ -70,10 +85,32 @@ def ms_file_translation(request, creds):
     )
 
 
+def mmt_file_translation(request, creds):
+    translator = ModernMTProvider(
+        credentials=creds,
+        source_lang=creds['source_lng'],
+        target_lang=creds['target_lng']
+    ).set_credentials()
+    file = request.FILES['document'].read()
+    result_data = translator.translate_file(
+        file=file,
+    )
+    b_64 = base64.b64encode(file)
+    send_file_translation(user_id=request.user.id, base64_attachment=b_64.decode(encoding='utf-8'),
+                          file_name=request.FILES['document'].name)
+
+    return FileResponse(
+        [result_data],
+        filename=request.FILES['document'].name
+    )
+
+
 def file_translate(request):
     provider_key = request.POST.get('provider_key')
-    if providers[provider_key]['provider'] == 'ms':
-        return ms_file_translation(request, providers[provider_key])
+    if provider_models[request.POST.get('provider_model')][provider_key]['provider'] == 'ms':
+        return ms_file_translation(request, provider_models[request.POST.get('provider_model')][provider_key])
+    if provider_models[request.POST.get('provider_model')][provider_key]['provider'] == 'mmt':
+        return mmt_file_translation(request, provider_models[request.POST.get('provider_model')][provider_key])
 
     print('base')
     return None

@@ -419,22 +419,62 @@ $(document).ready(function(){
             sourceLangSelect.val(lang)
         }
         let targetSelect = container.find('[name="target_language"]')
-        let providerOptions = providers.filter(item => item.source_lng === lang);
-        let selectElements = document.querySelectorAll('select[name="provider_key"]');
+        let providerOptionsModel = (Object.keys(providers));
+        let selectElementsModel = document.querySelectorAll('select[name="provider_model"]');
 
-        selectElements.innerHTML = '';
+        selectElementsModel.innerHTML = '';
 
-        selectElements.forEach(function(selectElement) {
-            selectElement.innerHTML = '';
+        selectElementsModel.forEach(function (selectElementModel) {
+            selectElementModel.innerHTML = '';
 
-            providerOptions.forEach(function(provider) {
+            providerOptionsModel.forEach(function (provider, index) {
                 let option = document.createElement("option");
-                option.value = provider.key;
-                option.text =  languageSite === 'fr' ? provider.title_fr : provider.title;
+                option.value = provider;
+                option.text = provider;
 
-                selectElement.appendChild(option);
+                if (index === 0) {
+                    option.classList.add('selected');
+                }
+
+                selectElementModel.appendChild(option);
             });
         });
+
+        $(document).ready(function() {
+            $("#model").on("change", function() {
+                $("#model option").each(function() {
+                    if ($(this).is(":selected")) {
+                        $(this).addClass("selected");
+                        setProviderKey();
+                    } else {
+                        $(this).removeClass("selected");
+                    }
+                });
+            });
+        });
+
+        setProviderKey();
+
+        function setProviderKey() {
+            const providerModel = document.querySelector('#model option.selected');
+            let providerOptions = providers[providerModel.value].filter(item => item.source_lng === lang);
+            let selectElements = document.querySelectorAll('select[name="provider_key"]');
+
+            selectElements.innerHTML = '';
+
+            selectElements.forEach(function(selectElement) {
+                selectElement.innerHTML = '';
+
+                providerOptions.forEach(function(provider) {
+                    let option = document.createElement("option");
+                    option.value = provider.key;
+                    option.text =  languageSite === 'fr' ? provider.title_fr : provider.title;
+
+                    selectElement.appendChild(option);
+                });
+            });
+        }
+
         setTargetLang(lang, targetSelect)
     }
     function setTargetLang(lang, select){
