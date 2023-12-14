@@ -117,12 +117,8 @@ class ModernMTProvider:
     def translate(self, data):
         mmt = modernmt.ModernMT(self.__api_key)
         translated_text = []
-        data = ast.literal_eval(data)
-        print(type(data))
-        source_text = [x for x in data if x != '']
-        for sentence in source_text:
-            result = mmt.translate(self.source_lang, self.target_lang, sentence)
-            translated_text.append(result.translation)
+        result = mmt.translate(self.source_lang, self.target_lang, data)
+        translated_text.append(result.translation)
         return translated_text
 
     def translate_file(self, file):
