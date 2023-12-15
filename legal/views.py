@@ -134,7 +134,6 @@ class TranslateView(TemplateView):
                     'target_lng': provider_data[key]['target_lng'],
                     'provider': provider_data[key]['provider']
                 })
-        print(provs)
         context['providers'] = provs
         context['languages'] = languages
         return context
@@ -143,6 +142,7 @@ class TranslateView(TemplateView):
         if not request.is_ajax():
             return HttpResponseBadRequest()
         if request.POST.get('action') == 'text_translate':
+            print(text_translation(request=request))
             return JsonResponse({'result': text_translation(request)})
         if request.POST.get('action') == 'file_translate':
             return file_translate(request)
