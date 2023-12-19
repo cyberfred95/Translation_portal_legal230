@@ -15,7 +15,7 @@ from azure.storage.blob import ContainerClient, \
     ContainerSasPermissions
 import uuid
 import modernmt
-from .keys import MS_ACCESS_TOKEN, MS_CONNECTION, MS_ENDPOINT
+from .keys import MS_ACCESS_TOKEN, MS_CONNECTION, MS_ENDPOINT, MS_AZURE_ENDPOINT
 
 
 class MicrosoftCustomProvider:
@@ -71,7 +71,7 @@ class MicrosoftCustomProvider:
 
         blob_client.upload_blob(file)
         key = self.__key
-        endpoint = "https://legal230-test-litiges-en-fr.cognitiveservices.azure.com/"
+        endpoint = MS_AZURE_ENDPOINT
         sourcer_sas = '?' + generate_container_sas(
             'legal230storage',
             container_name=container_name,
