@@ -522,7 +522,7 @@ $(document).ready(function(){
         let btn = form.find('[type=submit]');
         let url = form.attr('action')
         let formData = new FormData(form[0]);
-        let resultContainer = $('.translate__form-text.result textarea')
+        let resultContainer = $('.translate__form-text.result textarea');
         let errorBlock = form.find('.invalid-feedback');
 
         if(text.length > parseInt(text.attr('maxlength'))) {
@@ -547,7 +547,7 @@ $(document).ready(function(){
         .then(r =>  r.json().then(data => ({status: r.status, body: data})))
         .then(obj => {
             if(obj.status === 200) {
-                resultContainer.text(obj.body['result']);
+                resultContainer.val(obj.body['result']);
                 btn.attr('disabled', false);
                 $('#expert_revision').removeClass('expert--revision');
                 preloader.fadeOut(300);
@@ -644,9 +644,11 @@ $(document).ready(function(){
 
     function clearText() {
         let btn = $(this)
-        let textarea = btn.closest('.translate__form-text').find('textarea')
+        let textarea = btn.closest('.translate__form-text').find('textarea');
+        let textareaResult = $('#result_text');
 
-        textarea.val('')
+        textarea.val('');
+        textareaResult.val('');
     }
     function copyText() {
         let btn = $(this)
@@ -674,6 +676,7 @@ $(document).ready(function(){
         targetLanguageInput.value = tempLang;
 
         var tempText = inputText.value;
+        console.log(inputText.value)
         inputText.value = resultText.value;
         resultText.value = tempText;
 
