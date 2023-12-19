@@ -3,7 +3,7 @@ from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpRespo
 from rest_framework.views import APIView
 
 from .helpers import MicrosoftCustomProvider, ModernMTProvider
-from .credentials import providers, languages, provider_models
+from .credentials import languages, provider_models
 from .mail_helpers import send_file_translation, send_text_translation, send_expert_revision_text, \
     send_expert_revision_file
 import base64
