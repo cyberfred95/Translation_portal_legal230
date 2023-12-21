@@ -46,7 +46,7 @@ services:
       - redis
 
   postgres:
-    build: ./docker/postgres
+    image: postgres:16.1
     environment:
       - POSTGRES_USER=legal
       - DJANGO_PG_PASSWOR=datasvitend

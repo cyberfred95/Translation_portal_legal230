@@ -3,7 +3,7 @@ from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpRespo
 from rest_framework.views import APIView
 
 from .helpers import MicrosoftCustomProvider, ModernMTProvider
-from .credentials import providers, languages, provider_models
+from .credentials import languages, provider_models
 from .mail_helpers import send_file_translation, send_text_translation, send_expert_revision_text, \
     send_expert_revision_file
 import base64
@@ -134,7 +134,6 @@ class TranslateView(TemplateView):
                     'target_lng': provider_data[key]['target_lng'],
                     'provider': provider_data[key]['provider']
                 })
-        print(provs)
         context['providers'] = provs
         context['languages'] = languages
         return context
@@ -143,6 +142,7 @@ class TranslateView(TemplateView):
         if not request.is_ajax():
             return HttpResponseBadRequest()
         if request.POST.get('action') == 'text_translate':
+            print(text_translation(request=request))
             return JsonResponse({'result': text_translation(request)})
         if request.POST.get('action') == 'file_translate':
             return file_translate(request)
