@@ -7,6 +7,7 @@ MS_AZURE_ENDPOINT = "https://legal230-test-litiges-en-fr.cognitiveservices.azure
 
 FILES_PROCESSING_API_URL = 'http://3.79.151.228'
 
+
 provider_models = {
     'Microsoft': {
         'ms_en_fr_des': {
@@ -318,3 +319,4 @@ provider_models = {
     }
 
 }
+

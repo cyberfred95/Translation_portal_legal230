@@ -1,4 +1,3 @@
-from .keys import MS_KEY, MMT_KEY
 languages = [
     {
         'name': 'English',
@@ -25,7 +24,5 @@ languages = [
         ]
     }
 ]
-
-
 
 # ca8b415515464c2c96fb8fee04682adf

@@ -6,7 +6,6 @@ from google.cloud import translate_v2 as translate
 import html
 import requests
 import ast
-import os
 from datetime import datetime
 from azure.core.credentials import AzureKeyCredential, AccessToken
 from azure.ai.translation.document import DocumentTranslationClient
@@ -15,7 +14,25 @@ from azure.storage.blob import ContainerClient, \
     ContainerSasPermissions
 import uuid
 import modernmt
-from .keys import MS_ACCESS_TOKEN, MS_CONNECTION, MS_ENDPOINT, MS_AZURE_ENDPOINT
+from .keys import MS_ACCESS_TOKEN, MS_CONNECTION, MS_ENDPOINT, MS_AZURE_ENDPOINT, FILES_PROCESSING_API_URL
+from typing import Tuple
+from os.path import basename, splitext
+import json
+files_processing_api_path_mapping = {
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "word"
+}
+
+class DocumentInfo:
+    def __init__(self, document_info: Tuple[str, str]):
+        if not document_info[0] in files_processing_api_path_mapping:
+            raise ValueError(f"Content type {document_info[0]} not supported")
+        self.content_type = document_info[0]
+        self.file_path = document_info[1]
+        with open(self.file_path, "rb") as temp:
+            self.file_content = temp.read()
+
+        self.file_name = basename(self.file_path)
+        self.file_extension = splitext(self.file_name)[1].lower()
 
 
 class MicrosoftCustomProvider:
@@ -80,7 +97,6 @@ class MicrosoftCustomProvider:
             expiry='2032-05-25T14:35:12Z',
             start='2022-05-25T14:35:12Z'
         )
-
         target_sas = '?' + generate_container_sas(
             'legal230storage',
             container_name=container_name + '-trans',
@@ -135,3 +151,62 @@ class ModernMTProvider:
     def get_memories_list(api_key: str):
         mmt = modernmt.ModernMT(api_key)
         return mmt.memories.list()
+
+
+def get_files_processing_api_url(document_content_type):
+    return f"{FILES_PROCESSING_API_URL}/api/{files_processing_api_path_mapping[document_content_type]}"
+
+
+def extract_texts_from_document(document_info: DocumentInfo):
+    headers = {
+        "Content-Type": document_info.content_type,
+        "Content-Disposition": f'attachment; filename="{document_info.file_name}"',
+    }
+
+    api_url = get_files_processing_api_url(document_info.content_type)
+    r = requests.post(api_url + "/export", data=document_info.file_content, headers=headers)
+    return r.json()
+
+
+def create_translated_document(document_info: DocumentInfo, texts_object, translated_texts):
+    for i in range(len(translated_texts)):
+        translated_text = translated_texts[i]
+        texts_object["texts"][i]["text"] = translated_text
+
+    files = [
+        (
+            "json",
+            (
+                "input.json",
+                json.dumps(texts_object),
+                "application/json",
+            ),
+        ),
+        (
+            "file",
+            (
+                document_info.file_name,
+                document_info.file_content,
+                document_info.content_type,
+            ),
+        ),
+    ]
+
+    api_url = get_files_processing_api_url(document_info.content_type)
+    r = requests.post(api_url + "/create", files=files)
+    return r.content
+
+
+def run_modernmt_file_translation(document, creds, source_language, target_language):
+    try:
+        document_info = DocumentInfo(document_info=document)
+    except ValueError:
+        return False
+
+    text_objects = extract_texts_from_document(document_info)
+    source_texts: list[str] = [text_object["text"] for text_object in text_objects["texts"]]
+    translated_text = ModernMTProvider(credentials=creds,
+                                       source_lang=source_language,
+                                       target_lang=target_language).translate_from_file(source_texts)
+
+    return create_translated_document(document_info, text_objects, translated_text)
