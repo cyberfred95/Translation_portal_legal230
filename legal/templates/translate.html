@@ -94,7 +94,6 @@
                             <input type="hidden" name="action" value="text_translate">
                             <input type="hidden" name="source_language" value="en">
                             <input type="hidden" name="target_language" value="fr">
-                            <input type="hidden" name="provider" value="ms">
                             {% csrf_token %}
 
                             <div class="translate__form-row">
@@ -107,7 +106,7 @@
                                     </div>
                                     <div class="translate__form-title target">
                                         <span>{% trans "French" %}</span>
-                                        <select id="model" name="provider_model"></select>
+                                        <select class="model" name="provider_model"></select>
                                         <select name="provider_key"></select>
                                     </div>
                                 </div>
@@ -168,8 +167,8 @@
                             <input type="hidden" name="action" value="file_translate">
                             <input type="hidden" name="source_language" value="en">
                             <input type="hidden" name="target_language" value="fr">
-                            <input type="hidden" name="provider" value="mmt">
-                            <input type="hidden" name="provider_model" value="ModernMT">
+                            <input type="hidden" name="provider" value="ms">
+
                             {% csrf_token %}
                             <div class="translate__form-row">
                                 <div class="translate__form-header">
@@ -181,8 +180,8 @@
                                         <span>{% trans "French" %}</span>
                                     </div>
                                     <div class="translate__form-title document-select">
-{#                                        <select name="provider_key"></select>#}
-                                        <input name="provider_key" type="hidden" value="mmt_en_fr_des">
+                                        <select class="model-document" name="provider_model"></select>
+                                        <select name="provider_key"></select>
                                     </div>
                                 </div>
                             </div>

@@ -440,43 +440,62 @@ $(document).ready(function(){
             });
         });
 
-        $(document).ready(function() {
-            $("#model").on("change", function() {
-                $("#model option").each(function() {
+        setProviderKey(lang);
+
+            $(".model").on("change", function() {
+                $(".model option").each(function() {
                     if ($(this).is(":selected")) {
+                        console.log(2134)
                         $(this).addClass("selected");
-                        setProviderKey();
+                        setProviderKey(lang);
                     } else {
                         $(this).removeClass("selected");
                     }
                 });
             });
-        });
 
-        setProviderKey();
-
-        function setProviderKey() {
-            const providerModel = document.querySelector('#model option.selected');
-            let providerOptions = providers[providerModel.value].filter(item => item.source_lng === lang);
-            let selectElements = document.querySelectorAll('select[name="provider_key"]');
-
-            selectElements.innerHTML = '';
-
-            selectElements.forEach(function(selectElement) {
-                selectElement.innerHTML = '';
-
-                providerOptions.forEach(function(provider) {
-                    let option = document.createElement("option");
-                    option.value = provider.key;
-                    option.text =  languageSite === 'fr' ? provider.title_fr : provider.title;
-
-                    selectElement.appendChild(option);
-                });
+        $(".model-document").on("change", function() {
+            $(".model-document option").each(function() {
+                if ($(this).is(":selected")) {
+                    $(this).addClass("selected");
+                    console.log(233)
+                    setProviderKey(lang, true);
+                } else {
+                    $(this).removeClass("selected");
+                }
             });
-        }
+        });
 
         setTargetLang(lang, targetSelect)
     }
+
+    function setProviderKey(lang, file) {
+        let providerModel;
+        if (file) {
+             providerModel = document.querySelector('.model-document option.selected');
+        } else {
+            providerModel = document.querySelector('.model option.selected');
+        }
+        console.log(providerModel.value);
+        let providerOptions = providers[providerModel.value].filter(item => item.source_lng === lang);
+        console.log(providerOptions);
+        let selectElements = document.querySelectorAll('select[name="provider_key"]');
+
+        selectElements.innerHTML = '';
+
+        selectElements.forEach(function(selectElement) {
+            selectElement.innerHTML = '';
+
+            providerOptions.forEach(function(provider) {
+                let option = document.createElement("option");
+                option.value = provider.key;
+                option.text = languageSite === 'fr' ? provider.title_fr : provider.title;
+
+                selectElement.appendChild(option);
+            });
+        });
+    }
+
     function setTargetLang(lang, select){
         select.val('')
         select.find('option:not([value=""])').remove()
