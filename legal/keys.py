@@ -5,6 +5,9 @@ MS_CONNECTION = f'DefaultEndpointsProtocol=https;AccountName=legal230storage;Acc
 MS_ENDPOINT = 'https://legal230storage.blob.core.windows.net/'
 MS_AZURE_ENDPOINT = "https://legal230-test-litiges-en-fr.cognitiveservices.azure.com/"
 
+FILES_PROCESSING_API_URL = 'http://3.79.151.228'
+
+
 provider_models = {
     'Microsoft': {
         'ms_en_fr_des': {
@@ -316,3 +319,4 @@ provider_models = {
     }
 
 }
+
