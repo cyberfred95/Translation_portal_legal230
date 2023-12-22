@@ -11,7 +11,7 @@ from .mail_helpers import send_file_translation, send_text_translation, send_exp
 import base64
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
-from .tasks import extract_texts_from_document, DocumentInfo, create_translated_document
+from .helpers import run_modernmt_file_translation
 
 
 def get_file_ext(filename):
@@ -95,27 +95,20 @@ def mmt_file_translation(request, creds):
     file_name = storage.save(translation_file.name, translation_file)
     temp_file_path = storage.path(file_name)
     document_info = (translation_file.content_type, temp_file_path)
-
-    try:
-        document_info = DocumentInfo(document_info=document_info)
-    except ValueError:
-        return False
-
-    text_objects = extract_texts_from_document(document_info)
-    source_texts: list[str] = [text_object["text"] for text_object in text_objects["texts"]]
-    translated_text = ModernMTProvider(credentials=creds,
-                                       source_lang=request.POST['source_language'],
-                                       target_lang=request.POST['target_language']).translate_from_file(source_texts)
-
-    translated_document = create_translated_document(document_info,text_objects, translated_text)
+    translated_document = run_modernmt_file_translation(
+        document=document_info,
+        creds=creds,
+        source_language=request.POST['source_language'],
+        target_language=request.POST['target_language']
+    )
     b_64 = base64.b64encode(translated_document)
     send_file_translation(user_id=request.user.id, base64_attachment=b_64.decode(encoding='utf-8'),
                           file_name=request.FILES['document'].name)
+
     return FileResponse(
         [translated_document],
         filename=request.FILES['document'].name
     )
-
 
 def file_translate(request):
     provider_key = request.POST.get('provider_key')
