@@ -441,7 +441,7 @@ $(document).ready(function(){
         });
 
         setProviderKey(lang);
-
+        $(document).ready(function(){
             $(".model").on("change", function() {
                 $(".model option").each(function() {
                     if ($(this).is(":selected")) {
@@ -453,7 +453,9 @@ $(document).ready(function(){
                     }
                 });
             });
+        });
 
+        $(document).ready(function(){
         $(".model-document").on("change", function() {
             $(".model-document option").each(function() {
                 if ($(this).is(":selected")) {
@@ -465,6 +467,7 @@ $(document).ready(function(){
                 }
             });
         });
+        });
 
         setTargetLang(lang, targetSelect)
     }
@@ -473,6 +476,7 @@ $(document).ready(function(){
         let providerModel;
         if (file) {
              providerModel = document.querySelector('.model-document option.selected');
+            console.log('providerModel')
         } else {
             providerModel = document.querySelector('.model option.selected');
         }
