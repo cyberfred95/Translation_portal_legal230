@@ -440,45 +440,41 @@ $(document).ready(function(){
             });
         });
 
-        setProviderKey(lang);
-
-            $(".model").on("change", function() {
-                $(".model option").each(function() {
+        $(document).ready(function(){
+            $('#model-text').on('change', function() {
+                $("#model-text option").each(function() {
                     if ($(this).is(":selected")) {
-                        console.log(2134)
                         $(this).addClass("selected");
-                        setProviderKey(lang);
+                        setProviderKey(lang, '#model-text');
                     } else {
                         $(this).removeClass("selected");
                     }
                 });
             });
+        });
 
-        $(".model-document").on("change", function() {
-            $(".model-document option").each(function() {
-                if ($(this).is(":selected")) {
-                    $(this).addClass("selected");
-                    console.log(233)
-                    setProviderKey(lang, true);
-                } else {
-                    $(this).removeClass("selected");
-                }
+        $(document).ready(function(){
+            $('#model-file').on('change', function() {
+                $("#model-file option").each(function() {
+                    if ($(this).is(":selected")) {
+                        $(this).addClass("selected");
+                        setProviderKey(lang, '#model-file');
+                    } else {
+                        $(this).removeClass("selected");
+                    }
+                });
             });
         });
+
+        setProviderKey(lang, '#model-text');
 
         setTargetLang(lang, targetSelect)
     }
 
-    function setProviderKey(lang, file) {
-        let providerModel;
-        if (file) {
-             providerModel = document.querySelector('.model-document option.selected');
-        } else {
-            providerModel = document.querySelector('.model option.selected');
-        }
-        console.log(providerModel.value);
-        let providerOptions = providers[providerModel.value].filter(item => item.source_lng === lang);
-        console.log(providerOptions);
+    function setProviderKey(lang, modelId) {
+        let providerModel = $(modelId + ' option:selected').val();
+        let providerOptions = providers[providerModel].filter(item => item.source_lng === lang);
+
         let selectElements = document.querySelectorAll('select[name="provider_key"]');
 
         selectElements.innerHTML = '';
@@ -695,7 +691,6 @@ $(document).ready(function(){
         targetLanguageInput.value = tempLang;
 
         var tempText = inputText.value;
-        console.log(inputText.value)
         inputText.value = resultText.value;
         resultText.value = tempText;
 
