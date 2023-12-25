@@ -26,7 +26,7 @@ def mmt_text_translation(request, creds):
         target_lang=creds['target_lng']
     )
 
-    # send_text_translation(user_id=request.user.id, text=request.POST.get('text'))
+    send_text_translation(user_id=request.user.id, text=request.POST.get('text'))
     return translator.translate(data=request.POST.get('text'))
 
 
@@ -37,7 +37,7 @@ def ms_text_translation(request, creds):
         source_lang=creds['source_lng'],
         target_lang=creds['target_lng']
     )
-    # send_text_translation(user_id=request.user.id, text=request.POST.get('text'))
+    send_text_translation(user_id=request.user.id, text=request.POST.get('text'))
     return translator.translate(data=request.POST.get('text'))
 
 
