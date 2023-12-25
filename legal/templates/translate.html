@@ -107,7 +107,7 @@
                                     </div>
                                     <div class="translate__form-title target">
                                         <span>{% trans "French" %}</span>
-                                        <select class="model" name="provider_model"></select>
+                                        <select id="model-text" name="provider_model"></select>
                                         <select name="provider_key"></select>
                                     </div>
                                 </div>
@@ -168,7 +168,7 @@
                             <input type="hidden" name="action" value="file_translate">
                             <input type="hidden" name="source_language" value="en">
                             <input type="hidden" name="target_language" value="fr">
-                            <input type="hidden" name="provider" value="mmt">
+                            <input type="hidden" name="provider" value="ms">
 
                             {% csrf_token %}
                             <div class="translate__form-row">
@@ -181,7 +181,7 @@
                                         <span>{% trans "French" %}</span>
                                     </div>
                                     <div class="translate__form-title document-select">
-                                        <select class="model-document" name="provider_model"></select>
+                                        <select  id="model-file" name="provider_model"></select>
                                         <select name="provider_key"></select>
                                     </div>
                                 </div>
