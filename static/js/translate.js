@@ -420,76 +420,101 @@ $(document).ready(function(){
         }
         let targetSelect = container.find('[name="target_language"]')
         let providerOptionsModel = (Object.keys(providers));
-        let selectElementsModel = document.querySelectorAll('select[name="provider_model"]');
+        $('.translate__tab').each(function() {
+            let tab = $(this);
+            let providerModelHiddenInput = tab.find('[name="provider_model"]');
+            let providerKeyHiddenInput = tab.find('[name="provider_key"]');
+            let selectModel = tab.find('.select-box[name="provider_model"]');
+            let selectKey = tab.find('.select-box[name="provider_key"]');
 
-        selectElementsModel.innerHTML = '';
+            updateSelectOptions(selectModel, providerOptionsModel, providerModelHiddenInput, selectKey, providerKeyHiddenInput, lang);
+        });
 
-        selectElementsModel.forEach(function (selectElementModel) {
-            selectElementModel.innerHTML = '';
+        function updateSelectOptions(selectModel, providerOptionsModel, modelHiddenInput, selectKey, keyHiddenInput, lang) {
+            let optionsContainer = selectModel.find('.options-container');
+            let selectedTextSpan = selectModel.find('.selected-text');
+            // let providerModel = selectModel.find('.selected-text').text();
+            optionsContainer.empty();
 
-            providerOptionsModel.forEach(function (provider, index) {
-                let option = document.createElement("option");
-                option.value = provider;
-                option.text = provider;
+            providerOptionsModel.forEach(function(provider, index) {
+                console.log(provider);
+                let option = $('<li>').addClass('option').attr('data-value', provider).text(provider);
+                option.on('click', function() {
+                    selectedTextSpan.text(provider);
+                    modelHiddenInput.val(provider);
+                    updateProviderKey(provider, selectKey, keyHiddenInput, lang);
+                });
+
+                optionsContainer.append(option);
 
                 if (index === 0) {
-                    option.classList.add('selected');
+                    selectedTextSpan.text(provider);
+                    modelHiddenInput.val(provider);
+                    updateProviderKey(provider, selectKey, keyHiddenInput, lang);
                 }
-
-                selectElementModel.appendChild(option);
             });
-        });
+        }
 
-        $(document).ready(function(){
-            $('#model-text').on('change', function() {
-                $("#model-text option").each(function() {
-                    if ($(this).is(":selected")) {
-                        $(this).addClass("selected");
-                        setProviderKey(lang, '#model-text');
-                    } else {
-                        $(this).removeClass("selected");
-                    }
+        function updateProviderKey(provider, selectKey, hiddenInput, lang) {
+            console.log( providers[provider]);
+            let providerOptions = providers[provider].filter(item => item.source_lng === lang);
+            let optionsContainer = selectKey.find('.options-container');
+            let selectedTextSpan = selectKey.find('.selected-text');
+
+            optionsContainer.empty();
+
+            providerOptions.forEach(function(provider, index) {
+                let option = $('<li>').addClass('option').attr('data-value', provider.key).text(languageSite === 'fr' ? provider.title_fr : provider.title);
+                option.on('click', function() {
+                    selectedTextSpan.text(provider.title);
+                    hiddenInput.val(provider.key);
                 });
-            });
-        });
 
-        $(document).ready(function(){
-            $('#model-file').on('change', function() {
-                $("#model-file option").each(function() {
-                    if ($(this).is(":selected")) {
-                        $(this).addClass("selected");
-                        setProviderKey(lang, '#model-file');
-                    } else {
-                        $(this).removeClass("selected");
-                    }
-                });
-            });
-        });
+                optionsContainer.append(option);
 
-        setProviderKey(lang, '#model-text');
+                if (index === 0) {
+                    selectedTextSpan.text(provider.title);
+                    hiddenInput.val(provider.key);
+                }
+            });
+        }
 
         setTargetLang(lang, targetSelect)
     }
 
     function setProviderKey(lang, modelId) {
-        let providerModel = $(modelId + ' option:selected').val();
+        console.log(modelId);
+        let providerModel = $(modelId + ' .selected .selected-text').data('value');
         let providerOptions = providers[providerModel].filter(item => item.source_lng === lang);
+        let optionsContainer = document.querySelector('.select-box[name="provider_key"] .options-container');
+        let selectedDiv = document.querySelector('.select-box[name="provider_key"] .selected');
+        let selectedTextSpan = selectedDiv.querySelector('.selected-text');
+        let providerKeyHiddenInput = document.getElementById('provider_key_hidden_text');
 
-        let selectElements = document.querySelectorAll('select[name="provider_key"]');
+        if (optionsContainer) {
+            optionsContainer.innerHTML = '';
 
-        selectElements.innerHTML = '';
+            providerOptions.forEach(function(provider, index) {
+                let option = document.createElement("li");
+                option.classList.add('option');
+                option.setAttribute('data-value', provider.key);
+                option.textContent = languageSite === 'fr' ? provider.title_fr : provider.title;
 
-        selectElements.forEach(function(selectElement) {
-            selectElement.innerHTML = '';
+                option.addEventListener('click', function() {
+                    selectedTextSpan.textContent = provider.title;
+                    selectedDiv.setAttribute('data-value', provider.key);
+                    providerKeyHiddenInput.value = provider.key;
+                });
 
-            providerOptions.forEach(function(provider) {
-                let option = document.createElement("option");
-                option.value = provider.key;
-                option.text = languageSite === 'fr' ? provider.title_fr : provider.title;
+                optionsContainer.appendChild(option);
 
-                selectElement.appendChild(option);
+                if (index === 0) {
+                    selectedTextSpan.textContent = provider.title;
+                    selectedTextSpan.setAttribute('data-value', provider.key);
+                    providerKeyHiddenInput.value = provider.key;
+                }
             });
-        });
+        }
     }
 
     function setTargetLang(lang, select){
@@ -652,6 +677,9 @@ $(document).ready(function(){
     }
     function formReset(e) {
         e.preventDefault()
+        let form = $(this);
+        let btn = form.find('[type=submit]');
+        btn.show();
         formFile.find('input').val('')
         $('.complete').hide();
         $('.translate__file-block.input').css('display', 'flex')
@@ -721,6 +749,41 @@ $(document).ready(function(){
 
         setSourceLang(currentTargetLang);
     });
+
+    const selectBoxes = document.querySelectorAll(".select-box");
+
+    selectBoxes.forEach(function(box) {
+        const selected = box.querySelector(".selected");
+        const optionsContainer = box.querySelector(".options-container");
+        const options = optionsContainer.querySelectorAll(".option");
+
+        selected.addEventListener("click", function() {
+            document.querySelectorAll(".select-box .options-container.active").forEach(function(openContainer) {
+                if (openContainer !== optionsContainer) {
+                    openContainer.classList.remove("active");
+                }
+            });
+
+            optionsContainer.classList.toggle("active");
+        });
+
+        options.forEach(function(option) {
+            option.addEventListener("click", function() {
+                selected.innerHTML = option.textContent;
+                optionsContainer.classList.remove("active");
+            });
+        });
+    });
+
+    document.addEventListener('click', function(e) {
+        selectBoxes.forEach(function(box) {
+            const optionsContainer = box.querySelector(".options-container");
+            if (!box.contains(e.target)) {
+                optionsContainer.classList.remove("active");
+            }
+        });
+    });
+
 
     formText.on('submit', formTextHandler);
     formFile.on('submit', formFileHandler);
