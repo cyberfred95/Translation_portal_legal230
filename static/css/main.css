@@ -1741,7 +1741,8 @@ pointer-events: none}
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 10px 14px;
+    padding: 20px 14px;
+    gap: 20px;
     position: absolute;
     top: 100%;
     left: 0;
