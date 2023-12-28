@@ -437,7 +437,6 @@ $(document).ready(function(){
             optionsContainer.empty();
 
             providerOptionsModel.forEach(function(provider, index) {
-                console.log(provider);
                 let option = $('<li>').addClass('option').attr('data-value', provider).text(provider);
                 option.on('click', function() {
                     selectedTextSpan.text(provider);
@@ -456,7 +455,6 @@ $(document).ready(function(){
         }
 
         function updateProviderKey(provider, selectKey, hiddenInput, lang) {
-            console.log( providers[provider]);
             let providerOptions = providers[provider].filter(item => item.source_lng === lang);
             let optionsContainer = selectKey.find('.options-container');
             let selectedTextSpan = selectKey.find('.selected-text');
@@ -480,41 +478,6 @@ $(document).ready(function(){
         }
 
         setTargetLang(lang, targetSelect)
-    }
-
-    function setProviderKey(lang, modelId) {
-        console.log(modelId);
-        let providerModel = $(modelId + ' .selected .selected-text').data('value');
-        let providerOptions = providers[providerModel].filter(item => item.source_lng === lang);
-        let optionsContainer = document.querySelector('.select-box[name="provider_key"] .options-container');
-        let selectedDiv = document.querySelector('.select-box[name="provider_key"] .selected');
-        let selectedTextSpan = selectedDiv.querySelector('.selected-text');
-        let providerKeyHiddenInput = document.getElementById('provider_key_hidden_text');
-
-        if (optionsContainer) {
-            optionsContainer.innerHTML = '';
-
-            providerOptions.forEach(function(provider, index) {
-                let option = document.createElement("li");
-                option.classList.add('option');
-                option.setAttribute('data-value', provider.key);
-                option.textContent = languageSite === 'fr' ? provider.title_fr : provider.title;
-
-                option.addEventListener('click', function() {
-                    selectedTextSpan.textContent = provider.title;
-                    selectedDiv.setAttribute('data-value', provider.key);
-                    providerKeyHiddenInput.value = provider.key;
-                });
-
-                optionsContainer.appendChild(option);
-
-                if (index === 0) {
-                    selectedTextSpan.textContent = provider.title;
-                    selectedTextSpan.setAttribute('data-value', provider.key);
-                    providerKeyHiddenInput.value = provider.key;
-                }
-            });
-        }
     }
 
     function setTargetLang(lang, select){
