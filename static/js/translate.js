@@ -640,7 +640,6 @@ $(document).ready(function(){
             errorBlock.show()
             return false;
         }
-        let btn = form.find('[type=submit]');
         let url = form.attr('action')
         let formData = new FormData(form[0]);
 
@@ -648,7 +647,7 @@ $(document).ready(function(){
         $('.translate__file-block').hide();
         $('.translate__file-block.trans-progress').css('display', 'flex')
 
-        btn.hide();
+        $('.translate__form-submit').hide();
 
 
         fetch(url, {
