@@ -34,7 +34,10 @@ INSTALLED_APPS = [
     'compressor',
     'django_filters',
     'rosetta',
-    'gpt_processing.apps.GptProcessingConfig'
+    'gpt_processing.apps.GptProcessingConfig',
+    'settings.apps.SettingsConfig',
+    'preferences',
+    'users.apps.UsersConfig'
 ]
 
 STATICFILES_FINDERS = (
@@ -67,6 +70,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'preferences.context_processors.preferences_cp',
+
             ],
         },
     },
@@ -193,3 +198,5 @@ CELERY_TIMEZONE = "UTC"
 CELERY_ALWAYS_EAGER = bool(os.environ.get("CELERY_ALWAYS_EAGER", False))
 OPENAI_GPT_API_KEY = 'REMOVED_OPENAI_KEY_2'
 SENDGRID_API_KEY = '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'
+
+AUTH_USER_MODEL = 'users.User'
