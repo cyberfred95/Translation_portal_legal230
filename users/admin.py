@@ -3,8 +3,8 @@ from django.contrib.auth.admin import UserAdmin
 from .models import User
 from .models import UserGroup
 
-
 admin.site.register(UserGroup)
+
 
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
