@@ -108,9 +108,7 @@
                             <input type="hidden" name="action" value="text_translate">
                             <input type="hidden" name="source_language" value="en">
                             <input type="hidden" name="target_language" value="fr">
-                            <input type="hidden" name="provider" value="ms">
-                            <input type="hidden" name="provider_model" id="provider_model_hidden_text">
-                            <input type="hidden" name="provider_key" id="provider_key_hidden_text">
+
                             {% csrf_token %}
 
                             <div class="translate__form-row">
@@ -202,9 +200,6 @@
                             <input type="hidden" name="action" value="file_translate">
                             <input type="hidden" name="source_language" value="en">
                             <input type="hidden" name="target_language" value="fr">
-                            <input type="hidden" name="provider" value="ms">
-                            <input type="hidden" name="provider_model" id="provider_model_hidden_file">
-                            <input type="hidden" name="provider_key" id="provider_key_hidden_file">
 
                             {% csrf_token %}
                             <div class="translate__form-row">
