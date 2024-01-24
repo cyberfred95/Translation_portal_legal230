@@ -6,9 +6,10 @@ from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpRespo
 import django
 from rest_framework.views import APIView
 
+from languages.models import Language
 from users.models import User
 from .credentials import languages
-from .keys import provider_models, CUSTOM_MT_CONSOLE_URL, CLOUDSTORAGE_API_URL
+from .keys import CUSTOM_MT_CONSOLE_URL, CLOUDSTORAGE_API_URL
 from .mail_helpers import send_expert_revision_text, \
     send_expert_revision_file
 import base64
@@ -53,22 +54,36 @@ class TranslateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        provs = {}
-        for provider in provider_models:
-            provider_data = provider_models.get(provider)
-            provs[f'{provider}'] = []
-            for key in provider_data:
-                provs[f'{provider}'].append({
-                    'key': key,
-                    'title': provider_data[key]['title'],
-                    'title_fr': provider_data[key]['title_fr'],
-                    'source_lng': provider_data[key]['source_lng'],
-                    'target_lng': provider_data[key]['target_lng'],
-                    'provider': provider_data[key]['provider']
-                })
-        context['providers'] = provs
         context['languages'] = languages
+        context['templates'] = self.get_translation_templates()
+        print(context['templates'])
         return context
+
+    def get_translation_templates(self):
+        templates = dict()
+        response = requests.post(
+            CUSTOM_MT_CONSOLE_URL + "get-templates",
+            data={
+                "source_language": "en",
+                "target_language": "fr"
+            },
+            headers={
+                'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
+            })
+        templates['en_fr'] = response.json()
+
+        response = requests.post(
+            CUSTOM_MT_CONSOLE_URL + "get-templates",
+            data={
+                "source_language": "fr",
+                "target_language": "en"
+            },
+            headers={
+                'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
+            })
+
+        templates['fr_en'] = response.json()
+        return templates
 
     def post(self, request):
 

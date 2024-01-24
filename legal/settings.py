@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'gpt_processing.apps.GptProcessingConfig',
     'settings.apps.SettingsConfig',
     'preferences',
-    'users.apps.UsersConfig'
+    'users.apps.UsersConfig',
+    'languages.apps.LanguagesConfig'
 ]
 
 STATICFILES_FINDERS = (
