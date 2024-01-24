@@ -2003,11 +2003,11 @@ body {
 }
 
 .select-box .options-container {
-    display: flex;
+    display: none;
+    width: 100%;
     flex-direction: column;
     align-items: flex-start;
     padding: 10px 14px;
-    /*gap: 20px;*/
     position: absolute;
     top: 30px;
     left: 0;
@@ -2016,10 +2016,10 @@ body {
     font-size: 16px;
     background-color: white;
     font-weight: 500;
-    opacity: 0;
     transition: all 0.4s;
-    border-radius: 8px;
     order: 1;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .selected {
@@ -2034,7 +2034,7 @@ body {
 
 .select-box .options-container.active {
     height: auto;
-    opacity: 1;
+    display: flex;
 }
 
 .select-box .options-container.active + .selected {
@@ -2290,14 +2290,10 @@ body {
 }
 
 .selected-text {
-    color: #456B84;
+    color: var(--primary);
     font-size: 14px;
     font-weight: 500;
     margin-left: 4px;
-}
-
-.selected-text:hover {
-    color: #1D2945;
 }
 
 .modal {

@@ -440,63 +440,6 @@ $(document).ready(function(){
             sourceLangSelect.val(lang)
         }
         let targetSelect = container.find('[name="target_language"]')
-        let providerOptionsModel = (Object.keys(providers));
-        $('.translate__tab').each(function() {
-            let tab = $(this);
-            let providerModelHiddenInput = tab.find('[name="provider_model"]');
-            let providerKeyHiddenInput = tab.find('[name="provider_key"]');
-            let selectModel = tab.find('.select-box[name="provider_model"]');
-            let selectKey = tab.find('.select-box[name="provider_key"]');
-
-            updateSelectOptions(selectModel, providerOptionsModel, providerModelHiddenInput, selectKey, providerKeyHiddenInput, lang);
-        });
-
-        function updateSelectOptions(selectModel, providerOptionsModel, modelHiddenInput, selectKey, keyHiddenInput, lang) {
-            let optionsContainer = selectModel.find('.options-container');
-            let selectedTextSpan = selectModel.find('.selected-text');
-            // let providerModel = selectModel.find('.selected-text').text();
-            optionsContainer.empty();
-
-            providerOptionsModel.forEach(function(provider, index) {
-                let option = $('<li>').addClass('option').attr('data-value', provider).text(provider);
-                option.on('click', function() {
-                    selectedTextSpan.text(provider);
-                    modelHiddenInput.val(provider);
-                    updateProviderKey(provider, selectKey, keyHiddenInput, lang);
-                });
-
-                optionsContainer.append(option);
-
-                if (index === 0) {
-                    selectedTextSpan.text(provider);
-                    modelHiddenInput.val(provider);
-                    updateProviderKey(provider, selectKey, keyHiddenInput, lang);
-                }
-            });
-        }
-
-        function updateProviderKey(provider, selectKey, hiddenInput, lang) {
-            let providerOptions = providers[provider].filter(item => item.source_lng === lang);
-            let optionsContainer = selectKey.find('.options-container');
-            let selectedTextSpan = selectKey.find('.selected-text');
-
-            optionsContainer.empty();
-
-            providerOptions.forEach(function(provider, index) {
-                let option = $('<li>').addClass('option').attr('data-value', provider.key).text(languageSite === 'fr' ? provider.title_fr : provider.title);
-                option.on('click', function() {
-                    selectedTextSpan.text(provider.title);
-                    hiddenInput.val(provider.key);
-                });
-
-                optionsContainer.append(option);
-
-                if (index === 0) {
-                    selectedTextSpan.text(provider.title);
-                    hiddenInput.val(provider.key);
-                }
-            });
-        }
 
         setTargetLang(lang, targetSelect)
     }
@@ -571,7 +514,7 @@ $(document).ready(function(){
         .then(r =>  r.json().then(data => ({status: r.status, body: data})))
         .then(obj => {
             if(obj.status === 200) {
-                resultContainer.val(obj.body['result']);
+                resultContainer.val(obj.body['translated_text']);
                 btn.attr('disabled', false);
                 $('#expert_revision').removeClass('expert--revision');
                 preloader.fadeOut(300);
@@ -659,13 +602,16 @@ $(document).ready(function(){
         .catch(error => errorHandler(error))
     }
     function formReset(e) {
-        e.preventDefault()
+        e.preventDefault();
+
         let form = $(this);
         let btn = form.find('[type=submit]');
+        $('#document').val(null);
+
         btn.show();
-        formFile.find('input').val('')
-        $('.complete').hide();
-        $('.translate__file-block.input').css('display', 'flex')
+
+        $('.translate__file-block.input').css('display', 'flex');
+        $('.translate__file-block.complete').css('display', 'none');
     }
 
     function clearText() {
@@ -687,8 +633,8 @@ $(document).ready(function(){
     var swapIcon = document.querySelector('.swap__language-ico');
 
     swapIcon.addEventListener('click', function() {
-        var englishTitle = document.querySelector('.translate__form-title span');
-        var frenchTitle = document.querySelector('.translate__form-title.target span');
+        var sourceLanguage = document.querySelector('.translate__form-title span');
+        var targetLanguage = document.querySelector('.translate__form-title.target span');
         var inputText = document.querySelector('#translation_text');
         var resultText = document.querySelector('#result_text');
 
@@ -705,9 +651,9 @@ $(document).ready(function(){
         inputText.value = resultText.value;
         resultText.value = tempText;
 
-        var tempTitle = englishTitle.textContent;
-        englishTitle.textContent = frenchTitle.textContent;
-        frenchTitle.textContent = tempTitle;
+        var tempTitle = sourceLanguage.textContent;
+        sourceLanguage.textContent = targetLanguage.textContent;
+        targetLanguage.textContent = tempTitle;
 
         setSourceLang(currentTargetLang);
     });
@@ -715,8 +661,8 @@ $(document).ready(function(){
     var swapIconDocument = document.querySelector('.translate__tab#tabs-2 .swap__language-ico.document');
 
     swapIconDocument.addEventListener('click', function() {
-        var englishTitle = document.querySelector('.translate__tab#tabs-2 .translate__form-title span');
-        var frenchTitle = document.querySelector('.translate__tab#tabs-2 .translate__form-title.document span:last-child');
+        var sourceLanguage = document.querySelector('.translate__tab#tabs-2 .translate__form-title span');
+        var targetLanguage = document.querySelector('.translate__tab#tabs-2 .translate__form-title.document span:last-child');
         var sourceLanguageInput = document.querySelector('#tabs-2 input[name="source_language"]');
         var targetLanguageInput = document.querySelector('#tabs-2 input[name="target_language"]');
 
@@ -726,22 +672,22 @@ $(document).ready(function(){
         sourceLanguageInput.value = targetLanguageInput.value;
         targetLanguageInput.value = tempLang;
 
-        var tempTitle = englishTitle.textContent;
-        englishTitle.textContent = frenchTitle.textContent;
-        frenchTitle.textContent = tempTitle;
+        var tempTitle = sourceLanguage.textContent;
+        sourceLanguage.textContent = targetLanguage.textContent;
+        targetLanguage.textContent = tempTitle;
 
         setSourceLang(currentTargetLang);
     });
 
     const selectBoxes = document.querySelectorAll(".select-box");
 
-    selectBoxes.forEach(function(box) {
+    selectBoxes.forEach(function (box) {
         const selected = box.querySelector(".selected");
         const optionsContainer = box.querySelector(".options-container");
         const options = optionsContainer.querySelectorAll(".option");
 
-        selected.addEventListener("click", function() {
-            document.querySelectorAll(".select-box .options-container.active").forEach(function(openContainer) {
+        selected.addEventListener("click", function () {
+            document.querySelectorAll(".select-box .options-container.active").forEach(function (openContainer) {
                 if (openContainer !== optionsContainer) {
                     openContainer.classList.remove("active");
                 }
@@ -758,8 +704,8 @@ $(document).ready(function(){
         });
     });
 
-    document.addEventListener('click', function(e) {
-        selectBoxes.forEach(function(box) {
+    document.addEventListener('click', function (e) {
+        selectBoxes.forEach(function (box) {
             const optionsContainer = box.querySelector(".options-container");
             if (!box.contains(e.target)) {
                 optionsContainer.classList.remove("active");
@@ -777,9 +723,7 @@ $(document).ready(function(){
 
     sourceLangSelect.on('change', setSourceLang)
 
-    setSourceLang(base_lang_code)
     Upload.init();
-
 
     gpt_processing()
 });
