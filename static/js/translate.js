@@ -1,5 +1,3 @@
-
-
 function gpt_processing() {
     let requestProcessAction = gpt_process || '/gpt-processing/gpt_process/'
     let requestProcessMethod = 'POST'
@@ -369,8 +367,31 @@ $(document).ready(function(){
     let successPopup = '#success_modal'
     const languageSite = document.documentElement.lang
 
-    if(tabs.length)
-        tabs.tabs();
+    if (tabs.length) {
+        var tabIndex = 0; // Default tab index (first tab)
+        var hash = window.location.hash;
+
+        // Check if URL hash matches any of the tab's anchors
+        tabs.find("a").each(function (index) {
+            if ("#" + this.getAttribute("href").split("#")[1] === hash) {
+                tabIndex = index;
+            }
+        });
+
+        // Tabs with  determined active index
+        tabs.tabs({active: tabIndex});
+
+        // Add a handler for the beforeActivate event
+        tabs.tabs({
+            beforeActivate: function (event, ui) {
+                // Check if the tab has 'no-tab' class
+                if (ui.newTab.children("a").hasClass("no-tab")) {
+                    event.preventDefault();
+                    window.location.href = ui.newTab.children("a").attr("href");
+                }
+            }
+        });
+    }
 
     function downloadResult() {
         download(resultBlob, $('#file_translate_form input[name=document]').val().replace(/.*(\/|\\)/, ''));
