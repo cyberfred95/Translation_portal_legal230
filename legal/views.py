@@ -25,10 +25,9 @@ def text_translation(request):
     text = request.POST.get('text')
     response = requests.post(CUSTOM_MT_CONSOLE_URL + "translate", data={
         "text": [text],
-        "source_language": request.POST.get('source_language'),
-        "target_language": request.POST.get('target_language')
+        "template_name": request.POST.get('template_name')
     }, headers={"token": request.user.group.api_key})
-
+    print(response.json())
     return response.json()
 
 
@@ -36,8 +35,7 @@ def file_translate(request):
     response = requests.post(
         url=CLOUDSTORAGE_API_URL + 'translate/',
         data={
-            "source_language": request.POST.get("source_language"),
-            "target_language": request.POST.get("target_language"),
+            "template_name": request.POST.get('template_name'),
             "user_uuid": request.user.uuid
         },
         headers={"token": request.user.group.api_key},
@@ -45,7 +43,7 @@ def file_translate(request):
             'source_file': request.FILES["document"]
         }
     )
-
+    print(response.json())
     return response.json()
 
 
@@ -56,7 +54,6 @@ class TranslateView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['languages'] = languages
         context['templates'] = self.get_translation_templates()
-        print(context['templates'])
         return context
 
     def get_translation_templates(self):
