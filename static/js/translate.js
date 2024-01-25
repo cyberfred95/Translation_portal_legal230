@@ -574,7 +574,7 @@ $(document).ready(function(){
         $('.translate__file-block').hide();
         $('.translate__file-block.trans-progress').css('display', 'flex')
 
-        $('.translate__form-submit').hide();
+        $('.translate__form-submit').eq(1).hide();
 
 
         fetch(url, {
@@ -679,12 +679,18 @@ $(document).ready(function(){
         setSourceLang(currentTargetLang);
     });
 
-    const selectBoxes = document.querySelectorAll(".select-box");
-
-    selectBoxes.forEach(function (box) {
+    document.querySelectorAll(".select-box").forEach(function (box) {
         const selected = box.querySelector(".selected");
         const optionsContainer = box.querySelector(".options-container");
+        const selectedText = box.querySelector(".selected-text");
         const options = optionsContainer.querySelectorAll(".option");
+        const hiddenInput = box.closest('form').querySelector("input[name='template_name']");
+
+        const firstOption = optionsContainer.querySelector(".option");
+        if (firstOption) {
+            hiddenInput.value = firstOption.getAttribute("value");
+            selectedText.innerHTML = firstOption.textContent;
+        }
 
         selected.addEventListener("click", function () {
             document.querySelectorAll(".select-box .options-container.active").forEach(function (openContainer) {
@@ -696,23 +702,14 @@ $(document).ready(function(){
             optionsContainer.classList.toggle("active");
         });
 
-        options.forEach(function(option) {
-            option.addEventListener("click", function() {
-                selected.innerHTML = option.textContent;
+        options.forEach(function (option) {
+            option.addEventListener("click", function () {
+                selectedText.innerHTML = option.textContent;
+                hiddenInput.value = option.getAttribute("value");
                 optionsContainer.classList.remove("active");
             });
         });
     });
-
-    document.addEventListener('click', function (e) {
-        selectBoxes.forEach(function (box) {
-            const optionsContainer = box.querySelector(".options-container");
-            if (!box.contains(e.target)) {
-                optionsContainer.classList.remove("active");
-            }
-        });
-    });
-
 
     formText.on('submit', formTextHandler);
     formFile.on('submit', formFileHandler);
