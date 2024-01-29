@@ -692,6 +692,7 @@ $(document).ready(function(){
         targetLanguage.textContent = tempTitle;
 
         setSourceLang(currentTargetLang);
+        updateSelectBoxes(sourceLanguageInput.value, targetLanguageInput.value);
     });
 
     var swapIconDocument = document.querySelector('.translate__tab#tabs-2 .swap__language-ico.document');
@@ -713,26 +714,43 @@ $(document).ready(function(){
         targetLanguage.textContent = tempTitle;
 
         setSourceLang(currentTargetLang);
+        updateSelectBoxes(sourceLanguageInput.value, targetLanguageInput.value);
     });
 
-    const selectBoxes = document.querySelectorAll(".select-box");
+    function updateSelectBoxes(sourceLang, targetLang) {
+        const templateKey = sourceLang + '_' + targetLang;
+        const selectBoxes = document.querySelectorAll(".select-box");
 
-    selectBoxes.forEach(function (box) {
+        selectBoxes.forEach(function (box) {
+            const optionsContainer = box.querySelector(".options-container");
+            const selectedText = box.querySelector(".selected-text");
+            const hiddenInput = box.closest('form').querySelector("input[name='template_name']");
+
+            optionsContainer.innerHTML = '';
+
+            templates[templateKey].forEach(function(template) {
+                const option = document.createElement('li');
+                option.className = 'option';
+                option.textContent = template.template_name;
+                option.setAttribute('value', template.template_name);
+                optionsContainer.appendChild(option);
+            });
+
+            if (templates[templateKey].length > 0) {
+                const firstTemplate = templates[templateKey][0];
+                hiddenInput.value = firstTemplate.template_name;
+                selectedText.innerHTML = firstTemplate.template_name;
+            }
+        });
+    }
+
+// Перенесіть прив'язку обробників подій за межі функції updateSelectBoxes
+    document.querySelectorAll(".select-box").forEach(function (box) {
         const selected = box.querySelector(".selected");
         const optionsContainer = box.querySelector(".options-container");
-        const selectedText = box.querySelector(".selected-text");
-        const options = optionsContainer.querySelectorAll(".option");
         const hiddenInput = box.closest('form').querySelector("input[name='template_name']");
 
-        const firstOption = optionsContainer.querySelector(".option");
-        if (firstOption) {
-            hiddenInput.value = firstOption.getAttribute("value");
-            selectedText.innerHTML = firstOption.textContent;
-        }
-
         selected.addEventListener("click", function () {
-            console.log(selectedText);
-
             document.querySelectorAll(".select-box .options-container.active").forEach(function (openContainer) {
                 if (openContainer !== optionsContainer) {
                     openContainer.classList.remove("active");
@@ -742,12 +760,13 @@ $(document).ready(function(){
             optionsContainer.classList.toggle("active");
         });
 
-        options.forEach(function (option) {
-            option.addEventListener("click", function () {
-                selectedText.innerHTML = option.textContent;
-                hiddenInput.value = option.getAttribute("value");
+        optionsContainer.addEventListener("click", function (event) {
+            if (event.target.classList.contains('option')) {
+                const selectedText = box.querySelector(".selected-text");
+                selectedText.innerHTML = event.target.textContent;
+                hiddenInput.value = event.target.getAttribute("value");
                 optionsContainer.classList.remove("active");
-            });
+            }
         });
     });
 
@@ -759,6 +778,8 @@ $(document).ready(function(){
     copyBtn.on('click', copyText)
 
     sourceLangSelect.on('change', setSourceLang)
+
+    updateSelectBoxes('en', 'fr');
 
     Upload.init();
 
