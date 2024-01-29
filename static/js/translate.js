@@ -676,8 +676,15 @@ $(document).ready(function(){
         var docSourceLang = document.querySelector('#tabs-2 input[name="source_language"]');
         var docTargetLang = document.querySelector('#tabs-2 input[name="target_language"]');
 
+        var inputText = document.querySelector('#translation_text');
+        var resultText = document.querySelector('#result_text');
+
         [textSourceLang.value, textTargetLang.value] = [textTargetLang.value, textSourceLang.value];
         [docSourceLang.value, docTargetLang.value] = [docTargetLang.value, docSourceLang.value];
+
+        var tempText = inputText.value;
+        inputText.value = resultText.value;
+        resultText.value = tempText;
 
         var textSourceLangTitle = document.querySelector('.translate__tab#tabs-1 .translate__form-title span');
         var textTargetLangTitle = document.querySelector('.translate__tab#tabs-1 .translate__form-title.target span');
@@ -692,7 +699,6 @@ $(document).ready(function(){
 
     function updateSelectBoxes(sourceLang, targetLang) {
         const templateKey = sourceLang + '_' + targetLang;
-        console.log(templateKey);
         const selectBoxes = document.querySelectorAll(".select-box");
 
         selectBoxes.forEach(function (box) {
@@ -718,11 +724,22 @@ $(document).ready(function(){
         });
     }
 
-// Перенесіть прив'язку обробників подій за межі функції updateSelectBoxes
     document.querySelectorAll(".select-box").forEach(function (box) {
+        box.addEventListener("click", function (event) {
+            if (event.target.classList.contains('option')) {
+                const selectedText = box.querySelector(".selected-text");
+                const hiddenInput = box.closest('form').querySelector("input[name='template_name']");
+                const optionsContainer = box.querySelector(".options-container");
+
+                selectedText.textContent = event.target.textContent;
+                hiddenInput.value = event.target.getAttribute("value");
+
+                optionsContainer.classList.remove("active");
+            }
+        });
+
         const selected = box.querySelector(".selected");
         const optionsContainer = box.querySelector(".options-container");
-        const hiddenInput = box.closest('form').querySelector("input[name='template_name']");
 
         selected.addEventListener("click", function () {
             document.querySelectorAll(".select-box .options-container.active").forEach(function (openContainer) {
@@ -730,17 +747,7 @@ $(document).ready(function(){
                     openContainer.classList.remove("active");
                 }
             });
-
             optionsContainer.classList.toggle("active");
-        });
-
-        optionsContainer.addEventListener("click", function (event) {
-            if (event.target.classList.contains('option')) {
-                const selectedText = box.querySelector(".selected-text");
-                selectedText.innerHTML = event.target.textContent;
-                hiddenInput.value = event.target.getAttribute("value");
-                optionsContainer.classList.remove("active");
-            }
         });
     });
 
