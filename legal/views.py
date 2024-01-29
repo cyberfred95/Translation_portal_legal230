@@ -1,3 +1,4 @@
+from pprint import pprint
 from urllib.parse import urlparse, unquote
 from rest_framework.response import Response
 from rest_framework import status
@@ -43,7 +44,7 @@ def file_translate(request):
             'source_file': request.FILES["document"]
         }
     )
-    print(response.json())
+
     return response.json()
 
 
@@ -54,6 +55,8 @@ class TranslateView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['languages'] = languages
         context['templates'] = self.get_translation_templates()
+        pprint(context['languages'])
+        pprint(context['templates'])
         return context
 
     def get_translation_templates(self):
