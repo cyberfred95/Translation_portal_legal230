@@ -393,10 +393,6 @@ $(document).ready(function(){
         });
     }
 
-    function downloadResult() {
-        download(resultBlob, $('#file_translate_form input[name=document]').val().replace(/.*(\/|\\)/, ''));
-    }
-
     function sendDocument(e) {
         e.preventDefault();
         let url = expert_revision_file_url;
@@ -556,6 +552,48 @@ $(document).ready(function(){
         });
     }
 
+    function downloadResult(url) {
+        if (url) {
+            var a = document.createElement('A');
+            a.href = url;
+            a.download = url.substr(url.lastIndexOf('/') + 1);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    }
+
+    function checkDocument(fileId, intervalId, isPostEditing) {
+        let url = '/project/?project_id=' + encodeURIComponent(fileId);
+        $('.translate__file-block').hide();
+        $('.translate__file-block.trans-progress').css('display', 'flex')
+
+        $.ajax({
+            type: 'GET',
+            url: url,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function (response) {
+                if (response.status === 'Translated' && !isPostEditing) {
+                    clearInterval(intervalId);
+                    $('.translate__file-block').hide();
+                    $('.translate__file-block.complete').css('display', 'flex')
+                    $('#download_result').on('click', () => downloadResult(response.translated_file))
+                } else if (response.status === 'Error') {
+                    errorHandler();
+                }
+            },
+            error: function (xhr, status, error) {
+                errorHandler(error);
+            }
+        });
+    }
+
+
     function formFileHandler(e) {
         e.preventDefault();
         let form = $(this);
@@ -586,20 +624,18 @@ $(document).ready(function(){
             },
             body: formData
         })
-        .then(r =>  r.blob().then(data => ({status: r.status, body: data})))
-        .then(obj => {
-            if(obj.status === 200) {
-                $('.translate__file-block').hide();
-                $('.translate__file-block.complete').css('display', 'flex')
-
-                resultBlob = obj.body;
-                $('#download_result').on('click', downloadResult)
-                $('#expert_revision_document').on('click', sendDocument)
-            } else {
-                errorHandler();
-            }
-        })
-        .catch(error => errorHandler(error))
+            .then(r => r.json().then(data => ({status: r.status, body: data})))
+            .then(obj => {
+                if (obj.status === 200) {
+                    let intervalId = setInterval(() => {
+                        checkDocument(obj.body.id, intervalId);
+                    }, 10000);
+                    checkDocument(obj.body.id, intervalId);
+                } else {
+                    errorHandler();
+                }
+            })
+            .catch(error => errorHandler(error))
     }
     function formReset(e) {
         e.preventDefault();
