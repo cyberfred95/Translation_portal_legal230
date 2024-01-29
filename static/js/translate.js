@@ -715,7 +715,9 @@ $(document).ready(function(){
         setSourceLang(currentTargetLang);
     });
 
-    document.querySelectorAll(".select-box").forEach(function (box) {
+    const selectBoxes = document.querySelectorAll(".select-box");
+
+    selectBoxes.forEach(function (box) {
         const selected = box.querySelector(".selected");
         const optionsContainer = box.querySelector(".options-container");
         const selectedText = box.querySelector(".selected-text");
@@ -729,6 +731,8 @@ $(document).ready(function(){
         }
 
         selected.addEventListener("click", function () {
+            console.log(selectedText);
+
             document.querySelectorAll(".select-box .options-container.active").forEach(function (openContainer) {
                 if (openContainer !== optionsContainer) {
                     openContainer.classList.remove("active");
