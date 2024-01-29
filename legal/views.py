@@ -34,7 +34,7 @@ def text_translation(request):
 
 def file_translate(request):
     response = requests.post(
-        url=CLOUDSTORAGE_API_URL + 'translate/',
+        url=CLOUDSTORAGE_API_URL,
         data={
             "template_name": request.POST.get('template_name'),
             "user_uuid": request.user.uuid
@@ -129,7 +129,7 @@ class ProjectsHistoryView(TemplateView):
         if page is not None:
             params["page"] = int(page)
 
-        response = requests.get(CLOUDSTORAGE_API_URL + 'translate/', params=params, headers=headers).json()
+        response = requests.get(CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
         if 'results' in response:
             for project in response['results']:
                 file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
@@ -142,8 +142,8 @@ class ProjectsHistoryView(TemplateView):
                         project['username'] = None
                     except django.core.exceptions.ValidationError:
                         project['username'] = None
-
             context['projects'] = response
+
         return context
 
 
@@ -151,13 +151,13 @@ class SingleProjectView(APIView):
 
     def get(self, request):
         project_id = request.query_params.get('project_id')
-        response = requests.get(CLOUDSTORAGE_API_URL + f"translate/{project_id}/",
+        response = requests.get(CLOUDSTORAGE_API_URL + f"{project_id}/",
                                 headers={"token": request.user.group.api_key})
         return Response(response.json(), status=status.HTTP_200_OK)
 
     def delete(self, request):
         project_id = self.request.data.get('project_id')
-        response = requests.delete(CLOUDSTORAGE_API_URL + f"translate/{project_id}/",
+        response = requests.delete(CLOUDSTORAGE_API_URL + f"{project_id}/",
                                    headers={"token": request.user.group.api_key})
 
         return Response({"message": "Sucessfully deleted"}, status=status.HTTP_204_NO_CONTENT)
