@@ -365,7 +365,9 @@ $(document).ready(function(){
     let preloader = $('.modal__wrapper, .preloader');
     let errorPopup = '#error_popup'
     let successPopup = '#success_modal'
-    const languageSite = document.documentElement.lang
+    var swapTextIcon = document.querySelector('.swap__language-ico');
+    var swapDocIcon = document.querySelector('.translate__tab#tabs-2 .swap__language-ico.document');
+
 
     if (tabs.length) {
         var tabIndex = 0; // Default tab index (first tab)
@@ -583,6 +585,7 @@ $(document).ready(function(){
                     $('.translate__file-block').hide();
                     $('.translate__file-block.complete').css('display', 'flex')
                     $('#download_result').on('click', () => downloadResult(response.translated_file))
+                    $('#expert_revision_document').on('click', sendDocument)
                 } else if (response.status === 'Error') {
                     errorHandler();
                 }
@@ -666,59 +669,30 @@ $(document).ready(function(){
         document.execCommand('copy');
     }
 
-    var swapIcon = document.querySelector('.swap__language-ico');
+    function swapLanguages() {
+        var textSourceLang = document.querySelector('#tabs-1 input[name="source_language"]');
+        var textTargetLang = document.querySelector('#tabs-1 input[name="target_language"]');
 
-    swapIcon.addEventListener('click', function() {
-        var sourceLanguage = document.querySelector('.translate__form-title span');
-        var targetLanguage = document.querySelector('.translate__form-title.target span');
-        var inputText = document.querySelector('#translation_text');
-        var resultText = document.querySelector('#result_text');
+        var docSourceLang = document.querySelector('#tabs-2 input[name="source_language"]');
+        var docTargetLang = document.querySelector('#tabs-2 input[name="target_language"]');
 
-        var sourceLanguageInput = document.querySelector('input[name="source_language"]');
-        var targetLanguageInput = document.querySelector('input[name="target_language"]');
-        var currentSourceLang = sourceLanguageInput.value;
-        var currentTargetLang = targetLanguageInput.value;
+        [textSourceLang.value, textTargetLang.value] = [textTargetLang.value, textSourceLang.value];
+        [docSourceLang.value, docTargetLang.value] = [docTargetLang.value, docSourceLang.value];
 
-        var tempLang = currentSourceLang;
-        sourceLanguageInput.value = currentTargetLang;
-        targetLanguageInput.value = tempLang;
+        var textSourceLangTitle = document.querySelector('.translate__tab#tabs-1 .translate__form-title span');
+        var textTargetLangTitle = document.querySelector('.translate__tab#tabs-1 .translate__form-title.target span');
+        var docSourceLangTitle = document.querySelector('.translate__tab#tabs-2 .translate__form-title span');
+        var docTargetLangTitle = document.querySelector('.translate__tab#tabs-2 .translate__form-title.document span:last-child');
 
-        var tempText = inputText.value;
-        inputText.value = resultText.value;
-        resultText.value = tempText;
+        [textSourceLangTitle.textContent, textTargetLangTitle.textContent] = [textTargetLangTitle.textContent, textSourceLangTitle.textContent];
+        [docSourceLangTitle.textContent, docTargetLangTitle.textContent] = [docTargetLangTitle.textContent, docSourceLangTitle.textContent];
 
-        var tempTitle = sourceLanguage.textContent;
-        sourceLanguage.textContent = targetLanguage.textContent;
-        targetLanguage.textContent = tempTitle;
-
-        setSourceLang(currentTargetLang);
-        updateSelectBoxes(sourceLanguageInput.value, targetLanguageInput.value);
-    });
-
-    var swapIconDocument = document.querySelector('.translate__tab#tabs-2 .swap__language-ico.document');
-
-    swapIconDocument.addEventListener('click', function() {
-        var sourceLanguage = document.querySelector('.translate__tab#tabs-2 .translate__form-title span');
-        var targetLanguage = document.querySelector('.translate__tab#tabs-2 .translate__form-title.document span:last-child');
-        var sourceLanguageInput = document.querySelector('#tabs-2 input[name="source_language"]');
-        var targetLanguageInput = document.querySelector('#tabs-2 input[name="target_language"]');
-
-        var currentTargetLang = targetLanguageInput.value;
-
-        var tempLang = sourceLanguageInput.value;
-        sourceLanguageInput.value = targetLanguageInput.value;
-        targetLanguageInput.value = tempLang;
-
-        var tempTitle = sourceLanguage.textContent;
-        sourceLanguage.textContent = targetLanguage.textContent;
-        targetLanguage.textContent = tempTitle;
-
-        setSourceLang(currentTargetLang);
-        updateSelectBoxes(sourceLanguageInput.value, targetLanguageInput.value);
-    });
+        updateSelectBoxes(textSourceLang.value, textTargetLang.value);
+    }
 
     function updateSelectBoxes(sourceLang, targetLang) {
         const templateKey = sourceLang + '_' + targetLang;
+        console.log(templateKey);
         const selectBoxes = document.querySelectorAll(".select-box");
 
         selectBoxes.forEach(function (box) {
@@ -769,6 +743,9 @@ $(document).ready(function(){
             }
         });
     });
+
+    swapTextIcon.addEventListener('click', swapLanguages);
+    swapDocIcon.addEventListener('click', swapLanguages);
 
     formText.on('submit', formTextHandler);
     formFile.on('submit', formFileHandler);
