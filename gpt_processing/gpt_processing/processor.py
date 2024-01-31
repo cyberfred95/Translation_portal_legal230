@@ -28,7 +28,7 @@ class Processor(ABC):
         self.text = text
         self.prompt = None
         self.openai = openai
-        self.openai.api_key = ''
+        self.openai.api_key = 'REMOVED_OPENAI_KEY_2'
         self.openai.api_base = 'https://api.openai.com/v1'
         self.openai.api_type = 'open_ai'
         self.result = []

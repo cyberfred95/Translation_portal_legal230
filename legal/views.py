@@ -28,7 +28,6 @@ def text_translation(request):
         "text": [text],
         "template_name": request.POST.get('template_name')
     }, headers={"token": request.user.group.api_key})
-    print(response.json())
     return response.json()
 
 
@@ -55,8 +54,6 @@ class TranslateView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['languages'] = languages
         context['templates'] = self.get_translation_templates()
-        pprint(context['languages'])
-        pprint(context['templates'])
         return context
 
     def get_translation_templates(self):
