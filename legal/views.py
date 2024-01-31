@@ -27,7 +27,8 @@ def text_translation(request):
     response = requests.post(CUSTOM_MT_CONSOLE_URL + "translate", data={
         "text": [text],
         "template_name": request.POST.get('template_name')
-    }, headers={"token": request.user.group.api_key})
+    }, headers={
+            "token": preferences.MainSettings.custom_MT_api_key if request.user.is_staff else request.user.group.api_key})
     return response.json()
 
 
@@ -38,7 +39,8 @@ def file_translate(request):
             "template_name": request.POST.get('template_name'),
             "user_uuid": request.user.uuid
         },
-        headers={"token": request.user.group.api_key},
+        headers={
+            "token": preferences.MainSettings.custom_MT_api_key if request.user.is_staff else request.user.group.api_key},
         files={
             'source_file': request.FILES["document"]
         }
@@ -65,8 +67,7 @@ class TranslateView(TemplateView):
                 "target_language": "fr"
             },
             headers={
-                'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
-            })
+                "token": preferences.MainSettings.custom_MT_api_key if self.request.user.is_staff else self.request.user.group.api_key})
         templates['en_fr'] = response.json()
 
         response = requests.post(
@@ -149,12 +150,13 @@ class SingleProjectView(APIView):
     def get(self, request):
         project_id = request.query_params.get('project_id')
         response = requests.get(CLOUDSTORAGE_API_URL + f"{project_id}/",
-                                headers={"token": request.user.group.api_key})
+                                headers={
+                                    "token": preferences.MainSettings.custom_MT_api_key if request.user.is_staff else request.user.group.api_key}
         return Response(response.json(), status=status.HTTP_200_OK)
 
     def delete(self, request):
         project_id = self.request.data.get('project_id')
         response = requests.delete(CLOUDSTORAGE_API_URL + f"{project_id}/",
-                                   headers={"token": request.user.group.api_key})
+            headers={"token": preferences.MainSettings.custom_MT_api_key if request.user.is_staff else request.user.group.api_key})
 
         return Response({"message": "Sucessfully deleted"}, status=status.HTTP_204_NO_CONTENT)
