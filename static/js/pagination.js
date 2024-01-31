@@ -6,12 +6,6 @@ document.addEventListener('DOMContentLoaded', function () {
     var totalPages = parseInt(pagination.getAttribute('data-value'), 10);
     var currentPage = getCurrentPage();
 
-    if (!totalPages) {
-        currentPage = 1;
-        window.location.href = '/project-history/?page=1#tabs-4';
-        return;
-    }
-
     var maxPagesToShow = 3;
 
     createPageNumber(currentPage);
