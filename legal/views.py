@@ -151,7 +151,7 @@ class SingleProjectView(APIView):
         project_id = request.query_params.get('project_id')
         response = requests.get(CLOUDSTORAGE_API_URL + f"{project_id}/",
                                 headers={
-                                    "token": preferences.MainSettings.custom_MT_api_key if request.user.is_staff else request.user.group.api_key}
+                                    "token": preferences.MainSettings.custom_MT_api_key if request.user.is_staff else request.user.group.api_key})
         return Response(response.json(), status=status.HTTP_200_OK)
 
     def delete(self, request):
