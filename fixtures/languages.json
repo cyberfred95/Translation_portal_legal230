@@ -1,0 +1,1402 @@
+[
+  {
+    "model": "languages.language",
+    "pk": 1,
+    "fields": {
+      "name": "Afar",
+      "abbreviation": "AA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 2,
+    "fields": {
+      "name": "Abkhazian",
+      "abbreviation": "AB"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 3,
+    "fields": {
+      "name": "Avestan",
+      "abbreviation": "AE"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 4,
+    "fields": {
+      "name": "Afrikaans",
+      "abbreviation": "AF"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 5,
+    "fields": {
+      "name": "Akan",
+      "abbreviation": "AK"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 6,
+    "fields": {
+      "name": "Amharic",
+      "abbreviation": "AM"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 7,
+    "fields": {
+      "name": "Aragonese",
+      "abbreviation": "AN"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 8,
+    "fields": {
+      "name": "Arabic",
+      "abbreviation": "AR"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 9,
+    "fields": {
+      "name": "Assamese",
+      "abbreviation": "AS"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 10,
+    "fields": {
+      "name": "Avaric",
+      "abbreviation": "AV"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 11,
+    "fields": {
+      "name": "Aymara",
+      "abbreviation": "AY"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 12,
+    "fields": {
+      "name": "Azerbaijani",
+      "abbreviation": "AZ"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 13,
+    "fields": {
+      "name": "Bashkir",
+      "abbreviation": "BA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 14,
+    "fields": {
+      "name": "Belarusian",
+      "abbreviation": "BE"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 15,
+    "fields": {
+      "name": "Bulgarian",
+      "abbreviation": "BG"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 16,
+    "fields": {
+      "name": "Bislama",
+      "abbreviation": "BI"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 17,
+    "fields": {
+      "name": "Bambara",
+      "abbreviation": "BM"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 18,
+    "fields": {
+      "name": "Bengali",
+      "abbreviation": "BN"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 19,
+    "fields": {
+      "name": "Tibetan",
+      "abbreviation": "BO"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 20,
+    "fields": {
+      "name": "Breton",
+      "abbreviation": "BR"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 21,
+    "fields": {
+      "name": "Bosnian",
+      "abbreviation": "BS"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 22,
+    "fields": {
+      "name": "Catalan",
+      "abbreviation": "CA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 23,
+    "fields": {
+      "name": "Chechen",
+      "abbreviation": "CE"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 24,
+    "fields": {
+      "name": "Chamorro",
+      "abbreviation": "CH"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 25,
+    "fields": {
+      "name": "Corsican",
+      "abbreviation": "CO"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 26,
+    "fields": {
+      "name": "Cree",
+      "abbreviation": "CR"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 27,
+    "fields": {
+      "name": "Czech",
+      "abbreviation": "CS"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 28,
+    "fields": {
+      "name": "Chuvash",
+      "abbreviation": "CV"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 29,
+    "fields": {
+      "name": "Welsh",
+      "abbreviation": "CY"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 30,
+    "fields": {
+      "name": "Danish",
+      "abbreviation": "DA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 31,
+    "fields": {
+      "name": "German",
+      "abbreviation": "DE"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 32,
+    "fields": {
+      "name": "Maldivian",
+      "abbreviation": "DV"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 33,
+    "fields": {
+      "name": "Dzongkha",
+      "abbreviation": "DZ"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 34,
+    "fields": {
+      "name": "Ewe",
+      "abbreviation": "EE"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 35,
+    "fields": {
+      "name": "Greek",
+      "abbreviation": "EL"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 36,
+    "fields": {
+      "name": "English",
+      "abbreviation": "EN"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 37,
+    "fields": {
+      "name": "Esperanto",
+      "abbreviation": "EO"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 38,
+    "fields": {
+      "name": "Spanish",
+      "abbreviation": "ES"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 39,
+    "fields": {
+      "name": "Estonian",
+      "abbreviation": "ET"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 40,
+    "fields": {
+      "name": "Basque",
+      "abbreviation": "EU"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 41,
+    "fields": {
+      "name": "Persian",
+      "abbreviation": "FA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 42,
+    "fields": {
+      "name": "Fulah",
+      "abbreviation": "FF"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 43,
+    "fields": {
+      "name": "Finnish",
+      "abbreviation": "FI"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 44,
+    "fields": {
+      "name": "Fijian",
+      "abbreviation": "FJ"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 45,
+    "fields": {
+      "name": "Faroese",
+      "abbreviation": "FO"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 46,
+    "fields": {
+      "name": "French",
+      "abbreviation": "FR"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 47,
+    "fields": {
+      "name": "Western Frisian",
+      "abbreviation": "FY"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 48,
+    "fields": {
+      "name": "Irish",
+      "abbreviation": "GA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 49,
+    "fields": {
+      "name": "Gaelic",
+      "abbreviation": "GD"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 50,
+    "fields": {
+      "name": "Galician",
+      "abbreviation": "GL"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 51,
+    "fields": {
+      "name": "Guarani",
+      "abbreviation": "GN"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 52,
+    "fields": {
+      "name": "Gujarati",
+      "abbreviation": "GU"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 53,
+    "fields": {
+      "name": "Manx",
+      "abbreviation": "GV"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 54,
+    "fields": {
+      "name": "Hausa",
+      "abbreviation": "HA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 55,
+    "fields": {
+      "name": "Hebrew",
+      "abbreviation": "HE"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 56,
+    "fields": {
+      "name": "Hindi",
+      "abbreviation": "HI"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 57,
+    "fields": {
+      "name": "Hiri Motu",
+      "abbreviation": "HO"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 58,
+    "fields": {
+      "name": "Croatian",
+      "abbreviation": "HR"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 59,
+    "fields": {
+      "name": "Haitian",
+      "abbreviation": "HT"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 60,
+    "fields": {
+      "name": "Hungarian",
+      "abbreviation": "HU"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 61,
+    "fields": {
+      "name": "Armenian",
+      "abbreviation": "HY"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 62,
+    "fields": {
+      "name": "Herero",
+      "abbreviation": "HZ"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 63,
+    "fields": {
+      "name": "Indonesian",
+      "abbreviation": "ID"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 64,
+    "fields": {
+      "name": "Igbo",
+      "abbreviation": "IG"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 65,
+    "fields": {
+      "name": "Sichuan Yi",
+      "abbreviation": "II"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 66,
+    "fields": {
+      "name": "Inupiaq",
+      "abbreviation": "IK"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 67,
+    "fields": {
+      "name": "Ido",
+      "abbreviation": "IO"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 68,
+    "fields": {
+      "name": "Icelandic",
+      "abbreviation": "IS"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 69,
+    "fields": {
+      "name": "Italian",
+      "abbreviation": "IT"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 70,
+    "fields": {
+      "name": "Inuktitut",
+      "abbreviation": "IU"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 71,
+    "fields": {
+      "name": "Japanese",
+      "abbreviation": "JA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 72,
+    "fields": {
+      "name": "Javanese",
+      "abbreviation": "JV"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 73,
+    "fields": {
+      "name": "Georgian",
+      "abbreviation": "KA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 74,
+    "fields": {
+      "name": "Kongo",
+      "abbreviation": "KG"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 75,
+    "fields": {
+      "name": "Kazakh",
+      "abbreviation": "KK"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 76,
+    "fields": {
+      "name": "Greenlandic",
+      "abbreviation": "KL"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 77,
+    "fields": {
+      "name": "Central Khmer",
+      "abbreviation": "KM"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 78,
+    "fields": {
+      "name": "Kannada",
+      "abbreviation": "KN"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 79,
+    "fields": {
+      "name": "Korean",
+      "abbreviation": "KO"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 80,
+    "fields": {
+      "name": "Kanuri",
+      "abbreviation": "KR"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 81,
+    "fields": {
+      "name": "Kashmiri",
+      "abbreviation": "KS"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 82,
+    "fields": {
+      "name": "Kurdish",
+      "abbreviation": "KU"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 83,
+    "fields": {
+      "name": "Komi",
+      "abbreviation": "KV"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 84,
+    "fields": {
+      "name": "Cornish",
+      "abbreviation": "KW"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 85,
+    "fields": {
+      "name": "Kyrgyz",
+      "abbreviation": "KY"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 86,
+    "fields": {
+      "name": "Latin",
+      "abbreviation": "LA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 87,
+    "fields": {
+      "name": "Luxembourgish",
+      "abbreviation": "LB"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 88,
+    "fields": {
+      "name": "Ganda",
+      "abbreviation": "LG"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 89,
+    "fields": {
+      "name": "Lingala",
+      "abbreviation": "LN"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 90,
+    "fields": {
+      "name": "Lao",
+      "abbreviation": "LO"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 91,
+    "fields": {
+      "name": "Lithuanian",
+      "abbreviation": "LT"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 92,
+    "fields": {
+      "name": "Luba-Katanga",
+      "abbreviation": "LU"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 93,
+    "fields": {
+      "name": "Latvian",
+      "abbreviation": "LV"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 94,
+    "fields": {
+      "name": "Malagasy",
+      "abbreviation": "MG"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 95,
+    "fields": {
+      "name": "Marshallese",
+      "abbreviation": "MH"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 96,
+    "fields": {
+      "name": "Maori",
+      "abbreviation": "MI"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 97,
+    "fields": {
+      "name": "Macedonian",
+      "abbreviation": "MK"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 98,
+    "fields": {
+      "name": "Malayalam",
+      "abbreviation": "ML"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 99,
+    "fields": {
+      "name": "Mongolian",
+      "abbreviation": "MN"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 100,
+    "fields": {
+      "name": "Marathi",
+      "abbreviation": "MR"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 101,
+    "fields": {
+      "name": "Malay",
+      "abbreviation": "MS"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 102,
+    "fields": {
+      "name": "Maltese",
+      "abbreviation": "MT"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 103,
+    "fields": {
+      "name": "Burmese",
+      "abbreviation": "MY"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 104,
+    "fields": {
+      "name": "Nauru",
+      "abbreviation": "NA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 105,
+    "fields": {
+      "name": "Norwegian",
+      "abbreviation": "NB"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 106,
+    "fields": {
+      "name": "North Ndebele",
+      "abbreviation": "ND"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 107,
+    "fields": {
+      "name": "Nepali",
+      "abbreviation": "NE"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 108,
+    "fields": {
+      "name": "Ndonga",
+      "abbreviation": "NG"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 109,
+    "fields": {
+      "name": "Dutch",
+      "abbreviation": "NL"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 110,
+    "fields": {
+      "name": "Norwegian",
+      "abbreviation": "NO"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 111,
+    "fields": {
+      "name": "South Ndebele",
+      "abbreviation": "NR"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 112,
+    "fields": {
+      "name": "Navaho",
+      "abbreviation": "NV"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 113,
+    "fields": {
+      "name": "Occitan",
+      "abbreviation": "OC"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 114,
+    "fields": {
+      "name": "Ojibwa",
+      "abbreviation": "OJ"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 115,
+    "fields": {
+      "name": "Oromo",
+      "abbreviation": "OM"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 116,
+    "fields": {
+      "name": "Oriya",
+      "abbreviation": "OR"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 117,
+    "fields": {
+      "name": "Ossetian",
+      "abbreviation": "OS"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 118,
+    "fields": {
+      "name": "Punjabi",
+      "abbreviation": "PA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 119,
+    "fields": {
+      "name": "Pali",
+      "abbreviation": "PI"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 120,
+    "fields": {
+      "name": "Polish",
+      "abbreviation": "PL"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 121,
+    "fields": {
+      "name": "Pushto",
+      "abbreviation": "PS"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 122,
+    "fields": {
+      "name": "Portuguese",
+      "abbreviation": "PT"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 123,
+    "fields": {
+      "name": "Quechua",
+      "abbreviation": "QU"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 124,
+    "fields": {
+      "name": "Romansh",
+      "abbreviation": "RM"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 125,
+    "fields": {
+      "name": "Rundi",
+      "abbreviation": "RN"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 126,
+    "fields": {
+      "name": "Romanian",
+      "abbreviation": "RO"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 127,
+    "fields": {
+      "name": "Russian",
+      "abbreviation": "RU"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 128,
+    "fields": {
+      "name": "Kinyarwanda",
+      "abbreviation": "RW"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 129,
+    "fields": {
+      "name": "Sanskrit",
+      "abbreviation": "SA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 130,
+    "fields": {
+      "name": "Sardinian",
+      "abbreviation": "SC"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 131,
+    "fields": {
+      "name": "Sindhi",
+      "abbreviation": "SD"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 132,
+    "fields": {
+      "name": "Northern Sami",
+      "abbreviation": "SE"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 133,
+    "fields": {
+      "name": "Sango",
+      "abbreviation": "SG"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 134,
+    "fields": {
+      "name": "Sinhalese",
+      "abbreviation": "SI"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 135,
+    "fields": {
+      "name": "Slovak",
+      "abbreviation": "SK"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 136,
+    "fields": {
+      "name": "Slovenian",
+      "abbreviation": "SL"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 137,
+    "fields": {
+      "name": "Samoan",
+      "abbreviation": "SM"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 138,
+    "fields": {
+      "name": "Shona",
+      "abbreviation": "SN"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 139,
+    "fields": {
+      "name": "Somali",
+      "abbreviation": "SO"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 140,
+    "fields": {
+      "name": "Albanian",
+      "abbreviation": "SQ"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 141,
+    "fields": {
+      "name": "Serbian",
+      "abbreviation": "SR"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 142,
+    "fields": {
+      "name": "Swati",
+      "abbreviation": "SS"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 143,
+    "fields": {
+      "name": "Southern Sotho",
+      "abbreviation": "ST"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 144,
+    "fields": {
+      "name": "Sundanese",
+      "abbreviation": "SU"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 145,
+    "fields": {
+      "name": "Swedish",
+      "abbreviation": "SV"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 146,
+    "fields": {
+      "name": "Swahili",
+      "abbreviation": "SW"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 147,
+    "fields": {
+      "name": "Tamil",
+      "abbreviation": "TA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 148,
+    "fields": {
+      "name": "Telugu",
+      "abbreviation": "TE"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 149,
+    "fields": {
+      "name": "Tajik",
+      "abbreviation": "TG"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 150,
+    "fields": {
+      "name": "Thai",
+      "abbreviation": "TH"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 151,
+    "fields": {
+      "name": "Tigrinya",
+      "abbreviation": "TI"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 152,
+    "fields": {
+      "name": "Turkmen",
+      "abbreviation": "TK"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 153,
+    "fields": {
+      "name": "Tagalog",
+      "abbreviation": "TL"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 154,
+    "fields": {
+      "name": "Tswana",
+      "abbreviation": "TN"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 155,
+    "fields": {
+      "name": "Tonga",
+      "abbreviation": "TO"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 156,
+    "fields": {
+      "name": "Turkish",
+      "abbreviation": "TR"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 157,
+    "fields": {
+      "name": "Tsonga",
+      "abbreviation": "TS"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 158,
+    "fields": {
+      "name": "Tatar",
+      "abbreviation": "TT"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 159,
+    "fields": {
+      "name": "Twi",
+      "abbreviation": "TW"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 160,
+    "fields": {
+      "name": "Tahitian",
+      "abbreviation": "TY"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 161,
+    "fields": {
+      "name": "Uighur",
+      "abbreviation": "UG"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 162,
+    "fields": {
+      "name": "Ukrainian",
+      "abbreviation": "UK"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 163,
+    "fields": {
+      "name": "Urdu",
+      "abbreviation": "UR"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 164,
+    "fields": {
+      "name": "Uzbek",
+      "abbreviation": "UZ"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 165,
+    "fields": {
+      "name": "Venda",
+      "abbreviation": "VE"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 166,
+    "fields": {
+      "name": "Vietnamese",
+      "abbreviation": "VI"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 167,
+    "fields": {
+      "name": "Volapük",
+      "abbreviation": "VO"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 168,
+    "fields": {
+      "name": "Walloon",
+      "abbreviation": "WA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 169,
+    "fields": {
+      "name": "Wolof",
+      "abbreviation": "WO"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 170,
+    "fields": {
+      "name": "Xhosa",
+      "abbreviation": "XH"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 171,
+    "fields": {
+      "name": "Yiddish",
+      "abbreviation": "YI"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 172,
+    "fields": {
+      "name": "Yoruba",
+      "abbreviation": "YO"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 173,
+    "fields": {
+      "name": "Zhuang",
+      "abbreviation": "ZA"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 174,
+    "fields": {
+      "name": "Chinese",
+      "abbreviation": "ZH"
+    }
+  },
+  {
+    "model": "languages.language",
+    "pk": 175,
+    "fields": {
+      "name": "Zulu",
+      "abbreviation": "ZU"
+    }
+  }
+]

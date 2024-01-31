@@ -1,5 +1,5 @@
 from sendgrid import SendGridAPIClient
-from django.contrib.auth.models import User
+from users.models import User
 from django.conf import settings
 from django.template.loader import render_to_string
 from sendgrid.helpers.mail import (Mail, Attachment, FileContent, FileName, FileType, Disposition)

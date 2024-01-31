@@ -88,13 +88,28 @@
                                 <span>{% trans "Writing" %}</span>
                             </a>
                         </li>
+                        <li>
+                            <a href="{% url 'project_history' %}#tabs-4"
+                               class="button button--ico button--secondary no-tab">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26"
+                                     fill="none">
+                                    <path d="M21.2439 11.05L22.858 9.43581C23.4819 8.81032 23.8322 7.96297 23.8322 7.07956C23.8322 6.19615 23.4819 5.3488 22.858 4.72331L21.2764 3.14164C20.6509 2.51781 19.8035 2.16748 18.9201 2.16748C18.0367 2.16748 17.1894 2.51781 16.5639 3.14164L14.9497 4.75581L21.2439 11.05Z"
+                                          fill="#456B84"/>
+                                    <path d="M13.4224 6.28333L3.33661 16.3692C2.9995 16.7053 2.78249 17.1432 2.71911 17.615L2.16661 21.32C2.11599 21.6321 2.13431 21.9516 2.22029 22.2559C2.30626 22.5602 2.45781 22.842 2.66428 23.0815C2.87076 23.3211 3.12716 23.5125 3.41549 23.6423C3.70382 23.7722 4.01708 23.8374 4.33328 23.8333H4.64745L8.35245 23.3025C8.82429 23.2391 9.26212 23.0221 9.59828 22.685L19.6841 12.5992L13.4224 6.28333Z"
+                                          fill="#456B84"/>
+                                </svg>
+                                <span>{% trans "Project history" %}</span>
+                            </a>
+                        </li>
                     </ul>
                     <div class="translate__tab" id="tabs-1">
                         <form method="post" action="{% url 'main_index' %}" class="translate__form needs-validation" id="text_translate_form">
                             <input type="hidden" name="action" value="text_translate">
                             <input type="hidden" name="source_language" value="en">
                             <input type="hidden" name="target_language" value="fr">
-                            <input type="hidden" name="provider" value="ms">
+                            <input type="hidden" name="template_name" value="">
+
                             {% csrf_token %}
 
                             <div class="translate__form-row">
@@ -107,8 +122,24 @@
                                     </div>
                                     <div class="translate__form-title target">
                                         <span>{% trans "French" %}</span>
-                                        <select id="model-text" name="provider_model"></select>
-                                        <select name="provider_key"></select>
+                                        <div class="select-container">
+                                            <div class="select-box">
+                                                <div class="selected">
+                                                    <span class="selected-text">Templates</span>
+                                                    <div class="select-icon">
+                                                        <svg width="8" height="5" viewBox="0 0 8 5" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M0.739091 0.25H7.26076C7.37613 0.250484 7.48876 0.285166 7.58442 0.349661C7.68007 0.414156 7.75446 0.505567 7.79816 0.612336C7.84187 0.719105 7.85294 0.836437 7.82996 0.949494C7.80699 1.06255 7.751 1.16626 7.66909 1.2475L4.41409 4.5025C4.35986 4.55718 4.29535 4.60057 4.22426 4.63019C4.15318 4.6598 4.07693 4.67505 3.99992 4.67505C3.92292 4.67505 3.84667 4.6598 3.77559 4.63019C3.7045 4.60057 3.63999 4.55718 3.58576 4.5025L0.330758 1.2475C0.248845 1.16626 0.192862 1.06255 0.169887 0.949494C0.146913 0.836437 0.157978 0.719105 0.201684 0.612336C0.245391 0.505567 0.319776 0.414156 0.415433 0.349661C0.51109 0.285166 0.623723 0.250484 0.739091 0.25Z"
+                                                                  fill="#456B84"/>
+                                                        </svg>
+                                                    </div>
+
+                                                    <ul class="options-container history">
+                                                        <li class="option" value=""></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -168,7 +199,7 @@
                             <input type="hidden" name="action" value="file_translate">
                             <input type="hidden" name="source_language" value="en">
                             <input type="hidden" name="target_language" value="fr">
-                            <input type="hidden" name="provider" value="ms">
+                            <input type="hidden" name="template_name" value="">
 
                             {% csrf_token %}
                             <div class="translate__form-row">
@@ -180,9 +211,23 @@
                                         </div>
                                         <span>{% trans "French" %}</span>
                                     </div>
-                                    <div class="translate__form-title document-select">
-                                        <select  id="model-file" name="provider_model"></select>
-                                        <select name="provider_key"></select>
+                                    <div class="select-container">
+                                            <div class="select-box">
+                                                <div class="selected">
+                                                    <span class="selected-text">Templates</span>
+                                                    <div class="select-icon">
+                                                        <svg width="8" height="5" viewBox="0 0 8 5" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M0.739091 0.25H7.26076C7.37613 0.250484 7.48876 0.285166 7.58442 0.349661C7.68007 0.414156 7.75446 0.505567 7.79816 0.612336C7.84187 0.719105 7.85294 0.836437 7.82996 0.949494C7.80699 1.06255 7.751 1.16626 7.66909 1.2475L4.41409 4.5025C4.35986 4.55718 4.29535 4.60057 4.22426 4.63019C4.15318 4.6598 4.07693 4.67505 3.99992 4.67505C3.92292 4.67505 3.84667 4.6598 3.77559 4.63019C3.7045 4.60057 3.63999 4.55718 3.58576 4.5025L0.330758 1.2475C0.248845 1.16626 0.192862 1.06255 0.169887 0.949494C0.146913 0.836437 0.157978 0.719105 0.201684 0.612336C0.245391 0.505567 0.319776 0.414156 0.415433 0.349661C0.51109 0.285166 0.623723 0.250484 0.739091 0.25Z"
+                                                                  fill="#456B84"/>
+                                                        </svg>
+                                                    </div>
+
+                                                    <ul class="options-container history">
+                                                        <li class="option" value=""></li>
+                                                    </ul>
+                                                </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -507,11 +552,10 @@
         </div>
     </div>
     <script>
-        var languages = {{ languages|safe }};
-        var providers = {{ providers|safe }};
+        var templates = {{ templates|safe }}
+        var languages = {{ languages|safe }}
         var expert_revision_url = "{% url 'expert_revision' %}"
         var expert_revision_file_url = "{% url 'expert_revision_file' %}"
-        var base_lang_code = 'en';
         var gpt_process = "{% url 'gpt_process' %}"
         var gpt_process_status_check = "{% url 'gpt_process_status_check' %}"
     </script>

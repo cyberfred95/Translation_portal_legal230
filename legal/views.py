@@ -1,124 +1,50 @@
-from django.core.files.storage import FileSystemStorage
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from pprint import pprint
+from urllib.parse import urlparse, unquote
+from rest_framework.response import Response
+from rest_framework import status
 from django.views.generic import TemplateView, View, DetailView, ListView
 from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound, FileResponse, HttpResponse
+import django
 from rest_framework.views import APIView
-from .helpers import MicrosoftCustomProvider, ModernMTProvider
+
+from languages.models import Language
+from users.models import User
 from .credentials import languages
-from .keys import provider_models
-from .mail_helpers import send_file_translation, send_text_translation, send_expert_revision_text, \
+from .keys import CUSTOM_MT_CONSOLE_URL, CLOUDSTORAGE_API_URL
+from .mail_helpers import send_expert_revision_text, \
     send_expert_revision_file
 import base64
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
-from .helpers import run_modernmt_file_translation
+import requests
+from preferences import preferences
 
-
-def get_file_ext(filename):
-    split = filename.split('.')
-    return split[-1]
-
-
-def mmt_text_translation(request, creds):
-    translator = ModernMTProvider(
-        credentials=creds,
-        source_lang=creds['source_lng'],
-        target_lang=creds['target_lng']
-    )
-
-    send_text_translation(user_id=request.user.id, text=request.POST.get('text'))
-    return translator.translate(data=request.POST.get('text'))
-
-
-def ms_text_translation(request, creds):
-    translator = MicrosoftCustomProvider(
-        key=creds['key'],
-        category=creds['category_id'],
-        source_lang=creds['source_lng'],
-        target_lang=creds['target_lng']
-    )
-    send_text_translation(user_id=request.user.id, text=request.POST.get('text'))
-    return translator.translate(data=request.POST.get('text'))
+PAGINATION_PAGE_SIZE = 30
 
 
 def text_translation(request):
-    provider_key = request.POST.get('provider_key')
-    if provider_models[request.POST.get('provider_model')][provider_key]['provider'] == 'ms':
-        return ms_text_translation(request, provider_models[request.POST.get('provider_model')][provider_key])
-    if provider_models[request.POST.get('provider_model')][provider_key]['provider'] == 'mmt':
-        return mmt_text_translation(request, provider_models[request.POST.get('provider_model')][provider_key])
-    print('base')
-    return None
+    text = request.POST.get('text')
+    response = requests.post(CUSTOM_MT_CONSOLE_URL + "translate", data={
+        "text": [text],
+        "template_name": request.POST.get('template_name')
+    }, headers={"token": request.user.group.api_key})
+    return response.json()
 
-
-def ms_file_translation(request, creds):
-    ext = get_file_ext(request.FILES['document'].name)
-
-    # if ext == 'txt':
-    #     translator = MicrosoftCustomProvider(
-    #         key=creds['key'],
-    #         category=creds['category_id'],
-    #         source_lang=creds['source_lng'],
-    #         target_lang=creds['target_lng']
-    #     )
-    #     result = translator.translate(data=request.FILES['document'].read().decode("utf-8"))
-    #     return FileResponse(
-    #         result,
-    #         filename=request.FILES['document'].name
-    #     )
-
-    translator = MicrosoftCustomProvider(
-        key=creds['key'],
-        category=creds['category_id'],
-        source_lang=creds['source_lng'],
-        target_lang=creds['target_lng']
-    )
-    file = request.FILES['document'].read()
-    result_data = translator.translate_file(
-        file=file,
-        mime_type=ext
-    )
-    b_64 = base64.b64encode(file)
-    send_file_translation(user_id=request.user.id, base64_attachment=b_64.decode(encoding='utf-8'),
-                          file_name=request.FILES['document'].name)
-
-    return FileResponse(
-        [result_data],
-        filename=request.FILES['document'].name
-    )
-
-
-def mmt_file_translation(request, creds):
-    storage = FileSystemStorage()
-    translation_file: InMemoryUploadedFile = request.FILES["document"]
-
-    file_name = storage.save(translation_file.name, translation_file)
-    temp_file_path = storage.path(file_name)
-    document_info = (translation_file.content_type, temp_file_path)
-    translated_document = run_modernmt_file_translation(
-        document=document_info,
-        creds=creds,
-        source_language=request.POST['source_language'],
-        target_language=request.POST['target_language']
-    )
-    b_64 = base64.b64encode(translated_document)
-    send_file_translation(user_id=request.user.id, base64_attachment=b_64.decode(encoding='utf-8'),
-                          file_name=request.FILES['document'].name)
-
-    return FileResponse(
-        [translated_document],
-        filename=request.FILES['document'].name
-    )
 
 def file_translate(request):
-    provider_key = request.POST.get('provider_key')
-    if provider_models[request.POST.get('provider_model')][provider_key]['provider'] == 'ms':
-        return ms_file_translation(request, provider_models[request.POST.get('provider_model')][provider_key])
-    if provider_models[request.POST.get('provider_model')][provider_key]['provider'] == 'mmt':
-        return mmt_file_translation(request, provider_models[request.POST.get('provider_model')][provider_key])
+    response = requests.post(
+        url=CLOUDSTORAGE_API_URL,
+        data={
+            "template_name": request.POST.get('template_name'),
+            "user_uuid": request.user.uuid
+        },
+        headers={"token": request.user.group.api_key},
+        files={
+            'source_file': request.FILES["document"]
+        }
+    )
 
-    print('base')
-    return None
+    return response.json()
 
 
 class TranslateView(TemplateView):
@@ -126,31 +52,42 @@ class TranslateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        provs = {}
-        for provider in provider_models:
-            provider_data = provider_models.get(provider)
-            provs[f'{provider}'] = []
-            for key in provider_data:
-                provs[f'{provider}'].append({
-                    'key': key,
-                    'title': provider_data[key]['title'],
-                    'title_fr': provider_data[key]['title_fr'],
-                    'source_lng': provider_data[key]['source_lng'],
-                    'target_lng': provider_data[key]['target_lng'],
-                    'provider': provider_data[key]['provider']
-                })
-        context['providers'] = provs
         context['languages'] = languages
+        context['templates'] = self.get_translation_templates()
         return context
 
+    def get_translation_templates(self):
+        templates = dict()
+        response = requests.post(
+            CUSTOM_MT_CONSOLE_URL + "get-templates",
+            data={
+                "source_language": "en",
+                "target_language": "fr"
+            },
+            headers={
+                'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
+            })
+        templates['en_fr'] = response.json()
+
+        response = requests.post(
+            CUSTOM_MT_CONSOLE_URL + "get-templates",
+            data={
+                "source_language": "fr",
+                "target_language": "en"
+            },
+            headers={
+                'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
+            })
+
+        templates['fr_en'] = response.json()
+        return templates
+
     def post(self, request):
-        if not request.is_ajax():
-            return HttpResponseBadRequest()
+
         if request.POST.get('action') == 'text_translate':
-            print(text_translation(request=request))
-            return JsonResponse({'result': text_translation(request)})
-        if request.POST.get('action') == 'file_translate':
-            return file_translate(request)
+            return JsonResponse(text_translation(request))
+        elif request.POST.get('action') == 'file_translate':
+            return JsonResponse(file_translate(request))
         return JsonResponse({})
 
 
@@ -170,3 +107,54 @@ def expert_revision_file(request):
     send_expert_revision_file(user_id=request.user.id, base64_attachment=b_64.decode(encoding='utf-8'),
                               file_name=request.FILES['file'].name)
     return JsonResponse({})
+
+
+class ProjectsHistoryView(TemplateView):
+    template_name = 'project_history.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        page = self.request.GET.get('page')
+        params = {
+            "page_size": PAGINATION_PAGE_SIZE,
+            "page": page,
+            "user_uuid": user.uuid if not user.is_staff else None
+        }
+        headers = {"token": preferences.MainSettings.api_key if user.is_staff else user.group.api_key}
+
+        if page is not None:
+            params["page"] = int(page)
+
+        response = requests.get(CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
+        if 'results' in response:
+            for project in response['results']:
+                file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
+                original_filename = unquote(file_name)
+                project['source_file_name'] = original_filename
+                if user.is_staff:
+                    try:
+                        project['username'] = User.objects.get(uuid=project['user_uuid'])
+                    except User.DoesNotExist:
+                        project['username'] = None
+                    except django.core.exceptions.ValidationError:
+                        project['username'] = None
+            context['projects'] = response
+
+        return context
+
+
+class SingleProjectView(APIView):
+
+    def get(self, request):
+        project_id = request.query_params.get('project_id')
+        response = requests.get(CLOUDSTORAGE_API_URL + f"{project_id}/",
+                                headers={"token": request.user.group.api_key})
+        return Response(response.json(), status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        project_id = self.request.data.get('project_id')
+        response = requests.delete(CLOUDSTORAGE_API_URL + f"{project_id}/",
+                                   headers={"token": request.user.group.api_key})
+
+        return Response({"message": "Sucessfully deleted"}, status=status.HTTP_204_NO_CONTENT)
