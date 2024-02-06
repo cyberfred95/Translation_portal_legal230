@@ -20,7 +20,7 @@ function gpt_processing() {
     function modalUpload() {
         let thisInput = $(this)
         let fileTypes = false;
-        if(thisInput[0].hasAttribute('accept') && thisInput.attr('accept')) {
+        if (thisInput[0].hasAttribute('accept') && thisInput.attr('accept')) {
             fileTypes = thisInput.attr('accept').replaceAll(' ', '').split(',')
         }
         let maxFileSize = parseFloat(thisInput.attr('data-maxsize')) * 1024 * 1024;
@@ -33,23 +33,23 @@ function gpt_processing() {
         let resultBlockImg = thisContainer.find('.upload_result img')
         let fileName = ''
         let thisName = files[0].name.split('.')
-        let thisExt = thisName[thisName.length-1]
+        let thisExt = thisName[thisName.length - 1]
         let checkboxUpload = thisContainer.find('input[type="checkbox"]')
 
         thisName.pop()
 
-        if(thisName.length > 1) {
+        if (thisName.length > 1) {
             thisName = thisName.join('.')
         } else {
             thisName = thisName[0]
         }
 
-        if(thisName.length > 27)
+        if (thisName.length > 27)
             thisName = thisName.substring(0, 27) + '... '
 
         fileName = thisName + '.' + thisExt
 
-        if(fileTypes) {
+        if (fileTypes) {
             $.each(fileTypes, function (_, type) {
                 if (type === '.' + thisExt)
                     isValid = true;
@@ -58,21 +58,21 @@ function gpt_processing() {
             isValid = true
         }
 
-        if(!isValid){
-            errorBlock.html('<p>Allowed extensions: '+fileTypes.join(', ')+'</p>').show()
+        if (!isValid) {
+            errorBlock.html('<p>Allowed extensions: ' + fileTypes.join(', ') + '</p>').show()
             thisInput.val('');
             thisContainer.addClass('is-error')
-            if(checkboxUpload.length)
+            if (checkboxUpload.length)
                 checkboxUpload.prop('checked', false)
             return false;
         }
 
-        if(files[0].size > maxFileSize){
+        if (files[0].size > maxFileSize) {
             isValid = false;
-            errorBlock.html('<p>Maximum file size is '+(maxFileSize / 1024 / 1024)+'mb</p>').show()
+            errorBlock.html('<p>Maximum file size is ' + (maxFileSize / 1024 / 1024) + 'mb</p>').show()
             thisInput.val('');
             thisContainer.addClass('is-error')
-            if(checkboxUpload.length)
+            if (checkboxUpload.length)
                 checkboxUpload.prop('checked', false)
             return false;
         }
@@ -90,6 +90,7 @@ function gpt_processing() {
 
             fileData = resultLines
         }
+
         function onErrorValid() {
             isValid = false;
             errorBlock.html('<p>Your file is empty</p>').show()
@@ -106,12 +107,13 @@ function gpt_processing() {
         });
         reader.readAsText(files[0]);
     }
+
     function modalUploadDelete() {
         let thisInput = $(this)
         let thisContainer = thisInput.closest('.modal__btn')
         let thisIndex = false;
 
-        if(!thisContainer.length){
+        if (!thisContainer.length) {
             thisContainer = thisInput.closest('.upload_result')
             thisIndex = thisContainer.index()
             thisContainer.remove()
@@ -125,7 +127,7 @@ function gpt_processing() {
         let resultBlock = thisContainer.find('.upload_result')
         let checkboxUpload = thisContainer.find('input[type="checkbox"]')
 
-        if(checkboxUpload.length)
+        if (checkboxUpload.length)
             checkboxUpload.prop('checked', false)
 
         uploadLabel.find('input').val('')
@@ -135,11 +137,12 @@ function gpt_processing() {
 
         fileData = false;
     }
-    function gptTxt(data, onSuccess, onError){
+
+    function gptTxt(data, onSuccess, onError) {
         data = data.replaceAll('\r', '')
         let lines = data.split('\n');
 
-        if(lines.length) {
+        if (lines.length) {
             onSuccess(lines)
         } else {
             onError()
@@ -149,9 +152,9 @@ function gpt_processing() {
     function checkAdditional() {
         let thisInp = $(this)
         let thisVal = thisInp.val()
-        if(!thisVal)
+        if (!thisVal)
             return;
-        let thisAdditionalBlock = thisInp.closest('.gpt_processing__row').find('[data-action="'+thisVal+'"]')
+        let thisAdditionalBlock = thisInp.closest('.gpt_processing__row').find('[data-action="' + thisVal + '"]')
 
         $(gptAdditional).hide()
         thisAdditionalBlock.css('display', 'flex').hide().show()
@@ -164,8 +167,9 @@ function gpt_processing() {
         $(selector).closest('.select').addClass('error')
         $(selector).closest('.select').append('<div class="errorText">This input is required.</div>')
     }
+
     function isValidF(selector = false) {
-        if(!selector || !$(selector).length) {
+        if (!selector || !$(selector).length) {
             $('.error').removeClass('error')
             $('.invalid-feedback').hide()
         } else {
@@ -178,7 +182,7 @@ function gpt_processing() {
     function onSuccess(data) {
         $(gptError).addClass('is-hidden')
 
-        if(!$(gptUploadTextSwitch).is(':checked')) {
+        if (!$(gptUploadTextSwitch).is(':checked')) {
             $(gptBtnDownload).removeClass('is-hidden')
 
 
@@ -191,16 +195,18 @@ function gpt_processing() {
             $('#gpt_result_text').text(data.join('\n'))
         }
     }
+
     function onError() {
         $(gptError).removeClass('is-hidden')
         $(gptBtnSubmit).removeClass('is-hidden')
 
         $(gptBtnDownload).addClass('is-hidden')
     }
+
     function onSubmit(e) {
         e.preventDefault()
         let action = $(gptInputAction).val()
-        if($(gptUploadTextSwitch).is(':checked')){
+        if ($(gptUploadTextSwitch).is(':checked')) {
             fileData = $(gptTranslationText).val().split('\n')
             if (!fileData) {
                 isInvalid(gptTranslationText)
@@ -212,11 +218,11 @@ function gpt_processing() {
                 isInvalid(gptUploads)
             }
         }
-        if(!action) {
-            isInvalid('[name="'+$(gptInputAction).attr('name')+'"]')
+        if (!action) {
+            isInvalid('[name="' + $(gptInputAction).attr('name') + '"]')
             return;
         } else {
-            isValidF('[name="'+$(gptInputAction).attr('name')+'"]')
+            isValidF('[name="' + $(gptInputAction).attr('name') + '"]')
         }
         let requestData = {
             "action": action,
@@ -225,7 +231,7 @@ function gpt_processing() {
         let additionalBlock = $(gptAdditional + '[data-action="' + action + '"]')
         let additional = {}
 
-        if(additionalBlock.length){
+        if (additionalBlock.length) {
             let additionalInputs = additionalBlock.find('[name]')
             let isValid = true;
 
@@ -234,17 +240,17 @@ function gpt_processing() {
 
                 additional[thisInput.attr('name')] = thisInput.val()
 
-                if(thisInput.prop('required') && !thisInput.val()){
-                    isInvalid('[name="'+thisInput.attr('name')+'"]')
+                if (thisInput.prop('required') && !thisInput.val()) {
+                    isInvalid('[name="' + thisInput.attr('name') + '"]')
                     isValid = false
                 } else {
-                    isValidF('[name="'+thisInput.attr('name')+'"]')
+                    isValidF('[name="' + thisInput.attr('name') + '"]')
                 }
             })
 
-            if(!isValid) return;
+            if (!isValid) return;
         }
-        if(!fileData)
+        if (!fileData)
             return;
 
         isValidF()
@@ -265,66 +271,17 @@ function gpt_processing() {
         })
             .then(response => response.json())
             .then(function (data) {
-                let taskId = typeof data['task_id'] !== 'undefined' ? data['task_id'] : false
-
-                if(taskId){
-                    let checkInterval = 0;
-
-                    function sendCheckRequest() {
-                        fetch(requestCheckAction, {
-                            method: requestCheckMethod,
-                            credentials: 'same-origin',
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'X-CSRFToken': getCookie('csrftoken'),
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify([taskId])
-                        })
-                            .then(function (response) {
-                                if(response.ok) {
-                                    return response.json()
-                                } else {
-                                    clearInterval(checkInterval)
-                                    return false;
-                                }
-                            })
-                            .then(function (data) {
-                                if(data[0]){
-                                    if(data[0]['task_status']){
-                                        if(data[0]['task_status'] !== 'PENDING') {
-                                            clearInterval(checkInterval)
-
-                                            if (data[0]['task_status'] === 'SUCCESS') {
-                                                onSuccess(data[0]['result'])
-                                            } else {
-                                                onError()
-                                            }
-                                        }
-                                    } else {
-                                        clearInterval(checkInterval)
-                                        onError()
-                                    }
-                                } else {
-                                    clearInterval(checkInterval)
-                                    onError()
-                                }
-                            })
-                    }
-                    console.log('checking ' + requestCheckAction)
-                    checkInterval = setInterval(sendCheckRequest, 1000)
-                } else {
-                    onError()
-                }
-            });
+                onSuccess(data.result);
+            }).catch(() => {
+            onError();
+        })
     }
 
     function toggleModalStock() {
         let uploadForm = $('.gpt_processing__upload')
         let textForm = $('.gpt_processing__text')
 
-        if($(gptUploadTextSwitch).is(':checked')){
+        if ($(gptUploadTextSwitch).is(':checked')) {
             uploadForm.fadeOut(300, function () {
                 textForm.fadeIn(300)
             })
@@ -334,6 +291,7 @@ function gpt_processing() {
             })
         }
     }
+
     toggleModalStock()
     toggleModalStock()
     $(document).on('change', gptUploadTextSwitch, toggleModalStock)
@@ -351,9 +309,8 @@ function gpt_processing() {
 }
 
 
-
-$(document).ready(function(){
-    let tabs = $( "#tabs" );
+$(document).ready(function () {
+    let tabs = $("#tabs");
     let formText = $('#text_translate_form');
     let formFile = $('#file_translate_form');
     let clearBtn = $('.btn_clear');
@@ -416,21 +373,21 @@ $(document).ready(function(){
                 'Accept': 'application/json',
             },
             dataType: 'json',
-            success: function() {
+            success: function () {
                 $('.translate__file-block').hide();
                 $('.translate__file-block.complete').css('display', 'flex')
                 $('#expert_revision_document').addClass('expert--revision');
                 successHandler();
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 errorHandler(error);
             }
         });
     }
 
-    function setSourceLang(lang){
+    function setSourceLang(lang) {
         let container = $('.translate__pair')
-        if($(this).is('select')) {
+        if ($(this).is('select')) {
             lang = $(this).val()
             container = $(this).closest('.translate__pair')
         } else {
@@ -441,37 +398,37 @@ $(document).ready(function(){
         setTargetLang(lang, targetSelect)
     }
 
-    function setTargetLang(lang, select){
+    function setTargetLang(lang, select) {
         select.val('')
         select.find('option:not([value=""])').remove()
-        if(!lang) return false;
+        if (!lang) return false;
 
         let pairs = languages.find(item => item.language === lang).pairs;
 
-        if(!pairs) return false;
+        if (!pairs) return false;
 
         $.each(pairs, function (_, pair) {
-            select.append($('<option value="'+pair.language+'">'+pair.name+'</option>'))
+            select.append($('<option value="' + pair.language + '">' + pair.name + '</option>'))
         })
     }
 
-    function errorHandler(){
+    function errorHandler() {
         preloader.hide()
-        $('<a href='+errorPopup+'></a>').fancybox({
-            arrows : false,
+        $('<a href=' + errorPopup + '></a>').fancybox({
+            arrows: false,
             padding: 0,
             overlay: {
                 locked: false
             },
-            afterClose: function() {
+            afterClose: function () {
                 location.reload()
             }
         }).click()
     }
 
-    function successHandler(){
-        $('<a href='+successPopup+'></a>').fancybox({
-            arrows : false,
+    function successHandler() {
+        $('<a href=' + successPopup + '></a>').fancybox({
+            arrows: false,
             padding: 0,
             overlay: {
                 locked: false
@@ -489,8 +446,8 @@ $(document).ready(function(){
         let resultContainer = $('.translate__form-text.result textarea');
         let errorBlock = form.find('.invalid-feedback');
 
-        if(text.length > parseInt(text.attr('maxlength'))) {
-            errorBlock.text('Maximum text length is '+text.attr('maxlength')).show()
+        if (text.length > parseInt(text.attr('maxlength'))) {
+            errorBlock.text('Maximum text length is ' + text.attr('maxlength')).show()
             return false;
         } else {
             errorBlock.hide()
@@ -508,18 +465,18 @@ $(document).ready(function(){
             },
             body: formData,
         })
-        .then(r =>  r.json().then(data => ({status: r.status, body: data})))
-        .then(obj => {
-            if(obj.status === 200) {
-                resultContainer.val(obj.body['translated_text']);
-                btn.attr('disabled', false);
-                $('#expert_revision').removeClass('expert--revision');
-                preloader.fadeOut(300);
-            } else {
-                errorHandler();
-            }
-        })
-        .catch(error => errorHandler(error))
+            .then(r => r.json().then(data => ({status: r.status, body: data})))
+            .then(obj => {
+                if (obj.status === 200) {
+                    resultContainer.val(obj.body['translated_text']);
+                    btn.attr('disabled', false);
+                    $('#expert_revision').removeClass('expert--revision');
+                    preloader.fadeOut(300);
+                } else {
+                    errorHandler();
+                }
+            })
+            .catch(error => errorHandler(error))
     }
 
     $('#expert_revision').on('click', expertRevision);
@@ -535,19 +492,19 @@ $(document).ready(function(){
         $.ajax({
             type: 'POST',
             url: url,
-            data: { result: resultData },
+            data: {result: resultData},
             dataType: 'json',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': getCookie('csrftoken'),
                 'Accept': 'application/json',
             },
-            success: function() {
+            success: function () {
                 $('#expert_revision').addClass('expert--revision');
                 preloader.fadeOut(300);
                 successHandler();
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 errorHandler(error);
             }
         });
@@ -601,7 +558,7 @@ $(document).ready(function(){
         let form = $(this);
         let fileInput = form.find('input[type=file]')
         let errorBlock = fileInput.closest('.translate__file-block').find('.invalid-feedback');
-        if(fileInput[0].files.length) {
+        if (fileInput[0].files.length) {
             errorBlock.hide();
         } else {
             errorBlock.show()
@@ -639,6 +596,7 @@ $(document).ready(function(){
             })
             .catch(error => errorHandler(error))
     }
+
     function formReset(e) {
         e.preventDefault();
 
@@ -660,6 +618,7 @@ $(document).ready(function(){
         textarea.val('');
         textareaResult.val('');
     }
+
     function copyText() {
         let btn = $(this)
         let textarea = btn.closest('.translate__form-text').find('textarea')
@@ -707,7 +666,7 @@ $(document).ready(function(){
 
             optionsContainer.innerHTML = '';
 
-            templates[templateKey].forEach(function(template) {
+            templates[templateKey].forEach(function (template) {
                 const option = document.createElement('li');
                 option.className = 'option';
                 option.textContent = template.template_name;
