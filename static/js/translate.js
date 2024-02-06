@@ -1,7 +1,6 @@
 function gpt_processing() {
     let requestProcessAction = gpt_process || '/gpt-processing/gpt_process/'
     let requestProcessMethod = 'POST'
-    let requestCheckAction = gpt_process_status_check || '/gpt-processing/gpt_check/'
     let requestCheckMethod = 'POST'
     let gptBtnDownload = '.gpt_processing__download'
     let gptBtnSubmit = '.gpt_processing__submit'
