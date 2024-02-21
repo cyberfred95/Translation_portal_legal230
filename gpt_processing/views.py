@@ -26,7 +26,7 @@ class GPTProcessingView(TemplateView):
 def gpt_process(request):
     data = request.data
     response = requests.post(
-        url='http://animated-spoon-runserver-1:8000/gpt-processing/foreign_gpt_process/',
+        url='https://console.custom.mt/gpt-processing/foreign_gpt_process/',
         data={
             "action": data['action'], "text": data['text'],
             "openai_gpt_api_key": settings.OPENAI_GPT_API_KEY,
@@ -43,5 +43,5 @@ def gpt_process(request):
 def gpt_check(request):
     tasks = request.data
     print(tasks)
-    response = requests.post(url='http://animated-spoon-runserver-1:8000/gpt-processing/gpt_check/', data=tasks)
+    response = requests.post(url='https://console.custom.mt/gpt-processing/gpt_check/', data=tasks)
     return Response(response.json(), status=status.HTTP_200_OK)
