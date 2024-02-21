@@ -37,7 +37,8 @@ def file_translate(request):
         url=CLOUDSTORAGE_API_URL,
         data={
             "template_name": request.POST.get('template_name'),
-            "user_uuid": request.user.uuid
+            "user_custom_mt_token": request.user.uuid,
+            "source_language": request.POST.get('source_language')
         },
         headers={
             "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
@@ -120,7 +121,7 @@ class ProjectsHistoryView(TemplateView):
         params = {
             "page_size": PAGINATION_PAGE_SIZE,
             "page": page,
-            "user_uuid": user.uuid if not user.is_staff else None
+            "user_custom_mt_token": user.uuid if not user.is_staff else None
         }
         headers = {"token": preferences.MainSettings.api_key if user.is_staff else user.group.api_key}
 
@@ -135,7 +136,7 @@ class ProjectsHistoryView(TemplateView):
                 project['source_file_name'] = original_filename
                 if user.is_staff:
                     try:
-                        project['username'] = User.objects.get(uuid=project['user_uuid'])
+                        project['username'] = User.objects.get(uuid=project['user_custom_mt_token'])
                     except User.DoesNotExist:
                         project['username'] = None
                     except django.core.exceptions.ValidationError:

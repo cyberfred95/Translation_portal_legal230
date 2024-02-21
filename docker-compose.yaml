@@ -17,12 +17,16 @@ services:
       - USE_DOCKER=yes
       - DJANGO_SETTINGS_MODULE=legal.settings_dev
       - DOCKER=true
+    networks:
+      - file_process
 
   dockerize:
     image: jwilder/dockerize
     command: dockerize -wait tcp://postgres:5432 -timeout 10s
     depends_on:
       - postgres
+    networks:
+      - file_process
 
   celery:
     <<: *django
@@ -34,16 +38,19 @@ services:
     depends_on:
       - dockerize
       - redis
-
+    networks:
+      - file_process
   runserver:
     <<: *django
     command: [ "bash", "./docker/django/start-dev.sh" ]
     ports:
-      - 8000:8000
+      - 8001:8000
     depends_on:
       - dockerize
       - celery
       - redis
+    networks:
+      - file_process
 
   postgres:
     build: ./docker/postgres
@@ -57,6 +64,8 @@ services:
     - type: bind
       source: ./postgres
       target: /tmp/
+    networks:
+      - file_process
 
   pgadmin:
     image: dpage/pgadmin4:4.14
@@ -64,15 +73,23 @@ services:
       PGADMIN_DEFAULT_EMAIL: "vjxzebra@gmail.com"
       PGADMIN_DEFAULT_PASSWORD: "datasvitend"
     ports:
-      - "8888:80"
+      - "8800:80"
     depends_on:
       - postgres
     volumes:
     - type: bind
       source: ./postgres
       target: /var/lib/pgadmin/storage/vjxzebra_gmail.com
+    networks:
+      - file_process
 
   redis:
     image: redis:6
     ports:
-      - 6379:6379
+      - 6380:6379
+    networks:
+      - file_process
+
+networks:
+  file_process:
+    external: true
