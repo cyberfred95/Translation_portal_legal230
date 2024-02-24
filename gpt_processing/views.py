@@ -29,7 +29,6 @@ def gpt_process(request):
         url='https://console.custom.mt/gpt-processing/foreign_gpt_process/',
         data={
             "action": data['action'], "text": data['text'],
-            "openai_gpt_api_key": settings.OPENAI_GPT_API_KEY,
             "source_language": data['prompt']['source_language'],
             "target_language": data['prompt']['target_language']
 
