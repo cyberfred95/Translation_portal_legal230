@@ -29,8 +29,7 @@ def gpt_process(request):
         url='https://console.custom.mt/gpt-processing/foreign_gpt_process/',
         data={
             "action": data['action'], "text": data['text'],
-            "source_language": data['prompt']['source_language'],
-            "target_language": data['prompt']['target_language']
+            **data['prompt']
 
         }
     )
