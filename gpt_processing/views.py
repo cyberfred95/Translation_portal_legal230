@@ -9,6 +9,7 @@ from django.conf import settings
 from .tasks import start_gpt_process
 from legal.mail_helpers import send_file_translation, send_text_translation, send_gpt_processing
 import requests
+from preferences import preferences
 
 
 class GPTProcessingView(TemplateView):
@@ -27,6 +28,9 @@ def gpt_process(request):
     data = request.data
     response = requests.post(
         url='https://console.custom.mt/gpt-processing/foreign_gpt_process/',
+        headers={
+            'token': preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+        },
         data={
             "action": data['action'], "text": data['text'],
             **data['prompt']
