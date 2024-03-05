@@ -1,3 +1,4 @@
+import os
 from pprint import pprint
 from urllib.parse import urlparse, unquote
 from rest_framework.response import Response
@@ -29,7 +30,7 @@ def text_translation(request):
         "template_name": request.POST.get('template_name')
     }, headers={
         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-    send_text_translation(user_id=request.user.id, text=text)
+    send_text_translation(user_id=request.user.id, text=text, template_name=request.POST.get('template_name'))
     return response.json()
 
 
@@ -50,7 +51,8 @@ def file_translate(request):
     file = request.FILES['document'].read()
     b_64 = base64.b64encode(file)
     send_file_translation(user_id=request.user.id, base64_attachment=b_64.decode(encoding='utf-8'),
-                          file_name=request.FILES['document'].name)
+                          file_name=request.FILES['document'].name, template_name=request.POST.get('template_name'),
+                          format=os.path.splitext(str(request.FILES['document']))[1])
     return response.json()
 
 
