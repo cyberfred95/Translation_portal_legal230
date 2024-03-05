@@ -12,7 +12,7 @@ from users.models import User
 from .credentials import languages
 from .keys import CUSTOM_MT_CONSOLE_URL, CLOUDSTORAGE_API_URL
 from .mail_helpers import send_expert_revision_text, \
-    send_expert_revision_file
+    send_expert_revision_file, send_file_translation, send_text_translation
 import base64
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
@@ -28,7 +28,10 @@ def text_translation(request):
         "text": [text],
         "template_name": request.POST.get('template_name')
     }, headers={
-            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+        "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+    print("sending email")
+    send_text_translation(user_id=request.user.id, text=text)
+    print("email sent")
     return response.json()
 
 
@@ -46,7 +49,10 @@ def file_translate(request):
             'source_file': request.FILES["document"]
         }
     )
-
+    file = request.FILES['document'].read()
+    b_64 = base64.b64encode(file)
+    send_file_translation(user_id=request.user.id, base64_attachment=b_64.decode(encoding='utf-8'),
+                          file_name=request.FILES['document'].name)
     return response.json()
 
 
@@ -156,6 +162,7 @@ class SingleProjectView(APIView):
     def delete(self, request):
         project_id = self.request.data.get('project_id')
         response = requests.delete(CLOUDSTORAGE_API_URL + f"{project_id}/",
-            headers={"token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+                                   headers={
+                                       "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
 
         return Response({"message": "Sucessfully deleted"}, status=status.HTTP_204_NO_CONTENT)
