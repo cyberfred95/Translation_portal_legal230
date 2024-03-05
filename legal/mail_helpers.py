@@ -61,11 +61,10 @@ def send_expert_revision_text(user_id, text):
     )
 
 
-def send_expert_revision_file(user_id, base64_attachment, file_name):
+def send_expert_revision_file(user_id, file_url):
     send_text_translation(
         user_id=user_id,
-        attachment=base64_attachment,
-        file_name=file_name,
         theme='Revision request for File translation',
-        template="expert_revision_email.html"
+        template="expert_revision_email.html",
+        text=file_url
     )

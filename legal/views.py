@@ -104,10 +104,8 @@ def expert_revision(request):
 @csrf_exempt
 @api_view(['POST'])
 def expert_revision_file(request):
-    file = request.FILES['file'].read()
-    b_64 = base64.b64encode(file)
-    send_expert_revision_file(user_id=request.user.id, base64_attachment=b_64.decode(encoding='utf-8'),
-                              file_name=request.FILES['file'].name)
+    file_url = request.POST.get('file_url')
+    send_expert_revision_file(user_id=request.user.id, file_url=file_url)
     return JsonResponse({})
 
 
