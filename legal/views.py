@@ -29,9 +29,7 @@ def text_translation(request):
         "template_name": request.POST.get('template_name')
     }, headers={
         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-    print("sending email")
     send_text_translation(user_id=request.user.id, text=text)
-    print("email sent")
     return response.json()
 
 
