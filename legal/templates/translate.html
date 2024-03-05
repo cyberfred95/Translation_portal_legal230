@@ -548,6 +548,7 @@
         </div>
     </div>
     <script>
+        var gpt_prompts = {{ prompts|safe }}
         var templates = {{ templates|safe }}
         var languages = {{ languages|safe }}
         var expert_revision_url = "{% url 'expert_revision' %}"
