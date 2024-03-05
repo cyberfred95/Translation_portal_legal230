@@ -66,8 +66,6 @@ class TranslateView(TemplateView):
         context['languages'] = languages
         context['templates'] = self.get_translation_templates()
         context['prompts'] = prompts_list
-        print(context['prompts'])
-
         return context
 
     def get_translation_templates(self):
