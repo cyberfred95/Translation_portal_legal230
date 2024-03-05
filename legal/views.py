@@ -1,3 +1,4 @@
+import json
 import os
 from pprint import pprint
 from urllib.parse import urlparse, unquote
@@ -19,6 +20,7 @@ from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from preferences import preferences
+from gpt_processing.prompts_list import prompts_list
 
 PAGINATION_PAGE_SIZE = 30
 
@@ -63,6 +65,9 @@ class TranslateView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['languages'] = languages
         context['templates'] = self.get_translation_templates()
+        context['prompts'] = prompts_list
+        print(context['prompts'])
+
         return context
 
     def get_translation_templates(self):
