@@ -42,7 +42,7 @@ prompts_list = [
                     Mr Lewinston works at Bain & Company. He was fired on XX/XX/XX. He lives at 2, Villa Delmore, Los Angeles. His phone number is 01 23 42 33 43. His social security number is 2910186113878. On XX, X XX he asked for a bonus.
                     
                     ###start of text###
-                    {{texttoedit}}
+                    {text}
                      ###end of text###
                     """
     },
@@ -72,7 +72,7 @@ prompts_list = [
                     
                     ###start of text###
                     
-                    {{texttoedit}}
+                    {text}
                     ###endof text###"""
     },
     {
@@ -81,7 +81,7 @@ prompts_list = [
 
                     ###start of the text###
                     
-                    {{texttoedit}}
+                    {text}
                     
                     ###end of the text###"""
     },
@@ -96,6 +96,6 @@ prompts_list = [
                     3. The size of the summary must be approximately 30% of the volume of the source text.
                     
                     ###Text to summarize###
-                    {{text_to_summarize}}"""
+                    {text}"""
     }
 ]
