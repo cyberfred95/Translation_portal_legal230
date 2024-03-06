@@ -1,6 +1,6 @@
 <p>Dear {{ user_name}},</p>
-<p>{{ sender_username }} has sent the attached document for translation.</p>
-{% if text  %}<p>{{ text }}</p>{% endif %}
+<p>{{ sender_username }} has sent this document for expert revision.</p>
+{% if file_url  %}<p>{{ file_url }}</p>{% endif %}
 {% if template_name %}<p>Template used: {{ template_name }}</p>{% endif %}
 {% if file_ext %}<p>Format of the submitted file: {{file_ext }} </p>{% endif %}
 <p>Thank you and kind regards</p>
