@@ -1,5 +1,10 @@
+import json
+import os
+import time
 from pprint import pprint
 from urllib.parse import urlparse, unquote
+
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework.response import Response
 from rest_framework import status
 from django.views.generic import TemplateView, View, DetailView, ListView
@@ -12,12 +17,13 @@ from users.models import User
 from .credentials import languages
 from .keys import CUSTOM_MT_CONSOLE_URL, CLOUDSTORAGE_API_URL
 from .mail_helpers import send_expert_revision_text, \
-    send_expert_revision_file
+    send_expert_revision_file, send_file_translation, send_text_translation
 import base64
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from preferences import preferences
+from gpt_processing.prompts_list import prompts_list
 
 PAGINATION_PAGE_SIZE = 30
 
@@ -28,7 +34,8 @@ def text_translation(request):
         "text": [text],
         "template_name": request.POST.get('template_name')
     }, headers={
-            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+        "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+    send_text_translation(user_id=request.user.id, text=text, template_name=request.POST.get('template_name'))
     return response.json()
 
 
@@ -47,6 +54,15 @@ def file_translate(request):
         }
     )
 
+    project_id = response.json().get('id')
+    res = requests.get(CLOUDSTORAGE_API_URL + f"{project_id}/",
+                       headers={
+                           "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+    time.sleep(0.1)
+
+    send_file_translation(user_id=request.user.id, file_url=res.json().get('source_file'),
+                          template_name=request.POST.get('template_name'), file_name=request.FILES["document"].name,
+                          file_ext=os.path.splitext(request.FILES["document"].name)[1])
     return response.json()
 
 
@@ -57,7 +73,15 @@ class TranslateView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['languages'] = languages
         context['templates'] = self.get_translation_templates()
+        context['prompts'] = self.get_prompts()
         return context
+
+    def get_prompts(self):
+        prompts = []
+        for prompt in prompts_list:
+            prompts.append({"slug": prompt['slug'], "name": prompt['name']})
+
+        return prompts
 
     def get_translation_templates(self):
         templates = dict()
@@ -104,10 +128,8 @@ def expert_revision(request):
 @csrf_exempt
 @api_view(['POST'])
 def expert_revision_file(request):
-    file = request.FILES['file'].read()
-    b_64 = base64.b64encode(file)
-    send_expert_revision_file(user_id=request.user.id, base64_attachment=b_64.decode(encoding='utf-8'),
-                              file_name=request.FILES['file'].name)
+    file_url = request.POST.get('file_url')
+    send_expert_revision_file(user_id=request.user.id, file_url=file_url)
     return JsonResponse({})
 
 
@@ -158,6 +180,7 @@ class SingleProjectView(APIView):
     def delete(self, request):
         project_id = self.request.data.get('project_id')
         response = requests.delete(CLOUDSTORAGE_API_URL + f"{project_id}/",
-            headers={"token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+                                   headers={
+                                       "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
 
         return Response({"message": "Sucessfully deleted"}, status=status.HTTP_204_NO_CONTENT)

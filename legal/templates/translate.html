@@ -399,50 +399,11 @@
                                                 <input class="output_value" type="hidden" name="Action" required>
                                                 <div class="select__dropdown">
                                                     <ul>
-                                                        <li data-value="RewriteForGenderNeutrality">
-                                                            <span class="select__item-title">{% trans "Rewrite for gender neutrality" %}</span>
-                                                            <span>{% trans "Make text gender-neutral" %}</span>
+                                                        {% for prompt in prompts %}
+                                                        <li data-value="{{ prompt.slug }}">
+                                                            <span class="select__item-title">{{ prompt.name }}</span>
                                                         </li>
-                                                        <li data-value="RewriteForOtherGender">
-                                                            <span class="select__item-title">{% trans "Rewrite for other gender" %}</span>
-                                                            <span>{% trans "Adjust for specific gender/pronouns" %}</span>
-                                                        </li>
-                                                        <li data-value="RewriteForSimplicity">
-                                                            <span class="select__item-title">{% trans "Rewrite for simplicity" %}</span>
-                                                            <span>{% trans "Simplify text" %}</span>
-                                                        </li>
-                                                        <li data-value="RewriteInOtherPerson">
-                                                            <span class="select__item-title">{% trans "Rewrite in other person" %}</span>
-                                                            <span>{% trans "Rewrite in other person ('you', 'I' or 'he/she/other')" %}</span>
-                                                        </li>
-                                                        <li data-value="CleanOutObscenities">
-                                                            <span class="select__item-title">{% trans "Clean out obscenities" %}</span>
-                                                            <span>{% trans "Remove offensive language" %}</span>
-                                                        </li>
-                                                        <li data-value="Summarize">
-                                                            <span class="select__item-title">{% trans "Summarize" %}</span>
-                                                            <span>{% trans "Generate a brief summary" %}</span>
-                                                        </li>
-                                                        <li data-value="Summary">
-                                                            <span class="select__item-title">{% trans "Summary" %}</span>
-                                                            <span>{% trans "Summary" %}</span>
-                                                        </li>
-                                                        <li data-value="SimplifyAText">
-                                                            <span class="select__item-title">{% trans "Simplify a text" %}</span>
-                                                            <span>{% trans "Simplify a text" %}</span>
-                                                        </li>
-                                                        <li data-value="ReplaceHateSpeech">
-                                                            <span class="select__item-title">{% trans "Replace hate speech with non violent communication" %}</span>
-                                                            <span>{% trans "Replace hate speech with non violent communication" %}</span>
-                                                        </li>
-                                                        <li data-value="HidePersonalData">
-                                                            <span class="select__item-title">{% trans "Hide personal data" %}</span>
-                                                            <span>{% trans "Hide personal data" %}</span>
-                                                        </li>
-                                                        <li data-value="ChangeTheGender">
-                                                            <span class="select__item-title">{% trans "Change the gender" %}</span>
-                                                            <span>{% trans "Change the gender" %}</span>
-                                                        </li>
+                                                        {% endfor %}
                                                     </ul>
                                                 </div>
                                             </div>

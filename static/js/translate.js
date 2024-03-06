@@ -184,15 +184,14 @@ function gpt_processing() {
 
         if (!$(gptUploadTextSwitch).is(':checked')) {
             $(gptBtnDownload).removeClass('is-hidden')
-
-
             var a = document.querySelector(gptBtnDownload);
 
             var file = new Blob([data.join('\n')], {type: 'text/plain'});
             a.href = URL.createObjectURL(file);
             a.download = 'result.txt';
         } else {
-            $('#gpt_result_text').text(data.join('\n'))
+            $(gptBtnSubmit).removeAttr('disabled', 'disabled')
+            $('#gpt_result_text').val(data);
         }
     }
 
@@ -225,7 +224,7 @@ function gpt_processing() {
             isValidF('[name="' + $(gptInputAction).attr('name') + '"]')
         }
         let requestData = {
-            "action": action,
+            "prompt": action,
             "text": fileData
         }
         let additionalBlock = $(gptAdditional + '[data-action="' + action + '"]')
@@ -255,7 +254,6 @@ function gpt_processing() {
 
         isValidF()
         $(gptBtnSubmit).attr('disabled', 'disabled')
-        requestData["prompt"] = additional
 
         console.log('creating ' + requestProcessAction)
         fetch(requestProcessAction, {
@@ -271,8 +269,10 @@ function gpt_processing() {
         })
             .then(response => response.json())
             .then(function (data) {
+                console.log('data', data);
                 onSuccess(data.result);
             }).catch(() => {
+            console.log(7635327236326)
             onError();
         })
     }
@@ -351,12 +351,10 @@ $(document).ready(function () {
         });
     }
 
-    function sendDocument(e) {
-        e.preventDefault();
+    function sendDocument(file) {
         let url = expert_revision_file_url;
-        var file = new File([resultBlob], $('#file_translate_form input[name=document]').val().replace(/.*(\/|\\)/, ''));
         let formData = new FormData();
-        formData.append('file', file);
+        formData.append('file_url', file);
 
         $('.translate__file-block').hide();
         $('.translate__file-block.trans-progress').css('display', 'flex')
@@ -377,7 +375,7 @@ $(document).ready(function () {
                 $('.translate__file-block').hide();
                 $('.translate__file-block.complete').css('display', 'flex')
                 $('#expert_revision_document').addClass('expert--revision');
-                successHandler();
+
             },
             error: function (xhr, status, error) {
                 errorHandler(error);
@@ -541,7 +539,7 @@ $(document).ready(function () {
                     $('.translate__file-block').hide();
                     $('.translate__file-block.complete').css('display', 'flex')
                     $('#download_result').on('click', () => downloadResult(response.translated_file))
-                    $('#expert_revision_document').on('click', sendDocument)
+                    $('#expert_revision_document').on('click', () => sendDocument(response.translated_file))
                 } else if (response.status === 'Error') {
                     errorHandler();
                 }
@@ -608,6 +606,7 @@ $(document).ready(function () {
 
         $('.translate__file-block.input').css('display', 'flex');
         $('.translate__file-block.complete').css('display', 'none');
+        $('#expert_revision_document').removeClass('expert--revision');
     }
 
     function clearText() {
