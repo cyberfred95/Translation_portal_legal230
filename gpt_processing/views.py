@@ -30,7 +30,7 @@ def gpt_process(request):
     data = request.data
     prompt = get_prompt(request)
     response = requests.post(
-        url='http://animated-spoon-runserver-1:8000/gpt-processing/foreign_gpt_process/',
+        url='https://console.custom.mt/gpt-processing/foreign_gpt_process/',
         headers={
             'token': preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
         },
@@ -54,5 +54,5 @@ def get_prompt(request):
 def gpt_check(request):
     tasks = request.data
     print(tasks)
-    response = requests.post(url='http://animated-spoon-runserver-1:8000/gpt-processing/gpt_check/', data=tasks)
+    response = requests.post(url='https://console.custom.mt/gpt-processing/gpt_check/', data=tasks)
     return Response(response.json(), status=status.HTTP_200_OK)
