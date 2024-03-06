@@ -2,6 +2,7 @@ prompts_list = [
 
     {
         "name": "Hide personnal data",
+        "slug": "hide-personnal-data",
         "prompt": """You will replace data in the text following the instructions described in each option. 
                     [VARIABLE1:Data to be removed::|Only names|Any figures|Dates]
 
@@ -49,6 +50,7 @@ prompts_list = [
 
     {
         "name": "Replace hate speech with non violent communication",
+        "slug": "replace-hate-speech",
         "prompt": """### Instructions ### 
                     Rephrase the text in the same language by replacing any obscenities with appropriate wording or hate speach with non-violent communication. The tone should remain professional.
                      
@@ -77,6 +79,7 @@ prompts_list = [
     },
     {
         "name": "Simplify a text",
+        "slug": "simplify-text",
         "prompt": """Simplify the text. Answer in the language of the text. Act as if you were explaining to a kid.
 
                     ###start of the text###
@@ -87,6 +90,7 @@ prompts_list = [
     },
     {
         "name": "Summarization for Andrea",
+        "slug": "summarization-for-andrea",
         "prompt": """###Role###
                     Change the gender of the text
                     

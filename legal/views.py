@@ -65,8 +65,15 @@ class TranslateView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['languages'] = languages
         context['templates'] = self.get_translation_templates()
-        context['prompts'] = prompts_list
+        context['prompts'] = self.get_prompts()
         return context
+
+    def get_prompts(self):
+        prompts = []
+        for prompt in prompts_list:
+            prompts.append({"slug":prompt['slug'], "name":prompt['name']})
+
+        return prompts
 
     def get_translation_templates(self):
         templates = dict()

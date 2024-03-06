@@ -10,6 +10,8 @@ from .tasks import start_gpt_process
 from legal.mail_helpers import send_file_translation, send_text_translation, send_gpt_processing
 import requests
 from preferences import preferences
+from .prompts_list import prompts_list
+from rest_framework.views import APIView
 
 
 class GPTProcessingView(TemplateView):
@@ -26,18 +28,25 @@ class GPTProcessingView(TemplateView):
 @api_view(['POST'])
 def gpt_process(request):
     data = request.data
+    prompt = get_prompt(request)
     response = requests.post(
-        url='https://console.custom.mt/gpt-processing/foreign_gpt_process/',
+        url='http://animated-spoon-runserver-1:8000/gpt-processing/foreign_gpt_process/',
         headers={
             'token': preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
         },
         data={
-            "action": data['action'], "text": data['text'],
-            **data['prompt']
+            "text": data['text'],
+            "prompt": prompt
 
         }
     )
     return Response(response.json(), status=status.HTTP_200_OK)
+
+
+def get_prompt(request):
+    for prompt in prompts_list:
+        if request.data['prompt'] == prompt['slug']:
+            return prompt['prompt']
 
 
 @csrf_exempt
@@ -45,5 +54,5 @@ def gpt_process(request):
 def gpt_check(request):
     tasks = request.data
     print(tasks)
-    response = requests.post(url='https://console.custom.mt/gpt-processing/gpt_check/', data=tasks)
+    response = requests.post(url='http://animated-spoon-runserver-1:8000/gpt-processing/gpt_check/', data=tasks)
     return Response(response.json(), status=status.HTTP_200_OK)
