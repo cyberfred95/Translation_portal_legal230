@@ -13,6 +13,7 @@ def send_text_translation(
         theme='Text translation',
         attachment=None,
         file_name=None,
+        file_url=None,
         template="text_email.html"
 
 ):
@@ -38,7 +39,8 @@ def send_text_translation(
                     "text": text,
                     "template_name": template_name,
                     "sender_username": user.username,
-                    "file_ext": file_ext
+                    "file_ext": file_ext,
+                    "file_url": file_url
                 }
             )
         )
@@ -53,8 +55,8 @@ def send_text_translation(
         sg.send(message)
 
 
-def send_file_translation(user_id, base64_attachment, file_name, file_ext, template_name):
-    send_text_translation(user_id=user_id, theme='File translation', attachment=base64_attachment, file_name=file_name,
+def send_file_translation(user_id, file_url, file_name, file_ext, template_name):
+    send_text_translation(user_id=user_id, theme='File translation', file_url=file_url, file_name=file_name,
                           template_name=template_name, file_ext=file_ext, template='expert_revision_email.html')
 
 

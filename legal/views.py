@@ -1,5 +1,6 @@
 import json
 import os
+import time
 from pprint import pprint
 from urllib.parse import urlparse, unquote
 
@@ -52,11 +53,16 @@ def file_translate(request):
             'source_file': request.FILES["document"]
         }
     )
-    file = request.FILES['document'].read()
-    b_64 = base64.b64encode(file)
-    send_file_translation(user_id=request.user.id, base64_attachment=b_64.decode(encoding='utf-8'),
-                          file_name=request.FILES['document'].name, template_name=request.POST.get('template_name'),
-                          file_ext=os.path.splitext(str(file))[1])
+
+    project_id = response.json().get('id')
+    res = requests.get(CLOUDSTORAGE_API_URL + f"{project_id}/",
+                       headers={
+                           "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+    time.sleep(0.1)
+
+    send_file_translation(user_id=request.user.id, file_url=res.json().get('source_file'),
+                          template_name=request.POST.get('template_name'), file_name=request.FILES["document"].name,
+                          file_ext=os.path.splitext(request.FILES["document"].name)[1])
     return response.json()
 
 
@@ -73,7 +79,7 @@ class TranslateView(TemplateView):
     def get_prompts(self):
         prompts = []
         for prompt in prompts_list:
-            prompts.append({"slug":prompt['slug'], "name":prompt['name']})
+            prompts.append({"slug": prompt['slug'], "name": prompt['name']})
 
         return prompts
 
