@@ -38,7 +38,7 @@ def send_text_translation(
                     "text": text,
                     "template_name": template_name,
                     "sender_username": user.username,
-                    "format": file_ext
+                    "file_ext": file_ext
                 }
             )
         )
