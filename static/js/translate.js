@@ -184,15 +184,14 @@ function gpt_processing() {
 
         if (!$(gptUploadTextSwitch).is(':checked')) {
             $(gptBtnDownload).removeClass('is-hidden')
-
-
             var a = document.querySelector(gptBtnDownload);
 
             var file = new Blob([data.join('\n')], {type: 'text/plain'});
             a.href = URL.createObjectURL(file);
             a.download = 'result.txt';
         } else {
-            $('#gpt_result_text').text(data.join('\n'))
+            $(gptBtnSubmit).removeAttr('disabled', 'disabled')
+            $('#gpt_result_text').val(data);
         }
     }
 
@@ -270,8 +269,10 @@ function gpt_processing() {
         })
             .then(response => response.json())
             .then(function (data) {
+                console.log('data', data);
                 onSuccess(data.result);
             }).catch(() => {
+            console.log(7635327236326)
             onError();
         })
     }
