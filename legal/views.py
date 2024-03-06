@@ -2,6 +2,8 @@ import json
 import os
 from pprint import pprint
 from urllib.parse import urlparse, unquote
+
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework.response import Response
 from rest_framework import status
 from django.views.generic import TemplateView, View, DetailView, ListView
@@ -54,7 +56,7 @@ def file_translate(request):
     b_64 = base64.b64encode(file)
     send_file_translation(user_id=request.user.id, base64_attachment=b_64.decode(encoding='utf-8'),
                           file_name=request.FILES['document'].name, template_name=request.POST.get('template_name'),
-                          format=os.path.splitext(str(request.FILES['document']))[1])
+                          file_ext=os.path.splitext(str(file))[1])
     return response.json()
 
 

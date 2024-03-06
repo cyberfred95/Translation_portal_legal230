@@ -8,7 +8,7 @@ from sendgrid.helpers.mail import (Mail, Attachment, FileContent, FileName, File
 def send_text_translation(
         user_id,
         template_name=None,
-        format=None,
+        file_ext=None,
         text=None,
         theme='Text translation',
         attachment=None,
@@ -38,7 +38,7 @@ def send_text_translation(
                     "text": text,
                     "template_name": template_name,
                     "sender_username": user.username,
-                    "format": format
+                    "format": file_ext
                 }
             )
         )
@@ -53,9 +53,9 @@ def send_text_translation(
         sg.send(message)
 
 
-def send_file_translation(user_id, base64_attachment, file_name, format, template_name):
+def send_file_translation(user_id, base64_attachment, file_name, file_ext, template_name):
     send_text_translation(user_id=user_id, theme='File translation', attachment=base64_attachment, file_name=file_name,
-                          template_name=template_name, format=format, template='expert_revision_email.html')
+                          template_name=template_name, file_ext=file_ext, template='expert_revision_email.html')
 
 
 def send_gpt_processing(user_id, text):
