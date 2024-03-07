@@ -409,45 +409,6 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                    <div class="gpt_processing__additional" data-action="Translate">
-                                        <input type="hidden" name="source_language" value="en">
-                                        <input type="hidden" name="target_language" value="fr">
-                                    </div>
-                                    <div class="gpt_processing__additional" data-action="RewriteForOtherGender">
-                                        <div class="gpt_processing__select">
-                                            <label>{% trans "Preferred pronouns" %}</label>
-                                            <div class="select new-design">
-                                                <input class="output_text" type="text" tabindex="0" placeholder="Select from the list">
-                                                <input class="output_value" type="hidden" required>
-                                                <input type="hidden" name="gender" required>
-                                                <input type="hidden" name="pronouns" required>
-                                                <div class="select__dropdown">
-                                                    <ul>
-                                                        <li data-value="male,He/him">{% trans "Male (He/him)" %}</li>
-                                                        <li data-value="female,She/her">{% trans "Female (She/her)" %}</li>
-                                                        <li data-value="other,They/them">{% trans "Other (They/them)" %}</li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="gpt_processing__additional" data-action="RewriteInOtherPerson">
-                                        <div class="gpt_processing__select">
-                                            <label>{% trans "Option" %}</label>
-                                            <div class="select new-design">
-                                                <input class="output_text" type="text" tabindex="0" placeholder="Select from the list">
-                                                <input class="output_value" type="hidden" name="person" required>
-                                                <div class="select__dropdown">
-                                                    <ul>
-                                                        <li data-value="first">{% trans "1st person" %}</li>
-                                                        <li data-value="second">{% trans "2nd person" %}</li>
-                                                        <li data-value="third">{% trans "3nd person" %}</li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                                 <div class="gpt_processing__bottom">
                                     <a href="" download="" class="gpt_processing__download button button--secondary is-hidden">{% trans "Download" %}</a>
