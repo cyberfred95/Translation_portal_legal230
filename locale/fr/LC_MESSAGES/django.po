@@ -63,8 +63,8 @@ msgid "Drag and drop"
 msgstr "Glisser déposer"
 
 #: legal/templates/translate.html:172 legal/templates/translate.html:193
-msgid "Plain text"
-msgstr "fichier texte"
+msgid "Supported formats"
+msgstr "Formats pris en charge"
 
 #: legal/templates/translate.html:177
 msgid "Add file"
