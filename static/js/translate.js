@@ -484,6 +484,7 @@ $(document).ready(function () {
     $('#expert_revision').on('click', expertRevision);
 
     function expertRevision(e) {
+        console.log(123);
         e.preventDefault();
         let resultTextArea = $('#result_text');
         let resultData = resultTextArea.val();
@@ -543,7 +544,7 @@ $(document).ready(function () {
                     $('.translate__file-block').hide();
                     $('.translate__file-block.complete').css('display', 'flex')
                     $('#download_result').on('click', () => downloadResult(response.translated_file))
-                    $('#expert_revision_document').on('click', () => sendDocument(response.translated_file))
+                    $('#expert_revision_document').off('click').on('click', () => sendDocument(response.translated_file));
                 } else if (response.status === 'Error') {
                     errorHandler();
                 }
