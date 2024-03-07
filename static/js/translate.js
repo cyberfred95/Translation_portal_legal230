@@ -269,7 +269,6 @@ function gpt_processing() {
         })
             .then(response => response.json())
             .then(function (data) {
-                console.log('data', data);
                 onSuccess(data.result);
             }).catch(() => {
             onError();
@@ -446,7 +445,7 @@ $(document).ready(function () {
         let btn = form.find('[type=submit]');
         let url = form.attr('action')
         let formData = new FormData(form[0]);
-        let resultContainer = $('.translate__form-text.result textarea');
+        let resultContainer = $('#result_text');
         let errorBlock = form.find('.invalid-feedback');
 
         if (text.length > parseInt(text.attr('maxlength'))) {
