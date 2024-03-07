@@ -272,7 +272,6 @@ function gpt_processing() {
                 console.log('data', data);
                 onSuccess(data.result);
             }).catch(() => {
-            console.log(7635327236326)
             onError();
         })
     }
@@ -305,7 +304,13 @@ function gpt_processing() {
     })
     $(document).on('change', gptInputAction, checkAdditional)
     $(document).on('click', gptBtnSubmit, onSubmit)
-    $(document).on('click', gptBtnRetry, onSubmit)
+    $(document).on('click', gptBtnRetry, function() {
+        $(gptInputAction).val('')
+        $(gptTranslationText).val('')
+        $(gptBtnSubmit).removeAttr('disabled', 'disabled')
+        $(gptError).addClass('is-hidden')
+        $(".output_text").val('');
+    });
 }
 
 
