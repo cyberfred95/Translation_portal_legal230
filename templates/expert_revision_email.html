@@ -1,7 +1,13 @@
-<p>Dear {{ user_name}},</p>
-<p>{{ sender_username }} has sent this document for expert revision.</p>
-{% if file_url  %}<p>{{ file_url }}</p>{% endif %}
-{% if template_name %}<p>Template used: {{ template_name }}</p>{% endif %}
-{% if file_ext %}<p>Format of the submitted file: {{file_ext }} </p>{% endif %}
-<p>Thank you and kind regards</p>
-<p>Legal 230 Portal</p>
+<div style="width: 100%; max-width: 355px;">
+    <p>Dear {{ user_name}},</p>
+    <p>{{ sender_username }} has sent this document for expert revision.</p>
+    {% if file_url  %}
+        <p style="padding: 30px 0; text-align: center">
+            <a style="padding: 10px 26px;background: #176C77;text-decoration: unset;text-align: center;border-radius: 4px; color: white;font-size: 16px;font-weight: 600;line-height: 20px;" href="{{ file_url }}" download>Download</a>
+        </p>
+    {% endif %}
+    {% if template_name %}<p>Template used: {{ template_name }}</p>{% endif %}
+    {% if file_ext %}<p>Format of the submitted file: {{file_ext }} </p>{% endif %}
+    <p>Thank you and kind regards</p>
+    <p>Legal 230 Portal</p>
+</div>
