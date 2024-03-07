@@ -224,7 +224,7 @@ function gpt_processing() {
             isValidF('[name="' + $(gptInputAction).attr('name') + '"]')
         }
         let requestData = {
-            "psddsrompt": action,
+            "prompt": action,
             "text": fileData
         }
         let additionalBlock = $(gptAdditional + '[data-action="' + action + '"]')
