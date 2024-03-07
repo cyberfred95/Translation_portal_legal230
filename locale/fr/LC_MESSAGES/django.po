@@ -56,7 +56,7 @@ msgstr "Traduire"
 
 #: legal/templates/translate.html:151 legal/templates/translate.html:233
 msgid "Expert Revision"
-msgstr "Votre demande a été envoyée"
+msgstr "Recevoir un devis pour une post-édition"
 
 #: legal/templates/translate.html:170 legal/templates/translate.html:191
 msgid "Drag and drop"
