@@ -1,8 +1,8 @@
 prompts_list = [
 
     {
-        "name": "Hide personnal data",
-        "slug": "hide-personnal-data",
+        "name": "Hide personal data",
+        "slug": "hide-personal-data",
         "prompt": """You will replace data in the text following the instructions described in each option. 
                     [VARIABLE1:Data to be removed::|Only names|Any figures|Dates]
 
@@ -89,8 +89,8 @@ prompts_list = [
                     ###end of the text###"""
     },
     {
-        "name": "Summarization for Andrea",
-        "slug": "summarization-for-andrea",
+        "name": "Summarization",
+        "slug": "summarization",
         "prompt": """###Role###
                     Change the gender of the text
                     
