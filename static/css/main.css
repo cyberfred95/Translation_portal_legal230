@@ -729,7 +729,6 @@ body {
 
 .translate__form-title {
     font-weight: 600;
-    margin-left: 10px;
     flex: 1;
 }
 
@@ -1560,7 +1559,6 @@ body {
 
 /* line 2105, static/newStatic/scss/main.scss */
 .select .errorText {
-    display: none;
     position: absolute;
     z-index: 1;
     bottom: -.5rem;
@@ -2005,12 +2003,13 @@ body {
 
 .select-box .options-container {
     display: none;
-    width: 200px;
+    width: 150px;
     flex-direction: column;
     align-items: flex-start;
-    padding: 10px 14px;
+    padding: 10px 0;
     position: absolute;
     top: 30px;
+    left: 0;
     z-index: 1000;
     box-shadow: 0 1px 2rem 5px rgba(57, 53, 53, 0.08);
     font-size: 16px;
@@ -2020,6 +2019,10 @@ body {
     order: 1;
     max-height: 300px;
     overflow-y: auto;
+}
+
+.select-box.templates .options-container {
+    left: -70px;
 }
 
 .selected {
@@ -2068,7 +2071,6 @@ body {
 }
 
 .select-box .selected {
-    padding: 6px 0 0 30px;
     cursor: pointer;
 }
 
@@ -2082,8 +2084,13 @@ body {
 }
 
 .option {
-    padding: 10px 0;
+    padding: 10px 10px;
     width: 100%;
+}
+
+.option:hover {
+    background-color: var(--secondary);
+    color: var(--white) !important;
 }
 
 .select-box .option .li {

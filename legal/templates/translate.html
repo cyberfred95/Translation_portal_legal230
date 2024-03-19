@@ -104,16 +104,11 @@
                         </li>
                     </ul>
 
-                    <select>
-                        {% for translate_language in translate_languages %}
-                            <option value="{{ translate_language.abbreviation }}"> {{ translate_language.name }}</option>
-                        {% endfor %}
-                    </select>
                     <div class="translate__tab" id="tabs-1">
                         <form method="post" action="{% url 'main_index' %}" class="translate__form needs-validation" id="text_translate_form">
                             <input type="hidden" name="action" value="text_translate">
-                            <input type="hidden" name="source_language" value="en">
-                            <input type="hidden" name="target_language" value="fr">
+                            <input type="hidden" name="source_language" value="">
+                            <input type="hidden" name="target_language" value="">
                             <input type="hidden" name="template_name" value="">
 
                             {% csrf_token %}
@@ -121,15 +116,53 @@
                             <div class="translate__form-row">
                                 <div class="translate__form-header">
                                     <div class="translate__form-title">
-                                        <span>{% trans "English" %}</span>
+                                        <div class="select-container">
+                                            <div class="select-box source">
+                                                <div class="selected">
+                                                    <span class="selected-text">Source language</span>
+                                                    <div class="select-icon">
+                                                        <svg width="8" height="5" viewBox="0 0 8 5" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M0.739091 0.25H7.26076C7.37613 0.250484 7.48876 0.285166 7.58442 0.349661C7.68007 0.414156 7.75446 0.505567 7.79816 0.612336C7.84187 0.719105 7.85294 0.836437 7.82996 0.949494C7.80699 1.06255 7.751 1.16626 7.66909 1.2475L4.41409 4.5025C4.35986 4.55718 4.29535 4.60057 4.22426 4.63019C4.15318 4.6598 4.07693 4.67505 3.99992 4.67505C3.92292 4.67505 3.84667 4.6598 3.77559 4.63019C3.7045 4.60057 3.63999 4.55718 3.58576 4.5025L0.330758 1.2475C0.248845 1.16626 0.192862 1.06255 0.169887 0.949494C0.146913 0.836437 0.157978 0.719105 0.201684 0.612336C0.245391 0.505567 0.319776 0.414156 0.415433 0.349661C0.51109 0.285166 0.623723 0.250484 0.739091 0.25Z"
+                                                                  fill="#456B84"/>
+                                                        </svg>
+                                                    </div>
+
+                                                    <ul class="options-container source">
+                                                        {% for translate_language in translate_languages %}
+                                                        <li class="option" value="{{ translate_language.abbreviation }}"> {{ translate_language.name }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="swap__language-ico">
                                         <img src="{% static 'images/ico-swap-language.svg' %}" alt="Swap language">
                                     </div>
                                     <div class="translate__form-title target">
-                                        <span>{% trans "French" %}</span>
                                         <div class="select-container">
-                                            <div class="select-box">
+                                            <div class="select-box target">
+                                                <div class="selected">
+                                                    <span class="selected-text">Target language</span>
+                                                    <div class="select-icon">
+                                                        <svg width="8" height="5" viewBox="0 0 8 5" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M0.739091 0.25H7.26076C7.37613 0.250484 7.48876 0.285166 7.58442 0.349661C7.68007 0.414156 7.75446 0.505567 7.79816 0.612336C7.84187 0.719105 7.85294 0.836437 7.82996 0.949494C7.80699 1.06255 7.751 1.16626 7.66909 1.2475L4.41409 4.5025C4.35986 4.55718 4.29535 4.60057 4.22426 4.63019C4.15318 4.6598 4.07693 4.67505 3.99992 4.67505C3.92292 4.67505 3.84667 4.6598 3.77559 4.63019C3.7045 4.60057 3.63999 4.55718 3.58576 4.5025L0.330758 1.2475C0.248845 1.16626 0.192862 1.06255 0.169887 0.949494C0.146913 0.836437 0.157978 0.719105 0.201684 0.612336C0.245391 0.505567 0.319776 0.414156 0.415433 0.349661C0.51109 0.285166 0.623723 0.250484 0.739091 0.25Z"
+                                                                  fill="#456B84"/>
+                                                        </svg>
+                                                    </div>
+
+                                                    <ul class="options-container target">
+                                                        {% for translate_language in translate_languages %}
+                                                        <li class="option" value="{{ translate_language.abbreviation }}"> {{ translate_language.name }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="select-container">
+                                            <div class="select-box templates">
                                                 <div class="selected">
                                                     <span class="selected-text">Templates</span>
                                                     <div class="select-icon">
@@ -140,7 +173,7 @@
                                                         </svg>
                                                     </div>
 
-                                                    <ul class="options-container history">
+                                                    <ul class="options-container templates">
                                                         <li class="option" value=""></li>
                                                     </ul>
                                                 </div>
@@ -203,24 +236,18 @@
                     <div class="translate__tab" id="tabs-2">
                         <form method="post"  action="{% url 'main_index' %}" class="needs-validation"  id="file_translate_form">
                             <input type="hidden" name="action" value="file_translate">
-                            <input type="hidden" name="source_language" value="en">
-                            <input type="hidden" name="target_language" value="fr">
+                            <input type="hidden" name="source_language" value="">
+                            <input type="hidden" name="target_language" value="">
                             <input type="hidden" name="template_name" value="">
 
                             {% csrf_token %}
                             <div class="translate__form-row">
                                 <div class="translate__form-header">
                                     <div class="translate__form-title document">
-                                        <span>{% trans "English" %}</span>
-                                        <div class="swap__language-ico document">
-                                            <img src="{% static 'images/ico-swap-language.svg' %}" alt="Swap language">
-                                        </div>
-                                        <span>{% trans "French" %}</span>
-                                    </div>
-                                    <div class="select-container">
-                                            <div class="select-box">
+                                        <div class="select-container">
+                                            <div class="select-box source">
                                                 <div class="selected">
-                                                    <span class="selected-text">Templates</span>
+                                                    <span class="selected-text">Source language</span>
                                                     <div class="select-icon">
                                                         <svg width="8" height="5" viewBox="0 0 8 5" fill="none"
                                                              xmlns="http://www.w3.org/2000/svg">
@@ -229,10 +256,54 @@
                                                         </svg>
                                                     </div>
 
-                                                    <ul class="options-container history">
-                                                        <li class="option" value=""></li>
+                                                    <ul class="options-container source">
+                                                        {% for translate_language in translate_languages %}
+                                                        <li class="option" value="{{ translate_language.abbreviation }}"> {{ translate_language.name }}</li>
+                                                        {% endfor %}
                                                     </ul>
                                                 </div>
+                                            </div>
+                                        </div>
+                                        <div class="swap__language-ico document">
+                                            <img src="{% static 'images/ico-swap-language.svg' %}" alt="Swap language">
+                                        </div>
+                                        <div class="select-container">
+                                            <div class="select-box target">
+                                                <div class="selected">
+                                                    <span class="selected-text">Target language</span>
+                                                    <div class="select-icon">
+                                                        <svg width="8" height="5" viewBox="0 0 8 5" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M0.739091 0.25H7.26076C7.37613 0.250484 7.48876 0.285166 7.58442 0.349661C7.68007 0.414156 7.75446 0.505567 7.79816 0.612336C7.84187 0.719105 7.85294 0.836437 7.82996 0.949494C7.80699 1.06255 7.751 1.16626 7.66909 1.2475L4.41409 4.5025C4.35986 4.55718 4.29535 4.60057 4.22426 4.63019C4.15318 4.6598 4.07693 4.67505 3.99992 4.67505C3.92292 4.67505 3.84667 4.6598 3.77559 4.63019C3.7045 4.60057 3.63999 4.55718 3.58576 4.5025L0.330758 1.2475C0.248845 1.16626 0.192862 1.06255 0.169887 0.949494C0.146913 0.836437 0.157978 0.719105 0.201684 0.612336C0.245391 0.505567 0.319776 0.414156 0.415433 0.349661C0.51109 0.285166 0.623723 0.250484 0.739091 0.25Z"
+                                                                  fill="#456B84"/>
+                                                        </svg>
+                                                    </div>
+
+                                                    <ul class="options-container target">
+                                                        {% for translate_language in translate_languages %}
+                                                        <li class="option" value="{{ translate_language.abbreviation }}"> {{ translate_language.name }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="select-container">
+                                        <div class="select-box templates">
+                                            <div class="selected">
+                                                <span class="selected-text">Templates</span>
+                                                <div class="select-icon">
+                                                    <svg width="8" height="5" viewBox="0 0 8 5" fill="none"
+                                                         xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M0.739091 0.25H7.26076C7.37613 0.250484 7.48876 0.285166 7.58442 0.349661C7.68007 0.414156 7.75446 0.505567 7.79816 0.612336C7.84187 0.719105 7.85294 0.836437 7.82996 0.949494C7.80699 1.06255 7.751 1.16626 7.66909 1.2475L4.41409 4.5025C4.35986 4.55718 4.29535 4.60057 4.22426 4.63019C4.15318 4.6598 4.07693 4.67505 3.99992 4.67505C3.92292 4.67505 3.84667 4.6598 3.77559 4.63019C3.7045 4.60057 3.63999 4.55718 3.58576 4.5025L0.330758 1.2475C0.248845 1.16626 0.192862 1.06255 0.169887 0.949494C0.146913 0.836437 0.157978 0.719105 0.201684 0.612336C0.245391 0.505567 0.319776 0.414156 0.415433 0.349661C0.51109 0.285166 0.623723 0.250484 0.739091 0.25Z"
+                                                              fill="#456B84"/>
+                                                    </svg>
+                                                </div>
+
+                                                <ul class="options-container templates">
+                                                    <li class="option" value=""></li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -340,19 +411,19 @@
                                 </div>
                             </div>
                             <div class="gpt_processing__block modal__gpt">
-                                <div class="gpt_processing__upload modal__btn">
-                                    <label tabindex="2" class="upload_label button button--transparent">{% trans "Upload file" %} <input type="file" data-maxsize="2" accept=".txt" required></label>
-                                    <p class="upload_result btn"></p>
-                                    <div class="upload_remove">
-                                        <img src="{% static 'images/ico-trash.svg' %}" alt="Remove" role="presentation">
-                                    </div>
-                                    <div class="modal__btn-text modal__btn-text--error">
-                                        <p></p>
-                                    </div>
-                                    <div class="modal__btn-text">
-                                        <p>.txt max 2Mb</p>
-                                    </div>
-                                </div>
+<!--                                <div class="gpt_processing__upload modal__btn">-->
+<!--                                    <label tabindex="2" class="upload_label button button&#45;&#45;transparent">{% trans "Upload file" %} <input type="file" data-maxsize="2" accept=".txt" required></label>-->
+<!--                                    <p class="upload_result btn"></p>-->
+<!--                                    <div class="upload_remove">-->
+<!--                                        <img src="{% static 'images/ico-trash.svg' %}" alt="Remove" role="presentation">-->
+<!--                                    </div>-->
+<!--                                    <div class="modal__btn-text modal__btn-text&#45;&#45;error">-->
+<!--                                        <p></p>-->
+<!--                                    </div>-->
+<!--                                    <div class="modal__btn-text">-->
+<!--                                        <p>.txt max 2Mb</p>-->
+<!--                                    </div>-->
+<!--                                </div>-->
                                 <div class="gpt_processing__text">
                                     <div class="translate__form-row">
                                         <div class="translate__form-text">
@@ -478,7 +549,7 @@
         </div>
     </div>
     <script>
-        var prompts = {{ prompts | safe }}
+        var prompts = {{ prompts|safe }}
         var templates = {{ templates|safe }}
         var languages = {{ languages|safe }}
         var expert_revision_url = "{% url 'expert_revision' %}"
