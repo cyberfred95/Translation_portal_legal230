@@ -161,6 +161,7 @@ class ProjectsHistoryView(TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         page = self.request.GET.get('page')
+        context['languages'] = languages
         params = {
             "page_size": PAGINATION_PAGE_SIZE,
             "page": page,

@@ -29,6 +29,10 @@
                     <img src="{% static 'images/logo.png' %}" alt="Logo">
                 </a>
                 <div class="header__btn">
+                    <ul class="header__lang">
+                        <li class="{% if LANGUAGE_CODE == 'en' %}is-active{% endif %}"><a href="/en">en</a></li>
+                        <li class="{% if LANGUAGE_CODE == 'fr' %}is-active{% endif %}"><a href="/fr">fr</a></li>
+                    </ul>
                     <a class="button" href="/accounts/logout/">
                         <span>{% trans "Logout" %}</span>
                     </a>
@@ -276,6 +280,10 @@
         </div>
     </div>
 </div>
+
+<script>
+    var languages = {{ languages|safe }}
+</script>
 
 <script src="{% static 'js/jquery.fancybox.min.js' %}"></script>
 <script src="{% static 'js/upload.js' %}"></script>
