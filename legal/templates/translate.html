@@ -489,12 +489,20 @@
                                                 <input class="output_value" type="hidden" name="Action" required>
                                                 <div class="select__dropdown">
                                                     <ul>
-                                                        {% for prompt in prompts %}
+                                                        {% if LANGUAGE_CODE == 'en' %}
+                                                        {% for prompt in prompts.en %}
                                                         <li data-value="{{ prompt.slug }}">
                                                             <span class="select__item-title">{{ prompt.name }}</span>
-
                                                         </li>
                                                         {% endfor %}
+                                                        {% else %}
+                                                    {% for prompt in prompts.fr %}
+                                                        <li data-value="{{ prompt.slug }}">
+                                                            <span class="select__item-title">{{ prompt.name }}</span>
+                                                        </li>
+                                                        {% endfor %}
+                                                    {% endif %}
+
                                                     </ul>
                                                 </div>
                                             <div class="errorText">{% trans "This input is required" %}</div>
