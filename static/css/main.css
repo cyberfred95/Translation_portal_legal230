@@ -2023,7 +2023,8 @@ body {
 }
 
 .select-box.templates .options-container {
-    left: -70px;
+    left: unset;
+    width: 200px;
 }
 
 .selected {

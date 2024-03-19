@@ -378,7 +378,7 @@ $(document).ready(function () {
                 $('.translate__file-block').hide();
                 $('.translate__file-block.complete').css('display', 'flex')
                 $('#expert_revision_document').addClass('expert--revision');
-
+                successHandler();
             },
             error: function (xhr, status, error) {
                 errorHandler(error);
@@ -483,7 +483,6 @@ $(document).ready(function () {
     $('#expert_revision').on('click', expertRevision);
 
     function expertRevision(e) {
-        console.log(123);
         e.preventDefault();
         let resultTextArea = $('#result_text');
         let resultData = resultTextArea.val();
@@ -647,19 +646,28 @@ $(document).ready(function () {
         inputText.value = resultText.value;
         resultText.value = tempText;
 
-        var textSourceLangTitle = document.querySelector('.translate__tab#tabs-1 .translate__form-title span');
-        var textTargetLangTitle = document.querySelector('.translate__tab#tabs-1 .translate__form-title.target span');
-        var docSourceLangTitle = document.querySelector('.translate__tab#tabs-2 .translate__form-title span');
-        var docTargetLangTitle = document.querySelector('.translate__tab#tabs-2 .translate__form-title.document span:last-child');
+        var textSourceLangTitle = document.querySelector('.translate__tab#tabs-1 .select-box.source .selected-text');
+        var textTargetLangTitle = document.querySelector('.translate__tab#tabs-1 .select-box.target .selected-text');
+
+        var docSourceLangTitle = document.querySelector('.translate__tab#tabs-2 .select-box.source .selected-text');
+        var docTargetLangTitle = document.querySelector('.translate__tab#tabs-2 .select-box.target .selected-text');
+
 
         [textSourceLangTitle.textContent, textTargetLangTitle.textContent] = [textTargetLangTitle.textContent, textSourceLangTitle.textContent];
         [docSourceLangTitle.textContent, docTargetLangTitle.textContent] = [docTargetLangTitle.textContent, docSourceLangTitle.textContent];
 
-        const sourceLanguage = textSourceLang.value.toUpperCase();
-        const targetLanguage = textTargetLang.value.toUpperCase();
+        var sourceLanguage = textSourceLang.textContent.toUpperCase();
+        var targetLanguage = textTargetLang.textContent.toUpperCase();
 
         if (targetLanguage && sourceLanguage) {
             getTemplates(sourceLanguage, targetLanguage);
+        }
+
+        var sourceDocLanguage = docSourceLang.textContent.toUpperCase();
+        var targetDocLanguage = docTargetLang.textContent.toUpperCase();
+
+        if (sourceDocLanguage && targetDocLanguage) {
+            getTemplates(sourceDocLanguage, targetDocLanguage);
         }
     }
 
@@ -690,45 +698,47 @@ $(document).ready(function () {
         });
     });
 
-    const sourceSelect = document.querySelector('.options-container.source');
-    const sourceInput = document.querySelector('input[name="source_language"]');
+    const sourceSelect1 = document.querySelector('.translate__tab#tabs-1 .options-container.source');
+    const sourceInput1 = document.querySelector('.translate__tab#tabs-1 input[name="source_language"]');
+    const targetSelect1 = document.querySelector('.translate__tab#tabs-1 .options-container.target');
+    const targetInput1 = document.querySelector('.translate__tab#tabs-1 input[name="target_language"]');
 
-    const targetSelect = document.querySelector('.options-container.target');
-    const targetInput = document.querySelector('input[name="target_language"]');
+    const sourceSelect2 = document.querySelector('.translate__tab#tabs-2 .options-container.source');
+    const sourceInput2 = document.querySelector('.translate__tab#tabs-2 input[name="source_language"]');
+    const targetSelect2 = document.querySelector('.translate__tab#tabs-2 .options-container.target');
+    const targetInput2 = document.querySelector('.translate__tab#tabs-2 input[name="target_language"]');
 
-    document.addEventListener('click', function (event) {
-        if (!event.target.closest('.select-box')) {
-            document.querySelectorAll(".options-container.active").forEach(function (openContainer) {
-                openContainer.classList.remove("active");
-            });
-        }
-    });
+    function handleSelection(sourceSelect, sourceInput, targetSelect, targetInput) {
+        sourceSelect.addEventListener('click', function (e) {
+            if (e.target && e.target.matches('li.option')) {
+                const value = e.target.getAttribute('value');
+                sourceInput.value = value.toLowerCase();
 
-    sourceSelect.addEventListener('click', function (e) {
-        if (e.target && e.target.matches('li.option')) {
-            const value = e.target.getAttribute('value');
-            sourceInput.value = value.toLowerCase();
-
-            const targetLanguage = targetInput.value.toLowerCase();
-            const sourceLanguage = value.toLowerCase();
-            if (targetLanguage && sourceLanguage) {
-                getTemplates(sourceLanguage, targetLanguage);
+                const targetLanguage = targetInput.value.toLowerCase();
+                const sourceLanguage = value.toLowerCase();
+                if (targetLanguage && sourceLanguage) {
+                    getTemplates(sourceLanguage, targetLanguage);
+                }
             }
-        }
-    });
+        });
 
-    targetSelect.addEventListener('click', function (e) {
-        if (e.target && e.target.matches('li.option')) {
-            const value = e.target.getAttribute('value');
-            targetInput.value = value.toLowerCase();
+        targetSelect.addEventListener('click', function (e) {
+            if (e.target && e.target.matches('li.option')) {
+                const value = e.target.getAttribute('value');
+                targetInput.value = value.toLowerCase();
 
-            const sourceLanguage = sourceInput.value.toLowerCase();
-            const targetLanguage = value.toLowerCase();
-            if (targetLanguage && sourceLanguage) {
-                getTemplates(sourceLanguage, targetLanguage);
+                const sourceLanguage = sourceInput.value.toLowerCase();
+                const targetLanguage = value.toLowerCase();
+                if (targetLanguage && sourceLanguage) {
+                    getTemplates(sourceLanguage, targetLanguage);
+                }
             }
-        }
-    });
+        });
+    }
+
+    handleSelection(sourceSelect1, sourceInput1, targetSelect1, targetInput1);
+    handleSelection(sourceSelect2, sourceInput2, targetSelect2, targetInput2);
+
 
     function getTemplates(sourceLanguage, targetLanguage) {
         let url = `get-templates?source_language=${sourceLanguage}&target_language=${targetLanguage}`;
@@ -743,7 +753,6 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                console.log(response);
                 const selectBoxes = document.querySelectorAll(".select-box.templates");
 
                 selectBoxes.forEach(function (box) {
