@@ -84,7 +84,7 @@ msgstr "Translation in progress..."
 
 #: legal/templates/translate.html:214
 msgid "Translation is completed!"
-msgstr "Translation is completed!"
+msgstr "Your translation is completed!"
 
 #: legal/templates/translate.html:230
 msgid "Download the translated document"
@@ -220,7 +220,7 @@ msgstr "Restart"
 
 #: legal/templates/translate.html:442
 msgid "Something went wrong"
-msgstr "Something went wrong"
+msgstr "Oops ! Something went wrong."
 
 #: legal/templates/translate.html:444
 msgid "Please try again later."
@@ -236,9 +236,34 @@ msgstr "Success"
 
 #: legal/templates/translate.html:460
 msgid "Request has been successfully"
-msgstr "Request has been sent successfully"
+msgstr "Your request has been sent successfully"
 
 
 #: legal/templates/translate.html:88
 msgid "Writing"
 msgstr "Writing"
+
+#legal/templates/translate.html:102
+msgid "Project history"
+msgstr "Project history"
+
+#legal/templates/project_history:119
+msgid "Username"
+msgstr "Username"
+
+#legal/templates/project_history:123
+msgid "Created"
+msgstr "Created"
+
+#legal/templates/project_history:122
+msgid "Status"
+msgstr "Status"
+
+msgid "Translated"
+msgstr "Translated"
+
+msgid "Error"
+msgstr "Error"
+
+msgid "This input is required"
+msgstr "Please choose an action."

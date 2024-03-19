@@ -29,6 +29,10 @@
                     <img src="{% static 'images/logo.png' %}" alt="Logo">
                 </a>
                 <div class="header__btn">
+                    <ul class="header__lang">
+                        <li class="{% if LANGUAGE_CODE == 'en' %}is-active{% endif %}"><a href="/en">en</a></li>
+                        <li class="{% if LANGUAGE_CODE == 'fr' %}is-active{% endif %}"><a href="/fr">fr</a></li>
+                    </ul>
                     <a class="button" href="/accounts/logout/">
                         <span>{% trans "Logout" %}</span>
                     </a>
@@ -39,7 +43,7 @@
     <div class="translate">
         <div class="wrapper">
             <div class="translate__title page-title">
-                <h1>{% trans "History" %}</h1>
+                <h1>{% trans "Project history" %}</h1>
             </div>
             <div class="translate__tabs" id="tabs">
                 <ul class="translate__nav">
@@ -116,11 +120,11 @@
                         <thead>
                         <tr>
                             {% if request.user.is_staff %}
-                            <th>Username</th>
+                            <th>{% trans "Username" %}</th>
                             {% endif %}
-                            <th>Project</th>
-                            <th>Status</th>
-                            <th>Created</th>
+                            <th>Document</th>
+                            <th>{% trans "Status" %}</th>
+                            <th>{% trans "Created" %}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -142,7 +146,14 @@
                             </td>
                             <td class="status-project">
                                 <span class="status" data-project-status="{{ project.status }}">
-                                {{ project.status }}
+                                    {% if project.status == "Error" %}
+                                        {% trans "Error" %}
+                                    {% elif project.status == "Translated" %}
+                                        {% trans "Translated" %}
+                                    {% else %}
+                                        {{ project.status }}
+                                    {% endif %}
+
                                 </span>
                             </td>
                             <td class="date">
@@ -169,7 +180,7 @@
                                                 </clipPath>
                                             </defs>
                                         </svg>
-                                        <span>{% trans "Pretranslated" %}</span>
+                                        <span>{% trans "Download" %}</span>
                                     </button>
                                 </div>
                                 {% endif %}
@@ -269,6 +280,10 @@
         </div>
     </div>
 </div>
+
+<script>
+    var languages = {{ languages|safe }}
+</script>
 
 <script src="{% static 'js/jquery.fancybox.min.js' %}"></script>
 <script src="{% static 'js/upload.js' %}"></script>

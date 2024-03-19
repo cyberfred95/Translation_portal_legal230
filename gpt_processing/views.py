@@ -44,9 +44,10 @@ def gpt_process(request):
 
 
 def get_prompt(request):
-    for prompt in prompts_list:
-        if request.data['prompt'] == prompt['slug']:
-            return prompt['prompt']
+    for prompts in prompts_list:
+        for prompt in prompts_list[prompts]:
+            if request.data['prompt'] == prompt['slug']:
+                return prompt['prompt']
 
 
 @csrf_exempt

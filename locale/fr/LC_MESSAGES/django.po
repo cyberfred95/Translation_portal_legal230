@@ -56,7 +56,7 @@ msgstr "Traduire"
 
 #: legal/templates/translate.html:151 legal/templates/translate.html:233
 msgid "Expert Revision"
-msgstr "Recevoir un devis pour une post-édition"
+msgstr "Demande de devis pour une post-édition"
 
 #: legal/templates/translate.html:170 legal/templates/translate.html:191
 msgid "Drag and drop"
@@ -68,7 +68,7 @@ msgstr "Formats pris en charge"
 
 #: legal/templates/translate.html:177
 msgid "Add file"
-msgstr "Ajouter le fichier"
+msgstr "Ajouter un document"
 
 #: legal/templates/translate.html:185
 msgid "Choose the document."
@@ -76,7 +76,7 @@ msgstr "Choisissez le document."
 
 #: legal/templates/translate.html:196
 msgid "File added"
-msgstr "Fichier ajouté"
+msgstr "Document ajouté"
 
 #: legal/templates/translate.html:206
 msgid "Translation in progress..."
@@ -84,15 +84,15 @@ msgstr "Traduction en cours..."
 
 #: legal/templates/translate.html:214
 msgid "Translation is completed!"
-msgstr "La traduction est terminée !"
+msgstr "Votre traduction est prête!"
 
 #: legal/templates/translate.html:230
 msgid "Download the translated document"
-msgstr "Télécharger le document traduit"
+msgstr "Télécharger votre document traduit"
 
 #: legal/templates/translate.html:249
 msgid "Translate another file"
-msgstr "Traduire un autre fichier"
+msgstr "Traduire un autre document"
 
 #: legal/templates/translate.html:253
 msgid "Translate file btn"
@@ -221,7 +221,7 @@ msgstr "Redémarrage"
 
 #: legal/templates/translate.html:442
 msgid "Something went wrong"
-msgstr "Quelque chose s'est mal passé"
+msgstr "Oups ! Quelque chose s’est mal passé."
 
 #: legal/templates/translate.html:444
 msgid "Please try again later."
@@ -233,12 +233,37 @@ msgstr "Fermer"
 
 #: legal/templates/translate.html:458
 msgid "Success"
-msgstr "Succès"
+msgstr "Message envoyé !"
 
 #: legal/templates/translate.html:460
 msgid "Request has been successfully"
-msgstr "Votre demande à été envoyé"
+msgstr "Votre demande a été transmise"
 
 #: legal/templates/translate.html:88
 msgid "Writing"
 msgstr "Personnaliser un document"
+
+#legal/templates/translate.html:102
+msgid "Project history"
+msgstr "Mon historique"
+
+#legal/templates/project_history:119
+msgid "Username"
+msgstr "Utilisateur"
+
+#legal/templates/project_history:123
+msgid "Created"
+msgstr "Date de création"
+
+#legal/templates/project_history:122
+msgid "Status"
+msgstr "Statut"
+
+msgid "Translated"
+msgstr "Traduit"
+
+msgid "Error"
+msgstr "Erreur !"
+
+msgid "This input is required"
+msgstr "Merci de choisir une personnalisation"

@@ -72,16 +72,20 @@ class TranslateView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['languages'] = languages
+        context['translate_languages'] = Language.objects.all()
         context['templates'] = self.get_translation_templates()
         context['prompts'] = self.get_prompts()
         return context
 
     def get_prompts(self):
-        prompts = []
-        for prompt in prompts_list:
-            prompts.append({"slug": prompt['slug'], "name": prompt['name']})
-
-        return prompts
+        user_prompts = {}
+        for prompts in prompts_list:
+            language_prompts = []
+            for prompt in prompts_list[prompts]:
+                language_prompts.append(
+                    {"slug": prompt['slug'], "description": prompt['description'], "name": prompt['name']})
+            user_prompts[prompts] = language_prompts
+        return user_prompts
 
     def get_translation_templates(self):
         templates = dict()
@@ -117,6 +121,23 @@ class TranslateView(TemplateView):
         return JsonResponse({})
 
 
+class GetTemplatesView(APIView):
+
+    def get(self, request):
+        if 'source_language' not in self.request.query_params or 'target_language' not in self.request.query_params:
+            return Response({"message":"Missing source language or target language"}, status=status.HTTP_400_BAD_REQUEST)
+        response = requests.post(
+            CUSTOM_MT_CONSOLE_URL + "get-templates",
+            data={
+                    "source_language": self.request.query_params['source_language'].lower(),
+                    "target_language": self.request.query_params['target_language'].lower()
+                },
+            headers={
+                'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
+            }
+        )
+        return Response(response.json(), status=status.HTTP_200_OK)
+
 @csrf_exempt
 @api_view(['POST'])
 def expert_revision(request):
@@ -140,6 +161,7 @@ class ProjectsHistoryView(TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         page = self.request.GET.get('page')
+        context['languages'] = languages
         params = {
             "page_size": PAGINATION_PAGE_SIZE,
             "page": page,
