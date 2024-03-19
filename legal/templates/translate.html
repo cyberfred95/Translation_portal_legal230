@@ -103,6 +103,12 @@
                             </a>
                         </li>
                     </ul>
+
+                    <select>
+                        {% for translate_language in translate_languages %}
+                            <option value="{{ translate_language.abbreviation }}"> {{ translate_language.name }}</option>
+                        {% endfor %}
+                    </select>
                     <div class="translate__tab" id="tabs-1">
                         <form method="post" action="{% url 'main_index' %}" class="translate__form needs-validation" id="text_translate_form">
                             <input type="hidden" name="action" value="text_translate">

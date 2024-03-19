@@ -72,6 +72,7 @@ class TranslateView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['languages'] = languages
+        context['translate_languages'] = Language.objects.all()
         context['templates'] = self.get_translation_templates()
         context['prompts'] = self.get_prompts()
         return context
@@ -116,6 +117,23 @@ class TranslateView(TemplateView):
             return JsonResponse(file_translate(request))
         return JsonResponse({})
 
+
+class GetTemplatesView(APIView):
+
+    def get(self, request):
+        if 'source_language' not in request.data or 'target_language' not in request.data:
+            return Response({"message":"Missing source language or target language"}, status=status.HTTP_400_BAD_REQUEST)
+        response = requests.post(
+            CUSTOM_MT_CONSOLE_URL + "get-templates",
+            data={
+                    "source_language": request.data['source_language'].lower(),
+                    "target_language": request.data['target_language'].lower()
+                },
+            headers={
+                'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
+            }
+        )
+        return Response(response.json(), status=status.HTTP_200_OK)
 
 @csrf_exempt
 @api_view(['POST'])
