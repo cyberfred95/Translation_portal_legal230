@@ -245,4 +245,4 @@ msgstr "Writing"
 
 #legal/templates/translate.html:102
 msgid "Project history"
-msgstr "Mon historique"
+msgstr "Project history"

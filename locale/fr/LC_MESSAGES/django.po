@@ -246,3 +246,4 @@ msgstr "Personnaliser un document"
 #legal/templates/translate.html:102
 msgid "Project history"
 msgstr "Mon historique"
+
