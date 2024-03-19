@@ -493,12 +493,14 @@
                                                         {% for prompt in prompts.en %}
                                                         <li data-value="{{ prompt.slug }}">
                                                             <span class="select__item-title">{{ prompt.name }}</span>
+                                                            <span>{{ prompt.description }}</span>
                                                         </li>
                                                         {% endfor %}
                                                         {% else %}
                                                     {% for prompt in prompts.fr %}
                                                         <li data-value="{{ prompt.slug }}">
                                                             <span class="select__item-title">{{ prompt.name }}</span>
+                                                            <span>{{ prompt.description }}</span>
                                                         </li>
                                                         {% endfor %}
                                                     {% endif %}
@@ -541,19 +543,18 @@
         <div class="preloader">
             <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
         </div>
-    </div>
-    <div class="popup" id="error_popup">
-        <div class="popup__inner">
-            <div class="popup__title">
-                <p>{% trans "Something went wrong" %}</p>
-            </div>
-            <p>{% trans "Please try again later." %}</p>
-            <div class="translate__form__submit">
-                <button type="button" class="button button--error" data-fancybox-close="">{% trans "Close" %}</button>
+        <div class="popup" id="error_popup">
+            <div class="popup__inner">
+                <div class="popup__title">
+                    <p>{% trans "Something went wrong" %}</p>
+                </div>
+                <p>{% trans "Please try again later." %}</p>
+                <div class="translate__form__submit">
+                    <button type="button" class="button button--error" data-fancybox-close="">{% trans "Close" %}</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 <div class="modal__wrapper">
     <div class="preloader">
         <div class="lds-ring">

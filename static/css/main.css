@@ -1561,6 +1561,7 @@ body {
 .select .errorText {
     position: absolute;
     z-index: 1;
+    display: none;
     bottom: -.5rem;
     left: 0;
     transform: translateY(100%);
