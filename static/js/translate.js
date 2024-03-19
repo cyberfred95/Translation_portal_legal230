@@ -162,10 +162,9 @@ function gpt_processing() {
 
     function isInvalid(selector) {
         $(selector).closest('.translate__form-row').find('.invalid-feedback').show()
-        $(selector).closest('.select').find('.errorText').remove()
         $(selector).closest('.modal__btn').addClass('error')
         $(selector).closest('.select').addClass('error')
-        $(selector).closest('.select').append('<div class="errorText">This input is required.</div>')
+        $(selector).closest('.select').find('.errorText').show();
     }
 
     function isValidF(selector = false) {

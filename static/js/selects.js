@@ -108,6 +108,9 @@ function selects() {
     if(thisItem.find('.select__item-title').length){
       thisText = thisItem.find('.select__item-title').text().trim().replaceAll('\n', '')
     }
+
+    $('.errorText').hide();
+
     let thisValue = thisItem.attr('data-value')
     let outputText = thisContainer.find('.output_text')
     let outputValue = thisContainer.find('.output_value')

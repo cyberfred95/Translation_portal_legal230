@@ -247,3 +247,23 @@ msgstr "Personnaliser un document"
 msgid "Project history"
 msgstr "Mon historique"
 
+#legal/templates/project_history:119
+msgid "Username"
+msgstr "Utilisateur"
+
+#legal/templates/project_history:123
+msgid "Created"
+msgstr "Date de création"
+
+#legal/templates/project_history:122
+msgid "Status"
+msgstr "Statut"
+
+msgid "Translated"
+msgstr "Traduit"
+
+msgid "Error"
+msgstr "Erreur !"
+
+msgid "This input is required"
+msgstr "Merci de choisir une personnalisation"

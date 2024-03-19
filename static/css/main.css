@@ -1560,6 +1560,7 @@ body {
 
 /* line 2105, static/newStatic/scss/main.scss */
 .select .errorText {
+    display: none;
     position: absolute;
     z-index: 1;
     bottom: -.5rem;
