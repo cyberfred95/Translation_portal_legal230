@@ -242,3 +242,7 @@ msgstr "Votre demande a été transmise"
 #: legal/templates/translate.html:88
 msgid "Writing"
 msgstr "Personnaliser un document"
+
+#legal/templates/translate.html:102
+msgid "Project history"
+msgstr "Mon historique"
