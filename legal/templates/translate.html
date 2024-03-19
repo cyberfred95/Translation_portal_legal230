@@ -408,6 +408,7 @@
                                                         {% for prompt in prompts %}
                                                         <li data-value="{{ prompt.slug }}">
                                                             <span class="select__item-title">{{ prompt.name }}</span>
+
                                                         </li>
                                                         {% endfor %}
                                                     </ul>
@@ -477,6 +478,7 @@
         </div>
     </div>
     <script>
+        var prompts = {{ prompts | safe }}
         var templates = {{ templates|safe }}
         var languages = {{ languages|safe }}
         var expert_revision_url = "{% url 'expert_revision' %}"

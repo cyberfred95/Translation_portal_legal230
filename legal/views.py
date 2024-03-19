@@ -78,11 +78,14 @@ class TranslateView(TemplateView):
         return context
 
     def get_prompts(self):
-        prompts = []
-        for prompt in prompts_list:
-            prompts.append({"slug": prompt['slug'], "name": prompt['name']})
-
-        return prompts
+        user_prompts = {}
+        for prompts in prompts_list:
+            language_prompts = []
+            for prompt in prompts_list[prompts]:
+                language_prompts.append(
+                    {"slug": prompt['slug'], "description": prompt['description'], "name": prompt['name']})
+            user_prompts[prompts] = language_prompts
+        return user_prompts
 
     def get_translation_templates(self):
         templates = dict()
@@ -122,18 +125,20 @@ class GetTemplatesView(APIView):
 
     def get(self, request):
         if 'source_language' not in request.data or 'target_language' not in request.data:
-            return Response({"message":"Missing source language or target language"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Missing source language or target language"},
+                            status=status.HTTP_400_BAD_REQUEST)
         response = requests.post(
             CUSTOM_MT_CONSOLE_URL + "get-templates",
             data={
-                    "source_language": request.data['source_language'].lower(),
-                    "target_language": request.data['target_language'].lower()
-                },
+                "source_language": request.data['source_language'].lower(),
+                "target_language": request.data['target_language'].lower()
+            },
             headers={
                 'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
             }
         )
         return Response(response.json(), status=status.HTTP_200_OK)
+
 
 @csrf_exempt
 @api_view(['POST'])
