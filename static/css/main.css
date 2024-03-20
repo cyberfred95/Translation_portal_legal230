@@ -828,9 +828,6 @@ body {
     height: 20px;
     object-fit: contain;
     cursor: pointer;
-}
-
-.swap__language-ico.document > img {
     margin: 0 10px;
 }
 
@@ -1114,7 +1111,6 @@ body {
 .button--download:hover path {
     fill: #1D2945;
 }
-
 
 
 .footer {
@@ -2352,4 +2348,54 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.select.translation {
+    width: 14rem;
+}
+
+.select.translation.templates {
+    width: 100%;
+}
+
+.select.translation > input {
+    font-size: 14px;
+    font-weight: 500;
+    background: none;
+    padding: 0 3rem 0 0;
+}
+
+.select.translation > input, .input > input {
+    border-radius: 4px;
+    height: auto;
+}
+
+.select.translation .select__dropdown {
+    bottom: 0 !important;
+}
+
+.select.translation > input::-webkit-input-placeholder, .select.translation > input::placeholder, .select.translation > input::placeholder {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--primary) !important;
+    opacity: 1 !important;
+}
+
+.select.translation::after {
+    content: '';
+    position: absolute;
+    display: block;
+    top: 0.8rem;
+    right: 1.3rem;
+    width: 0.8rem;
+    height: 0.8rem;
+    z-index: 2;
+    background: url("/static/images/new-select.svg") no-repeat center;
+    background-size: contain;
+    pointer-events: none;
+}
+
+.select.translation .select__dropdown {
+    margin-top: 1rem;
+    border-radius: 0;
 }
