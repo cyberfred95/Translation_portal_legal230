@@ -302,7 +302,7 @@ function gpt_processing() {
     })
     $(document).on('change', gptInputAction, checkAdditional)
     $(document).on('click', gptBtnSubmit, onSubmit)
-    $(document).on('click', gptBtnRetry, function() {
+    $(document).on('click', gptBtnRetry, function () {
         $(gptInputAction).val('')
         $(gptTranslationText).val('')
         $(gptBtnSubmit).removeAttr('disabled', 'disabled')
@@ -319,8 +319,6 @@ $(document).ready(function () {
     let clearBtn = $('.btn_clear');
     let copyBtn = $('.btn_copy');
     let resetBtn = $('.btn_reset');
-    let resultBlob;
-    let sourceLangSelect = $('[name=source_language]')
     let preloader = $('.modal__wrapper, .preloader');
     let errorPopup = '#error_popup'
     let successPopup = '#success_modal'
@@ -384,33 +382,6 @@ $(document).ready(function () {
                 errorHandler(error);
             }
         });
-    }
-
-    function setSourceLang(lang) {
-        let container = $('.translate__pair')
-        if ($(this).is('select')) {
-            lang = $(this).val()
-            container = $(this).closest('.translate__pair')
-        } else {
-            sourceLangSelect.val(lang)
-        }
-        let targetSelect = container.find('[name="target_language"]')
-
-        setTargetLang(lang, targetSelect)
-    }
-
-    function setTargetLang(lang, select) {
-        select.val('')
-        select.find('option:not([value=""])').remove()
-        if (!lang) return false;
-
-        let pairs = languages.find(item => item.language === lang).pairs;
-
-        if (!pairs) return false;
-
-        $.each(pairs, function (_, pair) {
-            select.append($('<option value="' + pair.language + '">' + pair.name + '</option>'))
-        })
     }
 
     function errorHandler() {
@@ -630,44 +601,41 @@ $(document).ready(function () {
     }
 
     function swapLanguages() {
-        var textSourceLang = document.querySelector('#tabs-1 input[name="source_language"]');
-        var textTargetLang = document.querySelector('#tabs-1 input[name="target_language"]');
+        var textSourceLangText = document.querySelector('#tabs-1 .output_text.source');
+        var textSourceLangValue = document.querySelector('#tabs-1 input[name="source_language"]');
+        var textTargetLangText = document.querySelector('#tabs-1 .output_text.target');
+        var textTargetLangValue = document.querySelector('#tabs-1 input[name="target_language"]');
 
-        var docSourceLang = document.querySelector('#tabs-2 input[name="source_language"]');
-        var docTargetLang = document.querySelector('#tabs-2 input[name="target_language"]');
+        var docSourceLangText = document.querySelector('#tabs-2 .output_text.source');
+        var docSourceLangValue = document.querySelector('#tabs-2 input[name="source_language"]');
+        var docTargetLangText = document.querySelector('#tabs-2 .output_text.target');
+        var docTargetLangValue = document.querySelector('#tabs-2 input[name="target_language"]');
 
         var inputText = document.querySelector('#translation_text');
         var resultText = document.querySelector('#result_text');
 
-        [textSourceLang.value, textTargetLang.value] = [textTargetLang.value, textSourceLang.value];
-        [docSourceLang.value, docTargetLang.value] = [docTargetLang.value, docSourceLang.value];
+        [textSourceLangText.value, textTargetLangText.value] = [textTargetLangText.value, textSourceLangText.value];
+        [textSourceLangValue.value, textTargetLangValue.value] = [textTargetLangValue.value, textSourceLangValue.value];
+
+        [docSourceLangText.value, docTargetLangText.value] = [docTargetLangText.value, docSourceLangText.value];
+        [docSourceLangValue.value, docTargetLangValue.value] = [docTargetLangValue.value, docSourceLangValue.value];
 
         var tempText = inputText.value;
         inputText.value = resultText.value;
         resultText.value = tempText;
 
-        var textSourceLangTitle = document.querySelector('.translate__tab#tabs-1 .select-box.source .selected-text');
-        var textTargetLangTitle = document.querySelector('.translate__tab#tabs-1 .select-box.target .selected-text');
+        var textSourceLang = textSourceLangValue.value.toLowerCase();
+        var textTargetLang = textTargetLangValue.value.toLowerCase();
 
-        var docSourceLangTitle = document.querySelector('.translate__tab#tabs-2 .select-box.source .selected-text');
-        var docTargetLangTitle = document.querySelector('.translate__tab#tabs-2 .select-box.target .selected-text');
-
-
-        [textSourceLangTitle.textContent, textTargetLangTitle.textContent] = [textTargetLangTitle.textContent, textSourceLangTitle.textContent];
-        [docSourceLangTitle.textContent, docTargetLangTitle.textContent] = [docTargetLangTitle.textContent, docSourceLangTitle.textContent];
-
-        var sourceLanguage = textSourceLang.textContent.toUpperCase();
-        var targetLanguage = textTargetLang.textContent.toUpperCase();
-
-        if (targetLanguage && sourceLanguage) {
-            getTemplates(sourceLanguage, targetLanguage);
+        if (textTargetLang && textSourceLang) {
+            getTemplates(textSourceLang, textTargetLang);
         }
 
-        var sourceDocLanguage = docSourceLang.textContent.toUpperCase();
-        var targetDocLanguage = docTargetLang.textContent.toUpperCase();
+        var docSourceLang = docSourceLangValue.value.toLowerCase();
+        var docTargetLang = docTargetLangValue.value.toLowerCase();
 
-        if (sourceDocLanguage && targetDocLanguage) {
-            getTemplates(sourceDocLanguage, targetDocLanguage);
+        if (docSourceLang && docTargetLang) {
+            getTemplates(docSourceLang, docTargetLang);
         }
     }
 
@@ -698,47 +666,6 @@ $(document).ready(function () {
         });
     });
 
-    const sourceSelect1 = document.querySelector('.translate__tab#tabs-1 .options-container.source');
-    const sourceInput1 = document.querySelector('.translate__tab#tabs-1 input[name="source_language"]');
-    const targetSelect1 = document.querySelector('.translate__tab#tabs-1 .options-container.target');
-    const targetInput1 = document.querySelector('.translate__tab#tabs-1 input[name="target_language"]');
-
-    const sourceSelect2 = document.querySelector('.translate__tab#tabs-2 .options-container.source');
-    const sourceInput2 = document.querySelector('.translate__tab#tabs-2 input[name="source_language"]');
-    const targetSelect2 = document.querySelector('.translate__tab#tabs-2 .options-container.target');
-    const targetInput2 = document.querySelector('.translate__tab#tabs-2 input[name="target_language"]');
-
-    function handleSelection(sourceSelect, sourceInput, targetSelect, targetInput) {
-        sourceSelect.addEventListener('click', function (e) {
-            if (e.target && e.target.matches('li.option')) {
-                const value = e.target.getAttribute('value');
-                sourceInput.value = value.toLowerCase();
-
-                const targetLanguage = targetInput.value.toLowerCase();
-                const sourceLanguage = value.toLowerCase();
-                if (targetLanguage && sourceLanguage) {
-                    getTemplates(sourceLanguage, targetLanguage);
-                }
-            }
-        });
-
-        targetSelect.addEventListener('click', function (e) {
-            if (e.target && e.target.matches('li.option')) {
-                const value = e.target.getAttribute('value');
-                targetInput.value = value.toLowerCase();
-
-                const sourceLanguage = sourceInput.value.toLowerCase();
-                const targetLanguage = value.toLowerCase();
-                if (targetLanguage && sourceLanguage) {
-                    getTemplates(sourceLanguage, targetLanguage);
-                }
-            }
-        });
-    }
-
-    handleSelection(sourceSelect1, sourceInput1, targetSelect1, targetInput1);
-    handleSelection(sourceSelect2, sourceInput2, targetSelect2, targetInput2);
-
 
     function getTemplates(sourceLanguage, targetLanguage) {
         let url = `get-templates?source_language=${sourceLanguage}&target_language=${targetLanguage}`;
@@ -753,35 +680,59 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                const selectBoxes = document.querySelectorAll(".select-box.templates");
+                $('.translate__tab').each(function () {
+                    const tab = $(this);
+                    const optionsContainer = tab.find('.output_value[name="template_name"]').siblings('.select__dropdown').find('ul');
+                    optionsContainer.empty();
 
-                selectBoxes.forEach(function (box) {
-                    const optionsContainer = box.querySelector(".options-container.templates");
-                    const selectedText = box.querySelector(".selected-text");
-                    const hiddenInput = box.closest('form').querySelector("input[name='template_name']");
+                    response.forEach((i, index) => {
+                        const option = $('<li></li>');
+                        option.addClass('option');
+                        option.attr('data-value', i.template_name);
+                        option.text(i.template_name);
+                        console.log(i.template_name)
+                        if (index === 0) {
+                            option.addClass('selected');
+                            tab.find('.output_value[name="template_name"]').val(i.template_name);
+                            tab.find('.output_text.template').val(i.template_name);
+                        }
 
-                    optionsContainer.innerHTML = '';
-
-                    response.forEach(function (template) {
-                        const option = document.createElement('li');
-                        option.className = 'option';
-                        option.textContent = template.template_name;
-                        option.setAttribute('value', template.template_name);
-                        optionsContainer.appendChild(option);
-                    });
-
-                    if (response.length > 0) {
-                        const firstTemplate = response[0];
-                        hiddenInput.value = firstTemplate.template_name;
-                        selectedText.innerHTML = firstTemplate.template_name;
-                    }
+                        optionsContainer.append(option);
+                    })
                 });
+
             },
             error: function (xhr, status, error) {
                 errorHandler(error);
             }
         });
     }
+
+    $(document).on('change', '[name="source_language"], [name="target_language"]', function () {
+    const sourceLanguage = $(this).closest('.translate__tab').find('.output_value[name="source_language"]').val().toLowerCase();
+    const sourceLanguageText = $(this).closest('.translate__tab').find('.output_text.source').val();
+    const targetLanguage = $(this).closest('.translate__tab').find('.output_value[name="target_language"]').val().toLowerCase();
+    const targetLanguageText = $(this).closest('.translate__tab').find('.output_text.target').val();
+
+    const tabIndex = $(this).closest('.translate__tab').attr('id').split('-')[1];
+
+    const oppositeTabIndex = tabIndex === '1' ? '2' : '1';
+
+    const oppositeSourceLanguageInput = $('#tabs-' + oppositeTabIndex + ' .output_value[name="source_language"]');
+    const oppositeSourceLanguageText = $('#tabs-' + oppositeTabIndex + ' .output_text.source');
+    const oppositeTargetLanguageInput = $('#tabs-' + oppositeTabIndex + ' .output_value[name="target_language"]');
+    const oppositeTargetLanguageText = $('#tabs-' + oppositeTabIndex + ' .output_text.target');
+
+    oppositeSourceLanguageInput.val(sourceLanguage);
+    oppositeTargetLanguageInput.val(targetLanguage);
+    oppositeSourceLanguageText.val(sourceLanguageText);
+    oppositeTargetLanguageText.val(targetLanguageText);
+
+    if (targetLanguage && sourceLanguage) {
+        getTemplates(sourceLanguage, targetLanguage);
+    }
+});
+
 
     swapTextIcon.addEventListener('click', swapLanguages);
     swapDocIcon.addEventListener('click', swapLanguages);
@@ -792,8 +743,6 @@ $(document).ready(function () {
 
     clearBtn.on('click', clearText)
     copyBtn.on('click', copyText)
-
-    sourceLangSelect.on('change', setSourceLang)
 
     Upload.init();
 
