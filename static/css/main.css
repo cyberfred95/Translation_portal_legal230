@@ -2355,7 +2355,7 @@ body {
 }
 
 .select.translation.templates {
-    width: 100%;
+    width: 35rem;
 }
 
 .select.translation > input {
@@ -2363,15 +2363,17 @@ body {
     font-weight: 500;
     background: none;
     padding: 0 3rem 0 0;
+    box-shadow: 0 1px 2rem 5px rgba(57, 53, 53, 0.08);
 }
 
 .select.translation > input, .input > input {
-    border-radius: 4px;
-    height: auto;
+    border-radius: 5px;
+    height: 3rem;
+    padding: 10px;
 }
 
 .select.translation .select__dropdown {
-    bottom: 0 !important;
+    bottom: -10px !important;
 }
 
 .select.translation > input::-webkit-input-placeholder, .select.translation > input::placeholder, .select.translation > input::placeholder {
@@ -2385,7 +2387,7 @@ body {
     content: '';
     position: absolute;
     display: block;
-    top: 0.8rem;
+    top: 1.2rem;
     right: 1.3rem;
     width: 0.8rem;
     height: 0.8rem;
@@ -2396,6 +2398,29 @@ body {
 }
 
 .select.translation .select__dropdown {
-    margin-top: 1rem;
+    border-radius: 5px;
+}
+
+.select.translation .select__dropdown > ul {
     border-radius: 0;
+    margin: 1rem 0.6rem 1rem 0;
+}
+
+.select.translation .select__dropdown ul li {
+    margin-right: 0;
+}
+
+.select.translation .selected {
+    border-radius: 0;
+    color: #fff !important;
+}
+
+.select.translation .select__dropdown ul li:hover {
+    background: #2B4459 !important;
+    color: #fff !important;
+}
+
+.select.translation .select__dropdown ul li.hover, .select.translation .select__dropdown ul li:hover, .select.translation .select__dropdown ul li.selected {
+    border-radius: 0;
+    color: #fff !important;
 }
