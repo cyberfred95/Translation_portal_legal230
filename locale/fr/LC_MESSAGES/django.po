@@ -270,3 +270,12 @@ msgstr "Merci de choisir une personnalisation"
 
 msgid "Select from the list"
 msgstr "Sélectionner dans la liste "
+
+msgid "Source language"
+msgstr "Langue source"
+
+msgid "Target language"
+msgstr "Langue cible"
+
+msgid "Practice"
+msgstr "Domaine"

@@ -270,3 +270,12 @@ msgstr "Please choose an action."
 
 msgid "Select from the list"
 msgstr "Select from the list"
+
+msgid "Source language"
+msgstr "Source language"
+
+msgid "Target language"
+msgstr "Target language"
+
+msgid "Practice"
+msgstr "Practice"
