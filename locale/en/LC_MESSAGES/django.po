@@ -267,3 +267,6 @@ msgstr "Error"
 
 msgid "This input is required"
 msgstr "Please choose an action."
+
+msgid "Select from the list"
+msgstr "Select from the list"

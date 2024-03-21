@@ -342,6 +342,10 @@ $(document).ready(function () {
 
         // Add a handler for the beforeActivate event
         tabs.tabs({
+            activate: function (event, ui) {
+                var currentHash = ui.newPanel.attr('id');
+                window.location.hash = currentHash;
+            },
             beforeActivate: function (event, ui) {
                 // Check if the tab has 'no-tab' class
                 if (ui.newTab.children("a").hasClass("no-tab")) {
@@ -350,7 +354,34 @@ $(document).ready(function () {
                 }
             }
         });
+
+        var hash = window.location.hash;
+        if (hash) {
+            $('#tabs').tabs('load', hash);
+        }
     }
+
+    $(".header__lang li a").click(function (event) {
+        event.preventDefault();
+
+        var languageCode = $(this).text().trim().toLowerCase();
+
+        var currentUrl = window.location.href;
+
+        if (languageCode === "en") {
+            currentUrl = currentUrl.replace("/fr/", "/en/");
+        } else if (languageCode === "fr") {
+            currentUrl = currentUrl.replace("/en/", "/fr/");
+        }
+
+        $(".header__lang li a").each(function () {
+            var href = $(this).attr("href");
+            var newHref = href.replace("/en/", "/fr/").replace("/fr/", "/en/");
+            $(this).attr("href", newHref);
+        });
+
+        window.location.href = currentUrl;
+    });
 
     function sendDocument(file) {
         let url = expert_revision_file_url;
@@ -709,29 +740,29 @@ $(document).ready(function () {
     }
 
     $(document).on('change', '[name="source_language"], [name="target_language"]', function () {
-    const sourceLanguage = $(this).closest('.translate__tab').find('.output_value[name="source_language"]').val().toLowerCase();
-    const sourceLanguageText = $(this).closest('.translate__tab').find('.output_text.source').val();
-    const targetLanguage = $(this).closest('.translate__tab').find('.output_value[name="target_language"]').val().toLowerCase();
-    const targetLanguageText = $(this).closest('.translate__tab').find('.output_text.target').val();
+        const sourceLanguage = $(this).closest('.translate__tab').find('.output_value[name="source_language"]').val().toLowerCase();
+        const sourceLanguageText = $(this).closest('.translate__tab').find('.output_text.source').val();
+        const targetLanguage = $(this).closest('.translate__tab').find('.output_value[name="target_language"]').val().toLowerCase();
+        const targetLanguageText = $(this).closest('.translate__tab').find('.output_text.target').val();
 
-    const tabIndex = $(this).closest('.translate__tab').attr('id').split('-')[1];
+        const tabIndex = $(this).closest('.translate__tab').attr('id').split('-')[1];
 
-    const oppositeTabIndex = tabIndex === '1' ? '2' : '1';
+        const oppositeTabIndex = tabIndex === '1' ? '2' : '1';
 
-    const oppositeSourceLanguageInput = $('#tabs-' + oppositeTabIndex + ' .output_value[name="source_language"]');
-    const oppositeSourceLanguageText = $('#tabs-' + oppositeTabIndex + ' .output_text.source');
-    const oppositeTargetLanguageInput = $('#tabs-' + oppositeTabIndex + ' .output_value[name="target_language"]');
-    const oppositeTargetLanguageText = $('#tabs-' + oppositeTabIndex + ' .output_text.target');
+        const oppositeSourceLanguageInput = $('#tabs-' + oppositeTabIndex + ' .output_value[name="source_language"]');
+        const oppositeSourceLanguageText = $('#tabs-' + oppositeTabIndex + ' .output_text.source');
+        const oppositeTargetLanguageInput = $('#tabs-' + oppositeTabIndex + ' .output_value[name="target_language"]');
+        const oppositeTargetLanguageText = $('#tabs-' + oppositeTabIndex + ' .output_text.target');
 
-    oppositeSourceLanguageInput.val(sourceLanguage);
-    oppositeTargetLanguageInput.val(targetLanguage);
-    oppositeSourceLanguageText.val(sourceLanguageText);
-    oppositeTargetLanguageText.val(targetLanguageText);
+        oppositeSourceLanguageInput.val(sourceLanguage);
+        oppositeTargetLanguageInput.val(targetLanguage);
+        oppositeSourceLanguageText.val(sourceLanguageText);
+        oppositeTargetLanguageText.val(targetLanguageText);
 
-    if (targetLanguage && sourceLanguage) {
-        getTemplates(sourceLanguage, targetLanguage);
-    }
-});
+        if (targetLanguage && sourceLanguage) {
+            getTemplates(sourceLanguage, targetLanguage);
+        }
+    });
 
 
     swapTextIcon.addEventListener('click', swapLanguages);

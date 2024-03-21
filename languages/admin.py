@@ -8,5 +8,6 @@ from .models import Language
 class LanguageRegionCodeAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "abbreviation"
+        "abbreviation",
+        "french_name"
     )
