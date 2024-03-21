@@ -133,7 +133,13 @@
                                                 <div class="select__dropdown">
                                                     <ul>
                                                         {% for translate_language in translate_languages %}
-                                                        <li class="option" data-value="{{ translate_language.abbreviation|lower }}"> {{ translate_language.name }}</li>
+                                                        <li class="option" data-value="{{ translate_language.abbreviation|lower }}">
+
+                                                            {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                                                                {{ translate_language.french_name }}
+                                                            {% else %} {{ translate_language.name }}
+                                                            {% endif %}
+                                                        </li>
                                                         {% endfor %}
                                                     </ul>
                                                 </div>
@@ -151,7 +157,13 @@
                                                 <div class="select__dropdown">
                                                     <ul>
                                                         {% for translate_language in translate_languages %}
-                                                        <li class="option" data-value="{{ translate_language.abbreviation|lower }}"> {{ translate_language.name }}</li>
+                                                        <li class="option" data-value="{{ translate_language.abbreviation|lower }}">
+
+                                                            {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                                                                {{ translate_language.french_name }}
+                                                            {% else %} {{ translate_language.name }}
+                                                            {% endif %}
+                                                        </li>
                                                         {% endfor %}
                                                     </ul>
                                                 </div>
@@ -237,7 +249,13 @@
                                                 <div class="select__dropdown">
                                                     <ul>
                                                         {% for translate_language in translate_languages %}
-                                                        <li class="option" data-value="{{ translate_language.abbreviation|lower }}"> {{ translate_language.name }}</li>
+                                                        <li class="option" data-value="{{ translate_language.abbreviation|lower }}">
+
+                                                            {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                                                                {{ translate_language.french_name }}
+                                                            {% else %} {{ translate_language.name }}
+                                                            {% endif %}
+                                                        </li>
                                                         {% endfor %}
                                                     </ul>
                                                 </div>
@@ -253,7 +271,13 @@
                                                 <div class="select__dropdown">
                                                     <ul>
                                                         {% for translate_language in translate_languages %}
-                                                        <li class="option" data-value="{{ translate_language.abbreviation|lower }}"> {{ translate_language.name }}</li>
+                                                        <li class="option" data-value="{{ translate_language.abbreviation|lower }}">
+
+                                                            {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                                                                {{ translate_language.french_name }}
+                                                            {% else %} {{ translate_language.name }}
+                                                            {% endif %}
+                                                        </li>
                                                         {% endfor %}
                                                     </ul>
                                                 </div>
