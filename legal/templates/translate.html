@@ -404,7 +404,7 @@
                                                     </defs>
                                                 </svg>
                                             </div>
-                                            <textarea required id="gpt_translation_text" maxlength="2400" name="text" placeholder="Start typing"></textarea>
+                                            <textarea required id="gpt_translation_text" maxlength="2400" name="text" placeholder="{% trans 'Start typing' %}"></textarea>
                                             <div class="invalid-feedback">
                                                 {% trans "Text is required." %}
                                             </div>
@@ -437,7 +437,7 @@
                                         <div class="gpt_processing__select">
                                             <label>{% trans "Action" %}</label>
                                             <div class="select new-design select--with-desc">
-                                                <input class="output_text" type="text" tabindex="0" placeholder="Select from the list">
+                                                <input class="output_text" type="text" tabindex="0" placeholder="{% trans 'Select from the list' %}">
                                                 <input class="output_value" type="hidden" name="Action" required>
                                                 <div class="select__dropdown">
                                                     <ul>

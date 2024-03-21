@@ -112,7 +112,7 @@ msgstr "télécharger un document"
 
 #: legal/templates/translate.html:329
 msgid "Action"
-msgstr "Action"
+msgstr "Personnalisations disponibles"
 
 #: legal/templates/translate.html:336
 msgid "Translate"
@@ -267,3 +267,6 @@ msgstr "Erreur !"
 
 msgid "This input is required"
 msgstr "Merci de choisir une personnalisation"
+
+msgid "Select from the list"
+msgstr "Sélectionner dans la liste "
