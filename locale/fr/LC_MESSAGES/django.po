@@ -279,3 +279,6 @@ msgstr "Langue cible"
 
 msgid "Practice"
 msgstr "Domaine"
+
+msgid "PDF file"
+msgstr "Attention ! La qualité de votre document affecte le résultat de la traduction. Les PDFs scannés ou peu lisibles ne permettent pas un rendu de qualité."
