@@ -279,3 +279,6 @@ msgstr "Target language"
 
 msgid "Practice"
 msgstr "Practice"
+
+msgid "PDF file"
+msgstr "Important! The quality of your document will have an impact on translation. Scanned or poorly legible PDFs cannot be processed to a high standard."
