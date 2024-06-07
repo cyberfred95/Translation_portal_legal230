@@ -15,6 +15,8 @@ var Upload = {
 			thisContainer.find('input').val('')
 			thisContainer.removeClass('upload-success')
 			$('.uploaded').hide();
+			$('.output-type').hide();
+
 			$('.translate__file-block.input').css('display', 'flex')
 		})
 
@@ -28,11 +30,15 @@ var Upload = {
 			let isValid = false;
 			let files = e ? e.originalEvent.dataTransfer.files : inp.files;
 			let resultBlock = thisContainer.find('.output-name')
+
 			let errorBlock = thisInput.closest('.input').find('.invalid-feedback')
 			let fileName = ''
 			let thisName = files[0].name.split('.')
 			let thisExt = thisName[thisName.length-1]
 
+			if (files[0].type === 'application/pdf') {
+				$('.output-type').css('display', 'flex')
+			}
 			thisName.pop()
 
 			if(thisName.length > 1) {

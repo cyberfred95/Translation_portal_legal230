@@ -2424,3 +2424,14 @@ body {
     border-radius: 0;
     color: #fff !important;
 }
+
+.output-type {
+    display: none;
+    text-align: center;
+    width: 300px;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 17px;
+    color: #CACACA;
+}

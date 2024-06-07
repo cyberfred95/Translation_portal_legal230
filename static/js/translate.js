@@ -35,7 +35,7 @@ function gpt_processing() {
         let thisName = files[0].name.split('.')
         let thisExt = thisName[thisName.length - 1]
         let checkboxUpload = thisContainer.find('input[type="checkbox"]')
-
+        console.log('files', files)
         thisName.pop()
 
         if (thisName.length > 1) {
@@ -389,6 +389,7 @@ $(document).ready(function () {
         formData.append('file_url', file);
 
         $('.translate__file-block').hide();
+        $('.output-type').hide();
         $('.translate__file-block.trans-progress').css('display', 'flex')
 
         $.ajax({
@@ -405,6 +406,7 @@ $(document).ready(function () {
             dataType: 'json',
             success: function () {
                 $('.translate__file-block').hide();
+                $('.output-type').hide();
                 $('.translate__file-block.complete').css('display', 'flex')
                 $('#expert_revision_document').addClass('expert--revision');
                 successHandler();
@@ -527,6 +529,7 @@ $(document).ready(function () {
     function checkDocument(fileId, intervalId, isPostEditing) {
         let url = '/project/?project_id=' + encodeURIComponent(fileId);
         $('.translate__file-block').hide();
+        $('.output-type').hide();
         $('.translate__file-block.trans-progress').css('display', 'flex')
 
         $.ajax({
@@ -542,6 +545,7 @@ $(document).ready(function () {
                 if (response.status === 'Translated' && !isPostEditing) {
                     clearInterval(intervalId);
                     $('.translate__file-block').hide();
+                    $('.output-type').hide();
                     $('.translate__file-block.complete').css('display', 'flex')
                     $('#download_result').on('click', () => downloadResult(response.translated_file))
                     $('#expert_revision_document').off('click').on('click', () => sendDocument(response.translated_file));
@@ -572,6 +576,7 @@ $(document).ready(function () {
 
 
         $('.translate__file-block').hide();
+        $('.output-type').hide();
         $('.translate__file-block.trans-progress').css('display', 'flex')
 
         $('.translate__form-submit').eq(1).hide();
