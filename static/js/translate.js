@@ -383,10 +383,11 @@ $(document).ready(function () {
         window.location.href = currentUrl;
     });
 
-    function sendDocument(file) {
+    function sendDocument(file, id) {
         let url = expert_revision_file_url;
         let formData = new FormData();
         formData.append('file_url', file);
+        formData.append('project_id', id);
 
         $('.translate__file-block').hide();
         $('.output-type').hide();
@@ -543,12 +544,13 @@ $(document).ready(function () {
             },
             success: function (response) {
                 if (response.status === 'Translated' && !isPostEditing) {
+                    console.log('response', response)
                     clearInterval(intervalId);
                     $('.translate__file-block').hide();
                     $('.output-type').hide();
                     $('.translate__file-block.complete').css('display', 'flex')
                     $('#download_result').on('click', () => downloadResult(response.translated_file))
-                    $('#expert_revision_document').off('click').on('click', () => sendDocument(response.translated_file));
+                    $('#expert_revision_document').off('click').on('click', () => sendDocument(response.translated_file, response.id));
                 } else if (response.status === 'Error') {
                     errorHandler();
                 }
