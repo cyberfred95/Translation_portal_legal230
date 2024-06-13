@@ -23,9 +23,7 @@ def send_text_translation(
 
     sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
 
-    emails = []
-    for item in users_to_send:
-        emails.append(item.email)
+
 
     if action == 'expert_revision':
         message = Mail(
