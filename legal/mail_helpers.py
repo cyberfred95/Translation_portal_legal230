@@ -5,6 +5,7 @@ from django.template.loader import render_to_string
 from sendgrid.helpers.mail import (Mail, Attachment, FileContent, FileName, FileType, Disposition)
 from preferences import preferences
 
+
 def send_text_translation(
         user_id,
         template_name=None,
@@ -22,8 +23,6 @@ def send_text_translation(
     users_to_send = User.objects.filter(is_staff=True, email__isnull=True).all()
 
     sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
-
-
 
     if action == 'expert_revision':
         message = Mail(
