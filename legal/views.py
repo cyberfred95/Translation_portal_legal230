@@ -1,7 +1,5 @@
-import json
 import os
 import time
-from pprint import pprint
 from urllib.parse import urlparse, unquote
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -151,7 +149,12 @@ def expert_revision(request):
 def expert_revision_file(request):
     file_url = request.POST.get('file_url')
     send_expert_revision_file(user_id=request.user.id, file_url=file_url)
-    return JsonResponse({})
+    response = requests.post(
+        CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
+        headers={
+            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
+        data={"email": preferences.MainSettings.sender_email})
+    return Response({"message": "Sent to post editing"}, status=status.HTTP_200_OK)
 
 
 class ProjectsHistoryView(TemplateView):
