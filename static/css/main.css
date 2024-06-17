@@ -1998,6 +1998,12 @@ body {
     position: relative;
 }
 
+.download-buttons.history {
+    align-items: flex-start;
+    gap: 10px;
+    padding: 16px 0;
+}
+
 .select-box .options-container {
     display: none;
     width: 150px;
@@ -2016,6 +2022,11 @@ body {
     order: 1;
     max-height: 300px;
     overflow-y: auto;
+
+    &.history {
+        width: auto;
+        left: initial;
+    }
 }
 
 .select-box.templates .options-container {
@@ -2086,11 +2097,6 @@ body {
     width: 100%;
 }
 
-.option:hover {
-    background-color: var(--secondary);
-    color: var(--white) !important;
-}
-
 .select-box .option .li {
     display: none;
 }
@@ -2144,6 +2150,10 @@ body {
         font-weight: 500;
         line-height: normal;
     }
+
+    thead tr th:last-child {
+        text-align: right;
+    }
 }
 
 .project {
@@ -2191,13 +2201,28 @@ body {
 }
 
 .translated {
-    color: #27AE60;
-    background-color: #E9F7EF;
+    color: #476C83;;
+    background-color: #EDF0F3;
 }
 
 .being-translated {
+    color: #706FD3;
+    background-color: #F1F1FB;
+}
+
+.sent-to-post-editing-not-accepted {
     color: #F39C12;
     background-color: #FEF5E7;
+}
+
+.sent-to-post-editing-accepted {
+    color: #1E90FF;
+    background-color: #E9F4FF;
+}
+
+.post-edited {
+    color: #27AE60;
+    background-color: #E9F7EF;
 }
 
 .error {
