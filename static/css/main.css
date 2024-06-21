@@ -2401,6 +2401,10 @@ body {
     bottom: -10px !important;
 }
 
+.select.translation > input.required {
+    box-shadow: 0 1px 2rem 3px rgba(255, 0, 0, 0.4);
+}
+
 .select.translation > input::-webkit-input-placeholder, .select.translation > input::placeholder, .select.translation > input::placeholder {
     font-size: 14px;
     font-weight: 500;
