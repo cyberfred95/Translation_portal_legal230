@@ -771,6 +771,22 @@ $(document).ready(function () {
         }
     });
 
+    const inputs = document.querySelectorAll('.select.translation > input.output_text');
+    const submitButton = document.querySelector('.translate__form-submit > button[type="submit"]');
+    const submitDocumentButton = document.querySelector('.translate__form-submit.uploaded > button[type="submit"]');
+
+    function validateForm() {
+        inputs.forEach(input => {
+            if (input.value.trim() === '') {
+                input.classList.add('required');
+            } else {
+                input.classList.remove('required');
+            }
+        });
+    }
+
+    submitButton.addEventListener('click', validateForm);
+    submitDocumentButton.addEventListener('click', validateForm);
 
     swapTextIcon.addEventListener('click', swapLanguages);
     swapDocIcon.addEventListener('click', swapLanguages);

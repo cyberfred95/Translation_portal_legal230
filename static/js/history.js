@@ -39,6 +39,15 @@ document.addEventListener('DOMContentLoaded', function () {
             case 'Translated':
                 span.classList.add('translated');
                 break;
+            case 'Sent to post-editing, not accepted yet':
+                span.classList.add('sent-to-post-editing-not-accepted');
+                break
+            case 'Sent to post-editing, accepted':
+                span.classList.add('sent-to-post-editing-accepted');
+                break
+            case 'Post-edited file uploaded':
+                span.classList.add('post-edited');
+                break
             case 'Error':
                 span.classList.add('error');
                 break;
@@ -58,6 +67,28 @@ document.addEventListener('DOMContentLoaded', function () {
     dateElements.forEach(function (el) {
         var date = el.textContent.trim();
         el.textContent = formatProjectDate(date);
+    });
+
+    const selectBoxes = document.querySelectorAll(".select-box");
+
+    selectBoxes.forEach(function (box) {
+        const optionsContainer = box.querySelector(".options-container");
+        const options = optionsContainer.querySelectorAll(".option");
+
+        options.forEach(function (option) {
+            option.addEventListener("click", function () {
+                optionsContainer.classList.remove("active");
+            });
+        });
+    });
+
+    document.addEventListener('click', function (e) {
+        selectBoxes.forEach(function (box) {
+            const optionsContainer = box.querySelector(".options-container");
+            if (!box.contains(e.target)) {
+                optionsContainer.classList.remove("active");
+            }
+        });
     });
 
     document.querySelectorAll('.delete-button').forEach(function (button) {

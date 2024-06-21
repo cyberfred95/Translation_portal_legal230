@@ -122,9 +122,10 @@
                             {% if request.user.is_staff %}
                             <th>{% trans "Username" %}</th>
                             {% endif %}
-                            <th>Document</th>
-                            <th>{% trans "Status" %}</th>
-                            <th>{% trans "Created" %}</th>
+                            <th>Project</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -146,32 +147,23 @@
                             </td>
                             <td class="status-project">
                                 <span class="status" data-project-status="{{ project.status }}">
-                                    {% if project.status == "Error" %}
-                                        {% trans "Error" %}
-                                    {% elif project.status == "Translated" %}
-                                        {% trans "Translated" %}
-                                    {% else %}
-                                        {{ project.status }}
-                                    {% endif %}
-
+                                {{ project.status }}
                                 </span>
                             </td>
                             <td class="date">
                                 {{ project.created_at }}
                             </td>
-                            <td>
-                                {% if project.translated_file %}
-                                <div class="action">
-                                    <button type="button"
-                                            class="button button--download button--ico download-file"
-                                            data-url="{{ project.translated_file }}">
+                            <td class="action">
+                                {% if project.reviewed_file and project.translated_file %}
+                                <div class="select-box">
+                                    <div class="target selected">
                                         <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
                                              xmlns="http://www.w3.org/2000/svg">
                                             <g clip-path="url(#clip0_2624_14289)">
                                                 <path d="M15.2188 7.71875C14.7875 7.71875 14.4375 8.06875 14.4375 8.5C14.4375 12.05 11.55 14.9375 8 14.9375C4.45 14.9375 1.5625 12.05 1.5625 8.5C1.5625 8.06875 1.2125 7.71875 0.78125 7.71875C0.35 7.71875 0 8.06875 0 8.5C0 10.6375 0.83125 12.6469 2.34375 14.1562C3.85625 15.6687 5.8625 16.5 8 16.5C10.1375 16.5 12.1469 15.6687 13.6562 14.1562C15.1687 12.6438 16 10.6375 16 8.5C16 8.06875 15.65 7.71875 15.2188 7.71875Z"
-                                                      fill="#176C77"/>
+                                                      fill="#456B84"/>
                                                 <path d="M6.92793 11.2375C7.21543 11.525 7.59668 11.6812 7.9998 11.6812C8.40605 11.6812 8.7873 11.5219 9.07168 11.2375L11.0373 9.27187C11.3436 8.96562 11.3436 8.47187 11.0373 8.16562C10.7311 7.85937 10.2373 7.85937 9.93105 8.16562L8.78105 9.31875V1.28125C8.78105 0.85 8.43105 0.5 7.9998 0.5C7.56855 0.5 7.21855 0.85 7.21855 1.28125V9.31875L6.06543 8.16562C5.75918 7.85937 5.26543 7.85937 4.95918 8.16562C4.65293 8.47187 4.65293 8.96562 4.95918 9.27187L6.92793 11.2375Z"
-                                                      fill="#176C77"/>
+                                                      fill="#456B84"/>
                                             </g>
                                             <defs>
                                                 <clipPath id="clip0_2624_14289">
@@ -180,12 +172,45 @@
                                                 </clipPath>
                                             </defs>
                                         </svg>
-                                        <span>{% trans "Download" %}</span>
-                                    </button>
+
+                                        <ul class="options-container history">
+                                            <li class="option" value="">
+                                                <button type="button"
+                                                        class="button button--download button--ico download-file"
+                                                        data-url="{{ project.reviewed_file }}">
+                                                    <span>{% trans "Post-edited" %}</span>
+                                                </button>
+                                            </li>
+                                            <li class="option" value="">
+                                                <button type="button"
+                                                        class="button button--download button--ico download-file"
+                                                        data-url="{{ project.translated_file }}">
+                                                    <span>{% trans "Pretranslated" %}</span>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
+                                {% elif project.translated_file %}
+                                <button type="button" class="button button--download button--ico download-file"
+                                        data-url="{{ project.translated_file }}">
+                                    <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <g clip-path="url(#clip0_2624_14289)">
+                                            <path d="M15.2188 7.71875C14.7875 7.71875 14.4375 8.06875 14.4375 8.5C14.4375 12.05 11.55 14.9375 8 14.9375C4.45 14.9375 1.5625 12.05 1.5625 8.5C1.5625 8.06875 1.2125 7.71875 0.78125 7.71875C0.35 7.71875 0 8.06875 0 8.5C0 10.6375 0.83125 12.6469 2.34375 14.1562C3.85625 15.6687 5.8625 16.5 8 16.5C10.1375 16.5 12.1469 15.6687 13.6562 14.1562C15.1687 12.6438 16 10.6375 16 8.5C16 8.06875 15.65 7.71875 15.2188 7.71875Z"
+                                                  fill="#456B84"/>
+                                            <path d="M6.92793 11.2375C7.21543 11.525 7.59668 11.6812 7.9998 11.6812C8.40605 11.6812 8.7873 11.5219 9.07168 11.2375L11.0373 9.27187C11.3436 8.96562 11.3436 8.47187 11.0373 8.16562C10.7311 7.85937 10.2373 7.85937 9.93105 8.16562L8.78105 9.31875V1.28125C8.78105 0.85 8.43105 0.5 7.9998 0.5C7.56855 0.5 7.21855 0.85 7.21855 1.28125V9.31875L6.06543 8.16562C5.75918 7.85937 5.26543 7.85937 4.95918 8.16562C4.65293 8.47187 4.65293 8.96562 4.95918 9.27187L6.92793 11.2375Z"
+                                                  fill="#456B84"/>
+                                        </g>
+                                        <defs>
+                                            <clipPath id="clip0_2624_14289">
+                                                <rect width="16" height="16" fill="white"
+                                                      transform="translate(0 0.5)"/>
+                                            </clipPath>
+                                        </defs>
+                                    </svg>
+                                </button>
                                 {% endif %}
-                            </td>
-                            <td class="action">
                                 <button type="button" class="button button--download button--ico delete-button"
                                         data-project-id="{{ project.id }}">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -200,7 +225,6 @@
                                         <path d="M2.5 2.625C2.2239 2.625 2 2.8489 2 3.125C2 3.4011 2.2239 3.625 2.5 3.625H3V12.825C3 13.955 3.92 14.875 5.05 14.875H10.95C12.08 14.875 13 13.955 13 12.825V3.625H13.5C13.7761 3.625 14 3.4011 14 3.125C14 2.8489 13.7761 2.625 13.5 2.625H12.5H3.5H2.5ZM12 3.625V12.825C12 13.405 11.53 13.875 10.95 13.875H5.05C4.47 13.875 4 13.405 4 12.825V3.625H12Z"
                                               fill="#176C77"/>
                                     </svg>
-                                    <span>{% trans "Delete" %}</span>
                                 </button>
                             </td>
                         </tr>
@@ -249,7 +273,7 @@
                <img src="{% static 'images/ico-close-modal.svg' %}" alt="Close">
             </span>
             <div class="modal__text">
-                <p>You are about to delete the project. Are you sure?</p>
+                <p>Are you sure? Deleted projects cannot be recovered.</p>
             </div>
             <div class="modal__buttons">
                 <button class="button button--transparent cancel-delete">Cancel</button>
@@ -281,10 +305,6 @@
     </div>
 </div>
 
-<script>
-    var languages = {{ languages|safe }}
-</script>
-
 <script src="{% static 'js/jquery.fancybox.min.js' %}"></script>
 <script src="{% static 'js/upload.js' %}"></script>
 <script src="{% static 'js/download.js' %}"></script>
@@ -296,3 +316,4 @@
 
 </body>
 </html>
+
