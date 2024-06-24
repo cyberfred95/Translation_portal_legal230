@@ -35,21 +35,27 @@ document.addEventListener('DOMContentLoaded', function () {
         switch (status) {
             case 'Being translated':
                 span.classList.add('being-translated');
+                span.innerHTML = current_language === 'fr' ? 'En cours de traduction' : 'Being translated';
                 break;
             case 'Translated':
                 span.classList.add('translated');
+                span.innerHTML = current_language === 'fr' ? 'Traduit de l\'anglais' : 'Translated';
                 break;
             case 'Sent to post-editing, not accepted yet':
                 span.classList.add('sent-to-post-editing-not-accepted');
+                span.innerHTML = current_language === 'fr' ? 'Envoyé en post-édition, pas encore accepté' : 'Sent to post-editing, not accepted yet';
                 break
             case 'Sent to post-editing, accepted':
                 span.classList.add('sent-to-post-editing-accepted');
+                span.innerHTML = current_language === 'fr' ? 'Envoyé en post-édition, accepté' : 'Sent to post-editing, accepted';
                 break
             case 'Post-edited file uploaded':
                 span.classList.add('post-edited');
+                span.innerHTML = current_language === 'fr' ? 'Fichier post-édité téléchargé' : 'Post-edited file uploaded';
                 break
             case 'Error':
                 span.classList.add('error');
+                span.innerHTML = current_language === 'fr' ? 'Erreur' : 'Error';
                 break;
         }
     });
