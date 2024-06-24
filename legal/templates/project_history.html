@@ -305,6 +305,10 @@
     </div>
 </div>
 
+<script>
+    var current_language = {{ request.LANGUAGE_CODE | safe }}
+</script>
+
 <script src="{% static 'js/jquery.fancybox.min.js' %}"></script>
 <script src="{% static 'js/upload.js' %}"></script>
 <script src="{% static 'js/download.js' %}"></script>
