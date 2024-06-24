@@ -285,3 +285,12 @@ msgstr "Attention ! La qualité de votre document affecte le résultat de la tra
 
 msgid "Expert revision"
 msgstr "Envoyer le résultat de la traduction à un expert pour révision"
+
+msgid "Post-editing is completed!"
+msgstr "La post-édition est terminée !"
+
+msgid "Go to project history"
+msgstr "Accéder à l'historique du projet"
+
+msgid "review"
+msgstr "Une fois l'examen terminé, vous recevrez un fichier mis à jour en pièce jointe par l'intermédiaire de l'adresse électronique utilisée lors de la connexion."

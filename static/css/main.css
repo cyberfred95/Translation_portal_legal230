@@ -2239,10 +2239,33 @@ body {
 
 .loader-description {
     display: none;
-    color: #476C83;
     margin-top: 10px;
     font-size: 14px;
     font-weight: 500;
+}
+
+.loader-title {
+    margin-top: 10px;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 29px;
+    margin-bottom: 10px;
+    color: #000000;
+}
+
+.download-file {
+    width: 100%;
+}
+
+.translate__file-translated {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    color: #000000;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 29px;
 }
 
 .post-edit {
@@ -2493,4 +2516,11 @@ body {
     visibility: visible;
     opacity: 1;
 }
+
+.post-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 

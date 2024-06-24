@@ -342,8 +342,9 @@
                                 </div>
 
                             <div class="translate__file-block trans-progress">
-                                <div class="translate__file-title">
-                                    <span>{% trans "Translation in progress..." %}</span>
+                                <div class="translate__file-translated">
+                                    <span id="loader_text" class="loader-title">{% trans "Translation in progress..." %}</span>
+                                    <span id="loader_description" class="loader-description">{% trans "review" %}</span>
                                 </div>
                                 <div class="translate__file-ico">
                                 </div>
@@ -390,6 +391,36 @@
                                         </div>
                                     </div>
                                     <a href="" class="btn_reset">{% trans "Translate another file" %}</a>
+                                </div>
+                                <div class="translate__file-block post-edit">
+                                    <div class="translate__file-translated">
+                                        <span>{% trans "Post-editing is completed!" %}</span>
+                                    </div>
+                                    <div class="download-buttons complete">
+                                        <button type="button"
+                                                class="button button--secondary button--transparent button--ico download-file"
+                                                data-url="{{ project.reviewed_file }}">
+                                            <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
+                                                 xmlns="http://www.w3.org/2000/svg">
+                                                <g clip-path="url(#clip0_2624_14289)">
+                                                    <path d="M15.2188 7.71875C14.7875 7.71875 14.4375 8.06875 14.4375 8.5C14.4375 12.05 11.55 14.9375 8 14.9375C4.45 14.9375 1.5625 12.05 1.5625 8.5C1.5625 8.06875 1.2125 7.71875 0.78125 7.71875C0.35 7.71875 0 8.06875 0 8.5C0 10.6375 0.83125 12.6469 2.34375 14.1562C3.85625 15.6687 5.8625 16.5 8 16.5C10.1375 16.5 12.1469 15.6687 13.6562 14.1562C15.1687 12.6438 16 10.6375 16 8.5C16 8.06875 15.65 7.71875 15.2188 7.71875Z"
+                                                          fill="#176C77"/>
+                                                    <path d="M6.92793 11.2375C7.21543 11.525 7.59668 11.6812 7.9998 11.6812C8.40605 11.6812 8.7873 11.5219 9.07168 11.2375L11.0373 9.27187C11.3436 8.96562 11.3436 8.47187 11.0373 8.16562C10.7311 7.85937 10.2373 7.85937 9.93105 8.16562L8.78105 9.31875V1.28125C8.78105 0.85 8.43105 0.5 7.9998 0.5C7.56855 0.5 7.21855 0.85 7.21855 1.28125V9.31875L6.06543 8.16562C5.75918 7.85937 5.26543 7.85937 4.95918 8.16562C4.65293 8.47187 4.65293 8.96562 4.95918 9.27187L6.92793 11.2375Z"
+                                                          fill="#176C77"/>
+                                                </g>
+                                                <defs>
+                                                    <clipPath id="clip0_2624_14289">
+                                                        <rect width="16" height="16" fill="white"
+                                                              transform="translate(0 0.5)"/>
+                                                    </clipPath>
+                                                </defs>
+                                            </svg>
+                                            <span>{% trans "Download post-edited file" %}</span>
+                                        </button>
+                                    </div>
+                                    <a href="{% url 'project_history' %}#tabs-3" class="no-taі">{% trans "Go to project history" %}</a>
+                                    <a href="" class="btn_reset">{% trans "Translate another file" %}</a>
+
                                 </div>
                             </div>
                             <div class="translate__form-submit uploaded">
