@@ -306,7 +306,7 @@
 </div>
 
 <script>
-    var current_language = {{ request.LANGUAGE_CODE | safe }}
+    var current_language = "{{ request.LANGUAGE_CODE | safe }}"
 </script>
 
 <script src="{% static 'js/jquery.fancybox.min.js' %}"></script>

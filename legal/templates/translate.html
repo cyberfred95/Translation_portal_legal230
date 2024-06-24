@@ -565,7 +565,7 @@
 <script>
     var templates = {{ templates|safe }}
     var languages = {{ languages|safe }}
-    var current_language = {{ request.LANGUAGE_CODE | safe }}
+    var current_language = "{{ request.LANGUAGE_CODE | safe }}"
     var expert_revision_url = "{% url 'expert_revision' %}"
     var expert_revision_file_url = "{% url 'expert_revision_file' %}"
     var gpt_process = "{% url 'gpt_process' %}"
