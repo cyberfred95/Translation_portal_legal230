@@ -344,7 +344,7 @@
                             <div class="translate__file-block trans-progress">
                                 <div class="translate__file-translated">
                                     <span id="loader_text" class="loader-title">{% trans "Translation in progress..." %}</span>
-                                    <span id="loader_description" class="loader-description">Once the review is completed, you will receive an updated file in an attachment via email used when logging in.</span>
+                                    <span id="loader_description" class="loader-description">{% trans "review" %}</span>
                                 </div>
                                 <div class="translate__file-ico">
                                 </div>
@@ -419,6 +419,8 @@
                                         </button>
                                     </div>
                                     <a href="{% url 'project_history' %}#tabs-3" class="no-taі">{% trans "Go to project history" %}</a>
+                                    <a href="" class="btn_reset">{% trans "Translate another file" %}</a>
+
                                 </div>
                             </div>
                             <div class="translate__form-submit uploaded">

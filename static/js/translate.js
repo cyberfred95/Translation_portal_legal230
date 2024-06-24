@@ -555,9 +555,9 @@ $(document).ready(function () {
                     $('#download_result').on('click', () => downloadResult(response.translated_file))
                     $('#expert_revision_document').on('click', () => sendDocument(response.translated_file, response.id));
                 } else if (response.status === 'Sent to post-editing, not accepted yet') {
-                    document.getElementById('loader_text').innerText = "File for post-editing sent to a translator, waiting for confirmation of task acceptance.";
+                    document.getElementById('loader_text').innerText = current_language === "en" ? "File for post-editing sent to a translator, waiting for confirmation of task acceptance." : "Fichier de post-édition envoyé à un traducteur, en attente de la confirmation de l'acceptation de la tâche.";
                 } else if (response.status === 'Sent to post-editing, accepted') {
-                    document.getElementById('loader_text').innerText = "Post-editing task has been accepted by the translator, proofreading is in progress.";
+                    document.getElementById('loader_text').innerText =  current_language === "en" ? "Post-editing task has been accepted by the translator, proofreading is in progress." : "Le travail de post-édition a été accepté par le traducteur, la relecture est en cours.";
                     document.getElementById('loader_description').style.display = 'block';
                 } else if (response.status === 'Post-edited file uploaded') {
                     clearInterval(intervalId);
