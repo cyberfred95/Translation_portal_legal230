@@ -991,7 +991,6 @@ body {
 
 
 .button {
-    position: relative;
     padding: 10px 26px;
     display: flex;
     align-items: center;
@@ -1007,6 +1006,13 @@ body {
     line-height: 20px;
     transition: background-color var(--transition), border-color var(--transition), color var(--transition);
     cursor: pointer;
+}
+#expert_revision {
+    position: relative;
+}
+
+#expert_revision_document {
+    position: relative;
 }
 
 .button.expert--revision {
@@ -2476,14 +2482,14 @@ body {
     padding: 5px 0;
     position: absolute;
     z-index: 1;
-    bottom: 100%;
-    right: -50%;
+    bottom: 130%;
+    left: 50%;
     transform: translateX(-50%);
     opacity: 0;
     transition: opacity 0.5s;
 }
 
-.button:hover .tooltiptext {
+.revision-icon:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
 }
