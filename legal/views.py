@@ -53,11 +53,10 @@ def file_translate(request):
     )
 
     project_id = response.json().get('id')
+    time.sleep(0.1)
     res = requests.get(CLOUDSTORAGE_API_URL + f"{project_id}/",
                        headers={
                            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-    time.sleep(0.1)
-
     send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
                           template_name=request.POST.get('template_name'), file_name=request.FILES["document"].name,
                           file_ext=os.path.splitext(request.FILES["document"].name)[1])
@@ -86,6 +85,8 @@ class TranslateView(TemplateView):
         return user_prompts
 
     def get_translation_templates(self):
+        if not self.request.user.is_staff and not self.request.user.group:
+            return HttpResponseBadRequest({"message": "You have to be staff or to be in group"})
         templates = dict()
         response = requests.post(
             CUSTOM_MT_CONSOLE_URL + "get-templates",
@@ -111,7 +112,8 @@ class TranslateView(TemplateView):
         return templates
 
     def post(self, request):
-
+        if not request.user.is_staff and not request.user.group:
+            return HttpResponseBadRequest({"message": "You have to be staff or to be in group"})
         if request.POST.get('action') == 'text_translate':
             return JsonResponse(text_translation(request))
         elif request.POST.get('action') == 'file_translate':
@@ -122,6 +124,8 @@ class TranslateView(TemplateView):
 class GetTemplatesView(APIView):
 
     def get(self, request):
+        if not request.user.is_staff and not request.user.group:
+            return Response({"message": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
         if 'source_language' not in self.request.query_params or 'target_language' not in self.request.query_params:
             return Response({"message": "Missing source language or target language"},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -141,14 +145,19 @@ class GetTemplatesView(APIView):
 @csrf_exempt
 @api_view(['POST'])
 def expert_revision(request):
-    text = request.POST['result']
-    send_expert_revision_text(user_id=request.user.id, text=text)
+    send_expert_revision_text(
+        user_id=request.user.id,
+        text=request.POST['result'],
+        source_text=request.POST['source_text']
+    )
     return JsonResponse({})
 
 
 @csrf_exempt
 @api_view(['POST'])
 def expert_revision_file(request):
+    if not request.user.is_staff and not request.user.group:
+        return Response({"message": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
     project_id = request.POST['project_id']
     project = requests.get(
         CLOUDSTORAGE_API_URL + f"{project_id}/",
@@ -157,10 +166,6 @@ def expert_revision_file(request):
         }
 
     ).json()
-    send_expert_revision_file(
-        user_id=request.user.id,
-        source_file_url=project.get('source_file'),
-        translated_file_url=project.get('translated_file'))
     response = requests.post(
         CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
         headers={

@@ -1,6 +1,15 @@
-<p>Dear {{ user_name}},</p>
+<p>Dear {{ user_name }},</p>
 <p>{{ sender_username }} has sent this text for expert revision.</p>
-{% if text  %}<p>{{ text }}</p>{% endif %}
+
+{% if source_text %}
+    <p>Source text:</p>
+    <p>{{ source_text }}</p>
+{% endif %}
+
+{% if text %}
+    <p>Translated text</p>
+    <p>{{ text }}</p>
+{% endif %}
 {% if template_name %}<p>Template used: {{ template_name }}</p>{% endif %}
 <p>Thank you and kind regards</p>
 <p>Legal 230 Portal</p>

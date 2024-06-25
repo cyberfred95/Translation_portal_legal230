@@ -15,6 +15,7 @@ class CustomUserAdmin(UserAdmin):
         }),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
+    readonly_fields = ['uuid']
 
 
 # Register the User model with the custom admin class
