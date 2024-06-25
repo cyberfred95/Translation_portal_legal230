@@ -28,6 +28,8 @@ class GPTProcessingView(TemplateView):
 @api_view(['POST'])
 def gpt_process(request):
     data = request.data
+    if not request.user.is_staff and not request.user.group:
+        return Response({"message": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
     prompt = get_prompt(request)
     response = requests.post(
         url='https://console.custom.mt/gpt-processing/foreign_gpt_process/',
