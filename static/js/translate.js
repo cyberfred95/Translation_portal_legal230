@@ -405,15 +405,12 @@ $(document).ready(function () {
                 'Accept': 'application/json',
             },
             dataType: 'json',
-            success: function (response) {
-                console.log(123);
-                if (response.message = 'Sent to post editing') {
-                    console.log(123);
-                    let intervalId = setInterval(() => {
-                        checkDocument(id, intervalId, true);
-                    }, 10000);
-                    checkDocument(id, intervalId, true);
-                }
+            success: function () {
+                $('.translate__file-block').hide();
+                $('.output-type').hide();
+                $('.translate__file-block.complete').css('display', 'flex')
+                $('#expert_revision_document').addClass('expert--revision');
+                successHandler();
             },
             error: function (xhr, status, error) {
                 errorHandler(error);
@@ -547,24 +544,12 @@ $(document).ready(function () {
             },
             success: function (response) {
                 if (response.status === 'Translated' && !isPostEditing) {
-                    console.log('response', response)
                     clearInterval(intervalId);
                     $('.translate__file-block').hide();
                     $('.output-type').hide();
                     $('.translate__file-block.complete').css('display', 'flex')
                     $('#download_result').on('click', () => downloadResult(response.translated_file))
-                    $('#expert_revision_document').on('click', () => sendDocument(response.translated_file, response.id));
-                } else if (response.status === 'Sent to post-editing, not accepted yet') {
-                    document.getElementById('loader_text').innerText = "File for post-editing sent to a translator, waiting for confirmation of task acceptance.";
-                } else if (response.status === 'Sent to post-editing, accepted') {
-                    document.getElementById('loader_text').innerText = "Post-editing task has been accepted by the translator, proofreading is in progress.";
-                    document.getElementById('loader_description').style.display = 'block';
-                } else if (response.status === 'Post-edited file uploaded') {
-                    clearInterval(intervalId);
-                    $('.translate__file-block').hide();
-                    $('.translate__file-block.post-edit').css('display', 'flex')
-                    var downloadButton = document.querySelector('.download-file');
-                    downloadButton.setAttribute('data-url', response?.reviewed_file);
+                    $('#expert_revision_document').off('click').on('click', () => sendDocument(response.translated_file, response.id));
                 } else if (response.status === 'Error') {
                     errorHandler();
                 }
@@ -574,21 +559,6 @@ $(document).ready(function () {
             }
         });
     }
-
-    var downloadButtons = document.querySelectorAll('.download-file');
-    downloadButtons.forEach(function (button) {
-        button.addEventListener('click', function () {
-            var url = this.getAttribute('data-url');
-            if (url) {
-                var a = document.createElement('A');
-                a.href = url;
-                a.download = url.substr(url.lastIndexOf('/') + 1);
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            }
-        });
-    });
 
     function formFileHandler(e) {
         e.preventDefault();
@@ -756,7 +726,7 @@ $(document).ready(function () {
                         option.addClass('option');
                         option.attr('data-value', i.template_name);
                         option.text(i.template_name);
-                        console.log(i.template_name)
+
                         if (index === 0) {
                             option.addClass('selected');
                             tab.find('.output_value[name="template_name"]').val(i.template_name);

@@ -2517,10 +2517,4 @@ body {
     opacity: 1;
 }
 
-.post-edit {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
 
