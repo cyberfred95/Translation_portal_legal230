@@ -2,13 +2,11 @@
 <p>{{ sender_username }} has sent this text for expert revision.</p>
 
 {% if source_text %}
-    <p>Source text:</p>
-    <p>{{ source_text }}</p>
+    <p>Source text: {{ source_text }}</p>
 {% endif %}
 
 {% if text %}
-    <p>Translated text:</p>
-    <p>{{ text }}</p>
+    <p>Translated text:{{ text }}</p>
 {% endif %}
 {% if template_name %}<p>Template used: {{ template_name }}</p>{% endif %}
 <p>Thank you and kind regards</p>
