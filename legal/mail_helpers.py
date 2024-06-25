@@ -10,6 +10,7 @@ def send_text_translation(
         user_id,
         template_name=None,
         file_ext=None,
+        source_text=None,
         text=None,
         action=None,
         theme='Text translation',
@@ -21,7 +22,7 @@ def send_text_translation(
 
 ):
     user = User.objects.get(pk=user_id)
-    users_to_send = User.objects.filter(is_staff=True, email__isnull=True).all()
+    users_to_send = User.objects.filter(is_staff=True, email__isnull=False).all()
 
     sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
 
@@ -36,6 +37,7 @@ def send_text_translation(
                     "user_name": preferences.MainSettings.sender_email,
                     "text": text,
                     "template_name": template_name,
+                    'source_text': source_text,
                     "sender_username": user.username,
                     "file_ext": file_ext,
                     "source_file_url": source_file_url,
@@ -85,10 +87,11 @@ def send_gpt_processing(user_id, text):
     send_text_translation(user_id=user_id, text=text, theme='GPT Processing')
 
 
-def send_expert_revision_text(user_id, text):
+def send_expert_revision_text(user_id, text, source_text):
     send_text_translation(
         user_id=user_id,
         text=text,
+        source_text=source_text,
         theme='Revision request for Text translation',
         template="expert_revision_text.html",
         action="expert_revision",

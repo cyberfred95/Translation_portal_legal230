@@ -53,11 +53,10 @@ def file_translate(request):
     )
 
     project_id = response.json().get('id')
+    time.sleep(0.1)
     res = requests.get(CLOUDSTORAGE_API_URL + f"{project_id}/",
                        headers={
                            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-    time.sleep(0.1)
-
     send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
                           template_name=request.POST.get('template_name'), file_name=request.FILES["document"].name,
                           file_ext=os.path.splitext(request.FILES["document"].name)[1])
@@ -146,8 +145,11 @@ class GetTemplatesView(APIView):
 @csrf_exempt
 @api_view(['POST'])
 def expert_revision(request):
-    text = request.POST['result']
-    send_expert_revision_text(user_id=request.user.id, text=text)
+    send_expert_revision_text(
+        user_id=request.user.id,
+        text=request.POST['result'],
+        source_text=request.POST['source_text']
+    )
     return JsonResponse({})
 
 
@@ -164,10 +166,6 @@ def expert_revision_file(request):
         }
 
     ).json()
-    send_expert_revision_file(
-        user_id=request.user.id,
-        source_file_url=project.get('source_file'),
-        translated_file_url=project.get('translated_file'))
     response = requests.post(
         CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
         headers={
