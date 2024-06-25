@@ -39,23 +39,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 break;
             case 'Translated':
                 span.classList.add('translated');
-                span.innerHTML = current_language === 'fr' ? 'Traduit de l\'anglais' : 'Translated';
+                span.innerHTML = current_language === 'fr' ? 'Traduit' : 'Translated';
                 break;
             case 'Sent to post-editing, not accepted yet':
                 span.classList.add('sent-to-post-editing-not-accepted');
-                span.innerHTML = current_language === 'fr' ? 'Envoyé en post-édition, pas encore accepté' : 'Sent to post-editing, not accepted yet';
+                span.innerHTML = current_language === 'fr' ? 'Demande de post-édition envoyée' : 'Request for post-editing sent';
                 break
             case 'Sent to post-editing, accepted':
                 span.classList.add('sent-to-post-editing-accepted');
-                span.innerHTML = current_language === 'fr' ? 'Envoyé en post-édition, accepté' : 'Sent to post-editing, accepted';
+                span.innerHTML = current_language === 'fr' ? 'Demande de post-édition acceptée' : 'Request for post-editing accepted';
                 break
             case 'Post-edited file uploaded':
                 span.classList.add('post-edited');
-                span.innerHTML = current_language === 'fr' ? 'Fichier post-édité téléchargé' : 'Post-edited file uploaded';
+                span.innerHTML = current_language === 'fr' ? ' Document post-édité' : 'Post-edited file uploaded';
                 break
             case 'Error':
                 span.classList.add('error');
-                span.innerHTML = current_language === 'fr' ? 'Erreur' : 'Error';
+                span.innerHTML = current_language === 'fr' ? 'Oups ! Erreur' : 'Error';
                 break;
         }
     });

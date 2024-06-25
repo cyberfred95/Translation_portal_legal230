@@ -58,7 +58,7 @@ def file_translate(request):
                            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
     time.sleep(0.1)
 
-    send_file_translation(user_id=request.user.id, file_url=res.json().get('source_file'),
+    send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
                           template_name=request.POST.get('template_name'), file_name=request.FILES["document"].name,
                           file_ext=os.path.splitext(request.FILES["document"].name)[1])
     return response.json()
@@ -123,18 +123,20 @@ class GetTemplatesView(APIView):
 
     def get(self, request):
         if 'source_language' not in self.request.query_params or 'target_language' not in self.request.query_params:
-            return Response({"message":"Missing source language or target language"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Missing source language or target language"},
+                            status=status.HTTP_400_BAD_REQUEST)
         response = requests.post(
             CUSTOM_MT_CONSOLE_URL + "get-templates",
             data={
-                    "source_language": self.request.query_params['source_language'].lower(),
-                    "target_language": self.request.query_params['target_language'].lower()
-                },
+                "source_language": self.request.query_params['source_language'].lower(),
+                "target_language": self.request.query_params['target_language'].lower()
+            },
             headers={
                 'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
             }
         )
         return Response(response.json(), status=status.HTTP_200_OK)
+
 
 @csrf_exempt
 @api_view(['POST'])
@@ -147,8 +149,18 @@ def expert_revision(request):
 @csrf_exempt
 @api_view(['POST'])
 def expert_revision_file(request):
-    file_url = request.POST.get('file_url')
-    send_expert_revision_file(user_id=request.user.id, file_url=file_url)
+    project_id = request.POST['project_id']
+    project = requests.get(
+        CLOUDSTORAGE_API_URL + f"{project_id}/",
+        headers={
+            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+        }
+
+    ).json()
+    send_expert_revision_file(
+        user_id=request.user.id,
+        source_file_url=project.get('source_file'),
+        translated_file_url=project.get('translated_file'))
     response = requests.post(
         CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
         headers={

@@ -726,7 +726,7 @@ $(document).ready(function () {
                         option.addClass('option');
                         option.attr('data-value', i.template_name);
                         option.text(i.template_name);
-
+                        console.log(i.template_name)
                         if (index === 0) {
                             option.addClass('selected');
                             tab.find('.output_value[name="template_name"]').val(i.template_name);

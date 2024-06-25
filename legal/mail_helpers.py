@@ -15,7 +15,8 @@ def send_text_translation(
         theme='Text translation',
         attachment=None,
         file_name=None,
-        file_url=None,
+        source_file_url=None,
+        translated_file_url=None,
         template="text_email.html"
 
 ):
@@ -37,7 +38,8 @@ def send_text_translation(
                     "template_name": template_name,
                     "sender_username": user.username,
                     "file_ext": file_ext,
-                    "file_url": file_url
+                    "source_file_url": source_file_url,
+                    "translated_file_url": translated_file_url,
                 }
             )
         )
@@ -58,7 +60,8 @@ def send_text_translation(
                         "template_name": template_name,
                         "sender_username": user.username,
                         "file_ext": file_ext,
-                        "file_url": file_url
+                        "source_file_url": source_file_url,
+                        "translated_file_url": translated_file_url,
                     }
                 )
             )
@@ -73,8 +76,8 @@ def send_text_translation(
             sg.send(message)
 
 
-def send_file_translation(user_id, file_url, file_name, file_ext, template_name):
-    send_text_translation(user_id=user_id, theme='File translation', file_url=file_url, file_name=file_name,
+def send_file_translation(user_id, source_file_url, file_name, file_ext, template_name):
+    send_text_translation(user_id=user_id, theme='File translation', source_file_url=source_file_url, file_name=file_name,
                           template_name=template_name, file_ext=file_ext, template='file_email.html')
 
 
@@ -93,11 +96,12 @@ def send_expert_revision_text(user_id, text):
     )
 
 
-def send_expert_revision_file(user_id, file_url):
+def send_expert_revision_file(user_id, source_file_url, translated_file_url):
     send_text_translation(
         user_id=user_id,
         theme='Revision request for File translation',
         template="expert_revision_email.html",
-        file_url=file_url,
+        source_file_url=source_file_url,
+        translated_file_url=translated_file_url,
         action="expert_revision"
     )

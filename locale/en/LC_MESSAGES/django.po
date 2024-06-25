@@ -285,3 +285,12 @@ msgstr "Important! The quality of your document will have an impact on translati
 
 msgid "Expert revision"
 msgstr "Send translation result to an expert for review"
+
+msgid "Post-editing is completed!"
+msgstr "Post-editing is completed!"
+
+msgid "Go to project history"
+msgstr "Go to project history"
+
+msgid "review"
+msgstr "Once the review is completed, you will receive an updated file in an attachment via email used when logging in."
