@@ -446,6 +446,7 @@ $(document).ready(function () {
         e.preventDefault();
         let form = $(this);
         let text = form.find('[name="text"]');
+
         let btn = form.find('[type=submit]');
         let url = form.attr('action')
         let formData = new FormData(form[0]);
@@ -489,8 +490,11 @@ $(document).ready(function () {
 
     function expertRevision(e) {
         e.preventDefault();
+
         let resultTextArea = $('#result_text');
+        let sourceTextArea = $('#translation_text');
         let resultData = resultTextArea.val();
+        let sourceData = sourceTextArea.val();
         let url = expert_revision_url;
 
         preloader.fadeIn(300);
@@ -498,7 +502,7 @@ $(document).ready(function () {
         $.ajax({
             type: 'POST',
             url: url,
-            data: {result: resultData},
+            data: {result: resultData, source_text: sourceData},
             dataType: 'json',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
@@ -726,7 +730,7 @@ $(document).ready(function () {
                         option.addClass('option');
                         option.attr('data-value', i.template_name);
                         option.text(i.template_name);
-                        console.log(i.template_name)
+
                         if (index === 0) {
                             option.addClass('selected');
                             tab.find('.output_value[name="template_name"]').val(i.template_name);
