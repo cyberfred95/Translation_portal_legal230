@@ -22,7 +22,7 @@ def send_text_translation(
 
 ):
     user = User.objects.get(pk=user_id)
-    users_to_send = User.objects.filter(is_staff=True, email__isnull=False).all()
+    users_to_send = User.objects.filter(is_staff=True, email__isnull=False)
     print(users_to_send)
 
     sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
