@@ -9,14 +9,15 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-04 13:35+0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2024-07-03 17:56+0300\n"
+"Last-Translator:   <vjxzebra@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Translated-Using: django-rosetta 0.9.7\n"
 
 #: legal/settings.py:132 legal/templates/translate.html:102
 msgid "English"
@@ -238,24 +239,23 @@ msgstr "Success"
 msgid "Request has been successfully"
 msgstr "Your request has been sent successfully"
 
-
 #: legal/templates/translate.html:88
 msgid "Writing"
 msgstr "Writing"
 
-#legal/templates/translate.html:102
+#: legal/templates/translate.html:102
 msgid "Project history"
 msgstr "Project history"
 
-#legal/templates/project_history:119
+#: legal/templates/project_history:119
 msgid "Username"
 msgstr "Username"
 
-#legal/templates/project_history:123
+#: legal/templates/project_history:123
 msgid "Created"
 msgstr "Created"
 
-#legal/templates/project_history:122
+#: legal/templates/project_history:122
 msgid "Status"
 msgstr "Status"
 

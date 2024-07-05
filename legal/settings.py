@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+
+from celery.schedules import crontab
 from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -38,7 +40,8 @@ INSTALLED_APPS = [
     'settings.apps.SettingsConfig',
     'preferences',
     'users.apps.UsersConfig',
-    'languages.apps.LanguagesConfig'
+    'languages.apps.LanguagesConfig',
+    'domains.apps.DomainsConfig',
 ]
 
 STATICFILES_FINDERS = (
@@ -197,7 +200,18 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
 CELERY_ALWAYS_EAGER = bool(os.environ.get("CELERY_ALWAYS_EAGER", False))
+
+
+CELERY_BEAT_SCHEDULE = {
+    'update_domains':{
+        'task': 'domains.tasks.update_domains',
+        'schedule': crontab(minute="0", hour="0")
+    }
+}
+
 OPENAI_GPT_API_KEY = 'REMOVED_OPENAI_KEY_1'
 SENDGRID_API_KEY = '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'
 
 AUTH_USER_MODEL = 'users.User'
+
+ROSETTA_SHOW_AT_ADMIN_PANEL = True

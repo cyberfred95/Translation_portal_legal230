@@ -10,6 +10,7 @@ from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpRespo
 import django
 from rest_framework.views import APIView
 
+from domains.models import Domain
 from languages.models import Language
 from users.models import User
 from .credentials import languages
@@ -140,6 +141,29 @@ class GetTemplatesView(APIView):
             }
         )
         return Response(response.json(), status=status.HTTP_200_OK)
+
+
+class GetDomainsView(APIView):
+
+    def get(self, request):
+        if 'source_language' not in self.request.query_params or 'target_language' not in self.request.query_params:
+            return Response({"message": "Missing source language or target language"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        domains = requests.post(
+            CUSTOM_MT_CONSOLE_URL + "get-domains",
+            data={
+                "source_language": self.request.query_params['source_language'].lower(),
+                "target_language": self.request.query_params['target_language'].lower()
+            },
+            headers={
+                'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
+            }
+        )
+        domain_names = []
+
+        for domain in domains.json():
+            domain_names.append(domain['domain_name'])
+        return Response({"data": domains}, status=status.HTTP_200_OK)
 
 
 @csrf_exempt
