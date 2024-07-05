@@ -243,19 +243,19 @@ msgstr "Votre demande a été transmise"
 msgid "Writing"
 msgstr "Personnaliser un document"
 
-#legal/templates/translate.html:102
+#: legal/templates/translate.html:102
 msgid "Project history"
 msgstr "Mon historique"
 
-#legal/templates/project_history:119
+#: legal/templates/project_history:119
 msgid "Username"
 msgstr "Utilisateur"
 
-#legal/templates/project_history:123
+#: legal/templates/project_history:123
 msgid "Created"
 msgstr "Date de création"
 
-#legal/templates/project_history:122
+#: legal/templates/project_history:122
 msgid "Status"
 msgstr "Statut"
 
