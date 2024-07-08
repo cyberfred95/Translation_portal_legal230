@@ -683,7 +683,7 @@ $(document).ready(function () {
         box.addEventListener("click", function (event) {
             if (event.target.classList.contains('option')) {
                 const selectedText = box.querySelector(".selected-text");
-                const hiddenInput = box.closest('form').querySelector("input[name='template_name']");
+                const hiddenInput = box.closest('form').querySelector("input[name='translation_name']");
                 const optionsContainer = box.querySelector(".options-container");
 
                 selectedText.textContent = event.target.textContent;
@@ -708,7 +708,15 @@ $(document).ready(function () {
 
 
     function getTemplates(sourceLanguage, targetLanguage) {
-        let url = `get-templates?source_language=${sourceLanguage}&target_language=${targetLanguage}`;
+        let url
+        const algorithm = translation_algorithm === 'domain';
+
+        if (algorithm) {
+            url = `get-domains?source_language=${sourceLanguage}&target_language=${targetLanguage}`;
+        } else {
+            url = `get-templates?source_language=${sourceLanguage}&target_language=${targetLanguage}`;
+        }
+
 
         $.ajax({
             type: 'GET',
@@ -720,21 +728,30 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
+                console.log('templates', response)
                 $('.translate__tab').each(function () {
                     const tab = $(this);
-                    const optionsContainer = tab.find('.output_value[name="template_name"]').siblings('.select__dropdown').find('ul');
+                    const optionsContainer = tab.find('.output_value[name="translation_name"]').siblings('.select__dropdown').find('ul');
                     optionsContainer.empty();
 
-                    response.forEach((i, index) => {
+                    let result = [];
+
+                    if (algorithm) {
+                        result = JSON.parse(response.data[0]).map(i => {return i?.domain_name});
+                    } else {
+                        result = response.data;
+                    }
+
+                    result.forEach((i, index) => {
                         const option = $('<li></li>');
                         option.addClass('option');
-                        option.attr('data-value', i.template_name);
-                        option.text(i.template_name);
+                        option.attr('data-value', i);
+                        option.text(i);
 
                         if (index === 0) {
                             option.addClass('selected');
-                            tab.find('.output_value[name="template_name"]').val(i.template_name);
-                            tab.find('.output_text.template').val(i.template_name);
+                            tab.find('.output_value[name="translation_name"]').val(i);
+                            tab.find('.output_text.template').val(i);
                         }
 
                         optionsContainer.append(option);
