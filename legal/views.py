@@ -103,7 +103,7 @@ class GetTemplatesView(APIView):
         if 'source_language' not in self.request.query_params or 'target_language' not in self.request.query_params:
             return Response({"message": "Missing source language or target language"},
                             status=status.HTTP_400_BAD_REQUEST)
-        response = requests.post(
+        templates = requests.post(
             CUSTOM_MT_CONSOLE_URL + "get-templates",
             data={
                 "source_language": self.request.query_params['source_language'].lower(),
@@ -113,7 +113,11 @@ class GetTemplatesView(APIView):
                 'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
             }
         )
-        return Response(response.json(), status=status.HTTP_200_OK)
+        template_names = []
+        for template in templates.json():
+            template_names.append(template['template_name'])
+
+        return Response({"data": template_names}, status=status.HTTP_200_OK)
 
 
 class GetDomainsView(APIView):
