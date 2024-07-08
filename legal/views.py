@@ -5,10 +5,11 @@ from urllib.parse import urlparse, unquote
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework.response import Response
 from rest_framework import status
-from django.views.generic import TemplateView, View, DetailView, ListView
-from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound, FileResponse, HttpResponse
+from django.views.generic import TemplateView
+from django.http import JsonResponse, HttpResponseBadRequest
 import django
 from rest_framework.views import APIView
+from .helpers import get_translate_data
 
 from domains.models import Domain
 from languages.models import Language
@@ -16,8 +17,7 @@ from users.models import User
 from .credentials import languages
 from .keys import CUSTOM_MT_CONSOLE_URL, CLOUDSTORAGE_API_URL
 from .mail_helpers import send_expert_revision_text, \
-    send_expert_revision_file, send_file_translation, send_text_translation
-import base64
+    send_file_translation, send_text_translation
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 import requests
@@ -31,7 +31,7 @@ def text_translation(request):
     text = request.POST.get('text')
     response = requests.post(CUSTOM_MT_CONSOLE_URL + "translate", data={
         "text": [text],
-        "template_name": request.POST.get('template_name')
+        **get_translate_data(request),
     }, headers={
         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
     send_text_translation(user_id=request.user.id, text=text, template_name=request.POST.get('template_name'))
@@ -42,7 +42,7 @@ def file_translate(request):
     response = requests.post(
         url=CLOUDSTORAGE_API_URL,
         data={
-            "template_name": request.POST.get('template_name'),
+            **get_translate_data(request),
             "user_custom_mt_token": request.user.uuid,
             "source_language": request.POST.get('source_language')
         },
@@ -59,7 +59,7 @@ def file_translate(request):
                        headers={
                            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
     send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
-                          template_name=request.POST.get('template_name'), file_name=request.FILES["document"].name,
+                          translate_name=request.POST.get('translate_name'), file_name=request.FILES["document"].name,
                           file_ext=os.path.splitext(request.FILES["document"].name)[1])
     return response.json()
 
@@ -71,7 +71,6 @@ class TranslateView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['languages'] = languages
         context['translate_languages'] = Language.objects.all()
-        context['templates'] = self.get_translation_templates()
         context['prompts'] = self.get_prompts()
         return context
 
@@ -85,32 +84,6 @@ class TranslateView(TemplateView):
             user_prompts[prompts] = language_prompts
         return user_prompts
 
-    def get_translation_templates(self):
-        if not self.request.user.is_staff and not self.request.user.group:
-            return HttpResponseBadRequest({"message": "You have to be staff or to be in group"})
-        templates = dict()
-        response = requests.post(
-            CUSTOM_MT_CONSOLE_URL + "get-templates",
-            data={
-                "source_language": "en",
-                "target_language": "fr"
-            },
-            headers={
-                "token": preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key})
-        templates['en_fr'] = response.json()
-
-        response = requests.post(
-            CUSTOM_MT_CONSOLE_URL + "get-templates",
-            data={
-                "source_language": "fr",
-                "target_language": "en"
-            },
-            headers={
-                'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
-            })
-
-        templates['fr_en'] = response.json()
-        return templates
 
     def post(self, request):
         if not request.user.is_staff and not request.user.group:

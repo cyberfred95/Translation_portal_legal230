@@ -44,6 +44,7 @@
         <div class="wrapper">
             <div class="translate__title page-title">
                 <h1>{% trans "Translator" %}</h1>
+                <h1>{{ preferences.MainSettings.algorithm }}</h1>
             </div>
             <div class="translate__tabs" id="tabs">
                 <ul class="translate__nav">
@@ -563,7 +564,7 @@
     </div>
 </div>
 <script>
-    var templates = {{ templates|safe }}
+    var translation_algorithm = "{{ preferences.MainSettings.algorithm | safe }}"
     var languages = {{ languages|safe }}
     var current_language = "{{ request.LANGUAGE_CODE | safe }}"
     var expert_revision_url = "{% url 'expert_revision' %}"
