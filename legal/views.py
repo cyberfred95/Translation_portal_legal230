@@ -34,32 +34,34 @@ def text_translation(request):
         **get_translate_data(request),
     }, headers={
         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-    send_text_translation(user_id=request.user.id, text=text, template_name=request.POST.get('template_name'))
+    send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('translation_name'))
     return response.json()
 
 
 def file_translate(request):
+    data = {**get_translate_data(request),
+            "user_custom_mt_token": request.user.uuid,
+            "source_language": request.POST.get('source_language')}
+    print(data)
+
     response = requests.post(
         url=CLOUDSTORAGE_API_URL,
-        data={
-            **get_translate_data(request),
-            "user_custom_mt_token": request.user.uuid,
-            "source_language": request.POST.get('source_language')
-        },
+
+        data=data,
         headers={
             "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
         files={
             'source_file': request.FILES["document"]
         }
     )
-
+    print(response.json())
     project_id = response.json().get('id')
     time.sleep(0.1)
     res = requests.get(CLOUDSTORAGE_API_URL + f"{project_id}/",
                        headers={
                            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
     send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
-                          translate_name=request.POST.get('translate_name'), file_name=request.FILES["document"].name,
+                          translation_name=request.POST.get('translation_name'), file_name=request.FILES["document"].name,
                           file_ext=os.path.splitext(request.FILES["document"].name)[1])
     return response.json()
 
@@ -137,10 +139,9 @@ class GetDomainsView(APIView):
             }
         )
         domain_names = []
-
         for domain in domains.json():
             domain_names.append(domain['domain_name'])
-        return Response({"data": domains}, status=status.HTTP_200_OK)
+        return Response({"data": domain_names}, status=status.HTTP_200_OK)
 
 
 @csrf_exempt
