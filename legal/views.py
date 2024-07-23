@@ -44,8 +44,7 @@ def file_translate(request):
     print(data)
 
     response = requests.post(
-        url=preferences.MainSettings.CLOUDSTORAGE_API_URL,
-
+        preferences.MainSettings.CLOUDSTORAGE_API_URL,
         data=data,
         headers={
             "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
@@ -53,12 +52,12 @@ def file_translate(request):
             'source_file': request.FILES["document"]
         }
     )
-    print(response.json())
     project_id = response.json().get('id')
     time.sleep(0.1)
     res = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                        headers={
                            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+    print(res.json())
     send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
                           translation_name=request.POST.get('translation_name'),
                           file_name=request.FILES["document"].name,
@@ -105,7 +104,7 @@ class GetTemplatesView(APIView):
             return Response({"message": "Missing source language or target language"},
                             status=status.HTTP_400_BAD_REQUEST)
         templates = requests.post(
-            preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "get-templates",
+            url=preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "get-templates",
             data={
                 "source_language": self.request.query_params['source_language'].lower(),
                 "target_language": self.request.query_params['target_language'].lower()
