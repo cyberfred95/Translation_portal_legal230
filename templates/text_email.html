@@ -1,6 +1,12 @@
-<p>Dear {{ user_name}},</p>
+<p>Dear {{ user_name }},</p>
 <p>{{ sender_username }} has sent the following text for translation:</p>
 {% if text %}<p>{{ text }}</p>{% endif %}
-{% if template_name %}<p>Template used: {{ template_name }}</p>{% endif %}
+{% if translation_name %}
+    {% if preferences.MainSettings.algorithm == preferences.MainSettings.AlgorithmChoices.template %}
+        <p>Template used: {{ translation_name }}</p>
+    {% elif preferences.MainSettings.algorithm == preferences.MainSettings.AlgorithmChoices.domains %}
+        <p>Domain used: {{ translation_name }}</p>
+    {% endif %}
+{% endif %}
 <p>Thank you and kind regards</p>
 <p>Legal 230 Portal</p>

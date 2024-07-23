@@ -5,19 +5,18 @@ from urllib.parse import urlparse, unquote
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework.response import Response
 from rest_framework import status
-from django.views.generic import TemplateView, View, DetailView, ListView
-from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound, FileResponse, HttpResponse
+from django.views.generic import TemplateView
+from django.http import JsonResponse, HttpResponseBadRequest
 import django
 from rest_framework.views import APIView
+from .helpers import get_translate_data
 
 from domains.models import Domain
 from languages.models import Language
 from users.models import User
 from .credentials import languages
-from .keys import CUSTOM_MT_CONSOLE_URL, CLOUDSTORAGE_API_URL
 from .mail_helpers import send_expert_revision_text, \
-    send_expert_revision_file, send_file_translation, send_text_translation
-import base64
+    send_file_translation, send_text_translation
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 import requests
@@ -29,37 +28,39 @@ PAGINATION_PAGE_SIZE = 30
 
 def text_translation(request):
     text = request.POST.get('text')
-    response = requests.post(CUSTOM_MT_CONSOLE_URL + "translate", data={
+    response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translate", data={
         "text": [text],
-        "template_name": request.POST.get('template_name')
+        **get_translate_data(request),
     }, headers={
         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-    send_text_translation(user_id=request.user.id, text=text, template_name=request.POST.get('template_name'))
+    send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('translation_name'))
     return response.json()
 
 
 def file_translate(request):
-    response = requests.post(
-        url=CLOUDSTORAGE_API_URL,
-        data={
-            "template_name": request.POST.get('template_name'),
+    data = {**get_translate_data(request),
             "user_custom_mt_token": request.user.uuid,
-            "source_language": request.POST.get('source_language')
-        },
+            "source_language": request.POST.get('source_language')}
+    print(data)
+
+    response = requests.post(
+        preferences.MainSettings.CLOUDSTORAGE_API_URL,
+        data=data,
         headers={
             "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
         files={
             'source_file': request.FILES["document"]
         }
     )
-
     project_id = response.json().get('id')
     time.sleep(0.1)
-    res = requests.get(CLOUDSTORAGE_API_URL + f"{project_id}/",
+    res = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                        headers={
                            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+    print(res.json())
     send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
-                          template_name=request.POST.get('template_name'), file_name=request.FILES["document"].name,
+                          translation_name=request.POST.get('translation_name'),
+                          file_name=request.FILES["document"].name,
                           file_ext=os.path.splitext(request.FILES["document"].name)[1])
     return response.json()
 
@@ -71,7 +72,6 @@ class TranslateView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['languages'] = languages
         context['translate_languages'] = Language.objects.all()
-        context['templates'] = self.get_translation_templates()
         context['prompts'] = self.get_prompts()
         return context
 
@@ -84,33 +84,6 @@ class TranslateView(TemplateView):
                     {"slug": prompt['slug'], "description": prompt['description'], "name": prompt['name']})
             user_prompts[prompts] = language_prompts
         return user_prompts
-
-    def get_translation_templates(self):
-        if not self.request.user.is_staff and not self.request.user.group:
-            return HttpResponseBadRequest({"message": "You have to be staff or to be in group"})
-        templates = dict()
-        response = requests.post(
-            CUSTOM_MT_CONSOLE_URL + "get-templates",
-            data={
-                "source_language": "en",
-                "target_language": "fr"
-            },
-            headers={
-                "token": preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key})
-        templates['en_fr'] = response.json()
-
-        response = requests.post(
-            CUSTOM_MT_CONSOLE_URL + "get-templates",
-            data={
-                "source_language": "fr",
-                "target_language": "en"
-            },
-            headers={
-                'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
-            })
-
-        templates['fr_en'] = response.json()
-        return templates
 
     def post(self, request):
         if not request.user.is_staff and not request.user.group:
@@ -130,8 +103,8 @@ class GetTemplatesView(APIView):
         if 'source_language' not in self.request.query_params or 'target_language' not in self.request.query_params:
             return Response({"message": "Missing source language or target language"},
                             status=status.HTTP_400_BAD_REQUEST)
-        response = requests.post(
-            CUSTOM_MT_CONSOLE_URL + "get-templates",
+        templates = requests.post(
+            url=preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "get-templates",
             data={
                 "source_language": self.request.query_params['source_language'].lower(),
                 "target_language": self.request.query_params['target_language'].lower()
@@ -140,7 +113,11 @@ class GetTemplatesView(APIView):
                 'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
             }
         )
-        return Response(response.json(), status=status.HTTP_200_OK)
+        template_names = []
+        for template in templates.json():
+            template_names.append(template['template_name'])
+
+        return Response({"data": template_names}, status=status.HTTP_200_OK)
 
 
 class GetDomainsView(APIView):
@@ -150,7 +127,7 @@ class GetDomainsView(APIView):
             return Response({"message": "Missing source language or target language"},
                             status=status.HTTP_400_BAD_REQUEST)
         domains = requests.post(
-            CUSTOM_MT_CONSOLE_URL + "get-domains",
+            preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "get-domains",
             data={
                 "source_language": self.request.query_params['source_language'].lower(),
                 "target_language": self.request.query_params['target_language'].lower()
@@ -160,10 +137,9 @@ class GetDomainsView(APIView):
             }
         )
         domain_names = []
-
         for domain in domains.json():
             domain_names.append(domain['domain_name'])
-        return Response({"data": domains}, status=status.HTTP_200_OK)
+        return Response({"data": domain_names}, status=status.HTTP_200_OK)
 
 
 @csrf_exempt
@@ -184,14 +160,14 @@ def expert_revision_file(request):
         return Response({"message": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
     project_id = request.POST['project_id']
     project = requests.get(
-        CLOUDSTORAGE_API_URL + f"{project_id}/",
+        preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
         headers={
             "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
         }
 
     ).json()
     response = requests.post(
-        CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
+        preferences.MainSettings.CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
         headers={
             "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
         data={"email": preferences.MainSettings.sender_email})
@@ -216,7 +192,7 @@ class ProjectsHistoryView(TemplateView):
         if page is not None:
             params["page"] = int(page)
 
-        response = requests.get(CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
+        response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
         if 'results' in response:
             for project in response['results']:
                 file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
@@ -238,14 +214,14 @@ class SingleProjectView(APIView):
 
     def get(self, request):
         project_id = request.query_params.get('project_id')
-        response = requests.get(CLOUDSTORAGE_API_URL + f"{project_id}/",
+        response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                                 headers={
                                     "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
         return Response(response.json(), status=status.HTTP_200_OK)
 
     def delete(self, request):
         project_id = self.request.data.get('project_id')
-        response = requests.delete(CLOUDSTORAGE_API_URL + f"{project_id}/",
+        response = requests.delete(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                                    headers={
                                        "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
 

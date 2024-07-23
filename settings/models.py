@@ -3,8 +3,16 @@ from preferences.models import Preferences
 
 
 class MainSettings(Preferences):
+    class AlgorithmChoices(models.TextChoices):
+        template = 'template', 'Template'
+        domains = 'domain', 'Domain'
+
     sender_email = models.EmailField()
     api_key = models.CharField(max_length=256)
+    algorithm = models.CharField(choices=AlgorithmChoices.choices, default=AlgorithmChoices.template, max_length=32)
+    CUSTOM_MT_CONSOLE_URL = models.URLField(max_length=256, default='https://console.custom.mt/translation/')
+    CLOUDSTORAGE_API_URL = models.URLField(max_length=256,
+                                           default='https://cloudstorage.fileprocessing.custom.mt/translate/legal230/')
 
     class Meta:
         verbose_name = "Main Settings"

@@ -8,7 +8,7 @@ from preferences import preferences
 
 def send_text_translation(
         user_id,
-        template_name=None,
+        translation_name=None,
         file_ext=None,
         source_text=None,
         text=None,
@@ -36,7 +36,7 @@ def send_text_translation(
                 {
                     "user_name": preferences.MainSettings.sender_email,
                     "text": text,
-                    "template_name": template_name,
+                    "translation_name": translation_name,
                     'source_text': source_text,
                     "sender_username": user.username,
                     "file_ext": file_ext,
@@ -59,7 +59,7 @@ def send_text_translation(
                     {
                         "user_name": user_to_send.username,
                         "text": text,
-                        "template_name": template_name,
+                        "translation_name": translation_name,
                         "sender_username": user.username,
                         "file_ext": file_ext,
                         "source_file_url": source_file_url,
@@ -78,9 +78,9 @@ def send_text_translation(
             sg.send(message)
 
 
-def send_file_translation(user_id, source_file_url, file_name, file_ext, template_name):
+def send_file_translation(user_id, source_file_url, file_name, file_ext, translation_name):
     send_text_translation(user_id=user_id, theme='File translation', source_file_url=source_file_url, file_name=file_name,
-                          template_name=template_name, file_ext=file_ext, template='file_email.html')
+                          translation_name=translation_name, file_ext=file_ext, template='file_email.html')
 
 
 def send_gpt_processing(user_id, text):
