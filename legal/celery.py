@@ -15,3 +15,11 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
+
+app.conf.beat_schedule = {
+    'refresh_domains_from_console': {
+        'task': "domains.tasks.update_domains",
+        "schedule": crontab(minute='0', hour='0'),
+        "args": (),
+    },
+}
