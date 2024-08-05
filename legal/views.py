@@ -41,7 +41,6 @@ def file_translate(request):
     data = {**get_translate_data(request),
             "user_custom_mt_token": request.user.uuid,
             "source_language": request.POST.get('source_language')}
-    print(data)
 
     response = requests.post(
         preferences.MainSettings.CLOUDSTORAGE_API_URL,
@@ -57,7 +56,6 @@ def file_translate(request):
     res = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                        headers={
                            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-    print(res.json())
     send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
                           translation_name=request.POST.get('translation_name'),
                           file_name=request.FILES["document"].name,
@@ -139,6 +137,12 @@ class GetDomainsView(APIView):
         domain_names = []
         for domain in domains.json():
             domain_names.append(domain['domain_name'])
+        domains = Domain.objects.filter(name__in=domain_names)
+
+        if request.LANGUAGE_CODE == 'en':
+            domain_names = domains.values_list('name', flat=True)
+        elif request.LANGUAGE_CODE == 'fr':
+            domain_names = domains.values_list('french_name', flat=True)
         return Response({"data": domain_names}, status=status.HTTP_200_OK)
 
 
