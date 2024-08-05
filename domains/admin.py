@@ -10,10 +10,12 @@ def update_domains_action(modeladmin, request, queryset):
 update_domains_action.short_description = 'Refresh'
 
 
-@admin.register(Domain)
-class LanguageRegionCodeAdmin(admin.ModelAdmin):
+class DomainAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "french_name"
     )
     actions = [update_domains_action]
+
+
+admin.site.register(Domain, DomainAdmin)
