@@ -7,6 +7,7 @@ class DomainAdmin(admin.ModelAdmin):
         "name",
         "french_name"
     )
+    change_list_template = "admin/domains/Domain/change_list.html"
 
 
 admin.site.register(Domain, DomainAdmin)
