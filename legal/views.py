@@ -142,7 +142,7 @@ class GetDomainsView(APIView):
         if request.LANGUAGE_CODE == 'en':
             domain_names = domains.values_list('name', flat=True)
         elif request.LANGUAGE_CODE == 'fr':
-            domain_names = domains.values_list('french_name', flat=True)
+            domain_names = [domain.french_name if domain.french_name else domain.name for domain in domains]
         return Response({"data": domain_names}, status=status.HTTP_200_OK)
 
 
