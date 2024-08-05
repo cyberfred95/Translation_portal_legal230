@@ -1,13 +1,5 @@
 from django.contrib import admin
 from .models import Domain
-from .tasks import update_domains
-
-
-def update_domains_action(modeladmin, request, queryset):
-    update_domains()
-
-
-update_domains_action.short_description = 'Refresh'
 
 
 class DomainAdmin(admin.ModelAdmin):
@@ -15,7 +7,6 @@ class DomainAdmin(admin.ModelAdmin):
         "name",
         "french_name"
     )
-    actions = [update_domains_action]
 
 
 admin.site.register(Domain, DomainAdmin)
