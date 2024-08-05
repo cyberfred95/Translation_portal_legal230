@@ -737,7 +737,7 @@ $(document).ready(function () {
                     let result = [];
 
                     if (algorithm) {
-                        result = JSON.parse(response.data[0]).map(i => {return i?.domain_name});
+                        result = response.data;
                     } else {
                         result = response.data;
                     }
