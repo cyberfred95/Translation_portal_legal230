@@ -1,5 +1,7 @@
 from preferences import preferences
 
+from domains.models import Domain
+
 
 def get_translate_data(request):
     translate_data = {
@@ -11,6 +13,8 @@ def get_translate_data(request):
         return {'template_name': request.POST.get('translation_name')}
 
     elif preferences.MainSettings.algorithm == preferences.MainSettings.AlgorithmChoices.domains:
-        translate_data['domain_name'] = request.POST.get('translation_name')
+        if request.LANGUAGE_CODE == 'fr':
+            translate_data['domain_name'] = Domain.objects.get(french_name=request.POST.get(
+                'translation_name')).name if request.LANGUAGE_CODE == 'fr' else request.POST.get('translation_name')
 
     return translate_data
