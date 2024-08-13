@@ -35,6 +35,17 @@ services:
       - dockerize
       - redis
 
+  celery_beat:
+    <<: *django
+    command: celery -A legal beat -l info
+    environment:
+      - POSTGRES_USER=legal
+      - DJANGO_PG_PASSWOR=datasvitend
+      - CELERY_REDIS=redis://redis:6379
+    depends_on:
+      - dockerize
+      - redis
+
   runserver:
     <<: *django
     command: [ "bash", "./docker/django/start-dev.sh" ]
@@ -52,9 +63,9 @@ services:
       - DJANGO_PG_PASSWOR=datasvitend
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
-    - type: bind
-      source: ./postgres
-      target: /tmp/
+      - type: bind
+        source: ./postgres
+        target: /tmp/
 
   redis:
     image: redis:6

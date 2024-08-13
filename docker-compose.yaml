@@ -40,6 +40,20 @@ services:
       - redis
     networks:
       - file_process
+
+  celery_beat:
+    <<: *django
+    command: celery -A legal beat -l info
+    environment:
+      - POSTGRES_USER=legal
+      - DJANGO_PG_PASSWOR=datasvitend
+      - CELERY_REDIS=redis://redis:6379
+    depends_on:
+      - dockerize
+      - redis
+    networks:
+      - file_process
+    
   runserver:
     <<: *django
     command: [ "bash", "./docker/django/start-dev.sh" ]
