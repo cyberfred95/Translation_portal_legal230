@@ -41,26 +41,36 @@ def file_translate(request):
     data = {**get_translate_data(request),
             "user_custom_mt_token": request.user.uuid,
             "source_language": request.POST.get('source_language')}
+    projects = []
 
-    response = requests.post(
-        preferences.MainSettings.CLOUDSTORAGE_API_URL,
-        data=data,
-        headers={
-            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
-        files={
-            'source_file': request.FILES["document"]
-        }
-    )
-    project_id = response.json().get('id')
+    for file in request.FILES.getlist('document'):
+        response = requests.post(
+            preferences.MainSettings.CLOUDSTORAGE_API_URL,
+            data=data,
+            headers={
+                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
+            files={
+                'source_file': file
+            }
+        )
+        projects.append({
+            'id': response.json().get('id'),
+            'file_name': file.name,
+            'file_extension': os.path.splitext(file.name)[1]
+        })
+
     time.sleep(0.1)
-    res = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
-                       headers={
-                           "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-    send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
-                          translation_name=request.POST.get('translation_name'),
-                          file_name=request.FILES["document"].name,
-                          file_ext=os.path.splitext(request.FILES["document"].name)[1])
-    return response.json()
+
+    for project in projects:
+        project_id = project.get('id')
+        res = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+                           headers={
+                               "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+        send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
+                              translation_name=request.POST.get('translation_name'),
+                              file_name=project['file_name'],
+                              file_ext=project['file_extension'])
+    return {"data": [project.get('id') for project in projects]}
 
 
 class TranslateView(TemplateView):
