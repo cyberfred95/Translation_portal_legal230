@@ -227,11 +227,14 @@ class ProjectsHistoryView(TemplateView):
 class SingleProjectView(APIView):
 
     def get(self, request):
-        project_id = request.query_params.get('project_id')
-        response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+        project_ids = request.query_params.getlist('project_id',[])
+        responses = []
+        for project_id in project_ids:
+            response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                                 headers={
                                     "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-        return Response(response.json(), status=status.HTTP_200_OK)
+            responses.append(response.json())
+        return Response(responses, status=status.HTTP_200_OK)
 
     def delete(self, request):
         project_id = self.request.data.get('project_id')
