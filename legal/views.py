@@ -47,8 +47,7 @@ def file_translate(request):
             "source_language": request.POST.get('source_language')}
     projects = []
 
-    for file in request.FILES.getlist('document[]',[]):
-
+    for file in request.FILES.getlist('document[]', []):
         response = requests.post(
             preferences.MainSettings.CLOUDSTORAGE_API_URL,
             data=data,
@@ -58,14 +57,14 @@ def file_translate(request):
                 'source_file': file
             }
         )
-        print(response.json())
-        stats = UserStats.objects.create(user=request.user, chars=get_chars(file))
+        # chars = get_chars(file)
+        # print(chars)
+        # stats = UserStats.objects.create(user=request.user, chars=chars)
         projects.append({
             'id': response.json().get('id'),
             'file_name': file.name,
             'file_extension': os.path.splitext(file.name)[1]
         })
-    print(projects)
     time.sleep(0.1)
     for project in projects:
         project_id = project.get('id')
@@ -79,32 +78,33 @@ def file_translate(request):
     return {"project_ids": [project.get('id') for project in projects]}
 
 
-def get_chars(file):
-    file_extension_route_mapping = {
-        '.docx': 'word',
-        '.pptx': 'powerpoint',
-        '.txt': 'text',
-        '.pdf': 'word',
-        '.xlsx': 'excel',
-    }
-    file_extension = os.path.splitext(file.name)[1]
 
-    def get_files_processing_api_url():
-        return f"{settings.FILES_PROCESSING_API_URL}/api/{file_extension_route_mapping[file_extension]}/export"
-
-    response = requests.post(
-        get_files_processing_api_url(),
-        headers={
-            "Content-Type": file_extension,
-            "Content-Disposition": f'attachment; '
-                                   f'filename="{file.name}"',
-        },
-        data=file.read()
-    )
-    chars = 0
-    for paragraph in response.json()['texts']:
-        chars += len(paragraph['text'])
-    return chars
+# def get_chars(file):
+#     file_extension_route_mapping = {
+#         '.docx': 'word',
+#         '.pptx': 'powerpoint',
+#         '.txt': 'text',
+#         '.pdf': 'word',
+#         '.xlsx': 'excel',
+#     }
+#     file_extension = os.path.splitext(file.name)[1]
+#
+#     def get_files_processing_api_url():
+#         return f"{settings.FILES_PROCESSING_API_URL}/api/{file_extension_route_mapping[file_extension]}/export"
+#
+#     response = requests.post(
+#         get_files_processing_api_url(),
+#         headers={
+#             "Content-Type": file_extension,
+#             "Content-Disposition": f'attachment; '
+#                                    f'filename="{file.name}"',
+#         },
+#         data=file.read()
+#     )
+#     chars = 0
+#     for paragraph in response.json()['texts']:
+#         chars += len(paragraph['text'])
+#     return chars
 
 
 class TranslateView(TemplateView):
