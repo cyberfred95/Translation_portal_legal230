@@ -20,43 +20,57 @@ var Upload = {
             }
         });
 
-        function validateFiles(e, inp){
-            let thisInput = thisContainer.find('input')
-            let fileTypes = false;
-            if(thisInput[0].hasAttribute('accept') && thisInput.attr('accept')) {
-                fileTypes = thisInput.attr('accept').replaceAll(' ', '').split(',')
-            }
+        function validateFiles(e, inp) {
+            let thisInput = thisContainer.find('input');
+            let fileTypes = thisInput[0].hasAttribute('accept') && thisInput.attr('accept')
+                ? thisInput.attr('accept').replaceAll(' ', '').split(',').map(type => type.trim())
+                : false;
             let maxFileSize = parseInt(thisInput.attr('data-maxsize')) * 1024 * 1024;
             let isValid = true;
             let files = e ? e.originalEvent.dataTransfer.files : inp.files;
-            let errorBlock = thisInput.closest('.input').find('.invalid-feedback')
+            let errorBlock = thisInput.closest('.input').find('.invalid-feedback');
 
-            // Очищаємо попередній список файлів
             $('.file-list').empty();
 
-            // Перевіряємо кожен файл
+            console.log('Очищені FileTypes:', fileTypes);
+
             for (let i = 0; i < files.length; i++) {
                 let file = files[i];
                 let fileName = file.name;
                 let isFileValid = true;
 
+                console.log('Тип файлу:', file.type);
+                console.log('Імя файлу:', file.name);
+
                 if (fileTypes) {
-                    isFileValid = fileTypes.some(type => file.type.indexOf(type) !== -1);
+                    isFileValid = fileTypes.some(type => {
+                        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                        return file.type === type ||
+                            file.type.includes(type.split(',')[0]) ||
+                            fileExtension === '.' + type.split('.').pop();
+                    });
                 }
 
+                console.log('Чи валідний:', isFileValid);
+                console.log('File type check:', fileTypes ? fileTypes.some(type => file.type === type) : 'No file types specified');
+                console.log('File extension check:', fileTypes ? fileTypes.some(type => {
+                    const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                    return fileExtension === '.' + type.split('.').pop();
+                }) : 'No file types specified');
+
                 if (!isFileValid) {
-                    errorBlock.html('Дозволені розширення: ' + fileTypes.join(', '))
+                    errorBlock.html('Дозволені розширення: ' + fileTypes.map(type => '.' + type.split('.').pop()).join(', '));
                     isValid = false;
                 } else if (file.size > maxFileSize) {
-                    errorBlock.html('Максимальний розмір файлу ' + (maxFileSize / 1024 / 1024) + 'mb')
+                    errorBlock.html('Максимальний розмір файлу ' + (maxFileSize / 1024 / 1024) + 'MB');
                     isValid = false;
                 } else {
                     $('.file-list').append(`
-                        <div class="translate__file-review">
-                            <span class="output-name">${fileName}</span>
-                            <img src="/static/images/ico-cancel.svg" class="upload-remove" alt="X">
-                        </div>
-                    `);
+                <div class="translate__file-review">
+                    <span class="output-name">${fileName}</span>
+                    <img src="/static/images/ico-cancel.svg" class="upload-remove" alt="X">
+                </div>
+            `);
                 }
             }
 
@@ -66,7 +80,7 @@ var Upload = {
                 return false;
             }
 
-            thisContainer.addClass('upload-success').removeClass('is-error')
+            thisContainer.addClass('upload-success').removeClass('is-error');
             if (e)
                 thisInput[0].files = files;
             Upload.submit();
