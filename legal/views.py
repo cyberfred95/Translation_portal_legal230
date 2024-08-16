@@ -267,7 +267,9 @@ class SingleProjectView(APIView):
                                     headers={
                                         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
             res = response.json()
-            res['file_name']
+            file_name = urlparse(response.json()['source_file']).path.lstrip('/').split('/')[-1]
+            original_filename = unquote(file_name)
+            res['file_name'] = original_filename
 
             responses.append(response.json())
         return Response(responses, status=status.HTTP_200_OK)
