@@ -1,4 +1,5 @@
 import os
+import time
 
 from django.conf import settings
 import requests
@@ -39,3 +40,4 @@ class StatsCalculator:
             chars = self.get_chars(file)
             print(chars)
             stats = UserStats.objects.create(user=user, chars=chars)
+            time.sleep(0.2)

@@ -46,8 +46,8 @@ def file_translate(request):
             "user_custom_mt_token": request.user.uuid,
             "source_language": request.POST.get('source_language')}
     projects = []
-
-    for file in request.FILES.getlist('document[]', []):
+    files = request.FILES.getlist('document[]', [])
+    for file in files:
         response = requests.post(
             preferences.MainSettings.CLOUDSTORAGE_API_URL,
             data=data,
@@ -73,7 +73,7 @@ def file_translate(request):
                               translation_name=request.POST.get('translation_name'),
                               file_name=project['file_name'],
                               file_ext=project['file_extension'])
-    # StatsCalculator().calculate_statistics(files=request.FILES.getlist('document[]', []), user=request.user)
+    # StatsCalculator().calculate_statistics(files=files, user=request.user)
     return {"project_ids": [project.get('id') for project in projects]}
 
 
