@@ -54,7 +54,7 @@ var Upload = {
                     $('.file-list').append(`
                         <div class="translate__file-review">
                             <span class="output-name">${fileName}</span>
-                            <img src="../images/ico-cancel.svg" class="upload-remove" alt="X">
+                            <img src="/static/images/ico-cancel.svg" class="upload-remove" alt="X">
                         </div>
                     `);
                 }
@@ -112,7 +112,7 @@ function updateFileList() {
         fileList.innerHTML += `
             <div class="translate__file-review">
                 <span class="output-name">${fileName}</span>
-                <img src="{% static 'images/ico-cancel.svg' %}" class="upload-remove" alt="X">
+                <img src="/static/images/ico-cancel.svg" class="upload-remove" alt="X">
             </div>
         `;
     }
