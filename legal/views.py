@@ -269,7 +269,7 @@ class SingleProjectView(APIView):
             res = response.json()
             file_name = urlparse(response.json()['source_file']).path.lstrip('/').split('/')[-1]
             original_filename = unquote(file_name)
-            res['file_name'] = original_filename
+            res['source_file_name'] = original_filename
 
             responses.append(response.json())
         return Response(responses, status=status.HTTP_200_OK)
