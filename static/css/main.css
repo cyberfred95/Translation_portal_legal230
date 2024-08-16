@@ -2517,4 +2517,20 @@ body {
     opacity: 1;
 }
 
+.file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.button-set {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.button-set:last-child {
+    margin-bottom: 0;
+}
+
 

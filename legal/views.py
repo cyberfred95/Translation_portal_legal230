@@ -43,7 +43,7 @@ def file_translate(request):
             "source_language": request.POST.get('source_language')}
     projects = []
 
-    for file in request.FILES.getlist('document'):
+    for file in request.FILES.getlist('document[]',[]):
         response = requests.post(
             preferences.MainSettings.CLOUDSTORAGE_API_URL,
             data=data,
@@ -227,7 +227,7 @@ class ProjectsHistoryView(TemplateView):
 class SingleProjectView(APIView):
 
     def get(self, request):
-        project_ids = request.query_params.getlist('project_id', [])
+        project_ids = request.query_params.getlist('project_id[]', [])
         responses = []
         for project_id in project_ids:
             response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",

@@ -311,7 +311,7 @@
                                     </div>
                                     <label class="button button--transparent">
                                         {% trans "Add file" %}
-                                        <input type="file" id="document" data-maxsize="32"
+                                        <input type="file" id="document" data-maxsize="32" multiple
                                                accept="text/plain, application/vnd.openxmlformats-officedocument.wordprocessingml.document,
                                                 application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
                                                 application/vnd.openxmlformats-officedocument.presentationml.presentation, application/pdf"
@@ -331,11 +331,13 @@
                                     <img src="{% static 'images/ico-uploaded.svg' %}" alt="Add file">
                                     <span>{% trans "File added" %}</span>
                                 </div>
-                                <div class="translate__file-review">
-                                    <span class="output-name">hhhh</span>
-                                    <img src="{% static 'images/ico-cancel.svg' %}" class="upload-remove" alt="X">
-
+                                <div class="file-list">
+                                    <!-- Тут будуть виводитися завантажені файли -->
                                 </div>
+<!--                                <div class="translate__file-review">-->
+<!--                                    <span class="output-name">hhhh</span>-->
+<!--                                    <img src="{% static 'images/ico-cancel.svg' %}" class="upload-remove" alt="X">-->
+<!--                                </div>-->
                             </div>
                                 <div class="output-type" >
                                     <span>{%trans 'PDF file' %}</span>
@@ -386,7 +388,8 @@
                                                     </svg>
                                                     <span class="tooltiptext">{% trans "Expert revision" %}</span>
                                                 </span>
-                                            </button>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                     <a href="" class="btn_reset">{% trans "Translate another file" %}</a>
