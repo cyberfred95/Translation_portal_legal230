@@ -216,3 +216,5 @@ SENDGRID_API_KEY = 'SG.VCxAu5LvR7qlIutkPaEVSg.bceiKrqr51EstGOr1XjY14PasITzDYLVru
 AUTH_USER_MODEL = 'users.User'
 
 ROSETTA_SHOW_AT_ADMIN_PANEL = True
+
+FILES_PROCESSING_API_URL = 'https://office.fileprocessing.custom.mt'
