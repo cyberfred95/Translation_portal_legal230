@@ -273,7 +273,7 @@ class SingleProjectView(APIView):
             original_filename = unquote(file_name)
             res['source_file_name'] = original_filename
 
-            responses.append(response.json())
+            responses.append(res)
         return Response(responses, status=status.HTTP_200_OK)
 
     def delete(self, request):
