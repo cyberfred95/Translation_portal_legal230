@@ -9,6 +9,8 @@ from django.views.generic import TemplateView
 from django.http import JsonResponse, HttpResponseBadRequest
 import django
 from rest_framework.views import APIView
+
+from stats.models import UserStats
 from .helpers import get_translate_data
 
 from domains.models import Domain
@@ -22,6 +24,7 @@ from django.views.decorators.csrf import csrf_exempt
 import requests
 from preferences import preferences
 from gpt_processing.prompts_list import prompts_list
+from django.conf import settings
 
 PAGINATION_PAGE_SIZE = 30
 
@@ -34,6 +37,7 @@ def text_translation(request):
     }, headers={
         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
     send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('translation_name'))
+    statistic = UserStats.objects.create(user=request.user, chars=len(text))
     return response.json()
 
 
@@ -44,6 +48,7 @@ def file_translate(request):
     projects = []
 
     for file in request.FILES.getlist('document[]',[]):
+
         response = requests.post(
             preferences.MainSettings.CLOUDSTORAGE_API_URL,
             data=data,
@@ -53,14 +58,13 @@ def file_translate(request):
                 'source_file': file
             }
         )
+        stats = UserStats.objects.create(user=request.user, chars=get_chars(file))
         projects.append({
             'id': response.json().get('id'),
             'file_name': file.name,
             'file_extension': os.path.splitext(file.name)[1]
         })
-
     time.sleep(0.1)
-
     for project in projects:
         project_id = project.get('id')
         res = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
@@ -70,7 +74,35 @@ def file_translate(request):
                               translation_name=request.POST.get('translation_name'),
                               file_name=project['file_name'],
                               file_ext=project['file_extension'])
-    return {"data": [project.get('id') for project in projects]}
+    return {"project_ids": [project.get('id') for project in projects]}
+
+
+def get_chars(file):
+    file_extension_route_mapping = {
+        '.docx': 'word',
+        '.pptx': 'powerpoint',
+        '.txt': 'text',
+        '.pdf': 'word',
+        '.xlsx': 'excel',
+    }
+    file_extension = os.path.splitext(file.name)[1]
+
+    def get_files_processing_api_url():
+        return f"{settings.FILES_PROCESSING_API_URL}/api/{file_extension_route_mapping[file_extension]}/export"
+
+    response = requests.post(
+        get_files_processing_api_url(),
+        headers={
+            "Content-Type": file_extension,
+            "Content-Disposition": f'attachment; '
+                                   f'filename="{file.name}"',
+        },
+        data=file.read()
+    )
+    chars = 0
+    for paragraph in response.json()['texts']:
+        chars += len(paragraph['text'])
+    return chars
 
 
 class TranslateView(TemplateView):
@@ -230,14 +262,19 @@ class SingleProjectView(APIView):
         project_ids = request.query_params.getlist('project_id[]', [])
         responses = []
         for project_id in project_ids:
+            print(project_id)
             response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                                     headers={
                                         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+            res = response.json()
+            res['file_name']
+
             responses.append(response.json())
         return Response(responses, status=status.HTTP_200_OK)
 
     def delete(self, request):
         project_id = self.request.data.get('project_id')
+
         response = requests.delete(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                                    headers={
                                        "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
