@@ -1,101 +1,152 @@
 var Upload = {
+    init: function() {
+        let thisContainer = $("#upload");
 
-	init: function() {
-		let thisContainer = $("#upload");
+        thisContainer.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        })
+            .on('dragover dragenter', function() { thisContainer.addClass('is-dragover'); })
+            .on('dragleave dragend drop', function() { thisContainer.removeClass('is-dragover'); })
+            .on('drop', validateFiles);
 
-		thisContainer.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
-			e.preventDefault();
-			e.stopPropagation();
-		})
-		.on('dragover dragenter', function() { thisContainer.addClass('is-dragover'); })
-		.on('dragleave dragend drop', function() { thisContainer.removeClass('is-dragover'); })
-		.on('drop', validateFile);
+        $(document).on('click', '.upload-remove', function () {
+            let fileItem = $(this).closest('.translate__file-review');
+            let fileName = fileItem.find('.output-name').text();
+            removeFile(fileName);
+            fileItem.remove();
+            if ($('.file-list .translate__file-review').length === 0) {
+                resetUpload();
+            }
+        });
 
-		$(document).on('click', '.upload-remove', function () {
-			thisContainer.find('input').val('')
-			thisContainer.removeClass('upload-success')
-			$('.uploaded').hide();
-			$('.output-type').hide();
+        function validateFiles(e, inp) {
+            let thisInput = thisContainer.find('input');
+            let fileTypes = thisInput[0].hasAttribute('accept') && thisInput.attr('accept')
+                ? thisInput.attr('accept').replaceAll(' ', '').split(',').map(type => type.trim())
+                : false;
+            let maxFileSize = parseInt(thisInput.attr('data-maxsize')) * 1024 * 1024;
+            let isValid = true;
+            let files = e ? e.originalEvent.dataTransfer.files : inp.files;
+            let errorBlock = thisInput.closest('.input').find('.invalid-feedback');
 
-			$('.translate__file-block.input').css('display', 'flex')
-		})
+            $('.file-list').empty();
 
-		function validateFile(e, inp){
-			let thisInput = thisContainer.find('input')
-			let fileTypes = false;
-			if(thisInput[0].hasAttribute('accept') && thisInput.attr('accept')) {
-				fileTypes = thisInput.attr('accept').replaceAll(' ', '').split(',')
-			}
-			let maxFileSize = parseInt(thisInput.attr('data-maxsize')) * 1024 * 1024;
-			let isValid = false;
-			let files = e ? e.originalEvent.dataTransfer.files : inp.files;
-			let resultBlock = thisContainer.find('.output-name')
+            console.log('Очищені FileTypes:', fileTypes);
 
-			let errorBlock = thisInput.closest('.input').find('.invalid-feedback')
-			let fileName = ''
-			let thisName = files[0].name.split('.')
-			let thisExt = thisName[thisName.length-1]
+            for (let i = 0; i < files.length; i++) {
+                let file = files[i];
+                let fileName = file.name;
+                let isFileValid = true;
 
-			if (files[0].type === 'application/pdf') {
-				$('.output-type').css('display', 'flex')
-			}
-			thisName.pop()
+                console.log('Тип файлу:', file.type);
+                console.log('Імя файлу:', file.name);
 
-			if(thisName.length > 1) {
-				thisName = thisName.join('.')
-			} else {
-				thisName = thisName[0]
-			}
+                if (fileTypes) {
+                    isFileValid = fileTypes.some(type => {
+                        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                        return file.type === type ||
+                            file.type.includes(type.split(',')[0]) ||
+                            fileExtension === '.' + type.split('.').pop();
+                    });
+                }
 
-			if(thisName.length > 22)
-				thisName = thisName.substring(0, 22) + '... '
+                console.log('Чи валідний:', isFileValid);
+                console.log('File type check:', fileTypes ? fileTypes.some(type => file.type === type) : 'No file types specified');
+                console.log('File extension check:', fileTypes ? fileTypes.some(type => {
+                    const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                    return fileExtension === '.' + type.split('.').pop();
+                }) : 'No file types specified');
 
-			fileName = thisName + '.' + thisExt
+                if (!isFileValid) {
+                    errorBlock.html('Дозволені розширення: ' + fileTypes.map(type => '.' + type.split('.').pop()).join(', '));
+                    isValid = false;
+                } else if (file.size > maxFileSize) {
+                    errorBlock.html('Максимальний розмір файлу ' + (maxFileSize / 1024 / 1024) + 'MB');
+                    isValid = false;
+                } else {
+                    $('.file-list').append(`
+                <div class="translate__file-review">
+                    <span class="output-name">${fileName}</span>
+                    <img src="/static/images/ico-cancel.svg" class="upload-remove" alt="X">
+                </div>
+            `);
+                }
+            }
 
-			if(fileTypes) {
-				$.each(fileTypes, function (_, type) {
-					if(type.indexOf(files[0].type) !== -1)
-						isValid = true;
-				})
-			} else {
-				isValid = true
-			}
+            if (!isValid) {
+                thisInput.val('');
+                thisContainer.removeClass('upload-success').addClass('is-error');
+                return false;
+            }
 
-			if(!isValid){
-				errorBlock.html('Allowed extensions: ' + fileTypes.join(', '))
-				thisInput.val('');
-				thisContainer.removeClass('upload-success')
-				thisContainer.addClass('is-error')
+            thisContainer.addClass('upload-success').removeClass('is-error');
+            if (e)
+                thisInput[0].files = files;
+            Upload.submit();
+        }
 
-				return false;
-			}
+        thisContainer.on('change', 'input', function(e) {
+            validateFiles(false, this)
+        });
+    },
 
-			if(files[0].size > maxFileSize){
-				isValid = false;
-				errorBlock.html('Maximum file size is ' + (maxFileSize / 1024 / 1024)+'mb')
-				thisInput.val('');
-				thisContainer.removeClass('upload-success')
-				thisContainer.addClass('is-error')
-
-				return false;
-			}
-
-			thisContainer.addClass('upload-success').removeClass('is-error')
-
-			resultBlock.text(fileName)
-			if(e)
-				thisInput[0].files = files;
-			Upload.submit();
-		}
-
-		thisContainer.on('change', 'input', function(e) {
-			validateFile(false, this)
-		});
-	},
-
-	// Check the uploaded file
-	submit: function() {
-		$('.translate__file-block').hide();
-		$('.uploaded').css('display', 'flex')
-	}
+    // Перевірка завантажених файлів
+    submit: function() {
+        $('.translate__file-block').hide();
+        $('.uploaded').css('display', 'flex')
+    }
 }
+
+function removeFile(fileName) {
+    let input = document.querySelector('input[type="file"]');
+    let files = input.files;
+    let fileBuffer = new DataTransfer();
+
+    for (let i = 0; i < files.length; i++) {
+        if (files[i].name !== fileName) {
+            fileBuffer.items.add(files[i]);
+        }
+    }
+
+    input.files = fileBuffer.files;
+
+    console.log(`Видалено файл: ${fileName}`);
+
+    updateFileList();
+}
+
+function updateFileList() {
+    let input = document.querySelector('input[type="file"]');
+    let fileList = document.querySelector('.file-list');
+    fileList.innerHTML = '';
+
+    for (let i = 0; i < input.files.length; i++) {
+        let fileName = input.files[i].name;
+        fileList.innerHTML += `
+            <div class="translate__file-review">
+                <span class="output-name">${fileName}</span>
+                <img src="/static/images/ico-cancel.svg" class="upload-remove" alt="X">
+            </div>
+        `;
+    }
+
+    if (input.files.length === 0) {
+        resetUpload();
+    }
+}
+
+function resetUpload() {
+    let thisContainer = $("#upload");
+    thisContainer.find('input').val('')
+    thisContainer.removeClass('upload-success')
+    $('.uploaded').hide();
+    $('.output-type').hide();
+    $('.translate__file-block.input').css('display', 'flex')
+}
+
+$(document).on('click', '.upload-remove', function () {
+    let fileItem = $(this).closest('.translate__file-review');
+    let fileName = fileItem.find('.output-name').text();
+    removeFile(fileName);
+});

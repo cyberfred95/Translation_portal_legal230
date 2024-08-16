@@ -8,6 +8,7 @@ from django.contrib.auth.models import AbstractUser
 class UserGroup(models.Model):
     name = models.CharField(max_length=64)
     api_key = models.CharField(max_length=256)
+    admin = models.ForeignKey('users.User', on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Group'

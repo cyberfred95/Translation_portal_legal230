@@ -32,3 +32,4 @@ static/scss/CACHE/
 .env
 .env_dev
 /Script/
+celerybeat-schedule

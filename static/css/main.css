@@ -2517,4 +2517,44 @@ body {
     opacity: 1;
 }
 
+.file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.download-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.button-set {
+    display: flex;
+    gap: 10px;
+    flex: 1 0 calc(50% - 5px); /
+    min-width: 200px;
+}
+
+@media (max-width: 768px) {
+    .button-set {
+        flex: 1 0 100%;
+    }
+}
+
+.download-file-button {
+    width: 300px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.download-file-button .button-text {
+    display: inline-block;
+    max-width: calc(100% - 30px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+}
 

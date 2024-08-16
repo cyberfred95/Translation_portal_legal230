@@ -9,6 +9,8 @@ from django.views.generic import TemplateView
 from django.http import JsonResponse, HttpResponseBadRequest
 import django
 from rest_framework.views import APIView
+
+from stats.models import UserStats
 from .helpers import get_translate_data
 
 from domains.models import Domain
@@ -22,6 +24,7 @@ from django.views.decorators.csrf import csrf_exempt
 import requests
 from preferences import preferences
 from gpt_processing.prompts_list import prompts_list
+from stats.calculator import StatsCalculator
 
 PAGINATION_PAGE_SIZE = 30
 
@@ -34,6 +37,7 @@ def text_translation(request):
     }, headers={
         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
     send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('translation_name'))
+    statistic = UserStats.objects.create(user=request.user, chars=len(text))
     return response.json()
 
 
@@ -41,26 +45,36 @@ def file_translate(request):
     data = {**get_translate_data(request),
             "user_custom_mt_token": request.user.uuid,
             "source_language": request.POST.get('source_language')}
+    projects = []
+    files = request.FILES.getlist('document[]', [])
+    for file in files:
+        response = requests.post(
+            preferences.MainSettings.CLOUDSTORAGE_API_URL,
+            data=data,
+            headers={
+                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
+            files={
+                'source_file': file
+            }
+        )
+        projects.append({
+            'id': response.json().get('id'),
+            'file_name': file.name,
+            'file_extension': os.path.splitext(file.name)[1]
+        })
 
-    response = requests.post(
-        preferences.MainSettings.CLOUDSTORAGE_API_URL,
-        data=data,
-        headers={
-            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
-        files={
-            'source_file': request.FILES["document"]
-        }
-    )
-    project_id = response.json().get('id')
     time.sleep(0.1)
-    res = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
-                       headers={
-                           "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-    send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
-                          translation_name=request.POST.get('translation_name'),
-                          file_name=request.FILES["document"].name,
-                          file_ext=os.path.splitext(request.FILES["document"].name)[1])
-    return response.json()
+    for project in projects:
+        project_id = project.get('id')
+        res = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+                           headers={
+                               "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+        send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
+                              translation_name=request.POST.get('translation_name'),
+                              file_name=project['file_name'],
+                              file_ext=project['file_extension'])
+    # StatsCalculator().calculate_statistics(files=files, user=request.user)
+    return {"project_ids": [project.get('id') for project in projects]}
 
 
 class TranslateView(TemplateView):
@@ -217,14 +231,24 @@ class ProjectsHistoryView(TemplateView):
 class SingleProjectView(APIView):
 
     def get(self, request):
-        project_id = request.query_params.get('project_id')
-        response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
-                                headers={
-                                    "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-        return Response(response.json(), status=status.HTTP_200_OK)
+        project_ids = request.query_params.getlist('project_id[]', [])
+        responses = []
+        for project_id in project_ids:
+            print(project_id)
+            response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+                                    headers={
+                                        "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+            res = response.json()
+            file_name = urlparse(response.json()['source_file']).path.lstrip('/').split('/')[-1]
+            original_filename = unquote(file_name)
+            res['source_file_name'] = original_filename
+
+            responses.append(res)
+        return Response(responses, status=status.HTTP_200_OK)
 
     def delete(self, request):
         project_id = self.request.data.get('project_id')
+
         response = requests.delete(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                                    headers={
                                        "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})

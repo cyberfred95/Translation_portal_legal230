@@ -21,6 +21,7 @@ urlpatterns = i18n_patterns(
     path('get-templates/', login_required(GetTemplatesView.as_view()), name='get-templates'),
     path('get-domains/', login_required(GetDomainsView.as_view()), name='get_domains'),
     path('refresh_domains/', update_domains_view, name='refresh_domains'),
+    path('statistics/', include('stats.urls')),
 
     re_path(r'^rosetta/', include('rosetta.urls'))
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
