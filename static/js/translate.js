@@ -83,7 +83,7 @@ function gpt_processing() {
 
             resultBlock.text(fileName)
             resultBlock.append(resultBlockImg)
-            resultBlock.addClass('uploaded')
+            // resultBlock.addClass('uploaded')
 
             uploadLabel.hide()
             resultBlock.css('display', 'inline-block')
@@ -531,8 +531,14 @@ $(document).ready(function () {
         }
     }
 
-    function checkDocument(fileId, intervalId, isPostEditing) {
-        let url = '/project/?project_id=' + encodeURIComponent(fileId);
+    function checkDocument(fileIds, intervalId, isPostEditing) {
+        let params = new URLSearchParams();
+
+        fileIds.forEach(fileId => {
+            params.append('project_id[]', fileId);
+        });
+
+        let url = '/project/?' + params.toString();
         $('.translate__file-block').hide();
         $('.output-type').hide();
         $('.translate__file-block.trans-progress').css('display', 'flex')
@@ -547,14 +553,77 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                if (response.status === 'Translated' && !isPostEditing) {
+                console.log('response', response);
+
+                let allTranslated = response.every(project => project.status === 'Translated');
+
+                if (allTranslated && !isPostEditing) {
                     clearInterval(intervalId);
                     $('.translate__file-block').hide();
                     $('.output-type').hide();
-                    $('.translate__file-block.complete').css('display', 'flex')
-                    $('#download_result').on('click', () => downloadResult(response.translated_file))
-                    $('#expert_revision_document').off('click').on('click', () => sendDocument(response.translated_file, response.id));
-                } else if (response.status === 'Error') {
+                    let completeBlock = $('.translate__file-block.complete');
+                    completeBlock.css('display', 'flex');
+
+                    // Очищаємо попередній вміст блоку з кнопками
+                    completeBlock.find('.download-buttons').remove();
+
+                    // Створюємо новий контейнер для кнопок
+                    let downloadButtonsContainer = $('<div class="download-buttons"></div>');
+
+                    // Додаємо кнопки для кожного перекладеного файлу
+                    response.forEach((project) => {
+                        let buttonSet = $(`
+                        <div class="button-set">
+                            <button type="button" class="button button--secondary button--transparent button--ico download-result" data-file="${project.translated_file}">
+                                <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g clip-path="url(#clip0_2624_14289)">
+                                        <path d="M15.2188 7.71875C14.7875 7.71875 14.4375 8.06875 14.4375 8.5C14.4375 12.05 11.55 14.9375 8 14.9375C4.45 14.9375 1.5625 12.05 1.5625 8.5C1.5625 8.06875 1.2125 7.71875 0.78125 7.71875C0.35 7.71875 0 8.06875 0 8.5C0 10.6375 0.83125 12.6469 2.34375 14.1562C3.85625 15.6687 5.8625 16.5 8 16.5C10.1375 16.5 12.1469 15.6687 13.6562 14.1562C15.1687 12.6438 16 10.6375 16 8.5C16 8.06875 15.65 7.71875 15.2188 7.71875Z" fill="#292929"/>
+                                        <path d="M6.92793 11.2375C7.21543 11.525 7.59668 11.6812 7.9998 11.6812C8.40605 11.6812 8.7873 11.5219 9.07168 11.2375L11.0373 9.27187C11.3436 8.96562 11.3436 8.47187 11.0373 8.16562C10.7311 7.85937 10.2373 7.85937 9.93105 8.16562L8.78105 9.31875V1.28125C8.78105 0.85 8.43105 0.5 7.9998 0.5C7.56855 0.5 7.21855 0.85 7.21855 1.28125V9.31875L6.06543 8.16562C5.75918 7.85937 5.26543 7.85937 4.95918 8.16562C4.65293 8.47187 4.65293 8.96562 4.95918 9.27187L6.92793 11.2375Z" fill="#292929"/>
+                                    </g>
+                                    <defs>
+                                        <clipPath id="clip0_2624_14289">
+                                            <rect width="16" height="16" fill="white" transform="translate(0 0.5)"/>
+                                        </clipPath>
+                                    </defs>
+                                </svg>
+                                <span>Download ${project.name}</span>
+                            </button>
+                            <button type="button" class="button button--secondary button--transparent button--ico export--revision--download expert-revision" data-id="${project.id}">
+                                <span>Expert Revision</span>
+                                <span class="revision-icon">
+                                    <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <g clip-path="url(#clip0_2704_437)">
+                                            <path d="M8 0.5C6.41775 0.5 4.87104 0.969192 3.55544 1.84824C2.23985 2.72729 1.21447 3.97672 0.608967 5.43853C0.00346629 6.90034 -0.15496 8.50887 0.153721 10.0607C0.462403 11.6126 1.22433 13.038 2.34315 14.1569C3.46197 15.2757 4.88743 16.0376 6.43928 16.3463C7.99113 16.655 9.59966 16.4965 11.0615 15.891C12.5233 15.2855 13.7727 14.2602 14.6518 12.9446C15.5308 11.629 16 10.0823 16 8.5C15.9977 6.37897 15.1541 4.34547 13.6543 2.84568C12.1545 1.34589 10.121 0.502294 8 0.5ZM8 15.1667C6.68146 15.1667 5.39253 14.7757 4.2962 14.0431C3.19987 13.3106 2.34539 12.2694 1.84081 11.0512C1.33622 9.83305 1.2042 8.49261 1.46144 7.1994C1.71867 5.90619 2.35361 4.71831 3.28596 3.78596C4.21831 2.85361 5.4062 2.21867 6.6994 1.96143C7.99261 1.7042 9.33305 1.83622 10.5512 2.3408C11.7694 2.84539 12.8106 3.69987 13.5431 4.7962C14.2757 5.89253 14.6667 7.18146 14.6667 8.5C14.6647 10.2675 13.9617 11.9621 12.7119 13.2119C11.4621 14.4617 9.76752 15.1647 8 15.1667Z" fill="#292929"/>
+                                            <path d="M8.47816 3.87534C8.09372 3.8053 7.69857 3.8206 7.32069 3.92017C6.94281 4.01974 6.59144 4.20115 6.29143 4.45155C5.99142 4.70195 5.7501 5.01522 5.58457 5.36921C5.41903 5.72319 5.33332 6.10923 5.3335 6.50001C5.3335 6.67682 5.40373 6.84639 5.52876 6.97142C5.65378 7.09644 5.82335 7.16668 6.00016 7.16668C6.17697 7.16668 6.34654 7.09644 6.47157 6.97142C6.59659 6.84639 6.66683 6.67682 6.66683 6.50001C6.66666 6.30386 6.70977 6.11009 6.79309 5.93252C6.87641 5.75494 6.99788 5.59794 7.14884 5.4727C7.2998 5.34746 7.47654 5.25707 7.66645 5.20797C7.85635 5.15888 8.05475 5.15229 8.2475 5.18868C8.51086 5.2398 8.753 5.36827 8.943 5.55767C9.13299 5.74707 9.26222 5.98881 9.31416 6.25201C9.36663 6.52828 9.3304 6.81406 9.21067 7.0685C9.09093 7.32294 8.89381 7.53301 8.6475 7.66868C8.23961 7.90499 7.90255 8.24635 7.67145 8.65721C7.44034 9.06807 7.32364 9.53338 7.3335 10.0047V10.5C7.3335 10.6768 7.40373 10.8464 7.52876 10.9714C7.65378 11.0964 7.82335 11.1667 8.00016 11.1667C8.17697 11.1667 8.34654 11.0964 8.47157 10.9714C8.59659 10.8464 8.66683 10.6768 8.66683 10.5V10.0047C8.65846 9.77269 8.71137 9.54258 8.82021 9.33754C8.92905 9.13249 9.08999 8.95974 9.28683 8.83668C9.76984 8.57139 10.1588 8.16298 10.4002 7.66761C10.6416 7.17225 10.7237 6.61425 10.635 6.07036C10.5464 5.52647 10.2914 5.0234 9.90516 4.63034C9.51893 4.23728 9.02041 3.97352 8.47816 3.87534Z" fill="#292929"/>
+                                            <path d="M8.66683 12.5C8.66683 12.1319 8.36835 11.8334 8.00016 11.8334C7.63197 11.8334 7.3335 12.1319 7.3335 12.5C7.3335 12.8682 7.63197 13.1667 8.00016 13.1667C8.36835 13.1667 8.66683 12.8682 8.66683 12.5Z" fill="#292929"/>
+                                        </g>
+                                        <defs>
+                                            <clipPath id="clip0_2704_437">
+                                                <rect width="16" height="16" fill="white" transform="translate(0 0.5)"/>
+                                            </clipPath>
+                                        </defs>
+                                    </svg>
+                                    <span class="tooltiptext">Expert revision</span>
+                                </span>
+                            </button>
+                        </div>
+                    `);
+                        downloadButtonsContainer.append(buttonSet);
+                    });
+
+                    completeBlock.find('.translate__file-ico').append(downloadButtonsContainer);
+
+                    $('.download-result').on('click', function() {
+                        downloadResult($(this).data('file'));
+                    });
+
+                    $('.expert-revision').on('click', function() {
+                        let projectId = $(this).data('id');
+                        let project = response.find(p => p.id === projectId);
+                        sendDocument(project.translated_file, projectId);
+                    });
+
+                } else if (response.some(project => project.status === 'Error')) {
                     errorHandler();
                 }
             },
@@ -576,15 +645,22 @@ $(document).ready(function () {
             return false;
         }
         let url = form.attr('action')
-        let formData = new FormData(form[0]);
+        let formData = new FormData();
 
+        for (let i = 0; i < fileInput[0].files.length; i++) {
+            formData.append('document[]', fileInput[0].files[i]);
+        }
+
+        let otherInputs = form.find('input:not([type=file]), select, textarea');
+        otherInputs.each(function() {
+            formData.append(this.name, this.value);
+        });
 
         $('.translate__file-block').hide();
         $('.output-type').hide();
         $('.translate__file-block.trans-progress').css('display', 'flex')
 
         $('.translate__form-submit').eq(1).hide();
-
 
         fetch(url, {
             method: 'POST',
@@ -598,10 +674,11 @@ $(document).ready(function () {
             .then(r => r.json().then(data => ({status: r.status, body: data})))
             .then(obj => {
                 if (obj.status === 200) {
+                    console.log('obj.body', obj.body.data)
                     let intervalId = setInterval(() => {
-                        checkDocument(obj.body.id, intervalId);
+                        checkDocument(obj.body.data, intervalId);
                     }, 10000);
-                    checkDocument(obj.body.id, intervalId);
+                    checkDocument(obj.body.data, intervalId);
                 } else {
                     errorHandler();
                 }
