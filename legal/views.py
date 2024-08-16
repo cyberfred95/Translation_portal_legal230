@@ -24,7 +24,7 @@ from django.views.decorators.csrf import csrf_exempt
 import requests
 from preferences import preferences
 from gpt_processing.prompts_list import prompts_list
-from django.conf import settings
+from stats.calculator import StatsCalculator
 
 PAGINATION_PAGE_SIZE = 30
 
@@ -46,8 +46,8 @@ def file_translate(request):
             "user_custom_mt_token": request.user.uuid,
             "source_language": request.POST.get('source_language')}
     projects = []
-
-    for file in request.FILES.getlist('document[]', []):
+    files = request.FILES.getlist('document[]', [])
+    for file in files:
         response = requests.post(
             preferences.MainSettings.CLOUDSTORAGE_API_URL,
             data=data,
@@ -57,14 +57,12 @@ def file_translate(request):
                 'source_file': file
             }
         )
-        # chars = get_chars(file)
-        # print(chars)
-        # stats = UserStats.objects.create(user=request.user, chars=chars)
         projects.append({
             'id': response.json().get('id'),
             'file_name': file.name,
             'file_extension': os.path.splitext(file.name)[1]
         })
+
     time.sleep(0.1)
     for project in projects:
         project_id = project.get('id')
@@ -75,36 +73,8 @@ def file_translate(request):
                               translation_name=request.POST.get('translation_name'),
                               file_name=project['file_name'],
                               file_ext=project['file_extension'])
+    # StatsCalculator().calculate_statistics(files=files, user=request.user)
     return {"project_ids": [project.get('id') for project in projects]}
-
-
-
-# def get_chars(file):
-#     file_extension_route_mapping = {
-#         '.docx': 'word',
-#         '.pptx': 'powerpoint',
-#         '.txt': 'text',
-#         '.pdf': 'word',
-#         '.xlsx': 'excel',
-#     }
-#     file_extension = os.path.splitext(file.name)[1]
-#
-#     def get_files_processing_api_url():
-#         return f"{settings.FILES_PROCESSING_API_URL}/api/{file_extension_route_mapping[file_extension]}/export"
-#
-#     response = requests.post(
-#         get_files_processing_api_url(),
-#         headers={
-#             "Content-Type": file_extension,
-#             "Content-Disposition": f'attachment; '
-#                                    f'filename="{file.name}"',
-#         },
-#         data=file.read()
-#     )
-#     chars = 0
-#     for paragraph in response.json()['texts']:
-#         chars += len(paragraph['text'])
-#     return chars
 
 
 class TranslateView(TemplateView):
