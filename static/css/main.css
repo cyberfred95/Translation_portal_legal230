@@ -2523,14 +2523,24 @@ body {
     gap: 10px;
 }
 
-.button-set {
+.download-buttons {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
-    margin-bottom: 10px;
 }
 
-.button-set:last-child {
-    margin-bottom: 0;
+.button-set {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1 0 calc(50% - 5px); /
+    min-width: 200px;
+}
+
+@media (max-width: 768px) {
+    .button-set {
+        flex: 1 0 100%;
+    }
 }
 
 
