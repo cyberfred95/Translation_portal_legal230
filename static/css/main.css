@@ -2521,6 +2521,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    margin-top: 30px;
 }
 
 .download-buttons {
@@ -2557,4 +2558,5 @@ body {
     text-overflow: ellipsis;
     vertical-align: bottom;
 }
+
 

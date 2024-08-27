@@ -1,152 +1,153 @@
 var Upload = {
-    init: function() {
+    fileList: new DataTransfer(),
+
+    init: function () {
         let thisContainer = $("#upload");
 
-        thisContainer.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
+        thisContainer.on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
             e.preventDefault();
             e.stopPropagation();
         })
-            .on('dragover dragenter', function() { thisContainer.addClass('is-dragover'); })
-            .on('dragleave dragend drop', function() { thisContainer.removeClass('is-dragover'); })
-            .on('drop', validateFiles);
+            .on('dragover dragenter', function () {
+                thisContainer.addClass('is-dragover');
+            })
+            .on('dragleave dragend drop', function () {
+                thisContainer.removeClass('is-dragover');
+            })
+            .on('drop', function (e) {
+                Upload.handleFiles(e.originalEvent.dataTransfer.files);
+            });
 
         $(document).on('click', '.upload-remove', function () {
             let fileItem = $(this).closest('.translate__file-review');
             let fileName = fileItem.find('.output-name').text();
-            removeFile(fileName);
-            fileItem.remove();
-            if ($('.file-list .translate__file-review').length === 0) {
-                resetUpload();
-            }
+            Upload.removeFile(fileName);
         });
 
-        function validateFiles(e, inp) {
-            let thisInput = thisContainer.find('input');
-            let fileTypes = thisInput[0].hasAttribute('accept') && thisInput.attr('accept')
-                ? thisInput.attr('accept').replaceAll(' ', '').split(',').map(type => type.trim())
-                : false;
-            let maxFileSize = parseInt(thisInput.attr('data-maxsize')) * 1024 * 1024;
-            let isValid = true;
-            let files = e ? e.originalEvent.dataTransfer.files : inp.files;
-            let errorBlock = thisInput.closest('.input').find('.invalid-feedback');
+        thisContainer.on('change', 'input', function (e) {
+            Upload.handleFiles(this.files);
+        });
+    },
 
-            $('.file-list').empty();
+    handleFiles: function (newFiles) {
+        let thisContainer = $("#upload");
+        let thisInput = thisContainer.find('input');
+        let fileTypes = thisInput[0].hasAttribute('accept') && thisInput.attr('accept')
+            ? thisInput.attr('accept').replaceAll(' ', '').split(',').map(type => type.trim())
+            : false;
+        let maxFileSize = parseInt(thisInput.attr('data-maxsize')) * 1024 * 1024;
+        let errorBlock = thisInput.closest('.input').find('.invalid-feedback');
 
-            console.log('Очищені FileTypes:', fileTypes);
+        for (let i = 0; i < newFiles.length; i++) {
+            let file = newFiles[i];
+            let isFileValid = this.validateFile(file, fileTypes, maxFileSize);
 
-            for (let i = 0; i < files.length; i++) {
-                let file = files[i];
-                let fileName = file.name;
-                let isFileValid = true;
+            if (isFileValid === true) {
+                this.addFile(file);
+            } else {
+                errorBlock.html(isFileValid);
+                thisContainer.removeClass('upload-success').addClass('is-error');
+            }
+        }
 
-                console.log('Тип файлу:', file.type);
-                console.log('Імя файлу:', file.name);
+        this.updateFileList();
+        this.updateInputFiles();
 
-                if (fileTypes) {
-                    isFileValid = fileTypes.some(type => {
-                        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
-                        return file.type === type ||
-                            file.type.includes(type.split(',')[0]) ||
-                            fileExtension === '.' + type.split('.').pop();
-                    });
-                }
+        if (this.fileList.files.length > 0) {
+            thisContainer.addClass('upload-success').removeClass('is-error');
+            this.submit();
+        }
+    },
 
-                console.log('Чи валідний:', isFileValid);
-                console.log('File type check:', fileTypes ? fileTypes.some(type => file.type === type) : 'No file types specified');
-                console.log('File extension check:', fileTypes ? fileTypes.some(type => {
-                    const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
-                    return fileExtension === '.' + type.split('.').pop();
-                }) : 'No file types specified');
+    validateFile: function (file, fileTypes, maxFileSize) {
+        if (fileTypes) {
+            let isValidType = fileTypes.some(type => {
+                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                return file.type === type ||
+                    file.type.includes(type.split(',')[0]) ||
+                    fileExtension === '.' + type.split('.').pop();
+            });
+            if (!isValidType) {
+                return 'Allow file: ' + fileTypes.map(type => '.' + type.split('.').pop()).join(', ');
+            }
+        }
 
-                if (!isFileValid) {
-                    errorBlock.html('Дозволені розширення: ' + fileTypes.map(type => '.' + type.split('.').pop()).join(', '));
-                    isValid = false;
-                } else if (file.size > maxFileSize) {
-                    errorBlock.html('Максимальний розмір файлу ' + (maxFileSize / 1024 / 1024) + 'MB');
-                    isValid = false;
-                } else {
-                    $('.file-list').append(`
+        if (file.size > maxFileSize) {
+            return 'Max size file' + (maxFileSize / 1024 / 1024) + 'MB';
+        }
+
+        return true;
+    },
+
+    addFile: function (file) {
+        // Перевіряємо, чи файл з таким ім'ям вже існує
+        for (let i = 0; i < this.fileList.files.length; i++) {
+            if (this.fileList.files[i].name === file.name) {
+                console.log(`Файл ${file.name} вже існує в списку.`);
+                return;
+            }
+        }
+        this.fileList.items.add(file);
+    },
+
+    removeFile: function (fileName) {
+        let newFileList = new DataTransfer();
+        for (let i = 0; i < this.fileList.files.length; i++) {
+            if (this.fileList.files[i].name !== fileName) {
+                newFileList.items.add(this.fileList.files[i]);
+            }
+        }
+        this.fileList = newFileList;
+        this.updateFileList();
+        this.updateInputFiles();
+
+        if (this.fileList.files.length === 0) {
+            this.resetUpload();
+        }
+    },
+
+    updateFileList: function () {
+        let fileList = $('.file-list');
+        fileList.empty();
+
+        for (let i = 0; i < this.fileList.files.length; i++) {
+            let fileName = this.fileList.files[i].name;
+            fileList.append(`
                 <div class="translate__file-review">
                     <span class="output-name">${fileName}</span>
                     <img src="/static/images/ico-cancel.svg" class="upload-remove" alt="X">
                 </div>
             `);
-                }
-            }
-
-            if (!isValid) {
-                thisInput.val('');
-                thisContainer.removeClass('upload-success').addClass('is-error');
-                return false;
-            }
-
-            thisContainer.addClass('upload-success').removeClass('is-error');
-            if (e)
-                thisInput[0].files = files;
-            Upload.submit();
         }
-
-        thisContainer.on('change', 'input', function(e) {
-            validateFiles(false, this)
-        });
     },
 
-    // Перевірка завантажених файлів
-    submit: function() {
-        $('.translate__file-block').hide();
-        $('.uploaded').css('display', 'flex')
+    updateInputFiles: function () {
+        let input = document.querySelector('input[type="file"]');
+        input.files = this.fileList.files;
+    },
+
+    resetUpload: function () {
+        let thisContainer = $("#upload");
+        thisContainer.find('input').val('');
+        thisContainer.removeClass('upload-success');
+        $('.uploaded').hide();
+        $('.output-type').hide();
+        this.fileList = new DataTransfer();
+        this.updateFileList();
+        this.updateInputFiles();
+        $('.translate__file-block.input').css('display', 'flex');
+        $('.translate__file-block.complete').css('display', 'none');
+    },
+
+    publicReset: function () {
+        this.resetUpload();
+    },
+
+    submit: function () {
+        $('.uploaded').css('display', 'flex');
     }
 }
 
-function removeFile(fileName) {
-    let input = document.querySelector('input[type="file"]');
-    let files = input.files;
-    let fileBuffer = new DataTransfer();
-
-    for (let i = 0; i < files.length; i++) {
-        if (files[i].name !== fileName) {
-            fileBuffer.items.add(files[i]);
-        }
-    }
-
-    input.files = fileBuffer.files;
-
-    console.log(`Видалено файл: ${fileName}`);
-
-    updateFileList();
-}
-
-function updateFileList() {
-    let input = document.querySelector('input[type="file"]');
-    let fileList = document.querySelector('.file-list');
-    fileList.innerHTML = '';
-
-    for (let i = 0; i < input.files.length; i++) {
-        let fileName = input.files[i].name;
-        fileList.innerHTML += `
-            <div class="translate__file-review">
-                <span class="output-name">${fileName}</span>
-                <img src="/static/images/ico-cancel.svg" class="upload-remove" alt="X">
-            </div>
-        `;
-    }
-
-    if (input.files.length === 0) {
-        resetUpload();
-    }
-}
-
-function resetUpload() {
-    let thisContainer = $("#upload");
-    thisContainer.find('input').val('')
-    thisContainer.removeClass('upload-success')
-    $('.uploaded').hide();
-    $('.output-type').hide();
-    $('.translate__file-block.input').css('display', 'flex')
-}
-
-$(document).on('click', '.upload-remove', function () {
-    let fileItem = $(this).closest('.translate__file-review');
-    let fileName = fileItem.find('.output-name').text();
-    removeFile(fileName);
+$(document).ready(function () {
+    Upload.init();
 });

@@ -698,6 +698,8 @@ $(document).ready(function () {
         $('.translate__file-block.input').css('display', 'flex');
         $('.translate__file-block.complete').css('display', 'none');
         $('#expert_revision_document').removeClass('expert--revision');
+
+        Upload.publicReset();
     }
 
     function clearText() {
