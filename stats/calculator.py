@@ -18,7 +18,7 @@ class StatsCalculator:
     def get_files_processing_api_url(self, file_extension):
         return f"{settings.FILES_PROCESSING_API_URL}/api/{self.file_extension_route_mapping[file_extension]}/export"
 
-    def get_chars(self, file):
+    def get_texts(self, file):
         file_extension = os.path.splitext(file.name)[1]
 
         response = requests.post(
@@ -30,6 +30,10 @@ class StatsCalculator:
             },
             data=file.read()
         )
+        return response.json()
+
+    def get_chars(self, file):
+        response = self.get_texts(file)
         chars = 0
         for paragraph in response.json()['texts']:
             chars += len(paragraph['text'])
