@@ -813,28 +813,25 @@ $(document).ready(function () {
                     const optionsContainer = tab.find('.output_value[name="translation_name"]').siblings('.select__dropdown').find('ul');
                     optionsContainer.empty();
 
-                    let result = [];
+                    if (response.data.length > 0) {
+                        response.data.forEach((i, index) => {
+                            const option = $('<li></li>');
+                            option.addClass('option');
+                            option.attr('data-value', i);
+                            option.text(i);
 
-                    if (algorithm) {
-                        result = response.data;
+                            if (index === 0) {
+                                option.addClass('selected');
+                                tab.find('.output_value[name="translation_name"]').val(i);
+                                tab.find('.output_text.template').val(i);
+                            }
+
+                            optionsContainer.append(option);
+                        })
                     } else {
-                        result = response.data;
+                        tab.find('.output_value[name="translation_name"]').val('');
+                        tab.find('.output_text.template').val('');
                     }
-
-                    result.forEach((i, index) => {
-                        const option = $('<li></li>');
-                        option.addClass('option');
-                        option.attr('data-value', i);
-                        option.text(i);
-
-                        if (index === 0) {
-                            option.addClass('selected');
-                            tab.find('.output_value[name="translation_name"]').val(i);
-                            tab.find('.output_text.template').val(i);
-                        }
-
-                        optionsContainer.append(option);
-                    })
                 });
 
             },
