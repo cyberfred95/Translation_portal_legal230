@@ -260,7 +260,11 @@ class SingleProjectView(APIView):
 class LanguageDetectView(APIView):
 
     def get(self, request):
-        file = request.FILES.getlist('document[]', [])[0]
-        text = StatsCalculator().get_texts(file=file)['texts'][0]['text']
-        language = langdetect.detect(text)
-        return JsonResponse({'language': language}, status=status.HTTP_200_OK)
+        files = request.FILES.getlist('document[]', [])
+        result = {}
+        for file in files:
+            text = StatsCalculator().get_texts(file=file)['texts'][0]['text']
+            tmp_language = langdetect.detect(text)
+            language = Language.objects.filter(abbreviation__iexact=tmp_language).first()
+            result[f'{file.name}'] = language.french_name if request.LANGUAGE_CODE != 'fr' else language.name
+        return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
