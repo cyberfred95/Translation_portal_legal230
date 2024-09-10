@@ -25,6 +25,7 @@ import requests
 from preferences import preferences
 from gpt_processing.prompts_list import prompts_list
 from stats.calculator import StatsCalculator
+import langdetect
 
 PAGINATION_PAGE_SIZE = 30
 
@@ -254,3 +255,16 @@ class SingleProjectView(APIView):
                                        "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
 
         return Response({"message": "Sucessfully deleted"}, status=status.HTTP_204_NO_CONTENT)
+
+
+class LanguageDetectView(APIView):
+
+    def get(self, request):
+        files = request.FILES.getlist('document[]', [])
+        result = {}
+        for file in files:
+            text = StatsCalculator().get_texts(file=file)['texts'][0]['text']
+            tmp_language = langdetect.detect(text)
+            language = Language.objects.filter(abbreviation__iexact=tmp_language).first()
+            result[f'{file.name}'] = language.french_name if request.LANGUAGE_CODE != 'fr' else language.name
+        return JsonResponse({'languages': result}, status=status.HTTP_200_OK)

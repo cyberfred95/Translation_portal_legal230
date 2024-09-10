@@ -1044,12 +1044,12 @@ body {
 
 .button.button--secondary {
     background: var(--secondary);
-    color: var(--white) !important;
+    color: var(--white);
 }
 
 .button.button--secondary.button--transparent {
     background: transparent;
-    color: var(--secondary) !important;
+    color: var(--secondary);
     border-color: var(--secondary);
 }
 
@@ -2001,6 +2001,8 @@ body {
 
 .select-box {
     display: flex;
+    align-items: center;
+    justify-content: center;
     flex-direction: column;
     position: relative;
 }
@@ -2175,18 +2177,13 @@ body {
 }
 
 .project.name {
-    max-width: 500px;
-    width: 500px;
+    max-width: 400px;
+    width: 400px;
 }
 
 .project.username {
-    max-width: 200px;
-    width: 200px;
-}
-
-.project.username {
-    max-width: 300px;
-    width: 300px;
+    max-width: 150px;
+    width: 150px;
 }
 
 .status {
@@ -2203,6 +2200,7 @@ body {
 
 .action {
     display: flex;
+    gap: 15px;
     justify-content: flex-end;
     align-items: center;
 }
@@ -2251,10 +2249,6 @@ body {
     line-height: 29px;
     margin-bottom: 10px;
     color: #000000;
-}
-
-.download-file {
-    width: 100%;
 }
 
 .translate__file-translated {
@@ -2505,8 +2499,8 @@ body {
     padding: 5px 0;
     position: absolute;
     z-index: 1;
-    bottom: 130%;
-    left: 50%;
+    bottom: 72%;
+    left: 67%;
     transform: translateX(-50%);
     opacity: 0;
     transition: opacity 0.5s;
@@ -2557,6 +2551,18 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     vertical-align: bottom;
+}
+
+.expert-revision:disabled {
+    cursor: default;
+    border-color: #b3b1b1 !important;
+    color: #b3b1b1 !important;
+    opacity: 0.65;
+    pointer-events: none;
+}
+
+.expert-revision:disabled:hover {
+    background-color: transparent;
 }
 
 

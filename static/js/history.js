@@ -1,6 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
     let errorPopup = '#error_popup';
-    var downloadButtons = document.querySelectorAll('.download-file');
+    let successPopup = '#success_modal'
+
+    var downloadButtons = document.querySelectorAll('.download-files');
+    var expertRevision = document.querySelectorAll('.expert-revision');
+    console.log(expertRevision);
 
     function errorHandler() {
         $('<a href=' + errorPopup + '></a>').fancybox({
@@ -11,9 +15,58 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             afterClose: function () {
                 location.reload()
-            }
+            },
         }).click()
     }
+
+    function successHandler() {
+        $('<a href=' + successPopup + '></a>').fancybox({
+            arrows: false,
+            padding: 0,
+            overlay: {
+                locked: false
+            },
+            afterClose: function () {
+                location.reload()
+            },
+        }).click()
+    }
+
+    expertRevision.forEach(function (button) {
+        button.addEventListener('click', function () {
+            var url = this.getAttribute('data-url');
+            var id = this.getAttribute('data-id');
+            console.log('url', url);
+            console.log('id', id);
+            let formData = new FormData();
+            formData.append('file_url', url);
+            formData.append('project_id', id);
+
+            $('.translate__file-block').hide();
+            $('.output-type').hide();
+            $('.translate__file-block.trans-progress').css('display', 'flex')
+
+            $.ajax({
+                type: 'POST',
+                url: expert_revision_file_url,
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Accept': 'application/json',
+                },
+                dataType: 'json',
+                success: function () {
+                    successHandler();
+                },
+                error: function (xhr, status, error) {
+                    errorHandler(error);
+                }
+            });
+        });
+    });
 
     downloadButtons.forEach(function (button) {
         button.addEventListener('click', function () {
