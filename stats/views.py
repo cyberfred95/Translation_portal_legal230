@@ -6,7 +6,6 @@ from rest_framework.response import Response
 import requests
 from preferences import preferences
 
-PORTAL_STATISTIC_URL = "https://statistics.portal.custom.mt/"
 
 
 # Create your views here.
@@ -18,7 +17,7 @@ class GetUserStatsView(APIView):
         additional_url_params = self.set_additional_url_params(request)
 
         response = requests.get(
-            PORTAL_STATISTIC_URL + additional_url_params + '&group_admin=true' if self.request.user.group.admin == self.request.user else '',
+            preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params + '&group_admin=true' if self.request.user.group.admin == self.request.user else '',
             headers={
                 'token': preferences.MainSettings.STATISTIC_SERVICE_URL
             },

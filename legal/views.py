@@ -38,7 +38,7 @@ def text_translation(request):
     }, headers={
         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
     send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('translation_name'))
-    statistic = StatsProcessor().send_request(texts=[text], request=request)
+    StatsProcessor.send_request(texts=[text], request=request)
     return response.json()
 
 

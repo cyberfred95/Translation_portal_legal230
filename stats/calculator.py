@@ -38,7 +38,8 @@ class StatsProcessor:
             chars += len(paragraph['text'])
         return chars
 
-    def send_request(self, texts: list, request):
+    @staticmethod
+    def send_request(texts: list, request):
         response = requests.post(
             preferences.StatisticSettings.URL + "add_statistic/",
             headers={
