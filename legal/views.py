@@ -265,6 +265,6 @@ class LanguageDetectView(APIView):
         for file in files:
             text = StatsProcessor().get_texts(file=file)['texts'][0]['text']
             tmp_language = langdetect.detect(text)
-            language = Language.objects.filter(abbreviation__iexact=tmp_language).first()
+            language = Language.objects.filter(abbreviation__exact=tmp_language).first()
             result[f'{file.name}'] = language.french_name if request.LANGUAGE_CODE != 'fr' else language.name
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
