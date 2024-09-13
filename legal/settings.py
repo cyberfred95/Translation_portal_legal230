@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'languages.apps.LanguagesConfig',
     'domains.apps.DomainsConfig',
     'stats.apps.StatsConfig',
+    'glossaries.apps.GlossariesConfig',
 ]
 
 STATICFILES_FINDERS = (
