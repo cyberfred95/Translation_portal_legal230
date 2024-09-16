@@ -5,8 +5,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Legal230</title>
+    <!-- FONT -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- TAILWIND -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- JQUERY -->
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"
             integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
     <script>
@@ -63,6 +66,10 @@
                             100: '#FCF9ED',
                             400: '#D4A600',
                         },
+                        blue: {
+                            100: '#E9F4FF',
+                            400: '#1E90FF',
+                        },
                     },
                     fontSize: generateTailwindSizes(),
                     width: generateTailwindSizes(),
@@ -80,7 +87,7 @@
     </script>
 </head>
 <body class="font-montserrat">
-<div class="flex min-h-screen max-h-full">
+<div class="flex h-screen">
     <!-- Sidebar -->
     {% include 'sidebar.html' %}
 
@@ -95,6 +102,7 @@
     </div>
 </div>
 <script src="{% static 'js/upload-document.js' %}"></script>
+<script src="{% static 'js/history.js' %}"></script>
 {% block extra_js %} {% endblock %}
 </body>
 </html>

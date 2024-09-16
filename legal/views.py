@@ -45,7 +45,9 @@ def text_translation(request):
 def file_translate(request):
     data = {**get_translate_data(request),
             "user_custom_mt_token": request.user.uuid,
-            "source_language": request.POST.get('source_language')}
+            "source_language": request.POST.get('source_language'),
+            "target_language": request.POST.get('target_language')
+            }
     projects = []
     files = request.FILES.getlist('document[]', [])
     for file in files:
