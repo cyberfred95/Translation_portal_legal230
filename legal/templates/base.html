@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load static %}
+<html lang="{{ request.LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <title>Legal230</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+            integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script>
+        const generateTailwindSizes = () => {
+            const sizes = {};
+            for (let px = 0; px <= 2000; px++) {
+                const tailwindName = (px / 4);
+                const remValue = (px / 16).toFixed(3);
+                sizes[tailwindName] = `${remValue}rem`;
+            }
+            return sizes;
+        }
+
+        tailwind.config = {
+            theme: {
+                extend: {
+                    screens: {
+                        'xs': '320px',
+                        'sm': '576px',
+                        'md': '768px',
+                        'lg': '1024px',
+                        'xl': '1280px',
+                        '2xl': '1536px',
+                        '3xl': '1920px',
+                    },
+                    fontFamily: {
+                        'montserrat': ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        gray: {
+                            100: '#F4F6F7',
+                            200: '#EAECED',
+                            300: '#D5DADE',
+                            400: '#AAB4BD',
+                            500: '#808E9B',
+                            600: '#556A7B',
+                            700: '#2A4459',
+                            800: '#0D2B40',
+                        },
+                        green: {
+                            100: '#F3F8F8',
+                            200: '#E7F0F1',
+                            300: '#D1E2E3',
+                            400: '#A1C4C9',
+                            500: '#74A6AC',
+                            600: '#458993',
+                            700: '#156D77',
+                        },
+                        red: {
+                            100: '#FFEFEF',
+                            400: '#FD625E',
+                        },
+                        yellow: {
+                            100: '#FCF9ED',
+                            400: '#D4A600',
+                        },
+                    },
+                    fontSize: generateTailwindSizes(),
+                    width: generateTailwindSizes(),
+                    maxWidth: generateTailwindSizes(),
+                    height: generateTailwindSizes(),
+                    padding: generateTailwindSizes(),
+                    margin: generateTailwindSizes(),
+                    inset: generateTailwindSizes(),
+                    spacing: generateTailwindSizes(),
+                    borderRadius: generateTailwindSizes(),
+                    gap: generateTailwindSizes(),
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-montserrat">
+<div class="flex min-h-screen max-h-full">
+    <!-- Sidebar -->
+    {% include 'sidebar.html' %}
+
+    <!-- Main page -->
+    <div class="flex-1">
+        <!-- Header -->
+        {% include 'header.html' %}
+        {% block content %}
+        <!-- Page content -->
+
+        {% endblock %}
+    </div>
+</div>
+<script src="{% static 'js/upload-document.js' %}"></script>
+{% block extra_js %} {% endblock %}
+</body>
+</html>
+

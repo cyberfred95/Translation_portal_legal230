@@ -1,590 +1,626 @@
-<!DOCTYPE html>
-{% load i18n %}
-{% load static %}
-<html lang="{{ request.LANGUAGE_CODE }}">
-<head>
-    <meta charset="UTF-8">
-    <title>Legal230</title>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
-    <link rel="shortcut icon" href="{% static 'images/favicon.png' %}"/>
-    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
-    <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-    <link href="{% static 'css/jquery.fancybox.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/main.css' %}" rel="stylesheet">
-    <!-- JavaScript Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
-            crossorigin="anonymous"></script>
-</head>
-<body>
-<div class="global_wrapper">
-    <header class="header">
-        <div class="wrapper">
-            <div class="header__container">
-                <a href="/" class="header__logo">
-                    {% get_current_language as LANGUAGE_CODE %}
-                    <img src="{% static 'images/logo.png' %}" alt="Logo">
-                </a>
-                <div class="header__btn">
-                    <ul class="header__lang">
-                        <li class="{% if LANGUAGE_CODE == 'en' %}is-active{% endif %}"><a href="/en">en</a></li>
-                        <li class="{% if LANGUAGE_CODE == 'fr' %}is-active{% endif %}"><a href="/fr">fr</a></li>
-                    </ul>
-                    <a class="button" href="/accounts/logout/">
-                        <span>{% trans "Logout" %}</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </header>
-    <div class="translate">
-        <div class="wrapper">
-            <div class="translate__title page-title">
-                <h1>{% trans "Translator" %}</h1>
-            </div>
-            <div class="translate__tabs" id="tabs">
-                <ul class="translate__nav">
-                    <li>
-                        <a href="#tabs-1" class="button button--ico button--secondary">
-                            <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <g clip-path="url(#clip0_2611_13192)">
-                                    <path d="M23.1987 10.6065H13.4081C11.8634 10.6065 10.6068 11.8632 10.6068 13.4078V18.7272L8.07007 20.539C7.86992 20.6819 7.7511 20.9128 7.7511 21.1587C7.7511 21.4049 7.86992 21.6358 8.07007 21.7786L10.6373 23.6123C10.8378 24.9616 12.004 26 13.4081 26H23.1987C24.7434 26 26 24.7434 26 23.1985V13.4078C26 11.8632 24.7434 10.6065 23.1987 10.6065ZM19.9067 21.3099C19.7271 21.3099 19.5885 21.2529 19.5478 21.0978L19.2376 20.0126H17.369L17.0591 21.0978C17.0183 21.2529 16.8796 21.3099 16.7001 21.3099C16.4145 21.3099 16.031 21.1306 16.031 20.8695C16.031 20.853 16.0392 20.8205 16.0473 20.7878L17.6221 15.6557C17.6955 15.4109 17.9974 15.2965 18.2993 15.2965C18.6094 15.2965 18.9113 15.4109 18.9847 15.6557L20.5595 20.7878C20.5676 20.8205 20.5757 20.8449 20.5757 20.8695C20.5757 21.1222 20.1923 21.3099 19.9067 21.3099Z"
-                                          fill="#9EAAB3"/>
-                                    <path d="M17.5894 19.1802H19.0092L18.2991 16.6755L17.5894 19.1802Z" fill="#9EAAB3"/>
-                                    <path d="M9.0833 13.4078C9.0833 12.3851 9.44095 11.4448 10.0366 10.7035C9.1676 10.7035 8.36125 10.4316 7.69653 9.96959C7.03181 10.4318 6.22546 10.7035 5.35623 10.7035C5.11919 10.7035 4.92677 10.5111 4.92677 10.2739C4.92677 10.0366 5.11919 9.84442 5.35623 9.84442C5.96501 9.84442 6.53471 9.67581 7.02249 9.38382C6.43414 8.74886 6.04297 7.92902 5.94835 7.0217H5.35643C5.11919 7.0217 4.92677 6.82948 4.92677 6.59224C4.92677 6.355 5.11919 6.16258 5.35643 6.16258H7.26727V5.11958C7.26727 4.88214 7.45949 4.68993 7.69673 4.68993C7.93398 4.68993 8.12619 4.88214 8.12619 5.11958V6.16258H10.037C10.2743 6.16258 10.4667 6.355 10.4667 6.59224C10.4667 6.82948 10.2743 7.0217 10.037 7.0217H9.44511C9.35049 7.92902 8.95932 8.74886 8.37097 9.38382C8.85855 9.67621 9.42845 9.84442 10.037 9.84442C10.2638 9.84442 10.449 10.0202 10.4651 10.2429C11.2377 9.52406 12.2722 9.0831 13.4082 9.0831H15.3935V7.27283L17.9301 5.46097C18.1301 5.31815 18.2489 5.08725 18.2489 4.84128C18.2489 4.59511 18.1301 4.36421 17.9301 4.22139L15.3629 2.38771C15.1622 1.03844 13.996 0 12.592 0H2.8015C1.25664 0 0 1.25664 0 2.8013V12.5922C0 14.1368 1.25664 15.3935 2.8015 15.3935H9.0833V13.4078Z"
-                                          fill="#9EAAB3"/>
-                                    <path d="M7.69655 8.84703C8.16667 8.35925 8.48584 7.72588 8.57927 7.02188H6.81403C6.90746 7.72588 7.22682 8.35925 7.69655 8.84703Z"
-                                          fill="#9EAAB3"/>
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_2611_13192">
-                                        <rect width="26" height="26" fill="white"/>
-                                    </clipPath>
-                                </defs>
-                            </svg>
-                            <span>{% trans "Text translate" %}</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#tabs-2" class="button button--ico button--secondary">
-                            <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M21.2442 11.05L22.8583 9.43584C23.4822 8.81035 23.8325 7.963 23.8325 7.07959C23.8325 6.19618 23.4822 5.34883 22.8583 4.72334L21.2767 3.14167C20.6512 2.51784 19.8038 2.16751 18.9204 2.16751C18.037 2.16751 17.1897 2.51784 16.5642 3.14167L14.95 4.75584L21.2442 11.05Z"
-                                      fill="#9EAAB3"/>
-                                <path d="M13.4225 6.28333L3.33668 16.3692C2.99956 16.7053 2.78255 17.1432 2.71918 17.615L2.16668 21.32C2.11605 21.6321 2.13437 21.9516 2.22035 22.2559C2.30632 22.5602 2.45787 22.842 2.66434 23.0815C2.87082 23.3211 3.12723 23.5125 3.41555 23.6423C3.70388 23.7722 4.01714 23.8374 4.33334 23.8333H4.64751L8.35251 23.3025C8.82435 23.2391 9.26218 23.0221 9.59834 22.685L19.6842 12.5992L13.4225 6.28333Z"
-                                      fill="#9EAAB3"/>
-                            </svg>
-                            <span>{% trans "Document translate" %}</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#tabs-3" class="button button--ico button--secondary">
-                            <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <g clip-path="url(#clip0_2611_13199)">
-                                    <path d="M4.33331 7.3125C4.33331 4.47525 6.6419 2.16667 9.47915 2.16667H19.3732C19.0168 0.91975 17.8804 0 16.5208 0H4.06248C2.41906 0 1.08331 1.33575 1.08331 2.97917V19.7708C1.08331 21.4143 2.41906 22.75 4.06248 22.75H4.33331V7.3125Z"
-                                          fill="#9EAAB3"/>
-                                    <path d="M21.9375 4.33334H9.47917C7.83575 4.33334 6.5 5.66909 6.5 7.31251V23.0208C6.5 24.6643 7.83575 26 9.47917 26H21.9375C23.5809 26 24.9167 24.6643 24.9167 23.0208V7.31251C24.9167 5.66909 23.5809 4.33334 21.9375 4.33334ZM19.7708 22.75H11.6458C11.1973 22.75 10.8333 22.386 10.8333 21.9375C10.8333 21.489 11.1973 21.125 11.6458 21.125H19.7708C20.2193 21.125 20.5833 21.489 20.5833 21.9375C20.5833 22.386 20.2193 22.75 19.7708 22.75ZM19.7708 18.4167H11.6458C11.1973 18.4167 10.8333 18.0527 10.8333 17.6042C10.8333 17.1557 11.1973 16.7917 11.6458 16.7917H19.7708C20.2193 16.7917 20.5833 17.1557 20.5833 17.6042C20.5833 18.0527 20.2193 18.4167 19.7708 18.4167ZM19.7708 14.625H11.6458C11.1973 14.625 10.8333 14.261 10.8333 13.8125C10.8333 13.364 11.1973 13 11.6458 13H19.7708C20.2193 13 20.5833 13.364 20.5833 13.8125C20.5833 14.261 20.2193 14.625 19.7708 14.625ZM19.7708 10.2917H11.6458C11.1973 10.2917 10.8333 9.92768 10.8333 9.47918C10.8333 9.03068 11.1973 8.66668 11.6458 8.66668H19.7708C20.2193 8.66668 20.5833 9.03068 20.5833 9.47918C20.5833 9.92768 20.2193 10.2917 19.7708 10.2917Z"
-                                          fill="#9EAAB3"/>
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_2611_13199">
-                                        <rect width="26" height="26" fill="white"/>
-                                    </clipPath>
-                                </defs>
-                            </svg>
+{% extends 'base.html' %}
 
-                            <span>{% trans "Writing" %}</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'project_history' %}#tabs-4"
-                           class="button button--ico button--secondary no-tab">
-
-                            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26"
-                                 fill="none">
-                                <path d="M21.2439 11.05L22.858 9.43581C23.4819 8.81032 23.8322 7.96297 23.8322 7.07956C23.8322 6.19615 23.4819 5.3488 22.858 4.72331L21.2764 3.14164C20.6509 2.51781 19.8035 2.16748 18.9201 2.16748C18.0367 2.16748 17.1894 2.51781 16.5639 3.14164L14.9497 4.75581L21.2439 11.05Z"
-                                      fill="#456B84"/>
-                                <path d="M13.4224 6.28333L3.33661 16.3692C2.9995 16.7053 2.78249 17.1432 2.71911 17.615L2.16661 21.32C2.11599 21.6321 2.13431 21.9516 2.22029 22.2559C2.30626 22.5602 2.45781 22.842 2.66428 23.0815C2.87076 23.3211 3.12716 23.5125 3.41549 23.6423C3.70382 23.7722 4.01708 23.8374 4.33328 23.8333H4.64745L8.35245 23.3025C8.82429 23.2391 9.26212 23.0221 9.59828 22.685L19.6841 12.5992L13.4224 6.28333Z"
-                                      fill="#456B84"/>
-                            </svg>
-                            <span>{% trans "Project history" %}</span>
-                        </a>
-                    </li>
-                </ul>
-
-                    <div class="translate__tab" id="tabs-1">
-                        <form method="post" action="{% url 'main_index' %}" class="translate__form needs-validation" id="text_translate_form">
-                            <input type="hidden" name="action" value="text_translate">
-
-                        {% csrf_token %}
-
-                            <div class="translate__form-row">
-                                <div class="translate__form-header">
-                                    <div class="translate__form-title">
-                                        <div class="gpt_processing__select">
-                                            <div class="select new-design select--with-desc translation">
-                                                <input class="output_text source" required type="text" tabindex="0" placeholder="{% trans 'Source language' %}">
-                                                <input class="output_value" type="hidden" name="source_language" required>
-                                                <div class="select__dropdown">
-                                                    <ul>
-                                                        {% for translate_language in translate_languages %}
-                                                        <li class="option" data-value="{{ translate_language.abbreviation|lower }}">
-
-                                                            {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                                                                {{ translate_language.french_name }}
-                                                            {% else %} {{ translate_language.name }}
-                                                            {% endif %}
-                                                        </li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="swap__language-ico">
-                                        <img src="{% static 'images/ico-swap-language.svg' %}" alt="Swap language">
-                                    </div>
-                                    <div class="translate__form-title target">
-                                        <div class="gpt_processing__select">
-                                            <div class="select new-design select--with-desc translation">
-                                                <input class="output_text target" required type="text" tabindex="0" placeholder="{% trans 'Target language' %}">
-                                                <input class="output_value" type="hidden" name="target_language" required>
-                                                <div class="select__dropdown">
-                                                    <ul>
-                                                        {% for translate_language in translate_languages %}
-                                                        <li class="option" data-value="{{ translate_language.abbreviation|lower }}">
-
-                                                            {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                                                                {{ translate_language.french_name }}
-                                                            {% else %} {{ translate_language.name }}
-                                                            {% endif %}
-                                                        </li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="gpt_processing__select">
-                                            <div class="select new-design select--with-desc translation templates">
-                                                <input class="output_text template" required type="text" tabindex="0" placeholder="{% trans 'Practice' %}">
-                                                <input class="output_value" type="hidden" name="translation_name" required>
-                                                <div class="select__dropdown">
-                                                    <ul>
-
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="translate__form-row">
-                                <div class="translate__form-text">
-                                    <div class="translate__form-btn btn_clear">
-                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <g clip-path="url(#clip0_2611_13225)">
-                                                <path d="M8.23814 7.00014L13.7435 1.49482C14.0855 1.15307 14.0855 0.598568 13.7435 0.25682C13.4014 -0.0852201 12.8475 -0.0852201 12.5055 0.25682L7.00015 5.76215L1.49453 0.25682C1.15249 -0.0852201 0.59857 -0.0852201 0.25653 0.25682C-0.08551 0.598568 -0.08551 1.15307 0.25653 1.49482L5.76215 7.00014L0.25653 12.5055C-0.08551 12.8472 -0.08551 13.4017 0.25653 13.7435C0.42755 13.9142 0.651685 13.9997 0.875529 13.9997C1.09937 13.9997 1.32351 13.9142 1.49453 13.7432L7.00015 8.23785L12.5055 13.7432C12.6765 13.9142 12.9006 13.9997 13.1245 13.9997C13.3483 13.9997 13.5724 13.9142 13.7435 13.7432C14.0855 13.4014 14.0855 12.8469 13.7435 12.5052L8.23814 7.00014Z" fill="#292929"/>
-                                            </g>
-                                            <defs>
-                                                <clipPath id="clip0_2611_13225">
-                                                    <rect width="14" height="14" fill="white"/>
-                                                </clipPath>
-                                            </defs>
-                                        </svg>
-                                    </div>
-                                    <textarea required id="translation_text" maxlength="2400" name="text" placeholder="{% trans "Start typing" %}"></textarea>
-                                    <div class="invalid-feedback">
-                                        {% trans "Text is required." %}
-                                    </div>
-                                </div>
-                                <div class="translate__form-text result">
-                                    <div class="translate__form-btn btn_copy" data-tooltip="Text copied">
-                                        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <g clip-path="url(#clip0_2611_13230)">
-                                                <path d="M28.9995 6.2001C28.9887 6.17637 28.9764 6.15363 28.9627 6.13172C28.8909 6.00539 28.8023 5.88756 28.6976 5.78156L23.4733 0.496055C23.341 0.362168 23.1867 0.252832 23.019 0.170977C23.0163 0.169453 23.0135 0.168223 23.0107 0.166758C23.0069 0.164941 23.0031 0.163066 22.9993 0.161309C22.9838 0.153516 22.9679 0.146426 22.9516 0.140039C22.7427 0.0491016 22.5156 0 22.2856 0H13.0962C12.1754 0 11.4263 0.749121 11.4263 1.66992V6.17748H2.49011C1.56931 6.17748 0.82019 6.92654 0.82019 7.84734V28.3301C0.82019 29.2509 1.56931 30 2.49011 30H16.7839C17.7047 30 18.4539 29.2509 18.4539 28.3301V23.8225H27.5098C28.4306 23.8225 29.1797 23.0735 29.1797 22.1527V6.95543C29.1797 6.68871 29.1171 6.43143 28.9995 6.2001ZM27.1233 5.85592H23.822C23.5474 5.85592 23.324 5.6325 23.324 5.35787V2.01211L27.1233 5.85592ZM12.5982 8.18959L16.3975 12.0335H13.0962C12.8216 12.0335 12.5982 11.81 12.5982 11.5354V8.18959ZM17.282 28.3301C17.282 28.6047 17.0586 28.8281 16.784 28.8281H2.49011C2.21548 28.8281 1.99207 28.6047 1.99207 28.3301V7.84734C1.99207 7.57271 2.21548 7.34936 2.49011 7.34936H11.4263V11.5354C11.4263 12.4562 12.1754 13.2053 13.0962 13.2053H17.282V15.2477H15.4046C15.081 15.2477 14.8186 15.5101 14.8186 15.8336C14.8186 16.1572 15.081 16.4195 15.4046 16.4195H17.282V28.3301ZM27.5099 22.6506H18.4539V16.4196H22.4371L21.0888 17.7622C20.8595 17.9906 20.8587 18.3616 21.0871 18.5909C21.2016 18.7059 21.3519 18.7634 21.5023 18.7634C21.6518 18.7634 21.8014 18.7065 21.9157 18.5926L24.2594 16.2587C24.3695 16.149 24.4316 16.0001 24.4319 15.8447C24.4319 15.8428 24.4317 15.8409 24.4317 15.839C24.4317 15.8372 24.4319 15.8355 24.4319 15.8337C24.4319 15.6415 24.339 15.4715 24.1962 15.3647L21.9175 13.0765C21.6891 12.8472 21.3181 12.8464 21.0888 13.0748C20.8595 13.3032 20.8587 13.6741 21.0871 13.9035L22.4258 15.2478H18.4539V13.133C18.4539 12.6906 18.2827 12.2737 17.9717 11.9591L12.7474 6.67359C12.7004 6.62602 12.6504 6.58195 12.5982 6.5407V1.66992C12.5982 1.39529 12.8217 1.17188 13.0963 1.17188H22.1522V5.35787C22.1522 6.27867 22.9014 7.02779 23.8222 7.02779H28.008V22.1527C28.0079 22.4273 27.7844 22.6506 27.5099 22.6506Z" fill="#292929"/>
-                                                <path d="M4.64343 16.4062H12.3571C12.6807 16.4062 12.9431 16.1439 12.9431 15.8203C12.9431 15.4968 12.6807 15.2344 12.3571 15.2344H4.64343C4.31982 15.2344 4.0575 15.4968 4.0575 15.8203C4.0575 16.1439 4.31982 16.4062 4.64343 16.4062Z" fill="#292929"/>
-                                                <path d="M4.64343 19.5117H11.0725C11.3961 19.5117 11.6585 19.2493 11.6585 18.9258C11.6585 18.6022 11.3961 18.3398 11.0725 18.3398H4.64343C4.31982 18.3398 4.0575 18.6022 4.0575 18.9258C4.0575 19.2493 4.31982 19.5117 4.64343 19.5117Z" fill="#292929"/>
-                                                <path d="M13.9886 19.512C14.3123 19.512 14.5748 19.2496 14.5748 18.9258C14.5748 18.602 14.3123 18.3396 13.9886 18.3396C13.6648 18.3396 13.4023 18.602 13.4023 18.9258C13.4023 19.2496 13.6648 19.512 13.9886 19.512Z" fill="#292929"/>
-                                                <path d="M14.0022 21.4844H4.64343C4.31982 21.4844 4.0575 21.7468 4.0575 22.0703C4.0575 22.3939 4.31982 22.6563 4.64343 22.6563H14.0022C14.3258 22.6563 14.5881 22.3939 14.5881 22.0703C14.5881 21.7468 14.3258 21.4844 14.0022 21.4844Z" fill="#292929"/>
-                                                <path d="M14.0022 24.6094H4.64343C4.31982 24.6094 4.0575 24.8718 4.0575 25.1953C4.0575 25.5189 4.31982 25.7812 4.64343 25.7812H14.0022C14.3258 25.7812 14.5881 25.5189 14.5881 25.1953C14.5881 24.8718 14.3258 24.6094 14.0022 24.6094Z" fill="#292929"/>
-                                            </g>
-                                            <defs>
-                                                <clipPath id="clip0_2611_13230">
-                                                    <rect width="30" height="30" fill="white"/>
-                                                </clipPath>
-                                            </defs>
-                                        </svg>
-                                    </div>
-                                    <textarea readonly id="result_text"></textarea>
-                                </div>
-                            </div>
-                            <div class="translate__form-submit">
-                                <button type="submit" class="button">{% trans "Translate text btn" %}</button>
-                                <button type="button" class="button expert--revision" id="expert_revision">
-                                    <span>{% trans "Expert Revision" %}</span>
-                                    <span class="revision-icon">
-                                        <svg  width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M6.9997 0C3.13422 0 0 3.13422 0 6.9997C0 10.8652 3.13422 14 6.9997 14C10.8652 14 14 10.8652 14 6.9997C14 3.13422 10.8652 0 6.9997 0ZM8.45689 10.8486C8.09659 10.9908 7.80978 11.0987 7.59467 11.1733C7.38015 11.248 7.13067 11.2853 6.84681 11.2853C6.41067 11.2853 6.07111 11.1787 5.82933 10.9659C5.58756 10.7532 5.46726 10.4836 5.46726 10.1559C5.46726 10.0284 5.47615 9.89807 5.49393 9.76533C5.5123 9.63259 5.54133 9.48326 5.58104 9.31556L6.032 7.72267C6.0717 7.56978 6.10607 7.42459 6.13333 7.28948C6.16059 7.15318 6.17363 7.02815 6.17363 6.91437C6.17363 6.7117 6.13156 6.56948 6.048 6.48948C5.96326 6.40948 5.80385 6.37037 5.56622 6.37037C5.45007 6.37037 5.33037 6.38756 5.2077 6.4237C5.08622 6.46104 4.98074 6.49481 4.89422 6.528L5.01333 6.03733C5.30844 5.91704 5.59111 5.81393 5.86074 5.72859C6.13037 5.64207 6.38519 5.59941 6.62519 5.59941C7.05837 5.59941 7.39259 5.70489 7.62785 5.91348C7.86193 6.12267 7.97985 6.39467 7.97985 6.72889C7.97985 6.79822 7.97156 6.9203 7.95556 7.09452C7.93956 7.26933 7.90933 7.42874 7.86548 7.57511L7.41689 9.16326C7.38015 9.29067 7.34756 9.43644 7.31793 9.59941C7.28889 9.76237 7.27467 9.88682 7.27467 9.97037C7.27467 10.1813 7.32148 10.3253 7.4163 10.4018C7.50993 10.4782 7.67407 10.5167 7.90637 10.5167C8.016 10.5167 8.13867 10.4972 8.27733 10.4593C8.41481 10.4213 8.51437 10.3876 8.57719 10.3585L8.45689 10.8486ZM8.37748 4.40237C8.1683 4.59674 7.91644 4.69393 7.62193 4.69393C7.328 4.69393 7.07437 4.59674 6.86341 4.40237C6.65363 4.208 6.54756 3.97156 6.54756 3.69541C6.54756 3.41985 6.65422 3.18281 6.86341 2.98667C7.07437 2.78993 7.328 2.69215 7.62193 2.69215C7.91644 2.69215 8.16889 2.78993 8.37748 2.98667C8.58667 3.18281 8.69156 3.41985 8.69156 3.69541C8.69156 3.97215 8.58667 4.208 8.37748 4.40237Z" fill="white"/>
-                                        </svg>
-                                        <span class="tooltiptext">{% trans "Expert revision" %}</span>
-                                    </span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="translate__tab" id="tabs-2">
-                        <form method="post"  action="{% url 'main_index' %}" class="needs-validation"  id="file_translate_form">
-                            <input type="hidden" name="action" value="file_translate">
-
-                            {% csrf_token %}
-                            <div class="translate__form-row">
-                                <div class="translate__form-header">
-                                    <div class="translate__form-title document">
-                                        <div class="gpt_processing__select">
-                                            <div class="select new-design select--with-desc translation">
-                                                <input class="output_text source" required type="text" tabindex="0" placeholder="{% trans 'Source language' %}">
-                                                <input class="output_value" type="hidden" name="source_language" required>
-                                                <div class="select__dropdown">
-                                                    <ul>
-                                                        {% for translate_language in translate_languages %}
-                                                        <li class="option" data-value="{{ translate_language.abbreviation|lower }}">
-
-                                                            {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                                                                {{ translate_language.french_name }}
-                                                            {% else %} {{ translate_language.name }}
-                                                            {% endif %}
-                                                        </li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="swap__language-ico document">
-                                            <img src="{% static 'images/ico-swap-language.svg' %}" alt="Swap language">
-                                        </div>
-                                        <div class="gpt_processing__select">
-                                            <div class="select new-design select--with-desc translation">
-                                                <input class="output_text target" required type="text" tabindex="0" placeholder="{% trans 'Target language' %}">
-                                                <input class="output_value" type="hidden" name="target_language" required>
-                                                <div class="select__dropdown">
-                                                    <ul>
-                                                        {% for translate_language in translate_languages %}
-                                                        <li class="option" data-value="{{ translate_language.abbreviation|lower }}">
-
-                                                            {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                                                                {{ translate_language.french_name }}
-                                                            {% else %} {{ translate_language.name }}
-                                                            {% endif %}
-                                                        </li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="gpt_processing__select">
-                                        <div class="select new-design select--with-desc translation templates">
-                                            <input class="output_text template" type="text" tabindex="0" required placeholder="{% trans 'Practice' %}">
-                                            <input class="output_value" type="hidden" name="translation_name" required>
-                                            <div class="select__dropdown">
-                                                <ul>
-
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="translate__file" id="upload">
-                                <div class="translate__file-block input">
-                                    <div class="translate__file-title">
-                                        <span>{% trans "Drag and drop" %}</span>
-                                    </div>
-                                    <p>{% trans "Supported formats" %}: .txt, .docx, .xlsx, .pptx, .pdf</p>
-                                    <div class="translate__file-ico">
-                                        <img src="{% static 'images/ico-upload.svg' %}" alt="Add file">
-                                    </div>
-                                    <label class="button button--transparent">
-                                        {% trans "Add file" %}
-                                        <input type="file" id="document" data-maxsize="32" multiple
-                                               accept="text/plain, application/vnd.openxmlformats-officedocument.wordprocessingml.document,
-                                                application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
-                                                application/vnd.openxmlformats-officedocument.presentationml.presentation, application/pdf"
-                                           name="document">
-                                </label>
-                                <div class="invalid-feedback">
-                                    {% trans "Choose the document." %}
-                                </div>
-                            </div>
-
-                            <div class="translate__file-block uploaded">
-<!--                                <div class="translate__file-ico">-->
-<!--                                    <img src="{% static 'images/ico-uploaded.svg' %}" alt="Add file">-->
-<!--                                    <span>{% trans "File added" %}</span>-->
-<!--                                </div>-->
-                                <div class="file-list">
-                                    <!-- Тут будуть виводитися завантажені файли -->
-                                </div>
-<!--                                <div class="translate__file-review">-->
-<!--                                    <span class="output-name">hhhh</span>-->
-<!--                                    <img src="{% static 'images/ico-cancel.svg' %}" class="upload-remove" alt="X">-->
-<!--                                </div>-->
-                            </div>
-                                <div class="output-type" >
-                                    <span>{%trans 'PDF file' %}</span>
-                                </div>
-
-                            <div class="translate__file-block trans-progress">
-                                <div class="translate__file-title">
-                                    <span>{% trans "Translation in progress..." %}</span>
-                                </div>
-                                <div class="translate__file-ico">
-                                </div>
-                            </div>
-
-                                <div class="translate__file-block complete">
-                                    <div class="translate__file-title">
-                                        <span>{% trans "Translation is completed!" %}</span>
-                                    </div>
-                                    <div class="translate__file-ico">
-                                        <div class="download-buttons">
-                                            <button type="button" id="download_result" class="button button--secondary button--transparent button--ico">
-                                                <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <g clip-path="url(#clip0_2624_14289)">
-                                                        <path d="M15.2188 7.71875C14.7875 7.71875 14.4375 8.06875 14.4375 8.5C14.4375 12.05 11.55 14.9375 8 14.9375C4.45 14.9375 1.5625 12.05 1.5625 8.5C1.5625 8.06875 1.2125 7.71875 0.78125 7.71875C0.35 7.71875 0 8.06875 0 8.5C0 10.6375 0.83125 12.6469 2.34375 14.1562C3.85625 15.6687 5.8625 16.5 8 16.5C10.1375 16.5 12.1469 15.6687 13.6562 14.1562C15.1687 12.6438 16 10.6375 16 8.5C16 8.06875 15.65 7.71875 15.2188 7.71875Z" fill="#292929"/>
-                                                        <path d="M6.92793 11.2375C7.21543 11.525 7.59668 11.6812 7.9998 11.6812C8.40605 11.6812 8.7873 11.5219 9.07168 11.2375L11.0373 9.27187C11.3436 8.96562 11.3436 8.47187 11.0373 8.16562C10.7311 7.85937 10.2373 7.85937 9.93105 8.16562L8.78105 9.31875V1.28125C8.78105 0.85 8.43105 0.5 7.9998 0.5C7.56855 0.5 7.21855 0.85 7.21855 1.28125V9.31875L6.06543 8.16562C5.75918 7.85937 5.26543 7.85937 4.95918 8.16562C4.65293 8.47187 4.65293 8.96562 4.95918 9.27187L6.92793 11.2375Z" fill="#292929"/>
-                                                    </g>
-                                                    <defs>
-                                                        <clipPath id="clip0_2624_14289">
-                                                            <rect width="16" height="16" fill="white" transform="translate(0 0.5)"/>
-                                                        </clipPath>
-                                                    </defs>
-                                                </svg>
-                                                <span>{% trans "Download the translated document" %}</span>
-                                            </button>
-                                            <button type="button" id="expert_revision_document" class="button button--secondary button--transparent button--ico export--revision--download">
-                                                <span>{% trans "Expert Revision" %}</span>
-                                                <span class="revision-icon">
-                                                    <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <g clip-path="url(#clip0_2704_437)">
-                                                            <path d="M8 0.5C6.41775 0.5 4.87104 0.969192 3.55544 1.84824C2.23985 2.72729 1.21447 3.97672 0.608967 5.43853C0.00346629 6.90034 -0.15496 8.50887 0.153721 10.0607C0.462403 11.6126 1.22433 13.038 2.34315 14.1569C3.46197 15.2757 4.88743 16.0376 6.43928 16.3463C7.99113 16.655 9.59966 16.4965 11.0615 15.891C12.5233 15.2855 13.7727 14.2602 14.6518 12.9446C15.5308 11.629 16 10.0823 16 8.5C15.9977 6.37897 15.1541 4.34547 13.6543 2.84568C12.1545 1.34589 10.121 0.502294 8 0.5ZM8 15.1667C6.68146 15.1667 5.39253 14.7757 4.2962 14.0431C3.19987 13.3106 2.34539 12.2694 1.84081 11.0512C1.33622 9.83305 1.2042 8.49261 1.46144 7.1994C1.71867 5.90619 2.35361 4.71831 3.28596 3.78596C4.21831 2.85361 5.4062 2.21867 6.6994 1.96143C7.99261 1.7042 9.33305 1.83622 10.5512 2.3408C11.7694 2.84539 12.8106 3.69987 13.5431 4.7962C14.2757 5.89253 14.6667 7.18146 14.6667 8.5C14.6647 10.2675 13.9617 11.9621 12.7119 13.2119C11.4621 14.4617 9.76752 15.1647 8 15.1667Z" fill="#292929"/>
-                                                            <path d="M8.47816 3.87534C8.09372 3.8053 7.69857 3.8206 7.32069 3.92017C6.94281 4.01974 6.59144 4.20115 6.29143 4.45155C5.99142 4.70195 5.7501 5.01522 5.58457 5.36921C5.41903 5.72319 5.33332 6.10923 5.3335 6.50001C5.3335 6.67682 5.40373 6.84639 5.52876 6.97142C5.65378 7.09644 5.82335 7.16668 6.00016 7.16668C6.17697 7.16668 6.34654 7.09644 6.47157 6.97142C6.59659 6.84639 6.66683 6.67682 6.66683 6.50001C6.66666 6.30386 6.70977 6.11009 6.79309 5.93252C6.87641 5.75494 6.99788 5.59794 7.14884 5.4727C7.2998 5.34746 7.47654 5.25707 7.66645 5.20797C7.85635 5.15888 8.05475 5.15229 8.2475 5.18868C8.51086 5.2398 8.753 5.36827 8.943 5.55767C9.13299 5.74707 9.26222 5.98881 9.31416 6.25201C9.36663 6.52828 9.3304 6.81406 9.21067 7.0685C9.09093 7.32294 8.89381 7.53301 8.6475 7.66868C8.23961 7.90499 7.90255 8.24635 7.67145 8.65721C7.44034 9.06807 7.32364 9.53338 7.3335 10.0047V10.5C7.3335 10.6768 7.40373 10.8464 7.52876 10.9714C7.65378 11.0964 7.82335 11.1667 8.00016 11.1667C8.17697 11.1667 8.34654 11.0964 8.47157 10.9714C8.59659 10.8464 8.66683 10.6768 8.66683 10.5V10.0047C8.65846 9.77269 8.71137 9.54258 8.82021 9.33754C8.92905 9.13249 9.08999 8.95974 9.28683 8.83668C9.76984 8.57139 10.1588 8.16298 10.4002 7.66761C10.6416 7.17225 10.7237 6.61425 10.635 6.07036C10.5464 5.52647 10.2914 5.0234 9.90516 4.63034C9.51893 4.23728 9.02041 3.97352 8.47816 3.87534Z" fill="#292929"/>
-                                                            <path d="M8.66683 12.5C8.66683 12.1319 8.36835 11.8334 8.00016 11.8334C7.63197 11.8334 7.3335 12.1319 7.3335 12.5C7.3335 12.8682 7.63197 13.1667 8.00016 13.1667C8.36835 13.1667 8.66683 12.8682 8.66683 12.5Z" fill="#292929"/>
-                                                        </g>
-                                                        <defs>
-                                                            <clipPath id="clip0_2704_437">
-                                                                <rect width="16" height="16" fill="white" transform="translate(0 0.5)"/>
-                                                            </clipPath>
-                                                        </defs>
-                                                    </svg>
-                                                    <span class="tooltiptext">{% trans "Expert revision" %}</span>
-                                                </span>
-                                                </button>
-                                        </div>
-                                    </div>
-                                    <a href="" class="btn_reset">{% trans "Translate another file" %}</a>
-                                </div>
-                            </div>
-                            <div class="translate__form-submit uploaded">
-                                <button type="submit" class="button">{% trans "Translate file btn" %}</button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="translate__tab" id="tabs-3">
-                        <div class="gpt_processing">
-                            <div class="gpt_processing__block">
-                                <div class="modal__switch">
-                                    <input type="checkbox" id="modal_switch_1" class="gpt_upload_text_switch" checked="checked">
-{#                                    <label for="modal_switch_1">#}
-{#                                        <span>{% trans "Document" %}</span>#}
-{#                                        <span class="modal__switch-inner"></span>#}
-{#                                        <span>{% trans "Text" %}</span>#}
-{#                                    </label>#}
-                                </div>
-                            </div>
-                            <div class="gpt_processing__block modal__gpt">
-<!--                                <div class="gpt_processing__upload modal__btn">-->
-<!--                                    <label tabindex="2" class="upload_label button button&#45;&#45;transparent">{% trans "Upload file" %} <input type="file" data-maxsize="2" accept=".txt" required></label>-->
-<!--                                    <p class="upload_result btn"></p>-->
-<!--                                    <div class="upload_remove">-->
-<!--                                        <img src="{% static 'images/ico-trash.svg' %}" alt="Remove" role="presentation">-->
-<!--                                    </div>-->
-<!--                                    <div class="modal__btn-text modal__btn-text&#45;&#45;error">-->
-<!--                                        <p></p>-->
-<!--                                    </div>-->
-<!--                                    <div class="modal__btn-text">-->
-<!--                                        <p>.txt max 2Mb</p>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-                                <div class="gpt_processing__text">
-                                    <div class="translate__form-row">
-                                        <div class="translate__form-text">
-                                            <div class="translate__form-btn btn_clear">
-                                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <g clip-path="url(#clip0_2611_13225)">
-                                                        <path d="M8.23814 7.00014L13.7435 1.49482C14.0855 1.15307 14.0855 0.598568 13.7435 0.25682C13.4014 -0.0852201 12.8475 -0.0852201 12.5055 0.25682L7.00015 5.76215L1.49453 0.25682C1.15249 -0.0852201 0.59857 -0.0852201 0.25653 0.25682C-0.08551 0.598568 -0.08551 1.15307 0.25653 1.49482L5.76215 7.00014L0.25653 12.5055C-0.08551 12.8472 -0.08551 13.4017 0.25653 13.7435C0.42755 13.9142 0.651685 13.9997 0.875529 13.9997C1.09937 13.9997 1.32351 13.9142 1.49453 13.7432L7.00015 8.23785L12.5055 13.7432C12.6765 13.9142 12.9006 13.9997 13.1245 13.9997C13.3483 13.9997 13.5724 13.9142 13.7435 13.7432C14.0855 13.4014 14.0855 12.8469 13.7435 12.5052L8.23814 7.00014Z" fill="#292929"/>
-                                                    </g>
-                                                    <defs>
-                                                        <clipPath id="clip0_2611_13225">
-                                                            <rect width="14" height="14" fill="white"/>
-                                                        </clipPath>
-                                                    </defs>
-                                                </svg>
-                                            </div>
-                                            <textarea required id="gpt_translation_text" maxlength="2400" name="text" placeholder="{% trans 'Start typing' %}"></textarea>
-                                            <div class="invalid-feedback">
-                                                {% trans "Text is required." %}
-                                            </div>
-                                        </div>
-                                        <div class="translate__form-text result">
-                                            <div class="translate__form-btn btn_copy" data-tooltip="Text copied">
-                                                <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <g clip-path="url(#clip0_2611_13230)">
-                                                        <path d="M28.9995 6.2001C28.9887 6.17637 28.9764 6.15363 28.9627 6.13172C28.8909 6.00539 28.8023 5.88756 28.6976 5.78156L23.4733 0.496055C23.341 0.362168 23.1867 0.252832 23.019 0.170977C23.0163 0.169453 23.0135 0.168223 23.0107 0.166758C23.0069 0.164941 23.0031 0.163066 22.9993 0.161309C22.9838 0.153516 22.9679 0.146426 22.9516 0.140039C22.7427 0.0491016 22.5156 0 22.2856 0H13.0962C12.1754 0 11.4263 0.749121 11.4263 1.66992V6.17748H2.49011C1.56931 6.17748 0.82019 6.92654 0.82019 7.84734V28.3301C0.82019 29.2509 1.56931 30 2.49011 30H16.7839C17.7047 30 18.4539 29.2509 18.4539 28.3301V23.8225H27.5098C28.4306 23.8225 29.1797 23.0735 29.1797 22.1527V6.95543C29.1797 6.68871 29.1171 6.43143 28.9995 6.2001ZM27.1233 5.85592H23.822C23.5474 5.85592 23.324 5.6325 23.324 5.35787V2.01211L27.1233 5.85592ZM12.5982 8.18959L16.3975 12.0335H13.0962C12.8216 12.0335 12.5982 11.81 12.5982 11.5354V8.18959ZM17.282 28.3301C17.282 28.6047 17.0586 28.8281 16.784 28.8281H2.49011C2.21548 28.8281 1.99207 28.6047 1.99207 28.3301V7.84734C1.99207 7.57271 2.21548 7.34936 2.49011 7.34936H11.4263V11.5354C11.4263 12.4562 12.1754 13.2053 13.0962 13.2053H17.282V15.2477H15.4046C15.081 15.2477 14.8186 15.5101 14.8186 15.8336C14.8186 16.1572 15.081 16.4195 15.4046 16.4195H17.282V28.3301ZM27.5099 22.6506H18.4539V16.4196H22.4371L21.0888 17.7622C20.8595 17.9906 20.8587 18.3616 21.0871 18.5909C21.2016 18.7059 21.3519 18.7634 21.5023 18.7634C21.6518 18.7634 21.8014 18.7065 21.9157 18.5926L24.2594 16.2587C24.3695 16.149 24.4316 16.0001 24.4319 15.8447C24.4319 15.8428 24.4317 15.8409 24.4317 15.839C24.4317 15.8372 24.4319 15.8355 24.4319 15.8337C24.4319 15.6415 24.339 15.4715 24.1962 15.3647L21.9175 13.0765C21.6891 12.8472 21.3181 12.8464 21.0888 13.0748C20.8595 13.3032 20.8587 13.6741 21.0871 13.9035L22.4258 15.2478H18.4539V13.133C18.4539 12.6906 18.2827 12.2737 17.9717 11.9591L12.7474 6.67359C12.7004 6.62602 12.6504 6.58195 12.5982 6.5407V1.66992C12.5982 1.39529 12.8217 1.17188 13.0963 1.17188H22.1522V5.35787C22.1522 6.27867 22.9014 7.02779 23.8222 7.02779H28.008V22.1527C28.0079 22.4273 27.7844 22.6506 27.5099 22.6506Z" fill="#292929"/>
-                                                        <path d="M4.64343 16.4062H12.3571C12.6807 16.4062 12.9431 16.1439 12.9431 15.8203C12.9431 15.4968 12.6807 15.2344 12.3571 15.2344H4.64343C4.31982 15.2344 4.0575 15.4968 4.0575 15.8203C4.0575 16.1439 4.31982 16.4062 4.64343 16.4062Z" fill="#292929"/>
-                                                        <path d="M4.64343 19.5117H11.0725C11.3961 19.5117 11.6585 19.2493 11.6585 18.9258C11.6585 18.6022 11.3961 18.3398 11.0725 18.3398H4.64343C4.31982 18.3398 4.0575 18.6022 4.0575 18.9258C4.0575 19.2493 4.31982 19.5117 4.64343 19.5117Z" fill="#292929"/>
-                                                        <path d="M13.9886 19.512C14.3123 19.512 14.5748 19.2496 14.5748 18.9258C14.5748 18.602 14.3123 18.3396 13.9886 18.3396C13.6648 18.3396 13.4023 18.602 13.4023 18.9258C13.4023 19.2496 13.6648 19.512 13.9886 19.512Z" fill="#292929"/>
-                                                        <path d="M14.0022 21.4844H4.64343C4.31982 21.4844 4.0575 21.7468 4.0575 22.0703C4.0575 22.3939 4.31982 22.6563 4.64343 22.6563H14.0022C14.3258 22.6563 14.5881 22.3939 14.5881 22.0703C14.5881 21.7468 14.3258 21.4844 14.0022 21.4844Z" fill="#292929"/>
-                                                        <path d="M14.0022 24.6094H4.64343C4.31982 24.6094 4.0575 24.8718 4.0575 25.1953C4.0575 25.5189 4.31982 25.7812 4.64343 25.7812H14.0022C14.3258 25.7812 14.5881 25.5189 14.5881 25.1953C14.5881 24.8718 14.3258 24.6094 14.0022 24.6094Z" fill="#292929"/>
-                                                    </g>
-                                                    <defs>
-                                                        <clipPath id="clip0_2611_13230">
-                                                            <rect width="30" height="30" fill="white"/>
-                                                        </clipPath>
-                                                    </defs>
-                                                </svg>
-                                            </div>
-                                            <textarea readonly id="gpt_result_text"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="gpt_processing__row">
-                                    <div class="gpt_processing__action">
-                                        <div class="gpt_processing__select">
-                                            <label>{% trans "Action" %}</label>
-                                            <div class="select new-design select--with-desc">
-                                                <input class="output_text" type="text" tabindex="0" placeholder="{% trans 'Select from the list' %}">
-                                                <input class="output_value" type="hidden" name="Action" required>
-                                                <div class="select__dropdown">
-                                                    <ul>
-                                                        {% if LANGUAGE_CODE == 'en' %}
-                                                        {% for prompt in prompts.en %}
-                                                        <li data-value="{{ prompt.slug }}">
-                                                            <span class="select__item-title">{{ prompt.name }}</span>
-                                                            <span>{{ prompt.description }}</span>
-                                                        </li>
-                                                        {% endfor %}
-                                                        {% else %}
-                                                    {% for prompt in prompts.fr %}
-                                                        <li data-value="{{ prompt.slug }}">
-                                                            <span class="select__item-title">{{ prompt.name }}</span>
-                                                            <span>{{ prompt.description }}</span>
-                                                        </li>
-                                                        {% endfor %}
-                                                    {% endif %}
-
-                                                    </ul>
-                                                </div>
-                                            <div class="errorText">{% trans "This input is required" %}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="gpt_processing__bottom">
-                                    <a href="" download="" class="gpt_processing__download button button--secondary is-hidden">{% trans "Download" %}</a>
-                                    <button type="button" class="gpt_processing__submit button">
-                                        <span>{% trans "Process" %}</span>
-                                    </button>
-                                    <div class="gpt_processing__error is-hidden">
-                                        <span>
-                                            <img src="{% static 'images/ico-btn-cancel.svg' %}" alt="Error">
-                                            <span>{% trans "The task failed at some point" %}</span>
-                                        </span>
-                                        <span class="gpt_processing__error-restart">
-                                            <span>{% trans "Restart" %}</span>
-                                            <img src="{% static 'images/ico-btn-cancel.svg' %}" alt="Error">
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <footer class="footer">
-{#            <p>{% trans "Created by" %} <a href="https://custom.mt" target="_blank">Custom.MT</a><br>{% trans "Contact us for support" %}</p>#}
-        </footer>
+{% block content %}
+<div class="ml-31.25 mt-11.5 mr-63.75">
+    <p class="text-7.5">Translator</p>
+    <div class="flex gap-2.5 my-5">
+        <button class="flex gap-2.5 items-center px-4 py-2.5 rounded-md bg-transparent hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-300 hover:border-gray-800 transition-colors duration-300">
+            <svg class="w-6.5 h-6.5" width="26" height="26" viewBox="0 0 26 26" fill="none"
+                 xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_759_1481)">
+                    <path d="M23.1996 10.6064H13.4089C11.8642 10.6064 10.6076 11.8631 10.6076 13.4077V18.7271L8.07092 20.5389C7.87077 20.6818 7.75195 20.9127 7.75195 21.1586C7.75195 21.4048 7.87077 21.6357 8.07092 21.7785L10.6382 23.6122C10.8387 24.9615 12.0049 25.9999 13.4089 25.9999H23.1996C24.7442 25.9999 26.0009 24.7433 26.0009 23.1984V13.4077C26.0009 11.8631 24.7442 10.6064 23.1996 10.6064ZM19.9075 21.3098C19.728 21.3098 19.5893 21.2529 19.5487 21.0977L19.2384 20.0125H17.3698L17.06 21.0977C17.0191 21.2529 16.8805 21.3098 16.701 21.3098C16.4153 21.3098 16.0319 21.1305 16.0319 20.8694C16.0319 20.853 16.04 20.8204 16.0481 20.7877L17.623 15.6556C17.6964 15.4108 17.9983 15.2964 18.3002 15.2964C18.6102 15.2964 18.9121 15.4108 18.9855 15.6556L20.5603 20.7877C20.5685 20.8204 20.5766 20.8448 20.5766 20.8694C20.5766 21.1221 20.1932 21.3098 19.9075 21.3098Z"
+                          fill="currentColor"/>
+                    <path d="M17.5898 19.1805H19.0097L18.2996 16.6758L17.5898 19.1805Z" fill="currentColor"/>
+                    <path d="M9.0833 13.4078C9.0833 12.3851 9.44095 11.4448 10.0366 10.7035C9.1676 10.7035 8.36125 10.4316 7.69653 9.96959C7.03181 10.4318 6.22546 10.7035 5.35623 10.7035C5.11919 10.7035 4.92677 10.5111 4.92677 10.2739C4.92677 10.0366 5.11919 9.84442 5.35623 9.84442C5.96501 9.84442 6.53471 9.67581 7.02249 9.38382C6.43414 8.74886 6.04297 7.92902 5.94835 7.0217H5.35643C5.11919 7.0217 4.92677 6.82948 4.92677 6.59224C4.92677 6.355 5.11919 6.16258 5.35643 6.16258H7.26727V5.11958C7.26727 4.88214 7.45949 4.68993 7.69673 4.68993C7.93398 4.68993 8.12619 4.88214 8.12619 5.11958V6.16258H10.037C10.2743 6.16258 10.4667 6.355 10.4667 6.59224C10.4667 6.82948 10.2743 7.0217 10.037 7.0217H9.44511C9.35049 7.92902 8.95932 8.74886 8.37097 9.38382C8.85855 9.67621 9.42845 9.84442 10.037 9.84442C10.2638 9.84442 10.449 10.0202 10.4651 10.2429C11.2377 9.52406 12.2722 9.0831 13.4082 9.0831H15.3935V7.27283L17.9301 5.46097C18.1301 5.31815 18.2489 5.08725 18.2489 4.84128C18.2489 4.59511 18.1301 4.36421 17.9301 4.22139L15.3629 2.38771C15.1622 1.03844 13.996 0 12.592 0H2.8015C1.25664 0 0 1.25664 0 2.8013V12.5922C0 14.1368 1.25664 15.3935 2.8015 15.3935H9.0833V13.4078Z"
+                          fill="currentColor"/>
+                    <path d="M7.69698 8.84663C8.1671 8.35886 8.48627 7.72548 8.5797 7.02148H6.81445C6.90788 7.72548 7.22725 8.35886 7.69698 8.84663Z"
+                          fill="#currentColor"/>
+                </g>
+                <defs>
+                    <clipPath id="clip0_759_1481">
+                        <rect width="26" height="26" fill="currentColor"/>
+                    </clipPath>
+                </defs>
+            </svg>
+            <span class="text-3.5">Text translate</span>
+        </button>
+        <button class="flex gap-2.5 items-center px-4 py-2 rounded-md bg-transparent hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-300 hover:border-gray-800 transition-colors duration-300">
+            <svg class="w-6.5 h-6.5" width="26" height="26" viewBox="0 0 26 26" fill="none"
+                 xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_759_1488)">
+                    <path d="M4.33398 7.3125C4.33398 4.47525 6.64257 2.16667 9.47982 2.16667H19.3739C19.0175 0.91975 17.8811 0 16.5215 0H4.06315C2.41973 0 1.08398 1.33575 1.08398 2.97917V19.7708C1.08398 21.4143 2.41973 22.75 4.06315 22.75H4.33398V7.3125Z"
+                          fill="currentColor"/>
+                    <path d="M21.9375 4.33301H9.47917C7.83575 4.33301 6.5 5.66876 6.5 7.31217V23.0205C6.5 24.6639 7.83575 25.9997 9.47917 25.9997H21.9375C23.5809 25.9997 24.9167 24.6639 24.9167 23.0205V7.31217C24.9167 5.66876 23.5809 4.33301 21.9375 4.33301ZM19.7708 22.7497H11.6458C11.1973 22.7497 10.8333 22.3857 10.8333 21.9372C10.8333 21.4887 11.1973 21.1247 11.6458 21.1247H19.7708C20.2193 21.1247 20.5833 21.4887 20.5833 21.9372C20.5833 22.3857 20.2193 22.7497 19.7708 22.7497ZM19.7708 18.4163H11.6458C11.1973 18.4163 10.8333 18.0523 10.8333 17.6038C10.8333 17.1553 11.1973 16.7913 11.6458 16.7913H19.7708C20.2193 16.7913 20.5833 17.1553 20.5833 17.6038C20.5833 18.0523 20.2193 18.4163 19.7708 18.4163ZM19.7708 14.6247H11.6458C11.1973 14.6247 10.8333 14.2607 10.8333 13.8122C10.8333 13.3637 11.1973 12.9997 11.6458 12.9997H19.7708C20.2193 12.9997 20.5833 13.3637 20.5833 13.8122C20.5833 14.2607 20.2193 14.6247 19.7708 14.6247ZM19.7708 10.2913H11.6458C11.1973 10.2913 10.8333 9.92734 10.8333 9.47884C10.8333 9.03034 11.1973 8.66634 11.6458 8.66634H19.7708C20.2193 8.66634 20.5833 9.03034 20.5833 9.47884C20.5833 9.92734 20.2193 10.2913 19.7708 10.2913Z"
+                          fill="currentColor"/>
+                </g>
+                <defs>
+                    <clipPath id="clip0_759_1488">
+                        <rect width="26" height="26" fill="currentColor"/>
+                    </clipPath>
+                </defs>
+            </svg>
+            <span class="text-3.5">Document translate</span>
+        </button>
+        <button class="flex gap-2.5 items-center px-4 py-2 rounded-md bg-transparent hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-300 hover:border-gray-800 transition-colors duration-300">
+            <svg class="w-6.5 h-6.5" width="22" height="22" viewBox="0 0 22 22" fill="none"
+                 xmlns="http://www.w3.org/2000/svg">
+                <path d="M19.2434 9.05046L20.8576 7.4363C21.4814 6.81081 21.8317 5.96345 21.8317 5.08005C21.8317 4.19664 21.4814 3.34929 20.8576 2.7238L19.2759 1.14213C18.6504 0.518296 17.803 0.167969 16.9196 0.167969C16.0362 0.167969 15.1889 0.518296 14.5634 1.14213L12.9492 2.7563L19.2434 9.05046Z"
+                      fill="currentColor"/>
+                <path d="M11.4224 4.28418L1.33661 14.37C0.999499 14.7062 0.782485 15.144 0.719114 15.6158L0.166614 19.3208C0.115992 19.633 0.134311 19.9524 0.220286 20.2568C0.30626 20.5611 0.457806 20.8429 0.664284 21.0824C0.870761 21.3219 1.12716 21.5133 1.41549 21.6432C1.70382 21.7731 2.01708 21.8383 2.33328 21.8342H2.64745L6.35245 21.3033C6.82429 21.24 7.26212 21.023 7.59828 20.6858L17.6841 10.6L11.4224 4.28418Z"
+                      fill="currentColor"/>
+            </svg>
+            <span class="text-3.5">Writing</span>
+        </button>
     </div>
-    <div class="modal__wrapper">
-        <div class="preloader">
-            <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
-        </div>
-        <div class="popup" id="error_popup">
-            <div class="popup__inner">
-                <div class="popup__title">
-                    <p>{% trans "Something went wrong" %}</p>
-                </div>
-                <p>{% trans "Please try again later." %}</p>
-                <div class="translate__form__submit">
-                    <button type="button" class="button button--error" data-fancybox-close="">{% trans "Close" %}</button>
-                </div>
+    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">
+        <div class="border-dashed border-2 border-gray-400 w-full h-full py-7.5 px-5 grid grid-cols-1 divide-y file-upload">
+            <div class="flex flex-col justify-center items-center">
+                <span class="text-gray-800 text-6 mb-2.5">Drag and drop</span>
+                <span class="text-gray-300 text-3.5">Fichiers pris en charge: plain text, .docx, .xlsx, .pptx</span>
+                <svg class="my-7.5 w-10 h-10" width="40" height="40" viewBox="0 0 40 40" fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_759_1541)">
+                        <path d="M33.0197 17.6379V37.088C33.0197 38.6963 31.7159 39.9999 30.1077 39.9999H6.18539C4.57711 39.9999 3.27344 38.6962 3.27344 37.088V6.61898C3.27344 5.01031 4.5775 3.70703 6.18539 3.70703H19.0884L33.0197 17.6379Z"
+                              fill="#99B5BB"/>
+                        <path d="M9.89242 36.293C8.28414 36.293 6.98047 34.9892 6.98047 33.381V2.91195C6.98039 1.30328 8.28445 0 9.89242 0H22.7954C25.0138 0 36.7266 11.7128 36.7266 13.9309V33.381C36.7266 34.9893 35.4229 36.293 33.8147 36.293H9.89242Z"
+                              fill="#F4F7FA"/>
+                        <path d="M36.7274 13.9312V15.163C36.7274 12.5696 34.6245 10.4666 32.0311 10.4666H29.1727C27.5648 10.4666 26.2608 9.16258 26.2608 7.55469V4.69633C26.2608 2.10297 24.1578 0 21.5645 0H22.7962C25.0142 0 27.1421 0.88125 28.7104 2.44961L34.2779 8.01711C35.8461 9.58539 36.7274 11.7132 36.7274 13.9312Z"
+                              fill="#AEC4C9"/>
+                        <path d="M18.9545 22.2308V30.7445C18.9545 31.1117 19.2523 31.4095 19.6195 31.4095H24.0878C24.4551 31.4095 24.7528 31.1117 24.7528 30.7445V22.2308H26.6524C27.2448 22.2308 27.5416 21.5146 27.1227 21.0956L22.878 16.851C22.3123 16.2853 21.3951 16.2853 20.8294 16.851L16.5848 21.0956C16.1659 21.5146 16.4626 22.2308 17.055 22.2308H18.9545Z"
+                              fill="#176C77"/>
+                        <path d="M16.6709 14.515H27.0346C27.7503 14.515 28.3305 13.9349 28.3305 13.2192V13.1836C28.3305 12.4679 27.7503 11.8877 27.0346 11.8877H16.6709C15.9552 11.8877 15.375 12.4679 15.375 13.1836V13.2192C15.375 13.9348 15.9552 14.515 16.6709 14.515Z"
+                              fill="#176C77"/>
+                    </g>
+                    <defs>
+                        <clipPath id="clip0_759_1541">
+                            <rect width="40" height="40" fill="white"/>
+                        </clipPath>
+                    </defs>
+                </svg>
+                <button class="flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold choose-file">
+                    <span class="text-3.5">Choose file</span>
+                </button>
             </div>
+            <div class="pt-5 mt-5 flex flex-wrap gap-2.5 file-list hidden"></div>
         </div>
+        <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold upload-document hidden">
+            <span class="text-3.5">Following</span>
+        </button>
     </div>
-<div class="modal__wrapper">
-    <div class="preloader">
-        <div class="lds-ring">
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
-    </div>
-    <div class="popup" id="success_modal">
-        <div class="popup__inner">
-            <div class="popup__title">
-                <p>{% trans "Success" %}</p>
-            </div>
-            <p>{% trans "Request has been successfully" %}</p>
-            <div class="translate__form__submit">
-                <button type="button" class="button button--success" data-fancybox-close="">{% trans "Close" %}</button>
-            </div>
-        </div>
-    </div>
+<!--    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">-->
+<!--        <div class="border-dashed border-2 border-gray-400 w-full h-full py-7.5 px-5">-->
+<!--            <span class="text-4 text-gray-800 font-semibold">Domains</span>-->
+<!--            <div class="flex flex-wrap mt-5 gap-2.5">-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    Generic-->
+<!--                </button>-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    Dispute-->
+<!--                </button>-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    Dispute-->
+<!--                </button>-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    Audience-->
+<!--                </button>-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    Commercial-->
+<!--                </button>-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    Tax-->
+<!--                </button>-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    Social-->
+<!--                </button>-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    Real estate-->
+<!--                </button>-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    Banking / Finance-->
+<!--                </button>-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    Generic-->
+<!--                </button>-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    PI / IT-->
+<!--                </button>-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    Dispute-->
+<!--                </button>-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    Tax-->
+<!--                </button>-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    Dispute-->
+<!--                </button>-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    Social-->
+<!--                </button>-->
+<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+<!--                    Real estate-->
+<!--                </button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="flex w-full items-center justify-between">-->
+<!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
+<!--                <span class="text-3.5">Previous</span>-->
+<!--            </button>-->
+<!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
+<!--                <span class="text-3.5">Following</span>-->
+<!--            </button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">-->
+<!--        <div class="border-dashed border-2 border-gray-400 w-full h-full py-7.5 px-5">-->
+<!--            <div class="flex items-center w-full justify-between">-->
+<!--                <span class="text-4 text-gray-800 font-semibold">Terminology</span>-->
+<!--                <a href="#" class="text-3 text-green-700">+ Add glossary</a>-->
+<!--            </div>-->
+<!--            <div class="flex items-center mt-5">-->
+<!--                <button class="px-5 py-3 text-3.5 bg-gray-200 text-gray-400 rounded-l-md hover:bg-gray-800 hover:text-white">-->
+<!--                    Default-->
+<!--                </button>-->
+<!--                <button class="px-5 py-3 text-3.5 bg-gray-200 text-gray-400 hover:bg-gray-800 hover:text-white">-->
+<!--                    My glossaries-->
+<!--                </button>-->
+<!--                <button class="px-5 py-3 text-3.5 bg-gray-200 text-gray-400 rounded-r-md hover:bg-gray-800 hover:text-white">-->
+<!--                    No glossary-->
+<!--                </button>-->
+<!--            </div>-->
+<!--            <div class="flex flex-wrap gap-2.5 mt-5">-->
+<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+<!--                    <span>RH</span>-->
+<!--                    <button class="remove-file">-->
+<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+<!--                             xmlns="http://www.w3.org/2000/svg">-->
+<!--                            <g clip-path="url(#clip0_759_4082)">-->
+<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+<!--                                      fill="#176C77"/>-->
+<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+<!--                                      fill="white"/>-->
+<!--                            </g>-->
+<!--                            <defs>-->
+<!--                                <clipPath id="clip0_759_4082">-->
+<!--                                    <rect width="20" height="20" fill="white"/>-->
+<!--                                </clipPath>-->
+<!--                            </defs>-->
+<!--                        </svg>-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+<!--                    <span>Droit du travais</span>-->
+<!--                    <button class="remove-file">-->
+<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+<!--                             xmlns="http://www.w3.org/2000/svg">-->
+<!--                            <g clip-path="url(#clip0_759_4082)">-->
+<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+<!--                                      fill="#176C77"/>-->
+<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+<!--                                      fill="white"/>-->
+<!--                            </g>-->
+<!--                            <defs>-->
+<!--                                <clipPath id="clip0_759_4082">-->
+<!--                                    <rect width="20" height="20" fill="white"/>-->
+<!--                                </clipPath>-->
+<!--                            </defs>-->
+<!--                        </svg>-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+<!--                    <span>Sécurité sociale</span>-->
+<!--                    <button class="remove-file">-->
+<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+<!--                             xmlns="http://www.w3.org/2000/svg">-->
+<!--                            <g clip-path="url(#clip0_759_4082)">-->
+<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+<!--                                      fill="#176C77"/>-->
+<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+<!--                                      fill="white"/>-->
+<!--                            </g>-->
+<!--                            <defs>-->
+<!--                                <clipPath id="clip0_759_4082">-->
+<!--                                    <rect width="20" height="20" fill="white"/>-->
+<!--                                </clipPath>-->
+<!--                            </defs>-->
+<!--                        </svg>-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+<!--                    <span>Sécurité...</span>-->
+<!--                    <button class="remove-file">-->
+<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+<!--                             xmlns="http://www.w3.org/2000/svg">-->
+<!--                            <g clip-path="url(#clip0_759_4082)">-->
+<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+<!--                                      fill="#176C77"/>-->
+<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+<!--                                      fill="white"/>-->
+<!--                            </g>-->
+<!--                            <defs>-->
+<!--                                <clipPath id="clip0_759_4082">-->
+<!--                                    <rect width="20" height="20" fill="white"/>-->
+<!--                                </clipPath>-->
+<!--                            </defs>-->
+<!--                        </svg>-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+<!--                    <span>Terminology</span>-->
+<!--                    <button class="remove-file">-->
+<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+<!--                             xmlns="http://www.w3.org/2000/svg">-->
+<!--                            <g clip-path="url(#clip0_759_4082)">-->
+<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+<!--                                      fill="#176C77"/>-->
+<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+<!--                                      fill="white"/>-->
+<!--                            </g>-->
+<!--                            <defs>-->
+<!--                                <clipPath id="clip0_759_4082">-->
+<!--                                    <rect width="20" height="20" fill="white"/>-->
+<!--                                </clipPath>-->
+<!--                            </defs>-->
+<!--                        </svg>-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+<!--                    <span>RH</span>-->
+<!--                    <button class="remove-file">-->
+<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+<!--                             xmlns="http://www.w3.org/2000/svg">-->
+<!--                            <g clip-path="url(#clip0_759_4082)">-->
+<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+<!--                                      fill="#176C77"/>-->
+<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+<!--                                      fill="white"/>-->
+<!--                            </g>-->
+<!--                            <defs>-->
+<!--                                <clipPath id="clip0_759_4082">-->
+<!--                                    <rect width="20" height="20" fill="white"/>-->
+<!--                                </clipPath>-->
+<!--                            </defs>-->
+<!--                        </svg>-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+<!--                    <span>Droit du travais</span>-->
+<!--                    <button class="remove-file">-->
+<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+<!--                             xmlns="http://www.w3.org/2000/svg">-->
+<!--                            <g clip-path="url(#clip0_759_4082)">-->
+<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+<!--                                      fill="#176C77"/>-->
+<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+<!--                                      fill="white"/>-->
+<!--                            </g>-->
+<!--                            <defs>-->
+<!--                                <clipPath id="clip0_759_4082">-->
+<!--                                    <rect width="20" height="20" fill="white"/>-->
+<!--                                </clipPath>-->
+<!--                            </defs>-->
+<!--                        </svg>-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+<!--                    <span>Sécurité sociale</span>-->
+<!--                    <button class="remove-file">-->
+<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+<!--                             xmlns="http://www.w3.org/2000/svg">-->
+<!--                            <g clip-path="url(#clip0_759_4082)">-->
+<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+<!--                                      fill="#176C77"/>-->
+<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+<!--                                      fill="white"/>-->
+<!--                            </g>-->
+<!--                            <defs>-->
+<!--                                <clipPath id="clip0_759_4082">-->
+<!--                                    <rect width="20" height="20" fill="white"/>-->
+<!--                                </clipPath>-->
+<!--                            </defs>-->
+<!--                        </svg>-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+<!--                    <span>Sécurité...</span>-->
+<!--                    <button class="remove-file">-->
+<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+<!--                             xmlns="http://www.w3.org/2000/svg">-->
+<!--                            <g clip-path="url(#clip0_759_4082)">-->
+<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+<!--                                      fill="#176C77"/>-->
+<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+<!--                                      fill="white"/>-->
+<!--                            </g>-->
+<!--                            <defs>-->
+<!--                                <clipPath id="clip0_759_4082">-->
+<!--                                    <rect width="20" height="20" fill="white"/>-->
+<!--                                </clipPath>-->
+<!--                            </defs>-->
+<!--                        </svg>-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="flex w-full items-center justify-between">-->
+<!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
+<!--                <span class="text-3.5">Previous</span>-->
+<!--            </button>-->
+<!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
+<!--                <span class="text-3.5">Following</span>-->
+<!--            </button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">-->
+<!--        <div class="border-dashed border-2 border-gray-400 w-full h-full py-7.5 px-5">-->
+<!--            <span class="text-4 text-gray-800 font-semibold">Review</span>-->
+<!--            <table class="table-auto mt-5 w-full border-separate border-spacing-y-5">-->
+<!--                <tbody>-->
+<!--                <tr>-->
+<!--                    <td>-->
+<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
+<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                        <div class="text-3.25 text-green-700">-->
+<!--                            Processing...-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
+<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
+<!--                                 xmlns="http://www.w3.org/2000/svg">-->
+<!--                                <g clip-path="url(#clip0_759_2185)">-->
+<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
+<!--                                          fill="#176C77"/>-->
+<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
+<!--                                          fill="#176C77"/>-->
+<!--                                </g>-->
+<!--                                <defs>-->
+<!--                                    <clipPath id="clip0_759_2185">-->
+<!--                                        <rect width="16" height="16" fill="white"-->
+<!--                                              transform="translate(0.333984)"/>-->
+<!--                                    </clipPath>-->
+<!--                                </defs>-->
+<!--                            </svg>-->
+<!--                            Download-->
+<!--                        </button>-->
+<!--                    </td>-->
+<!--                    <td class="flex justify-end">-->
+<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
+<!--                            Revision-->
+<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+<!--                                 xmlns="http://www.w3.org/2000/svg">-->
+<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
+<!--                                      fill="#0D2B40"/>-->
+<!--                            </svg>-->
+
+<!--                        </button>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td>-->
+<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
+<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                                <span class="rounded-md bg-red-100 text-red-400 py-3 px-4 text-3.25">-->
+<!--                                    Error-->
+<!--                                </span>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
+<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
+<!--                                 xmlns="http://www.w3.org/2000/svg">-->
+<!--                                <g clip-path="url(#clip0_759_2185)">-->
+<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
+<!--                                          fill="#176C77"/>-->
+<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
+<!--                                          fill="#176C77"/>-->
+<!--                                </g>-->
+<!--                                <defs>-->
+<!--                                    <clipPath id="clip0_759_2185">-->
+<!--                                        <rect width="16" height="16" fill="white"-->
+<!--                                              transform="translate(0.333984)"/>-->
+<!--                                    </clipPath>-->
+<!--                                </defs>-->
+<!--                            </svg>-->
+<!--                            Download-->
+<!--                        </button>-->
+<!--                    </td>-->
+<!--                    <td class="flex justify-end">-->
+<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
+<!--                            Revision-->
+<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+<!--                                 xmlns="http://www.w3.org/2000/svg">-->
+<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
+<!--                                      fill="#0D2B40"/>-->
+<!--                            </svg>-->
+
+<!--                        </button>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td>-->
+<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
+<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                                <span class="rounded-md bg-green-200 text-green-700 py-3 px-4 text-3.25">-->
+<!--                                    Post-edited file uploaded-->
+<!--                                </span>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
+<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
+<!--                                 xmlns="http://www.w3.org/2000/svg">-->
+<!--                                <g clip-path="url(#clip0_759_2185)">-->
+<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
+<!--                                          fill="#176C77"/>-->
+<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
+<!--                                          fill="#176C77"/>-->
+<!--                                </g>-->
+<!--                                <defs>-->
+<!--                                    <clipPath id="clip0_759_2185">-->
+<!--                                        <rect width="16" height="16" fill="white"-->
+<!--                                              transform="translate(0.333984)"/>-->
+<!--                                    </clipPath>-->
+<!--                                </defs>-->
+<!--                            </svg>-->
+<!--                            Download-->
+<!--                        </button>-->
+<!--                    </td>-->
+<!--                    <td class="flex justify-end">-->
+<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
+<!--                            Revision-->
+<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+<!--                                 xmlns="http://www.w3.org/2000/svg">-->
+<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
+<!--                                      fill="#0D2B40"/>-->
+<!--                            </svg>-->
+
+<!--                        </button>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td>-->
+<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
+<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                                <span class="rounded-md bg-yellow-100 text-yellow-400 py-3 px-4 text-3.25">-->
+<!--                                    Reguest for post-editing sent-->
+<!--                                </span>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
+<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
+<!--                                 xmlns="http://www.w3.org/2000/svg">-->
+<!--                                <g clip-path="url(#clip0_759_2185)">-->
+<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
+<!--                                          fill="#176C77"/>-->
+<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
+<!--                                          fill="#176C77"/>-->
+<!--                                </g>-->
+<!--                                <defs>-->
+<!--                                    <clipPath id="clip0_759_2185">-->
+<!--                                        <rect width="16" height="16" fill="white"-->
+<!--                                              transform="translate(0.333984)"/>-->
+<!--                                    </clipPath>-->
+<!--                                </defs>-->
+<!--                            </svg>-->
+<!--                            Download-->
+<!--                        </button>-->
+<!--                    </td>-->
+<!--                    <td class="flex justify-end">-->
+<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
+<!--                            Revision-->
+<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+<!--                                 xmlns="http://www.w3.org/2000/svg">-->
+<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
+<!--                                      fill="#0D2B40"/>-->
+<!--                            </svg>-->
+
+<!--                        </button>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td>-->
+<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
+<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                                <span class="rounded-md bg-gray-200 text-gray-800 py-3 px-4 text-3.25">-->
+<!--                                    Translated-->
+<!--                                </span>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
+<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
+<!--                                 xmlns="http://www.w3.org/2000/svg">-->
+<!--                                <g clip-path="url(#clip0_759_2185)">-->
+<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
+<!--                                          fill="#176C77"/>-->
+<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
+<!--                                          fill="#176C77"/>-->
+<!--                                </g>-->
+<!--                                <defs>-->
+<!--                                    <clipPath id="clip0_759_2185">-->
+<!--                                        <rect width="16" height="16" fill="white"-->
+<!--                                              transform="translate(0.333984)"/>-->
+<!--                                    </clipPath>-->
+<!--                                </defs>-->
+<!--                            </svg>-->
+<!--                            Download-->
+<!--                        </button>-->
+<!--                    </td>-->
+<!--                    <td class="flex justify-end">-->
+<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
+<!--                            Revision-->
+<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+<!--                                 xmlns="http://www.w3.org/2000/svg">-->
+<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
+<!--                                      fill="#0D2B40"/>-->
+<!--                            </svg>-->
+
+<!--                        </button>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td>-->
+<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
+<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                                <span class="rounded-md bg-gray-200 text-gray-800 py-3 px-4 text-3.25">-->
+<!--                                    Translated-->
+<!--                                </span>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
+<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
+<!--                                 xmlns="http://www.w3.org/2000/svg">-->
+<!--                                <g clip-path="url(#clip0_759_2185)">-->
+<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
+<!--                                          fill="#176C77"/>-->
+<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
+<!--                                          fill="#176C77"/>-->
+<!--                                </g>-->
+<!--                                <defs>-->
+<!--                                    <clipPath id="clip0_759_2185">-->
+<!--                                        <rect width="16" height="16" fill="white"-->
+<!--                                              transform="translate(0.333984)"/>-->
+<!--                                    </clipPath>-->
+<!--                                </defs>-->
+<!--                            </svg>-->
+<!--                            Download-->
+<!--                        </button>-->
+<!--                    </td>-->
+<!--                    <td class="flex justify-end">-->
+<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
+<!--                            Revision-->
+<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+<!--                                 xmlns="http://www.w3.org/2000/svg">-->
+<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
+<!--                                      fill="#0D2B40"/>-->
+<!--                            </svg>-->
+
+<!--                        </button>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--                </tbody>-->
+<!--            </table>-->
+<!--        </div>-->
+<!--        <div class="flex w-full items-center justify-start">-->
+<!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
+<!--                <span class="text-3.5">New translation</span>-->
+<!--            </button>-->
+<!--        </div>-->
+<!--    </div>-->
 </div>
-<script>
-    var translation_algorithm = "{{ preferences.MainSettings.algorithm | safe }}"
-    var languages = {{ languages|safe }}
-    var current_language = "{{ request.LANGUAGE_CODE | safe }}"
-    var expert_revision_url = "{% url 'expert_revision' %}"
-    var expert_revision_file_url = "{% url 'expert_revision_file' %}"
-    var gpt_process = "{% url 'gpt_process' %}"
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.4/lottie.min.js"></script>
-<script>
-    var animation = bodymovin.loadAnimation({
-        container: document.querySelector('.trans-progress .translate__file-ico'), // required
-        path: "{% static 'images/animation_lk3238s3.json' %}", // required
-        renderer: 'svg', // required
-        loop: true, // optional
-        autoplay: true, // optional
-    });
-</script>
-
-<script src="{% static 'js/jquery.fancybox.min.js' %}"></script>
-<script src="{% static 'js/upload.js' %}"></script>
-<script src="{% static 'js/download.js' %}"></script>
-<script src="{% static 'js/get-cookie.js' %}"></script>
-<script src="{% static 'js/selects.js' %}"></script>
-<script src="{% static 'js/translate.js' %}"></script>
-</body>
-</html>
-
+{% endblock %}
