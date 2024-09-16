@@ -4,16 +4,16 @@
 <div class="ml-31.25 mt-11.5 mr-63.75">
     <p class="text-7.5">Project history</p>
     <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md px-5 pt-5 w-full h-full flex flex-col items-end mt-5">
-        <table class="table-auto mt-5 w-full border-separate border-spacing-y-5">
+        <table class="border-collapse mt-5 w-full border-separate border-spacing-y-5">
             <thead>
-            <tr class="divide-y-2 divide-y-reverse">
-                <th class="text-4 text-gray-800 font-medium text-left pb-5">Username</th>
-                <th class="text-4 text-gray-800 font-medium text-left pb-5">Project</th>
-                <th class="text-4 text-gray-800 font-medium text-left pb-5">Languages</th>
-                <th class="text-4 text-gray-800 font-medium text-left pb-5">Status</th>
-                <th class="text-4 text-gray-800 font-medium text-left pb-5">Revision</th>
-                <th class="text-4 text-gray-800 font-medium text-left pb-5">Created</th>
-                <th class="text-4 text-gray-800 font-medium text-right pb-5">Actions</th>
+            <tr class="border-gray-500">
+                <th class="border-b text-4 text-gray-800 font-medium text-left pb-5">Username</th>
+                <th class="border-b text-4 text-gray-800 font-medium text-left pb-5">Project</th>
+                <th class="border-b text-4 text-gray-800 font-medium text-left pb-5">Languages</th>
+                <th class="border-b text-4 text-gray-800 font-medium text-left pb-5">Status</th>
+                <th class="border-b text-4 text-gray-800 font-medium text-left pb-5">Revision</th>
+                <th class="border-b text-4 text-gray-800 font-medium text-left pb-5">Created</th>
+                <th class="border-b text-4 text-gray-800 font-medium text-right pb-5">Actions</th>
             </tr>
             </thead>
             <tbody>
@@ -29,7 +29,7 @@
                 </td>
                 {% endif %}
                 <td class="text-3.25 text-gray-800 ">
-                    <div class="w-50 truncate">
+                    <div class="md:w-30 2xl:w-50 truncate">
                         {{ project.source_file_name }}
                     </div>
                 </td>
