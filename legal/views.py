@@ -228,7 +228,7 @@ class ProjectsHistoryView(TemplateView):
 
         return context
     
-class UsageView(TemplateView):
+class UsageHistoryView(TemplateView):
     template_name = 'usage_history.html'
 
     def get_context_data(self, **kwargs):

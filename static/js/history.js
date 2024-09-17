@@ -8,7 +8,7 @@ $(document).ready(function () {
     console.log('currentPage', currentPage)
     var totalPages = Math.ceil(totalItems / itemsPerPage);
 
-    function updatePagination() {
+       function updatePagination() {
         var $pageNumbers = $('#page-numbers');
         $pageNumbers.empty();
 
@@ -122,6 +122,29 @@ $(document).ready(function () {
             $(this).text(formattedDate);
         }
     });
+
+    function show() {
+        $('.user-row, .group-row, .filename-row').hide();
+    }
+
+    $(document).ready(function() {
+        // Hide rows when page is loaded
+        $('.hide-row, .hide-fields').hide();
+
+        $('#options').click(function(e) {
+            e.preventDefault();
+            toggleVisibility();
+        });
+
+        function toggleVisibility() {
+            var $rows = $('.hide-row, .hide-fields');
+            
+            if ($rows.is(':visible')) {
+                $rows.hide();
+            } else {
+                $rows.show();
+            }
+        }
+    });
+    
 });
-
-

@@ -5,7 +5,7 @@
     <div class="flex justify-between items-center">
         <div class="text-7.5">Usage history</div>
         <div class="flex gap-5 items-center font-montserrat text-xs font-medium leading-4.5 text-left text-[#7A8B98]">
-            <button id="show-options" class="underline">Show all options</button>
+            <button id="options" class="underline">Show all options</button>
             <p class="flex justify-between items-center gap-2">
                 <svg width="10" height="11" viewBox="0 0 10 11" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_1514_7479)">
@@ -37,14 +37,15 @@
             </p>
         </div>
     </div>
-    <div class="my-4 flex justify-between items-center w-full">
-        <p class="font-montserrat text-base font-normal leading-[19.5px] tracking-tight text-left w-50">User</p>
+    <div class="my-4 flex justify-between items-center w-full hide-row">
+        <p class="font-montserrat text-base font-normal leading-[19.5px] tracking-tight text-left w-50 hide-row">User
+        </p>
         <p class="font-montserrat text-base font-normal leading-[19.5px] tracking-tight text-left w-50">Group</p>
         <p class="font-montserrat text-base font-normal leading-[19.5px] tracking-tight text-left w-50">File name</p>
         <p class=" w-50 text-left"></p>
 
     </div>
-    <div id="additional-options" class="my-4 flex gap-3 items-center w-full">
+    <div id="additional-options" class="my-4 flex gap-3 items-center w-full hide-fields">
         <div class="relative w-80">
             <select
                 class="w-full rounded-md p-2 font-montserrat text-base text-[16px] leading-6 tracking-tight text-left bg-[#F4F7FA] text-[#D5DADE] appearance-none">
@@ -87,151 +88,72 @@
 
 
 
-    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">
-        <table class="table-auto mt-5 w-full border-separate border-spacing-y-5">
+    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md flex flex-col items-end px-5 pt-5 w-full h-full mt-5">
+        <table class="border-collapse mt-5 w-full border-separate border-spacing-y-5">
             <thead>
-                <tr>
-                    <th class="text-4 text-gray-800 font-medium text-left">User</th>
-                    <th class="text-4 text-gray-800 font-medium text-left">Group</th>
-                    <th class="text-4 text-gray-800 font-medium text-left">File name</th>
-                    <th class="text-4 text-gray-800 font-medium text-left">Characters</th>
-                    <th class="text-4 text-gray-800 font-medium text-left">Tokens</th>
-                    <th class="text-4 text-gray-800 font-medium text-left w-1">Data</th>
+                <tr class="border-gray-500">
+                    <th class="text-4 text-gray-800 font-medium text-left border-b pb-5 user-row">User</th>
+                    <th class="text-4 text-gray-800 font-medium text-left border-b pb-5">Group</th>
+                    <th class="text-4 text-gray-800 font-medium text-left border-b pb-5">File name</th>
+                    <th class="text-4 text-gray-800 font-medium text-left border-b pb-5">Characters</th>
+                    <th class="text-4 text-gray-800 font-medium text-left border-b pb-5">Tokens</th>
+                    <th class="text-4 text-gray-800 font-medium text-left w-1 border-b pb-5">Date</th>
                 </tr>
             </thead>
             <tbody>
+                {% for project in projects.results %}
                 <tr>
                     <td class="text-3.25 text-gray-800">
-                        Uknown
+                        {{ project.user }}
                     </td>
                     <td class="text-3.25 text-gray-800">
-                        Group 1
+                        {{ project.user__group }}
                     </td>
                     <td>
                         <div class="flex gap-1 text-4 items-center text-green-700">
-                            File name
+                            {{ project.file_name }}
                         </div>
                     </td>
                     <td>
                         <div class="text-3.25 text-green-700">
-                            XXXXXX
+                            {{ project.chars }}
                         </div>
                     </td>
                     <td>
                         <div class="text-3.25 text-green-700">
-                            XXXXXX
+                            {{ project.token }}
                         </div>
                     </td>
                     <td class="text-3.25 text-gray-800">
-                        06/08/2024
+                        {{ project.created_at }}
                     </td>
                 </tr>
-                <tr>
-                    <td class="text-3.25 text-gray-800">
-                        Uknown
-                    </td>
-                    <td class="text-3.25 text-gray-800">
-                        Group 1
-                    </td>
-                    <td>
-                        <div class="flex gap-1 text-4 items-center text-green-700">
-                            File name
-                        </div>
-                    </td>
-                    <td>
-                        <div class="text-3.25 text-green-700">
-                            XXXXXX
-                        </div>
-                    </td>
-                    <td>
-                        <div class="text-3.25 text-green-700">
-                            XXXXXX
-                        </div>
-                    </td>
-                    <td class="text-3.25 text-gray-800">
-                        06/08/2024
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-3.25 text-gray-800">
-                        Uknown
-                    </td>
-                    <td class="text-3.25 text-gray-800">
-                        Group 1
-                    </td>
-                    <td>
-                        <div class="flex gap-1 text-4 items-center text-green-700">
-                            File name
-                        </div>
-                    </td>
-                    <td>
-                        <div class="text-3.25 text-green-700">
-                            XXXXXX
-                        </div>
-                    </td>
-                    <td>
-                        <div class="text-3.25 text-green-700">
-                            XXXXXX
-                        </div>
-                    </td>
-                    <td class="text-3.25 text-gray-800">
-                        06/08/2024
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-3.25 text-gray-800">
-                        Uknown
-                    </td>
-                    <td class="text-3.25 text-gray-800">
-                        Group 1
-                    </td>
-                    <td>
-                        <div class="flex gap-1 text-4 items-center text-green-700">
-                            File name
-                        </div>
-                    </td>
-                    <td>
-                        <div class="text-3.25 text-green-700">
-                            XXXXXX
-                        </div>
-                    </td>
-                    <td>
-                        <div class="text-3.25 text-green-700">
-                            XXXXXX
-                        </div>
-                    </td>
-                    <td class="text-3.25 text-gray-800">
-                        06/08/2024
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-3.25 text-gray-800">
-                        Uknown
-                    </td>
-                    <td class="text-3.25 text-gray-800">
-                        Group 1
-                    </td>
-                    <td>
-                        <div class="flex gap-1 text-4 items-center text-green-700">
-                            File name
-                        </div>
-                    </td>
-                    <td>
-                        <div class="text-3.25 text-green-700">
-                            XXXXXX
-                        </div>
-                    </td>
-                    <td>
-                        <div class="text-3.25 text-green-700">
-                            XXXXXX
-                        </div>
-                    </td>
-                    <td class="text-3.25 text-gray-800">
-                        06/08/2024
-                    </td>
-                </tr>
+                {% endfor %}
             </tbody>
         </table>
+        <!-- <script>
+            $(document).ready(function() {
+                // Sakrij redove kada se stranica učita
+                $('.hide-row, .hide-fields').hide();
+    
+                $('#options').click(function(e) {
+                    e.preventDefault();
+                    toggleVisibility();
+                });
+    
+                function toggleVisibility() {
+                    var $rows = $('.hide-row, .hide-fields');
+                    
+                    if ($rows.is(':visible')) {
+                        console.log('Hiding rows');
+                        $rows.hide();
+                    } else {
+                        console.log('Showing rows');
+                        $rows.show();
+                    }
+                }
+            });
+        </script> -->
     </div>
     <div class="pagination flex justify-center items-center py-12.5 w-full gap-18"
         data-total-items="{{ projects.count }}" data-items-per-page="{{ projects.page_size }}"
@@ -260,4 +182,9 @@
 </div>
 
 {% endblock %}
-<script src="js/history.js"></script>
+
+{% block extra_js %}
+{% load static %}
+<script src="{% static 'js/history.js' %}"></script>
+
+{% endblock extra_js %}
