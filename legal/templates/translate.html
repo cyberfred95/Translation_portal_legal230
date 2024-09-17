@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="ml-31.25 mt-11.5 mr-63.75">
@@ -53,6 +54,53 @@
         </button>
     </div>
     <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">
+        <div class="w-full">
+            <div class="relative pt-1">
+                <div class="overflow-hidden h-1.5 mb-10 text-xs flex rounded bg-green-300">
+                    <div id="progress-bar"
+                         class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-400 transition-all duration-500 ease-out"
+                         style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between absolute w-full top-0.5">
+                    <div class="flex flex-col">
+                        <svg class="progress-point w-2.5 h-2.5 text-green-400" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="10" height="10" rx="5" fill="currentColor"/>
+                            <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
+                        </svg>
+                        <span class="text-xs mt-2 text-green-300">Upload the document</span>
+                    </div>
+                    <div id="point-2" class="flex flex-col">
+                        <svg class="progress-point w-2.5 h-2.5 text-green-400" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="10" height="10" rx="5" fill="currentColor"/>
+                            <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
+                        </svg>
+                        <span class="text-xs mt-2 text-green-300">Language combination</span>
+                    </div>
+                    <div id="point-3" class="flex flex-col">
+                        <svg class="progress-point w-2.5 h-2.5 text-green-400" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="10" height="10" rx="5" fill="currentColor"/>
+                            <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
+                        </svg>
+                        <span class="text-xs mt-2 text-green-300">Domain selection</span>
+                    </div>
+                    <div id="point-4" class="flex flex-col">
+                        <svg class="progress-point w-2.5 h-2.5 text-green-400" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="10" height="10" rx="5" fill="currentColor"/>
+                            <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
+                        </svg>
+                        <span class="text-xs mt-2 text-green-300">Terminology</span>
+                    </div>
+                    <div id="point-5" class="flex flex-col">
+                        <svg class="progress-point w-2.5 h-2.5 text-green-400" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="10" height="10" rx="5" fill="currentColor"/>
+                            <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
+                        </svg>
+                        <span class="text-xs mt-2 text-green-300">Review</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="border-dashed border-2 border-gray-400 w-full h-full py-7.5 px-5 grid grid-cols-1 divide-y file-upload">
             <div class="flex flex-col justify-center items-center">
                 <span class="text-gray-800 text-6 mb-2.5">Drag and drop</span>
@@ -83,544 +131,544 @@
             </div>
             <div class="pt-5 mt-5 flex flex-wrap gap-2.5 file-list hidden"></div>
         </div>
-        <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold upload-document hidden">
+        <button id="next-step" class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold upload-document hidden">
             <span class="text-3.5">Following</span>
         </button>
     </div>
-<!--    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">-->
-<!--        <div class="border-dashed border-2 border-gray-400 w-full h-full py-7.5 px-5">-->
-<!--            <span class="text-4 text-gray-800 font-semibold">Domains</span>-->
-<!--            <div class="flex flex-wrap mt-5 gap-2.5">-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Generic-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Dispute-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Dispute-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Audience-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Commercial-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Tax-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Social-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Real estate-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Banking / Finance-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Generic-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    PI / IT-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Dispute-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Tax-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Dispute-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Social-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Real estate-->
-<!--                </button>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        <div class="flex w-full items-center justify-between">-->
-<!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
-<!--                <span class="text-3.5">Previous</span>-->
-<!--            </button>-->
-<!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
-<!--                <span class="text-3.5">Following</span>-->
-<!--            </button>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">-->
-<!--        <div class="border-dashed border-2 border-gray-400 w-full h-full py-7.5 px-5">-->
-<!--            <div class="flex items-center w-full justify-between">-->
-<!--                <span class="text-4 text-gray-800 font-semibold">Terminology</span>-->
-<!--                <a href="#" class="text-3 text-green-700">+ Add glossary</a>-->
-<!--            </div>-->
-<!--            <div class="flex items-center mt-5">-->
-<!--                <button class="px-5 py-3 text-3.5 bg-gray-200 text-gray-400 rounded-l-md hover:bg-gray-800 hover:text-white">-->
-<!--                    Default-->
-<!--                </button>-->
-<!--                <button class="px-5 py-3 text-3.5 bg-gray-200 text-gray-400 hover:bg-gray-800 hover:text-white">-->
-<!--                    My glossaries-->
-<!--                </button>-->
-<!--                <button class="px-5 py-3 text-3.5 bg-gray-200 text-gray-400 rounded-r-md hover:bg-gray-800 hover:text-white">-->
-<!--                    No glossary-->
-<!--                </button>-->
-<!--            </div>-->
-<!--            <div class="flex flex-wrap gap-2.5 mt-5">-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>RH</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>Droit du travais</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>Sécurité sociale</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>Sécurité...</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>Terminology</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>RH</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>Droit du travais</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>Sécurité sociale</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>Sécurité...</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        <div class="flex w-full items-center justify-between">-->
-<!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
-<!--                <span class="text-3.5">Previous</span>-->
-<!--            </button>-->
-<!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
-<!--                <span class="text-3.5">Following</span>-->
-<!--            </button>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">-->
-<!--        <div class="border-dashed border-2 border-gray-400 w-full h-full py-7.5 px-5">-->
-<!--            <span class="text-4 text-gray-800 font-semibold">Review</span>-->
-<!--            <table class="table-auto mt-5 w-full border-separate border-spacing-y-5">-->
-<!--                <tbody>-->
-<!--                <tr>-->
-<!--                    <td>-->
-<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
-<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <div class="text-3.25 text-green-700">-->
-<!--                            Processing...-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
-<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <g clip-path="url(#clip0_759_2185)">-->
-<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                </g>-->
-<!--                                <defs>-->
-<!--                                    <clipPath id="clip0_759_2185">-->
-<!--                                        <rect width="16" height="16" fill="white"-->
-<!--                                              transform="translate(0.333984)"/>-->
-<!--                                    </clipPath>-->
-<!--                                </defs>-->
-<!--                            </svg>-->
-<!--                            Download-->
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                    <td class="flex justify-end">-->
-<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
-<!--                            Revision-->
-<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
-<!--                                      fill="#0D2B40"/>-->
-<!--                            </svg>-->
+    <!--    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">-->
+    <!--        <div class="border-dashed border-2 border-gray-400 w-full h-full py-7.5 px-5">-->
+    <!--            <span class="text-4 text-gray-800 font-semibold">Domains</span>-->
+    <!--            <div class="flex flex-wrap mt-5 gap-2.5">-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    Generic-->
+    <!--                </button>-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    Dispute-->
+    <!--                </button>-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    Dispute-->
+    <!--                </button>-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    Audience-->
+    <!--                </button>-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    Commercial-->
+    <!--                </button>-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    Tax-->
+    <!--                </button>-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    Social-->
+    <!--                </button>-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    Real estate-->
+    <!--                </button>-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    Banking / Finance-->
+    <!--                </button>-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    Generic-->
+    <!--                </button>-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    PI / IT-->
+    <!--                </button>-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    Dispute-->
+    <!--                </button>-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    Tax-->
+    <!--                </button>-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    Dispute-->
+    <!--                </button>-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    Social-->
+    <!--                </button>-->
+    <!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
+    <!--                    Real estate-->
+    <!--                </button>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--        <div class="flex w-full items-center justify-between">-->
+    <!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
+    <!--                <span class="text-3.5">Previous</span>-->
+    <!--            </button>-->
+    <!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
+    <!--                <span class="text-3.5">Following</span>-->
+    <!--            </button>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">-->
+    <!--        <div class="border-dashed border-2 border-gray-400 w-full h-full py-7.5 px-5">-->
+    <!--            <div class="flex items-center w-full justify-between">-->
+    <!--                <span class="text-4 text-gray-800 font-semibold">Terminology</span>-->
+    <!--                <a href="#" class="text-3 text-green-700">+ Add glossary</a>-->
+    <!--            </div>-->
+    <!--            <div class="flex items-center mt-5">-->
+    <!--                <button class="px-5 py-3 text-3.5 bg-gray-200 text-gray-400 rounded-l-md hover:bg-gray-800 hover:text-white">-->
+    <!--                    Default-->
+    <!--                </button>-->
+    <!--                <button class="px-5 py-3 text-3.5 bg-gray-200 text-gray-400 hover:bg-gray-800 hover:text-white">-->
+    <!--                    My glossaries-->
+    <!--                </button>-->
+    <!--                <button class="px-5 py-3 text-3.5 bg-gray-200 text-gray-400 rounded-r-md hover:bg-gray-800 hover:text-white">-->
+    <!--                    No glossary-->
+    <!--                </button>-->
+    <!--            </div>-->
+    <!--            <div class="flex flex-wrap gap-2.5 mt-5">-->
+    <!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+    <!--                    <span>RH</span>-->
+    <!--                    <button class="remove-file">-->
+    <!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+    <!--                             xmlns="http://www.w3.org/2000/svg">-->
+    <!--                            <g clip-path="url(#clip0_759_4082)">-->
+    <!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+    <!--                                      fill="#176C77"/>-->
+    <!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+    <!--                                      fill="white"/>-->
+    <!--                            </g>-->
+    <!--                            <defs>-->
+    <!--                                <clipPath id="clip0_759_4082">-->
+    <!--                                    <rect width="20" height="20" fill="white"/>-->
+    <!--                                </clipPath>-->
+    <!--                            </defs>-->
+    <!--                        </svg>-->
+    <!--                    </button>-->
+    <!--                </div>-->
+    <!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+    <!--                    <span>Droit du travais</span>-->
+    <!--                    <button class="remove-file">-->
+    <!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+    <!--                             xmlns="http://www.w3.org/2000/svg">-->
+    <!--                            <g clip-path="url(#clip0_759_4082)">-->
+    <!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+    <!--                                      fill="#176C77"/>-->
+    <!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+    <!--                                      fill="white"/>-->
+    <!--                            </g>-->
+    <!--                            <defs>-->
+    <!--                                <clipPath id="clip0_759_4082">-->
+    <!--                                    <rect width="20" height="20" fill="white"/>-->
+    <!--                                </clipPath>-->
+    <!--                            </defs>-->
+    <!--                        </svg>-->
+    <!--                    </button>-->
+    <!--                </div>-->
+    <!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+    <!--                    <span>Sécurité sociale</span>-->
+    <!--                    <button class="remove-file">-->
+    <!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+    <!--                             xmlns="http://www.w3.org/2000/svg">-->
+    <!--                            <g clip-path="url(#clip0_759_4082)">-->
+    <!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+    <!--                                      fill="#176C77"/>-->
+    <!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+    <!--                                      fill="white"/>-->
+    <!--                            </g>-->
+    <!--                            <defs>-->
+    <!--                                <clipPath id="clip0_759_4082">-->
+    <!--                                    <rect width="20" height="20" fill="white"/>-->
+    <!--                                </clipPath>-->
+    <!--                            </defs>-->
+    <!--                        </svg>-->
+    <!--                    </button>-->
+    <!--                </div>-->
+    <!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+    <!--                    <span>Sécurité...</span>-->
+    <!--                    <button class="remove-file">-->
+    <!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+    <!--                             xmlns="http://www.w3.org/2000/svg">-->
+    <!--                            <g clip-path="url(#clip0_759_4082)">-->
+    <!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+    <!--                                      fill="#176C77"/>-->
+    <!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+    <!--                                      fill="white"/>-->
+    <!--                            </g>-->
+    <!--                            <defs>-->
+    <!--                                <clipPath id="clip0_759_4082">-->
+    <!--                                    <rect width="20" height="20" fill="white"/>-->
+    <!--                                </clipPath>-->
+    <!--                            </defs>-->
+    <!--                        </svg>-->
+    <!--                    </button>-->
+    <!--                </div>-->
+    <!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+    <!--                    <span>Terminology</span>-->
+    <!--                    <button class="remove-file">-->
+    <!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+    <!--                             xmlns="http://www.w3.org/2000/svg">-->
+    <!--                            <g clip-path="url(#clip0_759_4082)">-->
+    <!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+    <!--                                      fill="#176C77"/>-->
+    <!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+    <!--                                      fill="white"/>-->
+    <!--                            </g>-->
+    <!--                            <defs>-->
+    <!--                                <clipPath id="clip0_759_4082">-->
+    <!--                                    <rect width="20" height="20" fill="white"/>-->
+    <!--                                </clipPath>-->
+    <!--                            </defs>-->
+    <!--                        </svg>-->
+    <!--                    </button>-->
+    <!--                </div>-->
+    <!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+    <!--                    <span>RH</span>-->
+    <!--                    <button class="remove-file">-->
+    <!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+    <!--                             xmlns="http://www.w3.org/2000/svg">-->
+    <!--                            <g clip-path="url(#clip0_759_4082)">-->
+    <!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+    <!--                                      fill="#176C77"/>-->
+    <!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+    <!--                                      fill="white"/>-->
+    <!--                            </g>-->
+    <!--                            <defs>-->
+    <!--                                <clipPath id="clip0_759_4082">-->
+    <!--                                    <rect width="20" height="20" fill="white"/>-->
+    <!--                                </clipPath>-->
+    <!--                            </defs>-->
+    <!--                        </svg>-->
+    <!--                    </button>-->
+    <!--                </div>-->
+    <!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+    <!--                    <span>Droit du travais</span>-->
+    <!--                    <button class="remove-file">-->
+    <!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+    <!--                             xmlns="http://www.w3.org/2000/svg">-->
+    <!--                            <g clip-path="url(#clip0_759_4082)">-->
+    <!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+    <!--                                      fill="#176C77"/>-->
+    <!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+    <!--                                      fill="white"/>-->
+    <!--                            </g>-->
+    <!--                            <defs>-->
+    <!--                                <clipPath id="clip0_759_4082">-->
+    <!--                                    <rect width="20" height="20" fill="white"/>-->
+    <!--                                </clipPath>-->
+    <!--                            </defs>-->
+    <!--                        </svg>-->
+    <!--                    </button>-->
+    <!--                </div>-->
+    <!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+    <!--                    <span>Sécurité sociale</span>-->
+    <!--                    <button class="remove-file">-->
+    <!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+    <!--                             xmlns="http://www.w3.org/2000/svg">-->
+    <!--                            <g clip-path="url(#clip0_759_4082)">-->
+    <!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+    <!--                                      fill="#176C77"/>-->
+    <!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+    <!--                                      fill="white"/>-->
+    <!--                            </g>-->
+    <!--                            <defs>-->
+    <!--                                <clipPath id="clip0_759_4082">-->
+    <!--                                    <rect width="20" height="20" fill="white"/>-->
+    <!--                                </clipPath>-->
+    <!--                            </defs>-->
+    <!--                        </svg>-->
+    <!--                    </button>-->
+    <!--                </div>-->
+    <!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
+    <!--                    <span>Sécurité...</span>-->
+    <!--                    <button class="remove-file">-->
+    <!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+    <!--                             xmlns="http://www.w3.org/2000/svg">-->
+    <!--                            <g clip-path="url(#clip0_759_4082)">-->
+    <!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
+    <!--                                      fill="#176C77"/>-->
+    <!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
+    <!--                                      fill="white"/>-->
+    <!--                            </g>-->
+    <!--                            <defs>-->
+    <!--                                <clipPath id="clip0_759_4082">-->
+    <!--                                    <rect width="20" height="20" fill="white"/>-->
+    <!--                                </clipPath>-->
+    <!--                            </defs>-->
+    <!--                        </svg>-->
+    <!--                    </button>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--        <div class="flex w-full items-center justify-between">-->
+    <!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
+    <!--                <span class="text-3.5">Previous</span>-->
+    <!--            </button>-->
+    <!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
+    <!--                <span class="text-3.5">Following</span>-->
+    <!--            </button>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">-->
+    <!--        <div class="border-dashed border-2 border-gray-400 w-full h-full py-7.5 px-5">-->
+    <!--            <span class="text-4 text-gray-800 font-semibold">Review</span>-->
+    <!--            <table class="table-auto mt-5 w-full border-separate border-spacing-y-5">-->
+    <!--                <tbody>-->
+    <!--                <tr>-->
+    <!--                    <td>-->
+    <!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
+    <!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
+    <!--                        </div>-->
+    <!--                    </td>-->
+    <!--                    <td>-->
+    <!--                        <div class="text-3.25 text-green-700">-->
+    <!--                            Processing...-->
+    <!--                        </div>-->
+    <!--                    </td>-->
+    <!--                    <td>-->
+    <!--                        <button class="flex gap-2.5 items-center text-green-700">-->
+    <!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
+    <!--                                 xmlns="http://www.w3.org/2000/svg">-->
+    <!--                                <g clip-path="url(#clip0_759_2185)">-->
+    <!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
+    <!--                                          fill="#176C77"/>-->
+    <!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
+    <!--                                          fill="#176C77"/>-->
+    <!--                                </g>-->
+    <!--                                <defs>-->
+    <!--                                    <clipPath id="clip0_759_2185">-->
+    <!--                                        <rect width="16" height="16" fill="white"-->
+    <!--                                              transform="translate(0.333984)"/>-->
+    <!--                                    </clipPath>-->
+    <!--                                </defs>-->
+    <!--                            </svg>-->
+    <!--                            Download-->
+    <!--                        </button>-->
+    <!--                    </td>-->
+    <!--                    <td class="flex justify-end">-->
+    <!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
+    <!--                            Revision-->
+    <!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+    <!--                                 xmlns="http://www.w3.org/2000/svg">-->
+    <!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
+    <!--                                      fill="#0D2B40"/>-->
+    <!--                            </svg>-->
 
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td>-->
-<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
-<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                                <span class="rounded-md bg-red-100 text-red-400 py-3 px-4 text-3.25">-->
-<!--                                    Error-->
-<!--                                </span>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
-<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <g clip-path="url(#clip0_759_2185)">-->
-<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                </g>-->
-<!--                                <defs>-->
-<!--                                    <clipPath id="clip0_759_2185">-->
-<!--                                        <rect width="16" height="16" fill="white"-->
-<!--                                              transform="translate(0.333984)"/>-->
-<!--                                    </clipPath>-->
-<!--                                </defs>-->
-<!--                            </svg>-->
-<!--                            Download-->
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                    <td class="flex justify-end">-->
-<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
-<!--                            Revision-->
-<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
-<!--                                      fill="#0D2B40"/>-->
-<!--                            </svg>-->
+    <!--                        </button>-->
+    <!--                    </td>-->
+    <!--                </tr>-->
+    <!--                <tr>-->
+    <!--                    <td>-->
+    <!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
+    <!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
+    <!--                        </div>-->
+    <!--                    </td>-->
+    <!--                    <td>-->
+    <!--                                <span class="rounded-md bg-red-100 text-red-400 py-3 px-4 text-3.25">-->
+    <!--                                    Error-->
+    <!--                                </span>-->
+    <!--                    </td>-->
+    <!--                    <td>-->
+    <!--                        <button class="flex gap-2.5 items-center text-green-700">-->
+    <!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
+    <!--                                 xmlns="http://www.w3.org/2000/svg">-->
+    <!--                                <g clip-path="url(#clip0_759_2185)">-->
+    <!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
+    <!--                                          fill="#176C77"/>-->
+    <!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
+    <!--                                          fill="#176C77"/>-->
+    <!--                                </g>-->
+    <!--                                <defs>-->
+    <!--                                    <clipPath id="clip0_759_2185">-->
+    <!--                                        <rect width="16" height="16" fill="white"-->
+    <!--                                              transform="translate(0.333984)"/>-->
+    <!--                                    </clipPath>-->
+    <!--                                </defs>-->
+    <!--                            </svg>-->
+    <!--                            Download-->
+    <!--                        </button>-->
+    <!--                    </td>-->
+    <!--                    <td class="flex justify-end">-->
+    <!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
+    <!--                            Revision-->
+    <!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+    <!--                                 xmlns="http://www.w3.org/2000/svg">-->
+    <!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
+    <!--                                      fill="#0D2B40"/>-->
+    <!--                            </svg>-->
 
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td>-->
-<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
-<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                                <span class="rounded-md bg-green-200 text-green-700 py-3 px-4 text-3.25">-->
-<!--                                    Post-edited file uploaded-->
-<!--                                </span>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
-<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <g clip-path="url(#clip0_759_2185)">-->
-<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                </g>-->
-<!--                                <defs>-->
-<!--                                    <clipPath id="clip0_759_2185">-->
-<!--                                        <rect width="16" height="16" fill="white"-->
-<!--                                              transform="translate(0.333984)"/>-->
-<!--                                    </clipPath>-->
-<!--                                </defs>-->
-<!--                            </svg>-->
-<!--                            Download-->
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                    <td class="flex justify-end">-->
-<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
-<!--                            Revision-->
-<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
-<!--                                      fill="#0D2B40"/>-->
-<!--                            </svg>-->
+    <!--                        </button>-->
+    <!--                    </td>-->
+    <!--                </tr>-->
+    <!--                <tr>-->
+    <!--                    <td>-->
+    <!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
+    <!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
+    <!--                        </div>-->
+    <!--                    </td>-->
+    <!--                    <td>-->
+    <!--                                <span class="rounded-md bg-green-200 text-green-700 py-3 px-4 text-3.25">-->
+    <!--                                    Post-edited file uploaded-->
+    <!--                                </span>-->
+    <!--                    </td>-->
+    <!--                    <td>-->
+    <!--                        <button class="flex gap-2.5 items-center text-green-700">-->
+    <!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
+    <!--                                 xmlns="http://www.w3.org/2000/svg">-->
+    <!--                                <g clip-path="url(#clip0_759_2185)">-->
+    <!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
+    <!--                                          fill="#176C77"/>-->
+    <!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
+    <!--                                          fill="#176C77"/>-->
+    <!--                                </g>-->
+    <!--                                <defs>-->
+    <!--                                    <clipPath id="clip0_759_2185">-->
+    <!--                                        <rect width="16" height="16" fill="white"-->
+    <!--                                              transform="translate(0.333984)"/>-->
+    <!--                                    </clipPath>-->
+    <!--                                </defs>-->
+    <!--                            </svg>-->
+    <!--                            Download-->
+    <!--                        </button>-->
+    <!--                    </td>-->
+    <!--                    <td class="flex justify-end">-->
+    <!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
+    <!--                            Revision-->
+    <!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+    <!--                                 xmlns="http://www.w3.org/2000/svg">-->
+    <!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
+    <!--                                      fill="#0D2B40"/>-->
+    <!--                            </svg>-->
 
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td>-->
-<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
-<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                                <span class="rounded-md bg-yellow-100 text-yellow-400 py-3 px-4 text-3.25">-->
-<!--                                    Reguest for post-editing sent-->
-<!--                                </span>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
-<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <g clip-path="url(#clip0_759_2185)">-->
-<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                </g>-->
-<!--                                <defs>-->
-<!--                                    <clipPath id="clip0_759_2185">-->
-<!--                                        <rect width="16" height="16" fill="white"-->
-<!--                                              transform="translate(0.333984)"/>-->
-<!--                                    </clipPath>-->
-<!--                                </defs>-->
-<!--                            </svg>-->
-<!--                            Download-->
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                    <td class="flex justify-end">-->
-<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
-<!--                            Revision-->
-<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
-<!--                                      fill="#0D2B40"/>-->
-<!--                            </svg>-->
+    <!--                        </button>-->
+    <!--                    </td>-->
+    <!--                </tr>-->
+    <!--                <tr>-->
+    <!--                    <td>-->
+    <!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
+    <!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
+    <!--                        </div>-->
+    <!--                    </td>-->
+    <!--                    <td>-->
+    <!--                                <span class="rounded-md bg-yellow-100 text-yellow-400 py-3 px-4 text-3.25">-->
+    <!--                                    Reguest for post-editing sent-->
+    <!--                                </span>-->
+    <!--                    </td>-->
+    <!--                    <td>-->
+    <!--                        <button class="flex gap-2.5 items-center text-green-700">-->
+    <!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
+    <!--                                 xmlns="http://www.w3.org/2000/svg">-->
+    <!--                                <g clip-path="url(#clip0_759_2185)">-->
+    <!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
+    <!--                                          fill="#176C77"/>-->
+    <!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
+    <!--                                          fill="#176C77"/>-->
+    <!--                                </g>-->
+    <!--                                <defs>-->
+    <!--                                    <clipPath id="clip0_759_2185">-->
+    <!--                                        <rect width="16" height="16" fill="white"-->
+    <!--                                              transform="translate(0.333984)"/>-->
+    <!--                                    </clipPath>-->
+    <!--                                </defs>-->
+    <!--                            </svg>-->
+    <!--                            Download-->
+    <!--                        </button>-->
+    <!--                    </td>-->
+    <!--                    <td class="flex justify-end">-->
+    <!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
+    <!--                            Revision-->
+    <!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+    <!--                                 xmlns="http://www.w3.org/2000/svg">-->
+    <!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
+    <!--                                      fill="#0D2B40"/>-->
+    <!--                            </svg>-->
 
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td>-->
-<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
-<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                                <span class="rounded-md bg-gray-200 text-gray-800 py-3 px-4 text-3.25">-->
-<!--                                    Translated-->
-<!--                                </span>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
-<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <g clip-path="url(#clip0_759_2185)">-->
-<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                </g>-->
-<!--                                <defs>-->
-<!--                                    <clipPath id="clip0_759_2185">-->
-<!--                                        <rect width="16" height="16" fill="white"-->
-<!--                                              transform="translate(0.333984)"/>-->
-<!--                                    </clipPath>-->
-<!--                                </defs>-->
-<!--                            </svg>-->
-<!--                            Download-->
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                    <td class="flex justify-end">-->
-<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
-<!--                            Revision-->
-<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
-<!--                                      fill="#0D2B40"/>-->
-<!--                            </svg>-->
+    <!--                        </button>-->
+    <!--                    </td>-->
+    <!--                </tr>-->
+    <!--                <tr>-->
+    <!--                    <td>-->
+    <!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
+    <!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
+    <!--                        </div>-->
+    <!--                    </td>-->
+    <!--                    <td>-->
+    <!--                                <span class="rounded-md bg-gray-200 text-gray-800 py-3 px-4 text-3.25">-->
+    <!--                                    Translated-->
+    <!--                                </span>-->
+    <!--                    </td>-->
+    <!--                    <td>-->
+    <!--                        <button class="flex gap-2.5 items-center text-green-700">-->
+    <!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
+    <!--                                 xmlns="http://www.w3.org/2000/svg">-->
+    <!--                                <g clip-path="url(#clip0_759_2185)">-->
+    <!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
+    <!--                                          fill="#176C77"/>-->
+    <!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
+    <!--                                          fill="#176C77"/>-->
+    <!--                                </g>-->
+    <!--                                <defs>-->
+    <!--                                    <clipPath id="clip0_759_2185">-->
+    <!--                                        <rect width="16" height="16" fill="white"-->
+    <!--                                              transform="translate(0.333984)"/>-->
+    <!--                                    </clipPath>-->
+    <!--                                </defs>-->
+    <!--                            </svg>-->
+    <!--                            Download-->
+    <!--                        </button>-->
+    <!--                    </td>-->
+    <!--                    <td class="flex justify-end">-->
+    <!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
+    <!--                            Revision-->
+    <!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+    <!--                                 xmlns="http://www.w3.org/2000/svg">-->
+    <!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
+    <!--                                      fill="#0D2B40"/>-->
+    <!--                            </svg>-->
 
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td>-->
-<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
-<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                                <span class="rounded-md bg-gray-200 text-gray-800 py-3 px-4 text-3.25">-->
-<!--                                    Translated-->
-<!--                                </span>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
-<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <g clip-path="url(#clip0_759_2185)">-->
-<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                </g>-->
-<!--                                <defs>-->
-<!--                                    <clipPath id="clip0_759_2185">-->
-<!--                                        <rect width="16" height="16" fill="white"-->
-<!--                                              transform="translate(0.333984)"/>-->
-<!--                                    </clipPath>-->
-<!--                                </defs>-->
-<!--                            </svg>-->
-<!--                            Download-->
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                    <td class="flex justify-end">-->
-<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
-<!--                            Revision-->
-<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
-<!--                                      fill="#0D2B40"/>-->
-<!--                            </svg>-->
+    <!--                        </button>-->
+    <!--                    </td>-->
+    <!--                </tr>-->
+    <!--                <tr>-->
+    <!--                    <td>-->
+    <!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
+    <!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
+    <!--                        </div>-->
+    <!--                    </td>-->
+    <!--                    <td>-->
+    <!--                                <span class="rounded-md bg-gray-200 text-gray-800 py-3 px-4 text-3.25">-->
+    <!--                                    Translated-->
+    <!--                                </span>-->
+    <!--                    </td>-->
+    <!--                    <td>-->
+    <!--                        <button class="flex gap-2.5 items-center text-green-700">-->
+    <!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
+    <!--                                 xmlns="http://www.w3.org/2000/svg">-->
+    <!--                                <g clip-path="url(#clip0_759_2185)">-->
+    <!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
+    <!--                                          fill="#176C77"/>-->
+    <!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
+    <!--                                          fill="#176C77"/>-->
+    <!--                                </g>-->
+    <!--                                <defs>-->
+    <!--                                    <clipPath id="clip0_759_2185">-->
+    <!--                                        <rect width="16" height="16" fill="white"-->
+    <!--                                              transform="translate(0.333984)"/>-->
+    <!--                                    </clipPath>-->
+    <!--                                </defs>-->
+    <!--                            </svg>-->
+    <!--                            Download-->
+    <!--                        </button>-->
+    <!--                    </td>-->
+    <!--                    <td class="flex justify-end">-->
+    <!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
+    <!--                            Revision-->
+    <!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
+    <!--                                 xmlns="http://www.w3.org/2000/svg">-->
+    <!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
+    <!--                                      fill="#0D2B40"/>-->
+    <!--                            </svg>-->
 
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                </tbody>-->
-<!--            </table>-->
-<!--        </div>-->
-<!--        <div class="flex w-full items-center justify-start">-->
-<!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
-<!--                <span class="text-3.5">New translation</span>-->
-<!--            </button>-->
-<!--        </div>-->
-<!--    </div>-->
+    <!--                        </button>-->
+    <!--                    </td>-->
+    <!--                </tr>-->
+    <!--                </tbody>-->
+    <!--            </table>-->
+    <!--        </div>-->
+    <!--        <div class="flex w-full items-center justify-start">-->
+    <!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
+    <!--                <span class="text-3.5">New translation</span>-->
+    <!--            </button>-->
+    <!--        </div>-->
+    <!--    </div>-->
 </div>
 {% endblock %}
