@@ -87,18 +87,23 @@
     </script>
 </head>
 <body class="font-montserrat">
-<div class="flex h-screen">
+<div class="flex h-screen overflow-hidden">
     <!-- Sidebar -->
-    {% include 'sidebar.html' %}
+    <div class="flex-shrink-0">
+        {% include 'sidebar.html' %}
+    </div>
 
-    <!-- Main page -->
-    <div class="flex-1">
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
         <!-- Header -->
         {% include 'header.html' %}
-        {% block content %}
-        <!-- Page content -->
 
-        {% endblock %}
+        <!-- Scrollable content -->
+        <main class="flex-1 overflow-y-auto">
+            {% block content %}
+            <!-- Page content -->
+            {% endblock %}
+        </main>
     </div>
 </div>
 <script src="{% static 'js/upload-document.js' %}"></script>
@@ -106,4 +111,3 @@
 {% block extra_js %} {% endblock %}
 </body>
 </html>
-

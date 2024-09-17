@@ -1,8 +1,83 @@
 $(document).ready(function () {
+    var $pagination = $('.pagination');
+    var totalItems = parseInt($pagination.data('total-items'));
+    console.log('totalItems', totalItems)
+    var itemsPerPage = parseInt($pagination.data('items-per-page'));
+    console.log('itemsPerPage', itemsPerPage)
+    var currentPage = parseInt($pagination.data('current-page'));
+    console.log('currentPage', currentPage)
+    var totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    function updatePagination() {
+        var $pageNumbers = $('#page-numbers');
+        $pageNumbers.empty();
+
+        var startPage = Math.max(1, currentPage - 2);
+        var endPage = Math.min(totalPages, startPage + 4);
+
+        if (startPage > 1) {
+            $pageNumbers.append('<a href="#" class="page-number text-gray-300">1</a>');
+            if (startPage > 2) {
+                $pageNumbers.append('<span class="text-gray-300">...</span>');
+            }
+        }
+
+        for (var i = startPage; i <= endPage; i++) {
+            if (i === currentPage) {
+                $pageNumbers.append('<span class="current-page text-gray-800 rounded">' + i + '</span>');
+            } else {
+                $pageNumbers.append('<a href="#" class="page-number text-gray-300">' + i + '</a>');
+            }
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                $pageNumbers.append('<span class="text-gray-300">...</span>');
+            }
+            $pageNumbers.append('<a href="#" class="page-number text-gray-300">' + totalPages + '</a>');
+        }
+
+        $('#prev-page').toggleClass('disabled', currentPage === 1);
+        $('#next-page').toggleClass('disabled', currentPage === totalPages);
+    }
+
+    function loadPage(page) {
+        $.ajax({
+            url: window.location.pathname,
+            data: {page: page},
+            success: function (data) {
+                $('tbody').html(data.results);
+                currentPage = page;
+                updatePagination();
+            }
+        });
+    }
+
+    $(document).on('click', '.page-number', function (e) {
+        e.preventDefault();
+        var page = parseInt($(this).text());
+        loadPage(page);
+    });
+
+    $('#prev-page').click(function (e) {
+        e.preventDefault();
+        if (currentPage > 1) {
+            loadPage(currentPage - 1);
+        }
+    });
+
+    $('#next-page').click(function (e) {
+        e.preventDefault();
+        if (currentPage < totalPages) {
+            loadPage(currentPage + 1);
+        }
+    });
+
+    updatePagination();
+
     $('td').each(function () {
         var statusElement = $(this).find('.status');
         var statusText = statusElement.text().trim();
-        console.log(statusText)
         switch (statusText) {
             case 'Being translated':
                 statusElement.text('Being translated');
@@ -33,7 +108,7 @@ $(document).ready(function () {
         }
     });
 
-    $('td.created-at').each(function() {
+    $('td.created-at').each(function () {
         var dateString = $(this).text().trim();
         var date = new Date(dateString);
 
