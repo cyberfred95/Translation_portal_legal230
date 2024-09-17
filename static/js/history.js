@@ -6,6 +6,13 @@ document.addEventListener('DOMContentLoaded', function () {
     var expertRevision = document.querySelectorAll('.expert-revision');
     console.log(expertRevision);
 
+    var button = document.getElementById('show-options');
+            button.addEventListener('click', function () {
+                console.log('Button clicked');
+                // var optionsDiv = document.getElementById('additional-options');
+                // optionsDiv.classList.toggle('hidden');
+                console.log('Options toggled');
+            });
     function errorHandler() {
         $('<a href=' + errorPopup + '></a>').fancybox({
             arrows: false,
@@ -200,4 +207,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 errorHandler()
             });
     }
+
+    
+        // Handle 'Show all options' button click
+      
+    
+        
+    
+    
 });
