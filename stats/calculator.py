@@ -44,10 +44,13 @@ class StatsProcessor:
             preferences.StatisticSettings.URL + "add_statistic/",
             headers={
                 'token': preferences.StatisticSettings.API_KEY,
-                'custom_mt_token': preferences.MainSettings.api_key
+                'custom_mt_api_key': preferences.MainSettings.api_key,
             },
             data={
                 "texts": texts,
-                "uuid": request.user.uuid
+                "uuid": request.user.uuid,
+                'custom_mt_api_key': preferences.MainSettings.api_key,
             }
         )
+        print(response.text)
+        print(response.status_code)

@@ -24,7 +24,6 @@ from preferences import preferences
 from gpt_processing.prompts_list import prompts_list
 from stats.calculator import StatsProcessor
 import langdetect
-from stats.views import PORTAL_STATISTIC_URL
 
 PAGINATION_PAGE_SIZE = 30
 PORTAL_API_KEY = ""
