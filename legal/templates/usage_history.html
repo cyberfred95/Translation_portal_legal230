@@ -17,45 +17,291 @@
                     <span
                         class="font-montserrat text-[12px] font-[500] leading-[14.63px] text-left text-[#2B4459] px-1 rounded">Filter</span>
                 </button>
-                
+
                 <!-- Dropdown -->
                 <div id="multi-dropdown" class="hidden z-10 bg-white divide-y divide-gray-100 rounded-md shadow w-60 
                     shadow-[0px_0px_20px_3px_#2B445914] absolute mt-1 right-0">
-                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="multiLevelDropdownButton">
-                        <li>
-                            <button id="doubleDropdownButton" data-dropdown-toggle="doubleDropdown"
-                                data-dropdown-placement="right-start" type="button"
-                                class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">User
-                                <svg class="w-3.5 h-2.5 ms-3 text-black" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-                                </svg>
-                            </button>
-                            <button id="doubleDropdownButton" data-dropdown-toggle="doubleDropdown"
-                                data-dropdown-placement="right-start" type="button"
-                                class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">File name
-                                <svg class="w-3.5 h-2.5 ms-3 text-black" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-                                </svg>
-                            </button>
-                            <button id="doubleDropdownButton" data-dropdown-toggle="doubleDropdown"
-                                data-dropdown-placement="right-start" type="button"
-                                class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">Group
-                                <svg class="w-3.5 h-2.5 ms-3 text-black" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-                                </svg>
-                            </button>
-                        </li>
-                        <div class="flex space-x-2 pt-3">
-                            <button class="h-[37px] w-[99px] px-5 py-2 bg-white border border-[#346C77] rounded-md text-[#346C77] ml-4">Clear</button>
-                            <button class="h-[37px] w-[99px] bg-[#346C77] px-4 py-2 rounded-md text-white">Apply</button>
-                        </div>
-                    </ul>
+                    <div class="">
+                        <ul class=" max-h-[500px] overflow-y-auto py-2 text-sm text-gray-700 dark:text-gray-200"
+                            aria-labelledby="multiLevelDropdownButton">
+                            <li class="py-2 text-sm text-gray-700 dark:text-gray-200">
+                                <button id="doubleDropdownButton" data-dropdown-toggle="doubleDropdown"
+                                    data-dropdown-placement="right-start" type="button"
+                                    class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">User
+                                    <svg id="dropdownArrow" class="w-3.5 h-2.5 ms-3 text-black" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="m1 1 4 4 4-4" />
+                                    </svg>
+                                </button>
+                                <div id="dropdownSearch" class="z-10  bg-white rounded-lg shadow w-60 hidden">
+                                    <div class="p-3">
+                                        <label for="input-group-search" class="sr-only">Search</label>
+                                        <div class="relative">
+                                            <div
+                                                class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+                                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M15.1068 14.0475L12.6745 11.6152C13.4117 10.6501 13.816 9.47965 13.8161 8.24451C13.8161 6.75604 13.2364 5.35657 12.1837 4.30408C11.1313 3.25159 9.73196 2.67188 8.24332 2.67188C6.75485 2.67188 5.35538 3.25159 4.30289 4.30408C2.13016 6.47699 2.13016 10.0124 4.30289 12.1849C5.35538 13.2376 6.75485 13.8173 8.24332 13.8173C9.47845 13.8172 10.649 13.4129 11.614 12.6757L14.0463 15.108C14.1926 15.2545 14.3847 15.3278 14.5766 15.3278C14.7685 15.3278 14.9605 15.2545 15.1068 15.108C15.3998 14.8152 15.3998 14.3403 15.1068 14.0475ZM5.36343 11.1244C3.77554 9.5365 3.77573 6.9527 5.36343 5.36462C6.13266 4.59558 7.15549 4.17188 8.24332 4.17188C9.33133 4.17188 10.354 4.59558 11.1232 5.36462C11.8924 6.13385 12.3161 7.15668 12.3161 8.24451C12.3161 9.33252 11.8924 10.3552 11.1232 11.1244C10.354 11.8936 9.33133 12.3173 8.24332 12.3173C7.15549 12.3173 6.13266 11.8936 5.36343 11.1244Z"
+                                                        fill="#2B4459" />
+                                                </svg>
+                                            </div>
+                                            <input type="text" id="input-group-search"
+                                                class="block w-full p-2 ps-10 text-xs font-roboto text-black border border-[#EAF0F6] rounded-lg placeholder-gray-300"
+                                                placeholder=" Start typing...">
+                                        </div>
+                                    </div>
+                                    <ul class="h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200"
+                                        aria-labelledby="dropdownSearchButton">
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-11" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-11"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Google</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                <input checked id="checkbox-item-12" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-12"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Microsoft</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                <input id="checkbox-item-13" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-13"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Globalese</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                <input id="checkbox-item-14" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-14"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Language
+                                                    Wire</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                <input id="checkbox-item-16" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-16"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Leslie
+                                                    Livingston</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                <input id="checkbox-item-17" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-17"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Roberta
+                                                    Casas</label>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <button id="doubleDropdownButtonn" data-dropdown-toggle="doubleDropdown"
+                                    data-dropdown-placement="right-start" type="button"
+                                    class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">File
+                                    name
+                                    <svg id="dropdownArroww" class="w-3.5 h-2.5 ms-3 text-black" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="m1 1 4 4 4-4" />
+                                    </svg>
+                                </button>
+                                <div id="dropdownSearchh" class="z-10  bg-white rounded-lg shadow w-60 hidden">
+                                    <div class="p-3">
+                                        <label for="input-group-search" class="sr-only">Search</label>
+                                        <div class="relative">
+                                            <div
+                                                class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+                                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M15.1068 14.0475L12.6745 11.6152C13.4117 10.6501 13.816 9.47965 13.8161 8.24451C13.8161 6.75604 13.2364 5.35657 12.1837 4.30408C11.1313 3.25159 9.73196 2.67188 8.24332 2.67188C6.75485 2.67188 5.35538 3.25159 4.30289 4.30408C2.13016 6.47699 2.13016 10.0124 4.30289 12.1849C5.35538 13.2376 6.75485 13.8173 8.24332 13.8173C9.47845 13.8172 10.649 13.4129 11.614 12.6757L14.0463 15.108C14.1926 15.2545 14.3847 15.3278 14.5766 15.3278C14.7685 15.3278 14.9605 15.2545 15.1068 15.108C15.3998 14.8152 15.3998 14.3403 15.1068 14.0475ZM5.36343 11.1244C3.77554 9.5365 3.77573 6.9527 5.36343 5.36462C6.13266 4.59558 7.15549 4.17188 8.24332 4.17188C9.33133 4.17188 10.354 4.59558 11.1232 5.36462C11.8924 6.13385 12.3161 7.15668 12.3161 8.24451C12.3161 9.33252 11.8924 10.3552 11.1232 11.1244C10.354 11.8936 9.33133 12.3173 8.24332 12.3173C7.15549 12.3173 6.13266 11.8936 5.36343 11.1244Z"
+                                                        fill="#2B4459" />
+                                                </svg>
+                                            </div>
+                                            <input type="text" id="input-group-search"
+                                                class="block w-full p-2 ps-10 text-xs font-roboto text-black border border-[#EAF0F6] rounded-lg placeholder-gray-300"
+                                                placeholder=" Start typing...">
+                                        </div>
+                                    </div>
+                                    <ul class="h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200"
+                                        aria-labelledby="dropdownSearchButton">
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-11" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-11"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Google</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                <input checked id="checkbox-item-12" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-12"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Microsoft</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                <input id="checkbox-item-13" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-13"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Globalese</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                <input id="checkbox-item-14" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-14"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Language
+                                                    Wire</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                <input id="checkbox-item-16" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-16"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Leslie
+                                                    Livingston</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                <input id="checkbox-item-17" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-17"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Roberta
+                                                    Casas</label>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <button id="doubleDropdownButtonnn" data-dropdown-toggle="doubleDropdown"
+                                    data-dropdown-placement="right-start" type="button"
+                                    class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">Group
+                                    <svg id="dropdownArrowww" class="w-3.5 h-2.5 ms-3 text-black" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="m1 1 4 4 4-4" />
+                                    </svg>
+                                </button>
+                                <div id="dropdownSearchhh" class="z-10  bg-white rounded-lg shadow w-60 hidden">
+                                    <div class="p-3">
+                                        <label for="input-group-search" class="sr-only">Search</label>
+                                        <div class="relative">
+                                            <div
+                                                class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+                                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M15.1068 14.0475L12.6745 11.6152C13.4117 10.6501 13.816 9.47965 13.8161 8.24451C13.8161 6.75604 13.2364 5.35657 12.1837 4.30408C11.1313 3.25159 9.73196 2.67188 8.24332 2.67188C6.75485 2.67188 5.35538 3.25159 4.30289 4.30408C2.13016 6.47699 2.13016 10.0124 4.30289 12.1849C5.35538 13.2376 6.75485 13.8173 8.24332 13.8173C9.47845 13.8172 10.649 13.4129 11.614 12.6757L14.0463 15.108C14.1926 15.2545 14.3847 15.3278 14.5766 15.3278C14.7685 15.3278 14.9605 15.2545 15.1068 15.108C15.3998 14.8152 15.3998 14.3403 15.1068 14.0475ZM5.36343 11.1244C3.77554 9.5365 3.77573 6.9527 5.36343 5.36462C6.13266 4.59558 7.15549 4.17188 8.24332 4.17188C9.33133 4.17188 10.354 4.59558 11.1232 5.36462C11.8924 6.13385 12.3161 7.15668 12.3161 8.24451C12.3161 9.33252 11.8924 10.3552 11.1232 11.1244C10.354 11.8936 9.33133 12.3173 8.24332 12.3173C7.15549 12.3173 6.13266 11.8936 5.36343 11.1244Z"
+                                                        fill="#2B4459" />
+                                                </svg>
+                                            </div>
+                                            <input type="text" id="input-group-search"
+                                                class="block w-full p-2 ps-10 text-xs font-roboto text-black border border-[#EAF0F6] rounded-lg placeholder-gray-300"
+                                                placeholder=" Start typing...">
+                                        </div>
+                                    </div>
+                                    <ul class="h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200"
+                                        aria-labelledby="dropdownSearchButton">
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-11" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-11"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Google</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                <input id="checkbox-item-12" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-12"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Microsoft</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                <input id="checkbox-item-13" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-13"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Globalese</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                <input id="checkbox-item-14" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-14"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Language
+                                                    Wire</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                <input id="checkbox-item-16" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-16"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Leslie
+                                                    Livingston</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="checkbox-item-17 items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                <input id="checkbox-item-17" type="checkbox" value=""
+                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                <label for="checkbox-item-17"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Roberta
+                                                    Casas</label>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <div class="flex space-x-2 pt-3">
+                                <button id="clear-button"
+                                    class="h-[37px] w-[99px] px-5 py-2 bg-white border border-[#346C77] rounded-md text-[#346C77] ml-4">Clear</button>
+                                <button
+                                    class="h-[37px] w-[99px] bg-[#346C77] px-4 py-2 rounded-md text-white">Apply</button>
+                            </div>
+                        </ul>
+                    </div>
                 </div>
             </div>
-           
+
 
             <p class="flex justify-between items-center gap-2">
                 <svg width="10" height="11" viewBox="0 0 10 11" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -133,30 +379,45 @@
         </table>
 
     </div>
-    <div class="pagination flex justify-center items-center py-12.5 w-full gap-18"
-        data-total-items="{{ projects.count }}" data-items-per-page="{{ projects.page_size }}"
-        data-current-page="{{ projects.current_page }}">
-        <a href="#" id="prev-page" class="flex items-center gap-2.5 text-3.25 text-gray-800">
-            <svg width="6" height="11" viewBox="0 0 6 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M0.286074 4.78962C0.336297 4.73904 0.3919 4.69635 0.449656 4.65922L4.32557 0.783488C4.70385 0.405564 5.31693 0.405385 5.69539 0.783667C6.07367 1.16177 6.07367 1.77502 5.69539 2.15348L2.35721 5.4913L5.71225 8.8467C6.09071 9.22462 6.09071 9.83805 5.71225 10.2165C5.52302 10.4054 5.27531 10.4999 5.02761 10.4999C4.7799 10.4999 4.53166 10.4054 4.34297 10.2162L0.449656 6.32338C0.3919 6.28625 0.336476 6.24374 0.286074 6.19298C0.0923591 5.99926 -0.000552654 5.74492 0.00375223 5.4913C-0.000731945 5.2375 0.0923591 4.9828 0.286074 4.78962Z"
-                    fill="#2B4459" />
-            </svg>
-            Prev
-        </a>
-        <div id="page-numbers" class="flex space-x-3.5 text-3.25 items-end">
-            <!-- Page numbers will be inserted here dynamically -->
-        </div>
-        <a href="#" id="next-page" class="flex items-center gap-2.5 text-3.25 text-gray-800">
-            Next
-            <svg width="6" height="11" viewBox="0 0 6 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M5.71393 4.78962C5.6637 4.73904 5.6081 4.69635 5.55034 4.65922L1.67443 0.783488C1.29615 0.405564 0.683075 0.405385 0.304613 0.783667C-0.0736695 1.16177 -0.0736695 1.77502 0.304613 2.15348L3.64279 5.4913L0.287753 8.8467C-0.0907092 9.22462 -0.0907092 9.83805 0.287753 10.2165C0.476983 10.4054 0.724687 10.4999 0.972392 10.4999C1.2201 10.4999 1.46834 10.4054 1.65703 10.2162L5.55034 6.32338C5.6081 6.28625 5.66352 6.24374 5.71393 6.19298C5.90764 5.99926 6.00055 5.74492 5.99625 5.4913C6.00073 5.2375 5.90764 4.9828 5.71393 4.78962Z"
-                    fill="#2B4459" />
-            </svg>
+    <div class="flex justify-between items-center py-12.5 w-full">
+        <div class="pagination flex justify-center items-center gap-18 w-full ml-50"
+            data-total-items="{{ projects.count }}" data-items-per-page="{{ projects.page_size }}"
+            data-current-page="{{ projects.current_page }}">
 
-        </a>
+            <a href="#" id="prev-page" class="flex items-center gap-2.5 text-3.25 text-gray-800">
+                <svg width="6" height="11" viewBox="0 0 6 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M0.286074 4.78962C0.336297 4.73904 0.3919 4.69635 0.449656 4.65922L4.32557 0.783488C4.70385 0.405564 5.31693 0.405385 5.69539 0.783667C6.07367 1.16177 6.07367 1.77502 5.69539 2.15348L2.35721 5.4913L5.71225 8.8467C6.09071 9.22462 6.09071 9.83805 5.71225 10.2165C5.52302 10.4054 5.27531 10.4999 5.02761 10.4999C4.7799 10.4999 4.53166 10.4054 4.34297 10.2162L0.449656 6.32338C0.3919 6.28625 0.336476 6.24374 0.286074 6.19298C0.0923591 5.99926 -0.000552654 5.74492 0.00375223 5.4913C-0.000731945 5.2375 0.0923591 4.9828 0.286074 4.78962Z"
+                        fill="#2B4459" />
+                </svg>
+                Prev
+            </a>
+
+            <div id="page-numbers" class="flex space-x-3.5 text-3.25 items-end">
+                <!-- Page numbers will be inserted here dynamically -->
+            </div>
+
+            <a href="#" id="next-page" class="flex items-center gap-2.5 text-3.25 text-gray-800">
+                Next
+                <svg width="6" height="11" viewBox="0 0 6 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M5.71393 4.78962C5.6637 4.73904 5.6081 4.69635 5.55034 4.65922L1.67443 0.783488C1.29615 0.405564 0.683075 0.405385 0.304613 0.783667C-0.0736695 1.16177 -0.0736695 1.77502 0.304613 2.15348L3.64279 5.4913L0.287753 8.8467C-0.0907092 9.22462 -0.0907092 9.83805 0.287753 10.2165C0.476983 10.4054 0.724687 10.4999 0.972392 10.4999C1.2201 10.4999 1.46834 10.4054 1.65703 10.2162L5.55034 6.32338C5.6081 6.28625 5.66352 6.24374 5.71393 6.19298C5.90764 5.99926 6.00055 5.74492 5.99625 5.4913C6.00073 5.2375 5.90764 4.9828 5.71393 4.78962Z"
+                        fill="#2B4459" />
+                </svg>
+            </a>
+        </div>
+
+        <div
+            class="flex items-center space-x-4 text-3.25 border rounded-md border-gray-300 p-2 text-sm font-montserrat">
+            <div class="text-green-500">1500</div>
+            <div class="text-gray-800">characters</div>
+            <span>|</span>
+            <div class="text-green-500">1500</div>
+            <div class="text-gray-800">tokens</div>
+        </div>
     </div>
+
+
 </div>
 
 {% endblock %}

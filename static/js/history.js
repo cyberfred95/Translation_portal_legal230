@@ -127,4 +127,54 @@ $(document).ready(function () {
         var dropdown = document.getElementById('multi-dropdown');
         dropdown.classList.toggle('hidden');
     });
+
+    function toggleDropdown(buttonId, dropdownId) {
+        var dropdown = document.getElementById(dropdownId);
+        dropdown.classList.toggle('hidden');
+    }
+    
+    document.getElementById('doubleDropdownButton').addEventListener('click', function() {
+        toggleDropdown('doubleDropdownButton', 'dropdownSearch');
+    });
+    
+    document.getElementById('doubleDropdownButtonn').addEventListener('click', function() {
+        toggleDropdown('doubleDropdownButtonn', 'dropdownSearchh');
+    });
+
+    document.getElementById('doubleDropdownButtonnn').addEventListener('click', function() {
+        toggleDropdown('doubleDropdownButtonnn', 'dropdownSearchhh');
+    });
+    
+
+    document.getElementById('doubleDropdownButton').addEventListener('click', function() {
+        var dropdown = document.getElementById('dropdownSearch');
+        var arrow = document.getElementById('dropdownArrow');
+    
+        arrow.classList.toggle('rotate-180');
+    });
+    document.getElementById('doubleDropdownButtonn').addEventListener('click', function() {
+        var dropdown = document.getElementById('dropdownSearchh');
+        var arrow = document.getElementById('dropdownArroww');
+    
+        arrow.classList.toggle('rotate-180');
+    });
+
+    document.getElementById('doubleDropdownButtonnn').addEventListener('click', function() {
+        var dropdown = document.getElementById('dropdownSearchhh');
+        var arrow = document.getElementById('dropdownArrowww');
+    
+        arrow.classList.toggle('rotate-180');
+    });
+
+    document.getElementById('clear-button').addEventListener('click', function() {
+        // Pronađite sve checkboxove sa klasom 'checkbox-item'
+        const checkboxes = document.querySelectorAll('.checkbox-item-17');
+        console.log('uslo');
+        // Resetujte svaki checkbox
+        checkboxes.forEach(function(checkbox) {
+            console.log('isto');
+            checkbox.checked = false;
+        });
+    });
+    
 });
