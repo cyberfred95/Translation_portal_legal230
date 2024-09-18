@@ -40,7 +40,6 @@ class StatsProcessor:
 
     @staticmethod
     def send_request(texts: list, request):
-        print(f'api_key {preferences.MainSettings.api_key}')
         response = requests.post(
             preferences.StatisticSettings.URL + "add_statistic/",
             headers={
@@ -48,9 +47,12 @@ class StatsProcessor:
                 'X-API-Key': preferences.MainSettings.api_key,
             },
             data={
-                "texts": texts,
+                "messages": texts,
                 "uuid": request.user.uuid,
                 'custom_mt_api_key': preferences.MainSettings.api_key,
+                'template_name': request.POST.get('translation_name'),
             }
         )
+        print(response.text)
         print(response.status_code)
+
