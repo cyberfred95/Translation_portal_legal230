@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
 <div class="ml-31.25 mt-11.5 mr-63.75">
     <p class="text-7.5">Project history</p>
@@ -119,4 +119,6 @@
         </a>
     </div>
 </div>
+<script src="{% static 'js/history.js' %}"></script>
+<script src="{% static 'js/pagination.js' %}"></script>
 {% endblock %}

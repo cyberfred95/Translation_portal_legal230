@@ -38,6 +38,40 @@
         right: 10px;
         transform: translateY(-50%);
     }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #0D2B40 !important;
+        color: white;
+    }
+
+    .select2-container--default .select2-results__option[aria-selected=true] {
+        background-color: #0D2B40 !important;
+        color: white;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        font-weight: 600;
+        font-size: 16px;
+        color: #0D2B40;
+        padding-left: 0;
+    }
+
+    .select2-container {
+        width: 100% !important;
+    }
+
+    .select2-container--default .select2-selection--single {
+        width: 100%;
+    }
+
+    .select2-container--default .select2-results__option {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .select2-results__options {
+        padding-left: 0;
+    }
 </style>
 
 <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-5 w-full h-full flex flex-col items-end">
