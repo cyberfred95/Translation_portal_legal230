@@ -123,28 +123,8 @@ $(document).ready(function () {
         }
     });
 
-    function show() {
-        $('.user-row, .group-row, .filename-row').hide();
-    }
-
-    $(document).ready(function() {
-        // Hide rows when page is loaded
-        $('.hide-row, .hide-fields').hide();
-
-        $('#options').click(function(e) {
-            e.preventDefault();
-            toggleVisibility();
-        });
-
-        function toggleVisibility() {
-            var $rows = $('.hide-row, .hide-fields');
-            
-            if ($rows.is(':visible')) {
-                $rows.hide();
-            } else {
-                $rows.show();
-            }
-        }
+    document.getElementById('multiLevelDropdownButton').addEventListener('click', function() {
+        var dropdown = document.getElementById('multi-dropdown');
+        dropdown.classList.toggle('hidden');
     });
-    
 });
