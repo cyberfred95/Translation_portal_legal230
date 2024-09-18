@@ -48,13 +48,11 @@ $(document).ready(function() {
         }
     });
 
-// Initialize progress
     updateProgress(currentStep);
     $('.tab-content').hide();
     $('#text-translate-content').show();
     $('#text-translate').addClass('bg-gray-800 text-white border-gray-800');
 
-    // Tab click event handlers
     $('#text-translate').click(function() {
         $('.tab-content').hide();
         $('#text-translate-content').show();

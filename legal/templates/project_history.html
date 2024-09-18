@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
+
 {% load static %}
+
 {% block content %}
+
 <div class="ml-31.25 mt-11.5 mr-63.75">
     <p class="text-7.5">Project history</p>
     <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md px-5 pt-5 w-full h-full flex flex-col items-end mt-5">
@@ -51,16 +54,23 @@
                 </td>
                 <td>
                     <button
-                            class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3 text-3.25 disabled:cursor-default disabled:text-gray-300 disabled:border-gray-300"
+                            class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-300 disabled:border-gray-300"
                             {% if not project.status == 'Translated' %}disabled{% endif %}
                     >
-                        Expert revision
+                    Expert revision
+                    <div class="relative group">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                              xmlns="http://www.w3.org/2000/svg">
                             <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"
                                   fill="currentColor"/>
                         </svg>
-
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 py-3 px-4.5 bg-gray-800 text-white text-2.75 rounded-md bottom-26 left-1/2 transform -translate-x-1/2 translate-y-full">
+                            <span class="text-justify text-wrap block">
+                                Click the button to see options for improving the quality of the translated file.
+                            </span>
+                            <div class="absolute w-3 h-3 bg-gray-800 transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5"></div>
+                        </div>
+                    </div>
                     </button>
                 </td>
                 <td class="text-3.25 text-gray-800 created-at">
@@ -119,6 +129,8 @@
         </a>
     </div>
 </div>
+
 <script src="{% static 'js/history.js' %}"></script>
 <script src="{% static 'js/pagination.js' %}"></script>
+
 {% endblock %}
