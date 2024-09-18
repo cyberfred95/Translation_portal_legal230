@@ -1,0 +1,74 @@
+{% load static %}
+
+<style>
+    .select2-container--open .select2-dropdown--below {
+        position: relative;
+    }
+
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        position: absolute;
+        top: -27px;
+        border: 0px !important;
+        width: 90%;
+    }
+
+    .select2-container--default .select2-search--dropdown .select2-search__field:focus-visible {
+        outline: -webkit-focus-ring-color auto 0px;
+    }
+
+    .select2-container--default .select2-selection--single,
+    .select2-container--default .select2-dropdown,
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        border: none !important;
+        border-radius: 0;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        display: none;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        background-image: url("/static/images/select-arrow.svg");
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 1.5rem;
+        height: 1rem;
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+    }
+</style>
+
+<div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-5 w-full h-full flex flex-col items-end">
+    <form class="flex w-full gap-1">
+        <div class="w-full flex flex-col gap-5">
+            <select class="js-example-basic-single" name="source_language">
+                {% for translate_language in translate_languages %}
+                <option value="{{ translate_language.abbreviation|lower }}">
+                    {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                    {{ translate_language.french_name }}
+                    {% else %} {{ translate_language.name }}
+                    {% endif %}
+                </option>
+                {% endfor %}
+            </select>
+            <textarea class="rounded-0.5 h-50 bg-gray-200 p-5 text-gray-300 resize-none" type="text"
+                      placeholder="Put text here"></textarea>
+        </div>
+        <div class="w-full flex flex-col gap-5">
+            <select class="js-example-basic-single" name="source_language">
+                {% for translate_language in translate_languages %}
+                <option value="{{ translate_language.abbreviation|lower }}">
+
+                    {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                    {{ translate_language.french_name }}
+                    {% else %} {{ translate_language.name }}
+                    {% endif %}
+                </option>
+                {% endfor %}
+            </select>
+            <textarea class="rounded-0.5 h-50 bg-gray-200 p-5 text-gray-300 resize-none" type="text"></textarea>
+        </div>
+    </form>
+</div>
