@@ -40,11 +40,12 @@ class StatsProcessor:
 
     @staticmethod
     def send_request(texts: list, request):
+        print(f'api_key {preferences.MainSettings.api_key}')
         response = requests.post(
             preferences.StatisticSettings.URL + "add_statistic/",
             headers={
                 'token': preferences.StatisticSettings.API_KEY,
-                'custom_mt_api_key': preferences.MainSettings.api_key,
+                'X-API-Key': preferences.MainSettings.api_key,
             },
             data={
                 "texts": texts,
@@ -52,5 +53,4 @@ class StatsProcessor:
                 'custom_mt_api_key': preferences.MainSettings.api_key,
             }
         )
-        print(response.text)
         print(response.status_code)
