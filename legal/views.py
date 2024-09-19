@@ -9,8 +9,6 @@ from django.views.generic import TemplateView
 from django.http import JsonResponse, HttpResponseBadRequest
 import django
 from rest_framework.views import APIView
-
-from stats.models import UserStats
 from .helpers import get_translate_data
 
 from domains.models import Domain
@@ -24,10 +22,12 @@ from django.views.decorators.csrf import csrf_exempt
 import requests
 from preferences import preferences
 from gpt_processing.prompts_list import prompts_list
-from stats.calculator import StatsCalculator
+from stats.calculator import StatsProcessor
 import langdetect
+from .tasks import send_statistic_request
 
 PAGINATION_PAGE_SIZE = 30
+PORTAL_API_KEY = ""
 
 
 def text_translation(request):
@@ -38,7 +38,7 @@ def text_translation(request):
     }, headers={
         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
     send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('translation_name'))
-    # statistic = UserStats.objects.create(user=request.user, chars=len(text))
+    send_statistic_request.delay(response.json().get('translated_text'), request.user.uuid, request.POST.get('translation_name'))
     return response.json()
 
 
@@ -74,7 +74,6 @@ def file_translate(request):
                               translation_name=request.POST.get('translation_name'),
                               file_name=project['file_name'],
                               file_ext=project['file_extension'])
-    # StatsCalculator().calculate_statistics(files=files, user=request.user)
     return {"project_ids": [project.get('id') for project in projects]}
 
 
@@ -263,8 +262,8 @@ class LanguageDetectView(APIView):
         files = request.FILES.getlist('document[]', [])
         result = {}
         for file in files:
-            text = StatsCalculator().get_texts(file=file)['texts'][0]['text']
+            text = StatsProcessor().get_texts(file=file)['texts'][0]['text']
             tmp_language = langdetect.detect(text)
-            language = Language.objects.filter(abbreviation__iexact=tmp_language).first()
+            language = Language.objects.filter(abbreviation__exact=tmp_language).first()
             result[f'{file.name}'] = language.french_name if request.LANGUAGE_CODE != 'fr' else language.name
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
