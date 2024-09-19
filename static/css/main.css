@@ -67,3 +67,28 @@
     padding-left: 8px;
     padding-right: 8px;
 }
+
+.select2-container.gray-text-select {
+    width: 220px !important;
+}
+
+.select2-container.gray-text-select .select2-selection--single {
+    width: 100% !important;
+}
+
+.select2-container.gray-text-select .select2-selection__rendered {
+    color: #9EAAB3 !important;
+}
+
+.select2-container.gray-text-select .detected-text {
+    font-weight: 400;
+}
+
+.select2-container.target-select-language {
+    width: 250px !important;
+}
+
+.select2-container.target-select-language .select2-selection--single {
+    width: 100% !important;
+}
+
