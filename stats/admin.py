@@ -1,14 +1,10 @@
 from django.contrib import admin
-
-from stats.models import UserStats
-
-
-# Register your models here.
-
-class UserStatsAdmin(admin.ModelAdmin):
-    ordering = ('created_at',)
-    list_display = ('user', 'chars', 'created_at')
-    list_filter = ('user__group', 'created_at')
+from .models import StatisticSettings
+from preferences.admin import PreferencesAdmin
 
 
-admin.site.register(UserStats, UserStatsAdmin)
+class StatisticSettingsAdmin(PreferencesAdmin):
+    exclude = ('sites',)
+
+
+admin.site.register(StatisticSettings, StatisticSettingsAdmin)

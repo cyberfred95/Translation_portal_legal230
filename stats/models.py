@@ -1,15 +1,11 @@
 from django.db import models
-from users.models import User
+from preferences.models import Preferences
 
 
-# Create your models here.
-
-
-class UserStats(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    chars = models.BigIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
+class StatisticSettings(Preferences):
+    API_KEY = models.CharField(max_length=255)
+    URL = models.URLField(max_length=255)
 
     class Meta:
-        verbose_name = "User statistics"
-        verbose_name_plural = "User statistics"
+        verbose_name = 'Statistic Settings'
+        verbose_name_plural = 'Statistic Settings'
