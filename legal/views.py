@@ -25,6 +25,7 @@ from gpt_processing.prompts_list import prompts_list
 from stats.calculator import StatsProcessor
 import langdetect
 from .tasks import send_statistic_request
+from languages.serializers import LanguageSerializer
 
 PAGINATION_PAGE_SIZE = 30
 PORTAL_API_KEY = ""
@@ -265,7 +266,8 @@ class LanguageDetectView(APIView):
         result = {}
         for file in files:
             text = StatsProcessor().get_texts(file=file)['texts'][0]['text']
+            print(text)
             tmp_language = langdetect.detect(text)
-            language = Language.objects.filter(abbreviation__exact=tmp_language).first()
-            result[f'{file.name}'] = language.french_name if request.LANGUAGE_CODE != 'fr' else language.name
+            language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).first()
+            result[f'{file.name}'] = LanguageSerializer(language).data
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
