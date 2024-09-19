@@ -11,6 +11,12 @@ from .serializers import GlossarySerializer
 class UserGlossariesView(TemplateView):
     template_name = 'glossaries.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['glossaries'] = Glossary.objects.all()
+        print(context['glossaries'])
+        return context
+
 
 class AddGlossaryView(CreateAPIView):
     permission_classes = (IsAuthenticated,)

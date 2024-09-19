@@ -20,9 +20,11 @@
             </tr>
             </thead>
             <tbody>
+            {% for glossary in glossaries %}
             <tr>
+
                 <td class="text-3.25 text-gray-800 flex gap-6 items-center">
-                    Unknown
+                    {{ glossary.user.username }}
                     <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g clip-path="url(#clip0_759_2669)">
                             <path d="M12.6666 8.53064C12.298 8.53064 12 8.82935 12 9.19727V14.5306C12 14.8979 11.7013 15.1973 11.3334 15.1973H2C1.63196 15.1973 1.33337 14.8979 1.33337 14.5306V5.19727C1.33337 4.82996 1.63196 4.53064 2 4.53064H7.33337C7.70203 4.53064 8 4.23193 8 3.86401C8 3.49597 7.70203 3.19727 7.33337 3.19727H2C0.897339 3.19727 0 4.0946 0 5.19727V14.5306C0 15.6333 0.897339 16.5306 2 16.5306H11.3334C12.436 16.5306 13.3334 15.6333 13.3334 14.5306V9.19727C13.3334 8.82861 13.0353 8.53064 12.6666 8.53064Z"
@@ -42,20 +44,20 @@
                 </td>
                 <td>
                     <div class="flex gap-1 text-4 items-center text-green-700">
-                        <span class="text-3 text-green-700">EN</span>
+                        <span class="text-3 text-green-700">{{ glossary.source_language.abbreviation |upper }}</span>
                         <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 4C12 3.91051 11.9711 3.837 11.9134 3.77947L8.83337 0.711292C8.77563 0.653764 8.70183 0.625 8.612 0.625C8.52858 0.625 8.4564 0.655362 8.39544 0.716087C8.33448 0.776811 8.304 0.848722 8.304 0.931818V2.77273H0.307999C0.224583 2.77273 0.152396 2.80309 0.0914373 2.86381C0.0304791 2.92454 0 2.99645 0 3.07955V4.92045C0 5.00355 0.0304791 5.07546 0.0914373 5.13619C0.152396 5.19691 0.224583 5.22727 0.307999 5.22727H8.304V7.06818C8.304 7.15767 8.33288 7.23118 8.39063 7.28871C8.44838 7.34624 8.52217 7.375 8.612 7.375C8.689 7.375 8.766 7.34304 8.843 7.27912L11.9134 4.22053C11.9711 4.163 12 4.08949 12 4Z"
                                   fill="#176C77"/>
                         </svg>
-                        <span class="text-3 text-green-700">FR</span>
+                        <span class="text-3 text-green-700">{{ glossary.target_language.abbreviation|upper }}</span>
                     </div>
 
                 </td>
                 <td class="text-3.25 text-gray-800 ">
-                    127Mb
+                    {{ glossary.file_size }}
                 </td>
                 <td class="text-3.25 text-gray-800 created-at">
-                    06/08/2024
+                    {{ glossary.created_at | date:"Y/m/d" }}
                 </td>
                 <td>
                     <div class="flex gap-5 items-center justify-end">
@@ -80,6 +82,7 @@
                     </div>
                 </td>
             </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>

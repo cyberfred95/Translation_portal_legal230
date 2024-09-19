@@ -23,6 +23,7 @@ class Glossary(models.Model):
         related_name='target_language_glossaries'
     )
     parent_id = models.ForeignKey('Glossary', on_delete=models.SET_NULL, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'Glossary'
