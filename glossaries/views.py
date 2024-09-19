@@ -19,10 +19,15 @@ class UserGlossariesView(TemplateView):
 
 
 class AddGlossaryView(CreateAPIView):
-    permission_classes = (IsAuthenticated,)
     serializer_class = GlossarySerializer
 
 
 class SingleGlossaryView(RetrieveUpdateDestroyAPIView):
-    permission_classes = (IsAuthenticated,)
     serializer_class = GlossarySerializer
+
+
+class GlossariesListAPIView(ListAPIView):
+    serializer_class = GlossarySerializer
+
+    def get_queryset(self):
+        return Glossary.objects.filter(user=self.request.user)
