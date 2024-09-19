@@ -39,7 +39,8 @@ def text_translation(request):
     }, headers={
         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
     send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('translation_name'))
-    send_statistic_request.delay(response.json().get('translated_text'), request.user.uuid, request.POST.get('translation_name'))
+    send_statistic_request.delay(response.json().get('translated_text'), request.user.uuid,
+                                 request.POST.get('translation_name'))
     return response.json()
 
 
@@ -268,6 +269,8 @@ class LanguageDetectView(APIView):
             text = StatsProcessor().get_texts(file=file)['texts'][0]['text']
             print(text)
             tmp_language = langdetect.detect(text)
-            language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).first()
-            result[f'{file.name}'] = LanguageSerializer(language).data
+            language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
+                'abbreviation', flat=True).first()
+
+            result[f'{file.name}'] = language.upper() if language else None
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
