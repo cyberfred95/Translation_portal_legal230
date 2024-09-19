@@ -1,7 +1,6 @@
 $(document).ready(function () {
 
 
-
     // ------------- SELECT -------------
 
 
@@ -147,18 +146,16 @@ $(document).ready(function () {
 
     function uploadFiles() {
         if (selectedFiles.length === 0) {
-            console.log("No files selected");
             return;
         }
 
         const formData = new FormData();
         selectedFiles.forEach((file) => {
-            console.log(123);
             formData.append(`document[]`, file);
         });
 
         $.ajax({
-            url: '/en/detect_language/',
+            url: detect_language,
             type: 'POST',
             data: formData,
             processData: false,
@@ -169,11 +166,7 @@ $(document).ready(function () {
             },
             success: function (response) {
                 displayDetectLanguageFiles(response.languages);
-                console.log("Files uploaded successfully", response.languages);
             },
-            error: function (xhr, status, error) {
-                console.error("Error uploading files", error);
-            }
         });
     }
 
@@ -238,7 +231,7 @@ $(document).ready(function () {
 
             $detectiveLanguageList.append($fileItem);
 
-            $fileItem.find('.js-example-basic-single').select2().each(function() {
+            $fileItem.find('.js-example-basic-single').select2().each(function () {
                 var $select = $(this);
                 var defaultValue = $select.data('default-value');
 
@@ -275,7 +268,6 @@ $(document).ready(function () {
     }
 
     function getLanguageOptions(defaultValue) {
-        console.log('languages', languages);
         return languages.map(lang =>
             `<option value="${lang.abbreviation.toLowerCase()}" ${lang.abbreviation === defaultValue ? 'selected' : ''}>
             ${lang.name}

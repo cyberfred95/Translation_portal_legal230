@@ -46,4 +46,35 @@ $(document).ready(function () {
             $(this).text(formattedDate);
         }
     });
+
+    $('table').on('click', '.expert-revision', function() {
+        var button = $(this);
+        var translatedFile = button.data('translated-file');
+        var id = button.data('id');
+
+        let formData = new FormData();
+        formData.append('file_url', translatedFile);
+        formData.append('project_id', id);
+
+        if (!button.prop('disabled')) {
+            $.ajax({
+                type: 'POST',
+                url: expert_revision_file_url,
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Accept': 'application/json',
+                },
+                dataType: 'json',
+                success: function () {
+                    window.location.reload();
+                },
+                error: function (xhr, status, error) {
+                }
+            });
+        }
+    });
 });
