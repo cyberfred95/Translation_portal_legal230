@@ -264,7 +264,7 @@ class LanguageDetectView(APIView):
 
     def post(self, request):
         files = request.FILES.getlist('document[]', [])
-        result = {}
+        result = []
         for file in files:
             text = StatsProcessor().get_texts(file=file)['texts'][0]['text']
             print(text)
@@ -272,5 +272,10 @@ class LanguageDetectView(APIView):
             language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
                 'abbreviation', flat=True).first()
 
-            result[f'{file.name}'] = language.upper() if language else None
+            result.append(
+                {
+                    "file_name": f'{file.name}',
+                    "abbreviation": language.upper() if language else None
+                }
+            )
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
