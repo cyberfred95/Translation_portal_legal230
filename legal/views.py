@@ -260,7 +260,7 @@ class SingleProjectView(APIView):
 
 class LanguageDetectView(APIView):
 
-    def get(self, request):
+    def post(self, request):
         files = request.FILES.getlist('document[]', [])
         result = {}
         for file in files:
