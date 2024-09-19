@@ -23,6 +23,7 @@ urlpatterns = i18n_patterns(
     path('refresh_domains/', update_domains_view, name='refresh_domains'),
     path('statistics/', include('stats.urls')),
     path('detect_language/', login_required(LanguageDetectView.as_view()), name='detect_language'),
+    path('glossaries/', include('glossaries.urls')),
 
     re_path(r'^rosetta/', include('rosetta.urls'))
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
