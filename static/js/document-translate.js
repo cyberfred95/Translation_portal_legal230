@@ -1,6 +1,18 @@
 $(document).ready(function () {
 
 
+
+    // ------------- SELECT -------------
+
+
+    $('.js-example-basic-single').select2();
+
+    $('.js-example-basic-single.target-select-language').each(function () {
+        var $select = $(this);
+        $select.next('.select2-container').addClass('target-select-language');
+    });
+
+
     // ------------- PROGRESS BAT -------------
 
 
@@ -155,11 +167,11 @@ $(document).ready(function () {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': getCookie('csrftoken'),
             },
-            success: function(response) {
+            success: function (response) {
                 displayDetectLanguageFiles(response.languages);
                 console.log("Files uploaded successfully", response.languages);
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error("Error uploading files", error);
             }
         });
@@ -191,7 +203,6 @@ $(document).ready(function () {
     }
 
     function displayDetectLanguageFiles(files) {
-        console.log('files',files)
         const $detectiveLanguageList = $('.detective-language-list');
         $detectiveLanguageList.empty();
 
@@ -199,7 +210,7 @@ $(document).ready(function () {
             const $fileItem = $(`
             <div class="flex gap-5 items-center">
                 <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">
-                    <span class="text-3.5">${file.file_name}</span>
+                    <span class="text-3.5 w-50 truncate">${file.file_name}</span>
                     <button class="remove-file">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clip-path="url(#clip0_759_4082)">
@@ -218,7 +229,7 @@ $(document).ready(function () {
                     <svg width="6" height="10" viewBox="0 0 6 10" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5.71393 4.28962C5.6637 4.23904 5.6081 4.19635 5.55034 4.15922L1.67443 0.283488C1.29615 -0.0944361 0.683075 -0.0946154 0.304613 0.283667C-0.0736695 0.66177 -0.0736695 1.27502 0.304613 1.65348L3.64279 4.9913L0.287753 8.3467C-0.0907092 8.72462 -0.0907092 9.33805 0.287753 9.71651C0.476983 9.90539 0.724687 9.99991 0.972392 9.99991C1.2201 9.99991 1.46834 9.90539 1.65703 9.71615L5.55034 5.82338C5.6081 5.78625 5.66352 5.74374 5.71393 5.69298C5.90764 5.49926 6.00055 5.24492 5.99625 4.9913C6.00073 4.7375 5.90764 4.4828 5.71393 4.28962Z" fill="#9EAAB3"/>
                     </svg>
-                    <select class="js-example-basic-single gray-text-select" name="source_language" required data-default-value="${file.abbreviation}">
+                    <select class="js-example-basic-single gray-text-select" name="source_language" required data-default-value="${file.abbreviation.toLowerCase()}">
                         ${getLanguageOptions(file.abbreviation)}
                     </select>
                 </div>
@@ -226,7 +237,50 @@ $(document).ready(function () {
         `);
 
             $detectiveLanguageList.append($fileItem);
+
+            $fileItem.find('.js-example-basic-single').select2().each(function() {
+                var $select = $(this);
+                var defaultValue = $select.data('default-value');
+
+                $select.next('.select2-container').addClass('gray-text-select');
+
+                if (defaultValue) {
+                    $select.val(defaultValue).trigger('change');
+                }
+
+                function updateDetectedText() {
+                    var $selectedOption = $select.find('option:selected');
+                    var text = $selectedOption.text().replace(' (detected)', '');
+
+                    $select.find('option').each(function () {
+                        $(this).text($(this).text().replace(' (detected)', ''));
+                    });
+
+                    if (defaultValue && $selectedOption.val() === defaultValue) {
+                        var newText = text + ' <span class="detected-text">(detected)</span>';
+                        $selectedOption.text(text + ' (detected)');
+                        $select.next('.select2-container').find('.select2-selection__rendered').html(newText);
+                    } else {
+                        $select.next('.select2-container').find('.select2-selection__rendered').text(text);
+                    }
+                }
+
+                updateDetectedText();
+
+                $select.on('select2:select', function (e) {
+                    updateDetectedText();
+                });
+            });
         });
+    }
+
+    function getLanguageOptions(defaultValue) {
+        console.log('languages', languages);
+        return languages.map(lang =>
+            `<option value="${lang.abbreviation.toLowerCase()}" ${lang.abbreviation === defaultValue ? 'selected' : ''}>
+            ${lang.name}
+        </option>`
+        ).join('');
     }
 
     $(document).on('click', '.remove-file', function () {
@@ -241,49 +295,4 @@ $(document).ready(function () {
     }
 
     toggleFollowingButton();
-
-
-    // ------------- SELECT -------------
-
-
-    $('.js-example-basic-single').select2();
-
-    $('.js-example-basic-single.target-select-language').each(function () {
-        var $select = $(this);
-        $select.next('.select2-container').addClass('target-select-language');
-    });
-
-    $('.js-example-basic-single.gray-text-select').each(function () {
-        var $select = $(this);
-        var defaultValue = $select.data('default-value');
-
-        $select.next('.select2-container').addClass('gray-text-select');
-
-        if (defaultValue) {
-            $select.val(defaultValue).trigger('change');
-        }
-
-        function updateDetectedText() {
-            var $selectedOption = $select.find('option:selected');
-            var text = $selectedOption.text().replace(' (detected)', '');
-
-            $select.find('option').each(function () {
-                $(this).text($(this).text().replace(' (detected)', ''));
-            });
-
-            if (defaultValue && $selectedOption.val() === defaultValue) {
-                var newText = text + ' <span class="detected-text">(detected)</span>';
-                $selectedOption.text(text + ' (detected)');
-                $select.next('.select2-container').find('.select2-selection__rendered').html(newText);
-            } else {
-                $select.next('.select2-container').find('.select2-selection__rendered').text(text);
-            }
-        }
-
-        updateDetectedText();
-
-        $select.on('select2:select', function (e) {
-            updateDetectedText();
-        });
-    });
 });

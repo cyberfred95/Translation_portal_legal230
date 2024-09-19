@@ -64,6 +64,15 @@
 
 </div>
 <script>
-    var languages = {{ translate_languages | safe }}
+    var languages = [
+        {% for language in translate_languages %}
+    {
+        "id": {{ language.id }},
+        "abbreviation": "{{ language.abbreviation }}",
+        "name": "{{ language.name }}",
+    },
+    {% endfor %}
+    ]
+    console.log('languages', languages)
 </script>
 {% endblock %}
