@@ -156,7 +156,8 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function(response) {
-                console.log("Files uploaded successfully", response);
+                displayDetectLanguageFiles(response.languages);
+                console.log("Files uploaded successfully", response.languages);
             },
             error: function(xhr, status, error) {
                 console.error("Error uploading files", error);
@@ -186,6 +187,45 @@ $(document).ready(function () {
         `);
 
             $fileList.append($fileItem);
+        });
+    }
+
+    function displayDetectLanguageFiles(files) {
+        console.log('files',files)
+        const $detectiveLanguageList = $('.detective-language-list');
+        $detectiveLanguageList.empty();
+
+        files.forEach(file => {
+            const $fileItem = $(`
+            <div class="flex gap-5 items-center">
+                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">
+                    <span class="text-3.5">${file.file_name}</span>
+                    <button class="remove-file">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_759_4082)">
+                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z" fill="#176C77"/>
+                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z" fill="white"/>
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_759_4082">
+                                    <rect width="20" height="20" fill="white"/>
+                                </clipPath>
+                            </defs>
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex gap-3 items-center">
+                    <svg width="6" height="10" viewBox="0 0 6 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.71393 4.28962C5.6637 4.23904 5.6081 4.19635 5.55034 4.15922L1.67443 0.283488C1.29615 -0.0944361 0.683075 -0.0946154 0.304613 0.283667C-0.0736695 0.66177 -0.0736695 1.27502 0.304613 1.65348L3.64279 4.9913L0.287753 8.3467C-0.0907092 8.72462 -0.0907092 9.33805 0.287753 9.71651C0.476983 9.90539 0.724687 9.99991 0.972392 9.99991C1.2201 9.99991 1.46834 9.90539 1.65703 9.71615L5.55034 5.82338C5.6081 5.78625 5.66352 5.74374 5.71393 5.69298C5.90764 5.49926 6.00055 5.24492 5.99625 4.9913C6.00073 4.7375 5.90764 4.4828 5.71393 4.28962Z" fill="#9EAAB3"/>
+                    </svg>
+                    <select class="js-example-basic-single gray-text-select" name="source_language" required data-default-value="${file.abbreviation}">
+                        ${getLanguageOptions(file.abbreviation)}
+                    </select>
+                </div>
+            </div>
+        `);
+
+            $detectiveLanguageList.append($fileItem);
         });
     }
 
