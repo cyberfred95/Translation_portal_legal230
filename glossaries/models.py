@@ -1,6 +1,7 @@
 from django.db import models
 from languages.models import Language
 from users.models import User
+from django.core.validators import FileExtensionValidator
 
 
 # Create your models here.
@@ -9,7 +10,7 @@ class Glossary(models.Model):
     name = models.CharField(max_length=255)
     default = models.BooleanField(default=False),
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
-    file = models.FileField(upload_to='glossaries/')
+    file = models.FileField(upload_to='glossaries/', validators=[FileExtensionValidator(['csv'])])
     source_language = models.ForeignKey(
         Language,
         on_delete=models.SET_NULL,
