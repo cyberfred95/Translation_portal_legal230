@@ -24,6 +24,7 @@ from preferences import preferences
 from gpt_processing.prompts_list import prompts_list
 from stats.calculator import StatsProcessor
 import langdetect
+from .tasks import send_statistic_request
 
 PAGINATION_PAGE_SIZE = 30
 PORTAL_API_KEY = ""
@@ -37,7 +38,7 @@ def text_translation(request):
     }, headers={
         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
     send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('translation_name'))
-    StatsProcessor.send_request(texts=[text], request=request)
+    send_statistic_request.delay(response.json().get('translated_text'), request.user.uuid, request.POST.get('translation_name'))
     return response.json()
 
 
@@ -73,7 +74,6 @@ def file_translate(request):
                               translation_name=request.POST.get('translation_name'),
                               file_name=project['file_name'],
                               file_ext=project['file_extension'])
-    # StatsProcessor().calculate_statistics(files=files, user=request.user)
     return {"project_ids": [project.get('id') for project in projects]}
 
 

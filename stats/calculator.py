@@ -39,7 +39,7 @@ class StatsProcessor:
         return chars
 
     @staticmethod
-    def send_request(texts: list, request):
+    def send_request(texts: list, user_uuid, translation_name, source_language=None, target_language=None):
         response = requests.post(
             preferences.StatisticSettings.URL + "add_statistic/",
             headers={
@@ -48,9 +48,9 @@ class StatsProcessor:
             },
             data={
                 "messages": texts,
-                "uuid": request.user.uuid,
+                "uuid": user_uuid,
                 'custom_mt_api_key': preferences.MainSettings.api_key,
-                'template_name': request.POST.get('translation_name'),
+                'template_name': translation_name,
             }
         )
         print(response.text)
