@@ -6,6 +6,7 @@ $(document).ready(function () {
 
     let currentStep = 0;
     const totalSteps = 4;
+    let selectedFiles = [];
 
     function updateProgress(step) {
         let percentage;
@@ -51,6 +52,9 @@ $(document).ready(function () {
 
     $("#next-step").click(function () {
         if (currentStep < totalSteps) {
+            if (currentStep === 0) {
+                uploadFiles(); // Завантажуємо файли при переході з першого кроку
+            }
             currentStep++;
             showStep(currentStep);
         }
@@ -64,6 +68,8 @@ $(document).ready(function () {
     });
 
     showStep(currentStep);
+
+    // ------------- TABS -------------
 
     $('.tab-content').hide();
     $('#text-translate-content').show();
@@ -117,13 +123,45 @@ $(document).ready(function () {
     });
 
     function handleFiles(e) {
-        const files = Array.from(e.target.files).filter(file => {
+        const files = Array.from(e.target.files || e.originalEvent.dataTransfer.files).filter(file => {
             const ext = '.' + file.name.split('.').pop().toLowerCase();
             return allowedTypes.includes(ext);
         });
 
+        selectedFiles = files; // Зберігаємо вибрані файли
         displayFiles(files);
         toggleFollowingButton();
+    }
+
+    function uploadFiles() {
+        if (selectedFiles.length === 0) {
+            console.log("No files selected");
+            return;
+        }
+
+        const formData = new FormData();
+        selectedFiles.forEach((file) => {
+            console.log(123);
+            formData.append(`document[]`, file);
+        });
+
+        $.ajax({
+            url: '/en/detect_language/',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function(response) {
+                console.log("Files uploaded successfully", response);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error uploading files", error);
+            }
+        });
     }
 
     function displayFiles(files) {
