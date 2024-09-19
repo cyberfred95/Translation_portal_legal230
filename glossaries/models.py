@@ -1,5 +1,5 @@
 from django.db import models
-
+from languages.models import Language
 from users.models import User
 
 
@@ -10,5 +10,30 @@ class Glossary(models.Model):
     default = models.BooleanField(default=False),
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     file = models.FileField(upload_to='glossaries/')
-    source_language = models.CharField(max_length=255)
-    target_language = models.CharField(max_length=255)
+    source_language = models.ForeignKey(
+        Language,
+        on_delete=models.SET_NULL,
+        blank=True, null=True,
+        related_name='source_language_glossaries'
+    )
+    target_language = models.ForeignKey(
+        Language,
+        on_delete=models.SET_NULL,
+        blank=True, null=True,
+        related_name='target_language_glossaries'
+    )
+    parent_id = models.ForeignKey('Glossary', on_delete=models.SET_NULL, blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Glossary'
+        verbose_name_plural = 'Glossaries'
+
+    def __str__(self):
+        return self.name
+
+    def file_size(self):
+        if self.file:
+            size = self.file.size
+            return str(round(size / (1024 * 1024), 2)) + " Mb"
+        else:
+            return
