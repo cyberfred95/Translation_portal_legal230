@@ -6,6 +6,9 @@ class DomainGroup(models.Model):
     name = models.CharField(_("name"), max_length=255)
     french_name = models.CharField(_("french_name"), max_length=255, blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Domain(models.Model):
     name = models.CharField(max_length=255)
