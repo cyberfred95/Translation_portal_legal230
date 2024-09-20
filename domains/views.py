@@ -1,7 +1,7 @@
 from django.http import JsonResponse, HttpResponseRedirect
 
-from .models import Domain
-from .serializers import DomainSerializer
+from .models import Domain, DomainGroup
+from .serializers import DomainSerializer, DomainGroupSerializer
 from .tasks import update_domains as update_domains
 from rest_framework.generics import ListAPIView
 
@@ -14,5 +14,5 @@ def update_domains_view(request):
 
 
 class DomainListView(ListAPIView):
-    queryset = Domain.objects.all()
-    serializer_class = DomainSerializer
+    queryset = DomainGroup.objects.all()
+    serializer_class = DomainGroupSerializer
