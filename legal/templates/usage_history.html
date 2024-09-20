@@ -7,29 +7,30 @@
         <div class="flex gap-5 items-center font-montserrat text-xs font-medium leading-4.5 text-left text-[#7A8B98]">
             <div class="relative inline-block">
                 <button id="multiLevelDropdownButton" data-dropdown-toggle="multi-dropdown" type="button"
-                    class="w-[90px] h-[32px] p-[6px] gap-[6px] rounded-md bg-[#EAECEE] opacity-100 flex items-center">
+                    class="w-22.5 h-8 p-1.5 gap-1.5 rounded-md bg-[#EAECEE] opacity-100 flex items-center">
                     <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg"
                         class="mr-1">
                         <path
                             d="M13.4798 0.5H0.574219C0.272156 0.5 0.0273438 0.744812 0.0273438 1.04688C0.0273438 2.56979 0.680176 4.02371 1.81847 5.03554L4.2135 7.16429C4.62879 7.53343 4.86698 8.06386 4.86698 8.6196V13.9525C4.86698 14.3883 5.35404 14.6495 5.71709 14.4074L8.94355 12.2565C9.09565 12.1551 9.18708 11.9844 9.18708 11.8015V8.6196C9.18708 8.06386 9.42527 7.53343 9.84055 7.16429L12.2355 5.03554C13.3738 4.02371 14.0266 2.56979 14.0266 1.04688C14.0266 0.744812 13.7818 0.5 13.4798 0.5ZM11.5088 4.218L9.11391 6.34686C8.46535 6.92343 8.09333 7.75176 8.09333 8.61949V11.5089L5.96062 12.9306V8.6196C5.96062 7.75176 5.58859 6.92343 4.94003 6.34686L2.54511 4.21811C1.77756 3.53569 1.28761 2.60066 1.15645 1.59364H12.8975C12.7663 2.60066 12.2765 3.53569 11.5088 4.218Z"
                             fill="#0D2B40" />
                     </svg>
-                    <span
-                        class="font-montserrat text-[12px] font-[500] leading-[14.63px] text-left text-[#2B4459] px-1 rounded">Filter</span>
+                    <span id="filter-button"
+                        class=" display flex justify-between  font-125 leading-1 text-left text-[#2B4459] rounded">Filter
+                    </span>
                 </button>
 
                 <!-- Dropdown -->
                 <div id="multi-dropdown" class="hidden z-10 bg-white divide-y divide-gray-100 rounded-md shadow w-60 
                     shadow-[0px_0px_20px_3px_#2B445914] absolute mt-1 right-0">
                     <div class="">
-                        <ul class=" max-h-[500px] overflow-y-auto py-2 text-sm text-gray-700 dark:text-gray-200"
+                        <ul class=" max-h-125 overflow-y-auto py-2 text-sm text-gray-700 dark:text-gray-200"
                             aria-labelledby="multiLevelDropdownButton">
                             <li class="py-2 text-sm text-gray-700 dark:text-gray-200">
                                 <button id="doubleDropdownButton" data-dropdown-toggle="doubleDropdown"
                                     data-dropdown-placement="right-start" type="button"
                                     class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">User
-                                    <svg id="dropdownArrow" class="w-3.5 h-2.5 ms-3 text-black" aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                    <svg id="dropdownArrow" class="w-2.5 h-1.5 text-black" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                             stroke-width="2" d="m1 1 4 4 4-4" />
                                     </svg>
@@ -56,57 +57,77 @@
                                         aria-labelledby="dropdownSearchButton">
                                         <li>
                                             <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
                                                 <input id="checkbox-item-11" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
                                                 <label for="checkbox-item-11"
                                                     class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Google</label>
                                             </div>
                                         </li>
                                         <li>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray">
+                                            </div>
+                                        </li>
+                                        <li>
                                             <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
-                                                <input checked id="checkbox-item-12" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-12" type="checkbox" value=""
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
                                                 <label for="checkbox-item-12"
                                                     class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Microsoft</label>
                                             </div>
                                         </li>
                                         <li>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray">
+                                            </div>
+                                        </li>
+                                        <li>
                                             <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
                                                 <input id="checkbox-item-13" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
                                                 <label for="checkbox-item-13"
                                                     class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Globalese</label>
                                             </div>
                                         </li>
                                         <li>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray">
+                                            </div>
+                                        </li>
+                                        <li>
                                             <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
                                                 <input id="checkbox-item-14" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
                                                 <label for="checkbox-item-14"
                                                     class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Language
                                                     Wire</label>
                                             </div>
                                         </li>
                                         <li>
-                                            <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
-                                                <input id="checkbox-item-16" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
-                                                <label for="checkbox-item-16"
-                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Leslie
-                                                    Livingston</label>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray">
                                             </div>
                                         </li>
                                         <li>
                                             <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
-                                                <input id="checkbox-item-17" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
-                                                <label for="checkbox-item-17"
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-15" type="checkbox" value=""
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                <label for="checkbox-item-15"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Leslie
+                                                    Livington</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray">
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-16" type="checkbox" value=""
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                <label for="checkbox-item-16"
                                                     class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Roberta
                                                     Casas</label>
                                             </div>
@@ -115,19 +136,19 @@
                                 </div>
                                 <button id="doubleDropdownButtonn" data-dropdown-toggle="doubleDropdown"
                                     data-dropdown-placement="right-start" type="button"
-                                    class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">File
-                                    name
-                                    <svg id="dropdownArroww" class="w-3.5 h-2.5 ms-3 text-black" aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                    class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">
+                                    File name
+                                    <svg id="dropdownArroww" class="w-2.5 h-1.5 text-black" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="m1 1 4 4 4-4" />
+                                            stroke-width="2" d=" m1 1 4 4 4-4" />
                                     </svg>
                                 </button>
                                 <div id="dropdownSearchh" class="z-10  bg-white rounded-lg shadow w-60 hidden">
                                     <div class="p-3">
                                         <label for="input-group-search" class="sr-only">Search</label>
                                         <div class="relative">
-                                            <div
+                                            <div id="input-group-search"
                                                 class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
                                                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
                                                     xmlns="http://www.w3.org/2000/svg">
@@ -145,57 +166,77 @@
                                         aria-labelledby="dropdownSearchButton">
                                         <li>
                                             <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
-                                                <input id="checkbox-item-11" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
-                                                <label for="checkbox-item-11"
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-111" type="checkbox" value=""
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                <label for="checkbox-item-111"
                                                     class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Google</label>
                                             </div>
                                         </li>
                                         <li>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray">
+                                            </div>
+                                        </li>
+                                        <li>
                                             <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
-                                                <input checked id="checkbox-item-12" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
-                                                <label for="checkbox-item-12"
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-122" type="checkbox" value=""
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                <label for="checkbox-item-122"
                                                     class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Microsoft</label>
                                             </div>
                                         </li>
                                         <li>
-                                            <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
-                                                <input id="checkbox-item-13" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
-                                                <label for="checkbox-item-13"
-                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Globalese</label>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray">
                                             </div>
                                         </li>
                                         <li>
                                             <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
-                                                <input id="checkbox-item-14" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
-                                                <label for="checkbox-item-14"
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-133" type="checkbox" value=""
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                <label for="checkbox-item-133"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Globalese</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray">
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-144" type="checkbox" value=""
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                <label for="checkbox-item-144"
                                                     class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Language
                                                     Wire</label>
                                             </div>
                                         </li>
                                         <li>
-                                            <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
-                                                <input id="checkbox-item-16" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
-                                                <label for="checkbox-item-16"
-                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Leslie
-                                                    Livingston</label>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray">
                                             </div>
                                         </li>
                                         <li>
                                             <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
-                                                <input id="checkbox-item-17" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
-                                                <label for="checkbox-item-17"
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-155" type="checkbox" value=""
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                <label for="checkbox-item-155"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Leslie
+                                                    Livington</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray">
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-166" type="checkbox" value=""
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                <label for="checkbox-item-166"
                                                     class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Roberta
                                                     Casas</label>
                                             </div>
@@ -205,8 +246,8 @@
                                 <button id="doubleDropdownButtonnn" data-dropdown-toggle="doubleDropdown"
                                     data-dropdown-placement="right-start" type="button"
                                     class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">Group
-                                    <svg id="dropdownArrowww" class="w-3.5 h-2.5 ms-3 text-black" aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                    <svg id="dropdownArrowww" class="w-2.5 h-1.5 text-black" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                             stroke-width="2" d="m1 1 4 4 4-4" />
                                     </svg>
@@ -233,57 +274,77 @@
                                         aria-labelledby="dropdownSearchButton">
                                         <li>
                                             <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
-                                                <input id="checkbox-item-11" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
-                                                <label for="checkbox-item-11"
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-1" type="checkbox" value=""
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                <label for="checkbox-item-1"
                                                     class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Google</label>
                                             </div>
                                         </li>
                                         <li>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray">
+                                            </div>
+                                        </li>
+                                        <li>
                                             <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
-                                                <input id="checkbox-item-12" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
-                                                <label for="checkbox-item-12"
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-2" type="checkbox" value=""
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                <label for="checkbox-item-2"
                                                     class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Microsoft</label>
                                             </div>
                                         </li>
                                         <li>
-                                            <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
-                                                <input id="checkbox-item-13" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
-                                                <label for="checkbox-item-13"
-                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Globalese</label>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray">
                                             </div>
                                         </li>
                                         <li>
                                             <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
-                                                <input id="checkbox-item-14" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
-                                                <label for="checkbox-item-14"
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-3" type="checkbox" value=""
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                <label for="checkbox-item-3"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Globalese</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray">
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-4" type="checkbox" value=""
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                <label for="checkbox-item-4"
                                                     class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Language
                                                     Wire</label>
                                             </div>
                                         </li>
                                         <li>
-                                            <div
-                                                class="flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
-                                                <input id="checkbox-item-16" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
-                                                <label for="checkbox-item-16"
-                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Leslie
-                                                    Livingston</label>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray">
                                             </div>
                                         </li>
                                         <li>
                                             <div
-                                                class="checkbox-item-17 items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200 divide-y divide-gray-200 w-full">
-                                                <input id="checkbox-item-17" type="checkbox" value=""
-                                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
-                                                <label for="checkbox-item-17"
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-5" type="checkbox" value=""
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                <label for="checkbox-item-5"
+                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Leslie
+                                                    Livington</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray">
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div
+                                                class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                <input id="checkbox-item-6" type="checkbox" value=""
+                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                <label for="checkbox-item-6"
                                                     class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">Roberta
                                                     Casas</label>
                                             </div>
@@ -293,9 +354,9 @@
                             </li>
                             <div class="flex space-x-2 pt-3">
                                 <button id="clear-button"
-                                    class="h-[37px] w-[99px] px-5 py-2 bg-white border border-[#346C77] rounded-md text-[#346C77] ml-4">Clear</button>
-                                <button
-                                    class="h-[37px] w-[99px] bg-[#346C77] px-4 py-2 rounded-md text-white">Apply</button>
+                                    class="h-9.25 w-24.75 px-5 py-2 bg-white border border-[#346C77] rounded-md text-[#346C77] ml-4">Clear</button>
+                                <button id="apply-button"
+                                    class="h-9.25 w-24.75 bg-[#346C77] px-4 py-2 rounded-md text-white">Apply</button>
                             </div>
                         </ul>
                     </div>

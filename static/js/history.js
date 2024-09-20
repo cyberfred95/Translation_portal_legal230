@@ -8,7 +8,7 @@ $(document).ready(function () {
     console.log('currentPage', currentPage)
     var totalPages = Math.ceil(totalItems / itemsPerPage);
 
-       function updatePagination() {
+    function updatePagination() {
         var $pageNumbers = $('#page-numbers');
         $pageNumbers.empty();
 
@@ -44,7 +44,7 @@ $(document).ready(function () {
     function loadPage(page) {
         $.ajax({
             url: window.location.pathname,
-            data: {page: page},
+            data: { page: page },
             success: function (data) {
                 $('tbody').html(data.results);
                 currentPage = page;
@@ -122,59 +122,70 @@ $(document).ready(function () {
             $(this).text(formattedDate);
         }
     });
+    $(document).ready(function () {
+        // Toggle dropdown za multiLevelDropdownButton
+        $('#multiLevelDropdownButton').on('click', function () {
+            $('#multi-dropdown').toggleClass('hidden');
+        });
 
-    document.getElementById('multiLevelDropdownButton').addEventListener('click', function() {
-        var dropdown = document.getElementById('multi-dropdown');
-        dropdown.classList.toggle('hidden');
-    });
+        function toggleDropdown(buttonId, dropdownId) {
+            $('#' + dropdownId).toggleClass('hidden');
+        }
 
-    function toggleDropdown(buttonId, dropdownId) {
-        var dropdown = document.getElementById(dropdownId);
-        dropdown.classList.toggle('hidden');
-    }
-    
-    document.getElementById('doubleDropdownButton').addEventListener('click', function() {
-        toggleDropdown('doubleDropdownButton', 'dropdownSearch');
-    });
-    
-    document.getElementById('doubleDropdownButtonn').addEventListener('click', function() {
-        toggleDropdown('doubleDropdownButtonn', 'dropdownSearchh');
-    });
+        $('#doubleDropdownButton').on('click', function () {
+            toggleDropdown('doubleDropdownButton', 'dropdownSearch');
+            $('#dropdownArrow').toggleClass('rotate-180');
+        });
 
-    document.getElementById('doubleDropdownButtonnn').addEventListener('click', function() {
-        toggleDropdown('doubleDropdownButtonnn', 'dropdownSearchhh');
-    });
-    
+        $('#doubleDropdownButtonn').on('click', function () {
+            toggleDropdown('doubleDropdownButtonn', 'dropdownSearchh');
+            $('#dropdownArroww').toggleClass('rotate-180');
+        });
 
-    document.getElementById('doubleDropdownButton').addEventListener('click', function() {
-        var dropdown = document.getElementById('dropdownSearch');
-        var arrow = document.getElementById('dropdownArrow');
-    
-        arrow.classList.toggle('rotate-180');
-    });
-    document.getElementById('doubleDropdownButtonn').addEventListener('click', function() {
-        var dropdown = document.getElementById('dropdownSearchh');
-        var arrow = document.getElementById('dropdownArroww');
-    
-        arrow.classList.toggle('rotate-180');
-    });
-
-    document.getElementById('doubleDropdownButtonnn').addEventListener('click', function() {
-        var dropdown = document.getElementById('dropdownSearchhh');
-        var arrow = document.getElementById('dropdownArrowww');
-    
-        arrow.classList.toggle('rotate-180');
-    });
-
-    document.getElementById('clear-button').addEventListener('click', function() {
-        // Pronađite sve checkboxove sa klasom 'checkbox-item'
-        const checkboxes = document.querySelectorAll('.checkbox-item-17');
-        console.log('uslo');
-        // Resetujte svaki checkbox
-        checkboxes.forEach(function(checkbox) {
-            console.log('isto');
-            checkbox.checked = false;
+        $('#doubleDropdownButtonnn').on('click', function () {
+            toggleDropdown('doubleDropdownButtonnn', 'dropdownSearchhh');
+            $('#dropdownArrowww').toggleClass('rotate-180');
         });
     });
-    
+
+
+    let checkedCheckboxes = [];
+
+    $('.checkbox-item input[type="checkbox"]').on('change', function () {
+        const checkboxId = $(this).attr('id');
+
+        if ($(this).is(':checked')) {
+            if (!checkedCheckboxes.includes(checkboxId)) {
+                checkedCheckboxes.push(checkboxId);
+            }
+        } else {
+            checkedCheckboxes = checkedCheckboxes.filter(id => id !== checkboxId);
+        }
+    });
+
+    // Clear button
+    $('#clear-button').on('click', function () {
+        $('.checkbox-item input[type="checkbox"]').each(function () {
+            $(this).prop('checked', false).trigger('change');
+        });
+
+        checkedCheckboxes = [];
+        updateFilterButton(0);
+    });
+
+    // Apply button
+    $('#apply-button').on('click', function () {
+        const selectedCount = checkedCheckboxes.length;
+        updateFilterButton(selectedCount);
+    });
+
+    function updateFilterButton(count) {
+        const filterButton = $('#filter-button');
+        if (count > 0) {
+            filterButton.html('Filter <span class="filter-count" style=" color: black; border: 2px solid white; background-color: white; border-radius: 50%; display: flex;justify-content: center;align-items: center;width: 17px; height: 17px">' + count + '</span>');
+        } else {
+            filterButton.text('Filter');
+        }
+    }
+
 });
