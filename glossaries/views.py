@@ -1,6 +1,4 @@
-from django.shortcuts import render
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAuthenticated
 from django.views.generic import TemplateView
 from .models import Glossary
 from .serializers import GlossarySerializer
@@ -13,9 +11,25 @@ class UserGlossariesView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['glossaries'] = Glossary.objects.all()
+        context['glossaries'] = self.get_glossaries()
         print(context['glossaries'])
         return context
+
+    def get_glossaries(self):
+        tmp_glossaries = Glossary.objects.all()
+        glossaries = []
+        for glossary in tmp_glossaries:
+            glossaries.append(
+                {
+                    "file_url": self.request.build_absolute_uri(glossary.file.url),
+                    "file_name": glossary.file.name,
+                    "source_language": glossary.source_language.abbreviation.upper(),
+                    "target_language": glossary.target_language.abbreviation.upper(),
+                    "file_size": glossary.file_size(),
+                    "created_at": glossary.created_at,
+                }
+            )
+        return glossaries
 
 
 class AddGlossaryView(CreateAPIView):

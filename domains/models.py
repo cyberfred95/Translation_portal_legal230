@@ -10,3 +10,6 @@ class Domain(models.Model):
         verbose_name = _("Domain")
         verbose_name_plural = _("Domains")
         ordering = ["name"]
+
+    def __str__(self):
+        return self.name
