@@ -1,21 +1,55 @@
-$(document).ready(function() {
+$(document).ready(function () {
     const $modal = $('#modal');
     const $closeIcon = $('#closeIcon');
+    const maxFileSize = 5 * 1024 * 1024; // 5MB
 
-    $('#openModal').on('click', function() {
+    $('#openModal').on('click', function () {
         $modal.removeClass('hidden');
         $closeIcon.removeClass('hidden');
     });
 
-    $('#closeModal, #closeIcon').on('click', function() {
+    $('#closeModal, #closeIcon').on('click', function () {
         $modal.addClass('hidden');
         $closeIcon.addClass('hidden');
     });
 
-    $(window).on('click', function(event) {
+    $(window).on('click', function (event) {
         if (event.target == $modal[0]) {
             $modal.addClass('hidden');
             $closeIcon.addClass('hidden');
         }
     });
+
+    $('#uploadButton').on('click', function () {
+        $('.glossary-file').click();
+    });
+
+    $('.glossary-file').on('change', function (e) {
+        var file = e.target.files[0];
+        if (file) {
+            if (file.size <= maxFileSize) {
+                showUploadedFile(file.name);
+            } else {
+                alert('File size exceeds 5MB limit.');
+                $(this).val('');
+            }
+        }
+    });
+
+    function showUploadedFile(fileName) {
+        $('#fileName').text(fileName);
+        $('#fileInfo').removeClass('hidden');
+        $('#uploadButton').addClass('hidden');
+    }
+
+    $(document).on('click', '.remove-file', function () {
+        resetUploadArea();
+    });
+
+    function resetUploadArea() {
+        $('#uploadButton').removeClass('hidden');
+        $('#fileInfo').addClass('hidden');
+        $('.glossary-file').val('');
+    }
+
 });

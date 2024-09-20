@@ -100,15 +100,37 @@
 
             <div class="p-12.5 flex flex-col items-center gap-7.5">
                 <div class="text-5">Add Glossary</div>
-                <div class="bg-gray-100 w-full py-5 px-46.75 flex flex-col gap-2.5 rounded-md">
-                    <button id="uploadButton" class="w-full bg-green-700 text-white py-2.5 rounded font-semibold">
-                        Upload file
-                    </button>
-                    <button id="downloadSample"
-                            class="w-full bg-white text-green-700 bg-green-700 py-2.5 rounded border border-green-700 font-semibold">
-                        Download sample
-                    </button>
-                    <p class="text-3.5 text-gray-300">Supported Files: .csv max 5mb</p>
+                <div class="bg-gray-100 w-full py-5 px-46.75 rounded-md">
+                    <div id="uploadButtons" class="flex flex-col gap-2.5">
+                        <button id="uploadButton" class="w-full bg-green-700 text-white py-2.5 rounded font-semibold">
+                            Upload file
+                        </button>
+                        <div id="fileInfo"
+                             class="hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-200 text-green-700 w-full">
+                            <span id="fileName"></span>
+                            <button class="remove-file">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <g clip-path="url(#clip0_759_4082)">
+                                        <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"
+                                              fill="#176C77"/>
+                                        <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"
+                                              fill="white"/>
+                                    </g>
+                                    <defs>
+                                        <clipPath id="clip0_759_4082">
+                                            <rect width="20" height="20" fill="white"/>
+                                        </clipPath>
+                                    </defs>
+                                </svg>
+                            </button>
+                        </div>
+                        <button id="downloadSample"
+                                class="w-full bg-white text-green-700 bg-green-700 py-2.5 rounded border border-green-700 font-semibold">
+                            Download sample
+                        </button>
+                        <p class="text-3.5 text-gray-300">Supported Files: .csv max 5mb</p>
+                    </div>
                 </div>
                 <span class="text-3.5 text-gray-600 text-center">
                     The glossary function is based on the GPT. The number of tokens used for editing terminology can be found in the Usage History section.
@@ -117,10 +139,16 @@
                     Continue
                 </button>
             </div>
+
+            <input type="file" class="hidden glossary-file" accept=".csv">
+
         </div>
     </div>
 </div>
 
 <script src="{% static 'js/glossaries.js' %}"></script>
+<script>
+    let add_glossary = "{% url 'add_glossary' %}"
+</script>
 
 {% endblock %}

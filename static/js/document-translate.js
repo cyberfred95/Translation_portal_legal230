@@ -165,7 +165,13 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                displayDetectLanguageFiles(response.languages);
+                const isSameLanguages = response.languages.every(i => i?.abbreviation === response.languages[0]?.abbreviation)
+
+                displayDetectLanguageFiles(response.languages, isSameLanguages);
+
+                if (!isSameLanguages) {
+                    $('.step-container').addClass('bg-red-100 border-red-200');
+                }
             },
         });
     }
@@ -195,7 +201,7 @@ $(document).ready(function () {
         });
     }
 
-    function displayDetectLanguageFiles(files) {
+    function displayDetectLanguageFiles(files, isSameLanguages) {
         const $detectiveLanguageList = $('.detective-language-list');
         $detectiveLanguageList.empty();
 
