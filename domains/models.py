@@ -10,7 +10,7 @@ class DomainGroup(models.Model):
 class Domain(models.Model):
     name = models.CharField(max_length=255)
     french_name = models.CharField(max_length=255, blank=True, null=True)
-    domain_group = models.ForeignKey(DomainGroup, on_delete=models.CASCADE, related_name='domains')
+    domain_group = models.ForeignKey(DomainGroup, on_delete=models.SET_NULL, blank=True, null=True, related_name='domains')
 
     class Meta:
         verbose_name = _("Domain")
