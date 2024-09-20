@@ -6,7 +6,8 @@ from languages.models import Language
 class GlossarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Glossary
-        fields = '__all__'
+        fields = ['name', 'file', 'source_language', 'target_language', 'domain']
+
 
     def validate(self, data):
         errors = {}
@@ -22,3 +23,7 @@ class GlossarySerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(errors)
 
         return data
+
+    def create(self, validated_data):
+        instance = Glossary.objects.create(**validated_data, user=self.context['request'].user)
+        return instance

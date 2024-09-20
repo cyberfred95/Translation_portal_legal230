@@ -2,6 +2,7 @@ from django.db import models
 from languages.models import Language
 from users.models import User
 from django.core.validators import FileExtensionValidator
+from domains.models import Domain
 
 
 # Create your models here.
@@ -23,8 +24,8 @@ class Glossary(models.Model):
         blank=True, null=True,
         related_name='target_language_glossaries'
     )
-    parent_id = models.ForeignKey('Glossary', on_delete=models.SET_NULL, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    domain = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name='glossaries')
 
     class Meta:
         verbose_name = 'Glossary'
