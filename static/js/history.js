@@ -148,18 +148,23 @@ $(document).ready(function () {
         });
     });
 
-
-    let checkedCheckboxes = [];
+    let checkedCheckboxes = {
+        users: [],
+        groups: [],
+        files: []
+    };
 
     $('.checkbox-item input[type="checkbox"]').on('change', function () {
         const checkboxId = $(this).attr('id');
+        const label = $(this).next('label').text();
+        const category = $(this).data('category');
 
         if ($(this).is(':checked')) {
-            if (!checkedCheckboxes.includes(checkboxId)) {
-                checkedCheckboxes.push(checkboxId);
+            if (!checkedCheckboxes[category].includes(label)) {
+                checkedCheckboxes[category].push(label);
             }
         } else {
-            checkedCheckboxes = checkedCheckboxes.filter(id => id !== checkboxId);
+            checkedCheckboxes[category] = checkedCheckboxes[category].filter(item => item !== label);
         }
     });
 
@@ -169,23 +174,69 @@ $(document).ready(function () {
             $(this).prop('checked', false).trigger('change');
         });
 
-        checkedCheckboxes = [];
+        checkedCheckboxes = { users: [], groups: [], files: [] };
         updateFilterButton(0);
+        $('#selected-items').empty().addClass('hidden');
     });
 
     // Apply button
     $('#apply-button').on('click', function () {
-        const selectedCount = checkedCheckboxes.length;
+        const selectedCount = Object.values(checkedCheckboxes).flat().length;
         updateFilterButton(selectedCount);
+        updateSelectedLabels();
+        $('#selected-items').removeClass('hidden');
     });
 
     function updateFilterButton(count) {
         const filterButton = $('#filter-button');
         if (count > 0) {
-            filterButton.html('Filter <span class="filter-count" style=" color: black; border: 2px solid white; background-color: white; border-radius: 50%; display: flex;justify-content: center;align-items: center;width: 17px; height: 17px">' + count + '</span>');
+            filterButton.html('Filter <span class="filter-count" style="color: black; border: 2px solid white; background-color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; width: 17px; height: 17px;">' + count + '</span>');
         } else {
             filterButton.text('Filter');
         }
     }
 
+
+    function updateSelectedLabels() {
+        const selectedItemsLabel = $('#selected-items');
+        selectedItemsLabel.empty(); 
+
+        for (const category in checkedCheckboxes) {
+            checkedCheckboxes[category].forEach(item => {
+                const label = $('<span></span>')
+                    .text(`${category.charAt(0).toUpperCase() + category.slice(1)}: ${item}`)
+                    .css({
+                        display: 'inline-block',
+                        border: '1px solid #F2F3F5',
+                        borderRadius: '8px',
+                        padding: '5px 10px',
+                        margin: '5px',
+                        backgroundColor: '#F2F3F5',
+                        color: 'black',
+                        fontFamily: 'Montserrat',
+                        fontSize: '13px',
+                        textColor: 'black'
+                    });
+
+                const removeBtn = $('<span></span>')
+                    .text(' X')
+                    .css({
+                        cursor: 'pointer',
+                        marginLeft: '5px',
+                        color: 'black',
+                        fontSize: '12px',
+                    })
+                    .on('click', function () {
+                        checkedCheckboxes[category] = checkedCheckboxes[category].filter(f => f !== item);
+                        updateSelectedLabels();
+                        $(`input[type="checkbox"][id="${item}"]`).prop('checked', false).trigger('change');
+                        const selectedCount = Object.values(checkedCheckboxes).flat().length;
+                        updateFilterButton(selectedCount);
+                    });
+
+                label.append(removeBtn);
+                selectedItemsLabel.append(label);
+            });
+        }
+    }
 });
