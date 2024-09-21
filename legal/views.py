@@ -156,13 +156,14 @@ class GetDomainsView(APIView):
         for domain in domains.json():
             domain_names.append(domain['domain_name'])
         domains = Domain.objects.filter(name__in=domain_names)
+        if self.request.query_params.get('domain_group'):
+            domains = domains.filter(domain_group__name=self.request.query_params.get('domain_group'))
 
         if request.LANGUAGE_CODE == 'en':
             domain_names = domains.values_list('name', flat=True)
         elif request.LANGUAGE_CODE == 'fr':
             domain_names = [domain.french_name if domain.french_name else domain.name for domain in domains]
         return Response({"data": domain_names}, status=status.HTTP_200_OK)
-
 
 @csrf_exempt
 @api_view(['POST'])
