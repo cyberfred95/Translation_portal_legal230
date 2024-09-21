@@ -9,7 +9,6 @@ from domains.models import Domain
 
 class Glossary(models.Model):
     name = models.CharField(max_length=255)
-    default = models.BooleanField(default=False),
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     file = models.FileField(upload_to='glossaries/', validators=[FileExtensionValidator(['csv'])])
     source_language = models.ForeignKey(
@@ -26,6 +25,8 @@ class Glossary(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name='glossaries')
+    is_default_glossary = models.BooleanField(default=False)
+
 
     class Meta:
         verbose_name = 'Glossary'
