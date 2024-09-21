@@ -1,4 +1,4 @@
-from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView
 from django.views.generic import TemplateView
 from .models import Glossary
 from .serializers import GlossarySerializer
@@ -44,3 +44,10 @@ class GlossariesListAPIView(ListAPIView):
 
     def get_queryset(self):
         return Glossary.objects.filter(user=self.request.user)
+
+
+class GetDefaultGlossaryView(RetrieveAPIView):
+    serializer_class = GlossarySerializer
+
+    def get_object(self):
+        return Glossary.objects.filter(domain=self.kwargs['domain'], default=True).first()
