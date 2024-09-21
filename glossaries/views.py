@@ -1,7 +1,12 @@
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView
 from django.views.generic import TemplateView
+from rest_framework.views import APIView
+
 from .models import Glossary
 from .serializers import GlossarySerializer
+from rest_framework.response import Response
 
 
 # Create your views here.
@@ -15,7 +20,7 @@ class UserGlossariesView(TemplateView):
         return context
 
     def get_glossaries(self):
-        tmp_glossaries = Glossary.objects.all()
+        tmp_glossaries = Glossary.objects.filter(user=self.request.user)
         glossaries = []
         for glossary in tmp_glossaries:
             glossaries.append(
@@ -39,15 +44,35 @@ class SingleGlossaryView(RetrieveUpdateDestroyAPIView):
     serializer_class = GlossarySerializer
 
 
-class GlossariesListAPIView(ListAPIView):
+class GlossariesListAPIView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        if 'source_language' and 'target_language' and 'domain_name' in request.data:
+            return Response(
+                {"message": "provide source_language, target_language and domain_name"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        glossaries = Glossary.objects.filter(
+            domain_name=request.data.get('domain_name'),
+            source_language=request.data.get('source_language'),
+            target_language=request.data.get('target_language'),
+            user=request.user
+        )
+
+        return Response(GlossarySerializer(glossaries, many=True).data, status=status.HTTP_200_OK)
+
+
+class GetDefaultGlossaryView(APIView):
     serializer_class = GlossarySerializer
 
-    def get_queryset(self):
-        return Glossary.objects.filter(user=self.request.user)
-
-
-class GetDefaultGlossaryView(RetrieveAPIView):
-    serializer_class = GlossarySerializer
-
-    def get_object(self):
-        return Glossary.objects.filter(domain=self.kwargs['domain'], default=True).first()
+    def get(self, request):
+        glossary = Glossary.objects.filter(
+            domain_name=request.data.get('domain_name'),
+            source_language=request.data.get('source_language'),
+            target_language=request.data.get('target_language'),
+            is_default_glossary=True
+        ).first()
+        if glossary:
+            return Response(GlossarySerializer(glossary).data, status=status.HTTP_200_OK)
+        return Response({"message": "Default glossary not found"}, status=status.HTTP_404_NOT_FOUND)
