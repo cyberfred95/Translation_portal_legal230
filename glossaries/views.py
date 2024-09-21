@@ -54,7 +54,7 @@ class GlossariesListAPIView(APIView):
             )
 
         glossaries = Glossary.objects.filter(
-            domain_name=request.data.get('domain_name'),
+            domain__name=request.data.get('domain_name'),
             source_language=request.data.get('source_language'),
             target_language=request.data.get('target_language'),
             user=request.user
@@ -68,7 +68,7 @@ class GetDefaultGlossaryView(APIView):
 
     def get(self, request):
         glossary = Glossary.objects.filter(
-            domain_name=request.data.get('domain_name'),
+            domain__name=request.data.get('domain_name'),
             source_language=request.data.get('source_language'),
             target_language=request.data.get('target_language'),
             is_default_glossary=True
