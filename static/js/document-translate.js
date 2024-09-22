@@ -32,13 +32,13 @@ $(document).ready(function () {
                 percentage = 0;
                 break;
             case 1:
-                percentage = 26;
+                percentage = 26.5;
                 break;
             case 2:
-                percentage = 52;
+                percentage = 52.5;
                 break;
             case 3:
-                percentage = 76;
+                percentage = 76.5;
                 break;
             case 4:
                 percentage = 100;
@@ -62,7 +62,8 @@ $(document).ready(function () {
         updateProgress(step);
 
         const $actionList = $(".action-list");
-
+        console.log(step)
+        console.log(totalSteps - 1)
         if (step === 0) {
             $("#prev-step").hide();
             $("#restart").hide();
@@ -72,7 +73,7 @@ $(document).ready(function () {
             } else {
                 $("#next-step").hide();
             }
-        } else if (step === totalSteps - 1) {
+        } else if (currentStep === 4) {
             $("#prev-step").hide();
             $("#next-step").hide();
             $("#restart").show().text("New translation");
@@ -85,36 +86,36 @@ $(document).ready(function () {
         }
 
         $("#prev-step").toggleClass('hidden', step === 0);
-        $("#next-step").toggleClass('hidden', step === totalSteps - 1);
+        $("#next-step").toggleClass('hidden', step === 4);
     }
 
     $("#next-step").click(function () {
-        if (currentStep < totalSteps - 1) {
-            if (currentStep === 0 && selectedFiles.length === 0) {
-                return;
-            }
-            if (currentStep === 0) {
-                uploadFiles();
-            }
-            if (currentStep === 1) {
-                targetLanguage = $('.target-select-language').val();
-                getDomainsGroups();
-            }
-            if (currentStep === 2) {
-                loadDefaultGlossary();
-            }
-            if (currentStep === 3) {
-                fileTranslate();
-            }
-            currentStep++;
-            showStep(currentStep);
+        if (currentStep === 0 && selectedFiles.length === 0) {
+            return;
         }
+        if (currentStep === 0) {
+            detectLanguageFiles();
+            checkLanguagesConsistency()
+        }
+        if (currentStep === 1) {
+            targetLanguage = $('.target-select-language').val();
+            getDomainsGroups();
+        }
+        if (currentStep === 2) {
+            loadDefaultGlossary();
+        }
+        if (currentStep === 3) {
+            fileTranslate();
+        }
+        currentStep++;
+        showStep(currentStep);
     });
 
     $("#prev-step").click(function () {
         if (currentStep > 0) {
             currentStep--;
             showStep(currentStep);
+            $("#next-step").removeClass('border-gray-300 text-gray-300 pointer-events-none').addClass('border-green-700 text-green-700').prop("disabled", false);
         }
     });
 
@@ -197,46 +198,11 @@ $(document).ready(function () {
         e.target.value = '';
     }
 
-    function uploadFiles() {
-        if (selectedFiles.length === 0) {
-            return;
-        }
-
-        const formData = new FormData();
-        selectedFiles.forEach((file) => {
-            formData.append(`document[]`, file);
-        });
-
-        $.ajax({
-            url: detect_language,
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-            success: function (response) {
-                const isSameLanguages = response.languages.every(i => i?.abbreviation === response.languages[0]?.abbreviation)
-
-                displayDetectLanguageFiles(response.languages, isSameLanguages);
-
-                if (!isSameLanguages) {
-                    $('.step-container').addClass('bg-red-100 border-red-200');
-                    $('#next-step').removeClass('border-green-700 text-white text-green-700').addClass('border-gray-300 text-gray-300 pointer-events-none').prop("disabled", true);
-                } else {
-                    sourceLanguage = response.languages[0].abbreviation.toLowerCase();
-                }
-            },
-        });
-    }
-
     const displayFiles = (files) => {
         $fileList.empty();
         files.forEach((file, index) => {
-            const fileId = `file-${Date.now()}-${index}`;
 
+            const fileId = file.fileId || `file-${Date.now()}-${index}`;
             file.fileId = fileId;
 
             const $fileItem = $(`
@@ -264,9 +230,7 @@ $(document).ready(function () {
 
     $(document).on('click', '.remove-file', function () {
         const fileId = $(this).data('file-id');
-        selectedFiles = selectedFiles.filter(file => file.fileId !== fileId);
-        $(`.file[data-file-id="${fileId}"]`).remove();
-        toggleFollowingButton();
+        removeFile(fileId);
     });
 
     function toggleFollowingButton() {
@@ -289,16 +253,59 @@ $(document).ready(function () {
     // ------------- STEP-2 -------------
 
 
-    const displayDetectLanguageFiles = (files, isSameLanguages) => {
+    function detectLanguageFiles() {
+        if (selectedFiles.length === 0) {
+            return;
+        }
+
+        const formData = new FormData();
+        selectedFiles.forEach((file) => {
+            formData.append(`document[]`, file);
+        });
+
+        $.ajax({
+            url: detect_language,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function (response) {
+                const isSameLanguages = response.languages.every(i => i?.abbreviation === response.languages[0]?.abbreviation);
+
+                const detectedFiles = response.languages.map(serverFile => {
+                    const matchingFile = selectedFiles.find(f => f.name === serverFile.file_name);
+                    return {
+                        ...serverFile,
+                        fileId: matchingFile ? matchingFile.fileId : `file-${Date.now()}-${serverFile.file_name}`
+                    };
+                });
+
+                displayDetectLanguageFiles(detectedFiles, isSameLanguages);
+
+                if (!isSameLanguages) {
+                    $('.step-container').addClass('bg-red-100 border-red-200');
+                } else {
+                    sourceLanguage = response.languages[0].abbreviation.toLowerCase();
+                }
+                checkLanguagesConsistency();
+            },
+        });
+    }
+
+    function displayDetectLanguageFiles(files, isSameLanguages) {
         const $detectiveLanguageList = $('.detective-language-list');
         $detectiveLanguageList.empty();
 
-        files.forEach(file => {
+        files.forEach((file) => {
             const $fileItem = $(`
-            <div class="flex gap-5 items-center">
+            <div class="flex gap-5 items-center" data-file-id="${file.fileId}">
                 <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">
                     <span class="text-3.5 w-50 truncate">${file.file_name}</span>
-                    <button class="remove-file">
+                    <button class="remove-detected-file" data-file-id="${file.fileId}">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clip-path="url(#clip0_759_4082)">
                                 <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z" fill="#176C77"/>
@@ -316,7 +323,7 @@ $(document).ready(function () {
                     <svg width="6" height="10" viewBox="0 0 6 10" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5.71393 4.28962C5.6637 4.23904 5.6081 4.19635 5.55034 4.15922L1.67443 0.283488C1.29615 -0.0944361 0.683075 -0.0946154 0.304613 0.283667C-0.0736695 0.66177 -0.0736695 1.27502 0.304613 1.65348L3.64279 4.9913L0.287753 8.3467C-0.0907092 8.72462 -0.0907092 9.33805 0.287753 9.71651C0.476983 9.90539 0.724687 9.99991 0.972392 9.99991C1.2201 9.99991 1.46834 9.90539 1.65703 9.71615L5.55034 5.82338C5.6081 5.78625 5.66352 5.74374 5.71393 5.69298C5.90764 5.49926 6.00055 5.24492 5.99625 4.9913C6.00073 4.7375 5.90764 4.4828 5.71393 4.28962Z" fill="#9EAAB3"/>
                     </svg>
-                    <select class="js-example-basic-single gray-text-select" name="source_language" required data-default-value="${file.abbreviation.toLowerCase()}">
+                    <select class="js-example-basic-single gray-text-select source-language-select" name="source_language" required data-file-id="${file.fileId}" data-default-value="${file.abbreviation.toLowerCase()}">
                         ${getLanguageOptions(file.abbreviation)}
                     </select>
                 </div>
@@ -361,12 +368,73 @@ $(document).ready(function () {
         });
     }
 
+    function checkLanguagesConsistency() {
+        const sourceSelects = $('.source-language-select');
+        const targetSelect = $('.target-select-language');
+        const nextButton = $('#next-step');
+
+        let isConsistent = true;
+        let firstValue = sourceSelects.first().val();
+        let targetValue = targetSelect.val();
+
+        sourceSelects.each(function () {
+            if ($(this).val() !== firstValue) {
+                isConsistent = false;
+                return false;
+            }
+        });
+
+        let isSameAsTarget = firstValue === targetValue;
+
+        if (!isConsistent || !targetValue || isSameAsTarget) {
+            nextButton.removeClass('border-green-700 text-white text-green-700')
+                .addClass('border-gray-300 text-gray-300 pointer-events-none')
+                .prop("disabled", true);
+
+        } else {
+            nextButton.removeClass('border-gray-300 text-gray-300 pointer-events-none')
+                .addClass('border-green-700 text-green-700')
+                .prop("disabled", false);
+        }
+    }
+
+    $(document).on('change', '.source-language-select, .target-select-language', function () {
+        checkLanguagesConsistency();
+    });
+
+    $(document).on('click', '.remove-detected-file', function () {
+        const fileId = $(this).data('file-id');
+        removeFile(fileId);
+    });
+
     const getLanguageOptions = (defaultValue) => {
         return languages.map(lang =>
             `<option value="${lang.abbreviation.toLowerCase()}" ${lang.abbreviation === defaultValue ? 'selected' : ''}>
             ${lang.name}
         </option>`
         ).join('');
+    }
+
+    function removeFile(fileId) {
+        selectedFiles = selectedFiles.filter(file => file.fileId !== fileId);
+
+        $(`.file[data-file-id="${fileId}"]`).remove();
+
+        const $detectedFile = $(`.flex.gap-5[data-file-id="${fileId}"]`);
+        if ($detectedFile.length) {
+            $detectedFile.remove();
+        }
+
+        toggleFollowingButton();
+
+        if (currentStep === 1) {
+            checkLanguagesConsistency();
+        }
+
+        if (selectedFiles.length === 0) {
+            currentStep = 0;
+            showStep(currentStep);
+        }
     }
 
 
