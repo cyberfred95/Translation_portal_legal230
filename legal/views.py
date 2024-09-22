@@ -33,14 +33,19 @@ PORTAL_API_KEY = ""
 
 def text_translation(request):
     text = request.POST.get('text')
+    print (request.POST)
     response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translate", data={
         "text": [text],
-        **get_translate_data(request),
+        "source_language": request.POST.get('source_language'),
+        "target_language": request.POST.get('target_language'),
+        "domain_name":request.POST.get('domain_name'),
+        # **get_translate_data(request),
     }, headers={
         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-    send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('translation_name'))
+    send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('domain_name'))
     send_statistic_request.delay(response.json().get('translated_text'), request.user.uuid,
-                                 request.POST.get('translation_name'))
+                                 request.POST.get('domain_name'))
+    print(response.text)
     return response.json()
 
 

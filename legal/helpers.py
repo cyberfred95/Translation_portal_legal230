@@ -10,11 +10,11 @@ def get_translate_data(request):
     }
 
     if preferences.MainSettings.algorithm == preferences.MainSettings.AlgorithmChoices.template:
-        return {'template_name': request.POST.get('translation_name')}
+        return {'template_name': request.POST.get('domain_name')}
 
     elif preferences.MainSettings.algorithm == preferences.MainSettings.AlgorithmChoices.domains:
         if request.LANGUAGE_CODE == 'fr':
             translate_data['domain_name'] = Domain.objects.get(french_name=request.POST.get(
-                'translation_name')).name if request.LANGUAGE_CODE == 'fr' else request.POST.get('translation_name')
+                'translation_name')).name if request.LANGUAGE_CODE == 'fr' else request.POST.get('POST')
 
     return translate_data
