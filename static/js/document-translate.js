@@ -58,17 +58,41 @@ $(document).ready(function () {
 
     function showStep(step) {
         $('.border-dashed > div').addClass('hidden');
-
         $(`.border-dashed > div:eq(${step})`).removeClass('hidden');
-
         updateProgress(step);
 
+        const $actionList = $(".action-list");
+
+        if (step === 0) {
+            $("#prev-step").hide();
+            $("#restart").hide();
+            if (selectedFiles.length > 0) {
+                $("#next-step").show().text("Following");
+                $actionList.css("justify-content", "flex-end");
+            } else {
+                $("#next-step").hide();
+            }
+        } else if (step === totalSteps - 1) {
+            $("#prev-step").hide();
+            $("#next-step").hide();
+            $("#restart").show().text("New translation");
+            $actionList.css("justify-content", "flex-start");
+        } else {
+            $("#prev-step").show();
+            $("#next-step").show().text("Following");
+            $("#restart").hide();
+            $actionList.css("justify-content", "space-between");
+        }
+
         $("#prev-step").toggleClass('hidden', step === 0);
-        $("#next-step").toggleClass('hidden', step === totalSteps);
+        $("#next-step").toggleClass('hidden', step === totalSteps - 1);
     }
 
     $("#next-step").click(function () {
-        if (currentStep < totalSteps) {
+        if (currentStep < totalSteps - 1) {
+            if (currentStep === 0 && selectedFiles.length === 0) {
+                return;
+            }
             if (currentStep === 0) {
                 uploadFiles();
             }
@@ -92,6 +116,11 @@ $(document).ready(function () {
             currentStep--;
             showStep(currentStep);
         }
+    });
+
+    $("#restart").click(function () {
+        currentStep = 0;
+        showStep(currentStep);
     });
 
     showStep(currentStep);
@@ -126,7 +155,6 @@ $(document).ready(function () {
     const $dropZone = $('.file-upload');
     const $chooseFileButton = $('.choose-file');
     const $fileList = $('.file-list');
-    const $followingButton = $('.upload-document');
 
     fileInput.on('change', handleFiles);
 
@@ -156,9 +184,17 @@ $(document).ready(function () {
             return allowedTypes.includes(ext);
         });
 
-        selectedFiles = files; // Зберігаємо вибрані файли
-        displayFiles(files);
+        const newFiles = files.filter(file =>
+            !selectedFiles.some(selectedFile =>
+                selectedFile.name === file.name && selectedFile.size === file.size
+            )
+        );
+
+        selectedFiles = [...selectedFiles, ...newFiles];
+        displayFiles(selectedFiles);
         toggleFollowingButton();
+
+        e.target.value = '';
     }
 
     function uploadFiles() {
@@ -197,11 +233,16 @@ $(document).ready(function () {
     }
 
     const displayFiles = (files) => {
-        files.forEach(file => {
+        $fileList.empty();
+        files.forEach((file, index) => {
+            const fileId = `file-${Date.now()}-${index}`;
+
+            file.fileId = fileId;
+
             const $fileItem = $(`
-            <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">
+            <div class="file flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700" data-file-id="${fileId}">
                 <span>${file.name}</span>
-                <button class="remove-file">
+                <button class="remove-file" data-file-id="${fileId}">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g clip-path="url(#clip0_759_4082)">
                             <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z" fill="#176C77"/>
@@ -219,20 +260,30 @@ $(document).ready(function () {
 
             $fileList.append($fileItem);
         });
-    }
+    };
 
     $(document).on('click', '.remove-file', function () {
-        $(this).closest('.flex.gap-4').remove();
+        const fileId = $(this).data('file-id');
+        selectedFiles = selectedFiles.filter(file => file.fileId !== fileId);
+        $(`.file[data-file-id="${fileId}"]`).remove();
         toggleFollowingButton();
     });
 
     function toggleFollowingButton() {
-        const filesExist = $fileList.children().length > 0;
-        $followingButton.toggleClass('hidden', !filesExist);
+        const filesExist = selectedFiles.length > 0;
+        const $actionList = $(".action-list");
+
+        if (filesExist && currentStep === 0) {
+            $("#prev-step").hide();
+            $("#next-step").show().text("Following");
+            $("#restart").hide();
+            $actionList.css("justify-content", "flex-end");
+        } else if (currentStep === 0) {
+            $("#next-step").hide();
+        }
+
         $fileList.toggleClass('hidden', !filesExist);
     }
-
-    toggleFollowingButton();
 
 
     // ------------- STEP-2 -------------

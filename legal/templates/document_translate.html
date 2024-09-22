@@ -3,7 +3,7 @@
 <form class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">
     <div class="w-full">
         <div class="relative pt-1">
-            <div class="overflow-hidden h-1.5 mb-10 text-xs flex rounded bg-green-300">
+            <div class="overflow-hidden h-1.5 mb-15 text-xs flex rounded bg-green-300">
                 <div id="progress-bar"
                      class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-700 transition-all duration-500 ease-out"
                      style="width: 0%"></div>
@@ -15,7 +15,10 @@
                         <rect width="10" height="10" rx="5" fill="currentColor"/>
                         <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
                     </svg>
-                    <span class="text-xs mt-2 text-green-300">Upload the document</span>
+                    <div class="flex flex-col gap-0.5 mt-2">
+                        <span class="text-3.25 text-green-300">Upload the document</span>
+                        <span class="text-2.5 text-green-300">Documents uploaded</span>
+                    </div>
                 </div>
                 <div id="point-2" class="flex flex-col">
                     <svg class="progress-point w-2.5 h-2.5 text-green-400" viewBox="0 0 10 10" fill="none"
@@ -23,7 +26,10 @@
                         <rect width="10" height="10" rx="5" fill="currentColor"/>
                         <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
                     </svg>
-                    <span class="text-xs mt-2 text-green-300">Language combination</span>
+                    <div class="flex flex-col gap-0.5 mt-2">
+                        <span class="text-3.25 text-green-300">Language combination</span>
+                        <span class="text-2.5 text-green-300"><span>EN</span>-<span>FR</span></span>
+                    </div>
                 </div>
                 <div id="point-3" class="flex flex-col">
                     <svg class="progress-point w-2.5 h-2.5 text-green-400" viewBox="0 0 10 10" fill="none"
@@ -31,7 +37,10 @@
                         <rect width="10" height="10" rx="5" fill="currentColor"/>
                         <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
                     </svg>
-                    <span class="text-xs mt-2 text-green-300">Domain selection</span>
+                    <div class="flex flex-col gap-0.5 mt-2">
+                        <span class="text-3.25 text-green-300">Domain selection</span>
+                        <span class="text-2.5 text-green-300">Generic</span>
+                    </div>
                 </div>
                 <div id="point-4" class="flex flex-col">
                     <svg class="progress-point w-2.5 h-2.5 text-green-400" viewBox="0 0 10 10" fill="none"
@@ -39,7 +48,10 @@
                         <rect width="10" height="10" rx="5" fill="currentColor"/>
                         <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
                     </svg>
-                    <span class="text-xs mt-2 text-green-300">Terminology</span>
+                    <div class="flex flex-col gap-0.5 mt-2">
+                        <span class="text-3.25 text-green-300">Terminology</span>
+                        <span class="text-2.5 text-green-300">RN</span>
+                    </div>
                 </div>
                 <div id="point-5" class="flex flex-col">
                     <svg class="progress-point w-2.5 h-2.5 text-green-400" viewBox="0 0 10 10" fill="none"
@@ -87,11 +99,16 @@
 
 
     </div>
-    <div class="flex items-center justify-between w-full">
+    <div class="flex items-center justify-between w-full action-list">
         <button type="button"
                 id="prev-step"
                 class="text-3.5 mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold upload-document hidden">
             Previous
+        </button>
+        <button type="button"
+                id="restart"
+                class="hidden text-3.5 mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold upload-document hidden">
+            New translation
         </button>
         <button type="button"
                 id="next-step"
