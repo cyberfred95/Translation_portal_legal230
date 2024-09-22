@@ -77,4 +77,50 @@ $(document).ready(function () {
             });
         }
     });
+
+    $(document).on('click', '.delete-project', function() {
+        $('.tooltip').addClass('opacity-0 invisible').removeClass('opacity-100 visible');
+        $(this).find('.tooltip').removeClass('opacity-0 invisible').addClass('opacity-100 visible');
+    });
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.delete-project').length) {
+            $('.tooltip').addClass('opacity-0 invisible').removeClass('opacity-100 visible');
+        }
+    });
+
+    $(document).on('click', '.allow-delete', function() {
+        const $deleteButton = $(this).closest('.delete-project');
+        const projectId = $deleteButton.data('project-id');
+
+        if (!projectId) {
+            console.error('Project ID not found');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('project_id', projectId);
+
+        $.ajax({
+            url: single_project,
+            type: 'DELETE',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            success: function(response) {
+                console.log('Project deleted');
+                $deleteButton.closest('tr').remove();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+    });
+
+    $(document).on('click', '.cancel-delete', function() {
+        $('.tooltip').addClass('opacity-0 invisible').removeClass('opacity-100 visible');
+    });
 });

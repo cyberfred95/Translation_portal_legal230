@@ -89,7 +89,8 @@ $(document).ready(function () {
     $('#text-translate, #document-translate, #writing').click(function () {
         $('.tab-content').hide();
         $(`#${this.id}-content`).show();
-        $('button').removeClass('bg-gray-800 text-white border-gray-800');
+        $('button.tab').removeClass('bg-gray-800 text-white border-gray-800');
+        $('#expert-revision').addClass('hidden');
         $(this).addClass('bg-gray-800 text-white border-gray-800');
     });
 

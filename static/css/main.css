@@ -95,11 +95,11 @@
 }
 
 .select2-container {
-    width: 150px !important;
+    width: 200px !important;
 }
 
 .select2-container--default .select2-selection--single {
-    width: 150px;
+    width: 200px;
 }
 
 .select2-container--default .select2-results__option {
@@ -247,4 +247,12 @@ body {
 
 .login-body input:-webkit-autofill {
     -webkit-text-fill-color: #000000 !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: inherit !important;
 }
