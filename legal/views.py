@@ -33,12 +33,12 @@ PORTAL_API_KEY = ""
 
 def text_translation(request):
     text = request.POST.get('text')
-    print (request.POST)
+    print(request.POST)
     response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translate", data={
         "text": [text],
         "source_language": request.POST.get('source_language'),
         "target_language": request.POST.get('target_language'),
-        "domain_name":request.POST.get('domain_name'),
+        "domain_name": request.POST.get('domain_name'),
         # **get_translate_data(request),
     }, headers={
         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
@@ -50,11 +50,12 @@ def text_translation(request):
 
 
 def file_translate(request):
-    data = {**get_translate_data(request),
-            "user_custom_mt_token": request.user.uuid,
-            "source_language": request.POST.get('source_language'),
-            "target_language": request.POST.get('target_language')
-            }
+    data = {
+        "user_custom_mt_token": request.user.uuid,
+        "source_language": request.POST.get('source_language'),
+        "target_language": request.POST.get('target_language'),
+        "domain_name": request.POST.get('domain_name'),
+    }
     projects = []
     files = request.FILES.getlist('document[]', [])
     for file in files:
@@ -169,6 +170,7 @@ class GetDomainsView(APIView):
         elif request.LANGUAGE_CODE == 'fr':
             domain_names = [domain.french_name if domain.french_name else domain.name for domain in domains]
         return Response({"data": domain_names}, status=status.HTTP_200_OK)
+
 
 @csrf_exempt
 @api_view(['POST'])
