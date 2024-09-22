@@ -106,6 +106,16 @@
 </div>
 <script src="{% static 'js/text-translate.js' %}"></script>
 <script>
+    let get_domains = "{% url 'get_domains' %}"
+    let translate = "{% url 'main_index' %}"
+    let expert_revision = "{% url 'expert_revision' %}"
+    let detect_language = "{% url 'detect_language' %}"
+    let domain_groups = "{% url 'domain_groups' %}"
+    let get_default_glossary = "{% url 'get_default_glossary' %}"
+    let api_list_glossaries = "{% url 'api_list_glossaries' %}"
+
+</script>
+<script>
     var languages = [
         {% for language in translate_languages %}
     {

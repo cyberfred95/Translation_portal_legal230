@@ -1,4 +1,11 @@
 $(document).ready(function () {
+    let sourceLanguage = '';
+    let targetLanguage = '';
+    let selectedDomain = '';
+    let selectedSubDomain = '';
+    let selectedGlossaryType = 'default';
+    let selectedGlossary = null;
+    let selectedFiles = [];
 
 
     // ------------- SELECT -------------
@@ -17,7 +24,6 @@ $(document).ready(function () {
 
     let currentStep = 0;
     const totalSteps = 4;
-    let selectedFiles = [];
 
     function updateProgress(step) {
         let percentage;
@@ -64,7 +70,17 @@ $(document).ready(function () {
     $("#next-step").click(function () {
         if (currentStep < totalSteps) {
             if (currentStep === 0) {
-                uploadFiles(); // Завантажуємо файли при переході з першого кроку
+                uploadFiles();
+            }
+            if (currentStep === 1) {
+                targetLanguage = $('.target-select-language').val();
+                getDomainsGroups();
+            }
+            if (currentStep === 2) {
+                loadDefaultGlossary();
+            }
+            if (currentStep === 3) {
+                fileTranslate();
             }
             currentStep++;
             showStep(currentStep);
@@ -172,12 +188,15 @@ $(document).ready(function () {
 
                 if (!isSameLanguages) {
                     $('.step-container').addClass('bg-red-100 border-red-200');
+                    $('#next-step').removeClass('border-green-700 text-white text-green-700').addClass('border-gray-300 text-gray-300 pointer-events-none').prop("disabled", true);
+                } else {
+                    sourceLanguage = response.languages[0].abbreviation.toLowerCase();
                 }
             },
         });
     }
 
-    function displayFiles(files) {
+    const displayFiles = (files) => {
         files.forEach(file => {
             const $fileItem = $(`
             <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">
@@ -202,7 +221,24 @@ $(document).ready(function () {
         });
     }
 
-    function displayDetectLanguageFiles(files, isSameLanguages) {
+    $(document).on('click', '.remove-file', function () {
+        $(this).closest('.flex.gap-4').remove();
+        toggleFollowingButton();
+    });
+
+    function toggleFollowingButton() {
+        const filesExist = $fileList.children().length > 0;
+        $followingButton.toggleClass('hidden', !filesExist);
+        $fileList.toggleClass('hidden', !filesExist);
+    }
+
+    toggleFollowingButton();
+
+
+    // ------------- STEP-2 -------------
+
+
+    const displayDetectLanguageFiles = (files, isSameLanguages) => {
         const $detectiveLanguageList = $('.detective-language-list');
         $detectiveLanguageList.empty();
 
@@ -274,7 +310,7 @@ $(document).ready(function () {
         });
     }
 
-    function getLanguageOptions(defaultValue) {
+    const getLanguageOptions = (defaultValue) => {
         return languages.map(lang =>
             `<option value="${lang.abbreviation.toLowerCase()}" ${lang.abbreviation === defaultValue ? 'selected' : ''}>
             ${lang.name}
@@ -282,16 +318,244 @@ $(document).ready(function () {
         ).join('');
     }
 
-    $(document).on('click', '.remove-file', function () {
-        $(this).closest('.flex.gap-4').remove();
-        toggleFollowingButton();
-    });
 
-    function toggleFollowingButton() {
-        const filesExist = $fileList.children().length > 0;
-        $followingButton.toggleClass('hidden', !filesExist);
-        $fileList.toggleClass('hidden', !filesExist);
+    // ------------- STEP-3 -------------
+
+
+    function updateDomainsList(domains) {
+        const domainsList = $('.domains-list');
+        domainsList.empty();
+
+        domains.forEach((domain, index) => {
+            const button = $('<button>', {
+                type: 'button',
+                class: 'domain-button text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md focus:text-white focus:bg-green-700',
+                text: domain.name,
+                'data-name': domain.name,
+                click: function () {
+                    $('.domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
+                    $(this).removeClass('bg-gray-200 text-gray-400').addClass('selected bg-green-700 text-white');
+                    selectedDomain = $(this).data('name');
+                    getDomains();
+                }
+            });
+
+            if (index === 0) {
+                button.removeClass('bg-gray-200 text-gray-400').addClass('selected bg-green-700 text-white');
+                selectedDomain = domain.name;
+            }
+
+            domainsList.append(button);
+        });
+
+        getDomains();
     }
 
-    toggleFollowingButton();
+    function updateSubDomainsList(subDomains) {
+        const subDomainsList = $('.sub-domain-list');
+        subDomainsList.empty();
+
+        subDomains.forEach((subDomain, index) => {
+            const button = $('<button>', {
+                type: 'button',
+                class: 'sub-domain-button text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md focus:text-white focus:bg-green-700',
+                text: subDomain,
+                'data-name': subDomain,
+                click: function () {
+                    $('.sub-domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
+                    $(this).removeClass('bg-gray-200 text-gray-400').addClass('selected bg-green-700 text-white');
+                    selectedSubDomain = $(this).data('name');
+                }
+            });
+
+            if (index === 0) {
+                button.removeClass('bg-gray-200 text-gray-400').addClass('selected bg-green-700 text-white');
+                selectedSubDomain = subDomain;
+            }
+
+            subDomainsList.append(button);
+        });
+    }
+
+    const getDomainsGroups = () => {
+        $.ajax({
+            url: domain_groups,
+            type: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function (response) {
+                updateDomainsList(response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching domains:", error);
+            }
+        });
+    }
+
+
+    const getDomains = () => {
+        $.ajax({
+            url: `${get_domains}?source_language=${sourceLanguage}&target_language=${targetLanguage}&domain_group=${selectedDomain}`,
+            type: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function (response) {
+                console.log("Domains fetched successfully:", response);
+                updateSubDomainsList(response.data);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching domains:", error);
+            }
+        });
+    }
+
+
+    // ------------- STEP-4 -------------
+
+
+    $(".step-4 button:contains('Default')").addClass('bg-gray-800 text-white');
+
+    $(".step-4 button:contains('Default')").click(function () {
+        selectGlossaryType('default');
+        loadDefaultGlossary();
+    });
+
+    $(".step-4 button:contains('My glossaries')").click(function () {
+        selectGlossaryType('my');
+        loadMyGlossaries();
+    });
+
+    $(".step-4 button:contains('No glossary')").click(function () {
+        selectGlossaryType('none');
+        clearGlossaryList();
+    });
+
+    function selectGlossaryType(type) {
+        selectedGlossaryType = type;
+        $(".step-4 button").removeClass('bg-gray-800 text-white').addClass('bg-gray-200 text-gray-400');
+        $(".step-4 button:contains('" + (type === 'default' ? 'Default' : type === 'my' ? 'My glossaries' : 'No glossary') + "')").removeClass('bg-gray-200 text-gray-400').addClass('bg-gray-800 text-white');
+    }
+
+    function loadDefaultGlossary() {
+
+        const data = {
+            source_language: sourceLanguage,
+            target_language: targetLanguage,
+            domain_name: selectedSubDomain
+        };
+
+        $.ajax({
+            url: get_default_glossary,
+            type: 'POST',
+            data: data,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function (response) {
+                console.log(response)
+                updateGlossaryList([response]);
+                selectedGlossary = response.id;
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching default glossary:", error);
+            }
+        });
+    }
+
+    function loadMyGlossaries() {
+
+        const data = {
+            source_language: sourceLanguage,
+            target_language: targetLanguage,
+            domain_name: selectedSubDomain
+        };
+
+        $.ajax({
+            url: api_list_glossaries,
+            type: 'POST',
+            data: data,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function (response) {
+                console.log(response)
+                updateGlossaryList(response);  // Припускаємо, що відповідь - це масив об'єктів глосаріїв
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching my glossaries:", error);
+            }
+        });
+    }
+
+    function updateGlossaryList(glossaries) {
+        const glossaryList = $('.glossary-list');
+        glossaryList.empty();
+
+        glossaries.forEach((glossary, index) => {
+            const button = $('<button>', {
+                type: 'button',
+                class: 'glossary-button text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md focus:text-white focus:bg-green-700',
+                text: glossary.name,  // Припускаємо, що у глосарія є поле name
+                'data-id': glossary.id,
+                click: function () {
+                    $('.glossary-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
+                    $(this).removeClass('bg-gray-200 text-gray-400').addClass('selected bg-green-700 text-white');
+                    selectedGlossary = $(this).data('id');
+                    console.log('Вибраний глосарій:', selectedGlossary);
+                }
+            });
+
+            if (index === 0) {
+                button.removeClass('bg-gray-200 text-gray-400').addClass('selected bg-green-700 text-white');
+                selectedGlossary = glossary.id;
+            }
+
+            glossaryList.append(button);
+        });
+    }
+
+    function clearGlossaryList() {
+        $('.glossary-list').empty();
+        selectedGlossary = null;
+    }
+
+
+    // ------------- STEP-5 -------------
+
+    const fileTranslate = () => {
+        const formData = new FormData();
+        selectedFiles.forEach((file) => {
+            formData.append(`document[]`, file);
+        });
+        formData.append('domain_name', selectedSubDomain);
+        formData.append('source_language', sourceLanguage);
+        formData.append('target_language', targetLanguage);
+        formData.append('action', 'file_translate');
+
+        $.ajax({
+            url: translate,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function (response) {
+                console.log(response);
+            },
+            error: function (xhr, status, error) {
+                console.error('Translation error:', error);
+            }
+        });
+
+    }
+
 });

@@ -48,7 +48,7 @@ $(document).ready(function () {
 
         let formData = new FormData(form[0]);
         $.ajax({
-            url: text_translate,
+            url: translate,
             type: 'POST',
             data: formData,
             processData: false,
