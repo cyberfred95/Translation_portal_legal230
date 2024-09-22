@@ -404,7 +404,6 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                console.log("Domains fetched successfully:", response);
                 updateSubDomainsList(response.data);
             },
             error: function (xhr, status, error) {
@@ -457,7 +456,6 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                console.log(response)
                 updateGlossaryList([response]);
                 selectedGlossary = response.id;
             },
@@ -484,7 +482,6 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                console.log(response)
                 updateGlossaryList(response);  // Припускаємо, що відповідь - це масив об'єктів глосаріїв
             },
             error: function (xhr, status, error) {
@@ -507,7 +504,6 @@ $(document).ready(function () {
                     $('.glossary-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
                     $(this).removeClass('bg-gray-200 text-gray-400').addClass('selected bg-green-700 text-white');
                     selectedGlossary = $(this).data('id');
-                    console.log('Вибраний глосарій:', selectedGlossary);
                 }
             });
 
@@ -549,7 +545,6 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                console.log(response);
             },
             error: function (xhr, status, error) {
                 console.error('Translation error:', error);
