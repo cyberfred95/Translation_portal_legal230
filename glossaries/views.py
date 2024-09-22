@@ -47,7 +47,7 @@ class SingleGlossaryView(RetrieveUpdateDestroyAPIView):
 class GlossariesListAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
-        if 'source_language' and 'target_language' and 'domain_name' in request.data:
+        if 'source_language' and 'target_language' and 'domain_name' in self.request.data:
             return Response(
                 {"message": "provide source_language, target_language and domain_name"},
                 status=status.HTTP_400_BAD_REQUEST
