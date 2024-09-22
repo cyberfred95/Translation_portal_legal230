@@ -47,7 +47,7 @@ class SingleGlossaryView(RetrieveUpdateDestroyAPIView):
 class GlossariesListAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
-        if 'source_language' and 'target_language' and 'domain_name' in self.request.data:
+        if 'source_language' and 'target_language' and 'domain_name' not in request.data:
             return Response(
                 {"message": "provide source_language, target_language and domain_name"},
                 status=status.HTTP_400_BAD_REQUEST
@@ -55,8 +55,8 @@ class GlossariesListAPIView(APIView):
 
         glossaries = Glossary.objects.filter(
             domain__name=request.data.get('domain_name'),
-            source_language=request.data.get('source_language'),
-            target_language=request.data.get('target_language'),
+            source_language__abbreviation=request.data.get('source_language').upper(),
+            target_language__abbreviation=request.data.get('target_language').upper(),
             user=request.user
         )
 
