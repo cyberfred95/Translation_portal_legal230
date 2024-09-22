@@ -66,11 +66,12 @@ class GlossariesListAPIView(APIView):
 class GetDefaultGlossaryView(APIView):
     serializer_class = GlossarySerializer
 
-    def get(self, request):
+    def post(self, request):
+        print(request.data)
         glossary = Glossary.objects.filter(
             domain__name=request.data.get('domain_name'),
-            source_language=request.data.get('source_language'),
-            target_language=request.data.get('target_language'),
+            source_language__abbreviation=request.data.get('source_language').upper(),
+            target_language__abbreviation=request.data.get('target_language').upper(),
             is_default_glossary=True
         ).first()
         if glossary:
