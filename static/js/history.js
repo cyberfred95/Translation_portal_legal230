@@ -1,4 +1,5 @@
 $(document).ready(function () {
+
     $('td').each(function () {
         var statusElement = $(this).find('.status');
         var statusText = statusElement.text().trim();
@@ -180,3 +181,4 @@ $(document).ready(function () {
         }
     });
 });
+

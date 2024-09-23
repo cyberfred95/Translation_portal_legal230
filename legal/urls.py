@@ -17,6 +17,7 @@ urlpatterns = i18n_patterns(
     path("expert-revision", login_required(expert_revision), name='expert_revision'),
     path('expert-revision-file', login_required(expert_revision_file), name='expert_revision_file'),
     path('project-history/', login_required(ProjectsHistoryView.as_view()), name='project_history'),
+    path('usage-history/', login_required(UsageHistoryView.as_view()), name='usage_history'),
     path('project/', login_required(SingleProjectView.as_view()), name='single_project'),
     path('get-templates/', login_required(GetTemplatesView.as_view()), name='get-templates'),
     path('get-domains/', login_required(GetDomainsView.as_view()), name='get_domains'),
