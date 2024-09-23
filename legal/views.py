@@ -27,7 +27,7 @@ import langdetect
 from .tasks import send_statistic_request
 from languages.serializers import LanguageSerializer
 
-PAGINATION_PAGE_SIZE = 30
+PAGINATION_PAGE_SIZE = 20
 PORTAL_API_KEY = ""
 
 
@@ -42,7 +42,6 @@ def text_translation(request):
     send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('domain_name'))
     # send_statistic_request.delay(response.json().get('translated_text'), request.user.uuid,
     #                              request.POST.get('domain_name'))
-    print(response.text)
     return response.json()
 
 
@@ -274,11 +273,14 @@ class LanguageDetectView(APIView):
             tmp_language = langdetect.detect(text)
             language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
                 'abbreviation', flat=True).first()
+            if not language:
+                language = Language.objects.all().values_list(
+                'abbreviation', flat=True).first()
 
             result.append(
                 {
                     "file_name": f'{file.name}',
-                    "abbreviation": language.upper() if language else None
+                    "abbreviation": language.upper()
                 }
             )
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
