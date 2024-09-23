@@ -70,13 +70,16 @@ class GetDefaultGlossaryView(APIView):
     serializer_class = GlossarySerializer
 
     def post(self, request):
-        print(request.data)
         glossary = Glossary.objects.filter(
-            domain__name=request.data.get('domain_name'),
             source_language__abbreviation=request.data.get('source_language').upper(),
             target_language__abbreviation=request.data.get('target_language').upper(),
             is_default_glossary=True
-        ).first()
+        ).all()
+        if request.LANGUAGE_CODE == 'fr':
+            glossary = glossary.filter(domain__french_name=request.data.get('domain_name'))
+        else:
+            glossary = glossary.filter(domain__name=request.data.get('domain_name'))
+        glossary = glossary.first()
         if glossary:
             return Response(GlossarySerializer(glossary).data, status=status.HTTP_200_OK)
         return Response({"message": "Default glossary not found"}, status=status.HTTP_404_NOT_FOUND)
