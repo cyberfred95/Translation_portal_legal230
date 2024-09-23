@@ -1,6 +1,6 @@
 {% load static %}
 
-<header class="flex justify-between items-center bg-gray-100 pl-31.25 pr-63.75 py-7.5">
+<header class="flex justify-between items-center bg-gray-150 pl-31.25 pr-63.75 py-7.5">
     <div class="w-30 h-7.25">
         <img src="{% static 'images/logo.png' %}" alt="Logo">
     </div>
@@ -9,15 +9,15 @@
                     {{ request.user.username }}
                 </span>
         <div>
-            <a href="/en" class="{% if request.LANGUAGE_CODE == 'en' %}text-gray-800{% else %}text-gray-400{% endif %}">
+            <a href="/en" class="{% if request.LANGUAGE_CODE == 'en' %}text-gray-750{% else %}text-gray-270{% endif %}">
                 EN
             </a>
             |
-            <a href="/fr" class="{% if request.LANGUAGE_CODE == 'fr' %}text-gray-800{% else %}text-gray-400{% endif %}">
+            <a href="/fr" class="{% if request.LANGUAGE_CODE == 'fr' %}text-gray-750{% else %}text-gray-270{% endif %}">
                 FR
             </a>
         </div>
-        <a href="/accounts/logout/" class="bg-green-700 text-white text-4 hover:bg-gray-700 rounded-md py-2.5 px-6.5 transition duration-300 ease-in-out">
+        <a href="/accounts/logout/" class="bg-green-650 text-white text-4 hover:bg-gray-700 rounded-md py-2.5 px-6.5 transition duration-300 ease-in-out">
             Logout
         </a>
     </div>

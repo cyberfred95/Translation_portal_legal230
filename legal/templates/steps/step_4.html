@@ -7,15 +7,15 @@
     </div>
     <div class="flex items-center mt-5">
         <button type="button"
-                class="glossary-tab default px-5 py-3 text-3.5 bg-gray-200 text-gray-400 rounded-l-md hover:bg-gray-800 hover:text-white focus:bg-gray-800 focus:text-white">
+                class="glossary-tab default px-5 py-3 text-3.5 bg-gray-160 text-gray-550 rounded-l-md hover:bg-gray-800 hover:text-white focus:bg-gray-800 focus:text-white">
             Default
         </button>
         <button type="button"
-                class="glossary-tab my-glossary px-5 py-3 text-3.5 bg-gray-200 text-gray-400 hover:bg-gray-800 hover:text-white focus:bg-gray-800 focus:text-white">
+                class="glossary-tab my-glossary px-5 py-3 text-3.5 bg-gray-160 text-gray-550 hover:bg-gray-800 hover:text-white focus:bg-gray-800 focus:text-white">
             My glossaries
         </button>
         <button type="button"
-                class="glossary-tab none px-5 py-3 text-3.5 bg-gray-200 text-gray-400 rounded-r-md hover:bg-gray-800 hover:text-white focus:bg-gray-800 focus:text-white">
+                class="glossary-tab none px-5 py-3 text-3.5 bg-gray-160 text-gray-550 rounded-r-md hover:bg-gray-800 hover:text-white focus:bg-gray-800 focus:text-white">
             No glossary
         </button>
     </div>
@@ -34,13 +34,14 @@
 
             <div class="p-12.5 flex flex-col items-center gap-7.5">
                 <div class="text-5">Add Glossary</div>
-                <div class="bg-gray-100 w-full py-5 px-46.75 rounded-md">
+                <div class="bg-gray-350 w-full py-5 px-46.75 rounded-md">
                     <div id="uploadButtons" class="flex flex-col gap-2.5">
-                        <button type="button" id="uploadButton" class="w-full bg-green-700 text-white py-2.5 rounded font-semibold">
+                        <button type="button" id="uploadButton"
+                                class="w-full bg-green-700 text-white py-2.5 rounded font-semibold">
                             Upload file
                         </button>
                         <div id="fileInfo"
-                             class="hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-200 text-green-700 w-full">
+                             class="hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-350 text-green-650 w-full">
                             <span id="fileName"></span>
                             <button type="button" class="remove-file">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
@@ -60,16 +61,17 @@
                             </button>
                         </div>
                         <button type="button" id="downloadSample"
-                                class="w-full bg-white text-green-700 bg-green-700 py-2.5 rounded border border-green-700 font-semibold">
+                                class="w-full bg-white text-green-650 bg-green-650 py-2.5 rounded border border-green-650 font-semibold">
                             Download sample
                         </button>
-                        <p class="text-3.5 text-gray-300">Supported Files: .csv max 5mb</p>
+                        <p class="text-3.5 text-gray-270">Supported Files: .csv max 5mb</p>
                     </div>
                 </div>
-                <span class="text-3.5 text-gray-600 text-center">
+                <span class="text-3.5 text-gray-750 text-center">
                     The glossary function is based on the GPT. The number of tokens used for editing terminology can be found in the Usage History section.
                 </span>
-                <button type="button" id="continueButton" class="bg-gray-800 px-6.5 py-2.5 rounded font-semibold text-4 text-white">
+                <button type="button" id="continueButton"
+                        class="bg-gray-800 px-6.5 py-2.5 rounded font-semibold text-4 text-white">
                     Continue
                 </button>
             </div>

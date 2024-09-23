@@ -24,7 +24,7 @@
             <tr>
 
                 <td class="text-3.25 text-gray-800 flex gap-6 items-center">
-                    <span class="md:w-60 2xl:w-80 truncate">{{ glossary.file_name|cut:"glossaries/" }}</span>
+                    <span class="md:w-60 2xl:w-80 w-max truncate">{{ glossary.file_name|cut:"glossaries/" }}</span>
                     <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g clip-path="url(#clip0_759_2669)">
                             <path d="M12.6666 8.53064C12.298 8.53064 12 8.82935 12 9.19727V14.5306C12 14.8979 11.7013 15.1973 11.3334 15.1973H2C1.63196 15.1973 1.33337 14.8979 1.33337 14.5306V5.19727C1.33337 4.82996 1.63196 4.53064 2 4.53064H7.33337C7.70203 4.53064 8 4.23193 8 3.86401C8 3.49597 7.70203 3.19727 7.33337 3.19727H2C0.897339 3.19727 0 4.0946 0 5.19727V14.5306C0 15.6333 0.897339 16.5306 2 16.5306H11.3334C12.436 16.5306 13.3334 15.6333 13.3334 14.5306V9.19727C13.3334 8.82861 13.0353 8.53064 12.6666 8.53064Z"
@@ -100,14 +100,14 @@
 
             <div class="p-12.5 flex flex-col items-center gap-7.5">
                 <div class="text-5">Add Glossary</div>
-                <div class="bg-gray-100 w-full py-5 px-46.75 rounded-md">
+                <div class="bg-gray-350 w-full py-5 px-46.75 rounded-md">
                     <div id="uploadButtons" class="flex flex-col gap-2.5">
                         <button type="button" id="uploadButton"
                                 class="w-full bg-green-700 text-white py-2.5 rounded font-semibold">
                             Upload file
                         </button>
                         <div id="fileInfo"
-                             class="hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-200 text-green-700 w-full">
+                             class="hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-350 text-green-650 w-full">
                             <span id="fileName"></span>
                             <button type="button" class="remove-file">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
@@ -127,13 +127,13 @@
                             </button>
                         </div>
                         <button type="button" id="downloadSample"
-                                class="w-full bg-white text-green-700 bg-green-700 py-2.5 rounded border border-green-700 font-semibold">
+                                class="w-full bg-white text-green-650 bg-green-650 py-2.5 rounded border border-green-650 font-semibold">
                             Download sample
                         </button>
-                        <p class="text-3.5 text-gray-300">Supported Files: .csv max 5mb</p>
+                        <p class="text-3.5 text-gray-270">Supported Files: .csv max 5mb</p>
                     </div>
                 </div>
-                <span class="text-3.5 text-gray-600 text-center">
+                <span class="text-3.5 text-gray-750 text-center">
                     The glossary function is based on the GPT. The number of tokens used for editing terminology can be found in the Usage History section.
                 </span>
                 <button type="button" id="continueButton"

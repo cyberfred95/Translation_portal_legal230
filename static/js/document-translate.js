@@ -31,13 +31,13 @@ $(document).ready(function () {
                 percentage = 0;
                 break;
             case 1:
-                percentage = 26.5;
+                percentage = 26;
                 break;
             case 2:
-                percentage = 52.5;
+                percentage = 52;
                 break;
             case 3:
-                percentage = 76.5;
+                percentage = 76;
                 break;
             case 4:
                 percentage = 100;
@@ -48,21 +48,21 @@ $(document).ready(function () {
 
         $("#progress-bar").css("width", percentage + "%");
 
-        $(".progress-point").parent().find("svg").removeClass("text-green-700").addClass("text-green-400");
-        $(".progress-point").parent().find(".text-3\\.25, .text-xs").removeClass("text-green-700").addClass("text-green-300");
+        $(".progress-point").parent().find("svg").removeClass("text-green-650").addClass("text-green-270");
+        $(".progress-point").parent().find(".text-3\\.25, .text-xs").removeClass("text-green-650").addClass("text-green-250");
 
-        $("#point-1").find("svg").removeClass("text-green-400").addClass("text-green-700");
-        $("#point-1").find(".text-3\\.25, .text-xs").removeClass("text-green-300").addClass("text-green-700");
+        $("#point-1").find("svg").removeClass("text-green-270").addClass("text-green-650");
+        $("#point-1").find(".text-3\\.25, .text-xs").removeClass("text-green-250").addClass("text-green-650");
 
         for (let i = 0; i <= step; i++) {
-            $(`#point-${i + 1}`).find("svg").removeClass("text-green-400").addClass("text-green-700");
-            $(`#point-${i + 1}`).find(".text-3\\.25, .text-xs").removeClass("text-green-300").addClass("text-green-700");
+            $(`#point-${i + 1}`).find("svg").removeClass("text-green-270").addClass("text-green-650");
+            $(`#point-${i + 1}`).find(".text-3\\.25, .text-xs").removeClass("text-green-250").addClass("text-green-650");
         }
     }
 
     function showStep(step) {
-        $('.border-dashed > div').addClass('hidden');
-        $(`.border-dashed > div:eq(${step})`).removeClass('hidden');
+        $('.border-line > div').addClass('hidden');
+        $(`.border-line > div:eq(${step})`).removeClass('hidden');
         updateProgress(step);
 
         const $actionList = $(".action-list");
@@ -70,6 +70,7 @@ $(document).ready(function () {
         if (step === 0) {
             $("#prev-step").hide();
             $("#restart").hide();
+            $("#restart-text").hide();
             if (selectedFiles.length > 0) {
                 $("#next-step").show().text("Following");
                 $actionList.css("justify-content", "flex-end");
@@ -80,11 +81,13 @@ $(document).ready(function () {
             $("#prev-step").hide();
             $("#next-step").hide();
             $("#restart").show().text("New translation");
+            $("#restart-text").show();
             $actionList.css("justify-content", "flex-start");
         } else {
             $("#prev-step").show();
             $("#next-step").show().text("Following");
             $("#restart").hide();
+            $("#restart-text").hide();
             $actionList.css("justify-content", "space-between");
         }
 
@@ -118,7 +121,7 @@ $(document).ready(function () {
         if (currentStep > 0) {
             currentStep--;
             showStep(currentStep);
-            $("#next-step").removeClass('border-gray-300 text-gray-300 pointer-events-none').addClass('border-green-700 text-green-700').prop("disabled", false);
+            $("#next-step").removeClass('border-gray-300 text-gray-300 pointer-events-none').addClass('border-green-650 text-green-650').prop("disabled", false);
             $('.step-container').removeClass('bg-red-100 border-red-200');
         }
     });
@@ -221,7 +224,7 @@ $(document).ready(function () {
             file.fileId = fileId;
 
             const $fileItem = $(`
-            <div class="file flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700" data-file-id="${fileId}">
+            <div class="file flex gap-4 items-center px-4 py-3 rounded-md bg-green-350 text-green-650" data-file-id="${fileId}">
                 <span>${file.name}</span>
                 <button type="button" class="remove-file" data-file-id="${fileId}">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -256,6 +259,7 @@ $(document).ready(function () {
             $("#prev-step").hide();
             $("#next-step").show().text("Following");
             $("#restart").hide();
+            $("#restart-text").hide();
             $actionList.css("justify-content", "flex-end");
         } else if (currentStep === 0) {
             $("#next-step").hide();
@@ -318,7 +322,7 @@ $(document).ready(function () {
         files.forEach((file) => {
             const $fileItem = $(`
             <div class="flex gap-5 items-center" data-file-id="${file.fileId}">
-                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700 detected-file">
+                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-350 text-green-650 detected-file">
                     <span class="text-3.5 w-50 truncate">${file.file_name}</span>
                     <button type="button" class="remove-detected-file" data-file-id="${file.fileId}">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -424,12 +428,12 @@ $(document).ready(function () {
         let isSameAsTarget = firstValue === targetValue;
 
         if (!isConsistent || !targetValue || isSameAsTarget) {
-            nextButton.removeClass('border-green-700 text-white text-green-700')
+            nextButton.removeClass('border-green-650 text-white text-green-650')
                 .addClass('border-gray-300 text-gray-300 pointer-events-none')
                 .prop("disabled", true);
         } else {
             nextButton.removeClass('border-gray-300 text-gray-300 pointer-events-none')
-                .addClass('border-green-700 text-green-700')
+                .addClass('border-green-650 text-green-650')
                 .prop("disabled", false);
         }
     }
@@ -485,19 +489,19 @@ $(document).ready(function () {
         domains.forEach((domain, index) => {
             const button = $('<button>', {
                 type: 'button',
-                class: 'domain-button text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md focus:text-white focus:bg-green-700',
+                class: 'domain-button text-3.5 py-3 px-7.5 bg-gray-160 text-gray-550 hover:bg-green-650 hover:text-white rounded-md focus:text-white focus:bg-green-650',
                 text: domain.name,
                 'data-name': domain.name,
                 click: function () {
-                    $('.domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
-                    $(this).removeClass('bg-gray-200 text-gray-400').addClass('selected bg-green-700 text-white');
+                    $('.domain-button').removeClass('selected bg-green-650 text-white').addClass('bg-gray-160 text-gray-550');
+                    $(this).removeClass('bg-gray-160 text-gray-550').addClass('selected bg-green-650 text-white');
                     selectedDomain = $(this).data('name');
                     getDomains();
                 }
             });
 
             if (index === 0) {
-                button.removeClass('bg-gray-200 text-gray-400').addClass('selected bg-green-700 text-white');
+                button.removeClass('bg-gray-160 text-gray-550').addClass('selected bg-green-650 text-white');
                 selectedDomain = domain.name;
             }
 
@@ -561,7 +565,7 @@ $(document).ready(function () {
             },
             success: function (response) {
                 if (response.data && response.data.length === 0) {
-                    $('#next-step').removeClass('border-green-700 text-white text-green-700')
+                    $('#next-step').removeClass('border-green-650 text-white text-green-650')
                         .addClass('border-gray-300 text-gray-300 pointer-events-none')
                         .prop("disabled", true);
                 }
@@ -775,23 +779,21 @@ $(document).ready(function () {
 
     function updateProjectTable(projects) {
         const tableBody = $('.projects tbody');
-        tableBody.empty(); // Clear existing rows
+        tableBody.empty();
 
         projects.forEach(project => {
             const row = $('<tr></tr>');
 
-            // File name column
             row.append(`
             <td>
-                <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">
+                <div class="rounded-md text-green-650 py-3 px-4 md:w-50 2xl:w-80 truncate text-3.25">
                     ${project.source_file_name}
                 </div>
             </td>
         `);
 
-            // Status column
             const statusColumn = $('<td></td>');
-            const statusSpan = $('<span class="rounded-md py-1.5 px-2.5 text-3.25"></span>');
+            const statusSpan = $('<span class="rounded-md py-1.5 px-2.5 text-3.25 font-medium"></span>');
 
             switch (project.status) {
                 case 'Being translated':
@@ -800,7 +802,7 @@ $(document).ready(function () {
                     break;
                 case 'Translated':
                     statusSpan.text('Translated');
-                    statusSpan.addClass('bg-gray-200 text-gray-800');
+                    statusSpan.addClass('bg-green-350 text-green-650');
                     break;
                 case 'Sent to post-editing, not accepted yet':
                     statusSpan.text('Request for post-editing sent');
@@ -812,7 +814,7 @@ $(document).ready(function () {
                     break;
                 case 'Post-edited file uploaded':
                     statusSpan.text('Post-edited file uploaded');
-                    statusSpan.addClass('bg-green-200 text-green-700');
+                    statusSpan.addClass('bg-green-370 text-green-750');
                     break;
                 case 'Error':
                     statusSpan.text('Error');
@@ -976,14 +978,12 @@ $(document).ready(function () {
                 'Accept': 'application/json',
             },
             dataType: 'json',
-            success: function (response) {
-                // Update the project status in the table
+            success: function () {
                 const projectRow = $(`button[data-id="${id}"]`).closest('tr');
                 const statusSpan = projectRow.find('td:eq(1) span');
                 statusSpan.text('Request for post-editing sent');
                 statusSpan.removeClass().addClass('rounded-md py-1.5 px-2.5 text-3.25 bg-yellow-100 text-yellow-400');
 
-                // Disable the revision button
                 projectRow.find('.expert-revision').prop('disabled', true).addClass('disabled:pointer-events-none disabled:text-gray-300 disabled:border-gray-300');
 
                 $modalRevision.addClass('hidden');
@@ -1013,7 +1013,7 @@ $(document).ready(function () {
                     'X-CSRFToken': getCookie('csrftoken'),
                 },
                 success: function (response) {
-                    updateProjectTable(response); // Update the table with new data
+                    updateProjectTable(response);
 
                     let allCompleted = response.every(project => project.status !== "Being translated");
                     if (allCompleted) {

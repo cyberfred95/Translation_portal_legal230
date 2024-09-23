@@ -254,3 +254,14 @@ input:focus,
 textarea:focus {
     outline: none;
 }
+
+.border-line {
+    background-image:
+            repeating-linear-gradient(to right, currentColor, currentColor 5px, transparent 5px, transparent 10px),
+            repeating-linear-gradient(to right, currentColor, currentColor 5px, transparent 5px, transparent 10px),
+            repeating-linear-gradient(to bottom, currentColor, currentColor 5px, transparent 5px, transparent 10px),
+            repeating-linear-gradient(to bottom, currentColor, currentColor 5px, transparent 5px, transparent 10px);
+    background-position: top, bottom, left, right;
+    background-size: 100% 1px, 100% 1px, 1px 100%, 1px 100%;
+    background-repeat: no-repeat;
+}
