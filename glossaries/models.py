@@ -3,6 +3,7 @@ from languages.models import Language
 from users.models import User, UserGroup
 from django.core.validators import FileExtensionValidator
 from domains.models import Domain
+from django.core.exceptions import ValidationError
 
 
 # Create your models here.
@@ -40,3 +41,12 @@ class Glossary(models.Model):
             return str(round(size / (1024 * 1024), 2)) + " Mb"
         else:
             return
+
+    def clean(self):
+        # Ensure that either user or group is selected, but not both
+        if self.user and self.group:
+            raise ValidationError("You cannot select both a user and a group at the same time.")
+        if not self.user and not self.group:
+            raise ValidationError("You must select either a user or a group.")
+
+        super().clean()
