@@ -61,7 +61,7 @@
                 </td>
                 <td>
                     <div class="flex gap-5 items-center justify-end">
-                        <button data-url="{{ glossary.file_url }}">
+                        <button type="button" data-url="{{ glossary.file_url }}">
                             <svg width="17" height="16" viewBox="0 0 17 16" fill="none"
                                  xmlns="http://www.w3.org/2000/svg">
                                 <path d="M15.7188 7.21875C15.2875 7.21875 14.9375 7.56875 14.9375 8C14.9375 11.55 12.05 14.4375 8.5 14.4375C4.95 14.4375 2.0625 11.55 2.0625 8C2.0625 7.56875 1.7125 7.21875 1.28125 7.21875C0.85 7.21875 0.5 7.56875 0.5 8C0.5 10.1375 1.33125 12.1469 2.84375 13.6562C4.35625 15.1687 6.3625 16 8.5 16C10.6375 16 12.6469 15.1687 14.1562 13.6562C15.6687 12.1438 16.5 10.1375 16.5 8C16.5 7.56875 16.15 7.21875 15.7188 7.21875Z"
@@ -70,7 +70,7 @@
                                       fill="#176C77"/>
                             </svg>
                         </button>
-                        <button>
+                        <button type="button">
                             <svg width="17" height="16" viewBox="0 0 17 16" fill="none"
                                  xmlns="http://www.w3.org/2000/svg">
                                 <path d="M14.5007 3.33398H2.50065C2.32384 3.33398 2.15427 3.40422 2.02925 3.52925C1.90422 3.65427 1.83398 3.82384 1.83398 4.00065C1.83398 4.17746 1.90422 4.34703 2.02925 4.47206C2.15427 4.59708 2.32384 4.66732 2.50065 4.66732H3.83398V12.6673C3.83414 13.1977 4.04491 13.7063 4.41995 14.0814C4.79498 14.4564 5.3036 14.6672 5.83398 14.6673H11.1673C11.6977 14.6672 12.2063 14.4564 12.5814 14.0814C12.9564 13.7063 13.1672 13.1977 13.1673 12.6673V4.66732H14.5007C14.6775 4.66732 14.847 4.59708 14.9721 4.47206C15.0971 4.34703 15.1673 4.17746 15.1673 4.00065C15.1673 3.82384 15.0971 3.65427 14.9721 3.52925C14.847 3.40422 14.6775 3.33398 14.5007 3.33398ZM7.83398 10.6673C7.83398 10.8441 7.76375 11.0137 7.63872 11.1387C7.5137 11.2637 7.34413 11.334 7.16732 11.334C6.99051 11.334 6.82094 11.2637 6.69591 11.1387C6.57089 11.0137 6.50065 10.8441 6.50065 10.6673V7.33398C6.50065 7.15717 6.57089 6.9876 6.69591 6.86258C6.82094 6.73756 6.99051 6.66732 7.16732 6.66732C7.34413 6.66732 7.5137 6.73756 7.63872 6.86258C7.76375 6.9876 7.83398 7.15717 7.83398 7.33398V10.6673ZM10.5007 10.6673C10.5007 10.8441 10.4304 11.0137 10.3054 11.1387C10.1804 11.2637 10.0108 11.334 9.83398 11.334C9.65717 11.334 9.4876 11.2637 9.36258 11.1387C9.23756 11.0137 9.16732 10.8441 9.16732 10.6673V7.33398C9.16732 7.15717 9.23756 6.9876 9.36258 6.86258C9.4876 6.73756 9.65717 6.66732 9.83398 6.66732C10.0108 6.66732 10.1804 6.73756 10.3054 6.86258C10.4304 6.9876 10.5007 7.15717 10.5007 7.33398V10.6673Z"
@@ -90,7 +90,7 @@
          class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
         <div class="relative bg-white rounded-lg shadow-xl max-w-172.5 w-full mx-4">
             <div class="absolute -top-4.5 -right-4.5 -mr-4 -mt-4 z-10">
-                <button id="closeIcon" class="p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
+                <button type="button" id="closeIcon" class="p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M11.7688 10.0003L19.6335 2.13553C20.1222 1.64732 20.1222 0.855171 19.6335 0.36696C19.1449 -0.121669 18.3536 -0.121669 17.865 0.36696L10.0002 8.23171L2.13504 0.36696C1.64641 -0.121669 0.8551 -0.121669 0.366471 0.36696C-0.122157 0.855171 -0.122157 1.64732 0.366471 2.13553L8.23164 10.0003L0.366471 17.865C-0.122157 18.3532 -0.122157 19.1454 0.366471 19.6336C0.610786 19.8775 0.930979 19.9997 1.25076 19.9997C1.57053 19.9997 1.89073 19.8775 2.13504 19.6332L10.0002 11.7684L17.865 19.6332C18.1093 19.8775 18.4295 19.9997 18.7492 19.9997C19.069 19.9997 19.3892 19.8775 19.6335 19.6332C20.1222 19.145 20.1222 18.3528 19.6335 17.8646L11.7688 10.0003Z"
                               fill="white"/>
@@ -102,13 +102,14 @@
                 <div class="text-5">Add Glossary</div>
                 <div class="bg-gray-100 w-full py-5 px-46.75 rounded-md">
                     <div id="uploadButtons" class="flex flex-col gap-2.5">
-                        <button id="uploadButton" class="w-full bg-green-700 text-white py-2.5 rounded font-semibold">
+                        <button type="button" id="uploadButton"
+                                class="w-full bg-green-700 text-white py-2.5 rounded font-semibold">
                             Upload file
                         </button>
                         <div id="fileInfo"
                              class="hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-200 text-green-700 w-full">
                             <span id="fileName"></span>
-                            <button class="remove-file">
+                            <button type="button" class="remove-file">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                      xmlns="http://www.w3.org/2000/svg">
                                     <g clip-path="url(#clip0_759_4082)">
@@ -125,7 +126,7 @@
                                 </svg>
                             </button>
                         </div>
-                        <button id="downloadSample"
+                        <button type="button" id="downloadSample"
                                 class="w-full bg-white text-green-700 bg-green-700 py-2.5 rounded border border-green-700 font-semibold">
                             Download sample
                         </button>
@@ -135,7 +136,8 @@
                 <span class="text-3.5 text-gray-600 text-center">
                     The glossary function is based on the GPT. The number of tokens used for editing terminology can be found in the Usage History section.
                 </span>
-                <button id="continueButton" class="bg-gray-800 px-6.5 py-2.5 rounded font-semibold text-4 text-white">
+                <button type="button" id="continueButton"
+                        class="bg-gray-800 px-6.5 py-2.5 rounded font-semibold text-4 text-white">
                     Continue
                 </button>
             </div>

@@ -119,6 +119,7 @@ $(document).ready(function () {
             currentStep--;
             showStep(currentStep);
             $("#next-step").removeClass('border-gray-300 text-gray-300 pointer-events-none').addClass('border-green-700 text-green-700').prop("disabled", false);
+            $('.step-container').removeClass('bg-red-100 border-red-200');
         }
     });
 
@@ -130,6 +131,8 @@ $(document).ready(function () {
         selectedSubDomain = '';
         selectedGlossaryType = 'default';
         selectedGlossary = null;
+        $('.target-select-language').val('');
+        $('.projects tbody').empty();
         selectedFiles = [];
         $fileList.empty().addClass('hidden');
         showStep(currentStep);
@@ -221,7 +224,7 @@ $(document).ready(function () {
             const $fileItem = $(`
             <div class="file flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700" data-file-id="${fileId}">
                 <span>${file.name}</span>
-                <button class="remove-file" data-file-id="${fileId}">
+                <button type="button" class="remove-file" data-file-id="${fileId}">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g clip-path="url(#clip0_759_4082)">
                             <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z" fill="#176C77"/>
@@ -318,7 +321,7 @@ $(document).ready(function () {
             <div class="flex gap-5 items-center" data-file-id="${file.fileId}">
                 <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">
                     <span class="text-3.5 w-50 truncate">${file.file_name}</span>
-                    <button class="remove-detected-file" data-file-id="${file.fileId}">
+                    <button type="button" class="remove-detected-file" data-file-id="${file.fileId}">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clip-path="url(#clip0_759_4082)">
                                 <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z" fill="#176C77"/>
@@ -395,7 +398,11 @@ $(document).ready(function () {
         sourceSelects.each(function () {
             if ($(this).val() !== firstValue) {
                 isConsistent = false;
+                $('.step-container').addClass('bg-red-100 border-red-200');
                 return false;
+            } else {
+                $('.step-container').removeClass('bg-red-100 border-red-200');
+
             }
         });
 
@@ -748,15 +755,237 @@ $(document).ready(function () {
         });
     };
 
-    const startStatusCheck = (projectIds) => {
+    const $modalRevision = $('#modal-revision');
+    const $closeRevision = $('#close-revision');
 
+    function updateProjectTable(projects) {
+        const tableBody = $('.projects tbody');
+        tableBody.empty(); // Clear existing rows
+
+        projects.forEach(project => {
+            const row = $('<tr></tr>');
+
+            // File name column
+            row.append(`
+            <td>
+                <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">
+                    ${project.source_file_name}
+                </div>
+            </td>
+        `);
+
+            // Status column
+            const statusColumn = $('<td></td>');
+            const statusSpan = $('<span class="rounded-md py-1.5 px-2.5 text-3.25"></span>');
+
+            switch (project.status) {
+                case 'Being translated':
+                    statusSpan.text('Processing...');
+                    statusSpan.addClass('text-green-700');
+                    break;
+                case 'Translated':
+                    statusSpan.text('Translated');
+                    statusSpan.addClass('bg-gray-200 text-gray-800');
+                    break;
+                case 'Sent to post-editing, not accepted yet':
+                    statusSpan.text('Request for post-editing sent');
+                    statusSpan.addClass('bg-yellow-100 text-yellow-400');
+                    break;
+                case 'Sent to post-editing, accepted':
+                    statusSpan.text('Request for post-editing accepted');
+                    statusSpan.addClass('bg-blue-100 text-blue-400');
+                    break;
+                case 'Post-edited file uploaded':
+                    statusSpan.text('Post-edited file uploaded');
+                    statusSpan.addClass('bg-green-200 text-green-700');
+                    break;
+                case 'Error':
+                    statusSpan.text('Error');
+                    statusSpan.addClass('bg-red-100 text-red-400');
+                    break;
+                default:
+                    statusSpan.text(project.status);
+                    statusSpan.addClass('bg-gray-200 text-gray-800');
+                    break;
+            }
+            statusColumn.append(statusSpan);
+            row.append(statusColumn);
+
+            const downloadColumn = $('<td></td>');
+            const downloadButton = $(`
+            <button type=button class="flex gap-2.5 items-center text-green-700 download-file">
+                <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_759_2185)">
+                        <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z" fill="#176C77"/>
+                        <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z" fill="#176C77"/>
+                    </g>
+                    <defs>
+                        <clipPath id="clip0_759_2185">
+                            <rect width="16" height="16" fill="white" transform="translate(0.333984)"/>
+                        </clipPath>
+                    </defs>
+                </svg>
+                Download
+            </button>
+        `);
+            downloadButton.attr('data-translated-file', project.translated_file);
+            if (project.reviewed_file) {
+                downloadButton.attr('data-reviewed-file', project.reviewed_file);
+            }
+            downloadColumn.append(downloadButton);
+            row.append(downloadColumn);
+
+            const revisionColumn = $('<td class="flex justify-end"></td>');
+            const revisionButton = $(`
+            <button
+                type="button"
+                data-translated-file="${project.translated_file}"
+                data-id="${project.id}"
+                class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3 text-3.25 expert-revision"
+                ${project.status !== 'Translated' ? 'disabled' : ''}
+            >
+                Expert revision
+                <div class="relative group">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z" fill="currentColor"/>
+                    </svg>
+                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 py-3 px-4.5 bg-gray-800 text-white text-2.75 rounded-md bottom-26 left-1/2 transform -translate-x-1/2 translate-y-full">
+                        <span class="text-justify text-wrap block">
+                            Click the button to see options for improving the quality of the translated file.
+                        </span>
+                        <div class="absolute w-3 h-3 bg-gray-800 transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5"></div>
+                    </div>
+                </div>
+            </button>
+        `);
+            revisionColumn.append(revisionButton);
+            row.append(revisionColumn);
+
+            tableBody.append(row);
+        });
+
+        initializeDownloadButtons();
+        initializeRevisionButtons();
+    }
+
+
+    function initializeDownloadButtons() {
+        $('.download-file').off('click').on('click', function(e) {
+            e.preventDefault();
+            const $button = $(this);
+            const translatedFile = $button.data('translated-file');
+            const reviewedFile = $button.data('reviewed-file');
+
+            if (reviewedFile) {
+                const $tooltip = $(`
+                <div class="download-tooltip absolute z-10 bg-white rounded-md shadow-lg p-2 mt-2 right-0">
+                    <button type="button" class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap" data-file-url="${translatedFile}">
+                        Translated
+                    </button>
+                    <button type="button" class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap" data-file-url="${reviewedFile}">
+                        Post-edited
+                    </button>
+                </div>
+            `);
+                $button.parent().append($tooltip);
+
+                $(document).one('click', function closeTooltip(e) {
+                    if (!$(e.target).closest('.download-tooltip').length && !$(e.target).closest('.download-file').length) {
+                        $tooltip.remove();
+                    } else {
+                        $(document).one('click', closeTooltip);
+                    }
+                });
+            } else if (translatedFile) {
+                window.location.href = translatedFile;
+            }
+        });
+
+        $(document).on('click', '.download-file-option', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const fileUrl = $(this).data('file-url');
+            if (fileUrl) {
+                window.location.href = fileUrl;
+            }
+        });
+    }
+
+    function initializeRevisionButtons() {
+        $('.expert-revision').off('click').on('click', function() {
+            if ($(this).prop('disabled')) return;
+
+            const button = $(this);
+            const translatedFile = button.data('translated-file');
+            const id = button.data('id');
+
+            $('.expert-revision', $modalRevision)
+                .data('translated-file', translatedFile)
+                .data('id', id);
+
+            $modalRevision.removeClass('hidden');
+            $closeRevision.removeClass('hidden');
+        });
+    }
+
+
+    $('#close-revision').on('click', function() {
+        $modalRevision.addClass('hidden');
+        $closeRevision.addClass('hidden');
+    });
+
+    $(window).on('click', function(event) {
+        if (event.target == $modalRevision[0]) {
+            $modalRevision.addClass('hidden');
+            $closeRevision.addClass('hidden');
+        }
+    });
+
+    $modalRevision.on('click', '.expert-revision', function() {
+        const translatedFile = $(this).data('translated-file');
+        const id = $(this).data('id');
+
+        let formData = new FormData();
+        formData.append('file_url', translatedFile);
+        formData.append('project_id', id);
+
+        $.ajax({
+            type: 'POST',
+            url: expert_revision_file,
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Accept': 'application/json',
+            },
+            dataType: 'json',
+            success: function (response) {
+                // Update the project status in the table
+                const projectRow = $(`button[data-id="${id}"]`).closest('tr');
+                const statusSpan = projectRow.find('td:eq(1) span');
+                statusSpan.text('Request for post-editing sent');
+                statusSpan.removeClass().addClass('rounded-md py-1.5 px-2.5 text-3.25 bg-yellow-100 text-yellow-400');
+
+                // Disable the revision button
+                projectRow.find('.expert-revision').prop('disabled', true).addClass('disabled:pointer-events-none disabled:text-gray-300 disabled:border-gray-300');
+
+                $modalRevision.addClass('hidden');
+                $closeRevision.addClass('hidden');
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+    });
+
+    const startStatusCheck = (projectIds) => {
         const checkDocumentStatus = () => {
             let params = new URLSearchParams();
-
             projectIds.forEach(projectId => {
                 params.append('project_id[]', projectId);
             });
-
             let url = '/project/?' + params.toString();
 
             $.ajax({
@@ -768,19 +997,12 @@ $(document).ready(function () {
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRFToken': getCookie('csrftoken'),
                 },
-                success: function (response) {
+                success: function(response) {
+                    updateProjectTable(response); // Update the table with new data
 
                     let allCompleted = response.every(project => project.status !== "Being translated");
-
                     if (allCompleted) {
                         clearInterval(checkInterval);
-                        response.forEach(project => {
-                            console.log(`Project ${project.id}: Status - ${project.status}`);
-                        });
-                    } else {
-                        response.forEach(project => {
-                            console.log(`Project ${project.id}: Status - ${project.status}`);
-                        });
                     }
 
                     let errorsPresent = response.some(project => project.status === "Error");
@@ -788,14 +1010,14 @@ $(document).ready(function () {
                         console.error('Errors occurred during translation for some documents');
                     }
                 },
-                error: function (xhr, status, error) {
+                error: function(xhr, status, error) {
                     console.error('Error checking document status:', error);
                 }
             });
         };
 
         checkDocumentStatus();
-
         const checkInterval = setInterval(checkDocumentStatus, 10000);
     };
+
 });

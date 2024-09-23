@@ -54,6 +54,7 @@
                 </td>
                 <td>
                     <button
+                            type="button"
                             data-translated-file="{{ project.translated_file }}"
                             data-id="{{ project.id }}"
                             class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-300 disabled:border-gray-300 expert-revision"
@@ -81,7 +82,7 @@
                 <td>
                     <div class="flex gap-5 items-center justify-end">
                         <div class="relative">
-                            <button class="download-file"
+                            <button type="button" class="download-file"
                                     data-translated-file="{{ project.translated_file }}"
                                     {% if project.reviewed_file %}data-reviewed-file="{{ project.reviewed_file }}"{% endif %}>
                                 <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -91,16 +92,16 @@
                             </button>
                             {% if project.reviewed_file and project.translated_file %}
                             <div class="download-tooltip hidden absolute z-10 bg-white rounded-md shadow-lg p-2 mt-2 right-0">
-                                <button class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap" data-file-url="{{ project.translated_file }}">
+                                <button type="button" class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap" data-file-url="{{ project.translated_file }}">
                                     Translated
                                 </button>
-                                <button class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap" data-file-url="{{ project.reviewed_file }}">
+                                <button type="button" class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap" data-file-url="{{ project.reviewed_file }}">
                                     Post-edited
                                 </button>
                             </div>
                             {% endif %}
                         </div>
-                        <button class="delete-project" data-project-id="{{ project.id }}">
+                        <button type="button" class="delete-project" data-project-id="{{ project.id }}">
                             <div class="relative group">
                                 <svg width="17" height="16" viewBox="0 0 17 16" fill="none"
                                      xmlns="http://www.w3.org/2000/svg">
@@ -144,7 +145,7 @@
          class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
         <div class="relative bg-white rounded-lg shadow-xl max-w-172.5 w-full mx-4">
             <div class="absolute -top-4.5 -right-4.5 -mr-4 -mt-4 z-10">
-                <button id="closeIcon" class="p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
+                <button type="button" id="closeIcon" class="p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M11.7688 10.0003L19.6335 2.13553C20.1222 1.64732 20.1222 0.855171 19.6335 0.36696C19.1449 -0.121669 18.3536 -0.121669 17.865 0.36696L10.0002 8.23171L2.13504 0.36696C1.64641 -0.121669 0.8551 -0.121669 0.366471 0.36696C-0.122157 0.855171 -0.122157 1.64732 0.366471 2.13553L8.23164 10.0003L0.366471 17.865C-0.122157 18.3532 -0.122157 19.1454 0.366471 19.6336C0.610786 19.8775 0.930979 19.9997 1.25076 19.9997C1.57053 19.9997 1.89073 19.8775 2.13504 19.6332L10.0002 11.7684L17.865 19.6332C18.1093 19.8775 18.4295 19.9997 18.7492 19.9997C19.069 19.9997 19.3892 19.8775 19.6335 19.6332C20.1222 19.145 20.1222 18.3528 19.6335 17.8646L11.7688 10.0003Z"
                               fill="white"/>
@@ -156,6 +157,7 @@
                 <div class="text-5 font-semibold">Quote for revision</div>
                 <span class="text-center text-3.5">By choosing the options below, you agree that you are sending a request for Quote  of the selected service to Legal230</span>
                 <button
+                        type="button"
                         data-translated-file="{{ project.translated_file }}"
                         data-id="{{ project.id }}"
                         class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-300 disabled:border-gray-300 expert-revision">
