@@ -390,6 +390,8 @@ $(document).ready(function () {
         let firstValue = sourceSelects.first().val();
         let targetValue = targetSelect.val();
 
+        sourceLanguage = firstValue;
+
         sourceSelects.each(function () {
             if ($(this).val() !== firstValue) {
                 isConsistent = false;
@@ -403,7 +405,7 @@ $(document).ready(function () {
             nextButton.removeClass('border-green-700 text-white text-green-700')
                 .addClass('border-gray-300 text-gray-300 pointer-events-none')
                 .prop("disabled", true);
-
+            ;
         } else {
             nextButton.removeClass('border-gray-300 text-gray-300 pointer-events-none')
                 .addClass('border-green-700 text-green-700')
