@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import GetUserStatsView
+from .views import UsageView
 from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
-    path('list/', login_required(GetUserStatsView.as_view()), name='list'),
+    path('', login_required(UsageView.as_view()), name='usage'),
 ]

@@ -409,31 +409,31 @@
                 </tr>
             </thead>
             <tbody>
-                {% for project in projects.results %}
+                {% for stat in stats.results %}
                 <tr>
                     <td class="text-3.25 text-gray-800">
-                        {{ project.user }}
+                        {{ stats.user }}
                     </td>
                     <td class="text-3.25 text-gray-800">
-                        {{ project.user__group }}
+                        {{ stat.user__group }}
                     </td>
                     <td>
                         <div class="flex gap-1 text-4 items-center text-green-700">
-                            {{ project.file_name }}
+                            {{ stat.file_name }}
                         </div>
                     </td>
                     <td>
                         <div class="text-3.25 text-green-700">
-                            {{ project.chars }}
+                            {{ stat.chars_count }}
                         </div>
                     </td>
                     <td>
                         <div class="text-3.25 text-green-700">
-                            {{ project.token }}
+                            {{ stat.tokens_count }}
                         </div>
                     </td>
                     <td class="text-3.25 text-gray-800">
-                        {{ project.created_at }}
+                        {{ stat.created_at }}
                     </td>
                 </tr>
                 {% endfor %}
@@ -471,10 +471,10 @@
 
         <div
             class="flex items-center space-x-4 text-3.25 border rounded-md border-gray-300 p-2 text-sm font-montserrat">
-            <div class="text-green-500">1500</div>
+            <div class="text-green-500">{{ stats.total_count.chars }}</div>
             <div class="text-gray-800">characters</div>
             <span>|</span>
-            <div class="text-green-500">1500</div>
+            <div class="text-green-500">{{ stats.total_count.tokens }}</div>
             <div class="text-gray-800">tokens</div>
         </div>
     </div>
