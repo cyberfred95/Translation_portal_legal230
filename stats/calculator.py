@@ -3,7 +3,6 @@ import os
 from django.conf import settings
 import requests
 from preferences import preferences
-from .helpers import get_template
 
 
 class StatsProcessor:
