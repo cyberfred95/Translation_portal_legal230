@@ -274,11 +274,13 @@ class LanguageDetectView(APIView):
             tmp_language = langdetect.detect(text)
             language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
                 'abbreviation', flat=True).first()
+            if not language:
+                language = Language.objects.all().first()
 
             result.append(
                 {
                     "file_name": f'{file.name}',
-                    "abbreviation": language.upper() if language else None
+                    "abbreviation": language.upper()
                 }
             )
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
