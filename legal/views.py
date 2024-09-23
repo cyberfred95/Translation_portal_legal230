@@ -25,7 +25,6 @@ from gpt_processing.prompts_list import prompts_list
 from stats.calculator import StatsProcessor
 import langdetect
 from .tasks import send_statistic_request
-from languages.serializers import LanguageSerializer
 
 PAGINATION_PAGE_SIZE = 20
 PORTAL_API_KEY = ""
@@ -33,15 +32,18 @@ PORTAL_API_KEY = ""
 
 def text_translation(request):
     text = request.POST.get('text')
-    print(request.POST)
+    api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
     response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translate", data={
         "text": [text],
         **get_translate_data(request),
     }, headers={
-        "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+        "token": api_key})
     send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('domain_name'))
-    send_statistic_request.delay(response.json().get('translated_text'), request.user.uuid,
-                                 request.POST.get('domain_name'))
+    send_statistic_request.delay(
+        api_key, response.json().get('translated_text'),
+        request.user.uuid,
+        **get_translate_data(request)
+    )
     return response.json()
 
 
@@ -232,7 +234,8 @@ class ProjectsHistoryView(TemplateView):
             context['projects'] = response
 
         return context
-    
+
+
 class UsageHistoryView(TemplateView):
     template_name = 'usage_history.html'
 
