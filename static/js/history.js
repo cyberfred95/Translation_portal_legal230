@@ -1,203 +1,182 @@
-document.addEventListener('DOMContentLoaded', function () {
-    let errorPopup = '#error_popup';
-    let successPopup = '#success_modal'
-
-    var downloadButtons = document.querySelectorAll('.download-files');
-    var expertRevision = document.querySelectorAll('.expert-revision');
-    console.log(expertRevision);
-
-    function errorHandler() {
-        $('<a href=' + errorPopup + '></a>').fancybox({
-            arrows: false,
-            padding: 0,
-            overlay: {
-                locked: false
-            },
-            afterClose: function () {
-                location.reload()
-            },
-        }).click()
-    }
-
-    function successHandler() {
-        $('<a href=' + successPopup + '></a>').fancybox({
-            arrows: false,
-            padding: 0,
-            overlay: {
-                locked: false
-            },
-            afterClose: function () {
-                location.reload()
-            },
-        }).click()
-    }
-
-    expertRevision.forEach(function (button) {
-        button.addEventListener('click', function () {
-            var url = this.getAttribute('data-url');
-            var id = this.getAttribute('data-id');
-            console.log('url', url);
-            console.log('id', id);
-            let formData = new FormData();
-            formData.append('file_url', url);
-            formData.append('project_id', id);
-
-            $('.translate__file-block').hide();
-            $('.output-type').hide();
-            $('.translate__file-block.trans-progress').css('display', 'flex')
-
-            $.ajax({
-                type: 'POST',
-                url: expert_revision_file_url,
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'Accept': 'application/json',
-                },
-                dataType: 'json',
-                success: function () {
-                    successHandler();
-                },
-                error: function (xhr, status, error) {
-                    errorHandler(error);
-                }
-            });
-        });
-    });
-
-    downloadButtons.forEach(function (button) {
-        button.addEventListener('click', function () {
-            var url = this.getAttribute('data-url');
-            if (url) {
-                var a = document.createElement('A');
-                a.href = url;
-                a.download = url.substr(url.lastIndexOf('/') + 1);
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            }
-        });
-    });
-
-    var statusSpans = document.querySelectorAll('.status');
-    statusSpans.forEach(function (span) {
-        var status = span.getAttribute('data-project-status');
-        switch (status) {
+$(document).ready(function () {
+    $('td').each(function () {
+        var statusElement = $(this).find('.status');
+        var statusText = statusElement.text().trim();
+        switch (statusText) {
             case 'Being translated':
-                span.classList.add('being-translated');
-                span.innerHTML = current_language === 'fr' ? 'En cours de traduction' : 'Being translated';
+                statusElement.text('Being translated');
+                statusElement.addClass('bg-gray-200 text-gray-800');
                 break;
             case 'Translated':
-                span.classList.add('translated');
-                span.innerHTML = current_language === 'fr' ? 'Traduit' : 'Translated';
+                statusElement.text('Translated');
+                statusElement.addClass('bg-gray-200 text-gray-800');
                 break;
             case 'Sent to post-editing, not accepted yet':
-                span.classList.add('sent-to-post-editing-not-accepted');
-                span.innerHTML = current_language === 'fr' ? 'Demande de post-édition envoyée' : 'Request for post-editing sent';
-                break
+                statusElement.text('Request for post-editing sent');
+                statusElement.addClass('bg-yellow-100 text-yellow-400');
+                break;
             case 'Sent to post-editing, accepted':
-                span.classList.add('sent-to-post-editing-accepted');
-                span.innerHTML = current_language === 'fr' ? 'Demande de post-édition acceptée' : 'Request for post-editing accepted';
-                break
+                statusElement.text('Request for post-editing accepted');
+                statusElement.addClass('bg-blue-100 text-blue-400');
+                break;
             case 'Post-edited file uploaded':
-                span.classList.add('post-edited');
-                span.innerHTML = current_language === 'fr' ? ' Document post-édité' : 'Post-edited file uploaded';
-                break
+                statusElement.text('Post-edited file uploaded');
+                statusElement.addClass('bg-green-200 text-green-700');
+                break;
             case 'Error':
-                span.classList.add('error');
-                span.innerHTML = current_language === 'fr' ? 'Oups ! Erreur' : 'Error';
+                statusElement.text('Error');
+                statusElement.addClass('bg-red-100 text-red-400');
+                break;
+            default:
                 break;
         }
     });
 
-    function formatProjectDate(isoDate) {
-        var date = new Date(isoDate);
-        var day = ('0' + date.getDate()).slice(-2);
-        var month = ('0' + (date.getMonth() + 1)).slice(-2);
-        var year = date.getFullYear().toString().slice(-2);
-        return day + '/' + month + '/' + year;
-    }
+    $('td.created-at').each(function () {
+        var dateString = $(this).text().trim();
+        var date = new Date(dateString);
 
-    var dateElements = document.querySelectorAll('.date');
+        if (!isNaN(date.getTime())) {
+            var day = ('0' + date.getDate()).slice(-2);
+            var month = ('0' + (date.getMonth() + 1)).slice(-2);
+            var year = date.getFullYear();
 
-    dateElements.forEach(function (el) {
-        var date = el.textContent.trim();
-        el.textContent = formatProjectDate(date);
+            var formattedDate = day + '/' + month + '/' + year;
+
+            $(this).text(formattedDate);
+        }
     });
 
-    const selectBoxes = document.querySelectorAll(".select-box");
+    const $modal = $('#modal');
+    const $closeIcon = $('#closeIcon');
 
-    selectBoxes.forEach(function (box) {
-        const optionsContainer = box.querySelector(".options-container");
-        const options = optionsContainer.querySelectorAll(".option");
+    $('table').on('click', '.expert-revision', function () {
+        const button = $(this);
+        const translatedFile = button.data('translated-file');
+        const id = button.data('id');
 
-        options.forEach(function (option) {
-            option.addEventListener("click", function () {
-                optionsContainer.classList.remove("active");
-            });
-        });
+        $modal.data('translatedFile', translatedFile);
+        $modal.data('projectId', id);
+
+        $modal.removeClass('hidden');
+        $closeIcon.removeClass('hidden');
     });
 
-    document.addEventListener('click', function (e) {
-        selectBoxes.forEach(function (box) {
-            const optionsContainer = box.querySelector(".options-container");
-            if (!box.contains(e.target)) {
-                optionsContainer.classList.remove("active");
-            }
-        });
+    $('#closeIcon').on('click', function () {
+        $modal.addClass('hidden');
+        $closeIcon.addClass('hidden');
     });
 
-    document.querySelectorAll('.delete-button').forEach(function (button) {
-        button.addEventListener('click', function () {
-            var projectId = this.getAttribute('data-project-id');
-            document.querySelector('.approve-delete').setAttribute('data-project-id', projectId);
-            var modal = document.querySelector('.delete-modal');
-            modal.style.display = 'block';
-        });
+    $(window).on('click', function (event) {
+        if (event.target == $modal[0]) {
+            $modal.addClass('hidden');
+            $closeIcon.addClass('hidden');
+        }
     });
 
-    document.querySelectorAll('.cancel-delete').forEach(function (button) {
-        button.addEventListener('click', closeModal);
-    });
+    $modal.on('click', '.expert-revision', function () {
+        const translatedFile = $modal.data('translatedFile');
+        const id = $modal.data('projectId');
 
-    document.querySelectorAll('.approve-delete').forEach(function (button) {
-        button.addEventListener('click', function () {
-            var projectId = this.getAttribute('data-project-id');
-            sendDeleteRequest(projectId);
-        });
-    });
+        let formData = new FormData();
+        formData.append('file_url', translatedFile);
+        formData.append('project_id', id);
 
-    document.querySelectorAll('.close').forEach(function (button) {
-        button.addEventListener('click', closeModal);
-    });
-
-    function closeModal() {
-        var modal = document.querySelector('.delete-modal');
-        modal.style.display = 'none';
-    }
-
-    function sendDeleteRequest(projectId) {
-        var formData = new FormData();
-        formData.append('project_id', projectId);
-
-        fetch('/project', {
-            method: 'DELETE',
-            body: formData,
+        $.ajax({
+            type: 'POST',
+            url: expert_revision_file_url,
+            data: formData,
+            processData: false,
+            contentType: false,
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken')
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Accept': 'application/json',
+            },
+            dataType: 'json',
+            success: function () {
+                window.location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', error);
             }
-        })
-            .then(response => {
-                if (response.ok) {
-                    location.reload();
+        });
+
+        $modal.addClass('hidden');
+        $closeIcon.addClass('hidden');
+    });
+
+    $(document).on('click', '.delete-project', function () {
+        $('.tooltip').addClass('opacity-0 invisible').removeClass('opacity-100 visible');
+        $(this).find('.tooltip').removeClass('opacity-0 invisible').addClass('opacity-100 visible');
+    });
+
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.delete-project').length) {
+            $('.tooltip').addClass('opacity-0 invisible').removeClass('opacity-100 visible');
+        }
+    });
+
+    $(document).on('click', '.allow-delete', function () {
+        const $deleteButton = $(this).closest('.delete-project');
+        const projectId = $deleteButton.data('project-id');
+        if (!projectId) {
+            console.error('Project ID not found');
+            return;
+        }
+        const formData = new FormData();
+        formData.append('project_id', projectId);
+        $.ajax({
+            url: single_project,
+            type: 'DELETE',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            success: function (response) {
+                $deleteButton.closest('tr').remove();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+    });
+
+    $(document).on('click', '.cancel-delete', function (e) {
+        e.stopPropagation();
+        $(this).closest('.tooltip').addClass('opacity-0 invisible').removeClass('opacity-100 visible');
+    });
+
+    $('.download-file').on('click', function(e) {
+        e.preventDefault();
+        const $button = $(this);
+        const translatedFile = $button.data('translated-file');
+        const reviewedFile = $button.data('reviewed-file');
+
+        if (reviewedFile) {
+            const $tooltip = $button.siblings('.download-tooltip');
+            $tooltip.toggleClass('hidden');
+
+            $(document).one('click', function closeTooltip(e) {
+                if (!$(e.target).closest('.download-tooltip').length && !$(e.target).closest('.download-file').length) {
+                    $tooltip.addClass('hidden');
+                } else {
+                    $(document).one('click', closeTooltip);
                 }
-            })
-            .catch(error => {
-                errorHandler()
             });
-    }
+        } else if (translatedFile) {
+            window.location.href = translatedFile;
+        }
+    });
+
+    $(document).on('click', '.download-file-option', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const fileUrl = $(this).data('file-url');
+        if (fileUrl) {
+            window.location.href = fileUrl;
+        }
+    });
 });

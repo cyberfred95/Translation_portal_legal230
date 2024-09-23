@@ -9,8 +9,6 @@ from django.views.generic import TemplateView
 from django.http import JsonResponse, HttpResponseBadRequest
 import django
 from rest_framework.views import APIView
-
-from stats.models import UserStats
 from .helpers import get_translate_data
 
 from domains.models import Domain
@@ -24,28 +22,35 @@ from django.views.decorators.csrf import csrf_exempt
 import requests
 from preferences import preferences
 from gpt_processing.prompts_list import prompts_list
-from stats.calculator import StatsCalculator
+from stats.calculator import StatsProcessor
 import langdetect
+from .tasks import send_statistic_request
+from languages.serializers import LanguageSerializer
 
 PAGINATION_PAGE_SIZE = 30
+PORTAL_API_KEY = ""
 
 
 def text_translation(request):
     text = request.POST.get('text')
+    print(request.POST)
     response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translate", data={
         "text": [text],
         **get_translate_data(request),
     }, headers={
         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-    send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('translation_name'))
-    # statistic = UserStats.objects.create(user=request.user, chars=len(text))
+    send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('domain_name'))
+    # send_statistic_request.delay(response.json().get('translated_text'), request.user.uuid,
+    #                              request.POST.get('domain_name'))
+    print(response.text)
     return response.json()
 
 
 def file_translate(request):
-    data = {**get_translate_data(request),
-            "user_custom_mt_token": request.user.uuid,
-            "source_language": request.POST.get('source_language')}
+    data = {
+        "user_custom_mt_token": request.user.uuid,
+        **get_translate_data(request),
+    }
     projects = []
     files = request.FILES.getlist('document[]', [])
     for file in files:
@@ -74,7 +79,6 @@ def file_translate(request):
                               translation_name=request.POST.get('translation_name'),
                               file_name=project['file_name'],
                               file_ext=project['file_extension'])
-    # StatsCalculator().calculate_statistics(files=files, user=request.user)
     return {"project_ids": [project.get('id') for project in projects]}
 
 
@@ -153,6 +157,8 @@ class GetDomainsView(APIView):
         for domain in domains.json():
             domain_names.append(domain['domain_name'])
         domains = Domain.objects.filter(name__in=domain_names)
+        if self.request.query_params.get('domain_group'):
+            domains = domains.filter(domain_group__name=self.request.query_params.get('domain_group'))
 
         if request.LANGUAGE_CODE == 'en':
             domain_names = domains.values_list('name', flat=True)
@@ -259,12 +265,20 @@ class SingleProjectView(APIView):
 
 class LanguageDetectView(APIView):
 
-    def get(self, request):
+    def post(self, request):
         files = request.FILES.getlist('document[]', [])
-        result = {}
+        result = []
         for file in files:
-            text = StatsCalculator().get_texts(file=file)['texts'][0]['text']
+            text = StatsProcessor().get_texts(file=file)['texts'][0]['text']
+            print(text)
             tmp_language = langdetect.detect(text)
-            language = Language.objects.filter(abbreviation__iexact=tmp_language).first()
-            result[f'{file.name}'] = language.french_name if request.LANGUAGE_CODE != 'fr' else language.name
+            language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
+                'abbreviation', flat=True).first()
+
+            result.append(
+                {
+                    "file_name": f'{file.name}',
+                    "abbreviation": language.upper() if language else None
+                }
+            )
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)

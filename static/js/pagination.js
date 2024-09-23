@@ -1,136 +1,67 @@
-document.addEventListener('DOMContentLoaded', function () {
-
-    var pagination = document.querySelector('.pagination');
-    var arrowsPagination = document.querySelectorAll('.page-arrow');
-
-    var totalPages = parseInt(pagination.getAttribute('data-value'), 10);
-    var currentPage = getCurrentPage();
-
-    var maxPagesToShow = 3;
-
-    createPageNumber(currentPage);
-
-    function getCurrentPage() {
-        var urlParams = new URLSearchParams(window.location.search);
-        return parseInt(urlParams.get('page')) || 1;
-    }
-
-    arrowsPagination.forEach((arrow) => {
-        arrow.addEventListener('click', function () {
-            var direction = arrow.getAttribute('data-direction');
-            if (direction === 'next' && currentPage < totalPages) {
-                currentPage += 1;
-            } else if (direction === 'previous' && currentPage !== 1) {
-                currentPage -= 1;
-            } else if (direction === 'end') {
-                currentPage = totalPages;
-            } else if (direction === 'start') {
-                currentPage = 1;
-            }
-
-            updatePagination();
-            window.location.href = '/project-history/?page=' + currentPage + '#tabs-4';
-        });
-
-    });
-
-
-    var numbersContainer = document.createElement('div');
-    numbersContainer.className = 'numbers-container';
-
-    function createPageNumber(pageNum) {
-        var pageNumber = document.createElement('div');
-        pageNumber.className = 'page-number' + (pageNum === currentPage ? ' active' : '');
-        pageNumber.textContent = pageNum;
-
-        pageNumber.addEventListener('click', function () {
-            document.querySelectorAll('.page-number').forEach(function (page) {
-                page.classList.remove('active');
-            });
-
-            pageNumber.classList.add('active');
-
-            window.location.href = '/project-history/?page=' + pageNum + '#tabs-4';
-        });
-
-        return pageNumber;
-    }
+$(document).ready(function () {
+    var $pagination = $('.pagination');
+    var totalItems = parseInt($pagination.data('total-items'));
+    var itemsPerPage = parseInt($pagination.data('items-per-page'));
+    var currentPage = parseInt($pagination.data('current-page'));
+    var totalPages = Math.ceil(totalItems / itemsPerPage);
 
     function updatePagination() {
+        var $pageNumbers = $('#page-numbers');
+        $pageNumbers.empty();
 
-        if (totalPages < 7) {
+        var startPage = Math.max(1, currentPage - 2);
+        var endPage = Math.min(totalPages, startPage + 4);
 
-            document.querySelectorAll('.page-number').forEach(function (page) {
-                page.classList.remove('active');
-            });
-
-            var startPage = Math.max(Math.min(currentPage, totalPages - maxPagesToShow + 1), 1);
-            var endPage = Math.min(startPage + maxPagesToShow - 1, totalPages);
-
-            numbersContainer.innerHTML = '';
-
-            for (var i = startPage; i <= endPage; i++) {
-                numbersContainer.appendChild(createPageNumber(i));
+        if (startPage > 1) {
+            $pageNumbers.append('<a href="#" class="page-number text-gray-300">1</a>');
+            if (startPage > 2) {
+                $pageNumbers.append('<span class="text-gray-300">...</span>');
             }
-        } else {
-            numbersContainer.innerHTML = ''; // Очищаємо попередні номери сторінок
-
-            for (var i = 1; i <= 3; i++) {
-                numbersContainer.appendChild(createPageNumber(i));
-            }
-
-            if (currentPage > 4) {
-                numbersContainer.appendChild(createEllipsis());
-            }
-
-            var startPage = Math.max(currentPage - 1, 4);
-            var endPage = Math.min(currentPage + 1, totalPages - 3);
-
-            for (var i = startPage; i <= endPage; i++) {
-                numbersContainer.appendChild(createPageNumber(i));
-            }
-
-            if (currentPage < totalPages - 3) {
-                numbersContainer.appendChild(createEllipsis());
-            }
-
-            for (var i = totalPages - 2; i <= totalPages; i++) {
-                numbersContainer.appendChild(createPageNumber(i));
-            }
-
-            var previousArrow = pagination.querySelector('.page-arrow[data-direction="previous"]');
-            pagination.insertBefore(numbersContainer, previousArrow.nextSibling);
         }
-    }
-
-    function createEllipsis() {
-        var ellipsis = document.createElement('div');
-        ellipsis.className = 'page-dots';
-        ellipsis.textContent = '...';
-        return ellipsis;
-    }
-
-    updatePagination(); // Перший виклик для ініціалізації пагінації
-
-    if (totalPages > maxPagesToShow) {
-        var startPage = Math.max(currentPage - 2, 1);
-        var endPage = Math.min(startPage + maxPagesToShow - 1, totalPages);
 
         for (var i = startPage; i <= endPage; i++) {
-            numbersContainer.appendChild(createPageNumber(i));
+            if (i === currentPage) {
+                $pageNumbers.append('<span class="current-page text-gray-800 rounded">' + i + '</span>');
+            } else {
+                $pageNumbers.append('<a href="#" class="page-number text-gray-300">' + i + '</a>');
+            }
         }
-    } else {
-        for (var i = 1; i <= totalPages; i++) {
-            numbersContainer.appendChild(createPageNumber(i));
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                $pageNumbers.append('<span class="text-gray-300">...</span>');
+            }
+            $pageNumbers.append('<a href="#" class="page-number text-gray-300">' + totalPages + '</a>');
         }
+
+        $('#prev-page').toggleClass('disabled', currentPage === 1);
+        $('#next-page').toggleClass('disabled', currentPage === totalPages);
     }
 
-    if (totalPages > 1) {
-        var endArrow = pagination.querySelector('.page-arrow[data-direction="next"]');
-        pagination.insertBefore(numbersContainer, endArrow);
-
+    function loadPage(page) {
+        window.location.href = '/project-history/?page=' + page;
         updatePagination();
-    } else {
-        pagination.style.display = 'none';
     }
+
+    $(document).on('click', '.page-number', function (e) {
+        e.preventDefault();
+        var page = parseInt($(this).text());
+        loadPage(page);
+    });
+
+    $('#prev-page').click(function (e) {
+        e.preventDefault();
+        if (currentPage > 1) {
+            loadPage(currentPage - 1);
+        }
+    });
+
+    $('#next-page').click(function (e) {
+        e.preventDefault();
+        if (currentPage < totalPages) {
+            loadPage(currentPage + 1);
+        }
+    });
+
+    updatePagination();
 });
