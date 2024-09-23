@@ -1,8 +1,29 @@
-<div style="margin: 0 auto; display: table;">
-    <h2>Log In</h2>
-    <form method="post" >
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit">Log In</button>
+<!DOCTYPE html>
+{% load i18n %}
+{% load static %}
+<html lang="{{ request.LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <title>Legal230</title>
+    <!-- FONTS -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- JQUERY -->
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+            integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <!-- STYLES -->
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+</head>
+<body>
+<div class="login-container">
+    <form method="post" class="login-body">
+        <h2>Log In</h2>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Log In</button>
     </form>
 </div>
+
+<script src="{% static 'js/authorization.js' %}"></script>
+
+</body>
+</html>

@@ -5,7 +5,7 @@ from .models import MainSettings
 
 
 class MainSettingsAdmin(PreferencesAdmin):
-    exclude = ('sites',)
+    exclude = ('sites', 'algorithm')
 
 
 admin.site.register(MainSettings, MainSettingsAdmin)

@@ -6,19 +6,19 @@
     </div>
     <div class="flex gap-5 items-center font-semibold">
                 <span class="text-gray-800">
-                    vjxzebra
+                    {{ request.user.username }}
                 </span>
         <div>
-            <button>
+            <a href="/en" class="{% if request.LANGUAGE_CODE == 'en' %}text-gray-800{% else %}text-gray-400{% endif %}">
                 EN
-            </button>
+            </a>
             |
-            <button>
+            <a href="/fr" class="{% if request.LANGUAGE_CODE == 'fr' %}text-gray-800{% else %}text-gray-400{% endif %}">
                 FR
-            </button>
+            </a>
         </div>
-        <button class="bg-green-700 text-white text-4 hover:bg-gray-700 rounded-md py-2.5 px-6.5 transition duration-300 ease-in-out">
+        <a href="/accounts/logout/" class="bg-green-700 text-white text-4 hover:bg-gray-700 rounded-md py-2.5 px-6.5 transition duration-300 ease-in-out">
             Logout
-        </button>
+        </a>
     </div>
 </header>

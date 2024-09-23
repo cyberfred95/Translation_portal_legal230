@@ -1,79 +1,4 @@
 $(document).ready(function () {
-    var $pagination = $('.pagination');
-    var totalItems = parseInt($pagination.data('total-items'));
-    console.log('totalItems', totalItems)
-    var itemsPerPage = parseInt($pagination.data('items-per-page'));
-    console.log('itemsPerPage', itemsPerPage)
-    var currentPage = parseInt($pagination.data('current-page'));
-    console.log('currentPage', currentPage)
-    var totalPages = Math.ceil(totalItems / itemsPerPage);
-
-    function updatePagination() {
-        var $pageNumbers = $('#page-numbers');
-        $pageNumbers.empty();
-
-        var startPage = Math.max(1, currentPage - 2);
-        var endPage = Math.min(totalPages, startPage + 4);
-
-        if (startPage > 1) {
-            $pageNumbers.append('<a href="#" class="page-number text-gray-300">1</a>');
-            if (startPage > 2) {
-                $pageNumbers.append('<span class="text-gray-300">...</span>');
-            }
-        }
-
-        for (var i = startPage; i <= endPage; i++) {
-            if (i === currentPage) {
-                $pageNumbers.append('<span class="current-page text-gray-800 rounded">' + i + '</span>');
-            } else {
-                $pageNumbers.append('<a href="#" class="page-number text-gray-300">' + i + '</a>');
-            }
-        }
-
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                $pageNumbers.append('<span class="text-gray-300">...</span>');
-            }
-            $pageNumbers.append('<a href="#" class="page-number text-gray-300">' + totalPages + '</a>');
-        }
-
-        $('#prev-page').toggleClass('disabled', currentPage === 1);
-        $('#next-page').toggleClass('disabled', currentPage === totalPages);
-    }
-
-    function loadPage(page) {
-        $.ajax({
-            url: window.location.pathname,
-            data: { page: page },
-            success: function (data) {
-                $('tbody').html(data.results);
-                currentPage = page;
-                updatePagination();
-            }
-        });
-    }
-
-    $(document).on('click', '.page-number', function (e) {
-        e.preventDefault();
-        var page = parseInt($(this).text());
-        loadPage(page);
-    });
-
-    $('#prev-page').click(function (e) {
-        e.preventDefault();
-        if (currentPage > 1) {
-            loadPage(currentPage - 1);
-        }
-    });
-
-    $('#next-page').click(function (e) {
-        e.preventDefault();
-        if (currentPage < totalPages) {
-            loadPage(currentPage + 1);
-        }
-    });
-
-    updatePagination();
 
     $('td').each(function () {
         var statusElement = $(this).find('.status');
@@ -122,121 +47,138 @@ $(document).ready(function () {
             $(this).text(formattedDate);
         }
     });
-    $(document).ready(function () {
-        // Toggle dropdown za multiLevelDropdownButton
-        $('#multiLevelDropdownButton').on('click', function () {
-            $('#multi-dropdown').toggleClass('hidden');
-        });
 
-        function toggleDropdown(buttonId, dropdownId) {
-            $('#' + dropdownId).toggleClass('hidden');
-        }
+    const $modal = $('#modal');
+    const $closeIcon = $('#closeIcon');
 
-        $('#doubleDropdownButton').on('click', function () {
-            toggleDropdown('doubleDropdownButton', 'dropdownSearch');
-            $('#dropdownArrow').toggleClass('rotate-180');
-        });
+    $('table').on('click', '.expert-revision', function () {
+        const button = $(this);
+        const translatedFile = button.data('translated-file');
+        const id = button.data('id');
 
-        $('#doubleDropdownButtonn').on('click', function () {
-            toggleDropdown('doubleDropdownButtonn', 'dropdownSearchh');
-            $('#dropdownArroww').toggleClass('rotate-180');
-        });
+        $modal.data('translatedFile', translatedFile);
+        $modal.data('projectId', id);
 
-        $('#doubleDropdownButtonnn').on('click', function () {
-            toggleDropdown('doubleDropdownButtonnn', 'dropdownSearchhh');
-            $('#dropdownArrowww').toggleClass('rotate-180');
-        });
+        $modal.removeClass('hidden');
+        $closeIcon.removeClass('hidden');
     });
 
-    let checkedCheckboxes = {
-        users: [],
-        groups: [],
-        files: []
-    };
+    $('#closeIcon').on('click', function () {
+        $modal.addClass('hidden');
+        $closeIcon.addClass('hidden');
+    });
 
-    $('.checkbox-item input[type="checkbox"]').on('change', function () {
-        const checkboxId = $(this).attr('id');
-        const label = $(this).next('label').text();
-        const category = $(this).data('category');
+    $(window).on('click', function (event) {
+        if (event.target == $modal[0]) {
+            $modal.addClass('hidden');
+            $closeIcon.addClass('hidden');
+        }
+    });
 
-        if ($(this).is(':checked')) {
-            if (!checkedCheckboxes[category].includes(label)) {
-                checkedCheckboxes[category].push(label);
+    $modal.on('click', '.expert-revision', function () {
+        const translatedFile = $modal.data('translatedFile');
+        const id = $modal.data('projectId');
+
+        let formData = new FormData();
+        formData.append('file_url', translatedFile);
+        formData.append('project_id', id);
+
+        $.ajax({
+            type: 'POST',
+            url: expert_revision_file_url,
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Accept': 'application/json',
+            },
+            dataType: 'json',
+            success: function () {
+                window.location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', error);
             }
-        } else {
-            checkedCheckboxes[category] = checkedCheckboxes[category].filter(item => item !== label);
-        }
-    });
-
-    // Clear button
-    $('#clear-button').on('click', function () {
-        $('.checkbox-item input[type="checkbox"]').each(function () {
-            $(this).prop('checked', false).trigger('change');
         });
 
-        checkedCheckboxes = { users: [], groups: [], files: [] };
-        updateFilterButton(0);
-        $('#selected-items').empty().addClass('hidden');
+        $modal.addClass('hidden');
+        $closeIcon.addClass('hidden');
     });
 
-    // Apply button
-    $('#apply-button').on('click', function () {
-        const selectedCount = Object.values(checkedCheckboxes).flat().length;
-        updateFilterButton(selectedCount);
-        updateSelectedLabels();
-        $('#selected-items').removeClass('hidden');
+    $(document).on('click', '.delete-project', function () {
+        $('.tooltip').addClass('opacity-0 invisible').removeClass('opacity-100 visible');
+        $(this).find('.tooltip').removeClass('opacity-0 invisible').addClass('opacity-100 visible');
     });
 
-    function updateFilterButton(count) {
-        const filterButton = $('#filter-button');
-        if (count > 0) {
-            filterButton.html('Filter <span class="filter-count" style="color: black; border: 2px solid white; background-color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; width: 17px; height: 17px;">' + count + '</span>');
-        } else {
-            filterButton.text('Filter');
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.delete-project').length) {
+            $('.tooltip').addClass('opacity-0 invisible').removeClass('opacity-100 visible');
         }
-    }
+    });
 
+    $(document).on('click', '.allow-delete', function () {
+        const $deleteButton = $(this).closest('.delete-project');
+        const projectId = $deleteButton.data('project-id');
+        if (!projectId) {
+            console.error('Project ID not found');
+            return;
+        }
+        const formData = new FormData();
+        formData.append('project_id', projectId);
+        $.ajax({
+            url: single_project,
+            type: 'DELETE',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            success: function (response) {
+                $deleteButton.closest('tr').remove();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+    });
 
-    function updateSelectedLabels() {
-        const selectedItemsLabel = $('#selected-items');
-        selectedItemsLabel.empty(); 
+    $(document).on('click', '.cancel-delete', function (e) {
+        e.stopPropagation();
+        $(this).closest('.tooltip').addClass('opacity-0 invisible').removeClass('opacity-100 visible');
+    });
 
-        for (const category in checkedCheckboxes) {
-            checkedCheckboxes[category].forEach(item => {
-                const label = $('<span></span>')
-                    .text(`${category.charAt(0).toUpperCase() + category.slice(1)}: ${item}`)
-                    .css({
-                        display: 'inline-block',
-                        border: '1px solid #F2F3F5',
-                        borderRadius: '8px',
-                        padding: '5px 10px',
-                        margin: '5px',
-                        backgroundColor: '#F2F3F5',
-                        color: 'black',
-                        fontFamily: 'Montserrat',
-                        fontSize: '13px',
-                        textColor: 'black'
-                    });
+    $('.download-file').on('click', function(e) {
+        e.preventDefault();
+        const $button = $(this);
+        const translatedFile = $button.data('translated-file');
+        const reviewedFile = $button.data('reviewed-file');
 
-                const removeBtn = $('<span></span>')
-                    .text(' X')
-                    .css({
-                        cursor: 'pointer',
-                        marginLeft: '5px',
-                        color: 'black',
-                        fontSize: '12px',
-                    })
-                    .on('click', function () {
-                        checkedCheckboxes[category] = checkedCheckboxes[category].filter(f => f !== item);
-                        updateSelectedLabels();
-                        $(`input[type="checkbox"][id="${item}"]`).prop('checked', false).trigger('change');
-                        const selectedCount = Object.values(checkedCheckboxes).flat().length;
-                        updateFilterButton(selectedCount);
-                    });
+        if (reviewedFile) {
+            const $tooltip = $button.siblings('.download-tooltip');
+            $tooltip.toggleClass('hidden');
 
-                label.append(removeBtn);
-                selectedItemsLabel.append(label);
+            $(document).one('click', function closeTooltip(e) {
+                if (!$(e.target).closest('.download-tooltip').length && !$(e.target).closest('.download-file').length) {
+                    $tooltip.addClass('hidden');
+                } else {
+                    $(document).one('click', closeTooltip);
+                }
             });
+        } else if (translatedFile) {
+            window.location.href = translatedFile;
         }
-    }
+    });
+
+    $(document).on('click', '.download-file-option', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const fileUrl = $(this).data('file-url');
+        if (fileUrl) {
+            window.location.href = fileUrl;
+        }
+    });
 });
+
