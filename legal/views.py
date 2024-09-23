@@ -27,7 +27,7 @@ import langdetect
 from .tasks import send_statistic_request
 from languages.serializers import LanguageSerializer
 
-PAGINATION_PAGE_SIZE = 30
+PAGINATION_PAGE_SIZE = 20
 PORTAL_API_KEY = ""
 
 
@@ -42,7 +42,6 @@ def text_translation(request):
     send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('domain_name'))
     # send_statistic_request.delay(response.json().get('translated_text'), request.user.uuid,
     #                              request.POST.get('domain_name'))
-    print(response.text)
     return response.json()
 
 
