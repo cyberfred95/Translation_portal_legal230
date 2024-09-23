@@ -249,10 +249,8 @@ body {
     -webkit-text-fill-color: #000000 !important;
 }
 
+select:focus,
 input:focus,
-textarea:focus,
-select:focus {
-    outline: none !important;
-    box-shadow: none !important;
-    border-color: inherit !important;
+textarea:focus {
+    outline: none;
 }

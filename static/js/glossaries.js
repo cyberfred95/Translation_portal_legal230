@@ -52,4 +52,22 @@ $(document).ready(function () {
         $('.glossary-file').val('');
     }
 
+    $('button[data-url]').on('click', function() {
+        const fileUrl = $(this).data('url');
+        if (fileUrl) {
+            downloadFile(fileUrl);
+        }
+    });
+
+    function downloadFile(url) {
+        const $link = $('<a>', {
+            href: url,
+            download: '',
+            style: 'display: none;'
+        }).appendTo('body');
+
+        $link[0].click();
+
+        $link.remove();
+    }
 });
