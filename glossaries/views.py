@@ -4,6 +4,7 @@ from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDe
 from django.views.generic import TemplateView
 from rest_framework.views import APIView
 
+from domains.models import Domain
 from .models import Glossary
 from .serializers import GlossarySerializer
 from rest_framework.response import Response
@@ -55,13 +56,22 @@ class GlossariesListAPIView(APIView):
                 {"message": "provide source_language, target_language and domain_name"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
+        domain = Domain.objects.get(
+            name=request.data.get('domain_name')) if request.LANGUAGE_CODE != 'fr' else Domain.objects.get(
+            french_name=request.data.get('domain_name'))
         glossaries = Glossary.objects.filter(
-            domain__name=request.data.get('domain_name'),
+            domain=domain,
             source_language__abbreviation=request.data.get('source_language').upper(),
-            target_language__abbreviation=request.data.get('target_language').upper(),
-            user=request.user
+            target_language__abbreviation=request.data.get('target_language').upper()
         )
+        user_glossaries = glossaries.filter(
+            user=request.user, group__isnull=True
+        )
+        group_glossaries = glossaries.filter(
+            group=request.user.group,
+            group__isnull=False
+        )
+        glossaries = user_glossaries | group_glossaries
 
         return Response(GlossarySerializer(glossaries, many=True).data, status=status.HTTP_200_OK)
 
@@ -73,7 +83,8 @@ class GetDefaultGlossaryView(APIView):
         glossary = Glossary.objects.filter(
             source_language__abbreviation=request.data.get('source_language').upper(),
             target_language__abbreviation=request.data.get('target_language').upper(),
-            is_default_glossary=True
+            user__isnull=True,
+            group__isnull=True,
         ).all()
         if request.LANGUAGE_CODE == 'fr':
             glossary = glossary.filter(domain__french_name=request.data.get('domain_name'))

@@ -1,6 +1,6 @@
 from django.db import models
 from languages.models import Language
-from users.models import User
+from users.models import User, UserGroup
 from django.core.validators import FileExtensionValidator
 from domains.models import Domain
 
@@ -10,6 +10,7 @@ from domains.models import Domain
 class Glossary(models.Model):
     name = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    group = models.ForeignKey(UserGroup, on_delete=models.SET_NULL, blank=True, null=True)
     file = models.FileField(upload_to='glossaries/', validators=[FileExtensionValidator(['csv'])])
     source_language = models.ForeignKey(
         Language,
@@ -25,8 +26,6 @@ class Glossary(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name='glossaries')
-    is_default_glossary = models.BooleanField(default=False)
-
 
     class Meta:
         verbose_name = 'Glossary'
