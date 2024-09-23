@@ -318,12 +318,12 @@ $(document).ready(function () {
         files.forEach((file) => {
             const $fileItem = $(`
             <div class="flex gap-5 items-center" data-file-id="${file.fileId}">
-                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">
+                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700 detected-file">
                     <span class="text-3.5 w-50 truncate">${file.file_name}</span>
                     <button type="button" class="remove-detected-file" data-file-id="${file.fileId}">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clip-path="url(#clip0_759_4082)">
-                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z" fill="#176C77"/>
+                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z" fill="currentColor"/>
                                 <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z" fill="white"/>
                             </g>
                             <defs>
@@ -385,8 +385,10 @@ $(document).ready(function () {
 
     function checkLanguagesConsistency() {
         const sourceSelects = $('.source-language-select');
-        const targetSelect = $('.target-select-language');
+        const targetLanguageBlock = $('.target-language');
+        const targetSelect = targetLanguageBlock.find('.target-select-language');
         const nextButton = $('#next-step');
+        const detectedFiles = $(".detected-file");
 
         let isConsistent = true;
         let firstValue = sourceSelects.first().val();
@@ -394,16 +396,30 @@ $(document).ready(function () {
 
         sourceLanguage = firstValue;
 
-        sourceSelects.each(function () {
-            if ($(this).val() !== firstValue) {
+        sourceSelects.each(function (index) {
+            const currentValue = $(this).val();
+            if (currentValue !== firstValue) {
                 isConsistent = false;
-                $('.step-container').addClass('bg-red-100 border-red-200');
                 return false;
-            } else {
-                $('.step-container').removeClass('bg-red-100 border-red-200');
-
             }
         });
+
+        targetLanguageBlock.find('.error-message').remove();
+
+        if (!isConsistent) {
+            $('.step-container').addClass('bg-red-100 border-red-200');
+
+            targetSelect.hide();
+            targetLanguageBlock.prepend('<div class="error-message text-red-400">One or more files have different language, please fix it.</div>');
+
+            detectedFiles.removeClass('bg-green-200 text-green-700').addClass('bg-red-100 text-red-400 border border-red-400');
+        } else {
+            $('.step-container').removeClass('bg-red-100 border-red-200');
+
+            targetSelect.show();
+
+            detectedFiles.removeClass('bg-red-100 text-red-400 border border-red-400').addClass('bg-green-200 text-green-700');
+        }
 
         let isSameAsTarget = firstValue === targetValue;
 
@@ -411,13 +427,13 @@ $(document).ready(function () {
             nextButton.removeClass('border-green-700 text-white text-green-700')
                 .addClass('border-gray-300 text-gray-300 pointer-events-none')
                 .prop("disabled", true);
-            ;
         } else {
             nextButton.removeClass('border-gray-300 text-gray-300 pointer-events-none')
                 .addClass('border-green-700 text-green-700')
                 .prop("disabled", false);
         }
     }
+
 
     $(document).on('change', '.source-language-select, .target-select-language', function () {
         checkLanguagesConsistency();
@@ -869,7 +885,7 @@ $(document).ready(function () {
 
 
     function initializeDownloadButtons() {
-        $('.download-file').off('click').on('click', function(e) {
+        $('.download-file').off('click').on('click', function (e) {
             e.preventDefault();
             const $button = $(this);
             const translatedFile = $button.data('translated-file');
@@ -900,7 +916,7 @@ $(document).ready(function () {
             }
         });
 
-        $(document).on('click', '.download-file-option', function(e) {
+        $(document).on('click', '.download-file-option', function (e) {
             e.preventDefault();
             e.stopPropagation();
             const fileUrl = $(this).data('file-url');
@@ -911,7 +927,7 @@ $(document).ready(function () {
     }
 
     function initializeRevisionButtons() {
-        $('.expert-revision').off('click').on('click', function() {
+        $('.expert-revision').off('click').on('click', function () {
             if ($(this).prop('disabled')) return;
 
             const button = $(this);
@@ -928,19 +944,19 @@ $(document).ready(function () {
     }
 
 
-    $('#close-revision').on('click', function() {
+    $('#close-revision').on('click', function () {
         $modalRevision.addClass('hidden');
         $closeRevision.addClass('hidden');
     });
 
-    $(window).on('click', function(event) {
+    $(window).on('click', function (event) {
         if (event.target == $modalRevision[0]) {
             $modalRevision.addClass('hidden');
             $closeRevision.addClass('hidden');
         }
     });
 
-    $modalRevision.on('click', '.expert-revision', function() {
+    $modalRevision.on('click', '.expert-revision', function () {
         const translatedFile = $(this).data('translated-file');
         const id = $(this).data('id');
 
@@ -996,7 +1012,7 @@ $(document).ready(function () {
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRFToken': getCookie('csrftoken'),
                 },
-                success: function(response) {
+                success: function (response) {
                     updateProjectTable(response); // Update the table with new data
 
                     let allCompleted = response.every(project => project.status !== "Being translated");
@@ -1009,7 +1025,7 @@ $(document).ready(function () {
                         console.error('Errors occurred during translation for some documents');
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error('Error checking document status:', error);
                 }
             });

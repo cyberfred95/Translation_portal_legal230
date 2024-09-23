@@ -275,7 +275,7 @@ class LanguageDetectView(APIView):
                 'abbreviation', flat=True).first()
             if not language:
                 language = Language.objects.all().values_list(
-                'abbreviation', flat=True).first()
+                    'abbreviation', flat=True).first()
 
             result.append(
                 {
@@ -284,3 +284,17 @@ class LanguageDetectView(APIView):
                 }
             )
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
+
+
+class DetectTextLanguageView(APIView):
+
+    def post(self, request):
+        text = request.data.get('text')
+        tmp_language = langdetect.detect(text)
+        language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
+            'abbreviation', flat=True).first()
+        if not language:
+            language = Language.objects.all().values_list(
+                'abbreviation', flat=True).first()
+
+        return Response({"language": language.upper()})
