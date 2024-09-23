@@ -275,7 +275,8 @@ class LanguageDetectView(APIView):
             language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
                 'abbreviation', flat=True).first()
             if not language:
-                language = Language.objects.all().first()
+                language = Language.objects.all().values_list(
+                'abbreviation', flat=True).first()
 
             result.append(
                 {
