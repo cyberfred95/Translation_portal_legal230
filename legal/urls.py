@@ -4,7 +4,7 @@ from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static, serve
 from .views import TranslateView, expert_revision, expert_revision_file, ProjectsHistoryView, SingleProjectView, \
-    GetTemplatesView, GetDomainsView, LanguageDetectView
+    GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
 from domains.views import update_domains_view
@@ -22,6 +22,7 @@ urlpatterns = i18n_patterns(
     path('get-domains/', login_required(GetDomainsView.as_view()), name='get_domains'),
     path('refresh_domains/', update_domains_view, name='refresh_domains'),
     path('detect_language/', login_required(LanguageDetectView.as_view()), name='detect_language'),
+    path('detect_text_language/', login_required(DetectTextLanguageView.as_view()), name='detect_text_language'),
     path('statistics/', include('stats.urls')),
     path('glossaries/', include('glossaries.urls')),
     path('domains/', include('domains.urls')),
