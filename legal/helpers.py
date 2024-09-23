@@ -9,8 +9,7 @@ def get_translate_data(request):
         'target_language': request.POST.get('target_language'),
     }
 
-    if request.LANGUAGE_CODE == 'fr':
-        translate_data['domain_name'] = Domain.objects.get(french_name=request.POST.get(
-            'domain_name')).name if request.LANGUAGE_CODE == 'fr' else request.POST.get('POST')
+    translate_data['domain_name'] = Domain.objects.get(french_name=request.POST.get(
+        'domain_name')).name if request.LANGUAGE_CODE == 'fr' else request.POST.get('domain_name')
 
     return translate_data
