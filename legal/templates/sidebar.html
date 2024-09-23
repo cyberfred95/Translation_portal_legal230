@@ -1,8 +1,9 @@
 <nav class="w-32.5 bg-gray-100 text-white h-screen pt-29 pb-5 flex flex-col justify-between">
     <ul>
         <li>
-            <a href="/"
-                class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out">
+            <a href="{% url 'main_index' %}"
+               class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out {% if request.resolver_match.url_name == 'main_index' %}bg-gray-800 text-white{% endif %}"}>
+
                 <svg class="w-5.75 h-5.75" width="26" height="26" viewBox="0 0 26 26" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -20,8 +21,8 @@
         </li>
 
         <li>
-            <a href="{% url 'glossaries' %}"
-                class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out">
+            <a  href="{% url 'glossaries' %}"
+               class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out  {% if request.resolver_match.url_name == 'glossaries' %}bg-gray-800 text-white{% endif %}">
                 <svg class="w-5.75 h-5.75" width="26" height="26" viewBox="0 0 26 26" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_760_711)">
@@ -64,8 +65,7 @@
         </li>
 
         <li>
-            <a href="{% url 'project_history' %}"
-                class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out">
+            <a href="{% url 'project_history' %}" class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out {% if request.resolver_match.url_name == 'project_history' %}bg-gray-800 text-white{% endif %}">
                 <svg class="w-5.75 h-5.75" width="26" height="26" viewBox="0 0 26 26" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_760_723)">
@@ -97,37 +97,37 @@
     </ul>
     <ul>
         <li>
-            <a href="{% url 'usage_history' %}"
-                class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out">
+            <a href="{% url 'project_history' %}" class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out">
                 <svg class="w-5.75 h-5.75" width="26" height="26" viewBox="0 0 26 26" fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
+                     xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_760_732)">
                         <path fill-rule="evenodd" clip-rule="evenodd"
-                            d="M8.09009 4.98024C8.31606 5.49743 8.07998 6.09989 7.56278 6.32586C4.31227 7.74606 2.04389 10.9885 2.04389 14.7585C2.04389 19.8381 6.16176 23.956 11.2414 23.956C15.0114 23.956 18.2538 21.6876 19.674 18.4371C19.9 17.9199 20.5025 17.6838 21.0197 17.9098C21.5369 18.1358 21.7729 18.7382 21.547 19.2554C19.8132 23.2235 15.8527 25.9999 11.2414 25.9999C5.03295 25.9999 0 20.967 0 14.7585C0 10.1472 2.77636 6.18666 6.74447 4.45293C7.26166 4.22696 7.86412 4.46304 8.09009 4.98024Z"
-                            fill="currentColor" />
+                              d="M8.09009 4.98024C8.31606 5.49743 8.07998 6.09989 7.56278 6.32586C4.31227 7.74606 2.04389 10.9885 2.04389 14.7585C2.04389 19.8381 6.16176 23.956 11.2414 23.956C15.0114 23.956 18.2538 21.6876 19.674 18.4371C19.9 17.9199 20.5025 17.6838 21.0197 17.9098C21.5369 18.1358 21.7729 18.7382 21.547 19.2554C19.8132 23.2235 15.8527 25.9999 11.2414 25.9999C5.03295 25.9999 0 20.967 0 14.7585C0 10.1472 2.77636 6.18666 6.74447 4.45293C7.26166 4.22696 7.86412 4.46304 8.09009 4.98024Z"
+                              fill="currentColor"/>
                         <path fill-rule="evenodd" clip-rule="evenodd"
-                            d="M9.81055 3.08153C9.81055 1.25669 11.4328 -0.268857 13.3183 0.0386757L13.3183 0.0386815C19.794 1.09518 24.9045 6.20559 25.961 12.6814C26.2686 14.5669 24.743 16.1892 22.9182 16.1892H12.8764C11.1832 16.1892 9.81055 14.8165 9.81055 13.1233V3.08153ZM12.9892 2.0559C12.4311 1.9649 11.8544 2.43061 11.8544 3.08153V13.1233C11.8544 13.6877 12.312 14.1453 12.8764 14.1453H22.9182C23.5691 14.1453 24.0348 13.5686 23.9438 13.0105L23.9438 13.0105C23.0288 7.40174 18.5979 2.97097 12.9892 2.05591"
-                            fill="currentColor" />
+                              d="M9.81055 3.08153C9.81055 1.25669 11.4328 -0.268857 13.3183 0.0386757L13.3183 0.0386815C19.794 1.09518 24.9045 6.20559 25.961 12.6814C26.2686 14.5669 24.743 16.1892 22.9182 16.1892H12.8764C11.1832 16.1892 9.81055 14.8165 9.81055 13.1233V3.08153ZM12.9892 2.0559C12.4311 1.9649 11.8544 2.43061 11.8544 3.08153V13.1233C11.8544 13.6877 12.312 14.1453 12.8764 14.1453H22.9182C23.5691 14.1453 24.0348 13.5686 23.9438 13.0105L23.9438 13.0105C23.0288 7.40174 18.5979 2.97097 12.9892 2.05591"
+                              fill="currentColor"/>
                     </g>
                     <defs>
                         <clipPath id="clip0_760_732">
-                            <rect width="26" height="26" fill="currentColor" />
+                            <rect width="26" height="26" fill="currentColor"/>
+
                         </clipPath>
                     </defs>
                 </svg>
                 Usage
             </a>
         </li>
+        <li>
+            <a href="mailto:{{ preferences.MainSettings.support_email }}" class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out">
+                <svg class="w-5.75 h-5.75" width="22" height="22" viewBox="0 0 22 22" fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.9993 0.166992C5.02585 0.166992 0.166016 5.02683 0.166016 11.0003V15.4886C0.166016 16.5979 1.13777 17.5003 2.33268 17.5003H3.41602C3.70333 17.5003 3.97888 17.3862 4.18205 17.183C4.38521 16.9799 4.49935 16.7043 4.49935 16.417V10.8454C4.49935 10.5581 4.38521 10.2825 4.18205 10.0794C3.97888 9.87621 3.70333 9.76208 3.41602 9.76208H2.43235C3.03468 5.56958 6.64218 2.33366 10.9993 2.33366C15.3565 2.33366 18.964 5.56958 19.5663 9.76208H18.5827C18.2954 9.76208 18.0198 9.87621 17.8166 10.0794C17.6135 10.2825 17.4993 10.5581 17.4993 10.8454V17.5003C17.4993 18.6952 16.5276 19.667 15.3327 19.667H13.166V18.5837H8.83268V21.8337H15.3327C17.7225 21.8337 19.666 19.8902 19.666 17.5003C20.8609 17.5003 21.8327 16.5979 21.8327 15.4886V11.0003C21.8327 5.02683 16.9728 0.166992 10.9993 0.166992Z"
+                          fill="currentColor"/>
+                </svg>
+                Support
+            </a>
 
-        <li
-            class="py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out">
-            <svg class="w-5.75 h-5.75" width="22" height="22" viewBox="0 0 22 22" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M10.9993 0.166992C5.02585 0.166992 0.166016 5.02683 0.166016 11.0003V15.4886C0.166016 16.5979 1.13777 17.5003 2.33268 17.5003H3.41602C3.70333 17.5003 3.97888 17.3862 4.18205 17.183C4.38521 16.9799 4.49935 16.7043 4.49935 16.417V10.8454C4.49935 10.5581 4.38521 10.2825 4.18205 10.0794C3.97888 9.87621 3.70333 9.76208 3.41602 9.76208H2.43235C3.03468 5.56958 6.64218 2.33366 10.9993 2.33366C15.3565 2.33366 18.964 5.56958 19.5663 9.76208H18.5827C18.2954 9.76208 18.0198 9.87621 17.8166 10.0794C17.6135 10.2825 17.4993 10.5581 17.4993 10.8454V17.5003C17.4993 18.6952 16.5276 19.667 15.3327 19.667H13.166V18.5837H8.83268V21.8337H15.3327C17.7225 21.8337 19.666 19.8902 19.666 17.5003C20.8609 17.5003 21.8327 16.5979 21.8327 15.4886V11.0003C21.8327 5.02683 16.9728 0.166992 10.9993 0.166992Z"
-                    fill="currentColor" />
-            </svg>
-            <a href="#" class="text-4">Support</a>
         </li>
     </ul>
 </nav>

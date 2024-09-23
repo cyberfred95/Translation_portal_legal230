@@ -1,33 +1,44 @@
+from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import requests
-from stats.models import UserStats
-from stats.serializers import UserStatsSerializer
 from preferences import preferences
 
 
 # Create your views here.
 
-class GetUserStatsView(ListAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = UserStatsSerializer
+class GetUserStatsView(APIView):
+    def get(self, request):
+        print(self.request.user)
+        print(request.user.uuid)
+        additional_url_params = self.set_additional_url_params(request)
 
-    def get_queryset(self):
-        return UserStats.objects.filter(user=self.request.user)
-
-
-class GetStatsFromConsole(APIView):
-    def post(self, request):
-        response = requests.post(
-            'https://console.custom.mt/get_statistics_by_api_key/',
+        response = requests.get(
+            preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params,
             headers={
-                'token': preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+                'token': preferences.StatisticSettings.API_KEY,
+                'X-API-Key': preferences.MainSettings.api_key
             },
-            data={
-                'date_from': request.data['date_from'],
-                'date_to': request.data['date_to'],
+            json={
+                "uuid": str(request.user.uuid)
             }
         )
-        return Response({'data': response.json()})
+        return Response(response.json(), status=status.HTTP_200_OK)
+
+    def set_additional_url_params(self, request):
+        date_from = request.data.get("date_from", None)
+        date_to = request.data.get("date_to", None)
+        additional_url_params = ""
+
+        if date_from and date_to:
+            additional_url_params += f"?date_from={date_from}&date_to={date_to}"
+        elif date_from:
+            additional_url_params += f"?date_from={date_from}"
+        elif date_to:
+            additional_url_params += f"?date_to={date_to}"
+        if request.user.group.admin != request.user:
+            additional_url_params += "&group_admin=true"
+
+        return additional_url_params

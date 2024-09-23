@@ -1,626 +1,130 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block content %}
+
 <div class="ml-31.25 mt-11.5 mr-63.75">
     <p class="text-7.5">Translator</p>
-    <div class="flex gap-2.5 my-5">
-        <button class="flex gap-2.5 items-center px-4 py-2.5 rounded-md bg-transparent hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-300 hover:border-gray-800 transition-colors duration-300">
-            <svg class="w-6.5 h-6.5" width="26" height="26" viewBox="0 0 26 26" fill="none"
-                 xmlns="http://www.w3.org/2000/svg">
-                <g clip-path="url(#clip0_759_1481)">
-                    <path d="M23.1996 10.6064H13.4089C11.8642 10.6064 10.6076 11.8631 10.6076 13.4077V18.7271L8.07092 20.5389C7.87077 20.6818 7.75195 20.9127 7.75195 21.1586C7.75195 21.4048 7.87077 21.6357 8.07092 21.7785L10.6382 23.6122C10.8387 24.9615 12.0049 25.9999 13.4089 25.9999H23.1996C24.7442 25.9999 26.0009 24.7433 26.0009 23.1984V13.4077C26.0009 11.8631 24.7442 10.6064 23.1996 10.6064ZM19.9075 21.3098C19.728 21.3098 19.5893 21.2529 19.5487 21.0977L19.2384 20.0125H17.3698L17.06 21.0977C17.0191 21.2529 16.8805 21.3098 16.701 21.3098C16.4153 21.3098 16.0319 21.1305 16.0319 20.8694C16.0319 20.853 16.04 20.8204 16.0481 20.7877L17.623 15.6556C17.6964 15.4108 17.9983 15.2964 18.3002 15.2964C18.6102 15.2964 18.9121 15.4108 18.9855 15.6556L20.5603 20.7877C20.5685 20.8204 20.5766 20.8448 20.5766 20.8694C20.5766 21.1221 20.1932 21.3098 19.9075 21.3098Z"
-                          fill="currentColor"/>
-                    <path d="M17.5898 19.1805H19.0097L18.2996 16.6758L17.5898 19.1805Z" fill="currentColor"/>
-                    <path d="M9.0833 13.4078C9.0833 12.3851 9.44095 11.4448 10.0366 10.7035C9.1676 10.7035 8.36125 10.4316 7.69653 9.96959C7.03181 10.4318 6.22546 10.7035 5.35623 10.7035C5.11919 10.7035 4.92677 10.5111 4.92677 10.2739C4.92677 10.0366 5.11919 9.84442 5.35623 9.84442C5.96501 9.84442 6.53471 9.67581 7.02249 9.38382C6.43414 8.74886 6.04297 7.92902 5.94835 7.0217H5.35643C5.11919 7.0217 4.92677 6.82948 4.92677 6.59224C4.92677 6.355 5.11919 6.16258 5.35643 6.16258H7.26727V5.11958C7.26727 4.88214 7.45949 4.68993 7.69673 4.68993C7.93398 4.68993 8.12619 4.88214 8.12619 5.11958V6.16258H10.037C10.2743 6.16258 10.4667 6.355 10.4667 6.59224C10.4667 6.82948 10.2743 7.0217 10.037 7.0217H9.44511C9.35049 7.92902 8.95932 8.74886 8.37097 9.38382C8.85855 9.67621 9.42845 9.84442 10.037 9.84442C10.2638 9.84442 10.449 10.0202 10.4651 10.2429C11.2377 9.52406 12.2722 9.0831 13.4082 9.0831H15.3935V7.27283L17.9301 5.46097C18.1301 5.31815 18.2489 5.08725 18.2489 4.84128C18.2489 4.59511 18.1301 4.36421 17.9301 4.22139L15.3629 2.38771C15.1622 1.03844 13.996 0 12.592 0H2.8015C1.25664 0 0 1.25664 0 2.8013V12.5922C0 14.1368 1.25664 15.3935 2.8015 15.3935H9.0833V13.4078Z"
-                          fill="currentColor"/>
-                    <path d="M7.69698 8.84663C8.1671 8.35886 8.48627 7.72548 8.5797 7.02148H6.81445C6.90788 7.72548 7.22725 8.35886 7.69698 8.84663Z"
-                          fill="#currentColor"/>
-                </g>
-                <defs>
-                    <clipPath id="clip0_759_1481">
-                        <rect width="26" height="26" fill="currentColor"/>
-                    </clipPath>
-                </defs>
-            </svg>
-            <span class="text-3.5">Text translate</span>
-        </button>
-        <button class="flex gap-2.5 items-center px-4 py-2 rounded-md bg-transparent hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-300 hover:border-gray-800 transition-colors duration-300">
-            <svg class="w-6.5 h-6.5" width="26" height="26" viewBox="0 0 26 26" fill="none"
-                 xmlns="http://www.w3.org/2000/svg">
-                <g clip-path="url(#clip0_759_1488)">
-                    <path d="M4.33398 7.3125C4.33398 4.47525 6.64257 2.16667 9.47982 2.16667H19.3739C19.0175 0.91975 17.8811 0 16.5215 0H4.06315C2.41973 0 1.08398 1.33575 1.08398 2.97917V19.7708C1.08398 21.4143 2.41973 22.75 4.06315 22.75H4.33398V7.3125Z"
-                          fill="currentColor"/>
-                    <path d="M21.9375 4.33301H9.47917C7.83575 4.33301 6.5 5.66876 6.5 7.31217V23.0205C6.5 24.6639 7.83575 25.9997 9.47917 25.9997H21.9375C23.5809 25.9997 24.9167 24.6639 24.9167 23.0205V7.31217C24.9167 5.66876 23.5809 4.33301 21.9375 4.33301ZM19.7708 22.7497H11.6458C11.1973 22.7497 10.8333 22.3857 10.8333 21.9372C10.8333 21.4887 11.1973 21.1247 11.6458 21.1247H19.7708C20.2193 21.1247 20.5833 21.4887 20.5833 21.9372C20.5833 22.3857 20.2193 22.7497 19.7708 22.7497ZM19.7708 18.4163H11.6458C11.1973 18.4163 10.8333 18.0523 10.8333 17.6038C10.8333 17.1553 11.1973 16.7913 11.6458 16.7913H19.7708C20.2193 16.7913 20.5833 17.1553 20.5833 17.6038C20.5833 18.0523 20.2193 18.4163 19.7708 18.4163ZM19.7708 14.6247H11.6458C11.1973 14.6247 10.8333 14.2607 10.8333 13.8122C10.8333 13.3637 11.1973 12.9997 11.6458 12.9997H19.7708C20.2193 12.9997 20.5833 13.3637 20.5833 13.8122C20.5833 14.2607 20.2193 14.6247 19.7708 14.6247ZM19.7708 10.2913H11.6458C11.1973 10.2913 10.8333 9.92734 10.8333 9.47884C10.8333 9.03034 11.1973 8.66634 11.6458 8.66634H19.7708C20.2193 8.66634 20.5833 9.03034 20.5833 9.47884C20.5833 9.92734 20.2193 10.2913 19.7708 10.2913Z"
-                          fill="currentColor"/>
-                </g>
-                <defs>
-                    <clipPath id="clip0_759_1488">
-                        <rect width="26" height="26" fill="currentColor"/>
-                    </clipPath>
-                </defs>
-            </svg>
-            <span class="text-3.5">Document translate</span>
-        </button>
-        <button class="flex gap-2.5 items-center px-4 py-2 rounded-md bg-transparent hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-300 hover:border-gray-800 transition-colors duration-300">
-            <svg class="w-6.5 h-6.5" width="22" height="22" viewBox="0 0 22 22" fill="none"
-                 xmlns="http://www.w3.org/2000/svg">
-                <path d="M19.2434 9.05046L20.8576 7.4363C21.4814 6.81081 21.8317 5.96345 21.8317 5.08005C21.8317 4.19664 21.4814 3.34929 20.8576 2.7238L19.2759 1.14213C18.6504 0.518296 17.803 0.167969 16.9196 0.167969C16.0362 0.167969 15.1889 0.518296 14.5634 1.14213L12.9492 2.7563L19.2434 9.05046Z"
-                      fill="currentColor"/>
-                <path d="M11.4224 4.28418L1.33661 14.37C0.999499 14.7062 0.782485 15.144 0.719114 15.6158L0.166614 19.3208C0.115992 19.633 0.134311 19.9524 0.220286 20.2568C0.30626 20.5611 0.457806 20.8429 0.664284 21.0824C0.870761 21.3219 1.12716 21.5133 1.41549 21.6432C1.70382 21.7731 2.01708 21.8383 2.33328 21.8342H2.64745L6.35245 21.3033C6.82429 21.24 7.26212 21.023 7.59828 20.6858L17.6841 10.6L11.4224 4.28418Z"
-                      fill="currentColor"/>
-            </svg>
-            <span class="text-3.5">Writing</span>
-        </button>
-    </div>
-    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">
-        <div class="border-dashed border-2 border-gray-400 w-full h-full py-7.5 px-5 grid grid-cols-1 divide-y file-upload">
-            <div class="flex flex-col justify-center items-center">
-                <span class="text-gray-800 text-6 mb-2.5">Drag and drop</span>
-                <span class="text-gray-300 text-3.5">Fichiers pris en charge: plain text, .docx, .xlsx, .pptx</span>
-                <svg class="my-7.5 w-10 h-10" width="40" height="40" viewBox="0 0 40 40" fill="none"
+    <div class="flex justify-between items-center my-5">
+        <div class="flex gap-2.5 items-center">
+            <button id="text-translate"
+                    class="tab flex gap-2.5 items-center px-4 py-2.5 rounded-md hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-300 hover:border-gray-800 transition-colors duration-300">
+                <svg class="w-6.5 h-6.5" width="26" height="26" viewBox="0 0 26 26" fill="none"
                      xmlns="http://www.w3.org/2000/svg">
-                    <g clip-path="url(#clip0_759_1541)">
-                        <path d="M33.0197 17.6379V37.088C33.0197 38.6963 31.7159 39.9999 30.1077 39.9999H6.18539C4.57711 39.9999 3.27344 38.6962 3.27344 37.088V6.61898C3.27344 5.01031 4.5775 3.70703 6.18539 3.70703H19.0884L33.0197 17.6379Z"
-                              fill="#99B5BB"/>
-                        <path d="M9.89242 36.293C8.28414 36.293 6.98047 34.9892 6.98047 33.381V2.91195C6.98039 1.30328 8.28445 0 9.89242 0H22.7954C25.0138 0 36.7266 11.7128 36.7266 13.9309V33.381C36.7266 34.9893 35.4229 36.293 33.8147 36.293H9.89242Z"
-                              fill="#F4F7FA"/>
-                        <path d="M36.7274 13.9312V15.163C36.7274 12.5696 34.6245 10.4666 32.0311 10.4666H29.1727C27.5648 10.4666 26.2608 9.16258 26.2608 7.55469V4.69633C26.2608 2.10297 24.1578 0 21.5645 0H22.7962C25.0142 0 27.1421 0.88125 28.7104 2.44961L34.2779 8.01711C35.8461 9.58539 36.7274 11.7132 36.7274 13.9312Z"
-                              fill="#AEC4C9"/>
-                        <path d="M18.9545 22.2308V30.7445C18.9545 31.1117 19.2523 31.4095 19.6195 31.4095H24.0878C24.4551 31.4095 24.7528 31.1117 24.7528 30.7445V22.2308H26.6524C27.2448 22.2308 27.5416 21.5146 27.1227 21.0956L22.878 16.851C22.3123 16.2853 21.3951 16.2853 20.8294 16.851L16.5848 21.0956C16.1659 21.5146 16.4626 22.2308 17.055 22.2308H18.9545Z"
-                              fill="#176C77"/>
-                        <path d="M16.6709 14.515H27.0346C27.7503 14.515 28.3305 13.9349 28.3305 13.2192V13.1836C28.3305 12.4679 27.7503 11.8877 27.0346 11.8877H16.6709C15.9552 11.8877 15.375 12.4679 15.375 13.1836V13.2192C15.375 13.9348 15.9552 14.515 16.6709 14.515Z"
-                              fill="#176C77"/>
+                    <g clip-path="url(#clip0_759_1481)">
+                        <path d="M23.1996 10.6064H13.4089C11.8642 10.6064 10.6076 11.8631 10.6076 13.4077V18.7271L8.07092 20.5389C7.87077 20.6818 7.75195 20.9127 7.75195 21.1586C7.75195 21.4048 7.87077 21.6357 8.07092 21.7785L10.6382 23.6122C10.8387 24.9615 12.0049 25.9999 13.4089 25.9999H23.1996C24.7442 25.9999 26.0009 24.7433 26.0009 23.1984V13.4077C26.0009 11.8631 24.7442 10.6064 23.1996 10.6064ZM19.9075 21.3098C19.728 21.3098 19.5893 21.2529 19.5487 21.0977L19.2384 20.0125H17.3698L17.06 21.0977C17.0191 21.2529 16.8805 21.3098 16.701 21.3098C16.4153 21.3098 16.0319 21.1305 16.0319 20.8694C16.0319 20.853 16.04 20.8204 16.0481 20.7877L17.623 15.6556C17.6964 15.4108 17.9983 15.2964 18.3002 15.2964C18.6102 15.2964 18.9121 15.4108 18.9855 15.6556L20.5603 20.7877C20.5685 20.8204 20.5766 20.8448 20.5766 20.8694C20.5766 21.1221 20.1932 21.3098 19.9075 21.3098Z"
+                              fill="currentColor"/>
+                        <path d="M17.5898 19.1805H19.0097L18.2996 16.6758L17.5898 19.1805Z" fill="currentColor"/>
+                        <path d="M9.0833 13.4078C9.0833 12.3851 9.44095 11.4448 10.0366 10.7035C9.1676 10.7035 8.36125 10.4316 7.69653 9.96959C7.03181 10.4318 6.22546 10.7035 5.35623 10.7035C5.11919 10.7035 4.92677 10.5111 4.92677 10.2739C4.92677 10.0366 5.11919 9.84442 5.35623 9.84442C5.96501 9.84442 6.53471 9.67581 7.02249 9.38382C6.43414 8.74886 6.04297 7.92902 5.94835 7.0217H5.35643C5.11919 7.0217 4.92677 6.82948 4.92677 6.59224C4.92677 6.355 5.11919 6.16258 5.35643 6.16258H7.26727V5.11958C7.26727 4.88214 7.45949 4.68993 7.69673 4.68993C7.93398 4.68993 8.12619 4.88214 8.12619 5.11958V6.16258H10.037C10.2743 6.16258 10.4667 6.355 10.4667 6.59224C10.4667 6.82948 10.2743 7.0217 10.037 7.0217H9.44511C9.35049 7.92902 8.95932 8.74886 8.37097 9.38382C8.85855 9.67621 9.42845 9.84442 10.037 9.84442C10.2638 9.84442 10.449 10.0202 10.4651 10.2429C11.2377 9.52406 12.2722 9.0831 13.4082 9.0831H15.3935V7.27283L17.9301 5.46097C18.1301 5.31815 18.2489 5.08725 18.2489 4.84128C18.2489 4.59511 18.1301 4.36421 17.9301 4.22139L15.3629 2.38771C15.1622 1.03844 13.996 0 12.592 0H2.8015C1.25664 0 0 1.25664 0 2.8013V12.5922C0 14.1368 1.25664 15.3935 2.8015 15.3935H9.0833V13.4078Z"
+                              fill="currentColor"/>
+                        <path d="M7.69698 8.84663C8.1671 8.35886 8.48627 7.72548 8.5797 7.02148H6.81445C6.90788 7.72548 7.22725 8.35886 7.69698 8.84663Z"
+                              fill="#currentColor"/>
                     </g>
                     <defs>
-                        <clipPath id="clip0_759_1541">
-                            <rect width="40" height="40" fill="white"/>
+                        <clipPath id="clip0_759_1481">
+                            <rect width="26" height="26" fill="currentColor"/>
                         </clipPath>
                     </defs>
                 </svg>
-                <button class="flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold choose-file">
-                    <span class="text-3.5">Choose file</span>
-                </button>
-            </div>
-            <div class="pt-5 mt-5 flex flex-wrap gap-2.5 file-list hidden"></div>
+                <span class="text-3.5">Text translate</span>
+            </button>
+            <button id="document-translate"
+                    class="tab flex gap-2.5 items-center px-4 py-2 rounded-md hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-300 hover:border-gray-800 transition-colors duration-300">
+                <svg class="w-6.5 h-6.5" width="26" height="26" viewBox="0 0 26 26" fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_759_1488)">
+                        <path d="M4.33398 7.3125C4.33398 4.47525 6.64257 2.16667 9.47982 2.16667H19.3739C19.0175 0.91975 17.8811 0 16.5215 0H4.06315C2.41973 0 1.08398 1.33575 1.08398 2.97917V19.7708C1.08398 21.4143 2.41973 22.75 4.06315 22.75H4.33398V7.3125Z"
+                              fill="currentColor"/>
+                        <path d="M21.9375 4.33301H9.47917C7.83575 4.33301 6.5 5.66876 6.5 7.31217V23.0205C6.5 24.6639 7.83575 25.9997 9.47917 25.9997H21.9375C23.5809 25.9997 24.9167 24.6639 24.9167 23.0205V7.31217C24.9167 5.66876 23.5809 4.33301 21.9375 4.33301ZM19.7708 22.7497H11.6458C11.1973 22.7497 10.8333 22.3857 10.8333 21.9372C10.8333 21.4887 11.1973 21.1247 11.6458 21.1247H19.7708C20.2193 21.1247 20.5833 21.4887 20.5833 21.9372C20.5833 22.3857 20.2193 22.7497 19.7708 22.7497ZM19.7708 18.4163H11.6458C11.1973 18.4163 10.8333 18.0523 10.8333 17.6038C10.8333 17.1553 11.1973 16.7913 11.6458 16.7913H19.7708C20.2193 16.7913 20.5833 17.1553 20.5833 17.6038C20.5833 18.0523 20.2193 18.4163 19.7708 18.4163ZM19.7708 14.6247H11.6458C11.1973 14.6247 10.8333 14.2607 10.8333 13.8122C10.8333 13.3637 11.1973 12.9997 11.6458 12.9997H19.7708C20.2193 12.9997 20.5833 13.3637 20.5833 13.8122C20.5833 14.2607 20.2193 14.6247 19.7708 14.6247ZM19.7708 10.2913H11.6458C11.1973 10.2913 10.8333 9.92734 10.8333 9.47884C10.8333 9.03034 11.1973 8.66634 11.6458 8.66634H19.7708C20.2193 8.66634 20.5833 9.03034 20.5833 9.47884C20.5833 9.92734 20.2193 10.2913 19.7708 10.2913Z"
+                              fill="currentColor"/>
+                    </g>
+                    <defs>
+                        <clipPath id="clip0_759_1488">
+                            <rect width="26" height="26" fill="currentColor"/>
+                        </clipPath>
+                    </defs>
+                </svg>
+                <span class="text-3.5">Document translate</span>
+            </button>
+            <button id="writing"
+                    class="tab flex gap-2.5 items-center px-4 py-2 rounded-md hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-300 hover:border-gray-800 transition-colors duration-300">
+                <svg class="w-6.5 h-6.5" width="22" height="22" viewBox="0 0 22 22" fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19.2434 9.05046L20.8576 7.4363C21.4814 6.81081 21.8317 5.96345 21.8317 5.08005C21.8317 4.19664 21.4814 3.34929 20.8576 2.7238L19.2759 1.14213C18.6504 0.518296 17.803 0.167969 16.9196 0.167969C16.0362 0.167969 15.1889 0.518296 14.5634 1.14213L12.9492 2.7563L19.2434 9.05046Z"
+                          fill="currentColor"/>
+                    <path d="M11.4224 4.28418L1.33661 14.37C0.999499 14.7062 0.782485 15.144 0.719114 15.6158L0.166614 19.3208C0.115992 19.633 0.134311 19.9524 0.220286 20.2568C0.30626 20.5611 0.457806 20.8429 0.664284 21.0824C0.870761 21.3219 1.12716 21.5133 1.41549 21.6432C1.70382 21.7731 2.01708 21.8383 2.33328 21.8342H2.64745L6.35245 21.3033C6.82429 21.24 7.26212 21.023 7.59828 20.6858L17.6841 10.6L11.4224 4.28418Z"
+                          fill="currentColor"/>
+                </svg>
+                <span class="text-3.5">Writing</span>
+            </button>
         </div>
-        <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold upload-document hidden">
-            <span class="text-3.5">Following</span>
+        <button id="expert-revision"
+                class="flex gap-2.5 items-center bg-green-700 text-white text-3.5 rounded-md py-3.25 px-6.5 hidden">
+            Expert revision
+            <div class="relative group">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"
+                          fill="currentColor"/>
+                </svg>
+                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 py-3 px-4.5 bg-gray-800 text-white text-2.75 rounded-md bottom-26 left-1/2 transform -translate-x-1/2 translate-y-full">
+                            <span class="text-justify text-wrap block">
+                                Click the button to see options for improving the quality of the translated file.
+                            </span>
+                    <div class="absolute w-3 h-3 bg-gray-800 transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5"></div>
+                </div>
+            </div>
         </button>
     </div>
-<!--    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">-->
-<!--        <div class="border-dashed border-2 border-gray-400 w-full h-full py-7.5 px-5">-->
-<!--            <span class="text-4 text-gray-800 font-semibold">Domains</span>-->
-<!--            <div class="flex flex-wrap mt-5 gap-2.5">-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Generic-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Dispute-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Dispute-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Audience-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Commercial-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Tax-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Social-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Real estate-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Banking / Finance-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Generic-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    PI / IT-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Dispute-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Tax-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Dispute-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Social-->
-<!--                </button>-->
-<!--                <button class="text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md">-->
-<!--                    Real estate-->
-<!--                </button>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        <div class="flex w-full items-center justify-between">-->
-<!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
-<!--                <span class="text-3.5">Previous</span>-->
-<!--            </button>-->
-<!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
-<!--                <span class="text-3.5">Following</span>-->
-<!--            </button>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">-->
-<!--        <div class="border-dashed border-2 border-gray-400 w-full h-full py-7.5 px-5">-->
-<!--            <div class="flex items-center w-full justify-between">-->
-<!--                <span class="text-4 text-gray-800 font-semibold">Terminology</span>-->
-<!--                <a href="#" class="text-3 text-green-700">+ Add glossary</a>-->
-<!--            </div>-->
-<!--            <div class="flex items-center mt-5">-->
-<!--                <button class="px-5 py-3 text-3.5 bg-gray-200 text-gray-400 rounded-l-md hover:bg-gray-800 hover:text-white">-->
-<!--                    Default-->
-<!--                </button>-->
-<!--                <button class="px-5 py-3 text-3.5 bg-gray-200 text-gray-400 hover:bg-gray-800 hover:text-white">-->
-<!--                    My glossaries-->
-<!--                </button>-->
-<!--                <button class="px-5 py-3 text-3.5 bg-gray-200 text-gray-400 rounded-r-md hover:bg-gray-800 hover:text-white">-->
-<!--                    No glossary-->
-<!--                </button>-->
-<!--            </div>-->
-<!--            <div class="flex flex-wrap gap-2.5 mt-5">-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>RH</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>Droit du travais</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>Sécurité sociale</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>Sécurité...</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>Terminology</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>RH</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>Droit du travais</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>Sécurité sociale</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-200 text-green-700">-->
-<!--                    <span>Sécurité...</span>-->
-<!--                    <button class="remove-file">-->
-<!--                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                             xmlns="http://www.w3.org/2000/svg">-->
-<!--                            <g clip-path="url(#clip0_759_4082)">-->
-<!--                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"-->
-<!--                                      fill="#176C77"/>-->
-<!--                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"-->
-<!--                                      fill="white"/>-->
-<!--                            </g>-->
-<!--                            <defs>-->
-<!--                                <clipPath id="clip0_759_4082">-->
-<!--                                    <rect width="20" height="20" fill="white"/>-->
-<!--                                </clipPath>-->
-<!--                            </defs>-->
-<!--                        </svg>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        <div class="flex w-full items-center justify-between">-->
-<!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
-<!--                <span class="text-3.5">Previous</span>-->
-<!--            </button>-->
-<!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
-<!--                <span class="text-3.5">Following</span>-->
-<!--            </button>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">-->
-<!--        <div class="border-dashed border-2 border-gray-400 w-full h-full py-7.5 px-5">-->
-<!--            <span class="text-4 text-gray-800 font-semibold">Review</span>-->
-<!--            <table class="table-auto mt-5 w-full border-separate border-spacing-y-5">-->
-<!--                <tbody>-->
-<!--                <tr>-->
-<!--                    <td>-->
-<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
-<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <div class="text-3.25 text-green-700">-->
-<!--                            Processing...-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
-<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <g clip-path="url(#clip0_759_2185)">-->
-<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                </g>-->
-<!--                                <defs>-->
-<!--                                    <clipPath id="clip0_759_2185">-->
-<!--                                        <rect width="16" height="16" fill="white"-->
-<!--                                              transform="translate(0.333984)"/>-->
-<!--                                    </clipPath>-->
-<!--                                </defs>-->
-<!--                            </svg>-->
-<!--                            Download-->
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                    <td class="flex justify-end">-->
-<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
-<!--                            Revision-->
-<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
-<!--                                      fill="#0D2B40"/>-->
-<!--                            </svg>-->
 
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td>-->
-<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
-<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                                <span class="rounded-md bg-red-100 text-red-400 py-3 px-4 text-3.25">-->
-<!--                                    Error-->
-<!--                                </span>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
-<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <g clip-path="url(#clip0_759_2185)">-->
-<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                </g>-->
-<!--                                <defs>-->
-<!--                                    <clipPath id="clip0_759_2185">-->
-<!--                                        <rect width="16" height="16" fill="white"-->
-<!--                                              transform="translate(0.333984)"/>-->
-<!--                                    </clipPath>-->
-<!--                                </defs>-->
-<!--                            </svg>-->
-<!--                            Download-->
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                    <td class="flex justify-end">-->
-<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
-<!--                            Revision-->
-<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
-<!--                                      fill="#0D2B40"/>-->
-<!--                            </svg>-->
+    <div>
+        <!--  ------------- TAB-1 -------------  -->
 
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td>-->
-<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
-<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                                <span class="rounded-md bg-green-200 text-green-700 py-3 px-4 text-3.25">-->
-<!--                                    Post-edited file uploaded-->
-<!--                                </span>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
-<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <g clip-path="url(#clip0_759_2185)">-->
-<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                </g>-->
-<!--                                <defs>-->
-<!--                                    <clipPath id="clip0_759_2185">-->
-<!--                                        <rect width="16" height="16" fill="white"-->
-<!--                                              transform="translate(0.333984)"/>-->
-<!--                                    </clipPath>-->
-<!--                                </defs>-->
-<!--                            </svg>-->
-<!--                            Download-->
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                    <td class="flex justify-end">-->
-<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
-<!--                            Revision-->
-<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
-<!--                                      fill="#0D2B40"/>-->
-<!--                            </svg>-->
 
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td>-->
-<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
-<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                                <span class="rounded-md bg-yellow-100 text-yellow-400 py-3 px-4 text-3.25">-->
-<!--                                    Reguest for post-editing sent-->
-<!--                                </span>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
-<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <g clip-path="url(#clip0_759_2185)">-->
-<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                </g>-->
-<!--                                <defs>-->
-<!--                                    <clipPath id="clip0_759_2185">-->
-<!--                                        <rect width="16" height="16" fill="white"-->
-<!--                                              transform="translate(0.333984)"/>-->
-<!--                                    </clipPath>-->
-<!--                                </defs>-->
-<!--                            </svg>-->
-<!--                            Download-->
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                    <td class="flex justify-end">-->
-<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
-<!--                            Revision-->
-<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
-<!--                                      fill="#0D2B40"/>-->
-<!--                            </svg>-->
+        <div id="text-translate-content" class="tab-content">
+            {% include 'text_translate.html' %}
+        </div>
 
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td>-->
-<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
-<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                                <span class="rounded-md bg-gray-200 text-gray-800 py-3 px-4 text-3.25">-->
-<!--                                    Translated-->
-<!--                                </span>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
-<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <g clip-path="url(#clip0_759_2185)">-->
-<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                </g>-->
-<!--                                <defs>-->
-<!--                                    <clipPath id="clip0_759_2185">-->
-<!--                                        <rect width="16" height="16" fill="white"-->
-<!--                                              transform="translate(0.333984)"/>-->
-<!--                                    </clipPath>-->
-<!--                                </defs>-->
-<!--                            </svg>-->
-<!--                            Download-->
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                    <td class="flex justify-end">-->
-<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
-<!--                            Revision-->
-<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
-<!--                                      fill="#0D2B40"/>-->
-<!--                            </svg>-->
 
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td>-->
-<!--                        <div class="rounded-md bg-gray-200 text-gray-400 py-3 px-4 w-50 truncate text-3.5">-->
-<!--                            The Sliding Mr. Bones (Next Stop,Pottersville)-->
-<!--                        </div>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                                <span class="rounded-md bg-gray-200 text-gray-800 py-3 px-4 text-3.25">-->
-<!--                                    Translated-->
-<!--                                </span>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <button class="flex gap-2.5 items-center text-green-700">-->
-<!--                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <g clip-path="url(#clip0_759_2185)">-->
-<!--                                    <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                    <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z"-->
-<!--                                          fill="#176C77"/>-->
-<!--                                </g>-->
-<!--                                <defs>-->
-<!--                                    <clipPath id="clip0_759_2185">-->
-<!--                                        <rect width="16" height="16" fill="white"-->
-<!--                                              transform="translate(0.333984)"/>-->
-<!--                                    </clipPath>-->
-<!--                                </defs>-->
-<!--                            </svg>-->
-<!--                            Download-->
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                    <td class="flex justify-end">-->
-<!--                        <button class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3">-->
-<!--                            Revision-->
-<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"-->
-<!--                                 xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"-->
-<!--                                      fill="#0D2B40"/>-->
-<!--                            </svg>-->
+        <!--  ------------- TAB-2 -------------  -->
 
-<!--                        </button>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                </tbody>-->
-<!--            </table>-->
-<!--        </div>-->
-<!--        <div class="flex w-full items-center justify-start">-->
-<!--            <button class="mt-5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold">-->
-<!--                <span class="text-3.5">New translation</span>-->
-<!--            </button>-->
-<!--        </div>-->
-<!--    </div>-->
+
+        <div id="document-translate-content" class="tab-content hidden">
+            {% include 'document_translate.html' %}
+        </div>
+
+
+        <!--  ------------- TAB-3 -------------  -->
+
+
+        <div id="writing-content" class="tab-content hidden">
+            {% include 'writing.html' %}
+        </div>
+    </div>
+
 </div>
+<script src="{% static 'js/text-translate.js' %}"></script>
+<script>
+    let get_domains = "{% url 'get_domains' %}"
+    let translate = "{% url 'main_index' %}"
+    let expert_revision = "{% url 'expert_revision' %}"
+    let detect_language = "{% url 'detect_language' %}"
+    let domain_groups = "{% url 'domain_groups' %}"
+    let get_default_glossary = "{% url 'get_default_glossary' %}"
+    let api_list_glossaries = "{% url 'api_list_glossaries' %}"
+    let expert_revision_file = "{% url 'expert_revision_file' %}"
+    let add_glossary = "{% url 'add_glossary' %}"
+</script>
+<script>
+    var languages = [
+        {% for language in translate_languages %}
+    {
+        "id": {{ language.id }},
+        "abbreviation": "{{ language.abbreviation }}",
+        "name": "{{ language.name }}",
+    },
+    {% endfor %}
+    ]
+</script>
 {% endblock %}

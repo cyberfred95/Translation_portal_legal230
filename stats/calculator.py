@@ -1,12 +1,11 @@
 import os
-import time
 
 from django.conf import settings
 import requests
-from .models import UserStats
+from preferences import preferences
 
 
-class StatsCalculator:
+class StatsProcessor:
     file_extension_route_mapping = {
         '.docx': 'word',
         '.pptx': 'powerpoint',
@@ -39,9 +38,21 @@ class StatsCalculator:
             chars += len(paragraph['text'])
         return chars
 
-    def calculate_statistics(self, files, user):
-        for file in files:
-            chars = self.get_chars(file)
-            print(chars)
-            stats = UserStats.objects.create(user=user, chars=chars)
-            time.sleep(0.2)
+    @staticmethod
+    def send_request(texts: list, user_uuid, translation_name, source_language=None, target_language=None):
+        response = requests.post(
+            preferences.StatisticSettings.URL + "add_statistic/",
+            headers={
+                'token': preferences.StatisticSettings.API_KEY,
+                'X-API-Key': preferences.MainSettings.api_key,
+            },
+            data={
+                "messages": texts,
+                "uuid": user_uuid,
+                'custom_mt_api_key': preferences.MainSettings.api_key,
+                'template_name': translation_name,
+            }
+        )
+        print(response.text)
+        print(response.status_code)
+

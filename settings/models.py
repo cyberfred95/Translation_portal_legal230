@@ -8,6 +8,7 @@ class MainSettings(Preferences):
         domains = 'domain', 'Domain'
 
     sender_email = models.EmailField()
+    support_email = models.EmailField(blank=True, null=True)
     api_key = models.CharField(max_length=256)
     algorithm = models.CharField(choices=AlgorithmChoices.choices, default=AlgorithmChoices.template, max_length=32)
     CUSTOM_MT_CONSOLE_URL = models.URLField(max_length=256, default='https://console.custom.mt/translation/')
