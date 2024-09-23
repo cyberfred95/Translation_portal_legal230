@@ -131,7 +131,6 @@ $(document).ready(function () {
         selectedSubDomain = '';
         selectedGlossaryType = 'default';
         selectedGlossary = null;
-        $('.target-select-language').val('');
         $('.projects tbody').empty();
         selectedFiles = [];
         $fileList.empty().addClass('hidden');
