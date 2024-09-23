@@ -224,7 +224,7 @@ $(document).ready(function () {
             file.fileId = fileId;
 
             const $fileItem = $(`
-            <div class="file flex gap-4 items-center px-4 py-3 rounded-md bg-green-350 text-green-650" data-file-id="${fileId}">
+            <div class="file flex gap-4 items-center px-4 py-3 rounded-md bg-green-350 text-green-650 font-normal" data-file-id="${fileId}">
                 <span>${file.name}</span>
                 <button type="button" class="remove-file" data-file-id="${fileId}">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -322,7 +322,7 @@ $(document).ready(function () {
         files.forEach((file) => {
             const $fileItem = $(`
             <div class="flex gap-5 items-center" data-file-id="${file.fileId}">
-                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-350 text-green-650 detected-file">
+                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-350 text-green-650 detected-file font-normal">
                     <span class="text-3.5 w-50 truncate">${file.file_name}</span>
                     <button type="button" class="remove-detected-file" data-file-id="${file.fileId}">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -370,7 +370,7 @@ $(document).ready(function () {
                     });
 
                     if (defaultValue && $selectedOption.val() === defaultValue) {
-                        var newText = text + ' <span class="detected-text">(detected)</span>';
+                        var newText = text + ' <span class="detected-text font-normal">(detected)</span>';
                         $selectedOption.text(text + ' (detected)');
                         $select.next('.select2-container').find('.select2-selection__rendered').html(newText);
                     } else {
