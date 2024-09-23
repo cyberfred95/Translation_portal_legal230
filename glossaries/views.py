@@ -43,6 +43,9 @@ class AddGlossaryView(CreateAPIView):
 class SingleGlossaryView(RetrieveUpdateDestroyAPIView):
     serializer_class = GlossarySerializer
 
+    def get_queryset(self):
+        return Glossary.objects.filter(user=self.request.user, id=self.kwargs['pk']).first()
+
 
 class GlossariesListAPIView(APIView):
 
