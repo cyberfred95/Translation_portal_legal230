@@ -931,12 +931,12 @@ $(document).ready(function () {
                 class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3 text-3.25 expert-revision"
                 ${project.status !== 'Translated' ? 'disabled' : ''}
             >
-                Expert revision
+                Revision
                 <div class="relative group">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z" fill="currentColor"/>
                     </svg>
-                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 py-3 px-4.5 bg-gray-800 text-white text-2.75 rounded-md bottom-26 left-1/2 transform -translate-x-1/2 translate-y-full">
+                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 py-3 px-4.5 bg-gray-800 text-white text-2.75 rounded-md bottom-30 left-1/2 transform -translate-x-1/2 translate-y-full">
                         <span class="text-justify text-wrap block">
                             Click the button to see options for improving the quality of the translated file.
                         </span>
