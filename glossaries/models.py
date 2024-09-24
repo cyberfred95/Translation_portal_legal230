@@ -46,7 +46,23 @@ class Glossary(models.Model):
         # Ensure that either user or group is selected, but not both
         if self.user and self.group:
             raise ValidationError("You cannot select both a user and a group at the same time.")
-        if not self.user and not self.group:
-            raise ValidationError("You must select either a user or a group.")
+
+        existing_glossary = Glossary.objects.filter(
+            domain=self.domain,
+            source_language=self.source_language,
+            target_language=self.target_language,
+        )
+
+        # If a user is selected, check for duplication by user
+        if self.user:
+            existing_glossary = existing_glossary.filter(user=self.user, group__isnull=True)
+
+        # If a group is selected, check for duplication by group
+        if self.group:
+            existing_glossary = existing_glossary.filter(group=self.group, user__isnull=True)
+
+        if existing_glossary.exists():
+            raise ValidationError(
+                "A glossary with the same source language, target language, domain, and user/group already exists.")
 
         super().clean()
