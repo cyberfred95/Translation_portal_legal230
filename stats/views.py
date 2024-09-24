@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import requests
 from preferences import preferences
 from django.views.generic import TemplateView
@@ -35,6 +37,9 @@ class UsageView(TemplateView):
         for stat in stats['results']:
             user = User.objects.filter(uuid=stat.get('user_uuid')).first()
             stat['user'] = user.username if user else 'Unknown'
+
+            stat['created_at'] = datetime.fromisoformat(stat['created_at'].replace('Z', '+00:00'))
+
             try:
                 stat['group'] = user.group.name
             except:

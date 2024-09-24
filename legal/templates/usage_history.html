@@ -433,7 +433,7 @@
                         </div>
                     </td>
                     <td class="text-3.25 text-gray-800">
-                        {{ stat.created_at }}
+                        {{ stat.created_at |date:"Y/m/d" }}
                     </td>
                 </tr>
                 {% endfor %}
