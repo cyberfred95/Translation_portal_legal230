@@ -433,7 +433,7 @@
                         </div>
                     </td>
                     <td class="text-3.25 text-gray-800">
-                        {{ stat.created_at }}
+                        {{ stat.created_at |date:"Y/m/d" }}
                     </td>
                 </tr>
                 {% endfor %}
@@ -476,12 +476,12 @@
             <span>|</span>
             <div class="text-green-500">{{ stats.total_count.tokens }}</div>
             <div class="text-gray-800">tokens</div>
-            <span>|</span>
-            <div class="text-green-500">{{ stats.current_page }}</div>
-            <div class="text-gray-800">current page</div>
-            <span>|</span>
-            <div class="text-green-500">{{ stats.num_pages }}</div>
-            <div class="text-gray-800">pages count</div>
+{#            <span>|</span>#}
+{#            <div class="text-green-500">{{ stats.current_page }}</div>#}
+{#            <div class="text-gray-800">current page</div>#}
+{#            <span>|</span>#}
+{#            <div class="text-green-500">{{ stats.num_pages }}</div>#}
+{#            <div class="text-gray-800">pages count</div>#}
         </div>
     </div>
 
