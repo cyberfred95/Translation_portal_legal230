@@ -28,7 +28,6 @@ from .tasks import send_statistic_request
 
 
 PAGINATION_PAGE_SIZE = 20
-PORTAL_API_KEY = ""
 
 
 def text_translation(request):
@@ -309,7 +308,8 @@ class LanguageDetectView(APIView):
         files = request.FILES.getlist('document[]', [])
         result = []
         for file in files:
-            text = StatsProcessor().get_texts(file=file)['texts'][0]['text']
+            api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+            text = StatsProcessor(api_key).get_texts(file=file)['texts'][0]['text']
             print(text)
             tmp_language = langdetect.detect(text)
             language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
