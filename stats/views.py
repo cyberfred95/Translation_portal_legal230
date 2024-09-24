@@ -16,7 +16,6 @@ class UsageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['stats'] = self.get_stats()
-        print(context['stats'])
         return context
 
     def get_stats(self):
@@ -35,7 +34,7 @@ class UsageView(TemplateView):
 
         stats = dict(response.json())
         for stat in stats['results']:
-            user = User.objects.filter(uuid=stat.get('user_uuid')).first()
+            user = User.objects.filter(uuid=stat.get('user_portal_uuid')).first()
             stat['user'] = user.username if user else 'Unknown'
 
             stat['created_at'] = datetime.fromisoformat(stat['created_at'].replace('Z', '+00:00'))
@@ -46,7 +45,7 @@ class UsageView(TemplateView):
                 stat['group'] = 'Unknown'
 
             stat.pop('portal_name')
-            stat.pop('user_uuid')
+            stat.pop('user_portal_uuid')
         stats['total_count'] = self.calculate_total_chars_and_tokens(stats)
         return stats
 
