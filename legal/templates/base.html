@@ -47,22 +47,39 @@
                     colors: {
                         gray: {
                             100: '#F4F6F7',
+                            120: '#EBEFF0',
+                            150: '#F5F7F7',
+                            160: '#F2F3F5',
+                            170: '#E4E8EA',
                             200: '#EAECED',
+                            250: '#CACACA',
+                            270: '#AFB9C1',
                             300: '#D5DADE',
+                            350: '#F8F9FA',
                             400: '#AAB4BD',
+                            450: '#9EAAB3',
                             500: '#808E9B',
+                            550: '#7A8B98',
                             600: '#556A7B',
                             700: '#2A4459',
+                            750: '#2B4459',
                             800: '#0D2B40',
                         },
                         green: {
                             100: '#F3F8F8',
                             200: '#E7F0F1',
+                            250: '#DFEAEC',
+                            270: '#B9D3D6',
                             300: '#D1E2E3',
+                            350: '#E8F0F1',
+                            370: '#E6F8F6',
                             400: '#A1C4C9',
                             500: '#74A6AC',
                             600: '#458993',
+                            650: '#176C77',
+                            670: '#346C77',
                             700: '#156D77',
+                            750: '#00BBA7',
                         },
                         red: {
                             100: '#FFEFEF',
@@ -87,13 +104,16 @@
                     inset: generateTailwindSizes(),
                     spacing: generateTailwindSizes(),
                     borderRadius: generateTailwindSizes(),
+                    borderWidth: generateTailwindSizes(),
+                    divideWidth: generateTailwindSizes(),
                     gap: generateTailwindSizes(),
                 }
             }
         }
     </script>
 </head>
-<body class="font-montserrat">
+<body class="font-montserrat font-medium">
+
 <div class="flex h-screen overflow-hidden">
     <!-- Sidebar -->
     <div class="flex-shrink-0">
