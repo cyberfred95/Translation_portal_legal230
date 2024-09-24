@@ -4,5 +4,5 @@ from .views import UsersListView
 
 
 urlpatterns = [
-    path('groups/', login_required(UsersListView.as_view()), name='groups'),
+    path('', login_required(UsersListView.as_view()), name='groups'),
 ]
