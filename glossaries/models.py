@@ -57,11 +57,27 @@ class Glossary(models.Model):
                 group__isnull=True,
                 user__isnull=True
             )
-            if not (self.group and self.user):
+            if not self.group and not self.user:
                 existing_default_glossaries = existing_default_glossaries.exclude(pk=self.pk)
+                print(existing_default_glossaries)
 
                 if existing_default_glossaries.exists():
                     raise ValidationError("A default glossary for this language pair and domain already exists.")
+
+        existing_glossary_filters = {
+            'domain': self.domain,
+            'source_language': self.source_language,
+            'target_language': self.target_language
+        }
+
+        if self.user:
+            if Glossary.objects.filter(**existing_glossary_filters, user=self.user).exclude(pk=self.pk).exists():
+                raise ValidationError(
+                    "A glossary for this language pair and domain and user already exists")
+        elif self.group:
+            if Glossary.objects.filter(**existing_glossary_filters, group=self.group).exclude(pk=self.pk).exists():
+                raise ValidationError(
+                    "A glossary for this language pair and domain and user already exists")
 
         super().clean()
 
