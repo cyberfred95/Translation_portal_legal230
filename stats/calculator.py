@@ -6,6 +6,10 @@ from preferences import preferences
 
 
 class StatsProcessor:
+
+    def __init__(self, api_key):
+        self._api_key = api_key
+
     file_extension_route_mapping = {
         '.docx': 'word',
         '.pptx': 'powerpoint',
@@ -38,8 +42,31 @@ class StatsProcessor:
             chars += len(paragraph['text'])
         return chars
 
-    @staticmethod
-    def send_request(texts: list, user_uuid, translation_name, source_language=None, target_language=None):
+
+    def get_template_name(self, source_language, target_language, domain_name):
+        response = requests.post(
+            preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "get_template_by_language_pair_and_domain",
+            headers={
+                "token": self._api_key
+            },
+            data={
+                "source_language": source_language,
+                "target_language": target_language,
+                "domain_name": domain_name
+            }
+        )
+        return response.json().get('name')
+
+    def send_request(self,
+                     texts: list,
+                     user_uuid,
+                     domain_name,
+                     source_language,
+                     target_language,
+                     file_name='Text translate',
+
+                     ):
+        template_name = self.get_template_name(source_language, target_language, domain_name)
         response = requests.post(
             preferences.StatisticSettings.URL + "add_statistic/",
             headers={
@@ -50,7 +77,9 @@ class StatsProcessor:
                 "messages": texts,
                 "uuid": user_uuid,
                 'custom_mt_api_key': preferences.MainSettings.api_key,
-                'template_name': translation_name,
+
+                'template_name': template_name,
+                'file_name': file_name
             }
         )
         print(response.text)

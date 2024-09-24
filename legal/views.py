@@ -25,23 +25,27 @@ from gpt_processing.prompts_list import prompts_list
 from stats.calculator import StatsProcessor
 import langdetect
 from .tasks import send_statistic_request
-from languages.serializers import LanguageSerializer
+
 
 PAGINATION_PAGE_SIZE = 20
-PORTAL_API_KEY = ""
 
 
 def text_translation(request):
     text = request.POST.get('text')
-    print(request.POST)
+
+    api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
     response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translate", data={
         "text": [text],
         **get_translate_data(request),
     }, headers={
-        "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+
+        "token": api_key})
     send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('domain_name'))
-    # send_statistic_request.delay(response.json().get('translated_text'), request.user.uuid,
-    #                              request.POST.get('domain_name'))
+    send_statistic_request.delay(
+        api_key, response.json().get('translated_text'),
+        request.user.uuid,
+        **get_translate_data(request)
+    )
     return response.json()
 
 
@@ -234,6 +238,42 @@ class ProjectsHistoryView(TemplateView):
         return context
 
 
+class UsageHistoryView(TemplateView):
+    template_name = 'usage_history.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        page = self.request.GET.get('page')
+        context['languages'] = languages
+        params = {
+            "page_size": PAGINATION_PAGE_SIZE,
+            "page": page,
+            "user_custom_mt_token": user.uuid if not user.is_staff else None
+        }
+        headers = {"token": preferences.MainSettings.api_key if user.is_staff else user.group.api_key}
+
+        if page is not None:
+            params["page"] = int(page)
+
+        response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
+        if 'results' in response:
+            for project in response['results']:
+                file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
+                original_filename = unquote(file_name)
+                project['source_file_name'] = original_filename
+                if user.is_staff:
+                    try:
+                        project['username'] = User.objects.get(uuid=project['user_custom_mt_token'])
+                    except User.DoesNotExist:
+                        project['username'] = None
+                    except django.core.exceptions.ValidationError:
+                        project['username'] = None
+            context['projects'] = response
+
+        return context
+
+
 class SingleProjectView(APIView):
 
     def get(self, request):
@@ -268,7 +308,8 @@ class LanguageDetectView(APIView):
         files = request.FILES.getlist('document[]', [])
         result = []
         for file in files:
-            text = StatsProcessor().get_texts(file=file)['texts'][0]['text']
+            api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+            text = StatsProcessor(api_key).get_texts(file=file)['texts'][0]['text']
             print(text)
             tmp_language = langdetect.detect(text)
             language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
