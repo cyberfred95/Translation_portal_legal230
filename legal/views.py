@@ -26,17 +26,20 @@ from stats.calculator import StatsProcessor
 import langdetect
 from .tasks import send_statistic_request
 
+
 PAGINATION_PAGE_SIZE = 20
 PORTAL_API_KEY = ""
 
 
 def text_translation(request):
     text = request.POST.get('text')
+
     api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
     response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translate", data={
         "text": [text],
         **get_translate_data(request),
     }, headers={
+
         "token": api_key})
     send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('domain_name'))
     send_statistic_request.delay(

@@ -1,4 +1,3 @@
-
 import requests
 from preferences import preferences
 from django.views.generic import TemplateView
@@ -6,6 +5,7 @@ from legal.views import PAGINATION_PAGE_SIZE
 
 
 # Create your views here.
+
 
 class UsageView(TemplateView):
     template_name = 'usage_history.html'
@@ -26,6 +26,7 @@ class UsageView(TemplateView):
                 'X-API-Key': preferences.MainSettings.api_key
             },
             json={
+
                 "uuid": str(self.request.user.uuid)
             }
         )
@@ -59,6 +60,7 @@ class UsageView(TemplateView):
             additional_url_params += f"?date_from={date_from}"
         elif date_to:
             additional_url_params += f"?date_to={date_to}"
+
         if self.request.user.group and self.request.user.group.admin == self.request.user:
             additional_url_params += "&group_admin=true"
 

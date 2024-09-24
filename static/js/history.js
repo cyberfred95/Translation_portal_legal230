@@ -5,12 +5,12 @@ $(document).ready(function () {
         var statusText = statusElement.text().trim();
         switch (statusText) {
             case 'Being translated':
-                statusElement.text('Being translated');
-                statusElement.addClass('bg-gray-200 text-gray-800');
+                statusElement.text('Processing...');
+                statusElement.addClass('text-green-700');
                 break;
             case 'Translated':
                 statusElement.text('Translated');
-                statusElement.addClass('bg-gray-200 text-gray-800');
+                statusElement.addClass('bg-green-350 text-green-650');
                 break;
             case 'Sent to post-editing, not accepted yet':
                 statusElement.text('Request for post-editing sent');
@@ -22,7 +22,7 @@ $(document).ready(function () {
                 break;
             case 'Post-edited file uploaded':
                 statusElement.text('Post-edited file uploaded');
-                statusElement.addClass('bg-green-200 text-green-700');
+                statusElement.addClass('bg-green-370 text-green-750');
                 break;
             case 'Error':
                 statusElement.text('Error');

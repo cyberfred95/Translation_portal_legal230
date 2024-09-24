@@ -3,7 +3,8 @@ from django.contrib import admin
 from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static, serve
-from .views import TranslateView, expert_revision, expert_revision_file, ProjectsHistoryView, SingleProjectView, \
+from .views import TranslateView, expert_revision, expert_revision_file, ProjectsHistoryView, UsageHistoryView, SingleProjectView, \
+
     GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns

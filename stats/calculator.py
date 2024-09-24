@@ -42,6 +42,7 @@ class StatsProcessor:
             chars += len(paragraph['text'])
         return chars
 
+
     def get_template_name(self, source_language, target_language, domain_name):
         response = requests.post(
             preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "get_template_by_language_pair_and_domain",
@@ -76,9 +77,11 @@ class StatsProcessor:
                 "messages": texts,
                 "uuid": user_uuid,
                 'custom_mt_api_key': preferences.MainSettings.api_key,
+
                 'template_name': template_name,
                 'file_name': file_name
             }
         )
         print(response.text)
         print(response.status_code)
+
