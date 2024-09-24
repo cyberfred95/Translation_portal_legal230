@@ -3,7 +3,7 @@
 <form class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-2.5 w-full h-full flex flex-col items-end">
     <div class="w-full">
         <div class="relative pt-1">
-            <div class="overflow-hidden h-1.5 mb-12 text-xs flex rounded bg-green-250">
+            <div class="overflow-hidden h-1.5 mb-15 text-xs flex rounded bg-green-250">
                 <div id="progress-bar"
                      class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-700 transition-all duration-500 ease-out"
                      style="width: 0%"></div>
@@ -15,8 +15,9 @@
                         <rect width="10" height="10" rx="5" fill="currentColor"/>
                         <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
                     </svg>
-                    <div class="flex flex-col gap-0.5 mt-2">
+                    <div class="flex flex-col gap-0.25 mt-2">
                         <span class="text-3.25 text-green-700">Upload the document</span>
+                        <span class="text-2.5 text-gray-450">Documents uploaded</span>
                     </div>
                 </div>
                 <div id="point-2" class="flex flex-col">
@@ -25,8 +26,9 @@
                         <rect width="10" height="10" rx="5" fill="currentColor"/>
                         <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
                     </svg>
-                    <div class="flex flex-col gap-0.5 mt-2">
+                    <div class="flex flex-col gap-0.25 mt-2">
                         <span class="text-3.25 text-green-300">Language combination</span>
+                        <span class="text-2.5 text-gray-450 hidden language-step"><span class="source"></span>-<span class="target"></span></span>
                     </div>
                 </div>
                 <div id="point-3" class="flex flex-col">
@@ -35,8 +37,9 @@
                         <rect width="10" height="10" rx="5" fill="currentColor"/>
                         <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
                     </svg>
-                    <div class="flex flex-col gap-0.5 mt-2">
+                    <div class="flex flex-col gap-0.25 mt-2">
                         <span class="text-3.25 text-green-300">Domain selection</span>
+                        <span class="text-2.5 text-gray-450 hidden domain-step"></span>
                     </div>
                 </div>
                 <div id="point-4" class="flex flex-col">
@@ -45,8 +48,9 @@
                         <rect width="10" height="10" rx="5" fill="currentColor"/>
                         <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
                     </svg>
-                    <div class="flex flex-col gap-0.5 mt-2">
+                    <div class="flex flex-col gap-0.25 mt-2">
                         <span class="text-3.25 text-green-300">Terminology</span>
+                        <span class="text-2.5 text-gray-450 hidden terminology-step"></span>
                     </div>
                 </div>
                 <div id="point-5" class="flex flex-col">
