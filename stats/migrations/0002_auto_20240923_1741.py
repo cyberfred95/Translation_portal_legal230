@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name='statisticsettings',
+            model_name='StatisticSettings',
             name='URL',
             field=models.URLField(default='https://statistic.portal.custom.mt/', max_length=255),
         ),
