@@ -2,6 +2,7 @@ import requests
 from preferences import preferences
 from django.views.generic import TemplateView
 from legal.views import PAGINATION_PAGE_SIZE
+from users.models import User, UserGroup
 
 
 # Create your views here.
@@ -33,7 +34,15 @@ class UsageView(TemplateView):
 
         stats = dict(response.json())
         for stat in stats['results']:
+            user = User.objects.filter(uuid=stat.get('user_uuid')).first()
+            stat['user'] = user.username if user else 'Unknown'
+            try:
+                stat['group'] = user.group.name
+            except:
+                stat['group'] = 'Unknown'
+
             stat.pop('portal_name')
+            stat.pop('user_uuid')
         stats['total_count'] = self.calculate_total_chars_and_tokens(stats)
         return stats
 
