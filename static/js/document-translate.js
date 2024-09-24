@@ -5,6 +5,7 @@ $(document).ready(function () {
     let selectedSubDomain = '';
     let selectedGlossaryType = 'default';
     let selectedGlossary = '';
+
     let selectedFiles = [];
 
 
@@ -57,12 +58,14 @@ $(document).ready(function () {
         for (let i = 0; i <= step; i++) {
             $(`#point-${i + 1}`).find("svg").removeClass("text-green-270").addClass("text-green-650");
             $(`#point-${i + 1}`).find(".text-3\\.25, .text-xs").removeClass("text-green-250").addClass("text-green-650");
+
         }
     }
 
     function showStep(step) {
         $('.border-line > div').addClass('hidden');
         $(`.border-line > div:eq(${step})`).removeClass('hidden');
+
         updateProgress(step);
 
         const $actionList = $(".action-list");
@@ -71,6 +74,7 @@ $(document).ready(function () {
             $("#prev-step").hide();
             $("#restart").hide();
             $("#restart-text").hide();
+
             if (selectedFiles.length > 0) {
                 $("#next-step").show().text("Following");
                 $actionList.css("justify-content", "flex-end");
@@ -82,12 +86,14 @@ $(document).ready(function () {
             $("#next-step").hide();
             $("#restart").show().text("New translation");
             $("#restart-text").show();
+
             $actionList.css("justify-content", "flex-start");
         } else {
             $("#prev-step").show();
             $("#next-step").show().text("Following");
             $("#restart").hide();
             $("#restart-text").hide();
+
             $actionList.css("justify-content", "space-between");
         }
 
@@ -110,6 +116,7 @@ $(document).ready(function () {
         if (currentStep === 2) {
             loadDefaultGlossary();
             $('.terminology-step').text('default').removeClass('hidden');
+
         }
         if (currentStep === 3) {
             fileTranslate();
@@ -123,6 +130,7 @@ $(document).ready(function () {
             currentStep--;
             showStep(currentStep);
             $("#next-step").removeClass('border-gray-300 text-gray-300 pointer-events-none').addClass('border-green-650 text-green-650').prop("disabled", false);
+
             $('.step-container').removeClass('bg-red-100 border-red-200');
         }
     });
@@ -135,6 +143,7 @@ $(document).ready(function () {
         selectedSubDomain = '';
         selectedGlossaryType = 'default';
         selectedGlossary = '';
+
         $('.projects tbody').empty();
         selectedFiles = [];
         $fileList.empty().addClass('hidden');
@@ -187,6 +196,7 @@ $(document).ready(function () {
     $('#writing').click(function () {
         showTab('writing');
         setHash(3);
+
     });
 
 
@@ -256,6 +266,7 @@ $(document).ready(function () {
 
             const $fileItem = $(`
             <div class="file flex gap-4 items-center px-4 py-3 rounded-md bg-green-350 text-green-650 font-normal" data-file-id="${fileId}">
+
                 <span>${file.name}</span>
                 <button type="button" class="remove-file" data-file-id="${fileId}">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -291,6 +302,7 @@ $(document).ready(function () {
             $("#next-step").show().text("Following");
             $("#restart").hide();
             $("#restart-text").hide();
+
             $actionList.css("justify-content", "flex-end");
         } else if (currentStep === 0) {
             $("#next-step").hide();
@@ -354,6 +366,7 @@ $(document).ready(function () {
             const $fileItem = $(`
             <div class="flex gap-5 items-center" data-file-id="${file.fileId}">
                 <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-350 text-green-650 detected-file font-normal">
+
                     <span class="text-3.5 w-50 truncate">${file.file_name}</span>
                     <button type="button" class="remove-detected-file" data-file-id="${file.fileId}">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -402,6 +415,7 @@ $(document).ready(function () {
 
                     if (defaultValue && $selectedOption.val() === defaultValue) {
                         var newText = text + ' <span class="detected-text font-normal">(detected)</span>';
+
                         $selectedOption.text(text + ' (detected)');
                         $select.next('.select2-container').find('.select2-selection__rendered').html(newText);
                     } else {
@@ -460,6 +474,7 @@ $(document).ready(function () {
 
         if (!isConsistent || !targetValue || isSameAsTarget) {
             nextButton.removeClass('border-green-650 text-white text-green-650')
+
                 .addClass('border-gray-300 text-gray-300 pointer-events-none')
                 .prop("disabled", true);
         } else {
@@ -469,6 +484,7 @@ $(document).ready(function () {
             $('.language-step').removeClass('hidden');
             $('.source').text(firstValue.toUpperCase());
             $('.target').text(targetValue.toUpperCase());
+
         }
     }
 
@@ -529,6 +545,7 @@ $(document).ready(function () {
                 click: function () {
                     $('.domain-button').removeClass('selected bg-green-650 text-white').addClass('bg-gray-160 text-gray-550');
                     $(this).removeClass('bg-gray-160 text-gray-550').addClass('selected bg-green-650 text-white');
+
                     selectedDomain = $(this).data('name');
                     getDomains();
                 }
@@ -536,6 +553,7 @@ $(document).ready(function () {
 
             if (index === 0) {
                 button.removeClass('bg-gray-160 text-gray-550').addClass('selected bg-green-650 text-white');
+
                 selectedDomain = domain.name;
             }
 
@@ -568,6 +586,7 @@ $(document).ready(function () {
             }
 
             $('.domain-step').text(selectedSubDomain).removeClass('hidden');
+
             subDomainsList.append(button);
         });
     }
@@ -601,6 +620,7 @@ $(document).ready(function () {
             success: function (response) {
                 if (response.data && response.data.length === 0) {
                     $('#next-step').removeClass('border-green-650 text-white text-green-650')
+
                         .addClass('border-gray-300 text-gray-300 pointer-events-none')
                         .prop("disabled", true);
                 }
@@ -622,6 +642,7 @@ $(document).ready(function () {
         selectGlossaryType('default');
         loadDefaultGlossary();
         $('.terminology-step').text('default').removeClass('hidden');
+
     });
 
     $(".step-4 .my-glossary").click(function () {
@@ -632,6 +653,7 @@ $(document).ready(function () {
     $(".step-4 .none").click(function () {
         selectGlossaryType('none');
         $('.terminology-step').text('none').removeClass('hidden');
+
         clearGlossaryList();
     });
 
@@ -695,6 +717,7 @@ $(document).ready(function () {
                 updateGlossaryList(response);
                 $('.terminology-step').text('default').removeClass('hidden');
 
+
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching my glossaries:", error);
@@ -712,12 +735,13 @@ $(document).ready(function () {
                 if (selectedGlossary === glossary.name) {
                     $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
                     selectedGlossary = '';
+
                 } else {
                     $(".glossary-item").removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
                     $(this).removeClass('bg-gray-200 text-gray-400').addClass('bg-green-700 text-white');
                     selectedGlossary = glossary.name;
-
                     $('.terminology-step').text(selectedGlossary).removeClass('hidden');
+
                 }
             });
             $list.append($item);
@@ -822,12 +846,14 @@ $(document).ready(function () {
         const tableBody = $('.projects tbody');
         tableBody.empty();
 
+
         projects.forEach(project => {
             const row = $('<tr></tr>');
 
             row.append(`
             <td>
                 <div class="rounded-md text-green-650 py-3 px-4 md:w-50 2xl:w-80 truncate text-3.25">
+
                     ${project.source_file_name}
                 </div>
             </td>
@@ -835,6 +861,7 @@ $(document).ready(function () {
 
             const statusColumn = $('<td></td>');
             const statusSpan = $('<span class="rounded-md py-1.5 px-2.5 text-3.25 font-medium"></span>');
+
 
             switch (project.status) {
                 case 'Being translated':
@@ -844,6 +871,7 @@ $(document).ready(function () {
                 case 'Translated':
                     statusSpan.text('Translated');
                     statusSpan.addClass('bg-green-350 text-green-650');
+
                     break;
                 case 'Sent to post-editing, not accepted yet':
                     statusSpan.text('Request for post-editing sent');
@@ -856,6 +884,7 @@ $(document).ready(function () {
                 case 'Post-edited file uploaded':
                     statusSpan.text('Post-edited file uploaded');
                     statusSpan.addClass('bg-green-370 text-green-750');
+
                     break;
                 case 'Error':
                     statusSpan.text('Error');
@@ -1020,10 +1049,12 @@ $(document).ready(function () {
             },
             dataType: 'json',
             success: function () {
+
                 const projectRow = $(`button[data-id="${id}"]`).closest('tr');
                 const statusSpan = projectRow.find('td:eq(1) span');
                 statusSpan.text('Request for post-editing sent');
                 statusSpan.removeClass().addClass('rounded-md py-1.5 px-2.5 text-3.25 bg-yellow-100 text-yellow-400');
+
 
                 projectRow.find('.expert-revision').prop('disabled', true).addClass('disabled:pointer-events-none disabled:text-gray-300 disabled:border-gray-300');
 
@@ -1055,6 +1086,7 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     updateProjectTable(response);
+
 
                     let allCompleted = response.every(project => project.status !== "Being translated");
                     if (allCompleted) {
