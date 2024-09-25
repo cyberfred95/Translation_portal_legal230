@@ -27,7 +27,7 @@ class UserGlossariesView(TemplateView):
             glossaries.append(
                 {
                     "file_url": self.request.build_absolute_uri(glossary.file.url),
-                    "file_name": glossary.file.name,
+                    "name": glossary.name,
                     "source_language": glossary.source_language.abbreviation.upper(),
                     "target_language": glossary.target_language.abbreviation.upper(),
                     "file_size": glossary.file_size(),
