@@ -6,24 +6,26 @@
     </div>
     <div class="flex-1 pl-4 flex items-center justify-center">
 
-        <div class="flex gap-3 items-center target-language">
-            <svg width="6" height="10" viewBox="0 0 6 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M5.71393 4.28962C5.6637 4.23904 5.6081 4.19635 5.55034 4.15922L1.67443 0.283488C1.29615 -0.0944361 0.683075 -0.0946154 0.304613 0.283667C-0.0736695 0.66177 -0.0736695 1.27502 0.304613 1.65348L3.64279 4.9913L0.287753 8.3467C-0.0907092 8.72462 -0.0907092 9.33805 0.287753 9.71651C0.476983 9.90539 0.724687 9.99991 0.972392 9.99991C1.2201 9.99991 1.46834 9.90539 1.65703 9.71615L5.55034 5.82338C5.6081 5.78625 5.66352 5.74374 5.71393 5.69298C5.90764 5.49926 6.00055 5.24492 5.99625 4.9913C6.00073 4.7375 5.90764 4.4828 5.71393 4.28962Z"
-                      fill="#0D2B40"/>
-            </svg>
-            <select class="js-example-basic-single target-select-language" name="source_language" required
-                    data-default-value="en">
-                <option value="" disabled selected>Select target language</option>
-                {% for translate_language in translate_languages %}
-                <option value="{{ translate_language.abbreviation|lower }}">
-                    {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                    {{ translate_language.french_name }}
-                    {% else %}
-                    {{ translate_language.name }}
-                    {% endif %}
-                </option>
-                {% endfor %}
-            </select>
+        <div class="target-language">
+            <div class="flex gap-3 items-center select-block">
+                <svg width="6" height="10" viewBox="0 0 6 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5.71393 4.28962C5.6637 4.23904 5.6081 4.19635 5.55034 4.15922L1.67443 0.283488C1.29615 -0.0944361 0.683075 -0.0946154 0.304613 0.283667C-0.0736695 0.66177 -0.0736695 1.27502 0.304613 1.65348L3.64279 4.9913L0.287753 8.3467C-0.0907092 8.72462 -0.0907092 9.33805 0.287753 9.71651C0.476983 9.90539 0.724687 9.99991 0.972392 9.99991C1.2201 9.99991 1.46834 9.90539 1.65703 9.71615L5.55034 5.82338C5.6081 5.78625 5.66352 5.74374 5.71393 5.69298C5.90764 5.49926 6.00055 5.24492 5.99625 4.9913C6.00073 4.7375 5.90764 4.4828 5.71393 4.28962Z"
+                          fill="#0D2B40"/>
+                </svg>
+                <select class="js-example-basic-single target-select-language" name="source_language" required
+                        data-default-value="en">
+                    <option value="" disabled selected>Select target language</option>
+                    {% for translate_language in translate_languages %}
+                    <option value="{{ translate_language.abbreviation|lower }}">
+                        {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                        {{ translate_language.french_name }}
+                        {% else %}
+                        {{ translate_language.name }}
+                        {% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
     </div>
 </div>

@@ -1,5 +1,6 @@
 import os
 import time
+from datetime import datetime
 from urllib.parse import urlparse, unquote
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -226,42 +227,8 @@ class ProjectsHistoryView(TemplateView):
                 file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
                 original_filename = unquote(file_name)
                 project['source_file_name'] = original_filename
-                if user.is_staff:
-                    try:
-                        project['username'] = User.objects.get(uuid=project['user_custom_mt_token'])
-                    except User.DoesNotExist:
-                        project['username'] = None
-                    except django.core.exceptions.ValidationError:
-                        project['username'] = None
-            context['projects'] = response
+                project['created_at'] = datetime.fromisoformat(project['created_at'].replace('Z', '+00:00'))
 
-        return context
-
-
-class UsageHistoryView(TemplateView):
-    template_name = 'usage_history.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-        page = self.request.GET.get('page')
-        context['languages'] = languages
-        params = {
-            "page_size": PAGINATION_PAGE_SIZE,
-            "page": page,
-            "user_custom_mt_token": user.uuid if not user.is_staff else None
-        }
-        headers = {"token": preferences.MainSettings.api_key if user.is_staff else user.group.api_key}
-
-        if page is not None:
-            params["page"] = int(page)
-
-        response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
-        if 'results' in response:
-            for project in response['results']:
-                file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
-                original_filename = unquote(file_name)
-                project['source_file_name'] = original_filename
                 if user.is_staff:
                     try:
                         project['username'] = User.objects.get(uuid=project['user_custom_mt_token'])

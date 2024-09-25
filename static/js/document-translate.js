@@ -159,9 +159,9 @@ $(document).ready(function () {
     function showTab(tabId) {
         $('.tab-content').hide();
         $(`#${tabId}-content`).show();
-        $('button.tab').removeClass('bg-gray-800 text-white border-gray-800');
+        $('button.tab').removeClass('bg-gray-800 text-white border-gray-800 hover:bg-gray-800 hover:text-white hover:border-gray-800');
         $('#expert-revision').addClass('hidden');
-        $(`#${tabId}`).addClass('bg-gray-800 text-white border-gray-800');
+        $(`#${tabId}`).addClass('bg-gray-800 text-white border-gray-800 hover:bg-gray-800 hover:text-white hover:border-gray-800');
     }
 
     function setHash(step) {
@@ -355,6 +355,9 @@ $(document).ready(function () {
                 }
                 checkLanguagesConsistency();
             },
+            error: function (xhr, status, error) {
+                errorNotification();
+            }
         });
     }
 
@@ -435,17 +438,17 @@ $(document).ready(function () {
     function checkLanguagesConsistency() {
         const sourceSelects = $('.source-language-select');
         const targetLanguageBlock = $('.target-language');
-        const targetSelect = targetLanguageBlock.find('.target-select-language');
+        const targetSelect = $('.select-block');
         const nextButton = $('#next-step');
         const detectedFiles = $(".detected-file");
 
         let isConsistent = true;
         let firstValue = sourceSelects.first().val();
-        let targetValue = targetSelect.val();
+        let targetValue = $('.target-select-language').val();
 
         sourceLanguage = firstValue;
 
-        sourceSelects.each(function (index) {
+        sourceSelects.each(function () {
             const currentValue = $(this).val();
             if (currentValue !== firstValue) {
                 isConsistent = false;
@@ -735,7 +738,7 @@ $(document).ready(function () {
                 if (selectedGlossary === glossary.name) {
                     $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
                     selectedGlossary = '';
-
+                    $('.terminology-step').text('').removeClass('hidden');
                 } else {
                     $(".glossary-item").removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
                     $(this).removeClass('bg-gray-200 text-gray-400').addClass('bg-green-700 text-white');
@@ -1070,14 +1073,14 @@ $(document).ready(function () {
     const startStatusCheck = (projectIds) => {
         const checkDocumentStatus = () => {
             let params = new URLSearchParams();
+
             projectIds.forEach(projectId => {
                 params.append('project_id[]', projectId);
             });
-            let url = '/project/?' + params.toString();
 
             $.ajax({
                 type: 'GET',
-                url: url,
+                url: `${single_project}?${params.toString()}`,
                 processData: false,
                 contentType: false,
                 headers: {
@@ -1087,16 +1090,6 @@ $(document).ready(function () {
                 success: function (response) {
                     updateProjectTable(response);
 
-
-                    let allCompleted = response.every(project => project.status !== "Being translated");
-                    if (allCompleted) {
-                        clearInterval(checkInterval);
-                    }
-
-                    let errorsPresent = response.some(project => project.status === "Error");
-                    if (errorsPresent) {
-                        console.error('Errors occurred during translation for some documents');
-                    }
                 },
                 error: function (xhr, status, error) {
                     console.error('Error checking document status:', error);
@@ -1105,7 +1098,8 @@ $(document).ready(function () {
         };
 
         checkDocumentStatus();
-        const checkInterval = setInterval(checkDocumentStatus, 10000);
+
+        setInterval(checkDocumentStatus, 10000);
     };
 
 });

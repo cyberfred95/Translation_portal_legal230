@@ -99,7 +99,7 @@
                 </button>
             </div>
 
-            <div class="p-12.5 flex flex-col items-center gap-7.5">
+            <form class="p-12.5 flex flex-col items-center gap-7.5">
                 <div class="text-5">Add Glossary</div>
                 <div class="bg-gray-350 w-full py-5 px-46.75 rounded-md">
 
@@ -111,7 +111,7 @@
                         <div id="fileInfo"
                              class="hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-350 text-green-650 w-full">
 
-                            <span id="fileName"></span>
+                            <span id="fileName" class="flex-grow truncate"></span>
                             <button type="button" class="remove-file">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                      xmlns="http://www.w3.org/2000/svg">
@@ -130,7 +130,7 @@
                             </button>
                         </div>
                         <a href="{% static 'Gloss_en-de.csv' %}" type="button" id="downloadSample"
-                                class="w-full bg-white text-green-650 bg-green-650 py-2.5 rounded border border-green-650 font-semibold">
+                           class="text-center w-full bg-white text-green-650 bg-green-650 py-2.5 rounded border border-green-650 font-semibold">
                             Download sample
                         </a>
                         <p class="text-3.5 text-gray-270">Supported Files: .csv max 5mb</p>
@@ -140,11 +140,11 @@
 
                     The glossary function is based on the GPT. The number of tokens used for editing terminology can be found in the Usage History section.
                 </span>
-                <button type="button" id="continueButton"
+                <button type="submit" id="continueButton"
                         class="bg-gray-800 px-6.5 py-2.5 rounded font-semibold text-4 text-white">
                     Continue
                 </button>
-            </div>
+            </form>
 
             <input type="file" class="hidden glossary-file" accept=".csv">
         </div>

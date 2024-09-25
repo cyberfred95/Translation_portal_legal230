@@ -1,3 +1,5 @@
+import os
+
 from django.db import models
 from languages.models import Language
 from users.models import User, UserGroup
@@ -9,7 +11,7 @@ from django.core.exceptions import ValidationError
 # Create your models here.
 
 class Glossary(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     group = models.ForeignKey(UserGroup, on_delete=models.SET_NULL, blank=True, null=True)
     file = models.FileField(upload_to='glossaries/', validators=[FileExtensionValidator(['csv'])])
@@ -43,26 +45,46 @@ class Glossary(models.Model):
             return
 
     def clean(self):
-        # Ensure that either user or group is selected, but not both
         if self.user and self.group:
             raise ValidationError("You cannot select both a user and a group at the same time.")
 
-        existing_glossary = Glossary.objects.filter(
-            domain=self.domain,
-            source_language=self.source_language,
-            target_language=self.target_language,
-        )
+        if self.pk:
 
-        # If a user is selected, check for duplication by user
+            existing_default_glossaries = Glossary.objects.filter(
+                domain=self.domain,
+                source_language=self.source_language,
+                target_language=self.target_language,
+                group__isnull=True,
+                user__isnull=True
+            )
+            if not self.group and not self.user:
+                existing_default_glossaries = existing_default_glossaries.exclude(pk=self.pk)
+                print(existing_default_glossaries)
+
+                if existing_default_glossaries.exists():
+                    raise ValidationError("A default glossary for this language pair and domain already exists.")
+
+        existing_glossary_filters = {
+            'domain': self.domain,
+            'source_language': self.source_language,
+            'target_language': self.target_language
+        }
+
         if self.user:
-            existing_glossary = existing_glossary.filter(user=self.user, group__isnull=True)
-
-        # If a group is selected, check for duplication by group
-        if self.group:
-            existing_glossary = existing_glossary.filter(group=self.group, user__isnull=True)
-
-        if existing_glossary.exists():
-            raise ValidationError(
-                "A glossary with the same source language, target language, domain, and user/group already exists.")
+            if Glossary.objects.filter(**existing_glossary_filters, user=self.user).exclude(pk=self.pk).exists():
+                raise ValidationError(
+                    "A glossary for this language pair and domain and user already exists")
+        elif self.group:
+            if Glossary.objects.filter(**existing_glossary_filters, group=self.group).exclude(pk=self.pk).exists():
+                raise ValidationError(
+                    "A glossary for this language pair and domain and user already exists")
 
         super().clean()
+
+    def save(self, *args, **kwargs):
+
+        if not self.name and self.file:
+            # Get the file name without the extension
+            self.name = os.path.splitext(os.path.basename(self.file.name))[0]
+
+        super(Glossary, self).save(*args, **kwargs)
