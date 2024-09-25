@@ -5,18 +5,25 @@
         <input type="hidden" name="action" value="text_translate">
         {% csrf_token %}
         <div class="flex w-full gap-1">
-            <div class="w-full flex flex-col gap-4">
-                <select class="js-example-basic-single" name="source_language" required>
-                    <option value="" disabled selected>Source language</option>
-                    {% for translate_language in translate_languages %}
-                    <option value="{{ translate_language.abbreviation|lower }}">
-                        {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                        {{ translate_language.french_name }}
-                        {% else %} {{ translate_language.name }}
-                        {% endif %}
-                    </option>
-                    {% endfor %}
-                </select>
+            <div class="w-full flex flex-col gap-4 item-center">
+                <div class="flex gap-2">
+                    <button id="detect-language"
+                            type="button"
+                            class="text-3.5 flex gap-2.5 items-center px-6.5 py-0.5 rounded-md bg-transparent hover:bg-gray-800 text-gray-800 hover:text-white border border-gray-800 transition-colors duration-300">
+                        Detect language
+                    </button>
+                    <select class="js-example-basic-single" name="source_language" required>
+                        <option value="" disabled selected>Source language</option>
+                        {% for translate_language in translate_languages %}
+                        <option value="{{ translate_language.abbreviation|lower }}">
+                            {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                            {{ translate_language.french_name }}
+                            {% else %} {{ translate_language.name }}
+                            {% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <div class="relative">
                 <textarea name="text" id="source-text" required
                           class="focus:border-transparent focus:ring-0 rounded-0.5 h-50 bg-gray-120 p-5 pr-10 text-gray-800 resize-none w-full placeholder:text-gray-250" type="text"
@@ -88,7 +95,7 @@
 
             </select>
             <button type="submit"
-                    class="flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-670 text-green-670 hover:text-white border border-green-670 transition-colors duration-300 font-semibold">
+                    class="flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-670 text-green-670 hover:text-white border border-green-670 transition-colors duration-300">
 
                 <span class="text-3.5">Translate</span>
             </button>

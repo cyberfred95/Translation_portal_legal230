@@ -218,6 +218,10 @@ body {
     box-sizing: border-box;
 }
 
+.login-body button:hover {
+    background: #0D2B40;
+}
+
 .login-body ul {
     color: #FFFFFF;
     list-style-type: none;
@@ -256,13 +260,31 @@ textarea:focus {
 }
 
 .border-line {
-    background-image:
-            repeating-linear-gradient(to right, currentColor, currentColor 5px, transparent 5px, transparent 10px),
-            repeating-linear-gradient(to right, currentColor, currentColor 5px, transparent 5px, transparent 10px),
-            repeating-linear-gradient(to bottom, currentColor, currentColor 5px, transparent 5px, transparent 10px),
-            repeating-linear-gradient(to bottom, currentColor, currentColor 5px, transparent 5px, transparent 10px);
+    background-image: repeating-linear-gradient(to right, currentColor, currentColor 5px, transparent 5px, transparent 10px),
+    repeating-linear-gradient(to right, currentColor, currentColor 5px, transparent 5px, transparent 10px),
+    repeating-linear-gradient(to bottom, currentColor, currentColor 5px, transparent 5px, transparent 10px),
+    repeating-linear-gradient(to bottom, currentColor, currentColor 5px, transparent 5px, transparent 10px);
     background-position: top, bottom, left, right;
     background-size: 100% 1px, 100% 1px, 1px 100%, 1px 100%;
     background-repeat: no-repeat;
+}
 
+.loader {
+    width: 48px;
+    height: 48px;
+    border: 2px solid #556A7B;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }

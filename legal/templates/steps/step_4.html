@@ -3,27 +3,27 @@
 <div class="step-4 hidden">
     <div class="flex items-center w-full justify-between">
         <span class="text-4 text-gray-800 font-semibold">Terminology</span>
-        <button id="openModal" type="button" class="text-3 text-green-700 add-glossary-btn hidden">+ Add glossary</button>
+        <button id="openModal" type="button" class="text-3 text-green-700 add-glossary-btn hidden">+ Add glossary
+        </button>
     </div>
     <div class="flex items-center mt-5">
         <button type="button"
-                class="glossary-tab default px-5 py-3 text-3.5 bg-gray-160 text-gray-550 rounded-l-md hover:bg-gray-800 hover:text-white focus:bg-gray-800 focus:text-white">
+                class="glossary-tab default px-5 py-3 text-3.5 bg-gray-160 text-gray-550 rounded-l-md hover:bg-gray-360 hover:text-gray-650 focus:bg-gray-800 focus:text-white">
             Default
         </button>
         <button type="button"
-                class="glossary-tab my-glossary px-5 py-3 text-3.5 bg-gray-160 text-gray-550 hover:bg-gray-800 hover:text-white focus:bg-gray-800 focus:text-white">
+                class="glossary-tab my-glossary px-5 py-3 text-3.5 bg-gray-160 text-gray-550 hover:bg-gray-360 hover:text-gray-650 focus:bg-gray-800 focus:text-white">
             My glossaries
         </button>
         <button type="button"
-                class="glossary-tab none px-5 py-3 text-3.5 bg-gray-160 text-gray-550 rounded-r-md hover:bg-gray-800 hover:text-white focus:bg-gray-800 focus:text-white">
-
+                class="glossary-tab none px-5 py-3 text-3.5 bg-gray-160 text-gray-550 rounded-r-md hover:bg-gray-360 hover:text-gray-650 focus:bg-gray-800 focus:text-white">
             No glossary
         </button>
     </div>
     <div class="flex flex-wrap gap-2.5 mt-5 glossary-list"></div>
     <div id="modal"
          class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
-        <div class="relative bg-white rounded-lg shadow-xl max-w-172.5 w-full mx-4">
+        <form class="relative bg-white rounded-lg shadow-xl max-w-172.5 w-full mx-4">
             <div class="absolute -top-4.5 -right-4.5 -mr-4 -mt-4 z-10">
                 <button type="button" id="closeIcon" class="p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -44,7 +44,7 @@
                         <div id="fileInfo"
                              class="hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-350 text-green-650 w-full">
 
-                            <span id="fileName"></span>
+                            <span id="fileName" class="flex-grow truncate"></span>
                             <button type="button" class="remove-file">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                      xmlns="http://www.w3.org/2000/svg">
@@ -63,7 +63,7 @@
                             </button>
                         </div>
                         <a href="{% static 'Gloss_en-de.csv' %}" type="button" id="downloadSample"
-                                class="w-full bg-white text-green-650 bg-green-650 py-2.5 rounded border border-green-650 font-semibold">
+                           class="text-center w-full bg-white text-green-650 bg-green-650 py-2.5 rounded border border-green-650 font-semibold">
                             Download sample
                         </a>
                         <p class="text-3.5 text-gray-270">Supported Files: .csv max 5mb</p>
@@ -80,6 +80,6 @@
             </div>
 
             <input type="file" class="hidden glossary-file" accept=".csv">
-        </div>
+        </form>
     </div>
 </div>

@@ -33,21 +33,6 @@ $(document).ready(function () {
         }
     });
 
-    $('td.created-at').each(function () {
-        var dateString = $(this).text().trim();
-        var date = new Date(dateString);
-
-        if (!isNaN(date.getTime())) {
-            var day = ('0' + date.getDate()).slice(-2);
-            var month = ('0' + (date.getMonth() + 1)).slice(-2);
-            var year = date.getFullYear();
-
-            var formattedDate = day + '/' + month + '/' + year;
-
-            $(this).text(formattedDate);
-        }
-    });
-
     const $modal = $('#modal');
     const $closeIcon = $('#closeIcon');
 
