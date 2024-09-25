@@ -113,4 +113,32 @@ $(document).ready(function () {
             $('#tooltip').removeClass('visible opacity-100').addClass('invisible opacity-0');
         }, 2000);
     }
+
+    $('#detect-language').click(function () {
+        const sourceText = $('#source-text').val();
+
+        const data = {text: sourceText}
+
+        $.ajax({
+            url: detect_text_language,
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Accept': 'application/json',
+            },
+            success: function (response) {
+                const detectedLanguage = response.language.toLowerCase();
+
+                const $select = $('select[name="source_language"]');
+
+                $select.val(detectedLanguage).trigger('change');
+            },
+            error: function (xhr, status, error) {
+                console.error('Expert revision error:', error);
+            }
+        });
+    });
 });
