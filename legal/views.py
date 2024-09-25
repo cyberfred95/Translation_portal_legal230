@@ -1,5 +1,6 @@
 import os
 import time
+from datetime import datetime
 from urllib.parse import urlparse, unquote
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -262,6 +263,7 @@ class UsageHistoryView(TemplateView):
                 file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
                 original_filename = unquote(file_name)
                 project['source_file_name'] = original_filename
+                project['created_at'] = datetime.fromisoformat(project['created_at'].replace('Z', '+00:00'))
                 if user.is_staff:
                     try:
                         project['username'] = User.objects.get(uuid=project['user_custom_mt_token'])
