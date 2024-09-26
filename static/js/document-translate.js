@@ -5,7 +5,7 @@ $(document).ready(function () {
     let selectedSubDomain = '';
     let selectedGlossaryType = 'default';
     let selectedGlossary = '';
-
+    let glossaryFile = '';
     let selectedFiles = [];
 
 
@@ -621,6 +621,7 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
+                console.log('response', response)
                 if (response.data && response.data.length === 0) {
                     $('#next-step').removeClass('border-green-650 text-white text-green-650')
 
@@ -701,7 +702,6 @@ $(document).ready(function () {
     }
 
     function loadMyGlossaries() {
-
         const data = {
             source_language: sourceLanguage,
             target_language: targetLanguage,
@@ -778,10 +778,10 @@ $(document).ready(function () {
     });
 
     $('.glossary-file').on('change', function (e) {
-        var file = e.target.files[0];
-        if (file) {
-            if (file.size <= maxFileSize) {
-                showUploadedFile(file.name);
+        glossaryFile = e.target.files[0];
+        if (glossaryFile) {
+            if (glossaryFile.size <= maxFileSize) {
+                showUploadedFile(glossaryFile.name);
             } else {
                 alert('File size exceeds 5MB limit.');
                 $(this).val('');
@@ -804,6 +804,48 @@ $(document).ready(function () {
         $('#fileInfo').addClass('hidden');
         $('.glossary-file').val('');
     }
+
+    $(document).on('click', '.create-glossary', function (e) {
+        e.preventDefault();
+
+        if (!glossaryFile) {
+            $('#uploadButton').removeClass('bg-green-700').addClass('bg-transparent border border-red-400 text-red-300');
+            $('.glossary-container').removeClass('bg-green-350').addClass('bg-red-150');
+            return;
+        }
+
+        const formData = new FormData();
+
+        formData.append('file', glossaryFile);
+        formData.append('domain_name', selectedSubDomain);
+        formData.append('source_language', sourceLanguage);
+        formData.append('target_language', targetLanguage);
+
+        $.ajax({
+            url: add_glossary,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function (response) {
+                updateGlossaryList(response);
+                $('.terminology-step').text('default').removeClass('hidden');
+                // Очищаємо форму після успішного додавання
+                glossaryFile = null;
+                $('#fileInfo').addClass('hidden');
+                $('#fileName').text('');
+                $('.glossary-file').val('');
+            },
+            error: function (xhr, status, error) {
+                console.error("Error adding glossary:", error);
+                // Тут можна додати відображення помилки для користувача
+            }
+        });
+    });
 
 
     // ------------- STEP-5 -------------
