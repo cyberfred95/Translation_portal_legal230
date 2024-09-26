@@ -153,53 +153,6 @@ $(document).ready(function () {
     showStep(currentStep);
 
 
-    // ------------- TABS -------------
-
-
-    function showTab(tabId) {
-        $('.tab-content').hide();
-        $(`#${tabId}-content`).show();
-        $('button.tab').removeClass('bg-gray-800 text-white border-gray-800 hover:bg-gray-800 hover:text-white hover:border-gray-800');
-        $('#expert-revision').addClass('hidden');
-        $(`#${tabId}`).addClass('bg-gray-800 text-white border-gray-800 hover:bg-gray-800 hover:text-white hover:border-gray-800');
-    }
-
-    function setHash(step) {
-        window.location.hash = `step-${step}`;
-    }
-
-    let initialTab = 'text-translate';
-    let initialStep = 1;
-    if (window.location.hash) {
-        const hash = window.location.hash.substring(1);
-        if (hash === 'step-2') {
-            initialTab = 'document-translate';
-            initialStep = 2;
-        } else if (hash === 'step-3') {
-            initialTab = 'writing';
-            initialStep = 3;
-        }
-    }
-    showTab(initialTab);
-    setHash(initialStep);
-
-    $('#text-translate').click(function () {
-        showTab('text-translate');
-        setHash(1);
-    });
-
-    $('#document-translate').click(function () {
-        showTab('document-translate');
-        setHash(2);
-    });
-
-    $('#writing').click(function () {
-        showTab('writing');
-        setHash(3);
-
-    });
-
-
     // ------------- STEP-1 -------------
 
 
@@ -542,7 +495,7 @@ $(document).ready(function () {
         domains.forEach((domain, index) => {
             const button = $('<button>', {
                 type: 'button',
-                class: 'domain-button text-3.5 py-3 px-7.5 bg-gray-160 text-gray-550 hover:bg-green-650 hover:text-white rounded-md focus:text-white focus:bg-green-650',
+                class: 'domain-button text-3.5 py-3 px-7.5 bg-gray-160 text-gray-550 hover:bg-green-650 hover:text-white rounded-md focus:text-white focus:bg-green-650 transition duration-300 ease-in-out',
                 text: domain.name,
                 'data-name': domain.name,
                 click: function () {
@@ -573,7 +526,7 @@ $(document).ready(function () {
         subDomains.forEach((subDomain, index) => {
             const button = $('<button>', {
                 type: 'button',
-                class: 'sub-domain-button text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md focus:text-white focus:bg-green-700',
+                class: 'sub-domain-button text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md focus:text-white focus:bg-green-700 transition duration-300 ease-in-out',
                 text: subDomain,
                 'data-name': subDomain,
                 click: function () {
@@ -738,7 +691,7 @@ $(document).ready(function () {
         $list.empty();
 
         glossaries.forEach(function (glossary) {
-            const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 rounded-md hover:bg-green-700 hover:text-white">${glossary.name}</button>`);
+            const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 rounded-md hover:bg-green-700 hover:text-white transition duration-300 ease-in-out">${glossary.name}</button>`);
             $item.click(function () {
                 if (selectedGlossary === glossary.name) {
                     $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
@@ -837,7 +790,6 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                $('.terminology-step').text('default').removeClass('hidden');
                 glossaryFile = null;
                 $('#fileInfo').addClass('hidden');
                 $('#fileName').text('');
