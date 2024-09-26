@@ -1,3 +1,4 @@
+from django.db.models.functions import Lower
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from django.views.generic import TemplateView
@@ -43,7 +44,7 @@ class AddGlossaryView(APIView):
     def validate(self, request):
         errors = {}
 
-        languages_list = Language.objects.all().values_list('abbreviation')
+        languages_list = Language.objects.all().values_list(Lower('abbreviation'), flat=True)
         if request.data["source_language"] == request.data["target_language"]:
             errors["language_pair"] = "Source and target languages cannot be the same"
         if request.data["source_language"] not in languages_list:
@@ -54,18 +55,18 @@ class AddGlossaryView(APIView):
             domains = Domain.objects.all().values_list('french_name', flat=True)
         else:
             domains = Domain.objects.all().values_list('name', flat=True)
-        if request.data('domain_name') not in domains:
+        if request.data.get('domain_name') not in domains:
             errors["domain_name"] = "Invalid domain name"
 
         if errors:
             raise serializers.ValidationError(errors)
 
     def post(self, request):
-        # self.validate(request)
+        self.validate(request)
         if request.LANGUAGE_CODE == 'fr':
-            domain = Domain.objects.filter(french_name=request.data.get('domain_name'))
+            domain = Domain.objects.get(french_name=request.data.get('domain_name'))
         else:
-            domain = Domain.objects.filter(name=request.data.get('domain_name'))
+            domain = Domain.objects.get(name=request.data.get('domain_name'))
 
         source_language = Language.objects.get(abbreviation=request.data.get('source_language').upper())
         target_language = Language.objects.get(abbreviation=request.data.get('target_language').upper())
@@ -75,6 +76,7 @@ class AddGlossaryView(APIView):
             source_language=source_language,
             target_language=target_language,
             file=request.FILES.get('file'),
+            domain=domain
         )
         return Response(GlossarySerializer(glossary).data, status=status.HTTP_201_CREATED)
 
