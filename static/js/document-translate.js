@@ -558,7 +558,7 @@ $(document).ready(function () {
                 updateDomainsList(response);
             },
             error: function (xhr, status, error) {
-                console.error("Error fetching domains:", error);
+                errorNotification();
             }
         });
     }
@@ -590,7 +590,7 @@ $(document).ready(function () {
                 updateSubDomainsList(response.data);
             },
             error: function (xhr, status, error) {
-                console.error("Error fetching domains:", error);
+                errorNotification();
             }
         });
     }
@@ -654,7 +654,7 @@ $(document).ready(function () {
                 clearGlossaryList();
             },
             error: function (xhr, status, error) {
-                console.error("Error fetching default glossary:", error);
+                errorNotification();
             }
         });
     }
@@ -681,7 +681,7 @@ $(document).ready(function () {
 
             },
             error: function (xhr, status, error) {
-                console.error("Error fetching my glossaries:", error);
+                errorNotification();
             }
         });
     }
@@ -818,7 +818,7 @@ $(document).ready(function () {
                 $list.append($item);
             },
             error: function (xhr, status, error) {
-                console.error('Error', error);
+                errorNotification();
             }
         });
     });
@@ -836,7 +836,10 @@ $(document).ready(function () {
         formData.append('source_language', sourceLanguage);
         formData.append('target_language', targetLanguage);
         formData.append('action', 'file_translate');
+// Показати лоадер
 
+// Приховати лоадер
+        $('#loader-row').removeClass('hidden');
         $.ajax({
             url: translate,
             type: 'POST',
@@ -850,13 +853,12 @@ $(document).ready(function () {
             success: function (response) {
                 if (response && response.project_ids && response.project_ids.length > 0) {
                     startStatusCheck(response.project_ids);
-                } else {
-                    console.error('No project IDs received from the server');
                 }
             },
             error: function (xhr, status, error) {
-                console.error('Translation error:', error);
-            }
+                $('#loader-row').addClass('hidden');
+                errorNotification();
+            },
         });
     };
 
@@ -1083,7 +1085,7 @@ $(document).ready(function () {
                 $closeRevision.addClass('hidden');
             },
             error: function (xhr, status, error) {
-                console.error('Error:', error);
+                errorNotification();
             }
         });
     });
@@ -1107,10 +1109,12 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     updateProjectTable(response);
-
                 },
                 error: function (xhr, status, error) {
-                    console.error('Error checking document status:', error);
+                    errorNotification();
+                },
+                complete: function (xhr, status, error) {
+                    $('#loader-row').addClass('hidden');
                 }
             });
         };
