@@ -28,6 +28,7 @@ class UserGlossariesView(TemplateView):
         for glossary in tmp_glossaries:
             glossaries.append(
                 {
+                    "id":glossary.id,
                     "file_url": self.request.build_absolute_uri(glossary.file.url),
                     "name": glossary.name,
                     "source_language": glossary.source_language.abbreviation.upper(),
@@ -84,7 +85,7 @@ class AddGlossaryView(APIView):
 class SingleGlossaryView(RetrieveUpdateDestroyAPIView):
     serializer_class = GlossarySerializer
 
-    def get_queryset(self):
+    def get_object(self):
         return Glossary.objects.filter(user=self.request.user, id=self.kwargs['pk']).first()
 
 

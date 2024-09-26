@@ -6,5 +6,5 @@ from languages.models import Language
 class GlossarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Glossary
-        fields = ['name', 'file', 'source_language', 'target_language', 'domain']
+        fields = ['id', 'name', 'file', 'source_language', 'target_language', 'domain']
 
