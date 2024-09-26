@@ -580,6 +580,7 @@ $(document).ready(function () {
                     $('.sub-domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
                     $(this).removeClass('bg-gray-200 text-gray-400').addClass('selected bg-green-700 text-white');
                     selectedSubDomain = $(this).data('name');
+                    $('.domain-step').text(selectedSubDomain).removeClass('hidden');
                 }
             });
 
@@ -587,8 +588,6 @@ $(document).ready(function () {
                 button.removeClass('bg-gray-200 text-gray-400').addClass('selected bg-green-700 text-white');
                 selectedSubDomain = subDomain;
             }
-
-            $('.domain-step').text(selectedSubDomain).removeClass('hidden');
 
             subDomainsList.append(button);
         });
@@ -627,6 +626,13 @@ $(document).ready(function () {
 
                         .addClass('border-gray-300 text-gray-300 pointer-events-none')
                         .prop("disabled", true);
+                    $('.domain-step').text('none').removeClass('hidden');
+
+                } else {
+                    $('#next-step').removeClass('border-gray-300 text-gray-300 pointer-events-none')
+                        .addClass('border-green-650 text-green-650')
+                        .prop("disabled", false);
+                    $('.domain-step').text(response.data[0]).removeClass('hidden');
                 }
 
                 updateSubDomainsList(response.data);
@@ -832,17 +838,36 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                updateGlossaryList(response);
                 $('.terminology-step').text('default').removeClass('hidden');
-                // Очищаємо форму після успішного додавання
                 glossaryFile = null;
                 $('#fileInfo').addClass('hidden');
                 $('#fileName').text('');
                 $('.glossary-file').val('');
+                $modal.addClass('hidden');
+                $closeIcon.addClass('hidden');
+
+                const $list = $(".glossary-list");
+
+                const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 rounded-md">${response.name}</button>`);
+
+                $item.click(function () {
+                    if (selectedGlossary === response.name) {
+                        $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
+                        selectedGlossary = '';
+                        $('.terminology-step').text('').removeClass('hidden');
+                    } else {
+                        $(".glossary-item").removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
+                        $(this).removeClass('bg-gray-200 text-gray-400').addClass('bg-green-700 text-white');
+                        selectedGlossary = response.name;
+                        $('.terminology-step').text(selectedGlossary).removeClass('hidden');
+
+                    }
+                });
+
+                $list.append($item);
             },
             error: function (xhr, status, error) {
-                console.error("Error adding glossary:", error);
-                // Тут можна додати відображення помилки для користувача
+                console.error('Error', error);
             }
         });
     });
