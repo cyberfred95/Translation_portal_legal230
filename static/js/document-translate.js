@@ -620,7 +620,6 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                console.log('response', response)
                 if (response.data && response.data.length === 0) {
                     $('#next-step').removeClass('border-green-650 text-white text-green-650')
 
@@ -739,7 +738,7 @@ $(document).ready(function () {
         $list.empty();
 
         glossaries.forEach(function (glossary) {
-            const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 rounded-md">${glossary.name}</button>`);
+            const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 rounded-md hover:bg-green-700 hover:text-white">${glossary.name}</button>`);
             $item.click(function () {
                 if (selectedGlossary === glossary.name) {
                     $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
@@ -848,7 +847,7 @@ $(document).ready(function () {
 
                 const $list = $(".glossary-list");
 
-                const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 rounded-md">${response.name}</button>`);
+                const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 rounded-md hover:bg-green-700 hover:text-white">${response.name}</button>`);
 
                 $item.click(function () {
                     if (selectedGlossary === response.name) {
@@ -998,7 +997,7 @@ $(document).ready(function () {
                 type="button"
                 data-translated-file="${project.translated_file}"
                 data-id="${project.id}"
-                class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3 text-3.25 expert-revision"
+                class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-300 disabled:border-gray-300 expert-revision"
                 ${project.status !== 'Translated' ? 'disabled' : ''}
             >
                 Revision
