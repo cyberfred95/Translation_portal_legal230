@@ -61,7 +61,7 @@ class AddGlossaryView(APIView):
             raise serializers.ValidationError(errors)
 
     def post(self, request):
-        self.validate(request)
+        # self.validate(request)
         if request.LANGUAGE_CODE == 'fr':
             domain = Domain.objects.filter(french_name=request.data.get('domain_name'))
         else:
