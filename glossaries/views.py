@@ -135,4 +135,4 @@ class GetDefaultGlossaryView(APIView):
         glossary = glossary.first()
         if glossary:
             return Response(GlossarySerializer(glossary).data, status=status.HTTP_200_OK)
-        return Response({"message": "Default glossary not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({}, status=status.HTTP_200_OK)
