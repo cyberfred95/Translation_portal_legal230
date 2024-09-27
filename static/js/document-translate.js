@@ -573,14 +573,17 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
+                console.log('response.data', response.data)
+                console.log('response.data.length', response.data.length)
                 if (response.data && response.data.length === 0) {
+                    console.log(1)
                     $('#next-step').removeClass('border-green-650 text-white text-green-650')
 
                         .addClass('border-gray-300 text-gray-300 pointer-events-none')
                         .prop("disabled", true);
                     $('.domain-step').text('none').removeClass('hidden');
-
                 } else {
+                    console.log(2)
                     $('#next-step').removeClass('border-gray-300 text-gray-300 pointer-events-none')
                         .addClass('border-green-650 text-green-650')
                         .prop("disabled", false);

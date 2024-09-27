@@ -166,4 +166,45 @@ $(document).ready(function () {
             $edit_modal.removeClass('flex').addClass('hidden');
         }
     });
+
+    let sourceLanguage, targetLanguage;
+
+    const getDomains = () => {
+        if (sourceLanguage && targetLanguage) {
+            $.ajax({
+                url: `${get_domains}?source_language=${sourceLanguage}&target_language=${targetLanguage}`,
+                type: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                success: function (response) {
+                    let domainSelect = $('select[name="domain_name"]');
+                    domainSelect.empty().prop('disabled', false);
+                    domainSelect.append($('<option></option>').attr('value', '').text('Domain').prop('disabled', true).prop('selected', true));
+
+                    if (response.data && response.data.length > 0) {
+                        $.each(response.data, function (index, domain) {
+                            domainSelect.append($('<option></option>').attr('value', domain).text(domain));
+                        });
+                    } else {
+                        domainSelect.append($('<option></option>').attr('value', '').text('No domains available').prop('disabled', true));
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching domains:", error);
+                }
+            });
+        }
+    }
+
+    $('.js-example-basic-single.glossary[name="source_language"]').on('change', function () {
+        sourceLanguage = $(this).val();
+        getDomains();
+    });
+
+    $('.js-example-basic-single.glossary[name="target_language"]').on('change', function () {
+        targetLanguage = $(this).val();
+        getDomains();
+    });
 });
