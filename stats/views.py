@@ -31,7 +31,6 @@ class UsageView(TemplateView):
                 "uuid": str(self.request.user.uuid)
             }
         )
-
         stats = dict(response.json())
         for stat in stats['results']:
             user = User.objects.filter(uuid=stat.get('user_portal_uuid')).first()
