@@ -136,6 +136,7 @@ $(document).ready(function () {
     });
 
     $("#restart").click(function () {
+        window.location.reload();
         currentStep = 0;
         sourceLanguage = '';
         targetLanguage = '';
@@ -579,7 +580,6 @@ $(document).ready(function () {
                         .addClass('border-gray-300 text-gray-300 pointer-events-none')
                         .prop("disabled", true);
                     $('.domain-step').text('none').removeClass('hidden');
-
                 } else {
                     $('#next-step').removeClass('border-gray-300 text-gray-300 pointer-events-none')
                         .addClass('border-green-650 text-green-650')
