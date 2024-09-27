@@ -32,7 +32,7 @@ class UsageView(TemplateView):
             }
         )
         stats = dict(response.json())
-        for stat in stats['results']:
+        for stat in stats.get('results', []):
             user = User.objects.filter(uuid=stat.get('user_portal_uuid')).first()
             stat['user'] = user.username if user else 'Unknown'
 
