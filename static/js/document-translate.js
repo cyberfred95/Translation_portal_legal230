@@ -136,6 +136,7 @@ $(document).ready(function () {
     });
 
     $("#restart").click(function () {
+        window.location.reload();
         currentStep = 0;
         sourceLanguage = '';
         targetLanguage = '';
