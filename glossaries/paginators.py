@@ -36,7 +36,6 @@ class TemplateViewPagination:
     max_page_size = 100
 
     def paginate_queryset(self, queryset, request):
-        # Get page number and page size from the request
         page_number = request.GET.get('page', 1)
         page_size = request.GET.get(self.page_size_query_param, self.page_size)
         try:
@@ -44,10 +43,8 @@ class TemplateViewPagination:
         except ValueError:
             page_size = self.page_size
 
-        # Initialize paginator with the given page size
         paginator = Paginator(queryset, page_size)
 
-        # Get the requested page
         try:
             page = paginator.page(page_number)
         except PageNotAnInteger:
@@ -55,7 +52,6 @@ class TemplateViewPagination:
         except EmptyPage:
             page = paginator.page(paginator.num_pages)
 
-        # Store page and paginator for later use in pagination controls
         self.page = page
         self.paginator = paginator
 
