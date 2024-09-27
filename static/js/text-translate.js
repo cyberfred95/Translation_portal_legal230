@@ -1,5 +1,9 @@
 $(document).ready(function () {
 
+
+    $select = $(".domain-select").select2({});
+    $select.data('select2').$container.addClass('domain');
+    $select.data('select2').$dropdown.addClass('domain');
     let sourceLanguage, targetLanguage;
 
     const getDomains = () => {
