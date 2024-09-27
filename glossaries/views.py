@@ -26,7 +26,6 @@ class UserGlossariesView(TemplateView):
         context['glossaries'] = glossaries_data
         context['translate_languages'] = Language.objects.all()
         context['paginator'] = pagination_context
-        print(context)
         return context
 
     def get_glossaries(self):
@@ -48,7 +47,6 @@ class UserGlossariesView(TemplateView):
             for glossary in paginated_glossaries
         ]
 
-        # Return the formatted glossaries and pagination context
         return formatted_glossaries, paginator.get_paginated_context()
 
 
