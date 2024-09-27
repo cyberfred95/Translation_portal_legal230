@@ -147,7 +147,7 @@
                             Upload file
                         </button>
                         <div id="fileInfo"
-                             class="hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-350 text-green-650 w-full">
+                             class="max-w-50.5 hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-350 text-green-650 w-full">
 
                             <span id="fileName" class="flex-grow truncate"></span>
                             <button type="button" class="remove-file">
@@ -185,7 +185,7 @@
                                 </option>
                                 {% endfor %}
                             </select>
-                            <select class="js-example-basic-single glossary" name="source_language" required>
+                            <select class="js-example-basic-single glossary" name="target_language" required>
                                 <option value="" disabled selected>Source language</option>
                                 {% for translate_language in translate_languages %}
                                 <option value="{{ translate_language.abbreviation|lower }}">
@@ -197,7 +197,7 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <select class="js-example-basic-single glossary" name="source_language" required>
+                        <select class="js-example-basic-single glossary" name="domain_name" required>
                             <option value="" disabled selected>Domain</option>
                             {% for translate_language in translate_languages %}
                             <option value="{{ translate_language.abbreviation|lower }}">
@@ -215,7 +215,7 @@
                     The glossary function is based on the GPT. The number of tokens used for editing terminology can be found in the Usage History section.
                 </span>
                 <button type="submit" id="continueButton"
-                        class="bg-gray-800 px-6.5 py-2.5 rounded font-semibold text-4 text-white">
+                        class="bg-gray-800 px-6.5 py-2.5 rounded font-semibold text-4 text-white create-glossary">
                     Continue
                 </button>
             </form>
@@ -254,6 +254,7 @@
 
 <script src="{% static 'js/glossaries.js' %}"></script>
 <script>
+    let get_domains = "{% url 'get_domains' %}"
     let add_glossary = "{% url 'add_glossary' %}"
 </script>
 

@@ -2,6 +2,8 @@ $(document).ready(function () {
 
     $('.js-example-basic-single.glossary').select2();
 
+    let file
+
     const $modal = $('#modal');
     const $closeIcon = $('#closeIcon');
     const maxFileSize = 5 * 1024 * 1024; // 5MB
@@ -28,7 +30,7 @@ $(document).ready(function () {
     });
 
     $('.glossary-file').on('change', function (e) {
-        var file = e.target.files[0];
+        file = e.target.files[0];
         if (file) {
             if (file.size <= maxFileSize) {
                 showUploadedFile(file.name);
@@ -126,7 +128,6 @@ $(document).ready(function () {
         $input.val(glossaryName);
         $edit_modal.removeClass('hidden').addClass('flex');
         currentEditUrl = $(this).data('edit-url');
-        console.log('currentEditUrl', currentEditUrl);
     });
 
     $('#close-edit-modal').on('click', function () {
@@ -139,8 +140,6 @@ $(document).ready(function () {
         const newName = $input.val();
         const formData = new FormData();
         formData.append('name', newName);
-
-        console.log('Submitting to URL:', currentEditUrl);
 
         $.ajax({
             url: currentEditUrl,
@@ -167,7 +166,7 @@ $(document).ready(function () {
         }
     });
 
-    let sourceLanguage, targetLanguage;
+    let sourceLanguage, targetLanguage, domainName;
 
     const getDomains = () => {
         if (sourceLanguage && targetLanguage) {
@@ -179,16 +178,18 @@ $(document).ready(function () {
                     'X-CSRFToken': getCookie('csrftoken'),
                 },
                 success: function (response) {
-                    let domainSelect = $('select[name="domain_name"]');
-                    domainSelect.empty().prop('disabled', false);
-                    domainSelect.append($('<option></option>').attr('value', '').text('Domain').prop('disabled', true).prop('selected', true));
+                    let domainSelect = $('.js-example-basic-single.glossary[name="domain_name"]');
+                    if (response.data.length !== 0) {
+                        domainName = response.data[0];
+                        domainSelect.empty();
+                        domainSelect.prop('disabled', false);
+                        domainSelect.append($('<option></option>').attr('value', '').text('Domain').prop('disabled', true));
 
-                    if (response.data && response.data.length > 0) {
                         $.each(response.data, function (index, domain) {
                             domainSelect.append($('<option></option>').attr('value', domain).text(domain));
                         });
-                    } else {
-                        domainSelect.append($('<option></option>').attr('value', '').text('No domains available').prop('disabled', true));
+
+                        domainSelect.find('option:not(:disabled):first').prop('selected', true);
                     }
                 },
                 error: function (xhr, status, error) {
@@ -198,6 +199,10 @@ $(document).ready(function () {
         }
     }
 
+    $('.js-example-basic-single.glossary[name="domain_name"]').on('change', function () {
+        domainName = $(this).val();
+    });
+
     $('.js-example-basic-single.glossary[name="source_language"]').on('change', function () {
         sourceLanguage = $(this).val();
         getDomains();
@@ -206,5 +211,40 @@ $(document).ready(function () {
     $('.js-example-basic-single.glossary[name="target_language"]').on('change', function () {
         targetLanguage = $(this).val();
         getDomains();
+    });
+
+    $(document).on('click', '.create-glossary', function (e) {
+        e.preventDefault();
+
+        if (!file) {
+            $('#uploadButton').removeClass('bg-green-700').addClass('bg-transparent border border-red-400 text-red-300');
+            $('.glossary-container').removeClass('bg-green-350').addClass('bg-red-150');
+            return;
+        }
+
+        const formData = new FormData();
+
+        formData.append('file', file);
+        formData.append('domain_name', domainName);
+        formData.append('source_language', sourceLanguage);
+        formData.append('target_language', targetLanguage);
+
+        $.ajax({
+            url: add_glossary,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function (response) {
+                window.location.reload();
+            },
+            error: function (xhr, status, error) {
+                errorNotification();
+            }
+        });
     });
 });
