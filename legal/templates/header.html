@@ -1,6 +1,6 @@
 {% load static %}
 
-<header class="flex justify-between items-center bg-gray-150 pl-31.25 pr-63.75 py-7.5">
+<header class="flex justify-between items-center bg-gray-150 px-31.25 py-7.5">
     <div class="w-30 h-7.25">
         <img src="{% static 'images/logo.png' %}" alt="Logo">
     </div>
@@ -9,11 +9,11 @@
                     {{ request.user.username }}
                 </span>
         <div>
-            <a href="/en" class="{% if request.LANGUAGE_CODE == 'en' %}text-gray-750{% else %}text-gray-270{% endif %}">
+            <a href="/en" class="{% if request.LANGUAGE_CODE == 'en' %}text-gray-750{% else %}text-gray-270 hover:text-green-650 transition duration-300 ease-in-out{% endif %}">
                 EN
             </a>
             |
-            <a href="/fr" class="{% if request.LANGUAGE_CODE == 'fr' %}text-gray-750{% else %}text-gray-270{% endif %}">
+            <a href="/fr" class="{% if request.LANGUAGE_CODE == 'fr' %}text-gray-750{% else %}text-gray-270 hover:text-green-650 transition duration-300 ease-in-out{% endif %}">
                 FR
             </a>
         </div>

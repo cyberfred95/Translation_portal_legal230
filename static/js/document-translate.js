@@ -5,7 +5,7 @@ $(document).ready(function () {
     let selectedSubDomain = '';
     let selectedGlossaryType = 'default';
     let selectedGlossary = '';
-
+    let glossaryFile = '';
     let selectedFiles = [];
 
 
@@ -151,53 +151,6 @@ $(document).ready(function () {
     });
 
     showStep(currentStep);
-
-
-    // ------------- TABS -------------
-
-
-    function showTab(tabId) {
-        $('.tab-content').hide();
-        $(`#${tabId}-content`).show();
-        $('button.tab').removeClass('bg-gray-800 text-white border-gray-800 hover:bg-gray-800 hover:text-white hover:border-gray-800');
-        $('#expert-revision').addClass('hidden');
-        $(`#${tabId}`).addClass('bg-gray-800 text-white border-gray-800 hover:bg-gray-800 hover:text-white hover:border-gray-800');
-    }
-
-    function setHash(step) {
-        window.location.hash = `step-${step}`;
-    }
-
-    let initialTab = 'text-translate';
-    let initialStep = 1;
-    if (window.location.hash) {
-        const hash = window.location.hash.substring(1);
-        if (hash === 'step-2') {
-            initialTab = 'document-translate';
-            initialStep = 2;
-        } else if (hash === 'step-3') {
-            initialTab = 'writing';
-            initialStep = 3;
-        }
-    }
-    showTab(initialTab);
-    setHash(initialStep);
-
-    $('#text-translate').click(function () {
-        showTab('text-translate');
-        setHash(1);
-    });
-
-    $('#document-translate').click(function () {
-        showTab('document-translate');
-        setHash(2);
-    });
-
-    $('#writing').click(function () {
-        showTab('writing');
-        setHash(3);
-
-    });
 
 
     // ------------- STEP-1 -------------
@@ -542,7 +495,7 @@ $(document).ready(function () {
         domains.forEach((domain, index) => {
             const button = $('<button>', {
                 type: 'button',
-                class: 'domain-button text-3.5 py-3 px-7.5 bg-gray-160 text-gray-550 hover:bg-green-650 hover:text-white rounded-md focus:text-white focus:bg-green-650',
+                class: 'domain-button text-3.5 py-3 px-7.5 bg-gray-160 text-gray-550 hover:bg-green-650 hover:text-white rounded-md focus:text-white focus:bg-green-650 transition duration-300 ease-in-out',
                 text: domain.name,
                 'data-name': domain.name,
                 click: function () {
@@ -573,13 +526,14 @@ $(document).ready(function () {
         subDomains.forEach((subDomain, index) => {
             const button = $('<button>', {
                 type: 'button',
-                class: 'sub-domain-button text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md focus:text-white focus:bg-green-700',
+                class: 'sub-domain-button text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md focus:text-white focus:bg-green-700 transition duration-300 ease-in-out',
                 text: subDomain,
                 'data-name': subDomain,
                 click: function () {
                     $('.sub-domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
                     $(this).removeClass('bg-gray-200 text-gray-400').addClass('selected bg-green-700 text-white');
                     selectedSubDomain = $(this).data('name');
+                    $('.domain-step').text(selectedSubDomain).removeClass('hidden');
                 }
             });
 
@@ -587,8 +541,6 @@ $(document).ready(function () {
                 button.removeClass('bg-gray-200 text-gray-400').addClass('selected bg-green-700 text-white');
                 selectedSubDomain = subDomain;
             }
-
-            $('.domain-step').text(selectedSubDomain).removeClass('hidden');
 
             subDomainsList.append(button);
         });
@@ -606,7 +558,7 @@ $(document).ready(function () {
                 updateDomainsList(response);
             },
             error: function (xhr, status, error) {
-                console.error("Error fetching domains:", error);
+                errorNotification();
             }
         });
     }
@@ -626,12 +578,19 @@ $(document).ready(function () {
 
                         .addClass('border-gray-300 text-gray-300 pointer-events-none')
                         .prop("disabled", true);
+                    $('.domain-step').text('none').removeClass('hidden');
+
+                } else {
+                    $('#next-step').removeClass('border-gray-300 text-gray-300 pointer-events-none')
+                        .addClass('border-green-650 text-green-650')
+                        .prop("disabled", false);
+                    $('.domain-step').text(response.data[0]).removeClass('hidden');
                 }
 
                 updateSubDomainsList(response.data);
             },
             error: function (xhr, status, error) {
-                console.error("Error fetching domains:", error);
+                errorNotification();
             }
         });
     }
@@ -695,13 +654,12 @@ $(document).ready(function () {
                 clearGlossaryList();
             },
             error: function (xhr, status, error) {
-                console.error("Error fetching default glossary:", error);
+                errorNotification();
             }
         });
     }
 
     function loadMyGlossaries() {
-
         const data = {
             source_language: sourceLanguage,
             target_language: targetLanguage,
@@ -723,7 +681,7 @@ $(document).ready(function () {
 
             },
             error: function (xhr, status, error) {
-                console.error("Error fetching my glossaries:", error);
+                errorNotification();
             }
         });
     }
@@ -733,7 +691,7 @@ $(document).ready(function () {
         $list.empty();
 
         glossaries.forEach(function (glossary) {
-            const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 rounded-md">${glossary.name}</button>`);
+            const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 rounded-md hover:bg-green-700 hover:text-white transition duration-300 ease-in-out">${glossary.name}</button>`);
             $item.click(function () {
                 if (selectedGlossary === glossary.name) {
                     $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
@@ -778,10 +736,10 @@ $(document).ready(function () {
     });
 
     $('.glossary-file').on('change', function (e) {
-        var file = e.target.files[0];
-        if (file) {
-            if (file.size <= maxFileSize) {
-                showUploadedFile(file.name);
+        glossaryFile = e.target.files[0];
+        if (glossaryFile) {
+            if (glossaryFile.size <= maxFileSize) {
+                showUploadedFile(glossaryFile.name);
             } else {
                 alert('File size exceeds 5MB limit.');
                 $(this).val('');
@@ -805,6 +763,66 @@ $(document).ready(function () {
         $('.glossary-file').val('');
     }
 
+    $(document).on('click', '.create-glossary', function (e) {
+        e.preventDefault();
+
+        if (!glossaryFile) {
+            $('#uploadButton').removeClass('bg-green-700').addClass('bg-transparent border border-red-400 text-red-300');
+            $('.glossary-container').removeClass('bg-green-350').addClass('bg-red-150');
+            return;
+        }
+
+        const formData = new FormData();
+
+        formData.append('file', glossaryFile);
+        formData.append('domain_name', selectedSubDomain);
+        formData.append('source_language', sourceLanguage);
+        formData.append('target_language', targetLanguage);
+
+        $.ajax({
+            url: add_glossary,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function (response) {
+                glossaryFile = null;
+                $('#fileInfo').addClass('hidden');
+                $('#fileName').text('');
+                $('.glossary-file').val('');
+                $modal.addClass('hidden');
+                $closeIcon.addClass('hidden');
+
+                const $list = $(".glossary-list");
+
+                const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 rounded-md hover:bg-green-700 hover:text-white">${response.name}</button>`);
+
+                $item.click(function () {
+                    if (selectedGlossary === response.name) {
+                        $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
+                        selectedGlossary = '';
+                        $('.terminology-step').text('').removeClass('hidden');
+                    } else {
+                        $(".glossary-item").removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
+                        $(this).removeClass('bg-gray-200 text-gray-400').addClass('bg-green-700 text-white');
+                        selectedGlossary = response.name;
+                        $('.terminology-step').text(selectedGlossary).removeClass('hidden');
+
+                    }
+                });
+
+                $list.append($item);
+            },
+            error: function (xhr, status, error) {
+                errorNotification();
+            }
+        });
+    });
+
 
     // ------------- STEP-5 -------------
 
@@ -818,7 +836,10 @@ $(document).ready(function () {
         formData.append('source_language', sourceLanguage);
         formData.append('target_language', targetLanguage);
         formData.append('action', 'file_translate');
+// Показати лоадер
 
+// Приховати лоадер
+        $('#loader-row').removeClass('hidden');
         $.ajax({
             url: translate,
             type: 'POST',
@@ -832,13 +853,12 @@ $(document).ready(function () {
             success: function (response) {
                 if (response && response.project_ids && response.project_ids.length > 0) {
                     startStatusCheck(response.project_ids);
-                } else {
-                    console.error('No project IDs received from the server');
                 }
             },
             error: function (xhr, status, error) {
-                console.error('Translation error:', error);
-            }
+                $('#loader-row').addClass('hidden');
+                errorNotification();
+            },
         });
     };
 
@@ -931,7 +951,7 @@ $(document).ready(function () {
                 type="button"
                 data-translated-file="${project.translated_file}"
                 data-id="${project.id}"
-                class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3 text-3.25 expert-revision"
+                class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-300 disabled:border-gray-300 expert-revision"
                 ${project.status !== 'Translated' ? 'disabled' : ''}
             >
                 Revision
@@ -1065,7 +1085,7 @@ $(document).ready(function () {
                 $closeRevision.addClass('hidden');
             },
             error: function (xhr, status, error) {
-                console.error('Error:', error);
+                errorNotification();
             }
         });
     });
@@ -1089,10 +1109,12 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     updateProjectTable(response);
-
                 },
                 error: function (xhr, status, error) {
-                    console.error('Error checking document status:', error);
+                    errorNotification();
+                },
+                complete: function (xhr, status, error) {
+                    $('#loader-row').addClass('hidden');
                 }
             });
         };

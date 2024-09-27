@@ -1,13 +1,15 @@
-from django.shortcuts import get_object_or_404
+from django.db.models.functions import Lower
 from rest_framework import status
-from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from django.views.generic import TemplateView
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import serializers
 
 from domains.models import Domain
+from languages.models import Language
 from .models import Glossary
 from .serializers import GlossarySerializer
-from rest_framework.response import Response
 
 
 # Create your views here.
@@ -18,6 +20,7 @@ class UserGlossariesView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['glossaries'] = self.get_glossaries()
+        context['translate_languages'] = Language.objects.all()
         return context
 
     def get_glossaries(self):
@@ -26,8 +29,9 @@ class UserGlossariesView(TemplateView):
         for glossary in tmp_glossaries:
             glossaries.append(
                 {
+                    "id":glossary.id,
                     "file_url": self.request.build_absolute_uri(glossary.file.url),
-                    "file_name": glossary.file.name,
+                    "name": glossary.name,
                     "source_language": glossary.source_language.abbreviation.upper(),
                     "target_language": glossary.target_language.abbreviation.upper(),
                     "file_size": glossary.file_size(),
@@ -37,14 +41,52 @@ class UserGlossariesView(TemplateView):
         return glossaries
 
 
-class AddGlossaryView(CreateAPIView):
-    serializer_class = GlossarySerializer
+class AddGlossaryView(APIView):
+
+    def validate(self, request):
+        errors = {}
+
+        languages_list = Language.objects.all().values_list(Lower('abbreviation'), flat=True)
+        if request.data["source_language"] == request.data["target_language"]:
+            errors["language_pair"] = "Source and target languages cannot be the same"
+        if request.data["source_language"] not in languages_list:
+            errors["source_language"] = "Invalid source language"
+        if request.data["target_language"] not in languages_list:
+            errors["target_language"] = "Invalid target language"
+        if request.LANGUAGE_CODE == 'fr':
+            domains = Domain.objects.all().values_list('french_name', flat=True)
+        else:
+            domains = Domain.objects.all().values_list('name', flat=True)
+        if request.data.get('domain_name') not in domains:
+            errors["domain_name"] = "Invalid domain name"
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+    def post(self, request):
+        self.validate(request)
+        if request.LANGUAGE_CODE == 'fr':
+            domain = Domain.objects.get(french_name=request.data.get('domain_name'))
+        else:
+            domain = Domain.objects.get(name=request.data.get('domain_name'))
+
+        source_language = Language.objects.get(abbreviation=request.data.get('source_language').upper())
+        target_language = Language.objects.get(abbreviation=request.data.get('target_language').upper())
+
+        glossary = Glossary.objects.create(
+            user=request.user,
+            source_language=source_language,
+            target_language=target_language,
+            file=request.FILES.get('file'),
+            domain=domain
+        )
+        return Response(GlossarySerializer(glossary).data, status=status.HTTP_201_CREATED)
 
 
 class SingleGlossaryView(RetrieveUpdateDestroyAPIView):
     serializer_class = GlossarySerializer
 
-    def get_queryset(self):
+    def get_object(self):
         return Glossary.objects.filter(user=self.request.user, id=self.kwargs['pk']).first()
 
 
