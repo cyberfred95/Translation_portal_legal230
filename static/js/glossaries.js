@@ -14,12 +14,20 @@ $(document).ready(function () {
     });
 
     $('#closeModal, #closeIcon').on('click', function () {
+        $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
+        $('#downloadSample').removeClass('bg-transparent border border-gray-170 text-gray-270').addClass('bg-green-700 text-green-650 border border-green-650');
+        $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-350');
+
         $modal.addClass('hidden');
         $closeIcon.addClass('hidden');
     });
 
     $(window).on('click', function (event) {
         if (event.target == $modal[0]) {
+            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
+            $('#downloadSample').removeClass('bg-transparent border border-gray-170 text-gray-270').addClass('bg-green-700 text-green-650 border border-green-650');
+            $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-350');
+
             $modal.addClass('hidden');
             $closeIcon.addClass('hidden');
         }
@@ -32,6 +40,9 @@ $(document).ready(function () {
     $('.glossary-file').on('change', function (e) {
         file = e.target.files[0];
         if (file) {
+            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
+            $('#downloadSample').removeClass('bg-transparent border border-gray-170 text-gray-270').addClass('bg-green-700 text-green-650 border border-green-650');
+            $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-350');
             if (file.size <= maxFileSize) {
                 showUploadedFile(file.name);
             } else {
@@ -166,66 +177,29 @@ $(document).ready(function () {
         }
     });
 
-    let sourceLanguage, targetLanguage, domainName;
-
-    const getDomains = () => {
-        if (sourceLanguage && targetLanguage) {
-            $.ajax({
-                url: `${get_domains}?source_language=${sourceLanguage}&target_language=${targetLanguage}`,
-                type: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': getCookie('csrftoken'),
-                },
-                success: function (response) {
-                    let domainSelect = $('.js-example-basic-single.glossary[name="domain_name"]');
-                    if (response.data.length !== 0) {
-                        domainName = response.data[0];
-                        domainSelect.empty();
-                        domainSelect.prop('disabled', false);
-                        domainSelect.append($('<option></option>').attr('value', '').text('Domain').prop('disabled', true));
-
-                        $.each(response.data, function (index, domain) {
-                            domainSelect.append($('<option></option>').attr('value', domain).text(domain));
-                        });
-
-                        domainSelect.find('option:not(:disabled):first').prop('selected', true);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error fetching domains:", error);
-                }
-            });
-        }
-    }
-
-    $('.js-example-basic-single.glossary[name="domain_name"]').on('change', function () {
-        domainName = $(this).val();
-    });
+    let sourceLanguage, targetLanguage
 
     $('.js-example-basic-single.glossary[name="source_language"]').on('change', function () {
         sourceLanguage = $(this).val();
-        getDomains();
     });
 
     $('.js-example-basic-single.glossary[name="target_language"]').on('change', function () {
         targetLanguage = $(this).val();
-        getDomains();
     });
 
     $(document).on('click', '.create-glossary', function (e) {
         e.preventDefault();
 
         if (!file) {
-            $('#uploadButton').removeClass('bg-green-700').addClass('bg-transparent border border-red-400 text-red-300');
-            $('.glossary-container').removeClass('bg-green-350').addClass('bg-red-150');
+            $('#uploadButton').removeClass('bg-green-700 border border-green-650').addClass('bg-transparent border border-red-400 text-red-400');
+            $('#downloadSample').removeClass('bg-green-700 text-green-650 ').addClass('bg-transparent border border-gray-170 text-gray-270');
+            $('.glossary-container').removeClass('bg-gray-350').addClass('bg-red-150');
             return;
         }
 
         const formData = new FormData();
 
         formData.append('file', file);
-        formData.append('domain_name', domainName);
         formData.append('source_language', sourceLanguage);
         formData.append('target_language', targetLanguage);
 
@@ -240,9 +214,10 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
+                console.log(response)
                 window.location.reload();
             },
-            error: function (xhr, status, error) {
+            error: function () {
                 errorNotification();
             }
         });

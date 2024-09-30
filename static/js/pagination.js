@@ -3,6 +3,7 @@ $(document).ready(function () {
     var totalItems = parseInt($pagination.data('total-items'));
     var itemsPerPage = parseInt($pagination.data('items-per-page'));
     var currentPage = parseInt($pagination.data('current-page'));
+    var currentUrl = $pagination.data('page-url');
     var totalPages = Math.ceil(totalItems / itemsPerPage);
 
     function updatePagination() {
@@ -50,7 +51,7 @@ $(document).ready(function () {
     }
 
     function loadPage(page) {
-        window.location.href = '/project-history/?page=' + page;
+        window.location.href = `/${currentUrl}/?page=` + page;
     }
 
     $(document).on('click', '.page-number', function (e) {
