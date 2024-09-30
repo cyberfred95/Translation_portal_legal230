@@ -18,8 +18,32 @@ class UsageView(TemplateView):
         context['stats'] = self.get_stats()
         context['date_from'] = self.request.GET.get("date_from", "")
         context['date_to'] = self.request.GET.get("date_to", "")
+        context['is_group_admin'] = self.get_is_group_admin()
         
         return context
+
+    def get_is_group_admin(self):
+        return self.request.user.group and self.request.user.group.admin and self.request.user.group.admin == self.request.user
+
+    def get_filters(self, unique_file_names, unique_user_file_names):
+
+        if self.request.user.is_staff:
+            return {
+                'users': [user.username for user in User.objects.all()],
+                'groups': [group.name for group in UserGroup.objects.all()],
+                'file_name': list(unique_file_names),
+            }
+        elif self.request.user.group and self.request.user.group.admin == self.request.user:
+            return {
+                'users': [user.username for user in User.objects.filter(group=self.request.user.group)],
+                'file_name': list(unique_file_names),
+
+            }
+        else:
+            return {
+                'file_name': list(unique_user_file_names.get(self.request.user.username, set())),
+            }
+
 
     def get_stats(self):
         additional_url_params = self.set_additional_url_params()
@@ -62,18 +86,8 @@ class UsageView(TemplateView):
 
         stats['total_count'] = self.calculate_total_chars_and_tokens(stats)
 
-        if self.request.user.is_superuser or (self.request.user.group and self.request.user.group.admin == self.request.user):
-            stats['filters'] = {
-                'users': [user.username for user in User.objects.all()],  
-                'groups': [group.name for group in UserGroup.objects.all()],  
-                'file_name': list(unique_file_names),  
-            }
-        else:
-            stats['filters'] = {
-                'file_name': list(unique_user_file_names.get(self.request.user.username, set())),
-            }
-
-        print(f"Filters for user {self.request.user.username}: {stats['filters']}")
+        stats['filters'] = self.get_filters(unique_file_names, unique_user_file_names)
+        print(stats['filters'])
   
         return stats
 
