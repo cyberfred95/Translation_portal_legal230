@@ -3,9 +3,17 @@ $(document).ready(function () {
     var totalItems = parseInt($pagination.data('total-items'));
     var itemsPerPage = parseInt($pagination.data('items-per-page'));
     var currentPage = parseInt($pagination.data('current-page'));
+    var currentUrl = $pagination.data('page-url');
     var totalPages = Math.ceil(totalItems / itemsPerPage);
 
     function updatePagination() {
+        if (totalPages <= 1) {
+            $pagination.addClass('hidden');
+            return;
+        } else {
+            $pagination.removeClass('hidden');
+        }
+
         var $pageNumbers = $('#page-numbers');
         $pageNumbers.empty();
 
@@ -34,13 +42,16 @@ $(document).ready(function () {
             $pageNumbers.append('<a href="#" class="page-number text-gray-300">' + totalPages + '</a>');
         }
 
-        $('#prev-page').toggleClass('disabled', currentPage === 1);
-        $('#next-page').toggleClass('disabled', currentPage === totalPages);
+        $('#prev-page').toggleClass('text-gray-300 pointer-events-none', currentPage === 1)
+            .toggleClass('text-gray-800', currentPage !== 1)
+            .prop('disabled', currentPage === 1);
+        $('#next-page').toggleClass('text-gray-300 pointer-events-none', currentPage === totalPages)
+            .toggleClass('text-gray-800', currentPage !== totalPages)
+            .prop('disabled', currentPage === totalPages);
     }
 
     function loadPage(page) {
-        window.location.href = '/project-history/?page=' + page;
-        updatePagination();
+        window.location.href = `/${currentUrl}/?page=` + page;
     }
 
     $(document).on('click', '.page-number', function (e) {

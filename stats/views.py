@@ -34,7 +34,6 @@ class UsageView(TemplateView):
                 "uuid": str(self.request.user.uuid)
             }
         )
-
         stats = dict(response.json())
         
         unique_file_names = set()

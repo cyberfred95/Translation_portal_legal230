@@ -23,7 +23,7 @@
     <div class="flex flex-wrap gap-2.5 mt-5 glossary-list"></div>
     <div id="modal"
          class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
-        <form class="relative bg-white rounded-lg shadow-xl max-w-172.5 w-full mx-4">
+        <div class="relative bg-white rounded-lg shadow-xl max-w-172.5 w-full mx-4">
             <div class="absolute -top-4.5 -right-4.5 -mr-4 -mt-4 z-10">
                 <button type="button" id="closeIcon" class="p-2 text-gray-600 hover:text-gray-900 focus:outline-none">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -35,7 +35,7 @@
 
             <div class="p-12.5 flex flex-col items-center gap-7.5">
                 <div class="text-5">Add Glossary</div>
-                <div class="bg-gray-350 w-full py-5 px-46.75 rounded-md">
+                <div class="glossary-container bg-gray-350 w-full py-5 px-46.75 rounded-md">
                     <div id="uploadButtons" class="flex flex-col gap-2.5">
                         <button type="button" id="uploadButton"
                                 class="w-full bg-green-700 text-white py-2.5 rounded font-semibold">
@@ -72,14 +72,13 @@
                 <span class="text-3.5 text-gray-750 text-center">
                     The glossary function is based on the GPT. The number of tokens used for editing terminology can be found in the Usage History section.
                 </span>
-                <button type="button" id="continueButton"
-                        class="bg-gray-800 px-6.5 py-2.5 rounded font-semibold text-4 text-white">
-
+                <button type="submit"
+                        class="bg-gray-800 px-6.5 py-2.5 rounded font-semibold text-4 text-white create-glossary">
                     Continue
                 </button>
             </div>
 
             <input type="file" class="hidden glossary-file" accept=".csv">
-        </form>
+        </div>
     </div>
 </div>

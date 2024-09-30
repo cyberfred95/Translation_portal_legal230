@@ -9,7 +9,7 @@
                 <div class="flex gap-2">
                     <button id="detect-language"
                             type="button"
-                            class="text-3.5 flex gap-2.5 items-center px-6.5 py-0.5 rounded-md bg-transparent hover:bg-gray-800 text-gray-800 hover:text-white border border-gray-800 transition-colors duration-300">
+                            class="text-3.5 flex gap-2.5 items-center px-6.5 py-0.5 rounded-md bg-transparent hover:bg-gray-800 text-gray-800 hover:text-white border border-gray-800 transition duration-300 ease-in-out">
                         Detect language
                     </button>
                     <select class="js-example-basic-single" name="source_language" required>
@@ -26,7 +26,8 @@
                 </div>
                 <div class="relative">
                 <textarea name="text" id="source-text" required
-                          class="focus:border-transparent focus:ring-0 rounded-0.5 h-50 bg-gray-120 p-5 pr-10 text-gray-800 resize-none w-full placeholder:text-gray-250" type="text"
+                          class="focus:border-transparent focus:ring-0 rounded-0.5 h-50 bg-gray-120 p-5 pr-10 text-gray-800 resize-none w-full placeholder:text-gray-250"
+                          type="text"
 
                           placeholder="Put text here"></textarea>
                     <svg id="clear" class="absolute top-5 right-5 cursor-pointer" width="14" height="14"
@@ -90,7 +91,7 @@
             </div>
         </div>
         <div class="flex items-center justify-between mt-5">
-            <select class="js-example-basic-single" name="domain_name" required>
+            <select class="domain-select" name="domain_name" required>
                 <option value="" disabled selected>Domain</option>
 
             </select>
