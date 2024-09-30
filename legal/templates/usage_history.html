@@ -25,94 +25,96 @@
                     <div class="">
                         <ul class=" max-h-125 overflow-y-auto py-2 text-sm text-gray-700 dark:text-gray-200"
                             aria-labelledby="multiLevelDropdownButton">
-                            {% if request.user.is_superuser %}
                             <li class="text-sm text-gray-700 dark:text-gray-200">
-                                <button id="doubleDropdownButton" data-dropdown-toggle="doubleDropdown"
-                                    data-dropdown-placement="right-start" type="button"
-                                    class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">User
-                                    <svg id="dropdownArrow" class="w-2.5 h-1.5 text-black" aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="m1 1 4 4 4-4" />
-                                    </svg>
-                                </button>
-                                <div id="dropdownSearch" class="bg-white rounded-lg shadow w-60 hidden">
-                                    <div class="p-3">
-                                        <label for="input-user-search" class="sr-only">Search</label>
-                                        <div class="relative">
-                                            <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
-                                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path
-                                                        d="M15.1068 14.0475L12.6745 11.6152C13.4117 10.6501 13.816 9.47965 13.8161 8.24451C13.8161 6.75604 13.2364 5.35657 12.1837 4.30408C11.1313 3.25159 9.73196 2.67188 8.24332 2.67188C6.75485 2.67188 5.35538 3.25159 4.30289 4.30408C2.13016 6.47699 2.13016 10.0124 4.30289 12.1849C5.35538 13.2376 6.75485 13.8173 8.24332 13.8173C9.47845 13.8172 10.649 13.4129 11.614 12.6757L14.0463 15.108C14.1926 15.2545 14.3847 15.3278 14.5766 15.3278C14.7685 15.3278 14.9605 15.2545 15.1068 15.108C15.3998 14.8152 15.3998 14.3403 15.1068 14.0475ZM5.36343 11.1244C3.77554 9.5365 3.77573 6.9527 5.36343 5.36462C6.13266 4.59558 7.15549 4.17188 8.24332 4.17188C9.33133 4.17188 10.354 4.59558 11.1232 5.36462C11.8924 6.13385 12.3161 7.15668 12.3161 8.24451C12.3161 9.33252 11.8924 10.3552 11.1232 11.1244C10.354 11.8936 9.33133 12.3173 8.24332 12.3173C7.15549 12.3173 6.13266 11.8936 5.36343 11.1244Z"
-                                                        fill="#2B4459" />
-                                                </svg>
-                                            </div>
+                                {% if request.user.is_staff or is_group_admin %}
 
-                                            <input type="text" id="input-user-search" 
-                                                class="block w-full p-2 ps-10 text-xs font-roboto text-black border border-[#EAF0F6] rounded-lg placeholder-gray-300"
-                                                placeholder=" Start typing...">
+                                    <button id="doubleDropdownButton" data-dropdown-toggle="doubleDropdown"
+                                        data-dropdown-placement="right-start" type="button"
+                                        class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">User
+                                        <svg id="dropdownArrow" class="w-2.5 h-1.5 text-black" aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                stroke-width="2" d="m1 1 4 4 4-4" />
+                                        </svg>
+                                    </button>
+                                    <div id="dropdownSearch" class="bg-white rounded-lg shadow w-60 hidden">
+                                        <div class="p-3">
+                                            <label for="input-user-search" class="sr-only">Search</label>
+                                            <div class="relative">
+                                                <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+                                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M15.1068 14.0475L12.6745 11.6152C13.4117 10.6501 13.816 9.47965 13.8161 8.24451C13.8161 6.75604 13.2364 5.35657 12.1837 4.30408C11.1313 3.25159 9.73196 2.67188 8.24332 2.67188C6.75485 2.67188 5.35538 3.25159 4.30289 4.30408C2.13016 6.47699 2.13016 10.0124 4.30289 12.1849C5.35538 13.2376 6.75485 13.8173 8.24332 13.8173C9.47845 13.8172 10.649 13.4129 11.614 12.6757L14.0463 15.108C14.1926 15.2545 14.3847 15.3278 14.5766 15.3278C14.7685 15.3278 14.9605 15.2545 15.1068 15.108C15.3998 14.8152 15.3998 14.3403 15.1068 14.0475ZM5.36343 11.1244C3.77554 9.5365 3.77573 6.9527 5.36343 5.36462C6.13266 4.59558 7.15549 4.17188 8.24332 4.17188C9.33133 4.17188 10.354 4.59558 11.1232 5.36462C11.8924 6.13385 12.3161 7.15668 12.3161 8.24451C12.3161 9.33252 11.8924 10.3552 11.1232 11.1244C10.354 11.8936 9.33133 12.3173 8.24332 12.3173C7.15549 12.3173 6.13266 11.8936 5.36343 11.1244Z"
+                                                            fill="#2B4459" />
+                                                    </svg>
+                                                </div>
+
+                                                <input type="text" id="input-user-search"
+                                                    class="block w-full p-2 ps-10 text-xs font-roboto text-black border border-[#EAF0F6] rounded-lg placeholder-gray-300"
+                                                    placeholder=" Start typing...">
+                                            </div>
                                         </div>
+                                        <ul id="user-list" class="px-3 pb-3 overflow-y-auto h-48 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
+                                            {% for user in stats.filters.users %}
+                                            <li>
+                                                <div class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                    <input id="checkbox-item-{{ loop.index }}" type="checkbox" value="" data-category="users"
+                                                        class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                    <label for="checkbox-item-{{ loop.index }}"
+                                                        class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray"> {{ user }}</label>
+                                                </div>
+                                            </li>
+                                            {% endfor %}
+                                            <li>
+                                                <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray"></div>
+                                            </li>
+                                        </ul>
                                     </div>
-                                    <ul id="user-list" class="px-3 pb-3 overflow-y-auto h-48 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
-                                        {% for user in stats.filters.users %}
-                                        <li>
-                                            <div class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
-                                                <input id="checkbox-item-{{ loop.index }}" type="checkbox" value="" data-category="users"
-                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
-                                                <label for="checkbox-item-{{ loop.index }}"
-                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray"> {{ user }}</label>
-                                            </div>
-                                        </li>
-                                        {% endfor %}
-                                        <li>
-                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray"></div>
-                                        </li>
-                                    </ul>
-                                </div>
                                 
-                                
-                                <button id="doubleDropdownButtonn" data-dropdown-toggle="doubleDropdown"
-                                    data-dropdown-placement="right-start" type="button"
-                                    class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">
-                                    Group
-                                    <svg id="dropdownArroww" class="w-2.5 h-1.5 text-black" aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d=" m1 1 4 4 4-4" />
-                                    </svg>
-                                </button>
-                                <div id="dropdownSearchh" class="z-10 bg-white rounded-lg shadow w-60 hidden">
-                                    <div class="p-3">
-                                        <label for="input-group-search" class="sr-only">Search</label>
-                                        <div class="relative">
-                                            <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
-                                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path
-                                                        d="M15.1068 14.0475L12.6745 11.6152C13.4117 10.6501 13.816 9.47965 13.8161 8.24451C13.8161 6.75604 13.2364 5.35657 12.1837 4.30408C11.1313 3.25159 9.73196 2.67188 8.24332 2.67188C6.75485 2.67188 5.35538 3.25159 4.30289 4.30408C2.13016 6.47699 2.13016 10.0124 4.30289 12.1849C5.35538 13.2376 6.75485 13.8173 8.24332 13.8173C9.47845 13.8172 10.649 13.4129 11.614 12.6757L14.0463 15.108C14.1926 15.2545 14.3847 15.3278 14.5766 15.3278C14.7685 15.3278 14.9605 15.2545 15.1068 15.108C15.3998 14.8152 15.3998 14.3403 15.1068 14.0475ZM5.36343 11.1244C3.77554 9.5365 3.77573 6.9527 5.36343 5.36462C6.13266 4.59558 7.15549 4.17188 8.24332 4.17188C9.33133 4.17188 10.354 4.59558 11.1232 5.36462C11.8924 6.13385 12.3161 7.15668 12.3161 8.24451C12.3161 9.33252 11.8924 10.3552 11.1232 11.1244C10.354 11.8936 9.33133 12.3173 8.24332 12.3173C7.15549 12.3173 6.13266 11.8936 5.36343 11.1244Z"
-                                                        fill="#2B4459" />
-                                                </svg>
+                                    {% if request.user.is_staff %}
+                                    <button id="doubleDropdownButtonn" data-dropdown-toggle="doubleDropdown"
+                                        data-dropdown-placement="right-start" type="button"
+                                        class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">
+                                        Group
+                                        <svg id="dropdownArroww" class="w-2.5 h-1.5 text-black" aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                stroke-width="2" d=" m1 1 4 4 4-4" />
+                                        </svg>
+                                    </button>
+                                    <div id="dropdownSearchh" class="z-10 bg-white rounded-lg shadow w-60 hidden">
+                                        <div class="p-3">
+                                            <label for="input-group-search" class="sr-only">Search</label>
+                                            <div class="relative">
+                                                <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+                                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path
+                                                            d="M15.1068 14.0475L12.6745 11.6152C13.4117 10.6501 13.816 9.47965 13.8161 8.24451C13.8161 6.75604 13.2364 5.35657 12.1837 4.30408C11.1313 3.25159 9.73196 2.67188 8.24332 2.67188C6.75485 2.67188 5.35538 3.25159 4.30289 4.30408C2.13016 6.47699 2.13016 10.0124 4.30289 12.1849C5.35538 13.2376 6.75485 13.8173 8.24332 13.8173C9.47845 13.8172 10.649 13.4129 11.614 12.6757L14.0463 15.108C14.1926 15.2545 14.3847 15.3278 14.5766 15.3278C14.7685 15.3278 14.9605 15.2545 15.1068 15.108C15.3998 14.8152 15.3998 14.3403 15.1068 14.0475ZM5.36343 11.1244C3.77554 9.5365 3.77573 6.9527 5.36343 5.36462C6.13266 4.59558 7.15549 4.17188 8.24332 4.17188C9.33133 4.17188 10.354 4.59558 11.1232 5.36462C11.8924 6.13385 12.3161 7.15668 12.3161 8.24451C12.3161 9.33252 11.8924 10.3552 11.1232 11.1244C10.354 11.8936 9.33133 12.3173 8.24332 12.3173C7.15549 12.3173 6.13266 11.8936 5.36343 11.1244Z"
+                                                            fill="#2B4459" />
+                                                    </svg>
+                                                </div>
+                                                <input type="text" id="input-group-search"
+                                                    class="block w-full p-2 ps-10 text-xs font-roboto text-black border border-[#EAF0F6] rounded-lg placeholder-gray-300"
+                                                    placeholder=" Start typing...">
                                             </div>
-                                            <input type="text" id="input-group-search"
-                                                class="block w-full p-2 ps-10 text-xs font-roboto text-black border border-[#EAF0F6] rounded-lg placeholder-gray-300"
-                                                placeholder=" Start typing...">
                                         </div>
+                                        <ul id="group-list" class="h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
+                                            {% for group in stats.filters.groups %}
+                                            <li>
+                                                <div class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
+                                                    <input id="checkbox-item-{{ loop.index }}" type="checkbox" value="" data-category="files"
+                                                        class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
+                                                    <label for="checkbox-item-{{ loop.index }}"
+                                                        class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">{{ group }}</label>
+                                                </div>
+                                            </li>
+                                            {% endfor %}
+                                            <li>
+                                                <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray"></div>
+                                            </li>
+                                        </ul>
                                     </div>
-                                    <ul id="group-list" class="h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
-                                        {% for group in stats.filters.groups %}
-                                        <li>
-                                            <div class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
-                                                <input id="checkbox-item-{{ loop.index }}" type="checkbox" value="" data-category="files"
-                                                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
-                                                <label for="checkbox-item-{{ loop.index }}"
-                                                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">{{ group }}</label>
-                                            </div>
-                                        </li>
-                                        {% endfor %}
-                                        <li>
-                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray"></div>
-                                        </li>
-                                    </ul>
-                                </div>                                
+                                    {% endif %}
                                 {% endif %}
                                 <button id="doubleDropdownButtonnn" data-dropdown-toggle="doubleDropdown"
                                     data-dropdown-placement="right-start" type="button"
@@ -207,9 +209,11 @@
         <table id="sorting" class="border-collapse mt-5 w-full border-separate border-spacing-y-5">
             <thead>
                 <tr class="border-gray-500">
-                    {% if request.user.is_authenticated and request.user.is_superuser %}  
+                    {% if request.user.is_staff or is_group_admin %}
                         <th class="text-4 text-gray-800 font-medium text-left border-b pb-5 user-row">User</th>
-                        <th class="text-4 text-gray-800 font-medium text-left border-b pb-5">Group</th>
+                        {% if request.user.is_staff %}
+                            <th class="text-4 text-gray-800 font-medium text-left border-b pb-5">Group</th>
+                        {% endif %}
                     {% endif %}
                     <th class="text-4 text-gray-800 font-medium text-left border-b pb-5">File name</th>
                     <th class="text-4 text-gray-800 font-medium text-left border-b pb-5">Characters</th>
@@ -220,13 +224,16 @@
             <tbody>
                 {% for stat in stats.results %}
                 <tr>
-                    {% if request.user.is_authenticated and request.user.is_superuser %}  
+                    {% if request.user.is_staff or is_group_admin %}
                         <td class="text-3.25 text-gray-800">
                             {{ stat.user }}  
                         </td>
-                        <td class="text-3.25 text-gray-800">
-                            {{ stat.group }}  
-                        </td>
+                        {% if request.user.is_staff %}
+                            <td class="text-3.25 text-gray-800">
+                                {{ stat.group }}
+                            </td>
+                        {% endif %}
+
                     {% endif %}
                     <td>
                         <div class="flex gap-1 text-4 items-center text-green-700">

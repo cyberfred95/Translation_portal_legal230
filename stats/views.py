@@ -18,8 +18,12 @@ class UsageView(TemplateView):
         context['stats'] = self.get_stats()
         context['date_from'] = self.request.GET.get("date_from", "")
         context['date_to'] = self.request.GET.get("date_to", "")
+        context['is_group_admin'] = self.get_is_group_admin()
         
         return context
+
+    def get_is_group_admin(self):
+        return self.request.user.group and self.request.user.group.admin and self.request.user.group.admin == self.request.user
 
     def get_filters(self, unique_file_names, unique_user_file_names):
 
