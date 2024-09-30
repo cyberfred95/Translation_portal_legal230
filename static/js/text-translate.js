@@ -1,6 +1,5 @@
 $(document).ready(function () {
 
-
     $select = $(".domain-select").select2({});
     $select.data('select2').$container.addClass('domain');
     $select.data('select2').$dropdown.addClass('domain');
@@ -96,8 +95,10 @@ $(document).ready(function () {
         });
     });
 
-    $('#clear').click(function () {
-        $('#source-text').val('');
+    $("#clear").on("click", function() {
+        $sourceTextarea.val('');
+        $translatedTextarea.val('');
+        resizeTextAreas();
     });
 
     $('#copy').click(function () {
@@ -145,4 +146,28 @@ $(document).ready(function () {
             }
         });
     });
+
+    var $sourceTextarea = $("#source-text");
+    var $translatedTextarea = $("#translated-text");
+
+    function resizeTextAreas() {
+        $sourceTextarea.css("height", "auto");
+        $translatedTextarea.css("height", "auto");
+
+        var maxHeight = Math.max(
+            $sourceTextarea[0].scrollHeight,
+            $translatedTextarea[0].scrollHeight
+        );
+
+        maxHeight = Math.max(maxHeight, 200);
+
+        $sourceTextarea.css("height", maxHeight + "px");
+        $translatedTextarea.css("height", maxHeight + "px");
+    }
+
+    $sourceTextarea.on("input", function () {
+        resizeTextAreas();
+    });
+
+    resizeTextAreas();
 });
