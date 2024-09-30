@@ -28,7 +28,7 @@ class Glossary(models.Model):
         related_name='target_language_glossaries'
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    domain = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name='glossaries')
+    domain = models.ForeignKey(Domain, on_delete=models.SET_NULL, blank=True, null=True, related_name='glossaries')
 
     class Meta:
         verbose_name = 'Glossary'
@@ -63,6 +63,9 @@ class Glossary(models.Model):
 
                 if existing_default_glossaries.exists():
                     raise ValidationError("A default glossary for this language pair and domain already exists.")
+
+                if not self.domain:
+                    raise ValidationError("You have to choose domain for default glossary")
 
         existing_glossary_filters = {
             'domain': self.domain,

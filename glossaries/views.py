@@ -62,22 +62,12 @@ class AddGlossaryView(APIView):
             errors["source_language"] = "Invalid source language"
         if request.data["target_language"] not in languages_list:
             errors["target_language"] = "Invalid target language"
-        if request.LANGUAGE_CODE == 'fr':
-            domains = Domain.objects.all().values_list('french_name', flat=True)
-        else:
-            domains = Domain.objects.all().values_list('name', flat=True)
-        if request.data.get('domain_name') not in domains:
-            errors["domain_name"] = "Invalid domain name"
 
         if errors:
             raise serializers.ValidationError(errors)
 
     def post(self, request):
         self.validate(request)
-        if request.LANGUAGE_CODE == 'fr':
-            domain = Domain.objects.get(french_name=request.data.get('domain_name'))
-        else:
-            domain = Domain.objects.get(name=request.data.get('domain_name'))
 
         source_language = Language.objects.get(abbreviation=request.data.get('source_language').upper())
         target_language = Language.objects.get(abbreviation=request.data.get('target_language').upper())
@@ -87,7 +77,6 @@ class AddGlossaryView(APIView):
             source_language=source_language,
             target_language=target_language,
             file=request.FILES.get('file'),
-            domain=domain
         )
         return Response(GlossarySerializer(glossary).data, status=status.HTTP_201_CREATED)
 
@@ -107,11 +96,7 @@ class GlossariesListAPIView(APIView):
                 {"message": "provide source_language, target_language and domain_name"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        domain = Domain.objects.get(
-            name=request.data.get('domain_name')) if request.LANGUAGE_CODE != 'fr' else Domain.objects.get(
-            french_name=request.data.get('domain_name'))
         glossaries = Glossary.objects.filter(
-            domain=domain,
             source_language__abbreviation=request.data.get('source_language').upper(),
             target_language__abbreviation=request.data.get('target_language').upper()
         )
