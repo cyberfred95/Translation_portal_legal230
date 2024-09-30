@@ -62,11 +62,17 @@ class UsageView(TemplateView):
 
         stats['total_count'] = self.calculate_total_chars_and_tokens(stats)
 
-        if self.request.user.is_superuser or (self.request.user.group and self.request.user.group.admin == self.request.user):
+        if self.request.user.is_staff:
             stats['filters'] = {
-                'users': [user.username for user in User.objects.all()],  
-                'groups': [group.name for group in UserGroup.objects.all()],  
-                'file_name': list(unique_file_names),  
+                'users': [user.username for user in User.objects.all()],
+                'groups': [group.name for group in UserGroup.objects.all()],
+                'file_name': list(unique_file_names),
+            }
+        elif self.request.user.group and self.request.user.group.admin == self.request.user:
+            stats['filters'] = {
+                'users': [user.username for user in User.objects.filter(group=self.request.user.group)],
+                'file_name': list(unique_file_names),
+
             }
         else:
             stats['filters'] = {
