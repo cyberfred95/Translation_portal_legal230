@@ -720,12 +720,18 @@ $(document).ready(function () {
     });
 
     $('#closeModal, #closeIcon').on('click', function () {
+        $('#uploadButton').removeClass('bg-green-700 border border-green-650').addClass('bg-transparent border border-red-400 text-red-400');
+        $('#downloadSample').removeClass('bg-green-700 text-green-650 ').addClass('bg-transparent border border-gray-170 text-gray-270');
+        $('.glossary-container').removeClass('bg-gray-350').addClass('bg-red-150');
         $modal.addClass('hidden');
         $closeIcon.addClass('hidden');
     });
 
     $(window).on('click', function (event) {
         if (event.target == $modal[0]) {
+            $('#uploadButton').removeClass('bg-green-700 border border-green-650').addClass('bg-transparent border border-red-400 text-red-400');
+            $('#downloadSample').removeClass('bg-green-700 text-green-650 ').addClass('bg-transparent border border-gray-170 text-gray-270');
+            $('.glossary-container').removeClass('bg-gray-350').addClass('bg-red-150');
             $modal.addClass('hidden');
             $closeIcon.addClass('hidden');
         }
@@ -738,6 +744,9 @@ $(document).ready(function () {
     $('.glossary-file').on('change', function (e) {
         glossaryFile = e.target.files[0];
         if (glossaryFile) {
+            $('#uploadButton').removeClass('bg-green-700 border border-green-650').addClass('bg-transparent border border-red-400 text-red-400');
+            $('#downloadSample').removeClass('bg-green-700 text-green-650 ').addClass('bg-transparent border border-gray-170 text-gray-270');
+            $('.glossary-container').removeClass('bg-gray-350').addClass('bg-red-150');
             if (glossaryFile.size <= maxFileSize) {
                 showUploadedFile(glossaryFile.name);
             } else {
@@ -767,8 +776,9 @@ $(document).ready(function () {
         e.preventDefault();
 
         if (!glossaryFile) {
-            $('#uploadButton').removeClass('bg-green-700').addClass('bg-transparent border border-red-400 text-red-300');
-            $('.glossary-container').removeClass('bg-green-350').addClass('bg-red-150');
+            $('#uploadButton').removeClass('bg-green-700 border border-green-650').addClass('bg-transparent border border-red-400 text-red-400');
+            $('#downloadSample').removeClass('bg-green-700 text-green-650 ').addClass('bg-transparent border border-gray-170 text-gray-270');
+            $('.glossary-container').removeClass('bg-gray-350').addClass('bg-red-150');
             return;
         }
 

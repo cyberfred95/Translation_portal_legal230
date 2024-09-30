@@ -157,7 +157,7 @@
 
             <form class="p-12.5 flex flex-col items-center gap-7.5">
                 <div class="text-5">Add Glossary</div>
-                <div class="bg-gray-350 w-full py-5 rounded-md">
+                <div class="glossary-container bg-gray-350 w-full py-5 rounded-md">
 
                     <div id="uploadButtons" class="flex flex-col gap-2.5 items-center">
                         <button type="button" id="uploadButton"
@@ -215,17 +215,6 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <select class="js-example-basic-single glossary" name="domain_name" required>
-                            <option value="" disabled selected>Domain</option>
-                            {% for translate_language in translate_languages %}
-                            <option value="{{ translate_language.abbreviation|lower }}">
-                                {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                                {{ translate_language.french_name }}
-                                {% else %} {{ translate_language.name }}
-                                {% endif %}
-                            </option>
-                            {% endfor %}
-                        </select>
                     </div>
                 </div>
                 <span class="text-3.5 text-gray-750 text-center">
