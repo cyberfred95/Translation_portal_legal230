@@ -92,8 +92,8 @@ $(document).ready(function () {
         if (!$(event.target).closest('#dropdownSearchh').length) {
             $('#dropdownSearchh').addClass('hidden');
         }
-        if (!$(event.target).closest('#dropdownSearchh').length) {
-            $('#dropdownSearchh').addClass('hidden');
+        if (!$(event.target).closest('#dropdownSearchhh').length) {
+            $('#dropdownSearchhh').addClass('hidden');
         }
     }
 
@@ -175,54 +175,62 @@ $(document).ready(function () {
 
     function updateSelectedLabels() {
         const selectedItemsLabel = $('#selected-items');
-        selectedItemsLabel.empty();
+    selectedItemsLabel.empty();
 
-        for (const category in checkedCheckboxes) {
-            if (checkedCheckboxes[category].length > 0) {
-
-                const itemsStr = checkedCheckboxes[category].join(", ");
-
-                const label = $('<span></span>')
-                    .text(`${capitalizeFirstLetter(category)}: ${itemsStr}`)
-                    .css({
-                        display: 'inline-block',
-                        border: '1px solid #F2F3F5',
-                        borderRadius: '8px',
-                        padding: '5px 10px',
-                        margin: '5px',
-                        backgroundColor: '#F2F3F5',
-                        color: 'black',
-                        fontFamily: 'Montserrat',
-                        fontSize: '13px',
-                        whiteSpace: 'nowrap'
-                    });
-
-                selectedItemsLabel.append(label);
-
-                const removeBtn = $('<span></span>')
-                    .text(' X')
-                    .css({
-                        cursor: 'pointer',
-                        marginLeft: '10px',
-                        color: 'black',
-                        fontSize: '12px',
-                        display: 'inline-block'
-                    })
-                    .on('click', function () {
-                        checkedCheckboxes[category] = [];
-                        updateSelectedLabels();
-
-                        $(`input[type="checkbox"][data-category="${category}"]`).prop('checked', false).trigger('change');
-
-                        updateFilterButton(0);
-                    });
-
-                label.append(removeBtn);
+    for (const category in checkedCheckboxes) {
+        if (checkedCheckboxes[category].length > 0) {
+            let categoryLabel;
+            if (category === 'files') {
+                categoryLabel = 'File name';
+            } else if (category === 'groups') {
+                categoryLabel = 'Groups';
+            } else if (category === 'users') {
+                categoryLabel = 'Users';
             }
-        }
 
-        const selectedCount = Object.values(checkedCheckboxes).flat().length;
-        updateFilterButton(selectedCount);
+            const itemsStr = `${categoryLabel}: ${checkedCheckboxes[category].join(", ")}`;
+
+            const labelElement = $('<span></span>')
+                .text(itemsStr)
+                .css({
+                    display: 'inline-block',
+                    border: '1px solid #F2F3F5',
+                    borderRadius: '8px',
+                    padding: '5px 10px',
+                    margin: '5px',
+                    backgroundColor: '#F2F3F5',
+                    color: 'black',
+                    fontFamily: 'Montserrat',
+                    fontSize: '13px',
+                    whiteSpace: 'nowrap'
+                });
+
+            selectedItemsLabel.append(labelElement);
+
+            const removeBtn = $('<span></span>')
+                .text(' X')
+                .css({
+                    cursor: 'pointer',
+                    marginLeft: '10px',
+                    color: 'black',
+                    fontSize: '12px',
+                    display: 'inline-block'
+                })
+                .on('click', function () {
+                    checkedCheckboxes[category] = [];
+                    updateSelectedLabels();
+
+                    $(`input[type="checkbox"][data-category="${category}"]`).prop('checked', false).trigger('change');
+
+                    updateFilterButton(0);
+                });
+
+            labelElement.append(removeBtn);
+        }
+    }
+
+    const selectedCount = Object.values(checkedCheckboxes).flat().length;
+    updateFilterButton(selectedCount);
     }
 
     function capitalizeFirstLetter(string) {
