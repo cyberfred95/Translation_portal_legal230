@@ -2,6 +2,7 @@ from celery import shared_task
 from preferences import preferences
 import requests
 from .models import Prompt, PromptTranslation
+from legal.constants import EN
 
 
 @shared_task
@@ -14,7 +15,7 @@ def refresh_prompts():
         }
     )
 
-    existing_prompts_names = [prompt.translations.filter(language='en').values_list('name', flat=True) for prompt in
+    existing_prompts_names = [prompt.translations.filter(language=EN).first().name for prompt in
                               existing_prompts]
     cmt_prompt_names = []
     for prompt in prompts.json().get('data', []):
@@ -26,6 +27,7 @@ def refresh_prompts():
                 prompt=prompt['prompt'],
             )
             english_translation = PromptTranslation.objects.create(
+                language=EN,
                 prompt=new_prompt,
                 name=prompt['name'],
                 description=prompt['description'],
