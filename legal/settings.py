@@ -220,3 +220,7 @@ AUTH_USER_MODEL = 'users.User'
 ROSETTA_SHOW_AT_ADMIN_PANEL = True
 
 FILES_PROCESSING_API_URL = 'https://office.fileprocessing.custom.mt'
+
+
+USE_X_FORWARDED_HOST=True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
