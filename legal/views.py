@@ -35,7 +35,7 @@ def text_translation(request):
     text = request.POST.get('text')
 
     api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
-    response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translate", data={
+    response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
         "text": [text],
         **get_translate_data(request),
     }, headers={
@@ -125,7 +125,7 @@ class GetTemplatesView(APIView):
             return Response({"message": "Missing source language or target language"},
                             status=status.HTTP_400_BAD_REQUEST)
         templates = requests.post(
-            url=preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "get-templates",
+            url=preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/get-templates",
             data={
                 "source_language": self.request.query_params['source_language'].lower(),
                 "target_language": self.request.query_params['target_language'].lower()
@@ -148,7 +148,7 @@ class GetDomainsView(APIView):
             return Response({"message": "Missing source language or target language"},
                             status=status.HTTP_400_BAD_REQUEST)
         domains = requests.post(
-            preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "get-domains",
+            preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/get-domains",
             data={
                 "source_language": self.request.query_params['source_language'].lower(),
                 "target_language": self.request.query_params['target_language'].lower()
