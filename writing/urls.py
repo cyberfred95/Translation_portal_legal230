@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import refesh_prompts_view
+from .views import WritingView
 
 urlpatterns = [
-    path('refresh/',refesh_prompts_view,name='refresh'),
+    path('', WritingView.as_view(), name='writing'),
 ]

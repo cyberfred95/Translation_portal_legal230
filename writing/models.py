@@ -6,9 +6,8 @@ from legal.constants import LANGUAGES
 # Create your models here.
 
 class Prompt(models.Model):
-    title = models.CharField(max_length=100)
     prompt = models.TextField()
-    variables = models.JSONField(default=dict)
+    variables = models.JSONField(default=dict, blank=True, null=True)
     temperature = models.DecimalField(decimal_places=1, max_digits=2, default=0,
                                       validators=[MinValueValidator(0), MaxValueValidator(1)])
     gpt_model = models.CharField(max_length=100)
