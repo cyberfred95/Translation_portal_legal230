@@ -9,7 +9,7 @@ from legal.constants import EN
 def refresh_prompts():
     existing_prompts = Prompt.objects.all()
     prompts = requests.post(
-        "https://console.custom.mt/gpt_playground/api/get-prompts-list",
+        preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "gpt_playground/api/get-prompts-list",
         headers={
             'token': preferences.MainSettings.api_key
         }

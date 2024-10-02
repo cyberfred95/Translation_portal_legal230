@@ -8,7 +8,7 @@ from .models import Domain
 def update_domains():
     existing_domains = Domain.objects.all()
     domains = requests.get(
-        preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + 'get-domamins-list',
+        preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + 'translation/get-domamins-list',
         headers={'token': preferences.MainSettings.api_key}
     )
     existing_domain_names = existing_domains.values_list('name', flat=True)
