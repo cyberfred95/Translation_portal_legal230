@@ -39,10 +39,15 @@ class Glossary(models.Model):
 
     def file_size(self):
         if self.file:
-            size = self.file.size
-            return str(round(size / (1024 * 1024), 2)) + " Mb"
-        else:
-            return
+            size = self.file.size  # File size in bytes
+
+            if size >= 1024 * 1024:  # Size in MB if larger than or equal to 1 MB
+                return f"{round(size / (1024 * 1024), 2)} MB"
+            elif size >= 1024:  # Size in KB if larger than or equal to 1 KB but less than 1 MB
+                return f"{round(size / 1024, 2)} KB"
+            else:  # Size in bytes if less than 1 KB
+                return f"{size} bytes"
+        return None
 
     def clean(self):
         if self.user and self.group:
