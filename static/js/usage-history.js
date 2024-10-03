@@ -118,9 +118,9 @@ $(document).ready(function () {
     });
 
     let checkedCheckboxes = {
-        users: [],
-        groups: [],
-        files: []
+        user: [],
+        group: [],
+        file: []
     };
 
     $('.checkbox-item input[type="checkbox"]').on('change', function () {
@@ -143,7 +143,7 @@ $(document).ready(function () {
             $(this).prop('checked', false).trigger('change');
         });
 
-        checkedCheckboxes = { users: [], groups: [], files: [] };
+        checkedCheckboxes = { user: [], group: [], file: [] };
         updateFilterButton(0);
         $('#selected-items').empty().addClass('hidden');
     });
@@ -164,11 +164,11 @@ $(document).ready(function () {
     for (const category in checkedCheckboxes) {
         if (checkedCheckboxes[category].length > 0) {
             let categoryLabel;
-            if (category === 'files') {
+            if (category === 'file') {
                 categoryLabel = 'File name';
-            } else if (category === 'groups') {
+            } else if (category === 'group') {
                 categoryLabel = 'Groups';
-            } else if (category === 'users') {
+            } else if (category === 'user') {
                 categoryLabel = 'Users';
             }
 
@@ -227,7 +227,7 @@ $(document).ready(function () {
         const dropdownButton = $('#multiLevelDropdownButton');
 
         if (count > 0) {
-            filterButton.html('Filter <span class="filter-count" style="color: black; border: 2px solid white; background-color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; width: 17px; height: 17px;">' + count + '</span>');
+            filterButton.html('Filter <span class="filter-count bg-white text-black text-3 rounded-full flex items-center justify-center w-5 h-5">' + count + '</span>');
 
             dropdownButton.css('width', 'auto');
         } else {
