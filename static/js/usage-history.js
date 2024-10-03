@@ -53,9 +53,7 @@ $(document).ready(function () {
         $("#datepicker_to").datepicker("show");
     });
 
-    $("#selected-date-to").on("click", function () {
-        $("#datepicker_to").datepicker("show");
-    });
+
     $("#prev-button").on("click", function() {
         if (dateFrom) {
             dateFrom.setMonth(dateFrom.getMonth() - 1);
@@ -158,21 +156,6 @@ $(document).ready(function () {
         $('#selected-items').removeClass('hidden');
     });
 
-    function updateFilterButton(count) {
-        const filterButton = $('#filter-button');
-        if (count > 0) {
-            filterButton.html('Filter <span class="filter-count" style="color: black; border: 2px solid white; background-color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; width: 17px; height: 17px;">' + count + '</span>');
-        } else {
-            filterButton.text('Filter');
-        }
-    }
-
-    $('#apply-button').on('click', function () {
-        const selectedCount = Object.values(checkedCheckboxes).flat().length;
-        updateFilterButton(selectedCount);
-        updateSelectedLabels();
-        $('#selected-items').removeClass('hidden');
-    });
 
     function updateSelectedLabels() {
         const selectedItemsLabel = $('#selected-items');
@@ -239,11 +222,6 @@ $(document).ready(function () {
     updateFilterButton(selectedCount);
     }
 
-    function capitalizeFirstLetter(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-
-
     function updateFilterButton(count) {
         const filterButton = $('#filter-button');
         const dropdownButton = $('#multiLevelDropdownButton');
@@ -283,35 +261,6 @@ $(document).ready(function () {
                 $(this).hide();
             }
         });
-    }
-    function toggleDropdown(dropdownId, listId) {
-        const dropdown = $(`#${dropdownId}`);
-        const list = $(`#${listId}`);
-
-        if (list.children().length === 0) {
-            dropdown.addClass('hidden');
-        } else {
-            dropdown.toggleClass('hidden');
-        }
-    }
-
-    function updateDropdownItems(dropdownId, listId, items) {
-        const list = $(`#${listId}`);
-        list.empty();
-
-        items.forEach(item => {
-            list.append(`
-                <li>
-                    <div class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
-                        <input id="${item.id}" type="checkbox" value="" data-category="${item.category || ''}" 
-                            class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
-                        <label for="${item.id}" class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">${item.label}</label>
-                    </div>
-                </li>
-            `);
-        });
-
-        toggleDropdown(dropdownId, listId);
     }
 
     updateLabels();
