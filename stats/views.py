@@ -114,7 +114,10 @@ class UsageView(TemplateView):
         elif date_to:
             additional_url_params += f"&date_to={date_to}"
 
-        if self.request.user.is_superuser or (self.request.user.group and self.request.user.group.admin == self.request.user):
+        if self.request.user.is_staff:
+            additional_url_params += f"&portal_admin=true"
+
+        elif self.request.user.group and self.request.user.group.admin == self.request.user:
             additional_url_params += "&group_admin=true"
 
         return additional_url_params
