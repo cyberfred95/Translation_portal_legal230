@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<div class="mx-31.25 mt-11.5">
+<div class="mx-31.25 my-11.5">
     <p class="text-7.5">Translator</p>
     <div class="flex justify-between items-center my-5">
         <div class="flex gap-2.5 items-center">
@@ -49,18 +49,6 @@
                 </svg>
                 <span class="text-3.5">Document translate</span>
             </button>
-            <button type="button" id="writing"
-                    class="tab flex gap-2.5 items-center px-4 py-2.5 rounded-md hover:bg-gray-170 hover:text-gray-550 text-gray-180 border border-gray-180 transition-colors duration-300 focus:text-white">
-
-                <svg class="w-6.5 h-6.5" width="22" height="22" viewBox="0 0 22 22" fill="none"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <path d="M19.2434 9.05046L20.8576 7.4363C21.4814 6.81081 21.8317 5.96345 21.8317 5.08005C21.8317 4.19664 21.4814 3.34929 20.8576 2.7238L19.2759 1.14213C18.6504 0.518296 17.803 0.167969 16.9196 0.167969C16.0362 0.167969 15.1889 0.518296 14.5634 1.14213L12.9492 2.7563L19.2434 9.05046Z"
-                          fill="currentColor"/>
-                    <path d="M11.4224 4.28418L1.33661 14.37C0.999499 14.7062 0.782485 15.144 0.719114 15.6158L0.166614 19.3208C0.115992 19.633 0.134311 19.9524 0.220286 20.2568C0.30626 20.5611 0.457806 20.8429 0.664284 21.0824C0.870761 21.3219 1.12716 21.5133 1.41549 21.6432C1.70382 21.7731 2.01708 21.8383 2.33328 21.8342H2.64745L6.35245 21.3033C6.82429 21.24 7.26212 21.023 7.59828 20.6858L17.6841 10.6L11.4224 4.28418Z"
-                          fill="currentColor"/>
-                </svg>
-                <span class="text-3.5">Writing</span>
-            </button>
         </div>
         <button type="button" id="expert-revision"
                 class="flex gap-2.5 items-center bg-green-670 text-white text-3.5 rounded-md py-3.25 px-6.5 hidden">
@@ -86,7 +74,7 @@
         <!--  ------------- TAB-1 -------------  -->
 
 
-        <div id="text-translate-content" class="tab-content">
+        <div id="text-translate-content" class="tab-content hidden">
             {% include 'text_translate.html' %}
         </div>
 
@@ -98,17 +86,11 @@
             {% include 'document_translate.html' %}
         </div>
 
-
-        <!--  ------------- TAB-3 -------------  -->
-
-
-        <div id="writing-content" class="tab-content hidden">
-            {% include 'writing.html' %}
-        </div>
     </div>
 
 </div>
 <script src="{% static 'js/text-translate.js' %}"></script>
+<script src="{% static 'js/translate.js' %}"></script>
 <script>
     let get_domains = "{% url 'get_domains' %}"
     let translate = "{% url 'main_index' %}"

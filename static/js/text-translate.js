@@ -1,8 +1,19 @@
 $(document).ready(function () {
 
-    $select = $(".domain-select").select2({});
+
+    $(".source-language").attr("data-placeholder","Source language");
+    $(".target-language").attr("data-placeholder","Target language");
+    $(".domain-select").attr("data-placeholder","Domain");
+
+    $(".source-language").select2();
+    $(".target-language").select2();
+    $(".domain-select").select2();
+
+    $select = $(".domain-select").select2();
+
     $select.data('select2').$container.addClass('domain');
     $select.data('select2').$dropdown.addClass('domain');
+
     let sourceLanguage, targetLanguage;
 
     const getDomains = () => {

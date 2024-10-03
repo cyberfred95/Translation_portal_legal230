@@ -8,18 +8,6 @@ $(document).ready(function () {
     let glossaryFile = '';
     let selectedFiles = [];
 
-
-    // ------------- SELECT -------------
-
-
-    $('.js-example-basic-single').select2();
-
-    $('.js-example-basic-single.target-select-language').each(function () {
-        var $select = $(this);
-        $select.next('.select2-container').addClass('target-select-language');
-    });
-
-
     // ------------- PROGRESS BAT -------------
 
 
@@ -110,7 +98,7 @@ $(document).ready(function () {
             checkLanguagesConsistency()
         }
         if (currentStep === 1) {
-            targetLanguage = $('.target-select-language').val();
+            targetLanguage = $('.document-target-language').val();
             getDomainsGroups();
         }
         if (currentStep === 2) {
@@ -303,19 +291,19 @@ $(document).ready(function () {
                 displayDetectLanguageFiles(detectedFiles, isSameLanguages);
 
                 if (!isSameLanguages) {
-                    $('.step-container').addClass('bg-red-100 border-red-200');
+                    $('.step-container').addClass('bg-red-150 text-red-200');
                 } else {
                     sourceLanguage = response.languages[0].abbreviation.toLowerCase();
                 }
                 checkLanguagesConsistency();
             },
-            error: function (xhr, status, error) {
+            error: function () {
                 errorNotification();
             }
         });
     }
 
-    function displayDetectLanguageFiles(files, isSameLanguages) {
+    function displayDetectLanguageFiles(files) {
         const $detectiveLanguageList = $('.detective-language-list');
         $detectiveLanguageList.empty();
 
@@ -343,7 +331,7 @@ $(document).ready(function () {
                     <svg width="6" height="10" viewBox="0 0 6 10" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5.71393 4.28962C5.6637 4.23904 5.6081 4.19635 5.55034 4.15922L1.67443 0.283488C1.29615 -0.0944361 0.683075 -0.0946154 0.304613 0.283667C-0.0736695 0.66177 -0.0736695 1.27502 0.304613 1.65348L3.64279 4.9913L0.287753 8.3467C-0.0907092 8.72462 -0.0907092 9.33805 0.287753 9.71651C0.476983 9.90539 0.724687 9.99991 0.972392 9.99991C1.2201 9.99991 1.46834 9.90539 1.65703 9.71615L5.55034 5.82338C5.6081 5.78625 5.66352 5.74374 5.71393 5.69298C5.90764 5.49926 6.00055 5.24492 5.99625 4.9913C6.00073 4.7375 5.90764 4.4828 5.71393 4.28962Z" fill="#9EAAB3"/>
                     </svg>
-                    <select class="js-example-basic-single gray-text-select source-language-select" name="source_language" required data-file-id="${file.fileId}" data-default-value="${file.abbreviation.toLowerCase()}">
+                    <select class="gray-text-select document-source-language" name="source_language" required data-file-id="${file.fileId}" data-default-value="${file.abbreviation.toLowerCase()}">
                         ${getLanguageOptions(file.abbreviation)}
                     </select>
                 </div>
@@ -352,7 +340,7 @@ $(document).ready(function () {
 
             $detectiveLanguageList.append($fileItem);
 
-            $fileItem.find('.js-example-basic-single').select2().each(function () {
+            $fileItem.find('.document-source-language').select2().each(function () {
                 var $select = $(this);
                 var defaultValue = $select.data('default-value');
 
@@ -390,15 +378,15 @@ $(document).ready(function () {
     }
 
     function checkLanguagesConsistency() {
-        const sourceSelects = $('.source-language-select');
-        const targetLanguageBlock = $('.target-language');
+        const sourceSelects = $('.document-source-language');
+        const targetLanguageBlock = $('.target-language-container');
         const targetSelect = $('.select-block');
         const nextButton = $('#next-step');
         const detectedFiles = $(".detected-file");
 
         let isConsistent = true;
         let firstValue = sourceSelects.first().val();
-        let targetValue = $('.target-select-language').val();
+        let targetValue = $('.document-target-language').val();
 
         sourceLanguage = firstValue;
 
@@ -410,28 +398,50 @@ $(document).ready(function () {
             }
         });
 
+
+        // ------------- SELECT -------------
+
+        $('.document-target-language').attr("data-placeholder", "Target language");
+
+        $('.document-target-language').select2();
+        $('.document-source-language').select2();
+
         targetLanguageBlock.find('.error-message').remove();
 
-        if (!isConsistent) {
-            $('.step-container').addClass('bg-red-100 border-red-200');
+        if (currentStep === 1) {
+            if (!isConsistent) {
+                $('.document-source-language').select2().each(function () {
+                    var $select = $(this);
+                    $select.data('select2').$container.addClass('error');
+                    $select.data('select2').$dropdown.addClass('error');
+                });
 
-            targetSelect.hide();
-            targetLanguageBlock.prepend('<div class="error-message text-red-400">One or more files have different language, please fix it.</div>');
+                $('.step-container').addClass('bg-red-150 text-red-200');
 
-            detectedFiles.removeClass('bg-green-200 text-green-700').addClass('bg-red-100 text-red-400 border border-red-400');
-        } else {
-            $('.step-container').removeClass('bg-red-100 border-red-200');
+                targetSelect.hide();
 
-            targetSelect.show();
+                targetLanguageBlock.prepend('<div class="error-message text-red-400">One or more files have different language, please fix it.</div>');
 
-            detectedFiles.removeClass('bg-red-100 text-red-400 border border-red-400').addClass('bg-green-200 text-green-700');
+                detectedFiles.removeClass('bg-green-150 text-green-700').addClass('bg-red-150 text-red-400 border border-red-400');
+            } else {
+                $('.document-source-language').select2().each(function () {
+                    var $select = $(this);
+                    $select.data('select2').$container.removeClass('error');
+                    $select.data('select2').$dropdown.removeClass('error');
+                });
+
+
+                $('.step-container').removeClass('bg-red-150 text-red-200');
+
+                targetSelect.show();
+
+                detectedFiles.removeClass('bg-red-150 text-red-400 border border-red-400').addClass('bg-green-200 text-green-700');
+            }
         }
-
         let isSameAsTarget = firstValue === targetValue;
 
         if (!isConsistent || !targetValue || isSameAsTarget) {
             nextButton.removeClass('border-green-650 text-white text-green-650')
-
                 .addClass('border-gray-300 text-gray-300 pointer-events-none')
                 .prop("disabled", true);
         } else {
@@ -446,7 +456,7 @@ $(document).ready(function () {
     }
 
 
-    $(document).on('change', '.source-language-select, .target-select-language', function () {
+    $(document).on('change', '.document-source-language, .document-target-language', function () {
         checkLanguagesConsistency();
     });
 
@@ -558,7 +568,7 @@ $(document).ready(function () {
             success: function (response) {
                 updateDomainsList(response);
             },
-            error: function (xhr, status, error) {
+            error: function () {
                 errorNotification();
             }
         });
@@ -589,7 +599,7 @@ $(document).ready(function () {
 
                 updateSubDomainsList(response.data);
             },
-            error: function (xhr, status, error) {
+            error: function () {
                 errorNotification();
             }
         });
@@ -653,7 +663,7 @@ $(document).ready(function () {
             success: function () {
                 clearGlossaryList();
             },
-            error: function (xhr, status, error) {
+            error: function () {
                 errorNotification();
             }
         });
@@ -676,11 +686,13 @@ $(document).ready(function () {
             },
             success: function (response) {
                 updateGlossaryList(response);
+                selectedGlossary = '';
                 $('.terminology-step').text('default').removeClass('hidden');
-
-
+                $('#next-step').removeClass('border-green-650 text-white text-green-650')
+                    .addClass('border-gray-300 text-gray-300 pointer-events-none')
+                    .prop("disabled", true);
             },
-            error: function (xhr, status, error) {
+            error: function () {
                 errorNotification();
             }
         });
@@ -697,12 +709,23 @@ $(document).ready(function () {
                     $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
                     selectedGlossary = '';
                     $('.terminology-step').text('').removeClass('hidden');
+                    if (selectedGlossaryType === 'my-glossary') {
+                        $('#next-step').removeClass('border-green-650 text-white text-green-650')
+                            .addClass('border-gray-300 text-gray-300 pointer-events-none')
+                            .prop("disabled", true);
+                    }
                 } else {
                     $(".glossary-item").removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
                     $(this).removeClass('bg-gray-200 text-gray-400').addClass('bg-green-700 text-white');
                     selectedGlossary = glossary.name;
                     $('.terminology-step').text(selectedGlossary).removeClass('hidden');
-
+                    console.log('selectedGlossaryType', selectedGlossaryType);
+                    console.log(123)
+                    if (selectedGlossaryType === 'my-glossary') {
+                        $('#next-step').removeClass('border-gray-300 text-gray-300 pointer-events-none')
+                            .addClass('border-green-650 text-green-650')
+                            .prop("disabled", false);
+                    }
                 }
             });
             $list.append($item);
@@ -827,7 +850,7 @@ $(document).ready(function () {
 
                 $list.append($item);
             },
-            error: function (xhr, status, error) {
+            error: function () {
                 errorNotification();
             }
         });
@@ -846,9 +869,7 @@ $(document).ready(function () {
         formData.append('source_language', sourceLanguage);
         formData.append('target_language', targetLanguage);
         formData.append('action', 'file_translate');
-// Показати лоадер
 
-// Приховати лоадер
         $('#loader-row').removeClass('hidden');
         $.ajax({
             url: translate,
@@ -865,7 +886,7 @@ $(document).ready(function () {
                     startStatusCheck(response.project_ids);
                 }
             },
-            error: function (xhr, status, error) {
+            error: function () {
                 $('#loader-row').addClass('hidden');
                 errorNotification();
             },
@@ -1094,7 +1115,7 @@ $(document).ready(function () {
                 $modalRevision.addClass('hidden');
                 $closeRevision.addClass('hidden');
             },
-            error: function (xhr, status, error) {
+            error: function () {
                 errorNotification();
             }
         });
@@ -1120,10 +1141,10 @@ $(document).ready(function () {
                 success: function (response) {
                     updateProjectTable(response);
                 },
-                error: function (xhr, status, error) {
+                error: function () {
                     errorNotification();
                 },
-                complete: function (xhr, status, error) {
+                complete: function () {
                     $('#loader-row').addClass('hidden');
                 }
             });
