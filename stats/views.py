@@ -21,7 +21,7 @@ class UsageView(TemplateView):
         context['date_from'] = self.request.GET.get("date_from", date.today())
         context['date_to'] = self.request.GET.get("date_to", date.today()+timedelta(days=30))
         context['is_group_admin'] = self.get_is_group_admin()
-        
+
         return context
 
     def get_is_group_admin(self):
@@ -61,7 +61,7 @@ class UsageView(TemplateView):
             }
         )
         stats = dict(response.json())
-        
+
         unique_file_names = set()
         unique_user_file_names = {}
 
@@ -90,7 +90,7 @@ class UsageView(TemplateView):
 
         stats['filters'] = self.get_filters(unique_file_names, unique_user_file_names)
         print(stats['filters'])
-  
+
         return stats
 
     def calculate_total_chars_and_tokens(self, stats):
@@ -105,9 +105,12 @@ class UsageView(TemplateView):
         }
 
     def set_additional_url_params(self):
-        date_from = self.request.GET.get("date_from", None)
-        date_to = self.request.GET.get("date_to", None)
-        additional_url_params = f"?page_size={PAGINATION_PAGE_SIZE}"
+        date_from = self.request.GET.get("date_from", date.today())
+        date_to = self.request.GET.get("date_to", date.today()+timedelta(days=30))
+        page = self.request.GET.get('page')
+        if page is not None:
+            page = int(page)
+        additional_url_params = f"?page_size={PAGINATION_PAGE_SIZE}&page={page}"
 
         if date_from and date_to:
             additional_url_params += f"&date_from={date_from}&date_to={date_to}"
