@@ -1,12 +1,10 @@
 from datetime import datetime, date, timedelta
 from django.views.generic import TemplateView
 
-
 import requests
 from preferences import preferences
 from legal.views import PAGINATION_PAGE_SIZE
 from users.models import User, UserGroup
-
 
 
 # Create your views here.
@@ -19,7 +17,7 @@ class UsageView(TemplateView):
         context = super().get_context_data()
         context['stats'] = self.get_stats()
         context['date_from'] = self.request.GET.get("date_from", date.today())
-        context['date_to'] = self.request.GET.get("date_to", date.today()+timedelta(days=30))
+        context['date_to'] = self.request.GET.get("date_to", date.today() + timedelta(days=30))
         context['is_group_admin'] = self.get_is_group_admin()
 
         return context
@@ -46,9 +44,20 @@ class UsageView(TemplateView):
                 'file_name': list(unique_user_file_names.get(self.request.user.username, set())),
             }
 
+    def get_users(self) -> list:
+        users_uuids = []
+        if self.request.user.is_staff or (
+                self.request.user.group and self.request.user.group.admin == self.request.user):
+            user_names = self.request.GET.getlist('user', [])
+            users = User.objects.filter(username__in=user_names)
+            for user in users:
+                users_uuids.append(str(user.uuid))
+            return users_uuids
+        return [str(self.request.user.uuid)]
 
     def get_stats(self):
         additional_url_params = self.set_additional_url_params()
+        print(additional_url_params)
 
         response = requests.get(
             preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params,
@@ -57,7 +66,7 @@ class UsageView(TemplateView):
                 'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
             },
             json={
-                "uuid": str(self.request.user.uuid)
+                "uuid": self.get_users()
             }
         )
         stats = dict(response.json())
@@ -106,7 +115,7 @@ class UsageView(TemplateView):
 
     def set_additional_url_params(self):
         date_from = self.request.GET.get("date_from", date.today())
-        date_to = self.request.GET.get("date_to", date.today()+timedelta(days=30))
+        date_to = self.request.GET.get("date_to", date.today() + timedelta(days=30))
         page = self.request.GET.get('page')
         additional_url_params = f"?page_size={PAGINATION_PAGE_SIZE}"
 
