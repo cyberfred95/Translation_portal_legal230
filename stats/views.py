@@ -57,7 +57,6 @@ class UsageView(TemplateView):
 
     def get_stats(self):
         additional_url_params = self.set_additional_url_params()
-        print(additional_url_params)
 
         response = requests.get(
             preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params,
@@ -98,7 +97,6 @@ class UsageView(TemplateView):
         stats['total_count'] = self.calculate_total_chars_and_tokens(stats)
 
         stats['filters'] = self.get_filters(unique_file_names, unique_user_file_names)
-        print(stats['filters'])
 
         return stats
 
@@ -116,6 +114,7 @@ class UsageView(TemplateView):
     def set_additional_url_params(self):
         date_from = self.request.GET.get("date_from", date.today())
         date_to = self.request.GET.get("date_to", date.today() + timedelta(days=30))
+        print(date_from, date_to)
         page = self.request.GET.get('page')
         additional_url_params = f"?page_size={PAGINATION_PAGE_SIZE}"
 
@@ -136,4 +135,5 @@ class UsageView(TemplateView):
         elif self.request.user.group and self.request.user.group.admin == self.request.user:
             additional_url_params += "&group_admin=true"
 
+        print(additional_url_params)
         return additional_url_params
