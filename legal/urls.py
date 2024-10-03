@@ -8,6 +8,7 @@ from .views import TranslateView, expert_revision, expert_revision_file, Project
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
 from domains.views import update_domains_view
+from writing.views import refresh_prompts_view
 
 urlpatterns = i18n_patterns(
     path("", login_required(TranslateView.as_view()), name="main_index"),
@@ -20,7 +21,10 @@ urlpatterns = i18n_patterns(
     path('project/', login_required(SingleProjectView.as_view()), name='single_project'),
     path('get-templates/', login_required(GetTemplatesView.as_view()), name='get-templates'),
     path('get-domains/', login_required(GetDomainsView.as_view()), name='get_domains'),
+
     path('refresh_domains/', update_domains_view, name='refresh_domains'),
+    path('refresh_prompts/', refresh_prompts_view, name='refresh_prompts'),
+
     path('detect_language/', login_required(LanguageDetectView.as_view()), name='detect_language'),
     path('detect_text_language/', login_required(DetectTextLanguageView.as_view()), name='detect_text_language'),
     path('statistics/', include('stats.urls')),
@@ -28,6 +32,7 @@ urlpatterns = i18n_patterns(
     path('domains/', include('domains.urls')),
     path('usage/', include('stats.urls')),
     path('users/', include('users.urls')),
+    path('writing/', include('writing.urls')),
 
     re_path(r'^rosetta/', include('rosetta.urls'))
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \

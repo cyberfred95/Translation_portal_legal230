@@ -1,7 +1,9 @@
-{% load static %}
+{% extends 'base.html' %}
 
 {% load static %}
 
+{% block content %}
+<div class="mx-31.25 my-11.5">
 <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-5 w-full h-full flex flex-col items-end">
     <form class="w-full flex flex-col">
         <input type="hidden" name="action" value="text_translate">
@@ -63,9 +65,13 @@
         <div class="flex justify-start mt-5">
             <select class="js-example-basic-single" name="action" required>
                 <option value="" disabled selected>Action</option>
-
+                {% for prompt in prompts %}
+                    <option> {{ prompt.name }}</option>
+                {% endfor %}
             </select>
         </div>
     </form>
 </div>
+</div>
 
+{% endblock %}
