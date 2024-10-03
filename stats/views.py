@@ -1,10 +1,12 @@
-from datetime import datetime
+from datetime import datetime, date, timedelta
+from django.views.generic import TemplateView
+
 
 import requests
 from preferences import preferences
-from django.views.generic import TemplateView
 from legal.views import PAGINATION_PAGE_SIZE
 from users.models import User, UserGroup
+
 
 
 # Create your views here.
@@ -16,8 +18,8 @@ class UsageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['stats'] = self.get_stats()
-        context['date_from'] = self.request.GET.get("date_from", "")
-        context['date_to'] = self.request.GET.get("date_to", "")
+        context['date_from'] = self.request.GET.get("date_from", date.today())
+        context['date_to'] = self.request.GET.get("date_to", date.today()+timedelta(days=30))
         context['is_group_admin'] = self.get_is_group_admin()
         
         return context
@@ -52,7 +54,7 @@ class UsageView(TemplateView):
             preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params,
             headers={
                 'token': preferences.StatisticSettings.API_KEY,
-                'X-API-Key': preferences.MainSettings.api_key
+                'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
             },
             json={
                 "uuid": str(self.request.user.uuid)
