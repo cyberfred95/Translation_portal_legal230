@@ -4,25 +4,6 @@
 
 {% block content %}
 
-<style>
-    .select2-container--default .select2-selection--single {
-        background-color: #F8F9FA !important;
-    }
-
-    .select2-search {
-        background-color: #F8F9FA;
-    }
-
-    .select2-search input {
-        background-color: #F8F9FA;
-    }
-
-    .select2-results {
-        background-color: #F8F9FA;
-    }
-
-</style>
-
 <div class="mx-31.25 my-11.5">
     <div class="flex justify-between items-center">
         <p class="text-7.5">Glossaries</p>
@@ -157,6 +138,36 @@
 
             <form class="p-12.5 flex flex-col items-center gap-7.5">
                 <div class="text-5">Add Glossary</div>
+                <div class="flex w-full justify-between">
+                    <div class="flex flex-col gap-2.5 ">
+                        <span>Source language</span>
+                        <select class="glossary-language-source glossary-language-select" name="source_language" required>
+                            <option value="" disabled selected>Source language</option>
+                            {% for translate_language in translate_languages %}
+                            <option value="{{ translate_language.abbreviation|lower }}">
+                                {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                                {{ translate_language.french_name }}
+                                {% else %} {{ translate_language.name }}
+                                {% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-2.5">
+                        <span>Target language</span>
+                        <select class="glossary-language-target glossary-language-select" name="target_language" required>
+                            <option value="" disabled selected>Source language</option>
+                            {% for translate_language in translate_languages %}
+                            <option value="{{ translate_language.abbreviation|lower }}">
+                                {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                                {{ translate_language.french_name }}
+                                {% else %} {{ translate_language.name }}
+                                {% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
                 <div class="glossary-container bg-gray-350 w-full py-5 rounded-md">
 
                     <div id="uploadButtons" class="flex flex-col gap-2.5 items-center">
@@ -190,31 +201,6 @@
                             Download sample
                         </a>
                         <p class="text-3.5 text-gray-270">Supported Files: .csv max 5mb</p>
-
-                        <div class="flex gap-5">
-                            <select class="js-example-basic-single glossary" name="source_language" required>
-                                <option value="" disabled selected>Source language</option>
-                                {% for translate_language in translate_languages %}
-                                <option value="{{ translate_language.abbreviation|lower }}">
-                                    {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                                    {{ translate_language.french_name }}
-                                    {% else %} {{ translate_language.name }}
-                                    {% endif %}
-                                </option>
-                                {% endfor %}
-                            </select>
-                            <select class="js-example-basic-single glossary" name="target_language" required>
-                                <option value="" disabled selected>Source language</option>
-                                {% for translate_language in translate_languages %}
-                                <option value="{{ translate_language.abbreviation|lower }}">
-                                    {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                                    {{ translate_language.french_name }}
-                                    {% else %} {{ translate_language.name }}
-                                    {% endif %}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
                     </div>
                 </div>
                 <span class="text-3.5 text-gray-750 text-center">

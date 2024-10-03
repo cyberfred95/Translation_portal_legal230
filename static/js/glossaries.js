@@ -1,6 +1,16 @@
 $(document).ready(function () {
 
-    $('.js-example-basic-single.glossary').select2();
+    $(".glossary-language-source").attr("data-placeholder", "Select from the list");
+    $(".glossary-language-target").attr("data-placeholder", "Select from the list");
+
+    $(".glossary-language-source").select2();
+    $(".glossary-language-target").select2();
+
+    $('.glossary-language-select').select2().each(function () {
+        var $select = $(this);
+        $select.data('select2').$container.addClass('glossary');
+        $select.data('select2').$dropdown.addClass('glossary');
+    });
 
     let file
 
@@ -179,11 +189,11 @@ $(document).ready(function () {
 
     let sourceLanguage, targetLanguage
 
-    $('.js-example-basic-single.glossary[name="source_language"]').on('change', function () {
+    $('.glossary-language-source[name="source_language"]').on('change', function () {
         sourceLanguage = $(this).val();
     });
 
-    $('.js-example-basic-single.glossary[name="target_language"]').on('change', function () {
+    $('.glossary-language-target[name="target_language"]').on('change', function () {
         targetLanguage = $(this).val();
     });
 
