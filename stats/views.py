@@ -108,9 +108,11 @@ class UsageView(TemplateView):
         date_from = self.request.GET.get("date_from", date.today())
         date_to = self.request.GET.get("date_to", date.today()+timedelta(days=30))
         page = self.request.GET.get('page')
+        additional_url_params = f"?page_size={PAGINATION_PAGE_SIZE}"
+
         if page is not None:
             page = int(page)
-        additional_url_params = f"?page_size={PAGINATION_PAGE_SIZE}&page={page}"
+            additional_url_params += f"&page={page}"
 
         if date_from and date_to:
             additional_url_params += f"&date_from={date_from}&date_to={date_to}"
