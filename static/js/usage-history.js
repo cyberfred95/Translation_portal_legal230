@@ -3,28 +3,40 @@ $(document).ready(function () {
     let dateFrom, dateTo;
 
     function updateLabels() {
-        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+        const dateOptions = {year: 'numeric', month: 'long', day: 'numeric'};
+        let currentUrl = new URL(window.location.href);
+        let urlDateFrom = currentUrl.searchParams.get('date_from');
+        let urlDateTo = currentUrl.searchParams.get('date_to');
+
         const today = new Date();
         const oneMonthAgo = new Date(today);
         oneMonthAgo.setMonth(today.getMonth() - 1);
 
         if (!dateFrom) {
-            dateFrom = oneMonthAgo;
+            dateFrom = urlDateFrom ? new Date(urlDateFrom) : oneMonthAgo;
         }
         if (!dateTo) {
-            dateTo = today;
+            dateTo = urlDateTo ? new Date(urlDateTo) : today;
         }
+
+        const dateFromFilter = dateFrom.toISOString().split('T')[0];
+        const dateToFilter = dateTo.toISOString().split('T')[0];
+
+        currentUrl.searchParams.set('date_from', dateFromFilter);
+        currentUrl.searchParams.set('date_to', dateToFilter);
+        window.history.pushState({}, '', currentUrl.toString());
 
         const formattedDateFrom = dateFrom.toLocaleDateString('en-EN', dateOptions);
         const formattedDateTo = dateTo.toLocaleDateString('en-EN', dateOptions);
 
         $("#selected-date-from").text(`${formattedDateFrom} /`);
         $("#selected-date-to").text(formattedDateTo);
+
     }
 
     $("#datepicker_from").datepicker({
         dateFormat: "mm/dd/yy",
-        onSelect: function(dateText) {
+        onSelect: function (dateText) {
             dateFrom = new Date(dateText);
             updateLabels();
             $("#datepicker_to").datepicker("show");
@@ -33,7 +45,7 @@ $(document).ready(function () {
 
     $("#datepicker_to").datepicker({
         dateFormat: "mm/dd/yy",
-        onSelect: function(dateText) {
+        onSelect: function (dateText) {
             dateTo = new Date(dateText);
             if (dateFrom && dateTo < dateFrom) {
                 alert('Date to cannot be less than date from.');
@@ -45,16 +57,16 @@ $(document).ready(function () {
         }
     });
 
-    $("#selected-date-from").on("click", function() {
+    $("#selected-date-from").on("click", function () {
         $("#datepicker_from").datepicker("show");
     });
 
-    $("#selected-date-to").on("click", function() {
+    $("#selected-date-to").on("click", function () {
         $("#datepicker_to").datepicker("show");
     });
 
 
-    $("#prev-button").on("click", function() {
+    $("#prev-button").on("click", function () {
         if (dateFrom) {
             dateFrom.setMonth(dateFrom.getMonth() - 1);
             updateLabels();
@@ -65,7 +77,7 @@ $(document).ready(function () {
         }
     });
 
-    $("#next-button").on("click", function() {
+    $("#next-button").on("click", function () {
         if (dateTo) {
             dateTo.setMonth(dateTo.getMonth() + 1);
             updateLabels();
@@ -100,16 +112,19 @@ $(document).ready(function () {
 
     $('#doubleDropdownButton').on('click', function (event) {
         event.stopPropagation();
+        $('#dropdownArrow').toggleClass('rotate-180');
         $('#dropdownSearch').toggleClass('hidden');
     });
 
     $('#doubleDropdownButtonn').on('click', function (event) {
         event.stopPropagation();
+        $('#dropdownArroww').toggleClass('rotate-180');
         $('#dropdownSearchh').toggleClass('hidden');
     });
 
     $('#doubleDropdownButtonnn').on('click', function (event) {
         event.stopPropagation();
+        $('#dropdownArrowww').toggleClass('rotate-180');
         $('#dropdownSearchhh').toggleClass('hidden');
     });
 
@@ -124,7 +139,6 @@ $(document).ready(function () {
     };
 
     $('.checkbox-item input[type="checkbox"]').on('change', function () {
-        const checkboxId = $(this).attr('id');
         const label = $(this).next('label').text();
         const category = $(this).data('category');
 
@@ -137,18 +151,16 @@ $(document).ready(function () {
         }
     });
 
-    // Clear button
     $('#clear-button').on('click', function () {
         $('.checkbox-item input[type="checkbox"]').each(function () {
             $(this).prop('checked', false).trigger('change');
         });
 
-        checkedCheckboxes = { user: [], group: [], file: [] };
+        checkedCheckboxes = {user: [], group: [], file: []};
         updateFilterButton(0);
         $('#selected-items').empty().addClass('hidden');
     });
 
-    // Apply button
     $('#apply-button').on('click', function () {
         const selectedCount = Object.values(checkedCheckboxes).flat().length;
         updateFilterButton(selectedCount);
@@ -159,67 +171,55 @@ $(document).ready(function () {
 
     function updateSelectedLabels() {
         const selectedItemsLabel = $('#selected-items');
-    selectedItemsLabel.empty();
+        selectedItemsLabel.empty();
 
-    for (const category in checkedCheckboxes) {
-        if (checkedCheckboxes[category].length > 0) {
-            let categoryLabel;
-            if (category === 'file') {
-                categoryLabel = 'File name';
-            } else if (category === 'group') {
-                categoryLabel = 'Groups';
-            } else if (category === 'user') {
-                categoryLabel = 'Users';
+        for (const category in checkedCheckboxes) {
+            if (checkedCheckboxes[category].length > 0) {
+                let categoryLabel;
+                if (category === 'file') {
+                    categoryLabel = 'File name';
+                } else if (category === 'group') {
+                    categoryLabel = 'Groups';
+                } else if (category === 'user') {
+                    categoryLabel = 'Users';
+                }
+
+                const itemsStr = `${categoryLabel}: ${checkedCheckboxes[category].join(", ")}`;
+
+                const labelElement = $('<span class="bg-gray-160 rounded-2.5 px-2 py-1.5 text-3.25 whitespace-nowrap mr-2.5"></span>')
+                    .text(itemsStr)
+
+                selectedItemsLabel.append(labelElement);
+
+                const removeBtn = $('<span>')
+                    .append(
+                        $('<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                            '<path d="M0.947952 9.93744C0.70278 9.9517 0.461663 9.87019 0.275444 9.71011C-0.0918148 9.34067 -0.0918148 8.74399 0.275444 8.37455L8.31722 0.332744C8.6992 -0.0246894 9.29859 -0.00481991 9.65603 0.377162C9.97924 0.722587 9.99808 1.25351 9.70013 1.62096L1.61098 9.71011C1.42716 9.86788 1.18991 9.94923 0.947952 9.93744Z" fill="#0D2B40"/>' +
+                            '<path d="M8.98023 9.93746C8.73175 9.9364 8.4936 9.83777 8.31717 9.66278L0.275368 1.62095C-0.0648786 1.22362 -0.0186203 0.625662 0.378708 0.285384C0.733335 -0.0183051 1.25634 -0.0183051 1.61093 0.285384L9.70009 8.32719C10.082 8.68472 10.1017 9.28414 9.74419 9.66603C9.72997 9.68122 9.71528 9.69591 9.70009 9.71013C9.50201 9.88238 9.24134 9.9647 8.98023 9.93746Z" fill="#0D2B40"/>' +
+                            '</svg>')
+                    )
+                    .css({
+                        cursor: 'pointer',
+                        marginLeft: '10px',
+                        color: 'black',
+                        fontSize: '12px',
+                        display: 'inline-block'
+                    })
+                    .on('click', function () {
+                        checkedCheckboxes[category] = [];
+                        updateSelectedLabels();
+
+                        $(`input[type="checkbox"][data-category="${category}"]`).prop('checked', false).trigger('change');
+
+                        updateFilterButton(0);
+                    });
+
+                labelElement.append(removeBtn);
             }
-
-            const itemsStr = `${categoryLabel}: ${checkedCheckboxes[category].join(", ")}`;
-
-            const labelElement = $('<span></span>')
-                .text(itemsStr)
-                .css({
-                    display: 'inline-block',
-                    border: '1px solid #F2F3F5',
-                    borderRadius: '8px',
-                    padding: '5px 10px',
-                    margin: '5px',
-                    backgroundColor: '#F2F3F5',
-                    color: 'black',
-                    fontFamily: 'Montserrat',
-                    fontSize: '13px',
-                    whiteSpace: 'nowrap'
-                });
-
-            selectedItemsLabel.append(labelElement);
-
-            const removeBtn = $('<span>')
-                .append(
-                    $('<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-                        '<path d="M0.947952 9.93744C0.70278 9.9517 0.461663 9.87019 0.275444 9.71011C-0.0918148 9.34067 -0.0918148 8.74399 0.275444 8.37455L8.31722 0.332744C8.6992 -0.0246894 9.29859 -0.00481991 9.65603 0.377162C9.97924 0.722587 9.99808 1.25351 9.70013 1.62096L1.61098 9.71011C1.42716 9.86788 1.18991 9.94923 0.947952 9.93744Z" fill="#0D2B40"/>' +
-                        '<path d="M8.98023 9.93746C8.73175 9.9364 8.4936 9.83777 8.31717 9.66278L0.275368 1.62095C-0.0648786 1.22362 -0.0186203 0.625662 0.378708 0.285384C0.733335 -0.0183051 1.25634 -0.0183051 1.61093 0.285384L9.70009 8.32719C10.082 8.68472 10.1017 9.28414 9.74419 9.66603C9.72997 9.68122 9.71528 9.69591 9.70009 9.71013C9.50201 9.88238 9.24134 9.9647 8.98023 9.93746Z" fill="#0D2B40"/>' +
-                        '</svg>')
-                )
-                .css({
-                    cursor: 'pointer',
-                    marginLeft: '10px',
-                    color: 'black',
-                    fontSize: '12px',
-                    display: 'inline-block'
-                })
-                .on('click', function () {
-                    checkedCheckboxes[category] = [];
-                    updateSelectedLabels();
-
-                    $(`input[type="checkbox"][data-category="${category}"]`).prop('checked', false).trigger('change');
-
-                    updateFilterButton(0);
-                });
-
-            labelElement.append(removeBtn);
         }
-    }
 
-    const selectedCount = Object.values(checkedCheckboxes).flat().length;
-    updateFilterButton(selectedCount);
+        const selectedCount = Object.values(checkedCheckboxes).flat().length;
+        updateFilterButton(selectedCount);
     }
 
     function updateFilterButton(count) {

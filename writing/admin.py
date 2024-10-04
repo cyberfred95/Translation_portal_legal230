@@ -15,6 +15,8 @@ class PromptAdmin(admin.ModelAdmin):
     list_display = ('id', 'gpt_model', 'name_en', 'name_fr')
     inlines = [PromptTranslationInline]
 
+    change_list_template = "admin/writing/Prompt/change_list.html"
+
     @staticmethod
     def name_en(obj: Prompt) -> str:
         return obj.translations.filter(language=EN).first().name if obj.translations.filter(language=EN) else '-'
