@@ -50,7 +50,8 @@ class UsageView(TemplateView):
             group_names = self.request.GET.getlist('group', [])
             users = User.objects.filter(group__name__in=group_names)
             group_user_uuids = [str(user.uuid) for user in users]
-        if self.request.user.is_staff or (self.request.user.group and self.request.user.group.admin == self.request.user):
+        if self.request.user.is_staff or (
+                self.request.user.group and self.request.user.group.admin == self.request.user):
             user_names = self.request.GET.getlist('user', [])
             users = User.objects.filter(username__in=user_names)
             user_uuids = [str(user.uuid) for user in users]
@@ -61,6 +62,7 @@ class UsageView(TemplateView):
         return [str(self.request.user.uuid)]
 
     def get_stats(self):
+        files = self.request.GET.getlist('file_name', [])
         additional_url_params = self.set_additional_url_params()
 
         response = requests.get(
@@ -70,7 +72,8 @@ class UsageView(TemplateView):
                 'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
             },
             json={
-                "uuid": self.get_users()
+                "uuid": self.get_users(),
+                "file_name": files
             }
         )
         stats = dict(response.json())
