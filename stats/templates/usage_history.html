@@ -17,19 +17,18 @@
 
                 <!-- Dropdown -->
                 <div id="multi-dropdown" class="hidden z-10 bg-white divide-y divide-gray-100 rounded-md shadow w-60 shadow-[0px_0px_20px_3px_#2B445914] absolute mt-4 right-0">
-                    <div>
                         <ul class="max-h-125 overflow-y-auto py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="multiLevelDropdownButton">
                             <li class="text-sm text-gray-700 dark:text-gray-200">
                                 {% if request.user.is_staff or is_group_admin %}
 
                                 <button id="doubleDropdownButton" data-dropdown-toggle="doubleDropdown" data-dropdown-placement="right-start" type="button"
-                                        class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">User
+                                        class="flex items-center justify-between w-full px-4 py-2 text-black">User
                                     <svg id="dropdownArrow" class="w-2.5 h-1.5 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                                     </svg>
                                 </button>
-                                <div id="dropdownSearch" class="bg-white rounded-lg shadow w-60 hidden overflow-hidden transition-all duration-300">
-                                    <div class="p-3">
+                                <div id="dropdownSearch" class="hidden overflow-hidden transition-all duration-300">
+                                    <div class="px-3">
                                         <label for="input-user-search" class="sr-only">Search</label>
                                         <div class="relative">
                                             <div class="absolute inset-y-0 start-0 flex items-center ps-3">
@@ -38,34 +37,29 @@
                                                 </svg>
                                             </div>
                                             <input type="text" id="input-user-search" placeholder="Start typing..."
-                                                   class="block w-full p-2 ps-10 text-xs font-roboto text-black border border-gray-190 rounded-lg placeholder-gray-300">
+                                                   class="block w-full py-2.5 px-3 ps-10 text-3.5 text-black border border-gray-190 rounded-2 placeholder:text-gray-300 font-normal">
                                         </div>
                                     </div>
-                                    <ul id="user-list" class="cursor-pointer  max-h-40 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
+                                    <ul id="user-list" class="cursor-pointer max-h-40 px-3 overflow-y-auto text-sm text-gray-700 divide-y divide-gray-190" aria-labelledby="dropdownSearchButton">
                                         {% for user in stats.filters.users %}
-                                        <li>
-                                            <div class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
-                                                <input id="checkbox-item-{{ loop.index }}" type="checkbox" value="" data-category="user"
-                                                       class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:text-black checked:after:text-sm">
-                                                <label for="checkbox-item-{{ loop.index }}" class="w-full py-2 ms-2 text-sm text-gray-900 rounded dark:text-gray">{{ user }}</label>
-                                            </div>
+                                        <li class="checkbox-item flex items-center ps-2 cursor-pointer">
+                                                <input type="checkbox" value="" data-category="user"
+                                                       class="cursor-pointer flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:text-black checked:after:text-sm">
+                                                <label class="cursor-pointer w-full py-2.5 ms-2 text-sm text-gray-900 rounded dark:text-gray">{{ user }}</label>
                                         </li>
                                         {% endfor %}
-                                        <li>
-                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray"></div>
-                                        </li>
                                     </ul>
                                 </div>
 
                                 {% if request.user.is_staff %}
                                 <button id="doubleDropdownButtonn" data-dropdown-toggle="doubleDropdown" data-dropdown-placement="right-start" type="button"
-                                        class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">Group
+                                        class="flex items-center justify-between w-full px-4 py-2 text-black">Group
                                     <svg id="dropdownArroww" class="w-2.5 h-1.5 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d=" m1 1 4 4 4-4" />
                                     </svg>
                                 </button>
                                 <div id="dropdownSearchh" class="z-10 bg-white rounded-lg shadow w-60 hidden transition-all duration-300">
-                                    <div class="p-3">
+                                    <div class="px-3">
                                         <label for="input-group-search" class="sr-only">Search</label>
                                         <div class="relative">
                                             <div class="absolute inset-y-0 start-0 flex items-center ps-3">
@@ -73,16 +67,14 @@
                                                     <path d="M15.1068 14.0475L12.6745 11.6152C13.4117 10.6501 13.816 9.47965 13.8161 8.24451C13.8161 6.75604 13.2364 5.35657 12.1837 4.30408C11.1313 3.25159 9.73196 2.67188 8.24332 2.67188C6.75485 2.67188 5.35538 3.25159 4.30289 4.30408C2.13016 6.47699 2.13016 10.0124 4.30289 12.1849C5.35538 13.2376 6.75485 13.8173 8.24332 13.8173C9.47845 13.8172 10.649 13.4129 11.614 12.6757L14.0463 15.108C14.1926 15.2545 14.3847 15.3278 14.5766 15.3278C14.7685 15.3278 14.9605 15.2545 15.1068 15.108C15.3998 14.8152 15.3998 14.3403 15.1068 14.0475ZM5.36343 11.1244C3.77554 9.5365 3.77573 6.9527 5.36343 5.36462C6.13266 4.59558 7.15549 4.17188 8.24332 4.17188C9.33133 4.17188 10.354 4.59558 11.1232 5.36462C11.8924 6.13385 12.3161 7.15668 12.3161 8.24451C12.3161 9.33252 11.8924 10.3552 11.1232 11.1244C10.354 11.8936 9.33133 12.3173 8.24332 12.3173C7.15549 12.3173 6.13266 11.8936 5.36343 11.1244Z" fill="#2B4459" />
                                                 </svg>
                                             </div>
-                                            <input type="text" id="input-group-search" class="block w-full p-2 ps-10 text-xs font-roboto text-black border border-gray-190 rounded-lg placeholder-gray-300" placeholder="Start typing...">
+                                            <input type="text" id="input-group-search" class="block w-full p-2 ps-10 text-xs text-black border border-gray-190 rounded-lg placeholder:text-gray-300" placeholder="Start typing...">
                                         </div>
                                     </div>
                                     <ul id="group-list" class="max-h-40 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
                                         {% for group in stats.filters.groups %}
-                                        <li>
-                                            <div class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
-                                                <input id="checkbox-item-{{ loop.index }}" type="checkbox" value="" data-category="group" class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:text-black checked:after:text-sm">
-                                                <label for="checkbox-item-{{ loop.index }}" class="w-full py-2 ms-2 text-sm text-gray-900 rounded dark:text-gray">{{ group }}</label>
-                                            </div>
+                                        <li class="checkbox-item flex items-center ps-2 rounded">
+                                                <input type="checkbox" value="" data-category="group" class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:text-black checked:after:text-sm">
+                                                <label class="w-full py-2 ms-2 text-sm text-gray-900 rounded dark:text-gray">{{ group }}</label>
                                         </li>
                                         {% endfor %}
                                         <li>
@@ -93,14 +85,14 @@
                                 {% endif %}
                                 {% endif %}
                                 <button id="doubleDropdownButtonnn" data-dropdown-toggle="doubleDropdown" data-dropdown-placement="right-start" type="button"
-                                        class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">File name
+                                        class="flex items-center justify-between w-full px-4 py-2 text-black">File name
                                     <svg id="dropdownArrowww" class="w-2.5 h-1.5 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                               stroke-width="2" d="m1 1 4 4 4-4" />
                                     </svg>
                                 </button>
                                 <div id="dropdownSearchhh" class="z-10 bg-white rounded-lg shadow w-60 hidden overflow-hidden transition-all duration-300">
-                                    <div class="p-3">
+                                    <div class="px-3">
                                         <label for="input-file-search" class="sr-only">Search</label>
                                         <div class="relative">
                                             <div class="absolute inset-y-0 start-0 flex items-center ps-3">
@@ -109,17 +101,15 @@
                                                 </svg>
                                             </div>
                                             <input type="text" id="input-file-search" placeholder="Start typing..."
-                                                   class="block w-full p-2 ps-10 text-xs font-roboto text-black border border-gray-160 rounded-lg placeholder-gray-300">
+                                                   class="block w-full p-2 ps-10 text-xs text-black border border-gray-160 rounded-lg placeholder:text-gray-300">
                                         </div>
                                     </div>
                                     <ul id="file-list" class="max-h-60 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
                                         {% for file_name in stats.filters.file_name %}
-                                        <li>
-                                            <div class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
-                                                <input id="checkbox-item-{{ loop.index }}" type="checkbox" value="" data-category="file"
+                                        <li class="checkbox-item flex items-center ps-2 rounded">
+                                                <input type="checkbox" value="" data-category="file"
                                                        class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:text-black checked:after:text-sm">
-                                                <label for="checkbox-item-{{ loop.index }}" class="w-full py-2 ms-2 text-sm text-gray-900 rounded dark:text-gray">{{ file_name }}</label>
-                                            </div>
+                                                <label class="w-full py-2 ms-2 text-sm text-gray-900 rounded dark:text-gray">{{ file_name }}</label>
                                         </li>
                                         {% endfor %}
                                         <li>
@@ -133,13 +123,12 @@
                                 <button id="apply-button" class="h-9.25 w-24.75 bg-green-670 px-4 py-2 rounded-md text-white">Apply</button>
                             </div>
                         </ul>
-                    </div>
                 </div>
             </div>
 
 
             <div class="flex justify-between items-center">
-                <svg class="m-2 cursor-pointer" id="prev-button" width="10" height="11" viewBox="0 0 10 11" fill="none"
+                <svg class="mr-2.5 cursor-pointer" id="prev-button" width="10" height="11" viewBox="0 0 10 11" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_1514_7479)">
                         <path
@@ -154,10 +143,10 @@
                 </svg>
                 <input type="text" id="datepicker_from" style="display: none;">
                 <input type="text" id="datepicker_to" style="display: none;">
-                <label id="selected-date-from" class="text-green-650 cursor-pointer"></label>
-                <label id="selected-date-to" class="text-green-650 cursor-pointer"></label>
+                <label id="selected-date-from" class="text-3 text-gray-550 cursor-pointer"></label>
+                <label id="selected-date-to" class="text-3 text-gray-550 cursor-pointer"></label>
 
-                <svg class="m-2 cursor-pointer" id="next-button" width="10" height="11" viewBox="0 0 10 11" fill="none"
+                <svg class="ml-2.5 cursor-pointer" id="next-button" width="10" height="11" viewBox="0 0 10 11" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_1514_7483)">
                         <path
@@ -192,6 +181,7 @@
                 </tr>
             </thead>
             <tbody>
+                {% if stats.results %}
                 {% for stat in stats.results %}
                 <tr>
                     {% if request.user.is_staff or is_group_admin %}
@@ -205,26 +195,30 @@
                     {% endif %}
 
                     {% endif %}
-                    <td>
-                        <div class="flex gap-1 text-4 items-center text-green-700">
-                            {{ stat.file_name }}
-                        </div>
+                    <td class="text-3.25 text-gray-800">
+                        {{ stat.file_name }}
                     </td>
-                    <td>
-                        <div class="text-3.25 text-green-700">
-                            {{ stat.chars_count }}
-                        </div>
+                    <td class="text-3.25 text-gray-800">
+                        {{ stat.chars_count }}
                     </td>
-                    <td>
-                        <div class="text-3.25 text-green-700">
-                            {{ stat.tokens_count }}
-                        </div>
+                    <td class="text-3.25 text-gray-800">
+                        {{ stat.tokens_count }}
                     </td>
                     <td class="text-3.25 text-gray-800">
                         {{ stat.created_at | date:"d/m/Y" }}
                     </td>
                 </tr>
                 {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center py-8 text-gray-500">
+                        <div class="flex flex-col items-center justify-center">
+                            <p class="text-5 text-gray-800 font-semibold">No data available</p>
+                            <p class="text-3.25 text-gray-800 mt-1.25">There are currently no statistic to display.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
             </tbody>
         </table>
 
