@@ -45,14 +45,19 @@ class UsageView(TemplateView):
             }
 
     def get_users(self) -> list:
-        users_uuids = []
-        if self.request.user.is_staff or (
-                self.request.user.group and self.request.user.group.admin == self.request.user):
+        group_user_uuids = []
+        if self.request.user.is_staff:
+            group_names = self.request.GET.getlist('group', [])
+            users = User.objects.filter(group__name__in=group_names)
+            group_user_uuids = [str(user.uuid) for user in users]
+        if self.request.user.is_staff or (self.request.user.group and self.request.user.group.admin == self.request.user):
             user_names = self.request.GET.getlist('user', [])
             users = User.objects.filter(username__in=user_names)
-            for user in users:
-                users_uuids.append(str(user.uuid))
-            return users_uuids
+            user_uuids = [str(user.uuid) for user in users]
+
+            if self.request.user.is_staff:
+                user_uuids = list(set(user_uuids + group_user_uuids))
+            return user_uuids
         return [str(self.request.user.uuid)]
 
     def get_stats(self):
@@ -114,7 +119,6 @@ class UsageView(TemplateView):
     def set_additional_url_params(self):
         date_from = self.request.GET.get("date_from", date.today())
         date_to = self.request.GET.get("date_to", date.today() + timedelta(days=30))
-        print(date_from, date_to)
         page = self.request.GET.get('page')
         additional_url_params = f"?page_size={PAGINATION_PAGE_SIZE}"
 
