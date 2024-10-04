@@ -8,7 +8,6 @@ $(document).ready(function () {
     var currentPage = parseInt($pagination.data('current-page'));
     console.log('currentPage', currentPage)
 
-    var currentUrl = $pagination.data('page-url');
     var totalPages = Math.ceil(totalItems / itemsPerPage);
 
     function updatePagination() {
@@ -56,7 +55,13 @@ $(document).ready(function () {
     }
 
     function loadPage(page) {
-        window.location.href = `/${currentUrl}/?page=` + page;
+        let currentUrl = new URL(window.location.href);
+
+        currentUrl.searchParams.set('page', page);
+
+        window.history.pushState({}, '', currentUrl.toString());
+
+        window.location.reload();
     }
 
     $(document).on('click', '.page-number', function (e) {
