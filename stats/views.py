@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import datetime, date, timedelta
+from django.views.generic import TemplateView
 
 import requests
 from preferences import preferences
-from django.views.generic import TemplateView
 from legal.views import PAGINATION_PAGE_SIZE
 from users.models import User, UserGroup
 
@@ -16,10 +16,10 @@ class UsageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['stats'] = self.get_stats()
-        context['date_from'] = self.request.GET.get("date_from", "")
-        context['date_to'] = self.request.GET.get("date_to", "")
+        context['date_from'] = self.request.GET.get("date_from", date.today())
+        context['date_to'] = self.request.GET.get("date_to", date.today() + timedelta(days=30))
         context['is_group_admin'] = self.get_is_group_admin()
-        
+
         return context
 
     def get_is_group_admin(self):
@@ -44,6 +44,16 @@ class UsageView(TemplateView):
                 'file_name': list(unique_user_file_names.get(self.request.user.username, set())),
             }
 
+    def get_users(self) -> list:
+        users_uuids = []
+        if self.request.user.is_staff or (
+                self.request.user.group and self.request.user.group.admin == self.request.user):
+            user_names = self.request.GET.getlist('user', [])
+            users = User.objects.filter(username__in=user_names)
+            for user in users:
+                users_uuids.append(str(user.uuid))
+            return users_uuids
+        return [str(self.request.user.uuid)]
 
     def get_stats(self):
         additional_url_params = self.set_additional_url_params()
@@ -52,14 +62,14 @@ class UsageView(TemplateView):
             preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params,
             headers={
                 'token': preferences.StatisticSettings.API_KEY,
-                'X-API-Key': preferences.MainSettings.api_key
+                'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
             },
             json={
-                "uuid": str(self.request.user.uuid)
+                "uuid": self.get_users()
             }
         )
         stats = dict(response.json())
-        
+
         unique_file_names = set()
         unique_user_file_names = {}
 
@@ -87,8 +97,7 @@ class UsageView(TemplateView):
         stats['total_count'] = self.calculate_total_chars_and_tokens(stats)
 
         stats['filters'] = self.get_filters(unique_file_names, unique_user_file_names)
-        print(stats['filters'])
-  
+
         return stats
 
     def calculate_total_chars_and_tokens(self, stats):
@@ -103,9 +112,15 @@ class UsageView(TemplateView):
         }
 
     def set_additional_url_params(self):
-        date_from = self.request.GET.get("date_from", None)
-        date_to = self.request.GET.get("date_to", None)
+        date_from = self.request.GET.get("date_from", date.today())
+        date_to = self.request.GET.get("date_to", date.today() + timedelta(days=30))
+        print(date_from, date_to)
+        page = self.request.GET.get('page')
         additional_url_params = f"?page_size={PAGINATION_PAGE_SIZE}"
+
+        if page is not None:
+            page = int(page)
+            additional_url_params += f"&page={page}"
 
         if date_from and date_to:
             additional_url_params += f"&date_from={date_from}&date_to={date_to}"
@@ -114,7 +129,11 @@ class UsageView(TemplateView):
         elif date_to:
             additional_url_params += f"&date_to={date_to}"
 
-        if self.request.user.is_superuser or (self.request.user.group and self.request.user.group.admin == self.request.user):
+        if self.request.user.is_staff:
+            additional_url_params += f"&portal_admin=true"
+
+        elif self.request.user.group and self.request.user.group.admin == self.request.user:
             additional_url_params += "&group_admin=true"
 
+        print(additional_url_params)
         return additional_url_params

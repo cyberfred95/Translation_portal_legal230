@@ -1,169 +1,134 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="mx-31.25 my-11.5">
+
+<div class="mx-31.25 mb-11.5">
     <div class="flex justify-between items-center">
-        <div class="text-7.5">Usage history</div>
-        <div
-            class="flex justify-between gap-5 items-center font-montserrat text-xs font-medium leading-4.5 text-left text-[#7A8B98]">
+        <p class="text-5 font-bold my-5">Usage history</p>
+        <div class="flex justify-between gap-5 items-center text-xs leading-4.5 text-left text-gray-550">
             <div class="relative inline-block">
                 <button id="multiLevelDropdownButton" data-dropdown-toggle="multi-dropdown" type="button"
-                    class="min-w-[64px] h-8 p-1.5 gap-1.5 rounded-md bg-[#EAECEE] opacity-100 flex items-center">
-                    <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg"
-                        class="mr-1">
-                        <path
-                            d="M13.4798 0.5H0.574219C0.272156 0.5 0.0273438 0.744812 0.0273438 1.04688C0.0273438 2.56979 0.680176 4.02371 1.81847 5.03554L4.2135 7.16429C4.62879 7.53343 4.86698 8.06386 4.86698 8.6196V13.9525C4.86698 14.3883 5.35404 14.6495 5.71709 14.4074L8.94355 12.2565C9.09565 12.1551 9.18708 11.9844 9.18708 11.8015V8.6196C9.18708 8.06386 9.42527 7.53343 9.84055 7.16429L12.2355 5.03554C13.3738 4.02371 14.0266 2.56979 14.0266 1.04688C14.0266 0.744812 13.7818 0.5 13.4798 0.5ZM11.5088 4.218L9.11391 6.34686C8.46535 6.92343 8.09333 7.75176 8.09333 8.61949V11.5089L5.96062 12.9306V8.6196C5.96062 7.75176 5.58859 6.92343 4.94003 6.34686L2.54511 4.21811C1.77756 3.53569 1.28761 2.60066 1.15645 1.59364H12.8975C12.7663 2.60066 12.2765 3.53569 11.5088 4.218Z"
-                            fill="#0D2B40" />
+                        class="flex items-center px-1.5 py-2.25 gap-1.5 rounded-2.5 bg-gray-130">
+                    <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-1">
+                        <path d="M13.4798 0.5H0.574219C0.272156 0.5 0.0273438 0.744812 0.0273438 1.04688C0.0273438 2.56979 0.680176 4.02371 1.81847 5.03554L4.2135 7.16429C4.62879 7.53343 4.86698 8.06386 4.86698 8.6196V13.9525C4.86698 14.3883 5.35404 14.6495 5.71709 14.4074L8.94355 12.2565C9.09565 12.1551 9.18708 11.9844 9.18708 11.8015V8.6196C9.18708 8.06386 9.42527 7.53343 9.84055 7.16429L12.2355 5.03554C13.3738 4.02371 14.0266 2.56979 14.0266 1.04688C14.0266 0.744812 13.7818 0.5 13.4798 0.5ZM11.5088 4.218L9.11391 6.34686C8.46535 6.92343 8.09333 7.75176 8.09333 8.61949V11.5089L5.96062 12.9306V8.6196C5.96062 7.75176 5.58859 6.92343 4.94003 6.34686L2.54511 4.21811C1.77756 3.53569 1.28761 2.60066 1.15645 1.59364H12.8975C12.7663 2.60066 12.2765 3.53569 11.5088 4.218Z" fill="#0D2B40" />
                     </svg>
-                    <span id="filter-button"
-                        class=" display flex justify-between  font-125 leading-1 text-left text-[#2B4459] rounded">Filter
-                    </span>
+                    <span id="filter-button" class="flex items-center text-gray-750 gap-1.5">Filter</span>
                 </button>
 
                 <!-- Dropdown -->
-                <div id="multi-dropdown" class="hidden z-10 bg-white divide-y divide-gray-100 rounded-md shadow w-60
-                    shadow-[0px_0px_20px_3px_#2B445914] absolute mt-1 right-0">
-                    <div class="">
-                        <ul class=" max-h-125 overflow-y-auto py-2 text-sm text-gray-700 dark:text-gray-200"
-                            aria-labelledby="multiLevelDropdownButton">
+                <div id="multi-dropdown" class="hidden z-10 bg-white divide-y divide-gray-100 rounded-md shadow w-60 shadow-[0px_0px_20px_3px_#2B445914] absolute mt-4 right-0">
+                        <ul class="max-h-125 overflow-y-auto py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="multiLevelDropdownButton">
                             <li class="text-sm text-gray-700 dark:text-gray-200">
                                 {% if request.user.is_staff or is_group_admin %}
 
-                                <button id="doubleDropdownButton" data-dropdown-toggle="doubleDropdown"
-                                data-dropdown-placement="right-start" type="button"
-                                class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">User
-                                <svg id="dropdownArrow" class="w-2.5 h-1.5 text-black" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="m1 1 4 4 4-4" />
-                                </svg>
-                            </button>
-                            <div id="dropdownSearch" class="bg-white rounded-lg shadow w-60 hidden overflow-hidden transition-all duration-300">
-                                <div class="p-3">
-                                    <label for="input-user-search" class="sr-only">Search</label>
-                                    <div class="relative">
-                                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M15.1068 14.0475L12.6745 11.6152C13.4117 10.6501 13.816 9.47965 13.8161 8.24451C13.8161 6.75604 13.2364 5.35657 12.1837 4.30408C11.1313 3.25159 9.73196 2.67188 8.24332 2.67188C6.75485 2.67188 5.35538 3.25159 4.30289 4.30408C2.13016 6.47699 2.13016 10.0124 4.30289 12.1849C5.35538 13.2376 6.75485 13.8173 8.24332 13.8173C9.47845 13.8172 10.649 13.4129 11.614 12.6757L14.0463 15.108C14.1926 15.2545 14.3847 15.3278 14.5766 15.3278C14.7685 15.3278 14.9605 15.2545 15.1068 15.108C15.3998 14.8152 15.3998 14.3403 15.1068 14.0475ZM5.36343 11.1244C3.77554 9.5365 3.77573 6.9527 5.36343 5.36462C6.13266 4.59558 7.15549 4.17188 8.24332 4.17188C9.33133 4.17188 10.354 4.59558 11.1232 5.36462C11.8924 6.13385 12.3161 7.15668 12.3161 8.24451C12.3161 9.33252 11.8924 10.3552 11.1232 11.1244C10.354 11.8936 9.33133 12.3173 8.24332 12.3173C7.15549 12.3173 6.13266 11.8936 5.36343 11.1244Z"
-                                                    fill="#2B4459" />
-                                            </svg>
+                                <button id="doubleDropdownButton" data-dropdown-toggle="doubleDropdown" data-dropdown-placement="right-start" type="button"
+                                        class="flex items-center justify-between w-full px-4 py-2 text-black">User
+                                    <svg id="dropdownArrow" class="w-2.5 h-1.5 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+                                    </svg>
+                                </button>
+                                <div id="dropdownSearch" class="hidden overflow-hidden transition-all duration-300">
+                                    <div class="px-3">
+                                        <label for="input-user-search" class="sr-only">Search</label>
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 start-0 flex items-center ps-3">
+                                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M15.1068 14.0475L12.6745 11.6152C13.4117 10.6501 13.816 9.47965 13.8161 8.24451C13.8161 6.75604 13.2364 5.35657 12.1837 4.30408C11.1313 3.25159 9.73196 2.67188 8.24332 2.67188C6.75485 2.67188 5.35538 3.25159 4.30289 4.30408C2.13016 6.47699 2.13016 10.0124 4.30289 12.1849C5.35538 13.2376 6.75485 13.8173 8.24332 13.8173C9.47845 13.8172 10.649 13.4129 11.614 12.6757L14.0463 15.108C14.1926 15.2545 14.3847 15.3278 14.5766 15.3278C14.7685 15.3278 14.9605 15.2545 15.1068 15.108C15.3998 14.8152 15.3998 14.3403 15.1068 14.0475ZM5.36343 11.1244C3.77554 9.5365 3.77573 6.9527 5.36343 5.36462C6.13266 4.59558 7.15549 4.17188 8.24332 4.17188C9.33133 4.17188 10.354 4.59558 11.1232 5.36462C11.8924 6.13385 12.3161 7.15668 12.3161 8.24451C12.3161 9.33252 11.8924 10.3552 11.1232 11.1244C10.354 11.8936 9.33133 12.3173 8.24332 12.3173C7.15549 12.3173 6.13266 11.8936 5.36343 11.1244Z" fill="#2B4459" />
+                                                </svg>
+                                            </div>
+                                            <input type="text" id="input-user-search" placeholder="Start typing..."
+                                                   class="block w-full py-2.5 px-3 ps-10 text-3.5 text-black border border-gray-190 rounded-2 placeholder:text-gray-300 font-normal">
                                         </div>
-                                        <input type="text" id="input-user-search"
-                                            class="block w-full p-2 ps-10 text-xs font-roboto text-black border border-[#EAF0F6] rounded-lg placeholder-gray-300"
-                                            placeholder="Start typing...">
                                     </div>
+                                    <ul id="user-list" class="cursor-pointer max-h-40 px-3 overflow-y-auto text-sm text-gray-700 divide-y divide-gray-190" aria-labelledby="dropdownSearchButton">
+                                        {% for user in stats.filters.users %}
+                                        <li class="checkbox-item flex items-center ps-2 cursor-pointer">
+                                                <input type="checkbox" value="" data-category="user"
+                                                       class="cursor-pointer flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:text-black checked:after:text-sm">
+                                                <label class="cursor-pointer w-full py-2.5 ms-2 text-sm text-gray-900 rounded dark:text-gray">{{ user }}</label>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
                                 </div>
-                                <ul id="user-list" class="max-h-40 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
-                                    {% for user in stats.filters.users %}
-                                    <li>
-                                        <div class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
-                                            <input id="checkbox-item-{{ loop.index }}" type="checkbox" value="" data-category="users"
-                                                class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
-                                            <label for="checkbox-item-{{ loop.index }}" class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">{{ user }}</label>
-                                        </div>
-                                    </li>
-                                    {% endfor %}
-                                    <li>
-                                        <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray"></div>
-                                    </li>
-                                </ul>
-                            </div>
 
                                 {% if request.user.is_staff %}
-                                <button id="doubleDropdownButtonn" data-dropdown-toggle="doubleDropdown"
-    data-dropdown-placement="right-start" type="button"
-    class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">
-    Group
-    <svg id="dropdownArroww" class="w-2.5 h-1.5 text-black" aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-            stroke-width="2" d=" m1 1 4 4 4-4" />
-    </svg>
-</button>
-<div id="dropdownSearchh" class="z-10 bg-white rounded-lg shadow w-60 hidden transition-all duration-300">
-    <div class="p-3">
-        <label for="input-group-search" class="sr-only">Search</label>
-        <div class="relative">
-            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M15.1068 14.0475L12.6745 11.6152C13.4117 10.6501 13.816 9.47965 13.8161 8.24451C13.8161 6.75604 13.2364 5.35657 12.1837 4.30408C11.1313 3.25159 9.73196 2.67188 8.24332 2.67188C6.75485 2.67188 5.35538 3.25159 4.30289 4.30408C2.13016 6.47699 2.13016 10.0124 4.30289 12.1849C5.35538 13.2376 6.75485 13.8173 8.24332 13.8173C9.47845 13.8172 10.649 13.4129 11.614 12.6757L14.0463 15.108C14.1926 15.2545 14.3847 15.3278 14.5766 15.3278C14.7685 15.3278 14.9605 15.2545 15.1068 15.108C15.3998 14.8152 15.3998 14.3403 15.1068 14.0475ZM5.36343 11.1244C3.77554 9.5365 3.77573 6.9527 5.36343 5.36462C6.13266 4.59558 7.15549 4.17188 8.24332 4.17188C9.33133 4.17188 10.354 4.59558 11.1232 5.36462C11.8924 6.13385 12.3161 7.15668 12.3161 8.24451C12.3161 9.33252 11.8924 10.3552 11.1232 11.1244C10.354 11.8936 9.33133 12.3173 8.24332 12.3173C7.15549 12.3173 6.13266 11.8936 5.36343 11.1244Z" fill="#2B4459" />
-                </svg>
-            </div>
-            <input type="text" id="input-group-search" class="block w-full p-2 ps-10 text-xs font-roboto text-black border border-[#EAF0F6] rounded-lg placeholder-gray-300" placeholder="Start typing...">
-        </div>
-    </div>
-    <ul id="group-list" class="max-h-40 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
-        {% for group in stats.filters.groups %}
-        <li>
-            <div class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
-                <input id="checkbox-item-{{ loop.index }}" type="checkbox" value="" data-category="groups" class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
-                <label for="checkbox-item-{{ loop.index }}" class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">{{ group }}</label>
-            </div>
-        </li>
-        {% endfor %}
-        <li>
-            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray"></div>
-        </li>
-    </ul>
-</div>
+                                <button id="doubleDropdownButtonn" data-dropdown-toggle="doubleDropdown" data-dropdown-placement="right-start" type="button"
+                                        class="flex items-center justify-between w-full px-4 py-2 text-black">Group
+                                    <svg id="dropdownArroww" class="w-2.5 h-1.5 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d=" m1 1 4 4 4-4" />
+                                    </svg>
+                                </button>
+                                <div id="dropdownSearchh" class="z-10 bg-white rounded-lg shadow w-60 hidden transition-all duration-300">
+                                    <div class="px-3">
+                                        <label for="input-group-search" class="sr-only">Search</label>
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 start-0 flex items-center ps-3">
+                                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M15.1068 14.0475L12.6745 11.6152C13.4117 10.6501 13.816 9.47965 13.8161 8.24451C13.8161 6.75604 13.2364 5.35657 12.1837 4.30408C11.1313 3.25159 9.73196 2.67188 8.24332 2.67188C6.75485 2.67188 5.35538 3.25159 4.30289 4.30408C2.13016 6.47699 2.13016 10.0124 4.30289 12.1849C5.35538 13.2376 6.75485 13.8173 8.24332 13.8173C9.47845 13.8172 10.649 13.4129 11.614 12.6757L14.0463 15.108C14.1926 15.2545 14.3847 15.3278 14.5766 15.3278C14.7685 15.3278 14.9605 15.2545 15.1068 15.108C15.3998 14.8152 15.3998 14.3403 15.1068 14.0475ZM5.36343 11.1244C3.77554 9.5365 3.77573 6.9527 5.36343 5.36462C6.13266 4.59558 7.15549 4.17188 8.24332 4.17188C9.33133 4.17188 10.354 4.59558 11.1232 5.36462C11.8924 6.13385 12.3161 7.15668 12.3161 8.24451C12.3161 9.33252 11.8924 10.3552 11.1232 11.1244C10.354 11.8936 9.33133 12.3173 8.24332 12.3173C7.15549 12.3173 6.13266 11.8936 5.36343 11.1244Z" fill="#2B4459" />
+                                                </svg>
+                                            </div>
+                                            <input type="text" id="input-group-search" class="block w-full p-2 ps-10 text-xs text-black border border-gray-190 rounded-lg placeholder:text-gray-300" placeholder="Start typing...">
+                                        </div>
+                                    </div>
+                                    <ul id="group-list" class="max-h-40 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
+                                        {% for group in stats.filters.groups %}
+                                        <li class="checkbox-item flex items-center ps-2 rounded">
+                                                <input type="checkbox" value="" data-category="group" class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:text-black checked:after:text-sm">
+                                                <label class="w-full py-2 ms-2 text-sm text-gray-900 rounded dark:text-gray">{{ group }}</label>
+                                        </li>
+                                        {% endfor %}
+                                        <li>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray"></div>
+                                        </li>
+                                    </ul>
+                                </div>
                                 {% endif %}
                                 {% endif %}
-                                <button id="doubleDropdownButtonnn" data-dropdown-toggle="doubleDropdown"
-    data-dropdown-placement="right-start" type="button"
-    class="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-200 dark:hover:text-black text-black">File name
-    <svg id="dropdownArrowww" class="w-2.5 h-1.5 text-black" aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-            stroke-width="2" d="m1 1 4 4 4-4" />
-    </svg>
-</button>
-<div id="dropdownSearchhh" class="z-10 bg-white rounded-lg shadow w-60 hidden overflow-hidden transition-all duration-300">
-    <div class="p-3">
-        <label for="input-file-search" class="sr-only">Search</label>
-        <div class="relative">
-            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M15.1068 14.0475L12.6745 11.6152C13.4117 10.6501 13.816 9.47965 13.8161 8.24451C13.8161 6.75604 13.2364 5.35657 12.1837 4.30408C11.1313 3.25159 9.73196 2.67188 8.24332 2.67188C6.75485 2.67188 5.35538 3.25159 4.30289 4.30408C2.13016 6.47699 2.13016 10.0124 4.30289 12.1849C5.35538 13.2376 6.75485 13.8173 8.24332 13.8173C9.47845 13.8172 10.649 13.4129 11.614 12.6757L14.0463 15.108C14.1926 15.2545 14.3847 15.3278 14.5766 15.3278C14.7685 15.3278 14.9605 15.2545 15.1068 15.108C15.3998 14.8152 15.3998 14.3403 15.1068 14.0475ZM5.36343 11.1244C3.77554 9.5365 3.77573 6.9527 5.36343 5.36462C6.13266 4.59558 7.15549 4.17188 8.24332 4.17188C9.33133 4.17188 10.354 4.59558 11.1232 5.36462C11.8924 6.13385 12.3161 7.15668 12.3161 8.24451C12.3161 9.33252 11.8924 10.3552 11.1232 11.1244C10.354 11.8936 9.33133 12.3173 8.24332 12.3173C7.15549 12.3173 6.13266 11.8936 5.36343 11.1244Z"
-                        fill="#2B4459" />
-                </svg>
-            </div>
-            <input type="text" id="input-file-search"
-                class="block w-full p-2 ps-10 text-xs font-roboto text-black border border-[#EAF0F6] rounded-lg placeholder-gray-300"
-                placeholder="Start typing...">
-        </div>
-    </div>
-    <ul id="file-list" class="max-h-60 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
-        {% for file_name in stats.filters.file_name %}
-        <li>
-            <div class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
-                <input id="checkbox-item-{{ loop.index }}" type="checkbox" value="" data-category="files"
-                    class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
-                <label for="checkbox-item-{{ loop.index }}"
-                    class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">{{ file_name }}</label>
-            </div>
-        </li>
-        {% endfor %}
-        <li>
-            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray"></div>
-        </li>
-    </ul>
-</div>
+                                <button id="doubleDropdownButtonnn" data-dropdown-toggle="doubleDropdown" data-dropdown-placement="right-start" type="button"
+                                        class="flex items-center justify-between w-full px-4 py-2 text-black">File name
+                                    <svg id="dropdownArrowww" class="w-2.5 h-1.5 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2" d="m1 1 4 4 4-4" />
+                                    </svg>
+                                </button>
+                                <div id="dropdownSearchhh" class="z-10 bg-white rounded-lg shadow w-60 hidden overflow-hidden transition-all duration-300">
+                                    <div class="px-3">
+                                        <label for="input-file-search" class="sr-only">Search</label>
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 start-0 flex items-center ps-3">
+                                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M15.1068 14.0475L12.6745 11.6152C13.4117 10.6501 13.816 9.47965 13.8161 8.24451C13.8161 6.75604 13.2364 5.35657 12.1837 4.30408C11.1313 3.25159 9.73196 2.67188 8.24332 2.67188C6.75485 2.67188 5.35538 3.25159 4.30289 4.30408C2.13016 6.47699 2.13016 10.0124 4.30289 12.1849C5.35538 13.2376 6.75485 13.8173 8.24332 13.8173C9.47845 13.8172 10.649 13.4129 11.614 12.6757L14.0463 15.108C14.1926 15.2545 14.3847 15.3278 14.5766 15.3278C14.7685 15.3278 14.9605 15.2545 15.1068 15.108C15.3998 14.8152 15.3998 14.3403 15.1068 14.0475ZM5.36343 11.1244C3.77554 9.5365 3.77573 6.9527 5.36343 5.36462C6.13266 4.59558 7.15549 4.17188 8.24332 4.17188C9.33133 4.17188 10.354 4.59558 11.1232 5.36462C11.8924 6.13385 12.3161 7.15668 12.3161 8.24451C12.3161 9.33252 11.8924 10.3552 11.1232 11.1244C10.354 11.8936 9.33133 12.3173 8.24332 12.3173C7.15549 12.3173 6.13266 11.8936 5.36343 11.1244Z" fill="#2B4459" />
+                                                </svg>
+                                            </div>
+                                            <input type="text" id="input-file-search" placeholder="Start typing..."
+                                                   class="block w-full p-2 ps-10 text-xs text-black border border-gray-160 rounded-lg placeholder:text-gray-300">
+                                        </div>
+                                    </div>
+                                    <ul id="file-list" class="max-h-60 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
+                                        {% for file_name in stats.filters.file_name %}
+                                        <li class="checkbox-item flex items-center ps-2 rounded">
+                                                <input type="checkbox" value="" data-category="file"
+                                                       class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:text-black checked:after:text-sm">
+                                                <label class="w-full py-2 ms-2 text-sm text-gray-900 rounded dark:text-gray">{{ file_name }}</label>
+                                        </li>
+                                        {% endfor %}
+                                        <li>
+                                            <div class="flex items-center ps-2 ml-2 h-0.5 bg-neutral-100 dark:bg-gray"></div>
+                                        </li>
+                                    </ul>
+                                </div>
                             </li>
                             <div class="flex space-x-2 pt-3">
-                                <button id="clear-button"
-                                    class="h-9.25 w-24.75 px-5 py-2 bg-white border border-[#346C77] rounded-md text-[#346C77] ml-4">Clear</button>
-                                <button id="apply-button"
-                                    class="h-9.25 w-24.75 bg-[#346C77] px-4 py-2 rounded-md text-white">Apply</button>
+                                <button id="clear-button" class="h-9.25 w-24.75 px-5 py-2 bg-white border border-green-670 rounded-md text-green-670 ml-4">Clear</button>
+                                <button id="apply-button" class="h-9.25 w-24.75 bg-green-670 px-4 py-2 rounded-md text-white">Apply</button>
                             </div>
                         </ul>
-                    </div>
                 </div>
             </div>
 
 
             <div class="flex justify-between items-center">
-                <svg class="m-2" id="prev-button" width="10" height="11" viewBox="0 0 10 11" fill="none"
+                <svg class="mr-2.5 cursor-pointer" id="prev-button" width="10" height="11" viewBox="0 0 10 11" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_1514_7479)">
                         <path
@@ -178,10 +143,10 @@
                 </svg>
                 <input type="text" id="datepicker_from" style="display: none;">
                 <input type="text" id="datepicker_to" style="display: none;">
-                <label id="selected-date-from" class="cursor-pointer">{{ date_from|default:"Date from/" }}</label>
-                <label id="selected-date-to" class="cursor-pointer">{{ date_to|default:"Date to" }}</label>
+                <label id="selected-date-from" class="text-3 text-gray-550 cursor-pointer"></label>
+                <label id="selected-date-to" class="text-3 text-gray-550 cursor-pointer"></label>
 
-                <svg class="m-2" id="next-button" width="10" height="11" viewBox="0 0 10 11" fill="none"
+                <svg class="ml-2.5 cursor-pointer" id="next-button" width="10" height="11" viewBox="0 0 10 11" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_1514_7483)">
                         <path
@@ -199,23 +164,24 @@
     </div>
     <label id="selected-items" class="display flex mr-2 text-gray-700 hidden"></label>
 
-    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md flex flex-col items-end px-5 pt-5 w-full h-full mt-5">
-        <table id="sorting" class="border-collapse mt-5 w-full border-separate border-spacing-y-5">
+    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md flex flex-col items-end px-5 pt-5 w-full h-full">
+        <table id="sorting" class="border-collapse w-full border-separate border-spacing-y-5">
             <thead>
                 <tr class="border-gray-500">
                     {% if request.user.is_staff or is_group_admin %}
-                    <th class="text-4 text-gray-800 font-medium text-left border-b pb-5 user-row">User</th>
+                    <th class="text-4 text-gray-800 font-semibold text-left border-b pb-5 user-row">User</th>
                     {% if request.user.is_staff %}
-                    <th class="text-4 text-gray-800 font-medium text-left border-b pb-5">Group</th>
+                    <th class="text-4 text-gray-800 font-semibold text-left border-b pb-5">Group</th>
                     {% endif %}
                     {% endif %}
-                    <th class="text-4 text-gray-800 font-medium text-left border-b pb-5">File name</th>
-                    <th class="text-4 text-gray-800 font-medium text-left border-b pb-5">Characters</th>
-                    <th class="text-4 text-gray-800 font-medium text-left border-b pb-5">Tokens</th>
-                    <th class="text-4 text-gray-800 font-medium text-left w-1 border-b pb-5">Date</th>
+                    <th class="text-4 text-gray-800 font-semibold text-left border-b pb-5">File name</th>
+                    <th class="text-4 text-gray-800 font-semibold text-left border-b pb-5">Characters</th>
+                    <th class="text-4 text-gray-800 font-semibold text-left border-b pb-5">Tokens</th>
+                    <th class="text-4 text-gray-800 font-semibold text-left w-1 border-b pb-5">Date</th>
                 </tr>
             </thead>
             <tbody>
+                {% if stats.results %}
                 {% for stat in stats.results %}
                 <tr>
                     {% if request.user.is_staff or is_group_admin %}
@@ -229,71 +195,70 @@
                     {% endif %}
 
                     {% endif %}
-                    <td>
-                        <div class="flex gap-1 text-4 items-center text-green-700">
-                            {{ stat.file_name }}
-                        </div>
-                    </td>
-                    <td>
-                        <div class="text-3.25 text-green-700">
-                            {{ stat.chars_count }}
-                        </div>
-                    </td>
-                    <td>
-                        <div class="text-3.25 text-green-700">
-                            {{ stat.tokens_count }}
-                        </div>
+                    <td class="text-3.25 text-gray-800">
+                        {{ stat.file_name }}
                     </td>
                     <td class="text-3.25 text-gray-800">
-                        {{ stat.created_at | date:"Y/m/d" }}
+                        {{ stat.chars_count }}
+                    </td>
+                    <td class="text-3.25 text-gray-800">
+                        {{ stat.tokens_count }}
+                    </td>
+                    <td class="text-3.25 text-gray-800">
+                        {{ stat.created_at | date:"d/m/Y" }}
                     </td>
                 </tr>
                 {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center py-8 text-gray-500">
+                        <div class="flex flex-col items-center justify-center">
+                            <p class="text-5 text-gray-800 font-semibold">No data available</p>
+                            <p class="text-3.25 text-gray-800 mt-1.25">There are currently no statistic to display.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
             </tbody>
         </table>
 
     </div>
-    <div class="flex justify-between items-center py-12.5 w-full">
-        <div class="pagination flex justify-center items-center gap-18 w-full ml-50"
-            data-total-items="{{ projects.count }}" data-items-per-page="{{ projects.page_size }}"
-            data-current-page="{{ projects.current_page }}">
-
+    <div class="flex justify-end items-center py-12.5 w-full">
+        <div class="pagination flex justify-center items-center py-12.5 w-full gap-18 hidden"
+             data-total-items="{{ stats.count }}"
+             data-items-per-page="{{ stats.page_size }}"
+             data-current-page="{{ stats.current_page }}"
+             data-page-url="usage">
             <a href="#" id="prev-page" class="flex items-center gap-2.5 text-3.25 text-gray-800">
                 <svg width="6" height="11" viewBox="0 0 6 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M0.286074 4.78962C0.336297 4.73904 0.3919 4.69635 0.449656 4.65922L4.32557 0.783488C4.70385 0.405564 5.31693 0.405385 5.69539 0.783667C6.07367 1.16177 6.07367 1.77502 5.69539 2.15348L2.35721 5.4913L5.71225 8.8467C6.09071 9.22462 6.09071 9.83805 5.71225 10.2165C5.52302 10.4054 5.27531 10.4999 5.02761 10.4999C4.7799 10.4999 4.53166 10.4054 4.34297 10.2162L0.449656 6.32338C0.3919 6.28625 0.336476 6.24374 0.286074 6.19298C0.0923591 5.99926 -0.000552654 5.74492 0.00375223 5.4913C-0.000731945 5.2375 0.0923591 4.9828 0.286074 4.78962Z"
-                        fill="#2B4459" />
+                    <path d="M0.286074 4.78962C0.336297 4.73904 0.3919 4.69635 0.449656 4.65922L4.32557 0.783488C4.70385 0.405564 5.31693 0.405385 5.69539 0.783667C6.07367 1.16177 6.07367 1.77502 5.69539 2.15348L2.35721 5.4913L5.71225 8.8467C6.09071 9.22462 6.09071 9.83805 5.71225 10.2165C5.52302 10.4054 5.27531 10.4999 5.02761 10.4999C4.7799 10.4999 4.53166 10.4054 4.34297 10.2162L0.449656 6.32338C0.3919 6.28625 0.336476 6.24374 0.286074 6.19298C0.0923591 5.99926 -0.000552654 5.74492 0.00375223 5.4913C-0.000731945 5.2375 0.0923591 4.9828 0.286074 4.78962Z"
+                          fill="currentColor"/>
                 </svg>
                 Prev
             </a>
-
             <div id="page-numbers" class="flex space-x-3.5 text-3.25 items-end">
                 <!-- Page numbers will be inserted here dynamically -->
             </div>
-
             <a href="#" id="next-page" class="flex items-center gap-2.5 text-3.25 text-gray-800">
                 Next
                 <svg width="6" height="11" viewBox="0 0 6 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M5.71393 4.78962C5.6637 4.73904 5.6081 4.69635 5.55034 4.65922L1.67443 0.783488C1.29615 0.405564 0.683075 0.405385 0.304613 0.783667C-0.0736695 1.16177 -0.0736695 1.77502 0.304613 2.15348L3.64279 5.4913L0.287753 8.8467C-0.0907092 9.22462 -0.0907092 9.83805 0.287753 10.2165C0.476983 10.4054 0.724687 10.4999 0.972392 10.4999C1.2201 10.4999 1.46834 10.4054 1.65703 10.2162L5.55034 6.32338C5.6081 6.28625 5.66352 6.24374 5.71393 6.19298C5.90764 5.99926 6.00055 5.74492 5.99625 5.4913C6.00073 5.2375 5.90764 4.9828 5.71393 4.78962Z"
-                        fill="#2B4459" />
+                    <path d="M5.71393 4.78962C5.6637 4.73904 5.6081 4.69635 5.55034 4.65922L1.67443 0.783488C1.29615 0.405564 0.683075 0.405385 0.304613 0.783667C-0.0736695 1.16177 -0.0736695 1.77502 0.304613 2.15348L3.64279 5.4913L0.287753 8.8467C-0.0907092 9.22462 -0.0907092 9.83805 0.287753 10.2165C0.476983 10.4054 0.724687 10.4999 0.972392 10.4999C1.2201 10.4999 1.46834 10.4054 1.65703 10.2162L5.55034 6.32338C5.6081 6.28625 5.66352 6.24374 5.71393 6.19298C5.90764 5.99926 6.00055 5.74492 5.99625 5.4913C6.00073 5.2375 5.90764 4.9828 5.71393 4.78962Z"
+                          fill="currentColor"/>
                 </svg>
+
             </a>
         </div>
 
-        <div
-            class="flex items-center space-x-4 text-3.25 border rounded-md border-gray-300 p-2 text-sm font-montserrat">
-            <div class="text-green-500">{{ stats.total_count.chars }}</div>
-            <div class="text-gray-800">characters</div>
-            <span>|</span>
-            <div class="text-green-500">{{ stats.total_count.tokens }}</div>
-            <div class="text-gray-800">tokens</div>
-            {# <span>|</span>#}
-            {# <div class="text-green-500">{{ stats.current_page }}</div>#}
-            {# <div class="text-gray-800">current page</div>#}
-            {# <span>|</span>#}
-            {# <div class="text-green-500">{{ stats.num_pages }}</div>#}
-            {# <div class="text-gray-800">pages count</div>#}
+        <div class="flex items-center border rounded-2.5 border-gray-300 px-2 py-2.25 text-4 gap-2.5">
+            <div class="flex items-center gap-1">
+                <div class="text-green-650">{{ stats.total_count.chars }}</div>
+                <div class="text-gray-450">characters</div>
+            </div>
+            <span class="text-green-650">|</span>
+            <div class="flex items-center gap-1">
+                <div class="text-green-650">{{ stats.total_count.tokens }}</div>
+                <div class="text-gray-450">tokens</div>
+            </div>
         </div>
     </div>
 
@@ -304,7 +269,8 @@
 
 {% block extra_js %}
 {% load static %}
-<script src="{% static 'js/history.js' %}"></script>
+
 <script src="{% static 'js/usage-history.js' %}"></script>
+<script src="{% static 'js/pagination.js' %}"></script>
 
 {% endblock extra_js %}

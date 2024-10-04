@@ -3,22 +3,23 @@ $(document).ready(function () {
     let dateFrom, dateTo;
 
     function updateLabels() {
-        const months = ["January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"];
+        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+        const today = new Date();
+        const oneMonthAgo = new Date(today);
+        oneMonthAgo.setMonth(today.getMonth() - 1);
 
-        if (dateFrom) {
-            const fromMonth = months[dateFrom.getMonth()];
-            $("#selected-date-from").text(`${fromMonth} ${dateFrom.getDate()}, ${dateFrom.getFullYear()} /`);
-        } else {
-            $("#selected-date-from").text('Date from /');
+        if (!dateFrom) {
+            dateFrom = oneMonthAgo;
+        }
+        if (!dateTo) {
+            dateTo = today;
         }
 
-        if (dateTo) {
-            const toMonth = months[dateTo.getMonth()];
-            $("#selected-date-to").text(`${toMonth} ${dateTo.getDate()}, ${dateTo.getFullYear()}`);
-        } else {
-            $("#selected-date-to").text('Date to');
-        }
+        const formattedDateFrom = dateFrom.toLocaleDateString('en-EN', dateOptions);
+        const formattedDateTo = dateTo.toLocaleDateString('en-EN', dateOptions);
+
+        $("#selected-date-from").text(`${formattedDateFrom} /`);
+        $("#selected-date-to").text(formattedDateTo);
     }
 
     $("#datepicker_from").datepicker({
@@ -35,9 +36,9 @@ $(document).ready(function () {
         onSelect: function(dateText) {
             dateTo = new Date(dateText);
             if (dateFrom && dateTo < dateFrom) {
-                alert('Date to cannot be less than date from.'); 
-                dateTo = null; 
-                $("#selected-date-to").text('Date to'); 
+                alert('Date to cannot be less than date from.');
+                dateTo = null;
+                $("#selected-date-to").text('Date to');
             } else {
                 updateLabels();
             }
@@ -52,9 +53,7 @@ $(document).ready(function () {
         $("#datepicker_to").datepicker("show");
     });
 
-    $("#selected-date-to").on("click", function () {
-        $("#datepicker_to").datepicker("show");
-    });
+
     $("#prev-button").on("click", function() {
         if (dateFrom) {
             dateFrom.setMonth(dateFrom.getMonth() - 1);
@@ -119,9 +118,9 @@ $(document).ready(function () {
     });
 
     let checkedCheckboxes = {
-        users: [],
-        groups: [],
-        files: []
+        user: [],
+        group: [],
+        file: []
     };
 
     $('.checkbox-item input[type="checkbox"]').on('change', function () {
@@ -144,7 +143,7 @@ $(document).ready(function () {
             $(this).prop('checked', false).trigger('change');
         });
 
-        checkedCheckboxes = { users: [], groups: [], files: [] };
+        checkedCheckboxes = { user: [], group: [], file: [] };
         updateFilterButton(0);
         $('#selected-items').empty().addClass('hidden');
     });
@@ -157,21 +156,6 @@ $(document).ready(function () {
         $('#selected-items').removeClass('hidden');
     });
 
-    function updateFilterButton(count) {
-        const filterButton = $('#filter-button');
-        if (count > 0) {
-            filterButton.html('Filter <span class="filter-count" style="color: black; border: 2px solid white; background-color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; width: 17px; height: 17px;">' + count + '</span>');
-        } else {
-            filterButton.text('Filter');
-        }
-    }
-
-    $('#apply-button').on('click', function () {
-        const selectedCount = Object.values(checkedCheckboxes).flat().length;
-        updateFilterButton(selectedCount);
-        updateSelectedLabels();
-        $('#selected-items').removeClass('hidden');
-    });
 
     function updateSelectedLabels() {
         const selectedItemsLabel = $('#selected-items');
@@ -180,11 +164,11 @@ $(document).ready(function () {
     for (const category in checkedCheckboxes) {
         if (checkedCheckboxes[category].length > 0) {
             let categoryLabel;
-            if (category === 'files') {
+            if (category === 'file') {
                 categoryLabel = 'File name';
-            } else if (category === 'groups') {
+            } else if (category === 'group') {
                 categoryLabel = 'Groups';
-            } else if (category === 'users') {
+            } else if (category === 'user') {
                 categoryLabel = 'Users';
             }
 
@@ -207,8 +191,13 @@ $(document).ready(function () {
 
             selectedItemsLabel.append(labelElement);
 
-            const removeBtn = $('<span></span>')
-                .text(' X')
+            const removeBtn = $('<span>')
+                .append(
+                    $('<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                        '<path d="M0.947952 9.93744C0.70278 9.9517 0.461663 9.87019 0.275444 9.71011C-0.0918148 9.34067 -0.0918148 8.74399 0.275444 8.37455L8.31722 0.332744C8.6992 -0.0246894 9.29859 -0.00481991 9.65603 0.377162C9.97924 0.722587 9.99808 1.25351 9.70013 1.62096L1.61098 9.71011C1.42716 9.86788 1.18991 9.94923 0.947952 9.93744Z" fill="#0D2B40"/>' +
+                        '<path d="M8.98023 9.93746C8.73175 9.9364 8.4936 9.83777 8.31717 9.66278L0.275368 1.62095C-0.0648786 1.22362 -0.0186203 0.625662 0.378708 0.285384C0.733335 -0.0183051 1.25634 -0.0183051 1.61093 0.285384L9.70009 8.32719C10.082 8.68472 10.1017 9.28414 9.74419 9.66603C9.72997 9.68122 9.71528 9.69591 9.70009 9.71013C9.50201 9.88238 9.24134 9.9647 8.98023 9.93746Z" fill="#0D2B40"/>' +
+                        '</svg>')
+                )
                 .css({
                     cursor: 'pointer',
                     marginLeft: '10px',
@@ -233,17 +222,12 @@ $(document).ready(function () {
     updateFilterButton(selectedCount);
     }
 
-    function capitalizeFirstLetter(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-
-
     function updateFilterButton(count) {
         const filterButton = $('#filter-button');
         const dropdownButton = $('#multiLevelDropdownButton');
 
         if (count > 0) {
-            filterButton.html('Filter <span class="filter-count" style="color: black; border: 2px solid white; background-color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; width: 17px; height: 17px;">' + count + '</span>');
+            filterButton.html('Filter <span class="filter-count bg-white text-black text-3 rounded-full flex items-center justify-center w-5 h-5">' + count + '</span>');
 
             dropdownButton.css('width', 'auto');
         } else {
@@ -278,33 +262,6 @@ $(document).ready(function () {
             }
         });
     }
-    function toggleDropdown(dropdownId, listId) {
-        const dropdown = $(`#${dropdownId}`);
-        const list = $(`#${listId}`);
 
-        if (list.children().length === 0) {
-            dropdown.addClass('hidden');
-        } else {
-            dropdown.toggleClass('hidden');
-        }
-    }
-
-    function updateDropdownItems(dropdownId, listId, items) {
-        const list = $(`#${listId}`);
-        list.empty();
-
-        items.forEach(item => {
-            list.append(`
-                <li>
-                    <div class="checkbox-item flex items-center ps-2 rounded hover:bg-gray-200 dark:hover:bg-gray-200">
-                        <input id="${item.id}" type="checkbox" value="" data-category="${item.category || ''}" 
-                            class="flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:content-['✓'] checked:after:text-black checked:after:text-sm">
-                        <label for="${item.id}" class="w-full py-2 ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray">${item.label}</label>
-                    </div>
-                </li>
-            `);
-        });
-
-        toggleDropdown(dropdownId, listId);
-    }
+    updateLabels();
 });

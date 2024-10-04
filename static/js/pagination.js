@@ -1,8 +1,13 @@
 $(document).ready(function () {
     var $pagination = $('.pagination');
     var totalItems = parseInt($pagination.data('total-items'));
+    console.log('totalItems', totalItems)
     var itemsPerPage = parseInt($pagination.data('items-per-page'));
+    console.log('itemsPerPage', itemsPerPage)
+
     var currentPage = parseInt($pagination.data('current-page'));
+    console.log('currentPage', currentPage)
+
     var currentUrl = $pagination.data('page-url');
     var totalPages = Math.ceil(totalItems / itemsPerPage);
 

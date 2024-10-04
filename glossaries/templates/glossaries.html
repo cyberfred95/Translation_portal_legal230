@@ -4,39 +4,20 @@
 
 {% block content %}
 
-<style>
-    .select2-container--default .select2-selection--single {
-        background-color: #F8F9FA !important;
-    }
-
-    .select2-search {
-        background-color: #F8F9FA;
-    }
-
-    .select2-search input {
-        background-color: #F8F9FA;
-    }
-
-    .select2-results {
-        background-color: #F8F9FA;
-    }
-
-</style>
-
-<div class="mx-31.25 my-11.5">
+<div class="mx-31.25 mb-11.5">
     <div class="flex justify-between items-center">
-        <p class="text-7.5">Glossaries</p>
+        <p class="text-5 font-bold my-5">Glossaries</p>
         <button id="openModal" type="button" class="text-3 text-green-700">+ Add glossary</button>
     </div>
-    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md px-5 pt-5 w-full h-full flex flex-col items-end mt-5">
-        <table class="border-collapse mt-5 w-full border-separate border-spacing-y-5">
+    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md px-5 pt-5 w-full h-full flex flex-col items-end">
+        <table class="border-collapse w-full border-separate border-spacing-y-5">
             <thead>
             <tr class="border-gray-500">
-                <th class="border-b text-4 text-gray-800 font-medium text-left pb-5">File name</th>
-                <th class="border-b text-4 text-gray-800 font-medium text-left pb-5">Languages</th>
-                <th class="border-b text-4 text-gray-800 font-medium text-left pb-5">Size</th>
-                <th class="border-b text-4 text-gray-800 font-medium text-left pb-5">Created</th>
-                <th class="border-b text-4 text-gray-800 font-medium text-right pb-5">Actions</th>
+                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">File name</th>
+                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">Languages</th>
+                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">Size</th>
+                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">Created</th>
+                <th class="border-b text-4 text-gray-800 font-semibold text-right pb-5">Actions</th>
             </tr>
             </thead>
             <tbody>
@@ -81,7 +62,7 @@
                     {{ glossary.file_size }}
                 </td>
                 <td class="text-3.25 text-gray-800 created-at">
-                    {{ glossary.created_at | date:"Y/m/d" }}
+                    {{ glossary.created_at | date:"d/m/Y" }}
                 </td>
                 <td>
                     <div class="flex gap-5 items-center justify-end">
@@ -157,6 +138,36 @@
 
             <form class="p-12.5 flex flex-col items-center gap-7.5">
                 <div class="text-5">Add Glossary</div>
+                <div class="flex w-full justify-between">
+                    <div class="flex flex-col gap-2.5 ">
+                        <span>Source language</span>
+                        <select class="glossary-language-source glossary-language-select" name="source_language" required>
+                            <option value="" disabled selected>Source language</option>
+                            {% for translate_language in translate_languages %}
+                            <option value="{{ translate_language.abbreviation|lower }}">
+                                {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                                {{ translate_language.french_name }}
+                                {% else %} {{ translate_language.name }}
+                                {% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-2.5">
+                        <span>Target language</span>
+                        <select class="glossary-language-target glossary-language-select" name="target_language" required>
+                            <option value="" disabled selected>Source language</option>
+                            {% for translate_language in translate_languages %}
+                            <option value="{{ translate_language.abbreviation|lower }}">
+                                {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                                {{ translate_language.french_name }}
+                                {% else %} {{ translate_language.name }}
+                                {% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
                 <div class="glossary-container bg-gray-350 w-full py-5 rounded-md">
 
                     <div id="uploadButtons" class="flex flex-col gap-2.5 items-center">
@@ -190,31 +201,6 @@
                             Download sample
                         </a>
                         <p class="text-3.5 text-gray-270">Supported Files: .csv max 5mb</p>
-
-                        <div class="flex gap-5">
-                            <select class="js-example-basic-single glossary" name="source_language" required>
-                                <option value="" disabled selected>Source language</option>
-                                {% for translate_language in translate_languages %}
-                                <option value="{{ translate_language.abbreviation|lower }}">
-                                    {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                                    {{ translate_language.french_name }}
-                                    {% else %} {{ translate_language.name }}
-                                    {% endif %}
-                                </option>
-                                {% endfor %}
-                            </select>
-                            <select class="js-example-basic-single glossary" name="target_language" required>
-                                <option value="" disabled selected>Source language</option>
-                                {% for translate_language in translate_languages %}
-                                <option value="{{ translate_language.abbreviation|lower }}">
-                                    {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                                    {{ translate_language.french_name }}
-                                    {% else %} {{ translate_language.name }}
-                                    {% endif %}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
                     </div>
                 </div>
                 <span class="text-3.5 text-gray-750 text-center">

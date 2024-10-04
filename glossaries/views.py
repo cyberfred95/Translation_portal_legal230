@@ -46,8 +46,6 @@ class UserGlossariesView(TemplateView):
             }
             for glossary in paginated_glossaries
         ]
-        for glossary in formatted_glossaries:
-            print(glossary.get('file_url'))
         return formatted_glossaries, paginator.get_paginated_context()
 
 
