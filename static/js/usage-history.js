@@ -34,58 +34,16 @@ $(document).ready(function () {
 
     }
 
-    $("#datepicker_from").datepicker({
-        dateFormat: "mm/dd/yy",
-        onSelect: function (dateText) {
-            dateFrom = new Date(dateText);
-            updateLabels();
-            $("#datepicker_to").datepicker("show");
-        }
-    });
-
-    $("#datepicker_to").datepicker({
-        dateFormat: "mm/dd/yy",
-        onSelect: function (dateText) {
-            dateTo = new Date(dateText);
-            if (dateFrom && dateTo < dateFrom) {
-                alert('Date to cannot be less than date from.');
-                dateTo = null;
-                $("#selected-date-to").text('Date to');
-            } else {
-                updateLabels();
-            }
-        }
-    });
-
-    $("#selected-date-from").on("click", function () {
-        $("#datepicker_from").datepicker("show");
-    });
-
-    $("#selected-date-to").on("click", function () {
-        $("#datepicker_to").datepicker("show");
-    });
-
-
     $("#prev-button").on("click", function () {
-        if (dateFrom) {
-            dateFrom.setMonth(dateFrom.getMonth() - 1);
-            updateLabels();
-        } else {
-            dateFrom = new Date();
-            dateFrom.setMonth(dateFrom.getMonth() - 1);
-            updateLabels();
-        }
+        dateFrom.setMonth(dateFrom.getMonth() - 1);
+        updateLabels();
+        window.location.reload();
     });
 
     $("#next-button").on("click", function () {
-        if (dateTo) {
-            dateTo.setMonth(dateTo.getMonth() + 1);
-            updateLabels();
-        } else {
-            dateTo = new Date();
-            dateTo.setMonth(dateTo.getMonth() + 1);
-            updateLabels();
-        }
+        dateTo.setMonth(dateTo.getMonth() + 1);
+        updateLabels();
+        window.location.reload();
     });
 
     $('#multiLevelDropdownButton').on('click', function (event) {
@@ -264,4 +222,5 @@ $(document).ready(function () {
     }
 
     updateLabels();
+    checkIfDataExists();
 });

@@ -6,7 +6,6 @@ $(document).ready(function () {
     console.log('itemsPerPage', itemsPerPage)
 
     var currentPage = parseInt($pagination.data('current-page'));
-    console.log('currentPage', currentPage)
 
     var totalPages = Math.ceil(totalItems / itemsPerPage);
 
