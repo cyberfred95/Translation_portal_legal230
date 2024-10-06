@@ -275,6 +275,21 @@
         </table>
 
     </div>
+    {% if stats.count < stats.page_size %}
+    <div class="py-12.5 flex w-full items-center justify-end">
+        <div class="flex items-center border rounded-2.5 border-gray-300 px-2 py-2.25 text-4 gap-2.5 justify-self-end">
+            <div class="flex items-center gap-1">
+                <div class="text-green-650">{{ stats.total_count.chars }}</div>
+                <div class="text-gray-450">characters</div>
+            </div>
+            <span class="text-green-650">|</span>
+            <div class="flex items-center gap-1">
+                <div class="text-green-650">{{ stats.total_count.tokens }}</div>
+                <div class="text-gray-450">tokens</div>
+            </div>
+        </div>
+    </div>
+    {% else %}
     <div class="py-12.5 grid grid-cols-3 items-center">
         <div></div>
         <div class="pagination flex justify-center items-center w-full gap-18 hidden"
@@ -311,6 +326,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
 
 {% endblock %}
