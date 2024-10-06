@@ -54,11 +54,12 @@ $(document).ready(function() {
                     const date = new Date(year, month, dayCount);
                     const isInRange = startDate && endDate && date >= startDate && date <= endDate;
                     const isRangeEnd = (date.getTime() === startDate?.getTime() || date.getTime() === endDate?.getTime());
-
+                    const isStartDate = date.getTime() === startDate?.getTime();
+                    const isEndDate =  date.getTime() === endDate?.getTime();
                     calendarHTML += `
     <div class="h-10 relative flex items-center justify-center cursor-pointer bg-white overflow-hidden"
          data-date="${date.toISOString()}">
-        <div class="absolute inset-x-0 top-1/2 transform -translate-y-1/2 h-3/4 ${isInRange ? 'bg-green-200' : ''}"></div>
+        <div class="absolute inset-x-0 top-1/2 transform -translate-y-1/2 h-3/4 ${isStartDate && 'w-1/2 right-0 translate-x-full'} ${isEndDate && 'w-1/2 left-0'} ${isInRange ? 'bg-green-200' : ''}"></div>
         ${isRangeEnd ? `<div class="absolute inset-0 bg-green-380 rounded-4"></div>` : ''}
         <span class="z-10 relative px-2 py-1 rounded-4 ${isInRange && !isRangeEnd ? 'text-green-380' : ''} 
                      ${isRangeEnd ? '!text-white' : ''} text-4">
