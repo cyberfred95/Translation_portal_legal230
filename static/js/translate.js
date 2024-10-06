@@ -20,7 +20,7 @@ $(document).ready(function () {
 
     if (window.location.hash) {
         const hash = window.location.hash.substring(1);
-        console.log('hash', hash)
+
         if (hash === 'document-translate') {
             initialTab = 'document-translate';
         } else if (hash === 'writing') {

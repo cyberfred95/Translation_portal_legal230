@@ -223,8 +223,7 @@ $(document).ready(function () {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': getCookie('csrftoken'),
             },
-            success: function (response) {
-                console.log(response)
+            success: function () {
                 window.location.reload();
             },
             error: function () {

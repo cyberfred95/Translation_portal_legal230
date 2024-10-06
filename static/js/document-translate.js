@@ -707,8 +707,7 @@ $(document).ready(function () {
                     $(this).removeClass('bg-gray-200 text-gray-400').addClass('bg-green-700 text-white');
                     selectedGlossary = glossary.name;
                     $('.terminology-step').text(selectedGlossary).removeClass('hidden');
-                    console.log('selectedGlossaryType', selectedGlossaryType);
-                    console.log(123)
+
                     if (selectedGlossaryType === 'my-glossary') {
                         $('#next-step').removeClass('border-gray-300 text-gray-300 pointer-events-none')
                             .addClass('border-green-650 text-green-650')

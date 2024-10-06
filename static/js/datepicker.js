@@ -3,12 +3,6 @@ $(document).ready(function() {
         $('#datepicker').toggleClass('hidden');
     });
 
-    $(document).on('click', function(event) {
-        if (!$(event.target).closest('#datepicker, .calendar').length) {
-            $('#datepicker').addClass('hidden');
-        }
-    });
-
     let currentDate = new Date();
     let startDate = null;
     let endDate = null;
@@ -177,7 +171,7 @@ $(document).ready(function() {
 
     $('#calendarContainer').on('scroll', function() {
         const $this = $(this);
-        const scrollThreshold = 50;
+        const scrollThreshold = 0;
 
         if ($this.scrollTop() + $this.innerHeight() >= $this[0].scrollHeight - scrollThreshold) {
             const lastMonth = new Date(currentDate);

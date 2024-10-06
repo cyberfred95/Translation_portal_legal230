@@ -1,49 +1,69 @@
 $(document).ready(function () {
 
     let dateFrom, dateTo;
+    const currentUrl = new URL(window.location.href);
 
-    function updateLabels() {
-        const dateOptions = {year: 'numeric', month: 'long', day: 'numeric'};
-        let currentUrl = new URL(window.location.href);
-        let urlDateFrom = currentUrl.searchParams.get('date_from');
-        let urlDateTo = currentUrl.searchParams.get('date_to');
+    function getMonthDates(year, month) {
+        const firstDay = new Date(Date.UTC(year, month, 1));
+        const lastDay = new Date(Date.UTC(year, month + 1, 0));
+        return { firstDay, lastDay };
+    }
 
-        const today = new Date();
-        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-        const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    function formatDateForURL(date) {
+        return date.toISOString().split('T')[0];
+    }
 
-        if (!dateFrom) {
-            dateFrom = urlDateFrom ? new Date(urlDateFrom) : firstDayOfMonth;
+    function updateLabels(isChange = false) {
+        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+
+        if (!isChange) {
+            const urlDateFrom = currentUrl.searchParams.get('date_from');
+            const urlDateTo = currentUrl.searchParams.get('date_to');
+
+            if (urlDateFrom && urlDateTo) {
+                dateFrom = new Date(urlDateFrom);
+                dateTo = new Date(urlDateTo);
+            } else {
+                const today = new Date();
+                const { firstDay, lastDay } = getMonthDates(today.getFullYear(), today.getMonth());
+                dateFrom = firstDay;
+                dateTo = lastDay;
+            }
+
+            updateURLParams();
         }
-        if (!dateTo) {
-            dateTo = urlDateTo ? new Date(urlDateTo) : lastDayOfMonth;
-        }
 
-        const dateFromFilter = dateFrom.toISOString().split('T')[0];
-        const dateToFilter = dateTo.toISOString().split('T')[0];
+        $("#selected-date-from").text(`${dateFrom.toLocaleDateString('en-EN', dateOptions)} /`);
+        $("#selected-date-to").text(dateTo.toLocaleDateString('en-EN', dateOptions));
+    }
 
-        currentUrl.searchParams.set('date_from', dateFromFilter);
-        currentUrl.searchParams.set('date_to', dateToFilter);
+    function updateURLParams() {
+        currentUrl.searchParams.set('date_from', formatDateForURL(dateFrom));
+        currentUrl.searchParams.set('date_to', formatDateForURL(dateTo));
         window.history.pushState({}, '', currentUrl.toString());
+    }
 
-        const formattedDateFrom = dateFrom.toLocaleDateString('en-EN', dateOptions);
-        const formattedDateTo = dateTo.toLocaleDateString('en-EN', dateOptions);
+    function navigateMonth(direction) {
+        const currentMonth = dateFrom.getUTCMonth();
+        const currentYear = dateFrom.getUTCFullYear();
+        const newMonth = direction === 'next' ? currentMonth + 1 : currentMonth - 1;
+        const { firstDay, lastDay } = getMonthDates(currentYear, newMonth);
 
-        $("#selected-date-from").text(`${formattedDateFrom} /`);
-        $("#selected-date-to").text(formattedDateTo);
-
+        dateFrom = firstDay;
+        dateTo = lastDay;
+        currentUrl.searchParams.set('page', '1');
+        window.history.pushState({}, '', currentUrl.toString());
+        updateURLParams();
+        updateLabels(true);
+        window.location.reload();
     }
 
     $("#prev-button").on("click", function () {
-        dateFrom.setMonth(dateFrom.getMonth() - 1);
-        updateLabels();
-        window.location.reload();
+        navigateMonth('prev');
     });
 
     $("#next-button").on("click", function () {
-        dateTo.setMonth(dateTo.getMonth() + 1);
-        updateLabels();
-        window.location.reload();
+        navigateMonth('next');
     });
 
     $('#multiLevelDropdownButton').on('click', function (event) {
@@ -55,16 +75,19 @@ $(document).ready(function () {
         if (!$(event.target).closest('#multi-dropdown').length) {
             $('#multi-dropdown').addClass('hidden');
         }
+
         if (!$(event.target).closest('#dropdownSearch').length) {
-            $('#dropdownArrow').romoveClass('rotate-180');
+            $('#dropdownArrow').removeClass('rotate-180');
             $('#dropdownSearch').addClass('hidden');
         }
+
         if (!$(event.target).closest('#dropdownSearchh').length) {
-            $('#dropdownArroww').romoveClass('rotate-180');
+            $('#dropdownArroww').removeClass('rotate-180');
             $('#dropdownSearchh').addClass('hidden');
         }
+
         if (!$(event.target).closest('#dropdownSearchhh').length) {
-            $('#dropdownArrowww').romoveClass('rotate-180');
+            $('#dropdownArrowww').removeClass('rotate-180');
             $('#dropdownSearchhh').addClass('hidden');
         }
     }
@@ -227,5 +250,5 @@ $(document).ready(function () {
         });
     }
 
-    updateLabels();
+    updateLabels(false);
 });
