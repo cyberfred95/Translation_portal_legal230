@@ -3,7 +3,6 @@ $(document).ready(function() {
         $('#datepicker').toggleClass('hidden');
     });
 
-
     $(document).on('click', function(event) {
         if (!$(event.target).closest('#datepicker, .calendar').length) {
             $('#datepicker').addClass('hidden');
@@ -13,37 +12,20 @@ $(document).ready(function() {
     let currentDate = new Date();
     let startDate = null;
     let endDate = null;
-    const monthsToRender = 24; // Кількість місяців для рендерингу (2 роки)
+    const monthsToRender = 24;
     let initialRender = true;
-
-    function initializeSelects() {
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        const currentYear = currentDate.getFullYear();
-        const currentMonth = currentDate.getMonth();
-
-        $('#monthSelect').html(months.map((month, index) =>
-            `<option value="${index}" ${index === currentMonth ? 'selected' : ''}>${month}</option>`
-        ));
-
-        for (let year = currentYear - 10; year <= currentYear + 10; year++) {
-            $('#yearSelect').append(`<option value="${year}" ${year === currentYear ? 'selected' : ''}>${year}</option>`);
-        }
-
-        setDefaultDateRange();
-    }
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
     function setDefaultDateRange() {
-        const year = parseInt($('#yearSelect').val());
-        const month = parseInt($('#monthSelect').val());
-        startDate = new Date(year, month, 1);
-        endDate = new Date(year, month + 1, 0);
+        startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
         updateInputs();
     }
 
     function renderCalendar() {
         let calendarHTML = '';
-        const selectedYear = parseInt($('#yearSelect').val());
-        const selectedMonth = parseInt($('#monthSelect').val());
+        const selectedYear = currentDate.getFullYear();
+        const selectedMonth = currentDate.getMonth();
 
         for (let i = 0; i < monthsToRender; i++) {
             const currentMonthDate = new Date(selectedYear, selectedMonth + i, 1);
@@ -100,11 +82,6 @@ $(document).ready(function() {
         }
     }
 
-    function updateSelects() {
-        $('#monthSelect').val(currentDate.getMonth());
-        $('#yearSelect').val(currentDate.getFullYear());
-    }
-
     function updateInputs() {
         $('#fromDate').val(startDate ? formatDate(startDate) : '');
         $('#toDate').val(endDate ? formatDate(endDate) : '');
@@ -126,14 +103,42 @@ $(document).ready(function() {
         return null;
     }
 
-    initializeSelects();
-    renderCalendar();
+    function updateMonthYearDisplay() {
+        $('#currentMonth').text(months[currentDate.getMonth()]);
+        $('#currentYear').text(currentDate.getFullYear());
+    }
 
-    $('#monthSelect, #yearSelect').on('change', function() {
-        currentDate = new Date($('#yearSelect').val(), $('#monthSelect').val(), 1);
-        setDefaultDateRange();
-        renderCalendar();
-    });
+    function initializeMonthYearNavigation() {
+        updateMonthYearDisplay();
+
+        $('#prevMonth').click(function() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            updateMonthYearDisplay();
+            renderCalendar();
+        });
+
+        $('#nextMonth').click(function() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            updateMonthYearDisplay();
+            renderCalendar();
+        });
+
+        $('#prevYear').click(function() {
+            currentDate.setFullYear(currentDate.getFullYear() - 1);
+            updateMonthYearDisplay();
+            renderCalendar();
+        });
+
+        $('#nextYear').click(function() {
+            currentDate.setFullYear(currentDate.getFullYear() + 1);
+            updateMonthYearDisplay();
+            renderCalendar();
+        });
+    }
+
+    setDefaultDateRange();
+    renderCalendar();
+    initializeMonthYearNavigation();
 
     $(document).on('click', '#calendarContent .cursor-pointer', function() {
         const clickedDate = new Date($(this).data('date'));
@@ -163,7 +168,7 @@ $(document).ready(function() {
                     updateInputs();
                 }
                 currentDate = new Date(startDate);
-                updateSelects();
+                updateMonthYearDisplay();
                 renderCalendar();
             }
         }
@@ -177,7 +182,7 @@ $(document).ready(function() {
             const lastMonth = new Date(currentDate);
             lastMonth.setMonth(lastMonth.getMonth() + monthsToRender);
             currentDate = new Date(lastMonth);
-            updateSelects();
+            updateMonthYearDisplay();
             renderCalendar();
             $this.scrollTop($this.scrollTop() - 100);
         } else if ($this.scrollTop() <= scrollThreshold) {
@@ -185,7 +190,7 @@ $(document).ready(function() {
             firstMonth.setMonth(firstMonth.getMonth() - 1);
             if (firstMonth >= new Date(currentDate.getFullYear() - 10, 0, 1)) {
                 currentDate = new Date(firstMonth);
-                updateSelects();
+                updateMonthYearDisplay();
                 renderCalendar();
                 $this.scrollTop($this.scrollTop() + 100);
             }
