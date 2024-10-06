@@ -9,14 +9,14 @@ $(document).ready(function () {
         let urlDateTo = currentUrl.searchParams.get('date_to');
 
         const today = new Date();
-        const oneMonthAgo = new Date(today);
-        oneMonthAgo.setMonth(today.getMonth() - 1);
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
         if (!dateFrom) {
-            dateFrom = urlDateFrom ? new Date(urlDateFrom) : oneMonthAgo;
+            dateFrom = urlDateFrom ? new Date(urlDateFrom) : firstDayOfMonth;
         }
         if (!dateTo) {
-            dateTo = urlDateTo ? new Date(urlDateTo) : today;
+            dateTo = urlDateTo ? new Date(urlDateTo) : lastDayOfMonth;
         }
 
         const dateFromFilter = dateFrom.toISOString().split('T')[0];
@@ -56,12 +56,15 @@ $(document).ready(function () {
             $('#multi-dropdown').addClass('hidden');
         }
         if (!$(event.target).closest('#dropdownSearch').length) {
+            $('#dropdownArrow').romoveClass('rotate-180');
             $('#dropdownSearch').addClass('hidden');
         }
         if (!$(event.target).closest('#dropdownSearchh').length) {
+            $('#dropdownArroww').romoveClass('rotate-180');
             $('#dropdownSearchh').addClass('hidden');
         }
         if (!$(event.target).closest('#dropdownSearchhh').length) {
+            $('#dropdownArrowww').romoveClass('rotate-180');
             $('#dropdownSearchhh').addClass('hidden');
         }
     }
@@ -121,9 +124,12 @@ $(document).ready(function () {
 
     $('#apply-button').on('click', function () {
         const selectedCount = Object.values(checkedCheckboxes).flat().length;
-        updateFilterButton(selectedCount);
-        updateSelectedLabels();
-        $('#selected-items').removeClass('hidden');
+
+        if (selectedCount !== 0) {
+            $('#selected-items').removeClass('hidden');
+            updateFilterButton(selectedCount);
+            updateSelectedLabels();
+        }
     });
 
 
@@ -222,5 +228,4 @@ $(document).ready(function () {
     }
 
     updateLabels();
-    checkIfDataExists();
 });
