@@ -110,7 +110,7 @@
     </ul>
     <ul>
         <li>
-            <a href="{% url 'usage' %}" class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out">
+            <a href="{% url 'usage' %}?date_from={{ request.GET.date_from|default:''|date:'Y-m-d'|default:'' }}{% if not request.GET.date_from %}{% now 'Y-m-01' %}{% endif %}&date_to={{ request.GET.date_to|default:''|date:'Y-m-d'|default:'' }}{% if not request.GET.date_to %}{% now 'Y-m-t' %}{% endif %}" class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out">
 
                 <svg class="w-5.75 h-5.75" width="26" height="26" viewBox="0 0 26 26" fill="none"
                      xmlns="http://www.w3.org/2000/svg">

@@ -125,18 +125,6 @@ $(document).ready(function () {
 
     $("#restart").click(function () {
         window.location.reload();
-        currentStep = 0;
-        sourceLanguage = '';
-        targetLanguage = '';
-        selectedDomain = '';
-        selectedSubDomain = '';
-        selectedGlossaryType = 'default';
-        selectedGlossary = '';
-
-        $('.projects tbody').empty();
-        selectedFiles = [];
-        $fileList.empty().addClass('hidden');
-        showStep(currentStep);
     });
 
     showStep(currentStep);
@@ -719,8 +707,7 @@ $(document).ready(function () {
                     $(this).removeClass('bg-gray-200 text-gray-400').addClass('bg-green-700 text-white');
                     selectedGlossary = glossary.name;
                     $('.terminology-step').text(selectedGlossary).removeClass('hidden');
-                    console.log('selectedGlossaryType', selectedGlossaryType);
-                    console.log(123)
+
                     if (selectedGlossaryType === 'my-glossary') {
                         $('#next-step').removeClass('border-gray-300 text-gray-300 pointer-events-none')
                             .addClass('border-green-650 text-green-650')
@@ -925,7 +912,6 @@ $(document).ready(function () {
                 case 'Translated':
                     statusSpan.text('Translated');
                     statusSpan.addClass('bg-green-350 text-green-650');
-
                     break;
                 case 'Sent to post-editing, not accepted yet':
                     statusSpan.text('Request for post-editing sent');
@@ -938,7 +924,6 @@ $(document).ready(function () {
                 case 'Post-edited file uploaded':
                     statusSpan.text('Post-edited file uploaded');
                     statusSpan.addClass('bg-green-370 text-green-750');
-
                     break;
                 case 'Error':
                     statusSpan.text('Error');
@@ -954,11 +939,11 @@ $(document).ready(function () {
 
             const downloadColumn = $('<td></td>');
             const downloadButton = $(`
-            <button type=button class="flex gap-2.5 items-center text-green-700 download-file">
+            <button type=button class="flex gap-2.5 items-center text-green-700 download-file disabled:pointer-events-none disabled:text-gray-300 disabled:border-gray-300" ${project.status !== 'Translated' ? 'disabled' : ''}>
                 <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_759_2185)">
-                        <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z" fill="#176C77"/>
-                        <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z" fill="#176C77"/>
+                        <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z" fill="currentColor"/>
+                        <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z" fill="currentColor"/>
                     </g>
                     <defs>
                         <clipPath id="clip0_759_2185">
@@ -1103,9 +1088,9 @@ $(document).ready(function () {
             },
             dataType: 'json',
             success: function () {
-
                 const projectRow = $(`button[data-id="${id}"]`).closest('tr');
                 const statusSpan = projectRow.find('td:eq(1) span');
+
                 statusSpan.text('Request for post-editing sent');
                 statusSpan.removeClass().addClass('rounded-md py-1.5 px-2.5 text-3.25 bg-yellow-100 text-yellow-400');
 

@@ -1,91 +1,69 @@
 $(document).ready(function () {
 
     let dateFrom, dateTo;
+    const currentUrl = new URL(window.location.href);
 
-    function updateLabels() {
-        const dateOptions = {year: 'numeric', month: 'long', day: 'numeric'};
-        let currentUrl = new URL(window.location.href);
-        let urlDateFrom = currentUrl.searchParams.get('date_from');
-        let urlDateTo = currentUrl.searchParams.get('date_to');
-
-        const today = new Date();
-        const oneMonthAgo = new Date(today);
-        oneMonthAgo.setMonth(today.getMonth() - 1);
-
-        if (!dateFrom) {
-            dateFrom = urlDateFrom ? new Date(urlDateFrom) : oneMonthAgo;
-        }
-        if (!dateTo) {
-            dateTo = urlDateTo ? new Date(urlDateTo) : today;
-        }
-
-        const dateFromFilter = dateFrom.toISOString().split('T')[0];
-        const dateToFilter = dateTo.toISOString().split('T')[0];
-
-        currentUrl.searchParams.set('date_from', dateFromFilter);
-        currentUrl.searchParams.set('date_to', dateToFilter);
-        window.history.pushState({}, '', currentUrl.toString());
-
-        const formattedDateFrom = dateFrom.toLocaleDateString('en-EN', dateOptions);
-        const formattedDateTo = dateTo.toLocaleDateString('en-EN', dateOptions);
-
-        $("#selected-date-from").text(`${formattedDateFrom} /`);
-        $("#selected-date-to").text(formattedDateTo);
-
+    function getMonthDates(year, month) {
+        const firstDay = new Date(Date.UTC(year, month, 1));
+        const lastDay = new Date(Date.UTC(year, month + 1, 0));
+        return { firstDay, lastDay };
     }
 
-    $("#datepicker_from").datepicker({
-        dateFormat: "mm/dd/yy",
-        onSelect: function (dateText) {
-            dateFrom = new Date(dateText);
-            updateLabels();
-            $("#datepicker_to").datepicker("show");
-        }
-    });
+    function formatDateForURL(date) {
+        return date.toISOString().split('T')[0];
+    }
 
-    $("#datepicker_to").datepicker({
-        dateFormat: "mm/dd/yy",
-        onSelect: function (dateText) {
-            dateTo = new Date(dateText);
-            if (dateFrom && dateTo < dateFrom) {
-                alert('Date to cannot be less than date from.');
-                dateTo = null;
-                $("#selected-date-to").text('Date to');
+    function updateLabels(isChange = false) {
+        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+
+        if (!isChange) {
+            const urlDateFrom = currentUrl.searchParams.get('date_from');
+            const urlDateTo = currentUrl.searchParams.get('date_to');
+
+            if (urlDateFrom && urlDateTo) {
+                dateFrom = new Date(urlDateFrom);
+                dateTo = new Date(urlDateTo);
             } else {
-                updateLabels();
+                const today = new Date();
+                const { firstDay, lastDay } = getMonthDates(today.getFullYear(), today.getMonth());
+                dateFrom = firstDay;
+                dateTo = lastDay;
             }
+
+            updateURLParams();
         }
-    });
 
-    $("#selected-date-from").on("click", function () {
-        $("#datepicker_from").datepicker("show");
-    });
+        $("#selected-date-from").text(`${dateFrom.toLocaleDateString('en-EN', dateOptions)} /`);
+        $("#selected-date-to").text(dateTo.toLocaleDateString('en-EN', dateOptions));
+    }
 
-    $("#selected-date-to").on("click", function () {
-        $("#datepicker_to").datepicker("show");
-    });
+    function updateURLParams() {
+        currentUrl.searchParams.set('date_from', formatDateForURL(dateFrom));
+        currentUrl.searchParams.set('date_to', formatDateForURL(dateTo));
+        window.history.pushState({}, '', currentUrl.toString());
+    }
 
+    function navigateMonth(direction) {
+        const currentMonth = dateFrom.getUTCMonth();
+        const currentYear = dateFrom.getUTCFullYear();
+        const newMonth = direction === 'next' ? currentMonth + 1 : currentMonth - 1;
+        const { firstDay, lastDay } = getMonthDates(currentYear, newMonth);
+
+        dateFrom = firstDay;
+        dateTo = lastDay;
+        currentUrl.searchParams.set('page', '1');
+        window.history.pushState({}, '', currentUrl.toString());
+        updateURLParams();
+        updateLabels(true);
+        window.location.reload();
+    }
 
     $("#prev-button").on("click", function () {
-        if (dateFrom) {
-            dateFrom.setMonth(dateFrom.getMonth() - 1);
-            updateLabels();
-        } else {
-            dateFrom = new Date();
-            dateFrom.setMonth(dateFrom.getMonth() - 1);
-            updateLabels();
-        }
+        navigateMonth('prev');
     });
 
     $("#next-button").on("click", function () {
-        if (dateTo) {
-            dateTo.setMonth(dateTo.getMonth() + 1);
-            updateLabels();
-        } else {
-            dateTo = new Date();
-            dateTo.setMonth(dateTo.getMonth() + 1);
-            updateLabels();
-        }
+        navigateMonth('next');
     });
 
     $('#multiLevelDropdownButton').on('click', function (event) {
@@ -97,13 +75,19 @@ $(document).ready(function () {
         if (!$(event.target).closest('#multi-dropdown').length) {
             $('#multi-dropdown').addClass('hidden');
         }
+
         if (!$(event.target).closest('#dropdownSearch').length) {
+            $('#dropdownArrow').removeClass('rotate-180');
             $('#dropdownSearch').addClass('hidden');
         }
+
         if (!$(event.target).closest('#dropdownSearchh').length) {
+            $('#dropdownArroww').removeClass('rotate-180');
             $('#dropdownSearchh').addClass('hidden');
         }
+
         if (!$(event.target).closest('#dropdownSearchhh').length) {
+            $('#dropdownArrowww').removeClass('rotate-180');
             $('#dropdownSearchhh').addClass('hidden');
         }
     }
@@ -163,9 +147,12 @@ $(document).ready(function () {
 
     $('#apply-button').on('click', function () {
         const selectedCount = Object.values(checkedCheckboxes).flat().length;
-        updateFilterButton(selectedCount);
-        updateSelectedLabels();
-        $('#selected-items').removeClass('hidden');
+
+        if (selectedCount !== 0) {
+            $('#selected-items').removeClass('hidden');
+            updateFilterButton(selectedCount);
+            updateSelectedLabels();
+        }
     });
 
 
@@ -263,5 +250,5 @@ $(document).ready(function () {
         });
     }
 
-    updateLabels();
+    updateLabels(false);
 });

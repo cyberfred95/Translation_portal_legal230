@@ -1,6 +1,5 @@
 $(document).ready(function () {
 
-
     $(".source-language").attr("data-placeholder","Source language");
     $(".target-language").attr("data-placeholder","Target language");
     $(".domain-select").attr("data-placeholder","Domain");
