@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from legal.constants import EN
 
 from writing.models import Prompt
 
@@ -8,7 +9,10 @@ class PromptSerializer(serializers.ModelSerializer):
     description = serializers.SerializerMethodField()
 
     def get_translation(self, instance: Prompt):
-        return instance.translations.filter(language=self.context['request'].LANGUAGE_CODE).first()
+        translation = instance.translations.filter(language=self.context['request'].LANGUAGE_CODE).first()
+        if translation:
+            return translation
+        return instance.translations.filter(language=EN).first()
 
     def get_name(self, instance: Prompt):
         translation = self.get_translation(instance)
