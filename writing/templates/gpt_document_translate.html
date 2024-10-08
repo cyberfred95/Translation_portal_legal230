@@ -12,6 +12,9 @@
         <div class="flex items-center justify-between mt-5">
             <select class="actions-select" name="action" required>
                 <option value=""></option>
+                {% for prompt in prompts %}
+                <option value="{{ prompt.id }}">{{ prompt.name }}</option>
+                {% endfor %}
             </select>
 
             <button type="submit"
