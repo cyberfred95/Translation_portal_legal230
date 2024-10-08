@@ -1,4 +1,11 @@
 $(document).ready(function () {
+    let currentDate = new Date();
+    let startDate = null;
+    let endDate = null;
+    const monthsToRender = 24;
+    let initialRender = true;
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
     function closeCalendar(event) {
         if (!$(event.target).closest('#datepicker, .calendar label').length) {
             $('#datepicker').addClass('hidden');
@@ -11,13 +18,6 @@ $(document).ready(function () {
         event.stopPropagation();
         $('#datepicker').toggleClass('hidden');
     });
-
-    let currentDate = new Date();
-    let startDate = null;
-    let endDate = null;
-    const monthsToRender = 24;
-    let initialRender = true;
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
     function getUrlParameter(name) {
         name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
@@ -71,10 +71,7 @@ $(document).ready(function () {
             calendarHTML += `
                 <div>
                     <div class="text-left mb-2">
-                        <span class="text-4 font-semibold text-gray-750">${firstDay.toLocaleString('default', {
-                month: 'long',
-                year: 'numeric'
-            })}</span>
+                        <span class="text-4 font-semibold text-gray-750">${firstDay.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
                     </div>
                     <div class="grid grid-cols-7">
             `;
@@ -101,7 +98,7 @@ $(document).ready(function () {
                     calendarHTML += `
     <div class="h-10 relative flex items-center justify-center cursor-pointer bg-white overflow-hidden"
          data-date="${date.toISOString()}">
-        <div class="absolute inset-x-0 top-1/2 transform -translate-y-1/2 h-3/4 ${isStartDate && 'w-1/2 right-0 translate-x-full'} ${isEndDate && 'w-1/2 left-0'} ${isInRange ? 'bg-green-200' : ''}"></div>
+        <div class="absolute inset-x-0 top-1/2 transform -translate-y-1/2 h-3/4 ${isStartDate ? 'w-1/2 right-0 translate-x-full' : ''} ${isEndDate ? 'w-1/2 left-0' : ''} ${isInRange ? 'bg-green-200' : ''}"></div>
         ${isRangeEnd ? `<div class="absolute inset-0 bg-green-380 rounded-4"></div>` : ''}
         <span class="z-10 relative px-2 py-1 rounded-4 ${isInRange && !isRangeEnd ? 'text-green-380' : ''} 
                      ${isRangeEnd ? '!text-white' : ''} text-4">
@@ -183,7 +180,8 @@ $(document).ready(function () {
     renderCalendar();
     initializeMonthYearNavigation();
 
-    $(document).on('click', '#calendarContent .cursor-pointer', function () {
+    $(document).on('click', '#calendarContent .cursor-pointer', function (event) {
+        event.stopPropagation();
         const clickedDate = new Date($(this).data('date'));
         if (!startDate || (startDate && endDate)) {
             startDate = clickedDate;
