@@ -17,10 +17,9 @@
 
                 <!-- Dropdown -->
                 <div id="multi-dropdown" class="hidden z-10 bg-white divide-y divide-gray-100 rounded-md shadow w-60 shadow-[0px_0px_20px_3px_#2B445914] absolute mt-4 right-0">
-                        <ul class="max-h-125 overflow-y-auto py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="multiLevelDropdownButton">
-                            <li class="text-sm text-gray-700 dark:text-gray-200">
+                        <ul class="max-h-125 overflow-y-auto py-2 text-3.5 text-gray-700" aria-labelledby="multiLevelDropdownButton">
                                 {% if request.user.is_staff or is_group_admin %}
-
+                            <li class="dropdown-item">
                                 <button id="doubleDropdownButton" data-dropdown-toggle="doubleDropdown" data-dropdown-placement="right-start" type="button"
                                         class="flex items-center justify-between w-full px-4 py-2 text-black">User
                                     <svg id="dropdownArrow" class="w-2.5 h-1.5 text-black origin-center transition duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
@@ -43,14 +42,15 @@
                                     <ul id="user-list" class="cursor-pointer max-h-40 px-3 overflow-y-auto text-sm text-gray-700 divide-y divide-gray-190" aria-labelledby="dropdownSearchButton">
                                         {% for user in stats.filters.users %}
                                         <li class="checkbox-item flex items-center ps-2 cursor-pointer">
-                                                <input type="checkbox" value="" data-category="user"
+                                                <input type="checkbox" value="{{ user }}" data-category="user"
                                                        class="cursor-pointer flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:text-black checked:after:text-sm">
-                                                <label class="cursor-pointer w-full py-2.5 ms-2 text-sm text-gray-900 rounded dark:text-gray">{{ user }}</label>
+                                                <label class="cursor-pointer w-full py-2.5 ms-2 text-sm text-gray-900 rounded">{{ user }}</label>
                                         </li>
                                         {% endfor %}
                                     </ul>
                                 </div>
-
+                            </li>
+                            <li class="dropdown-item">
                                 {% if request.user.is_staff %}
                                 <button id="doubleDropdownButtonn" data-dropdown-toggle="doubleDropdown" data-dropdown-placement="right-start" type="button"
                                         class="flex items-center justify-between w-full px-4 py-2 text-black">Group
@@ -74,15 +74,17 @@
                                     <ul id="group-list" class="cursor-pointer max-h-40 px-3 overflow-y-auto text-sm text-gray-700 divide-y divide-gray-190" aria-labelledby="dropdownSearchButton">
                                         {% for group in stats.filters.groups %}
                                         <li class="checkbox-item flex items-center ps-2 cursor-pointer">
-                                            <input type="checkbox" value="" data-category="group"
+                                            <input type="checkbox" value="{{ group }}" data-category="group"
                                                    class="cursor-pointer flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:text-black checked:after:text-sm">
-                                            <label class="cursor-pointer w-full py-2.5 ms-2 text-sm text-gray-900 rounded dark:text-gray">{{ group }}</label>
+                                            <label class="cursor-pointer w-full py-2.5 ms-2 text-sm text-gray-900 rounded">{{ group }}</label>
                                         </li>
                                         {% endfor %}
                                     </ul>
                                 </div>
                                 {% endif %}
                                 {% endif %}
+                            </li>
+                            <li class="dropdown-item">
                                 <button id="doubleDropdownButtonnn" data-dropdown-toggle="doubleDropdown" data-dropdown-placement="right-start" type="button"
                                         class="flex items-center justify-between w-full px-4 py-2 text-black">File name
                                     <svg id="dropdownArrowww" class="w-2.5 h-1.5 text-black origin-center transition duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
@@ -105,13 +107,14 @@
                                     <ul id="file-list" class="cursor-pointer max-h-40 px-3 overflow-y-auto text-sm text-gray-700 divide-y divide-gray-190" aria-labelledby="dropdownSearchButton">
                                         {% for file_name in stats.filters.file_name %}
                                         <li class="checkbox-item flex items-center ps-2 cursor-pointer">
-                                            <input type="checkbox" value="" data-category="file"
+                                            <input type="checkbox" value="{{ file_name }}" data-category="file_name"
                                                    class="cursor-pointer flex items-center justify-center w-4.5 h-4 bg-transparent text-transparent bg-gray-100 border border-gray-700 focus:ring-gray-500 appearance-none checked:bg-transparent checked:border-gray-700 checked:after:text-black checked:after:text-sm">
-                                            <label class="cursor-pointer w-full py-2.5 ms-2 text-sm text-gray-900 rounded dark:text-gray">{{ file_name }}</label>
+                                            <label class="cursor-pointer w-full py-2.5 ms-2 text-sm text-gray-900 rounded">{{ file_name }}</label>
                                         </li>
                                         {% endfor %}
                                     </ul>
                                 </div>
+                            </li>
                             <div class="flex space-x-2 pt-3">
                                 <button id="clear-button" class="h-9.25 w-24.75 px-5 py-2 bg-white border border-green-670 rounded-md text-green-670 ml-4">Clear</button>
                                 <button id="apply-button" class="h-9.25 w-24.75 bg-green-670 px-4 py-2 rounded-md text-white">Apply</button>
