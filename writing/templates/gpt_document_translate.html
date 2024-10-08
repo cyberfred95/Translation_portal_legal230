@@ -10,7 +10,7 @@
             <span class="text-gray-590 text-3.5 font-normal">txt. max 5mb</span>
         </div>
         <div class="flex items-center justify-between mt-5">
-            <select class="actions-select" name="action" required>
+            <select class="document-action-select" name="action" required>
                 <option value=""></option>
                 {% for prompt in prompts %}
                 <option value="{{ prompt.id }}">

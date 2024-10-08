@@ -142,49 +142,48 @@
     color: #176C77;
 }
 
-.select2-container--default.domain .select2-search--dropdown .select2-search__field:focus-visible {
+.select2-container--default.gray .select2-search--dropdown .select2-search__field:focus-visible {
     outline: -webkit-focus-ring-color auto 0px;
 }
 
-.select2-container.domain {
+.select2-container.gray {
     background: #F2F3F5;
     padding: 5px 0;
 }
 
-.select2-container--default.domain .select2-selection--single .select2-selection__rendered {
+.select2-container--default.gray .select2-selection--single .select2-selection__rendered {
     font-size: 14px;
+}
+
+.select2-container.gray .select2-selection {
+    background: #F2F3F5;
+}
+
+.select2-container.gray .select2-container--open {
+    background: #F2F3F5;
     border-radius: 6px;
 }
 
-.select2-container.domain .select2-selection {
+.select2-container.gray .select2-container--default {
     background: #F2F3F5;
 }
 
-.select2-container.domain .select2-container--open {
-    background: #F2F3F5;
-    border-radius: 6px;
-}
-
-.select2-container.domain .select2-container--default {
-    background: #F2F3F5;
-}
-
-.select2-container.domain .select2-dropdown {
+.select2-container.gray .select2-dropdown {
     background: #F2F3F5;
     border-radius: 0px !important;
 }
 
-.select2-container.domain .select2-search {
+.select2-container.gray .select2-search {
     background-color: #F2F3F5;
     border-radius: 0px !important;
 }
 
-.select2-container.domain .select2-search input {
+.select2-container.gray .select2-search input {
     background-color: #F2F3F5;
     border-radius: 0px !important;
 }
 
-.select2-container.domain .select2-results {
+.select2-container.gray .select2-results {
     background-color: #F2F3F5;
     border-radius: 0px !important;
 }
@@ -198,6 +197,10 @@
     padding: 12px 10px;
     background: #F8F9FA;
     width: 270px !important;
+}
+
+.select2-container.gray.action {
+    width: 350px !important;
 }
 
 .select2-container--default.glossary .select2-selection--single .select2-selection__rendered {

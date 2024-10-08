@@ -9,6 +9,7 @@ $(document).ready(function () {
         $(".select2-search__field")[0].focus();
     });
 
+
     // ------------- CHANGE LANGUAGE -------------
 
 

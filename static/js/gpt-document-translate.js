@@ -1,15 +1,15 @@
 $(document).ready(function() {
-    $(".actions-select").attr("data-placeholder", "Action");
+    $(".document-action-select").attr("data-placeholder", "Action");
 
-    $('.actions-select').select2({
+    $('.document-action-select').select2({
         templateResult: formatOption,
         templateSelection: formatSelection,
         escapeMarkup: function(m) { return m; }
     });
 
-    var $select = $(".actions-select");
-    $select.data('select2').$container.addClass('domain');
-    $select.data('select2').$dropdown.addClass('domain');
+    var $select = $(".document-action-select");
+    $select.data('select2').$container.addClass('gray action');
+    $select.data('select2').$dropdown.addClass('gray action');
 
     function formatOption(option) {
         if (!option.id) {
@@ -19,6 +19,7 @@ $(document).ready(function() {
         if (splitText.length < 2) {
             return option.text;
         }
+
         var $option = $(
             '<div class="flex flex-col gap-1.5">' +
             '<div class="font-medium text-4">' + splitText[0] + '</div>' +

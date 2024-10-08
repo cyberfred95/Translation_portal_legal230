@@ -1,9 +1,9 @@
 $(document).ready(function () {
-    $(".action-select").attr("data-placeholder", "Action");
+    $(".text-action-select").attr("data-placeholder", "Action");
     var $sourceTextarea = $("#source-text");
     var $translatedTextarea = $("#translated-text");
 
-    $('.action-select').select2({
+    $('.text-action-select').select2({
         templateResult: formatOption,
         templateSelection: formatSelection,
         escapeMarkup: function (m) {
@@ -11,9 +11,9 @@ $(document).ready(function () {
         }
     });
 
-    var $select = $(".action-select");
-    $select.data('select2').$container.addClass('domain');
-    $select.data('select2').$dropdown.addClass('domain');
+    var $select = $(".text-action-select");
+    $select.data('select2').$container.addClass('gray action');
+    $select.data('select2').$dropdown.addClass('gray action');
 
     function formatOption(option) {
         if (!option.id) {
