@@ -1,5 +1,14 @@
-$(document).ready(function() {
-    $('.calendar label').on('click', function() {
+$(document).ready(function () {
+    function closeCalendar(event) {
+        if (!$(event.target).closest('#datepicker, .calendar label').length) {
+            $('#datepicker').addClass('hidden');
+        }
+    }
+
+    $(document).on('click', closeCalendar);
+
+    $('.calendar label').on('click', function (event) {
+        event.stopPropagation();
         $('#datepicker').toggleClass('hidden');
     });
 
@@ -10,9 +19,38 @@ $(document).ready(function() {
     let initialRender = true;
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
+    function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+
+    function updateUrlWithDates() {
+        var searchParams = new URLSearchParams(window.location.search);
+        if (startDate) searchParams.set('date_from', formatDateForUrl(startDate));
+        if (endDate) searchParams.set('date_to', formatDateForUrl(endDate));
+        if (endDate) searchParams.set('page', '1');
+        var newRelativePathQuery = window.location.pathname + '?' + searchParams.toString();
+        history.pushState(null, '', newRelativePathQuery);
+    }
+
+    function formatDateForUrl(date) {
+        return date.getFullYear() + '-' + padZero(date.getMonth() + 1) + '-' + padZero(date.getDate());
+    }
+
     function setDefaultDateRange() {
-        startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-        endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+        var fromDateStr = getUrlParameter('date_from');
+        var toDateStr = getUrlParameter('date_to');
+
+        if (fromDateStr && toDateStr) {
+            startDate = new Date(fromDateStr);
+            endDate = new Date(toDateStr);
+            currentDate = new Date(startDate);
+        } else {
+            startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+        }
         updateInputs();
     }
 
@@ -33,7 +71,10 @@ $(document).ready(function() {
             calendarHTML += `
                 <div>
                     <div class="text-left mb-2">
-                        <span class="text-4 font-semibold text-gray-750">${firstDay.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+                        <span class="text-4 font-semibold text-gray-750">${firstDay.toLocaleString('default', {
+                month: 'long',
+                year: 'numeric'
+            })}</span>
                     </div>
                     <div class="grid grid-cols-7">
             `;
@@ -46,10 +87,17 @@ $(document).ready(function() {
                     calendarHTML += `<div class="h-10 bg-white"></div>`;
                 } else {
                     const date = new Date(year, month, dayCount);
-                    const isInRange = startDate && endDate && date >= startDate && date <= endDate;
-                    const isRangeEnd = (date.getTime() === startDate?.getTime() || date.getTime() === endDate?.getTime());
-                    const isStartDate = date.getTime() === startDate?.getTime();
-                    const isEndDate =  date.getTime() === endDate?.getTime();
+                    const dateWithoutTime = date.setHours(0, 0, 0, 0);
+                    const startDateWithoutTime = startDate ? new Date(startDate).setHours(0, 0, 0, 0) : null;
+                    const endDateWithoutTime = endDate ? new Date(endDate).setHours(0, 0, 0, 0) : null;
+
+                    const isInRange = startDateWithoutTime && endDateWithoutTime &&
+                        dateWithoutTime >= startDateWithoutTime &&
+                        dateWithoutTime <= endDateWithoutTime;
+                    const isStartDate = startDateWithoutTime && dateWithoutTime === startDateWithoutTime;
+                    const isEndDate = endDateWithoutTime && dateWithoutTime === endDateWithoutTime;
+                    const isRangeEnd = isStartDate || isEndDate;
+
                     calendarHTML += `
     <div class="h-10 relative flex items-center justify-center cursor-pointer bg-white overflow-hidden"
          data-date="${date.toISOString()}">
@@ -106,25 +154,25 @@ $(document).ready(function() {
     function initializeMonthYearNavigation() {
         updateMonthYearDisplay();
 
-        $('#prevMonth').click(function() {
+        $('#prevMonth').click(function () {
             currentDate.setMonth(currentDate.getMonth() - 1);
             updateMonthYearDisplay();
             renderCalendar();
         });
 
-        $('#nextMonth').click(function() {
+        $('#nextMonth').click(function () {
             currentDate.setMonth(currentDate.getMonth() + 1);
             updateMonthYearDisplay();
             renderCalendar();
         });
 
-        $('#prevYear').click(function() {
+        $('#prevYear').click(function () {
             currentDate.setFullYear(currentDate.getFullYear() - 1);
             updateMonthYearDisplay();
             renderCalendar();
         });
 
-        $('#nextYear').click(function() {
+        $('#nextYear').click(function () {
             currentDate.setFullYear(currentDate.getFullYear() + 1);
             updateMonthYearDisplay();
             renderCalendar();
@@ -135,7 +183,7 @@ $(document).ready(function() {
     renderCalendar();
     initializeMonthYearNavigation();
 
-    $(document).on('click', '#calendarContent .cursor-pointer', function() {
+    $(document).on('click', '#calendarContent .cursor-pointer', function () {
         const clickedDate = new Date($(this).data('date'));
         if (!startDate || (startDate && endDate)) {
             startDate = clickedDate;
@@ -147,10 +195,17 @@ $(document).ready(function() {
             endDate = clickedDate;
         }
         updateInputs();
-        renderCalendar();
+        updateUrlWithDates();
+
+        if (startDate && endDate) {
+            renderCalendar();
+            window.location.reload();
+        } else {
+            renderCalendar();
+        }
     });
 
-    $('#fromDate, #toDate').on('input', function() {
+    $('#fromDate, #toDate').on('input', function () {
         const fromValue = $('#fromDate').val();
         const toValue = $('#toDate').val();
 
@@ -164,12 +219,13 @@ $(document).ready(function() {
                 }
                 currentDate = new Date(startDate);
                 updateMonthYearDisplay();
-                renderCalendar();
+                updateUrlWithDates();
+                window.location.reload();
             }
         }
     });
 
-    $('#calendarContainer').on('scroll', function() {
+    $('#calendarContainer').on('scroll', function () {
         const $this = $(this);
         const scrollThreshold = 0;
 

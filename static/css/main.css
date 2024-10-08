@@ -407,6 +407,7 @@ body {
     -webkit-text-fill-color: #000000 !important;
 }
 
+button:focus,
 select:focus,
 input:focus,
 textarea:focus {

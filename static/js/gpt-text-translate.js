@@ -45,7 +45,7 @@ $(document).ready(function () {
         let form = $(this);
 
         let formData = new FormData(form[0]);
-        console.log('form[0]', form[0])
+
         $.ajax({
             url: gpt_process,
             type: 'POST',
