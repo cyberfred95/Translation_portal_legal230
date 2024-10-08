@@ -59,10 +59,12 @@
             </div>
         </div>
         <div class="flex items-center justify-between mt-5">
-            <select class="action-select" name="action" required>
+            <select class="action-select" name="prompt" required>
                 <option value=""></option>
                 {% for prompt in prompts %}
-                <option value="{{ prompt.id }}">{{ prompt.name }}</option>
+                <option value="{{ prompt.name }}">
+                    {{ prompt.name }}::{{ prompt.description }}
+                </option>
                 {% endfor %}
             </select>
 
@@ -74,6 +76,11 @@
         </div>
     </form>
 </div>
+
+<script>
+    let gpt_process = "{% url 'gpt_process' %}"
+    console.log(gpt_process)
+</script>
 
 <script src="{% static 'js/gpt-text-translate.js' %}"></script>
 

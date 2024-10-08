@@ -13,7 +13,9 @@
             <select class="actions-select" name="action" required>
                 <option value=""></option>
                 {% for prompt in prompts %}
-                <option value="{{ prompt.id }}">{{ prompt.name }}</option>
+                <option value="{{ prompt.id }}">
+                    {{ prompt.name }}::{{ prompt.description }}
+                </option>
                 {% endfor %}
             </select>
 
