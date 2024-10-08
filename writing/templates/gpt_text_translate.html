@@ -61,6 +61,18 @@
         <div class="flex items-center justify-between mt-5">
             <select class="text-action-select" name="prompt" required>
                 <option value=""></option>
+                <option value="Translate">
+                    Translate::Translate into different language
+                </option>
+                <option value="Rewrite for gender neutrality">
+                    Rewrite for gender neutrality::Make text gender-neutral
+                </option>
+                <option value="Rewrite for other gender">
+                    Rewrite for other gender::Adjust for specific gender/pronouns
+                </option>
+                <option value="Rewrite for simplicity">
+                    Rewrite for simplicity::Simplify text
+                </option>
                 {% for prompt in prompts %}
                 <option value="{{ prompt.name }}">
                     {{ prompt.name }}::{{ prompt.description }}

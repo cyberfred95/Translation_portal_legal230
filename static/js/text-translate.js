@@ -10,8 +10,8 @@ $(document).ready(function () {
 
     $select = $(".domain-select").select2();
 
-    $select.data('select2').$container.addClass('gray');
-    $select.data('select2').$dropdown.addClass('gray');
+    $select.data('select2').$container.addClass('action gray');
+    $select.data('select2').$dropdown.addClass('action gray');
 
     let sourceLanguage, targetLanguage;
 
