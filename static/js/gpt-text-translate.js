@@ -58,7 +58,7 @@ $(document).ready(function () {
             processData: false,
             contentType: false,
             success: function (response) {
-                $('#translated-text').val(response.translated_text);
+                $('#translated-text').val(response.result);
                 $('#expert-revision').removeClass('hidden');
             },
             error: function (xhr, status, error) {
