@@ -62,7 +62,7 @@
             <select class="text-action-select" name="prompt" required>
                 <option value=""></option>
                 {% for prompt in prompts %}
-                <option value="{{ prompt.name }}">
+                <option value="{{ prompt.id }}">
                     {{ prompt.name }}::{{ prompt.description }}
                 </option>
                 {% endfor %}
@@ -70,7 +70,6 @@
 
             <button type="submit"
                     class="flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-670 text-green-670 hover:text-white border border-green-670 transition-colors duration-300">
-
                 <span class="text-3.5">Process</span>
             </button>
         </div>

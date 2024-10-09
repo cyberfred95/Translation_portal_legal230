@@ -147,11 +147,13 @@
 
                     <div id="datepicker" class="hidden absolute top-full -right-5 mt-5 rounded-5 shadow-[0_0_15px_rgba(0,0,0,0.1)] px-4 pt-4 min-w-86.75 max-w-86.75 bg-white">
                         <div class="flex gap-2 mb-4 w-full">
-                            <div class="flex-1 flex-col">
-                                <input disabled type="text" id="fromDate" class="w-full text-3.5 text-center border border-gray-400 rounded-4 py-3 font-normal text-gray-750 disabled:bg-white" placeholder="DD/MM/YYYY" pattern="\d{2}/\d{2}/\d{4}">
+                            <div class="flex-1 flex-col relative">
+                                <input disabled type="text" id="fromDate" class="absolute w-full text-3.5 text-center border border-gray-400 rounded-4 py-3 font-normal text-gray-750 disabled:bg-white" placeholder="DD/MM/YYYY" pattern="\d{2}/\d{2}/\d{4}">
+                                <span class="absolute">From</span>
                             </div>
-                            <div class="flex-1 flex-col">
-                                <input disabled type="text" id="toDate" class="w-full text-3.5 border text-center border-gray-400 rounded-4 py-3 font-normal text-gray-750 disabled:bg-white" placeholder="DD/MM/YYYY" pattern="\d{2}/\d{2}/\d{4}">
+                            <div class="flex-1 flex-col relative">
+                                <input disabled type="text" id="toDate" class="absolute w-full text-3.5 border text-center border-gray-400 rounded-4 py-3 font-normal text-gray-750 disabled:bg-white" placeholder="DD/MM/YYYY" pattern="\d{2}/\d{2}/\d{4}">
+                                <span class="absolute">To</span>
                             </div>
                         </div>
                         <div class="flex justify-between items-center mb-4">

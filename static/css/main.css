@@ -215,11 +215,16 @@
 
 .select2-container.error {
     background: #FFF7F7;
-    padding: 5px 0;
+}
+
+.select2-container.error .select2-selection--single {
+    height: auto;
+    border-radius: 6px;
 }
 
 .select2-container--default.error .select2-selection--single .select2-selection__rendered {
     color: #9EAAB3;
+    border-radius: 6px;
 }
 
 .select2-container.error .select2-selection {
