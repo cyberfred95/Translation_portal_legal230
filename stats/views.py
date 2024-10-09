@@ -16,6 +16,7 @@ class UsageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['stats'] = self.get_stats()
+        context['stats']['filters'] = self.get_filters()
         context['date_from'] = self.request.GET.get("date_from", date.today())
         context['date_to'] = self.request.GET.get("date_to", date.today() + timedelta(days=30))
         context['is_group_admin'] = self.get_is_group_admin()
@@ -25,23 +26,66 @@ class UsageView(TemplateView):
     def get_is_group_admin(self):
         return self.request.user.group and self.request.user.group.admin and self.request.user.group.admin == self.request.user
 
-    def get_filters(self, unique_file_names, unique_user_file_names):
+    def get_filters(self):
+
+        def get_responses():
+            additional_url_params = self.set_additional_url_params(exclude_page_param=True)
+            print(additional_url_params)
+
+            responses = []
+            response = requests.get(
+                preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params,
+                headers={
+                    'token': preferences.StatisticSettings.API_KEY,
+                    'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
+                },
+                json={
+                    "uuid": self.get_users(),
+                }
+            )
+            responses.append(response)
+            if response.json().get('num_pages', 0) > 1:
+                for page in range(1, int(response.json().get('num_pages'))):
+                    responses.append(
+                        requests.get(
+                            preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params + f"&page={page}",
+                            headers={
+                                'token': preferences.StatisticSettings.API_KEY,
+                                'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
+                            },
+                            json={
+                                "uuid": self.get_users(),
+                            }
+                        )
+                    )
+            print(responses)
+            return list(set(responses))
+
+
+        responses = get_responses()
+
+        file_names = []
+        for response in responses:
+            for usage in response.json().get('results',[]):
+                file_names.append(usage['file_name'])
+
+        file_names = list(set(file_names))
+        print(file_names)
 
         if self.request.user.is_staff:
             return {
                 'users': [user.username for user in User.objects.all()],
                 'groups': [group.name for group in UserGroup.objects.all()],
-                'file_name': list(unique_file_names),
+                'file_name': file_names,
             }
         elif self.request.user.group and self.request.user.group.admin == self.request.user:
             return {
                 'users': [user.username for user in User.objects.filter(group=self.request.user.group)],
-                'file_name': list(unique_file_names),
-
+                'file_name': file_names,
             }
         else:
             return {
-                'file_name': list(unique_user_file_names.get(self.request.user.username, set())),
+                'file_name': file_names,
             }
 
     def get_users(self) -> list:
@@ -104,8 +148,6 @@ class UsageView(TemplateView):
 
         stats['total_count'] = self.calculate_total_chars_and_tokens(stats)
 
-        stats['filters'] = self.get_filters(unique_file_names, unique_user_file_names)
-
         return stats
 
     def calculate_total_chars_and_tokens(self, stats):
@@ -119,13 +161,13 @@ class UsageView(TemplateView):
             "tokens": total_tokens,
         }
 
-    def set_additional_url_params(self):
+    def set_additional_url_params(self, exclude_page_param=False):
         date_from = self.request.GET.get("date_from", date.today())
         date_to = self.request.GET.get("date_to", date.today() + timedelta(days=30))
         page = self.request.GET.get('page')
         additional_url_params = f"?page_size={PAGINATION_PAGE_SIZE}"
 
-        if page is not None:
+        if page is not None and not exclude_page_param:
             page = int(page)
             additional_url_params += f"&page={page}"
 
@@ -142,5 +184,4 @@ class UsageView(TemplateView):
         elif self.request.user.group and self.request.user.group.admin == self.request.user:
             additional_url_params += "&group_admin=true"
 
-        print(additional_url_params)
         return additional_url_params

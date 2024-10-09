@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'compressor',
     'django_filters',
     'rosetta',
-    'gpt_processing.apps.GptProcessingConfig',
     'settings.apps.SettingsConfig',
     'preferences',
     'users.apps.UsersConfig',

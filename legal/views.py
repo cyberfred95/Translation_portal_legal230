@@ -22,7 +22,6 @@ from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from preferences import preferences
-from gpt_processing.prompts_list import prompts_list
 from stats.calculator import StatsProcessor
 import langdetect
 from .tasks import send_statistic_request
@@ -33,7 +32,6 @@ PAGINATION_PAGE_SIZE = 20
 
 def text_translation(request):
     text = request.POST.get('text')
-
     api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
     response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
         "text": [text],
@@ -42,7 +40,7 @@ def text_translation(request):
 
         "token": api_key})
     send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('domain_name'))
-    send_statistic_request.delay(
+    send_statistic_request(
         api_key, response.json().get('translated_text'),
         request.user.uuid,
         **get_translate_data(request)
@@ -93,18 +91,7 @@ class TranslateView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['languages'] = languages
         context['translate_languages'] = Language.objects.all()
-        context['prompts'] = self.get_prompts()
         return context
-
-    def get_prompts(self):
-        user_prompts = {}
-        for prompts in prompts_list:
-            language_prompts = []
-            for prompt in prompts_list[prompts]:
-                language_prompts.append(
-                    {"slug": prompt['slug'], "description": prompt['description'], "name": prompt['name']})
-            user_prompts[prompts] = language_prompts
-        return user_prompts
 
     def post(self, request):
         if not request.user.is_staff and not request.user.group:
