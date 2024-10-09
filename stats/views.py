@@ -48,7 +48,7 @@ class UsageView(TemplateView):
                 for page in range(0, int(response.json().get('num_pages'))):
                     responses.append(
                         requests.get(
-                            preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params,
+                            preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params + f"&page={page}",
                             headers={
                                 'token': preferences.StatisticSettings.API_KEY,
                                 'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
