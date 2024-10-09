@@ -4,10 +4,7 @@ from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
-from celery.result import AsyncResult
-from django.conf import settings
-from .tasks import start_gpt_process
-from legal.mail_helpers import send_file_translation, send_text_translation, send_gpt_processing
+from writing.models import Prompt
 import requests
 from preferences import preferences
 from .prompts_list import prompts_list
@@ -30,15 +27,18 @@ def gpt_process(request):
     data = request.data
     if not request.user.is_staff and not request.user.group:
         return Response({"message": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
-    prompt = get_prompt(request)
+    prompt = Prompt.objects.filter(id=data['prompt']).first()
+    if not prompt:
+        return Response({"message": "Prompt not found"}, status=status.HTTP_404_NOT_FOUND)
+
     response = requests.post(
-        url='https://console.custom.mt/gpt-processing/foreign_gpt_process/',
+        url=preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + '/gpt-processing/foreign_gpt_process/',
         headers={
             'token': preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
         },
         data={
             "text": data['text'],
-            "prompt": prompt
+            "prompt": prompt.prompt
 
         }
     )
