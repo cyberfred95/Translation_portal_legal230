@@ -45,7 +45,7 @@ class UsageView(TemplateView):
             )
             responses.append(response)
             if response.json().get('num_pages', 0) > 1:
-                for page in range(0, int(response.json().get('num_pages'))):
+                for page in range(1, int(response.json().get('num_pages'))):
                     responses.append(
                         requests.get(
                             preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params + f"&page={page}",
