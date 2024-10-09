@@ -11,13 +11,39 @@
 
             <thead>
             <tr class="border-gray-500">
-                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">Username</th>
-                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">Project</th>
-                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">Languages</th>
-                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">Status</th>
-                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">Revision</th>
-                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">Created</th>
-                <th class="border-b text-4 text-gray-800 font-semibold text-right pb-5">Actions</th>
+                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">
+                    <div class="flex items-center gap-1 w-auto cursor-pointer">
+                        Username <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                    </div>
+                </th>
+                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">
+                    <div class="flex items-center gap-1 w-auto cursor-pointer">
+                        Project <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                    </div>
+                </th>
+                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">
+                    <div class="flex items-center gap-1 w-auto cursor-pointer">
+                        Languages <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                    </div>
+                </th>
+                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">
+                    <div class="flex items-center gap-1 w-auto cursor-pointer">
+                        Status <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                    </div>
+                </th>
+                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">
+                    <div class="flex items-center gap-1 w-auto cursor-pointer">
+                        Revision <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                    </div>
+                </th>
+                <th class="border-b text-4 text-gray-800 font-semibold text-left pb-5">
+                    <div class="flex items-center gap-1 w-auto cursor-pointer">
+                        Created <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                    </div>
+                </th>
+                <th class="border-b text-4 text-gray-800 font-semibold text-right pb-5">
+                    Actions
+                </th>
             </tr>
             </thead>
             <tbody>
@@ -86,18 +112,25 @@
                         <div class="relative">
                             <button type="button" class="download-file"
                                     data-translated-file="{{ project.translated_file }}"
-                                    {% if project.reviewed_file %}data-reviewed-file="{{ project.reviewed_file }}"{% endif %}>
-                                <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M15.7188 7.21875C15.2875 7.21875 14.9375 7.56875 14.9375 8C14.9375 11.55 12.05 14.4375 8.5 14.4375C4.95 14.4375 2.0625 11.55 2.0625 8C2.0625 7.56875 1.7125 7.21875 1.28125 7.21875C0.85 7.21875 0.5 7.56875 0.5 8C0.5 10.1375 1.33125 12.1469 2.84375 13.6562C4.35625 15.1687 6.3625 16 8.5 16C10.6375 16 12.6469 15.1687 14.1562 13.6562C15.6687 12.1438 16.5 10.1375 16.5 8C16.5 7.56875 16.15 7.21875 15.7188 7.21875Z" fill="#176C77"></path>
-                                    <path d="M7.42891 10.7375C7.71641 11.025 8.09766 11.1812 8.50078 11.1812C8.90703 11.1812 9.28828 11.0219 9.57266 10.7375L11.5383 8.77187C11.8445 8.46562 11.8445 7.97187 11.5383 7.66562C11.232 7.35937 10.7383 7.35937 10.432 7.66562L9.28203 8.81875V0.78125C9.28203 0.35 8.93203 0 8.50078 0C8.06953 0 7.71953 0.35 7.71953 0.78125V8.81875L6.56641 7.66562C6.26016 7.35937 5.76641 7.35937 5.46016 7.66562C5.15391 7.97187 5.15391 8.46562 5.46016 8.77187L7.42891 10.7375Z" fill="#176C77"></path>
+                                    {% if project.reviewed_file %}data-reviewed-file="{{ project.reviewed_file }}" {% endif %}>
+                                <svg width="17" height="16" viewBox="0 0 17 16" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M15.7188 7.21875C15.2875 7.21875 14.9375 7.56875 14.9375 8C14.9375 11.55 12.05 14.4375 8.5 14.4375C4.95 14.4375 2.0625 11.55 2.0625 8C2.0625 7.56875 1.7125 7.21875 1.28125 7.21875C0.85 7.21875 0.5 7.56875 0.5 8C0.5 10.1375 1.33125 12.1469 2.84375 13.6562C4.35625 15.1687 6.3625 16 8.5 16C10.6375 16 12.6469 15.1687 14.1562 13.6562C15.6687 12.1438 16.5 10.1375 16.5 8C16.5 7.56875 16.15 7.21875 15.7188 7.21875Z"
+                                          fill="#176C77"></path>
+                                    <path d="M7.42891 10.7375C7.71641 11.025 8.09766 11.1812 8.50078 11.1812C8.90703 11.1812 9.28828 11.0219 9.57266 10.7375L11.5383 8.77187C11.8445 8.46562 11.8445 7.97187 11.5383 7.66562C11.232 7.35937 10.7383 7.35937 10.432 7.66562L9.28203 8.81875V0.78125C9.28203 0.35 8.93203 0 8.50078 0C8.06953 0 7.71953 0.35 7.71953 0.78125V8.81875L6.56641 7.66562C6.26016 7.35937 5.76641 7.35937 5.46016 7.66562C5.15391 7.97187 5.15391 8.46562 5.46016 8.77187L7.42891 10.7375Z"
+                                          fill="#176C77"></path>
                                 </svg>
                             </button>
                             {% if project.reviewed_file and project.translated_file %}
                             <div class="download-tooltip hidden absolute z-10 bg-white rounded-md shadow-lg p-2 mt-2 right-0">
-                                <button type="button" class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap" data-file-url="{{ project.translated_file }}">
+                                <button type="button"
+                                        class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap"
+                                        data-file-url="{{ project.translated_file }}">
                                     Translated
                                 </button>
-                                <button type="button" class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap" data-file-url="{{ project.reviewed_file }}">
+                                <button type="button"
+                                        class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap"
+                                        data-file-url="{{ project.reviewed_file }}">
                                     Post-edited
                                 </button>
                             </div>
@@ -115,7 +148,8 @@
                                     </svg>
                                     <div class="tooltip invisible opacity-0 transition-opacity duration-300 absolute z-10 w-auto py-2 px-2 bg-white text-black text-2.75 rounded-md bottom-14 left-1/2 transform -translate-x-1/2 translate-y-full shadow-lg">
                                         <div class="flex items-center gap-1.5">
-                                            <svg class="allow-delete" width="14" height="14" viewBox="0 0 14 14" fill="none"
+                                            <svg class="allow-delete" width="14" height="14" viewBox="0 0 14 14"
+                                                 fill="none"
                                                  xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M7 14C10.866 14 14 10.866 14 7C14 3.13401 10.866 0 7 0C3.13401 0 0 3.13401 0 7C0 10.866 3.13401 14 7 14Z"
                                                       fill="#00BBA7"/>

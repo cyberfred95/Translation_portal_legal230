@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block content %}
 
 <div class="mx-31.25 mb-11.5">
@@ -226,15 +228,39 @@
             <thead>
                 <tr class="border-gray-500">
                     {% if request.user.is_staff or is_group_admin %}
-                    <th class="text-4 text-gray-800 font-semibold text-left border-b pb-5 user-row">User</th>
+                    <th class="text-4 text-gray-800 font-semibold text-left border-b pb-5 user-row">
+                        <div class="flex items-center gap-1 w-auto cursor-pointer">
+                            User <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        </div>
+                    </th>
                     {% if request.user.is_staff %}
-                    <th class="text-4 text-gray-800 font-semibold text-left border-b pb-5">Group</th>
+                    <th class="text-4 text-gray-800 font-semibold text-left border-b pb-5">
+                        <div class="flex items-center gap-1 w-auto cursor-pointer">
+                            Group <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        </div>
+                    </th>
                     {% endif %}
                     {% endif %}
-                    <th class="text-4 text-gray-800 font-semibold text-left border-b pb-5">File name</th>
-                    <th class="text-4 text-gray-800 font-semibold text-left border-b pb-5">Characters</th>
-                    <th class="text-4 text-gray-800 font-semibold text-left border-b pb-5">Tokens</th>
-                    <th class="text-4 text-gray-800 font-semibold text-left w-1 border-b pb-5">Date</th>
+                    <th class="text-4 text-gray-800 font-semibold text-left border-b pb-5">
+                        <div class="flex items-center gap-1 w-auto cursor-pointer">
+                            File name <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        </div>
+                    </th>
+                    <th class="text-4 text-gray-800 font-semibold text-left border-b pb-5">
+                        <div class="flex items-center gap-1 w-auto cursor-pointer">
+                            Characters <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        </div>
+                    </th>
+                    <th class="text-4 text-gray-800 font-semibold text-left border-b pb-5">
+                        <div class="flex items-center gap-1 w-auto cursor-pointer">
+                            Tokens <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        </div>
+                    </th>
+                    <th class="text-4 text-gray-800 font-semibold text-left w-1 border-b pb-5">
+                        <div class="flex items-center gap-1 w-auto cursor-pointer">
+                            Date <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        </div>
+                    </th>
                 </tr>
             </thead>
             <tbody>

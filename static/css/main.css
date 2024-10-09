@@ -52,7 +52,7 @@
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-    background-image: url("/static/images/select-arrow.svg");
+    background-image: url("/static/images/ico-arrow.svg");
     background-repeat: no-repeat;
     background-position: center;
     width: 1.5rem;
