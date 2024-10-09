@@ -32,13 +32,14 @@ def gpt_process(request):
         return Response({"message": "Prompt not found"}, status=status.HTTP_404_NOT_FOUND)
 
     response = requests.post(
-        url=preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + '/gpt-processing/foreign_gpt_process/',
+        url=preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + 'gpt-processing/foreign_gpt_process/',
         headers={
             'token': preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
         },
         data={
             "text": data['text'],
-            "prompt": prompt.prompt
+            "prompt": prompt.prompt,
+            "gpt_model": prompt.gpt_model
 
         }
     )
