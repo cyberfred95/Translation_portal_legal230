@@ -42,7 +42,6 @@ class StatsProcessor:
             chars += len(paragraph['text'])
         return chars
 
-
     def get_template_name(self, source_language, target_language, domain_name):
         response = requests.post(
             preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/get_template_by_language_pair_and_domain",
@@ -76,8 +75,6 @@ class StatsProcessor:
             data={
                 "messages": texts,
                 "uuid": user_uuid,
-                'custom_mt_api_key': preferences.MainSettings.api_key,
-
                 'template_name': template_name,
                 'file_name': file_name
             }
@@ -85,3 +82,22 @@ class StatsProcessor:
         print(response.text)
         print(response.status_code)
 
+    def send_writing_request(self,
+                             texts: list,
+                             user_uuid,
+                             file_name='Text writing',
+                             gpt_model='gpt-3.5-turbo-0613'):
+        response = requests.post(
+            preferences.StatisticSettings.URL + "add_writing_statistic/",
+            headers={
+                'token': preferences.StatisticSettings.API_KEY,
+                'X-API-Key': preferences.MainSettings.api_key,
+            },
+            data={
+                "messages": texts,
+                "uuid": user_uuid,
+                'file_name': file_name,
+                "gpt_model": gpt_model,
+            }
+
+        )

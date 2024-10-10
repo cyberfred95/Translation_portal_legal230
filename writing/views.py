@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from preferences import preferences
 
 from .serializers import PromptSerializer
-from .tasks import refresh_prompts
+from .tasks import refresh_prompts, send_statistic_request
 
 from .models import Prompt
 import requests
@@ -34,6 +34,7 @@ class WritingView(TemplateView):
         prompts = Prompt.objects.all()
         return PromptSerializer(prompts, many=True, context={'request': self.request}).data
 
+
 @csrf_exempt
 @api_view(['POST'])
 def writing_process(request):
@@ -56,4 +57,15 @@ def writing_process(request):
 
         }
     )
+    result = list(response.json().get('result'))
+    if not result:
+        result = []
+    send_statistic_request(
+        api_key=preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key,
+        texts=result,
+        gpt_model=prompt.gpt_model,
+        user_uuid=request.user.uuid,
+
+    )
+
     return Response(response.json(), status=status.HTTP_200_OK)

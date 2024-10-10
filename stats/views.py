@@ -58,7 +58,6 @@ class UsageView(TemplateView):
                             }
                         )
                     )
-            print(responses)
             return list(set(responses))
 
 
@@ -70,7 +69,6 @@ class UsageView(TemplateView):
                 file_names.append(usage['file_name'])
 
         file_names = list(set(file_names))
-        print(file_names)
 
         if self.request.user.is_staff:
             return {
