@@ -4,6 +4,8 @@ import requests
 from .models import Prompt, PromptTranslation
 from legal.constants import EN
 
+from stats.calculator import StatsProcessor
+
 
 @shared_task
 def refresh_prompts():
@@ -36,3 +38,9 @@ def refresh_prompts():
     for prompt in existing_prompts:
         if prompt.translations.filter(language='en').first().name not in cmt_prompt_names:
             prompt.delete()
+
+
+@shared_task
+def send_statistic_request(api_key, texts: list, user_uuid, gpt_model: str, file_name="Text writing"):
+    StatsProcessor(api_key=api_key).send_writing_request(texts=texts, user_uuid=user_uuid, gpt_model=gpt_model,
+                                                         file_name=file_name)
