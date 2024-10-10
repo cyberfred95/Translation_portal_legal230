@@ -58,7 +58,6 @@ def writing_process(request):
         }
     )
     result = list(response.json().get('result'))
-    print(response.json())
     if not result:
         result = []
     send_statistic_request(
