@@ -23,7 +23,7 @@ $(document).ready(function() {
         var $option = $(
             '<div class="flex flex-col gap-1.5">' +
             '<div class="font-medium text-4">' + splitText[0] + '</div>' +
-            '<div class="font-normal text-3.5 text-gray-590">' + splitText[1] + '</div>' +
+            '<div class="font-normal text-3.5 text-gray-425">' + splitText[1] + '</div>' +
             '</div>'
         );
         return $option;

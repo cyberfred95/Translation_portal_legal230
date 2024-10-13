@@ -24,32 +24,32 @@ $(document).ready(function () {
         var endPage = Math.min(totalPages, startPage + 4);
 
         if (startPage > 1) {
-            $pageNumbers.append('<a href="#" class="page-number text-gray-300">1</a>');
+            $pageNumbers.append('<a href="#" class="page-number text-gray-225">1</a>');
             if (startPage > 2) {
-                $pageNumbers.append('<span class="text-gray-300">...</span>');
+                $pageNumbers.append('<span class="text-gray-225">...</span>');
             }
         }
 
         for (var i = startPage; i <= endPage; i++) {
             if (i === currentPage) {
-                $pageNumbers.append('<span class="current-page text-gray-800 rounded">' + i + '</span>');
+                $pageNumbers.append('<span class="current-page text-gray-600 rounded">' + i + '</span>');
             } else {
-                $pageNumbers.append('<a href="#" class="page-number text-gray-300">' + i + '</a>');
+                $pageNumbers.append('<a href="#" class="page-number text-gray-225">' + i + '</a>');
             }
         }
 
         if (endPage < totalPages) {
             if (endPage < totalPages - 1) {
-                $pageNumbers.append('<span class="text-gray-300">...</span>');
+                $pageNumbers.append('<span class="text-gray-225">...</span>');
             }
-            $pageNumbers.append('<a href="#" class="page-number text-gray-300">' + totalPages + '</a>');
+            $pageNumbers.append('<a href="#" class="page-number text-gray-225">' + totalPages + '</a>');
         }
 
-        $('#prev-page').toggleClass('text-gray-300 pointer-events-none', currentPage === 1)
-            .toggleClass('text-gray-800', currentPage !== 1)
+        $('#prev-page').toggleClass('text-gray-225 pointer-events-none', currentPage === 1)
+            .toggleClass('text-gray-600', currentPage !== 1)
             .prop('disabled', currentPage === 1);
-        $('#next-page').toggleClass('text-gray-300 pointer-events-none', currentPage === totalPages)
-            .toggleClass('text-gray-800', currentPage !== totalPages)
+        $('#next-page').toggleClass('text-gray-225 pointer-events-none', currentPage === totalPages)
+            .toggleClass('text-gray-600', currentPage !== totalPages)
             .prop('disabled', currentPage === totalPages);
     }
 

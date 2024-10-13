@@ -1,8 +1,8 @@
-<nav class="w-32.5 bg-gray-150 text-white h-screen pt-29 pb-5 flex flex-col justify-between">
+<nav class="w-32.5 bg-gray-50 text-white h-screen pt-29 pb-5 flex flex-col justify-between">
     <ul>
         <li>
             <a href="{% url 'main_index' %}"
-               class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out {% if request.resolver_match.url_name == 'main_index' %}bg-gray-800 text-white{% endif %}"}>
+               class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer text-gray-600 group-hover:text-white ease-in-out {% if request.resolver_match.url_name == 'main_index' %}bg-gray-600 text-white{% endif %}"}>
 
                 <svg class="w-5.75 h-5.75" width="26" height="26" viewBox="0 0 26 26" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
@@ -22,7 +22,7 @@
 
         <li>
             <a  href="{% url 'glossaries' %}"
-               class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out  {% if request.resolver_match.url_name == 'glossaries' %}bg-gray-800 text-white{% endif %}">
+               class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer text-gray-600 group-hover:text-white ease-in-out  {% if request.resolver_match.url_name == 'glossaries' %}bg-gray-600 text-white{% endif %}">
                 <svg class="w-5.75 h-5.75" width="26" height="26" viewBox="0 0 26 26" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_760_711)">
@@ -65,7 +65,7 @@
         </li>
 
         <li>
-            <a href="{% url 'project_history' %}" class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out {% if request.resolver_match.url_name == 'project_history' %}bg-gray-800 text-white{% endif %}">
+            <a href="{% url 'project_history' %}" class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer text-gray-600 group-hover:text-white ease-in-out {% if request.resolver_match.url_name == 'project_history' %}bg-gray-600 text-white{% endif %}">
                 <svg class="w-5.75 h-5.75" width="26" height="26" viewBox="0 0 26 26" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_760_723)">
@@ -95,7 +95,7 @@
             </a>
         </li>
         <li>
-            <a href="{% url 'writing' %}" class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out {% if request.resolver_match.url_name == 'writing' %}bg-gray-800 text-white{% endif %}">
+            <a href="{% url 'writing' %}" class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer text-gray-600 group-hover:text-white ease-in-out {% if request.resolver_match.url_name == 'writing' %}bg-gray-600 text-white{% endif %}">
                 <svg width="24" height="26" viewBox="0 0 24 26" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M16.8984 11.1719C16.8984 10.6109 16.4437 10.1562 15.8828 10.1562H5.42188C4.86095 10.1562 4.40625 10.6109 4.40625 11.1719C4.40625 11.7328 4.86095 12.1875 5.42188 12.1875H15.8828C16.4437 12.1875 16.8984 11.7328 16.8984 11.1719Z" fill="currentColor"/>
                     <path d="M5.42188 14.2188C4.86095 14.2188 4.40625 14.6734 4.40625 15.2344C4.40625 15.7953 4.86095 16.25 5.42188 16.25H11.7752C12.3361 16.25 12.7908 15.7953 12.7908 15.2344C12.7908 14.6734 12.3361 14.2188 11.7752 14.2188H5.42188Z" fill="currentColor"/>
@@ -110,7 +110,7 @@
     </ul>
     <ul>
         <li>
-            <a href="{% url 'usage' %}?date_from={{ request.GET.date_from|default:''|date:'Y-m-d'|default:'' }}{% if not request.GET.date_from %}{% now 'Y-m-01' %}{% endif %}&date_to={{ request.GET.date_to|default:''|date:'Y-m-d'|default:'' }}{% if not request.GET.date_to %}{% now 'Y-m-t' %}{% endif %}" class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out">
+            <a href="{% url 'usage' %}?date_from={{ request.GET.date_from|default:''|date:'Y-m-d'|default:'' }}{% if not request.GET.date_from %}{% now 'Y-m-01' %}{% endif %}&date_to={{ request.GET.date_to|default:''|date:'Y-m-d'|default:'' }}{% if not request.GET.date_to %}{% now 'Y-m-t' %}{% endif %}" class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer text-gray-600 group-hover:text-white ease-in-out">
 
                 <svg class="w-5.75 h-5.75" width="26" height="26" viewBox="0 0 26 26" fill="none"
                      xmlns="http://www.w3.org/2000/svg">
@@ -133,7 +133,7 @@
             </a>
         </li>
         <li>
-            <a href="mailto:{{ preferences.MainSettings.support_email }}" class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-800 transition duration-300 hover:text-white group cursor-pointer text-gray-800 group-hover:text-white ease-in-out">
+            <a href="mailto:{{ preferences.MainSettings.support_email }}" class="text-4 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer text-gray-600 group-hover:text-white ease-in-out">
                 <svg class="w-5.75 h-5.75" width="22" height="22" viewBox="0 0 22 22" fill="none"
                      xmlns="http://www.w3.org/2000/svg">
                     <path d="M10.9993 0.166992C5.02585 0.166992 0.166016 5.02683 0.166016 11.0003V15.4886C0.166016 16.5979 1.13777 17.5003 2.33268 17.5003H3.41602C3.70333 17.5003 3.97888 17.3862 4.18205 17.183C4.38521 16.9799 4.49935 16.7043 4.49935 16.417V10.8454C4.49935 10.5581 4.38521 10.2825 4.18205 10.0794C3.97888 9.87621 3.70333 9.76208 3.41602 9.76208H2.43235C3.03468 5.56958 6.64218 2.33366 10.9993 2.33366C15.3565 2.33366 18.964 5.56958 19.5663 9.76208H18.5827C18.2954 9.76208 18.0198 9.87621 17.8166 10.0794C17.6135 10.2825 17.4993 10.5581 17.4993 10.8454V17.5003C17.4993 18.6952 16.5276 19.667 15.3327 19.667H13.166V18.5837H8.83268V21.8337H15.3327C17.7225 21.8337 19.666 19.8902 19.666 17.5003C20.8609 17.5003 21.8327 16.5979 21.8327 15.4886V11.0003C21.8327 5.02683 16.9728 0.166992 10.9993 0.166992Z"

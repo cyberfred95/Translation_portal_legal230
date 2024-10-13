@@ -37,15 +37,15 @@ $(document).ready(function () {
 
         $("#progress-bar").css("width", percentage + "%");
 
-        $(".progress-point").parent().find("svg").removeClass("text-green-650").addClass("text-green-270");
-        $(".progress-point").parent().find(".text-3\\.25, .text-xs").removeClass("text-green-650").addClass("text-green-250");
+        $(".progress-point").parent().find("svg").removeClass("text-green-400").addClass("text-green-250");
+        $(".progress-point").parent().find(".text-3\\.25, .text-xs").removeClass("text-green-400").addClass("text-green-200");
 
-        $("#point-1").find("svg").removeClass("text-green-270").addClass("text-green-650");
-        $("#point-1").find(".text-3\\.25, .text-xs").removeClass("text-green-250").addClass("text-green-650");
+        $("#point-1").find("svg").removeClass("text-green-250").addClass("text-green-400");
+        $("#point-1").find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-400");
 
         for (let i = 0; i <= step; i++) {
-            $(`#point-${i + 1}`).find("svg").removeClass("text-green-270").addClass("text-green-650");
-            $(`#point-${i + 1}`).find(".text-3\\.25, .text-xs").removeClass("text-green-250").addClass("text-green-650");
+            $(`#point-${i + 1}`).find("svg").removeClass("text-green-250").addClass("text-green-400");
+            $(`#point-${i + 1}`).find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-400");
 
         }
     }
@@ -117,7 +117,7 @@ $(document).ready(function () {
         if (currentStep > 0) {
             currentStep--;
             showStep(currentStep);
-            $("#next-step").removeClass('border-gray-300 text-gray-300 pointer-events-none').addClass('border-green-650 text-green-650').prop("disabled", false);
+            $("#next-step").removeClass('border-gray-225 text-gray-225 pointer-events-none').addClass('border-green-400 text-green-400').prop("disabled", false);
 
             $('.step-container').removeClass('bg-red-100 border-red-200');
         }
@@ -153,15 +153,15 @@ $(document).ready(function () {
     $dropZone.on('dragenter dragover', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        $(this).addClass('border-green-700');
-        $(this).find('.text-gray-800').text('Drop files here');
+        $(this).addClass('border-green-500');
+        $(this).find('.text-gray-600').text('Drop files here');
     });
 
     $dropZone.on('dragleave drop', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        $(this).removeClass('border-green-700');
-        $(this).find('.text-gray-800').text('Drag and drop');
+        $(this).removeClass('border-green-500');
+        $(this).find('.text-gray-600').text('Drag and drop');
     });
 
     $dropZone.on('drop', function (e) {
@@ -195,7 +195,7 @@ $(document).ready(function () {
             file.fileId = fileId;
 
             const $fileItem = $(`
-            <div class="file flex gap-4 items-center px-4 py-3 rounded-md bg-green-350 text-green-650 font-normal" data-file-id="${fileId}">
+            <div class="file flex gap-4 items-center px-4 py-3 rounded-md bg-green-100 text-green-400 font-normal" data-file-id="${fileId}">
 
                 <span>${file.name}</span>
                 <button type="button" class="remove-file" data-file-id="${fileId}">
@@ -298,7 +298,7 @@ $(document).ready(function () {
         files.forEach((file) => {
             const $fileItem = $(`
             <div class="flex gap-5 items-center" data-file-id="${file.fileId}">
-                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-350 text-green-650 detected-file font-normal">
+                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-100 text-green-400 detected-file font-normal">
 
                     <span class="text-3.5 w-50 truncate">${file.file_name}</span>
                     <button type="button" class="remove-detected-file" data-file-id="${file.fileId}">
@@ -410,7 +410,7 @@ $(document).ready(function () {
 
                 targetLanguageBlock.prepend('<div class="error-message text-red-400">One or more files have different language, please fix it.</div>');
 
-                detectedFiles.removeClass('bg-green-150 text-green-700').addClass('bg-red-150 text-red-400 border border-red-400');
+                detectedFiles.removeClass('bg-green-150 text-green-500').addClass('bg-red-150 text-red-400 border border-red-400');
             } else {
                 $('.document-source-language').select2().each(function () {
                     var $select = $(this);
@@ -423,18 +423,18 @@ $(document).ready(function () {
 
                 targetSelect.show();
 
-                detectedFiles.removeClass('bg-red-150 text-red-400 border border-red-400').addClass('bg-green-200 text-green-700');
+                detectedFiles.removeClass('bg-red-150 text-red-400 border border-red-400').addClass('bg-green-150 text-green-500');
             }
         }
         let isSameAsTarget = firstValue === targetValue;
 
         if (!isConsistent || !targetValue || isSameAsTarget) {
-            nextButton.removeClass('border-green-650 text-white text-green-650')
-                .addClass('border-gray-300 text-gray-300 pointer-events-none')
+            nextButton.removeClass('border-green-400 text-white text-green-400')
+                .addClass('border-gray-225 text-gray-225 pointer-events-none')
                 .prop("disabled", true);
         } else {
-            nextButton.removeClass('border-gray-300 text-gray-300 pointer-events-none')
-                .addClass('border-green-650 text-green-650')
+            nextButton.removeClass('border-gray-225 text-gray-225 pointer-events-none')
+                .addClass('border-green-400 text-green-400')
                 .prop("disabled", false);
             $('.language-step').removeClass('hidden');
             $('.source').text(firstValue.toUpperCase());
@@ -494,12 +494,12 @@ $(document).ready(function () {
         domains.forEach((domain, index) => {
             const button = $('<button>', {
                 type: 'button',
-                class: 'domain-button text-3.5 py-3 px-7.5 bg-gray-160 text-gray-550 hover:bg-green-650 hover:text-white rounded-md focus:text-white focus:bg-green-650 transition duration-300 ease-in-out',
+                class: 'domain-button text-3.5 py-3 px-7.5 bg-gray-100 text-gray-475 hover:bg-green-400 hover:text-white rounded-md focus:text-white focus:bg-green-400 transition duration-300 ease-in-out',
                 text: domain.name,
                 'data-name': domain.name,
                 click: function () {
-                    $('.domain-button').removeClass('selected bg-green-650 text-white').addClass('bg-gray-160 text-gray-550');
-                    $(this).removeClass('bg-gray-160 text-gray-550').addClass('selected bg-green-650 text-white');
+                    $('.domain-button').removeClass('selected bg-green-400 text-white').addClass('bg-gray-100 text-gray-475');
+                    $(this).removeClass('bg-gray-100 text-gray-475').addClass('selected bg-green-400 text-white');
 
                     selectedDomain = $(this).data('name');
                     getDomains();
@@ -507,7 +507,7 @@ $(document).ready(function () {
             });
 
             if (index === 0) {
-                button.removeClass('bg-gray-160 text-gray-550').addClass('selected bg-green-650 text-white');
+                button.removeClass('bg-gray-100 text-gray-475').addClass('selected bg-green-400 text-white');
 
                 selectedDomain = domain.name;
             }
@@ -525,19 +525,19 @@ $(document).ready(function () {
         subDomains.forEach((subDomain, index) => {
             const button = $('<button>', {
                 type: 'button',
-                class: 'sub-domain-button text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 hover:bg-green-700 hover:text-white rounded-md focus:text-white focus:bg-green-700 transition duration-300 ease-in-out',
+                class: 'sub-domain-button text-3.5 py-3 px-7.5 bg-gray-175 text-gray-375 hover:bg-green-500 hover:text-white rounded-md focus:text-white focus:bg-green-500 transition duration-300 ease-in-out',
                 text: subDomain,
                 'data-name': subDomain,
                 click: function () {
-                    $('.sub-domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
-                    $(this).removeClass('bg-gray-200 text-gray-400').addClass('selected bg-green-700 text-white');
+                    $('.sub-domain-button').removeClass('selected bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
+                    $(this).removeClass('bg-gray-175 text-gray-375').addClass('selected bg-green-500 text-white');
                     selectedSubDomain = $(this).data('name');
                     $('.domain-step').text(selectedSubDomain).removeClass('hidden');
                 }
             });
 
             if (index === 0) {
-                button.removeClass('bg-gray-200 text-gray-400').addClass('selected bg-green-700 text-white');
+                button.removeClass('bg-gray-175 text-gray-375').addClass('selected bg-green-500 text-white');
                 selectedSubDomain = subDomain;
             }
 
@@ -573,14 +573,14 @@ $(document).ready(function () {
             },
             success: function (response) {
                 if (response.data && response.data.length === 0) {
-                    $('#next-step').removeClass('border-green-650 text-white text-green-650')
+                    $('#next-step').removeClass('border-green-400 text-white text-green-400')
 
-                        .addClass('border-gray-300 text-gray-300 pointer-events-none')
+                        .addClass('border-gray-225 text-gray-225 pointer-events-none')
                         .prop("disabled", true);
                     $('.domain-step').text('none').removeClass('hidden');
                 } else {
-                    $('#next-step').removeClass('border-gray-300 text-gray-300 pointer-events-none')
-                        .addClass('border-green-650 text-green-650')
+                    $('#next-step').removeClass('border-gray-225 text-gray-225 pointer-events-none')
+                        .addClass('border-green-400 text-green-400')
                         .prop("disabled", false);
                     $('.domain-step').text(response.data[0]).removeClass('hidden');
                 }
@@ -597,7 +597,7 @@ $(document).ready(function () {
     // ------------- STEP-4 -------------
 
 
-    $(".step-4 .default").addClass('bg-gray-800 text-white');
+    $(".step-4 .default").addClass('bg-gray-600 text-white');
     $(".step-4 .default").click(function () {
         selectGlossaryType('default');
         loadDefaultGlossary();
@@ -619,8 +619,8 @@ $(document).ready(function () {
 
     function selectGlossaryType(type) {
         selectedGlossaryType = type;
-        $(".step-4 .glossary-tab").removeClass('bg-gray-800 text-white').addClass('bg-gray-200 text-gray-400');
-        $(".step-4 ." + type).removeClass('bg-gray-200 text-gray-400').addClass('bg-gray-800 text-white');
+        $(".step-4 .glossary-tab").removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
+        $(".step-4 ." + type).removeClass('bg-gray-175 text-gray-375').addClass('bg-gray-600 text-white');
 
         if (type === 'my-glossary') {
             $(".add-glossary-btn").removeClass('hidden');
@@ -676,8 +676,8 @@ $(document).ready(function () {
                 updateGlossaryList(response);
                 selectedGlossary = '';
                 $('.terminology-step').text('default').removeClass('hidden');
-                $('#next-step').removeClass('border-green-650 text-white text-green-650')
-                    .addClass('border-gray-300 text-gray-300 pointer-events-none')
+                $('#next-step').removeClass('border-green-400 text-white text-green-400')
+                    .addClass('border-gray-225 text-gray-225 pointer-events-none')
                     .prop("disabled", true);
             },
             error: function () {
@@ -691,26 +691,26 @@ $(document).ready(function () {
         $list.empty();
 
         glossaries.forEach(function (glossary) {
-            const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 rounded-md hover:bg-green-700 hover:text-white transition duration-300 ease-in-out">${glossary.name}</button>`);
+            const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-175 text-gray-375 rounded-md hover:bg-green-500 hover:text-white transition duration-300 ease-in-out">${glossary.name}</button>`);
             $item.click(function () {
                 if (selectedGlossary === glossary.name) {
-                    $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
+                    $(this).removeClass('bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
                     selectedGlossary = '';
                     $('.terminology-step').text('').removeClass('hidden');
                     if (selectedGlossaryType === 'my-glossary') {
-                        $('#next-step').removeClass('border-green-650 text-white text-green-650')
-                            .addClass('border-gray-300 text-gray-300 pointer-events-none')
+                        $('#next-step').removeClass('border-green-400 text-white text-green-400')
+                            .addClass('border-gray-225 text-gray-225 pointer-events-none')
                             .prop("disabled", true);
                     }
                 } else {
-                    $(".glossary-item").removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
-                    $(this).removeClass('bg-gray-200 text-gray-400').addClass('bg-green-700 text-white');
+                    $(".glossary-item").removeClass('bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
+                    $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-green-500 text-white');
                     selectedGlossary = glossary.name;
                     $('.terminology-step').text(selectedGlossary).removeClass('hidden');
 
                     if (selectedGlossaryType === 'my-glossary') {
-                        $('#next-step').removeClass('border-gray-300 text-gray-300 pointer-events-none')
-                            .addClass('border-green-650 text-green-650')
+                        $('#next-step').removeClass('border-gray-225 text-gray-225 pointer-events-none')
+                            .addClass('border-green-400 text-green-400')
                             .prop("disabled", false);
                     }
                 }
@@ -730,18 +730,18 @@ $(document).ready(function () {
     });
 
     $('#closeModal, #closeIcon').on('click', function () {
-        $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
-        $('#downloadSample').removeClass('bg-transparent border border-gray-170 text-gray-270').addClass('bg-green-700 text-green-650 border border-green-650');
-        $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-350');
+        $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-500');
+        $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-500 text-green-400 border border-green-400');
+        $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
         $modal.addClass('hidden');
         $closeIcon.addClass('hidden');
     });
 
     $(window).on('click', function (event) {
         if (event.target == $modal[0]) {
-            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
-            $('#downloadSample').removeClass('bg-transparent border border-gray-170 text-gray-270').addClass('bg-green-700 text-green-650 border border-green-650');
-            $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-350');
+            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-500');
+            $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-500 text-green-400 border border-green-400');
+            $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
             $modal.addClass('hidden');
             $closeIcon.addClass('hidden');
         }
@@ -754,9 +754,9 @@ $(document).ready(function () {
     $('.glossary-file').on('change', function (e) {
         glossaryFile = e.target.files[0];
         if (glossaryFile) {
-            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
-            $('#downloadSample').removeClass('bg-transparent border border-gray-170 text-gray-270').addClass('bg-green-700 text-green-650 border border-green-650');
-            $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-350');
+            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-500');
+            $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-500 text-green-400 border border-green-400');
+            $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
             if (glossaryFile.size <= maxFileSize) {
                 showUploadedFile(glossaryFile.name);
             } else {
@@ -786,9 +786,9 @@ $(document).ready(function () {
         e.preventDefault();
 
         if (!glossaryFile) {
-            $('#uploadButton').removeClass('bg-green-700 border border-green-650').addClass('bg-transparent border border-red-400 text-red-400');
-            $('#downloadSample').removeClass('bg-green-700 text-green-650 ').addClass('bg-transparent border border-gray-170 text-gray-270');
-            $('.glossary-container').removeClass('bg-gray-350').addClass('bg-red-150');
+            $('#uploadButton').removeClass('bg-green-500 border border-green-400').addClass('bg-transparent border border-red-400 text-red-400');
+            $('#downloadSample').removeClass('bg-green-500 text-green-400 ').addClass('bg-transparent border border-gray-200 text-gray-400');
+            $('.glossary-container').removeClass('bg-gray-25').addClass('bg-red-150');
             return;
         }
 
@@ -819,16 +819,16 @@ $(document).ready(function () {
 
                 const $list = $(".glossary-list");
 
-                const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-200 text-gray-400 rounded-md hover:bg-green-700 hover:text-white">${response.name}</button>`);
+                const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-175 text-gray-375 rounded-md hover:bg-green-500 hover:text-white">${response.name}</button>`);
 
                 $item.click(function () {
                     if (selectedGlossary === response.name) {
-                        $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
+                        $(this).removeClass('bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
                         selectedGlossary = '';
                         $('.terminology-step').text('').removeClass('hidden');
                     } else {
-                        $(".glossary-item").removeClass('bg-green-700 text-white').addClass('bg-gray-200 text-gray-400');
-                        $(this).removeClass('bg-gray-200 text-gray-400').addClass('bg-green-700 text-white');
+                        $(".glossary-item").removeClass('bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
+                        $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-green-500 text-white');
                         selectedGlossary = response.name;
                         $('.terminology-step').text(selectedGlossary).removeClass('hidden');
 
@@ -893,7 +893,7 @@ $(document).ready(function () {
 
             row.append(`
             <td>
-                <div class="rounded-md text-green-650 py-3 px-4 md:w-50 2xl:w-80 truncate text-3.25">
+                <div class="rounded-md text-green-400 py-3 px-4 md:w-50 2xl:w-80 truncate text-3.25">
 
                     ${project.source_file_name}
                 </div>
@@ -907,11 +907,11 @@ $(document).ready(function () {
             switch (project.status) {
                 case 'Being translated':
                     statusSpan.text('Processing...');
-                    statusSpan.addClass('text-green-700');
+                    statusSpan.addClass('text-green-500');
                     break;
                 case 'Translated':
                     statusSpan.text('Translated');
-                    statusSpan.addClass('bg-green-350 text-green-650');
+                    statusSpan.addClass('bg-green-100 text-green-400');
                     break;
                 case 'Sent to post-editing, not accepted yet':
                     statusSpan.text('Request for post-editing sent');
@@ -923,7 +923,7 @@ $(document).ready(function () {
                     break;
                 case 'Post-edited file uploaded':
                     statusSpan.text('Post-edited file uploaded');
-                    statusSpan.addClass('bg-green-370 text-green-750');
+                    statusSpan.addClass('bg-green-50 text-green-300');
                     break;
                 case 'Error':
                     statusSpan.text('Error');
@@ -931,7 +931,7 @@ $(document).ready(function () {
                     break;
                 default:
                     statusSpan.text(project.status);
-                    statusSpan.addClass('bg-gray-200 text-gray-800');
+                    statusSpan.addClass('bg-gray-175 text-gray-600');
                     break;
             }
             statusColumn.append(statusSpan);
@@ -939,7 +939,7 @@ $(document).ready(function () {
 
             const downloadColumn = $('<td></td>');
             const downloadButton = $(`
-            <button type=button class="flex gap-2.5 items-center text-green-700 download-file disabled:pointer-events-none disabled:text-gray-300 disabled:border-gray-300" ${project.status !== 'Translated' ? 'disabled' : ''}>
+            <button type=button class="flex gap-2.5 items-center text-green-500 download-file disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225" ${project.status !== 'Translated' ? 'disabled' : ''}>
                 <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_759_2185)">
                         <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z" fill="currentColor"/>
@@ -967,7 +967,7 @@ $(document).ready(function () {
                 type="button"
                 data-translated-file="${project.translated_file}"
                 data-id="${project.id}"
-                class="flex gap-2.5 items-center text-gray-800 border border-gray-800 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-300 disabled:border-gray-300 expert-revision"
+                class="flex gap-2.5 items-center text-gray-600 border border-gray-600 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision"
                 ${project.status !== 'Translated' ? 'disabled' : ''}
             >
                 Revision
@@ -975,11 +975,11 @@ $(document).ready(function () {
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z" fill="currentColor"/>
                     </svg>
-                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 py-3 px-4.5 bg-gray-800 text-white text-2.75 rounded-md bottom-30 left-1/2 transform -translate-x-1/2 translate-y-full">
+                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 py-3 px-4.5 bg-gray-600 text-white text-2.75 rounded-md bottom-30 left-1/2 transform -translate-x-1/2 translate-y-full">
                         <span class="text-justify text-wrap block">
                             Click the button to see options for improving the quality of the translated file.
                         </span>
-                        <div class="absolute w-3 h-3 bg-gray-800 transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5"></div>
+                        <div class="absolute w-3 h-3 bg-gray-600 transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5"></div>
                     </div>
                 </div>
             </button>
@@ -1095,7 +1095,7 @@ $(document).ready(function () {
                 statusSpan.removeClass().addClass('rounded-md py-1.5 px-2.5 text-3.25 bg-yellow-100 text-yellow-400');
 
 
-                projectRow.find('.expert-revision').prop('disabled', true).addClass('disabled:pointer-events-none disabled:text-gray-300 disabled:border-gray-300');
+                projectRow.find('.expert-revision').prop('disabled', true).addClass('disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225');
 
                 $modalRevision.addClass('hidden');
                 $closeRevision.addClass('hidden');
