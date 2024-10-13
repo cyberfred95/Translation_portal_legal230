@@ -127,8 +127,8 @@ $(document).ready(function () {
             success: function () {
                 $deleteButton.closest('tr').remove();
             },
-            error: function (xhr, status, error) {
-                console.error('Error:', error);
+            error: function () {
+                errorNotification();
             }
         });
     });
@@ -175,8 +175,8 @@ $(document).ready(function () {
                 $edit_modal.removeClass('flex').addClass('hidden');
                 window.location.reload();
             },
-            error: function (error) {
-                console.error('Error:', error);
+            error: function () {
+                errorNotification();
             }
         });
     });

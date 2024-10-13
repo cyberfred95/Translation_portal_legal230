@@ -61,8 +61,8 @@ $(document).ready(function () {
                 $('#translated-text').val(response.result);
                 $('#expert-revision').removeClass('hidden');
             },
-            error: function (xhr, status, error) {
-                console.error('Translation error:', error);
+            error: function () {
+                errorNotification();
             }
         });
     });

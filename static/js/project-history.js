@@ -83,9 +83,8 @@ $(document).ready(function () {
             success: function () {
                 window.location.reload();
             },
-            error: function (xhr, status, error) {
-                console.error('Error:', error);
-            }
+            error: function () {
+                errorNotification();            }
         });
 
         $modal.addClass('hidden');
@@ -124,8 +123,8 @@ $(document).ready(function () {
             success: function (response) {
                 $deleteButton.closest('tr').remove();
             },
-            error: function (xhr, status, error) {
-                console.error('Error:', error);
+            error: function () {
+                errorNotification();
             }
         });
     });

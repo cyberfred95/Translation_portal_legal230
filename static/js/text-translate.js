@@ -38,8 +38,8 @@ $(document).ready(function () {
                         domainSelect.find('option:not(:disabled):first').prop('selected', true);
                     }
                 },
-                error: function (xhr, status, error) {
-                    console.error("Error fetching domains:", error);
+                error: function () {
+                    errorNotification();
                 }
             });
         }
@@ -74,8 +74,8 @@ $(document).ready(function () {
                 $('#translated-text').val(response.translated_text);
                 $('#expert-revision').removeClass('hidden');
             },
-            error: function (xhr, status, error) {
-                console.error('Translation error:', error);
+            error: function () {
+                errorNotification();
             }
         });
     });
@@ -99,8 +99,8 @@ $(document).ready(function () {
             success: function () {
                 $('#expert-revision').addClass('hidden');
             },
-            error: function (xhr, status, error) {
-                console.error('Expert revision error:', error);
+            error: function () {
+                errorNotification();
             }
         });
     });
@@ -151,8 +151,8 @@ $(document).ready(function () {
 
                 $select.val(detectedLanguage).trigger('change');
             },
-            error: function (xhr, status, error) {
-                console.error('Expert revision error:', error);
+            error: function () {
+                errorNotification();
             }
         });
     });
