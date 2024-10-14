@@ -49,10 +49,22 @@ def text_translation(request):
     return response.json()
 
 
+def form_glossary_object(request) -> Optional[dict]:
+    glossary = Glossary.objects.get(id=request.POST.get('glossary'))
+    if glossary:
+        return {
+            "file": glossary.file,
+            "is_adaptive": True,
+        }
+
+    return
+
+
 def file_translate(request):
     data = {
         "user_custom_mt_token": request.user.uuid,
         **get_translate_data(request),
+        "glossary": form_glossary_object(request)
     }
     projects = []
     files = request.FILES.getlist('document[]', [])
