@@ -52,20 +52,21 @@ def text_translation(request):
 
 def form_glossary_object(request) -> Optional[dict]:
     glossary = Glossary.objects.get(id=request.POST.get('glossary'))
-
-    value = {}
-    with open(glossary.file, mode='r', encoding='utf-8') as file:
-        csv_reader = csv.reader(file)
-        for row in csv_reader:
-             if len(row) >= 2:
-                value[row[0]] = row[1]
-
     if glossary:
-        return {
-            "file_name": glossary.file.name,
-            "value": value,
-            "adaptive": True,
-        }
+
+
+        value = {}
+        with open(glossary.file, mode='r', encoding='utf-8') as file:
+            csv_reader = csv.reader(file)
+            for row in csv_reader:
+                 if len(row) >= 2:
+                    value[row[0]] = row[1]
+
+            return {
+                "file_name": glossary.file.name,
+                "value": value,
+                "adaptive": True,
+            }
 
     return
 
