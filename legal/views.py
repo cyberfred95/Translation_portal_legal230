@@ -25,7 +25,8 @@ from preferences import preferences
 from stats.calculator import StatsProcessor
 import langdetect
 from .tasks import send_statistic_request
-
+from glossaries.models import Glossary
+from typing import Optional
 
 PAGINATION_PAGE_SIZE = 20
 
@@ -41,7 +42,7 @@ def text_translation(request):
         "token": api_key})
     send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('domain_name'))
     send_statistic_request(
-        api_key, response.json().get('translated_text'),
+        api_key, [text],
         request.user.uuid,
         **get_translate_data(request)
     )
