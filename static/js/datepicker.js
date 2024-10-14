@@ -71,7 +71,7 @@ $(document).ready(function () {
             calendarHTML += `
                 <div>
                     <div class="text-left mb-2">
-                        <span class="text-4 font-semibold text-gray-750">${firstDay.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+                        <span class="text-4 font-semibold text-gray-575">${firstDay.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
                     </div>
                     <div class="grid grid-cols-7">
             `;
@@ -98,9 +98,9 @@ $(document).ready(function () {
                     calendarHTML += `
     <div class="h-10 relative flex items-center justify-center cursor-pointer bg-white overflow-hidden"
          data-date="${date.toISOString()}">
-        <div class="absolute inset-x-0 top-1/2 transform -translate-y-1/2 h-3/4 ${isStartDate ? 'w-1/2 right-0 translate-x-full' : ''} ${isEndDate ? 'w-1/2 left-0' : ''} ${isInRange ? 'bg-green-200' : ''}"></div>
-        ${isRangeEnd ? `<div class="absolute inset-0 bg-green-380 rounded-4"></div>` : ''}
-        <span class="z-10 relative px-2 py-1 rounded-4 ${isInRange && !isRangeEnd ? 'text-green-380' : ''} 
+        <div class="absolute inset-x-0 top-1/2 transform -translate-y-1/2 h-3/4 ${isStartDate ? 'w-1/2 right-0 translate-x-full' : ''} ${isEndDate ? 'w-1/2 left-0' : ''} ${isInRange ? 'bg-green-150' : ''}"></div>
+        ${isRangeEnd ? `<div class="absolute inset-0 bg-green-350 rounded-4"></div>` : ''}
+        <span class="z-10 relative px-2 py-1 rounded-4 ${isInRange && !isRangeEnd ? 'text-green-350' : ''} 
                      ${isRangeEnd ? '!text-white' : ''} text-4">
             ${dayCount}
         </span>

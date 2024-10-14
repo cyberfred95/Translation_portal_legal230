@@ -7,9 +7,9 @@ $(document).ready(function () {
     function showTab(tabId) {
         $('.tab-content').hide();
         $(`#${tabId}-content`).show();
-        $('button.tab').removeClass('bg-gray-800 text-white border-gray-800 hover:bg-gray-800 hover:text-white hover:border-gray-800');
+        $('button.tab').removeClass('bg-gray-600 text-white border-gray-600 hover:bg-gray-600 hover:text-white hover:border-gray-600');
         $('#expert-revision').addClass('hidden');
-        $(`#${tabId}`).addClass('bg-gray-800 text-white border-gray-800 hover:bg-gray-800 hover:text-white hover:border-gray-800');
+        $(`#${tabId}`).addClass('bg-gray-600 text-white border-gray-600 hover:bg-gray-600 hover:text-white hover:border-gray-600');
     }
 
     function setHash(tab) {

@@ -200,7 +200,7 @@ $(document).ready(function () {
 
                 const itemsStr = `${categoryLabel}: ${checkedCheckboxes[category].join(", ")}`;
 
-                const labelElement = $('<span class="bg-gray-160 rounded-2.5 px-2 py-1.5 text-3.25 whitespace-nowrap mr-2.5 flex items-center"></span>')
+                const labelElement = $('<span class="bg-gray-100 rounded-2.5 px-2 py-1.5 text-3.25 whitespace-nowrap mr-2.5 flex items-center"></span>')
                     .text(itemsStr);
 
                 selectedItemsLabel.append(labelElement);

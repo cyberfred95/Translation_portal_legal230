@@ -26,7 +26,7 @@ $(document).ready(function () {
         var $option = $(
             '<div class="flex flex-col gap-1.5 group">' +
             '<div class="font-medium text-4 group-hover:font-semibold">' + splitText[0] + '</div>' +
-            '<div class="font-normal text-3.5 text-gray-590 group-hover:font-medium">' + splitText[1] + '</div>' +
+            '<div class="font-normal text-3.5 text-gray-425 group-hover:font-medium">' + splitText[1] + '</div>' +
             '</div>'
         );
         return $option;
@@ -61,8 +61,8 @@ $(document).ready(function () {
                 $('#translated-text').val(response.result);
                 $('#expert-revision').removeClass('hidden');
             },
-            error: function (xhr, status, error) {
-                console.error('Translation error:', error);
+            error: function () {
+                errorNotification();
             }
         });
     });
