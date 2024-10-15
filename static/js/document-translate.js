@@ -693,7 +693,7 @@ $(document).ready(function () {
         glossaries.forEach(function (glossary) {
             const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-175 text-gray-375 rounded-md hover:bg-green-500 hover:text-white transition duration-300 ease-in-out">${glossary.name}</button>`);
             $item.click(function () {
-                if (selectedGlossary === glossary.name) {
+                if (selectedGlossary === glossary.id) {
                     $(this).removeClass('bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
                     selectedGlossary = '';
                     $('.terminology-step').text('').removeClass('hidden');
@@ -705,7 +705,7 @@ $(document).ready(function () {
                 } else {
                     $(".glossary-item").removeClass('bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
                     $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-green-500 text-white');
-                    selectedGlossary = glossary.name;
+                    selectedGlossary = glossary.id;
                     $('.terminology-step').text(selectedGlossary).removeClass('hidden');
 
                     if (selectedGlossaryType === 'my-glossary') {
@@ -822,14 +822,14 @@ $(document).ready(function () {
                 const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-175 text-gray-375 rounded-md hover:bg-green-500 hover:text-white">${response.name}</button>`);
 
                 $item.click(function () {
-                    if (selectedGlossary === response.name) {
+                    if (selectedGlossary === response.id) {
                         $(this).removeClass('bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
                         selectedGlossary = '';
                         $('.terminology-step').text('').removeClass('hidden');
                     } else {
                         $(".glossary-item").removeClass('bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
                         $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-green-500 text-white');
-                        selectedGlossary = response.name;
+                        selectedGlossary = response.id;
                         $('.terminology-step').text(selectedGlossary).removeClass('hidden');
 
                     }
@@ -852,7 +852,9 @@ $(document).ready(function () {
         selectedFiles.forEach((file) => {
             formData.append(`document[]`, file);
         });
+
         formData.append('domain_name', selectedSubDomain);
+        formData.append('glossary', selectedGlossary);
         formData.append('source_language', sourceLanguage);
         formData.append('target_language', targetLanguage);
         formData.append('action', 'file_translate');
