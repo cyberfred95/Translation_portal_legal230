@@ -27,6 +27,7 @@ import langdetect
 from .tasks import send_statistic_request
 from glossaries.models import Glossary
 from typing import Optional
+
 import csv
 
 PAGINATION_PAGE_SIZE = 20
@@ -51,25 +52,27 @@ def text_translation(request):
 
 
 def form_glossary_object(request) -> Optional[dict]:
-    glossary = Glossary.objects.get(id=request.POST.get('glossary'))
-    if glossary:
+    try:
+        glossary = Glossary.objects.get(id=request.POST.get('glossary'))
+        if glossary:
 
 
-        value = {}
-        with open(glossary.file, mode='r', encoding='utf-8') as file:
-            csv_reader = csv.reader(file)
-            for row in csv_reader:
-                 if len(row) >= 2:
-                    value[row[0]] = row[1]
+            value = {}
+            with glossary.file.open(mode='r') as file:
+                csv_reader = csv.reader(file)
+                for row in csv_reader:
+                     if len(row) >= 2:
+                        value[row[0]] = row[1]
 
-            return {
-                "file_name": glossary.file.name,
-                "value": value,
-                "adaptive": True,
-            }
-
-    return
-
+                return {
+                    "file_name": glossary.file.name,
+                    "value": value,
+                    "adaptive": True,
+                }
+    except Glossary.DoesNotExist:
+        return
+    except ValueError:
+        return
 
 def file_translate(request):
     data = {
