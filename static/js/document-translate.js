@@ -613,6 +613,7 @@ $(document).ready(function () {
     $(".step-4 .none").click(function () {
         selectGlossaryType('none');
         $('.terminology-step').text('none').removeClass('hidden');
+        selectedGlossary = 'none';
 
         clearGlossaryList();
     });
@@ -648,7 +649,8 @@ $(document).ready(function () {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': getCookie('csrftoken'),
             },
-            success: function () {
+            success: function (response) {
+                selectedGlossary = response?.id;
                 clearGlossaryList();
             },
             error: function () {

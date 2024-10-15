@@ -28,6 +28,8 @@ from .tasks import send_statistic_request
 from glossaries.models import Glossary
 from typing import Optional
 
+import csv
+
 PAGINATION_PAGE_SIZE = 20
 
 
@@ -49,10 +51,34 @@ def text_translation(request):
     return response.json()
 
 
+def form_glossary_object(request) -> Optional[dict]:
+    try:
+        glossary = Glossary.objects.get(id=request.POST.get('glossary'))
+        if glossary:
+
+            value = {}
+            with glossary.file.open(mode='r') as file:
+                csv_reader = csv.reader(file)
+                for row in csv_reader:
+                    if len(row) >= 2:
+                        value[row[0]] = row[1]
+
+                return {
+                    "file_name": glossary.file.name,
+                    "value": value,
+                    "adaptive": True,
+                }
+    except Glossary.DoesNotExist:
+        return
+    except ValueError:
+        return
+
+
 def file_translate(request):
     data = {
         "user_custom_mt_token": request.user.uuid,
         **get_translate_data(request),
+        "glossary": form_glossary_object(request)
     }
     projects = []
     files = request.FILES.getlist('document[]', [])
