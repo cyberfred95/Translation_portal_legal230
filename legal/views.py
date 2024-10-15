@@ -56,12 +56,11 @@ def form_glossary_object(request) -> Optional[dict]:
         glossary = Glossary.objects.get(id=request.POST.get('glossary'))
         if glossary:
 
-
             value = {}
             with glossary.file.open(mode='r') as file:
                 csv_reader = csv.reader(file)
                 for row in csv_reader:
-                     if len(row) >= 2:
+                    if len(row) >= 2:
                         value[row[0]] = row[1]
 
                 return {
@@ -73,6 +72,7 @@ def form_glossary_object(request) -> Optional[dict]:
         return
     except ValueError:
         return
+
 
 def file_translate(request):
     data = {
