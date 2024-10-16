@@ -1,3 +1,4 @@
+import json
 import os
 import time
 from datetime import datetime
@@ -66,19 +67,20 @@ def form_glossary_object(request) -> Optional[dict]:
                 return {
                     "file_name": glossary.file.name,
                     "value": value,
-                    "adaptive": True,
+                    "adaptive": False,
                 }
     except Glossary.DoesNotExist:
-        return
+        return {}
     except ValueError:
-        return
+        return {}
 
 
 def file_translate(request):
+    print(form_glossary_object(request))
     data = {
         "user_custom_mt_token": request.user.uuid,
         **get_translate_data(request),
-        "glossary": form_glossary_object(request)
+        "glossary": json.dumps(form_glossary_object(request))
     }
     projects = []
     files = request.FILES.getlist('document[]', [])
