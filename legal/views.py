@@ -57,17 +57,19 @@ def form_glossary_object(request) -> Optional[dict]:
         glossary = Glossary.objects.get(id=request.POST.get('glossary'))
         if glossary:
 
-            value = {}
+            value = []
             with glossary.file.open(mode='r') as file:
                 csv_reader = csv.reader(file)
+                next(csv_reader, None)
+
                 for row in csv_reader:
                     if len(row) >= 2:
-                        value[row[0]] = row[1]
+                        value.append(f"{row[0]}={row[1]}")
 
                 return {
                     "file_name": glossary.file.name,
                     "value": value,
-                    "adaptive": False,
+                    "adaptive": True,
                 }
     except Glossary.DoesNotExist:
         return {}
@@ -307,6 +309,7 @@ class LanguageDetectView(APIView):
                     "abbreviation": language.upper()
                 }
             )
+            print(result)
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
 
 
