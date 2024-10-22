@@ -78,7 +78,6 @@ def form_glossary_object(request) -> Optional[dict]:
 
 
 def file_translate(request):
-    print(form_glossary_object(request))
     data = {
         "user_custom_mt_token": request.user.uuid,
         **get_translate_data(request),
@@ -91,7 +90,9 @@ def file_translate(request):
             preferences.MainSettings.CLOUDSTORAGE_API_URL,
             data=data,
             headers={
-                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
+                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key,
+                "X-API-Key": preferences.StatisticSettings.API_KEY
+            },
             files={
                 'source_file': file
             }
