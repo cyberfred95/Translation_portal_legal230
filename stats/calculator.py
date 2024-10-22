@@ -91,7 +91,7 @@ class StatsProcessor:
             preferences.StatisticSettings.URL + "add_writing_statistic/",
             headers={
                 'token': preferences.StatisticSettings.API_KEY,
-                'X-API-Key': preferences.MainSettings.api_key,
+                'X-API-KEY': self._api_key,
             },
             data={
                 "messages": texts,
