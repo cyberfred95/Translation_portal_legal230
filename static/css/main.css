@@ -82,13 +82,13 @@
     background-repeat: no-repeat;
     background-position: 10px center;
     padding-left: 35px;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 400;
 }
 
 .select2-search--dropdown .select2-search__field::placeholder {
     color: #9EAAB3;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 400;
 }
 
@@ -125,7 +125,7 @@
 .select2-results__option {
     color: #0D2B40;
     font-weight: 400;
-    font-size: 14px;
+    font-size: 16px;
     padding: 8px 12px;
     border-top: 1px solid #E4E8EA;
     margin-right: 20px;
@@ -165,7 +165,7 @@
 }
 
 .select2-container--default.gray .select2-selection--single .select2-selection__rendered {
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .select2-container.gray .select2-selection {
@@ -423,7 +423,7 @@ textarea:focus {
 #translated-text {
     resize: none;
     box-sizing: border-box;
-    min-height: 200px;
+    min-height: 400px;
     max-height: 100%;
     overflow: hidden;
 }
