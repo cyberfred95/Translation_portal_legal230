@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load i18n %}
 <header class="flex justify-between items-center bg-gray-50 px-31.25 py-7.5">
     <a href="/" class="w-30 h-7.25">
         <img src="{% static 'images/logo.png' %}" alt="Logo">
@@ -19,7 +19,7 @@
         </div>
         <a href="/accounts/logout/" class="bg-green-400 text-white text-4 hover:bg-gray-550 rounded-md py-2.5 px-6.5 transition duration-300 ease-in-out">
 
-            Logout
+            {% trans 'Logout' %}
         </a>
     </div>
 </header>

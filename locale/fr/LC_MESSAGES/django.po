@@ -18,18 +18,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: legal/settings.py:132 legal/templates/translate.html:102
-msgid "English"
-msgstr "Anglais"
-
-#: legal/settings.py:133 legal/templates/translate.html:105
-msgid "French"
-msgstr "Français"
-
-#: legal/templates/translate.html:34
-msgid "Logout"
-msgstr "Se déconnecter"
-
 #: legal/templates/translate.html:43
 msgid "Translator"
 msgstr "Traduction automatique"
@@ -239,14 +227,6 @@ msgstr "Message envoyé !"
 msgid "Request has been successfully"
 msgstr "Votre demande a été transmise"
 
-#: legal/templates/translate.html:88
-msgid "Writing"
-msgstr "Personnaliser un document"
-
-#: legal/templates/translate.html:102
-msgid "Project history"
-msgstr "Mon historique"
-
 #: legal/templates/project_history:119
 msgid "Username"
 msgstr "Utilisateur"
@@ -294,3 +274,38 @@ msgstr "Accéder à l'historique du projet"
 
 msgid "review"
 msgstr "Une fois l'examen terminé, vous recevrez un fichier mis à jour en pièce jointe par l'intermédiaire de l'adresse électronique utilisée lors de la connexion."
+
+######################### HEADER ###
+
+msgid "English"
+msgstr "Anglais"
+
+msgid "French"
+msgstr "Français"
+
+msgid "Logout"
+msgstr "Déconnexion"
+
+#####################################
+
+######################### SIDEBAR ###
+
+msgid "Translation"
+msgstr "Traduction"
+
+msgid "Glossaries"
+msgstr "Lexiques"
+
+msgid "Project history"
+msgstr "Historique"
+
+msgid "Writing"
+msgstr "Writing"
+
+msgid "Usage"
+msgstr "Consommation"
+
+msgid "Support"
+msgstr "Support"
+
+####################################

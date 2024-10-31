@@ -19,18 +19,6 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Translated-Using: django-rosetta 0.9.7\n"
 
-#: legal/settings.py:132 legal/templates/translate.html:102
-msgid "English"
-msgstr "English"
-
-#: legal/settings.py:133 legal/templates/translate.html:105
-msgid "French"
-msgstr "French"
-
-#: legal/templates/translate.html:34
-msgid "Logout"
-msgstr "Logout"
-
 #: legal/templates/translate.html:43
 msgid "Translator"
 msgstr "Translator"
@@ -239,14 +227,6 @@ msgstr "Success"
 msgid "Request has been successfully"
 msgstr "Your request has been sent successfully"
 
-#: legal/templates/translate.html:88
-msgid "Writing"
-msgstr "Writing"
-
-#: legal/templates/translate.html:102
-msgid "Project history"
-msgstr "Project history"
-
 #: legal/templates/project_history:119
 msgid "Username"
 msgstr "Username"
@@ -294,3 +274,38 @@ msgstr "Go to project history"
 
 msgid "review"
 msgstr "Once the review is completed, you will receive an updated file in an attachment via email used when logging in."
+
+######################## HEADER ###
+
+msgid "English"
+msgstr "English"
+
+msgid "French"
+msgstr "French"
+
+msgid "Logout"
+msgstr "Logout"
+
+#####################################
+
+######################### SIDEBAR ###
+
+msgid "Translation"
+msgstr "Translation"
+
+msgid "Glossaries"
+msgstr "Glossaries"
+
+msgid "Project history"
+msgstr "Project history"
+
+msgid "Writing"
+msgstr "Writing"
+
+msgid "Usage"
+msgstr "Usage"
+
+msgid "Support"
+msgstr "Support"
+
+####################################
