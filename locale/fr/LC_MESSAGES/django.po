@@ -348,3 +348,17 @@ msgstr "Langues"
 
 msgid "Select target language"
 msgstr "Sélectionnez votre langue cible"
+
+########################################
+
+
+############################# STEP 3 ###
+
+msgid "Domain selection"
+msgstr "Domaine"
+
+msgid "Domains"
+msgstr "Domaines"
+
+msgid "Sub-Domains"
+msgstr "Spécialisation"

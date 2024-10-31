@@ -347,3 +347,15 @@ msgstr "Language"
 
 msgid "Select target language"
 msgstr "Select target language"
+
+
+############################# STEP 3 ###
+
+msgid "Domain selection"
+msgstr "Practice"
+
+msgid "Domains"
+msgstr "Practice"
+
+msgid "Sub-Domains"
+msgstr "Sub-Domains"
