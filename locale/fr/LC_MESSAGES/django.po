@@ -22,13 +22,7 @@ msgstr ""
 msgid "Translator"
 msgstr "Traduction automatique"
 
-#: legal/templates/translate.html:62
-msgid "Text translate"
-msgstr "Traduire un texte"
 
-#: legal/templates/translate.html:71
-msgid "Document translate"
-msgstr "Traduire un document"
 
 #: legal/templates/translate.html:122
 msgid "Start typing"
@@ -41,10 +35,6 @@ msgstr "Le texte est requis."
 #: legal/templates/translate.html:149
 msgid "Translate text btn"
 msgstr "Traduire"
-
-#: legal/templates/translate.html:151 legal/templates/translate.html:233
-msgid "Expert Revision"
-msgstr "Demande de devis pour une post-édition"
 
 #: legal/templates/translate.html:170 legal/templates/translate.html:191
 msgid "Drag and drop"
@@ -101,10 +91,6 @@ msgstr "télécharger un document"
 #: legal/templates/translate.html:329
 msgid "Action"
 msgstr "Personnalisations disponibles"
-
-#: legal/templates/translate.html:336
-msgid "Translate"
-msgstr "Traduire"
 
 #: legal/templates/translate.html:337
 msgid "Translate into different language"
@@ -251,15 +237,6 @@ msgstr "Merci de choisir une personnalisation"
 msgid "Select from the list"
 msgstr "Sélectionner dans la liste "
 
-msgid "Source language"
-msgstr "Langue source"
-
-msgid "Target language"
-msgstr "Langue cible"
-
-msgid "Practice"
-msgstr "Domaine"
-
 msgid "PDF file"
 msgstr "Attention ! La qualité de votre document affecte le résultat de la traduction. Les PDFs scannés ou peu lisibles ne permettent pas un rendu de qualité."
 
@@ -300,7 +277,7 @@ msgid "Project history"
 msgstr "Historique"
 
 msgid "Writing"
-msgstr "Writing"
+msgstr "Personnaliser"
 
 msgid "Usage"
 msgstr "Consommation"
@@ -309,3 +286,37 @@ msgid "Support"
 msgstr "Support"
 
 ####################################
+
+######################## TEXT TRANSLATE ####
+
+msgid "Text translate"
+msgstr "Traduire un texte"
+
+msgid "Document translate"
+msgstr "Traduire un document"
+
+msgid "Detect language"
+msgstr "Langue détectée"
+
+msgid "Source language"
+msgstr "Langue source"
+
+msgid "Target language"
+msgstr "Langue cible"
+
+msgid "Put text here"
+msgstr "Ajoutez votre texte ici"
+
+msgid "Practice"
+msgstr "Domaine"
+
+msgid "Translate"
+msgstr "Traduire"
+
+msgid "Expert Revision"
+msgstr "Relecture expert"
+
+msgid "Expert revision hint text"
+msgstr "En cliquant, vous recevrez par mail un devis pour la relecture de votre document, réalisée par un jurilinguiste expert dans votre domaine de droit."
+
+###########################################

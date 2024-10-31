@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load i18n %}
 <div class="step-5 hidden">
     <span class="text-4 text-gray-600 font-semibold">Review</span>
     <table class="table-auto mt-5 w-full border-separate border-spacing-y-5 translated projects">
@@ -34,7 +34,7 @@
                         data-translated-file="{{ project.translated_file }}"
                         data-id="{{ project.id }}"
                         class="flex gap-2.5 items-center text-gray-600 border border-gray-600 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision">
-                    Expert revision
+                    {% trans 'Expert revision' %}
                     <div class="relative group">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                              xmlns="http://www.w3.org/2000/svg">

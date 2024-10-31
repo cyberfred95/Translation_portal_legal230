@@ -23,14 +23,6 @@ msgstr ""
 msgid "Translator"
 msgstr "Translator"
 
-#: legal/templates/translate.html:62
-msgid "Text translate"
-msgstr "Text translate"
-
-#: legal/templates/translate.html:71
-msgid "Document translate"
-msgstr "Document translate"
-
 #: legal/templates/translate.html:122
 msgid "Start typing"
 msgstr "Start typing"
@@ -43,9 +35,7 @@ msgstr "Text is required."
 msgid "Translate text btn"
 msgstr "Translate"
 
-#: legal/templates/translate.html:151 legal/templates/translate.html:233
-msgid "Expert Revision"
-msgstr "Expert Revision"
+
 
 #: legal/templates/translate.html:170 legal/templates/translate.html:191
 msgid "Drag and drop"
@@ -102,10 +92,6 @@ msgstr "Upload file"
 #: legal/templates/translate.html:329
 msgid "Action"
 msgstr "Action"
-
-#: legal/templates/translate.html:336
-msgid "Translate"
-msgstr "Translate"
 
 #: legal/templates/translate.html:337
 msgid "Translate into different language"
@@ -251,15 +237,6 @@ msgstr "Please choose an action."
 msgid "Select from the list"
 msgstr "Select from the list"
 
-msgid "Source language"
-msgstr "Source language"
-
-msgid "Target language"
-msgstr "Target language"
-
-msgid "Practice"
-msgstr "Practice"
-
 msgid "PDF file"
 msgstr "Important! The quality of your document will have an impact on translation. Scanned or poorly legible PDFs cannot be processed to a high standard."
 
@@ -300,7 +277,7 @@ msgid "Project history"
 msgstr "Project history"
 
 msgid "Writing"
-msgstr "Writing"
+msgstr "Customization"
 
 msgid "Usage"
 msgstr "Usage"
@@ -309,3 +286,38 @@ msgid "Support"
 msgstr "Support"
 
 ####################################
+
+
+######################## TEXT TRANSLATE ####
+
+msgid "Text translate"
+msgstr "Text translate"
+
+msgid "Document translate"
+msgstr "Document translate"
+
+msgid "Detect language"
+msgstr "Detect language"
+
+msgid "Source language"
+msgstr "Source language"
+
+msgid "Target language"
+msgstr "Target language"
+
+msgid "Put text here"
+msgstr "Add your text here"
+
+msgid "Practice"
+msgstr "Practice"
+
+msgid "Translate"
+msgstr "Translate"
+
+msgid "Expert Revision"
+msgstr "Human revision"
+
+msgid "Expert revision hint text"
+msgstr "When clicking, you will receive a quote by mail for the proofreading of your document, undertaken by a legal translator."
+
+###########################################
