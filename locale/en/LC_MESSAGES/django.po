@@ -167,10 +167,6 @@ msgstr "2st person"
 msgid "3nd person"
 msgstr "3st person"
 
-#: legal/templates/translate.html:409
-msgid "Download"
-msgstr "Download"
-
 #: legal/templates/translate.html:411
 msgid "Process"
 msgstr "Process"
@@ -359,3 +355,47 @@ msgstr "Practice"
 
 msgid "Sub-Domains"
 msgstr "Sub-Domains"
+
+########################################
+
+######################## STEP 4 ########
+
+msgid "Terminology"
+msgstr "Glossaries"
+
+msgid "Default"
+msgstr "Glossaries"
+
+msgid "My glossaries"
+msgstr "My glossaries"
+
+msgid "Add glossary"
+msgstr "Add glossary"
+
+msgid "No glossary"
+msgstr "No glossary"
+
+msgid "Review"
+msgstr "Translation"
+
+#######################################
+
+
+############################ STEP 5 ###
+
+msgid "New translation"
+msgstr "New translation"
+
+msgid "You can leave the page and see your translation progress on the ‘Project history’ page"
+msgstr "You can leave the page and see your translation progress on the ‘Project history’ page"
+
+msgid "Revision"
+msgstr "Human revision"
+
+msgid "Download"
+msgstr "Download"
+
+msgid "Click the button to see options for improving the quality of the translated file."
+msgstr "Click the button to see options for improving the quality of the translated file."
+
+#######################################

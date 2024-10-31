@@ -52,7 +52,7 @@
                         <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
                     </svg>
                     <div class="flex flex-col gap-0.25 mt-2">
-                        <span class="text-3.25 text-green-300">Terminology</span>
+                        <span class="text-3.25 text-green-300">{% trans 'Terminology' %}</span>
                         <span class="w-25 text-2.5 text-gray-400 terminology-step truncate"></span>
                     </div>
                 </div>
@@ -63,7 +63,7 @@
                         <rect width="10" height="10" rx="5" fill="currentColor"/>
                         <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
                     </svg>
-                    <span class="text-xs mt-2 text-green-300">Review</span>
+                    <span class="text-xs mt-2 text-green-300">{% trans 'Review' %}</span>
                 </div>
             </div>
         </div>
@@ -111,9 +111,9 @@
             <button type="button"
                     id="restart"
                     class="hidden text-3.5 flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-400 text-green-400 hover:text-white border border-green-400 transition-colors duration-300 font-semibold upload-document hidden">
-                New translation
+                {% trans 'New translation' %}
             </button>
-            <span id="restart-text" class="text-3.5 text-gray-475 font-normal">You can leave the page and see your translation progress on the ‘Project history’ page</span>
+            <span id="restart-text" class="text-3.5 text-gray-475 font-normal">{% trans 'You can leave the page and see your translation progress on the ‘Project history’ page' %}</span>
         </div>
         <button type="button"
                 id="next-step"

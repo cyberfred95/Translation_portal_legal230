@@ -1,23 +1,23 @@
 {% load static %}
-
+{% load i18n %}
 <div class="step-4 hidden">
     <div class="flex items-center w-full justify-between">
-        <span class="text-4 text-gray-600 font-semibold">Terminology</span>
-        <button id="openModal" type="button" class="text-3 text-green-500 add-glossary-btn hidden">+ Add glossary
+        <span class="text-4 text-gray-600 font-semibold">{% trans 'Terminology' %}</span>
+        <button id="openModal" type="button" class="text-3 text-green-500 add-glossary-btn hidden">+ {% trans 'Add glossary' %}
         </button>
     </div>
     <div class="flex items-center mt-5">
         <button type="button"
                 class="glossary-tab default px-5 py-3 text-3.5 bg-gray-100 text-gray-475 rounded-l-md hover:bg-gray-275 hover:text-gray-525 focus:bg-gray-600 focus:text-white">
-            Default
+            {% trans 'Default' %}
         </button>
         <button type="button"
                 class="glossary-tab my-glossary px-5 py-3 text-3.5 bg-gray-100 text-gray-475 hover:bg-gray-275 hover:text-gray-525 focus:bg-gray-600 focus:text-white">
-            My glossaries
+            {% trans 'My glossaries' %}
         </button>
         <button type="button"
                 class="glossary-tab none px-5 py-3 text-3.5 bg-gray-100 text-gray-475 rounded-r-md hover:bg-gray-275 hover:text-gray-525 focus:bg-gray-600 focus:text-white">
-            No glossary
+            {% trans 'No glossary' %}
         </button>
     </div>
     <div class="flex flex-wrap gap-2.5 mt-5 glossary-list"></div>
@@ -34,7 +34,7 @@
             </div>
 
             <div class="p-12.5 flex flex-col items-center gap-7.5">
-                <div class="text-5">Add Glossary</div>
+                <div class="text-5">{% trans 'Add glossary' %}</div>
                 <div class="glossary-container bg-gray-25 w-full py-5 px-46.75 rounded-md">
                     <div id="uploadButtons" class="flex flex-col gap-2.5">
                         <button type="button" id="uploadButton"
