@@ -118,8 +118,6 @@ class GetDefaultGlossaryView(APIView):
         glossary = Glossary.objects.filter(
             source_language__abbreviation=request.data.get('source_language').upper(),
             target_language__abbreviation=request.data.get('target_language').upper(),
-            user__isnull=True,
-            group__isnull=True,
         ).all()
         if request.LANGUAGE_CODE == 'fr':
             glossary = glossary.filter(domain__french_name=request.data.get('domain_name'))
