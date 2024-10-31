@@ -36,14 +36,6 @@ msgstr "Le texte est requis."
 msgid "Translate text btn"
 msgstr "Traduire"
 
-#: legal/templates/translate.html:170 legal/templates/translate.html:191
-msgid "Drag and drop"
-msgstr "Glisser déposer"
-
-#: legal/templates/translate.html:172 legal/templates/translate.html:193
-msgid "Supported formats"
-msgstr "Formats pris en charge"
-
 #: legal/templates/translate.html:177
 msgid "Add file"
 msgstr "Ajouter un document"
@@ -287,7 +279,7 @@ msgstr "Support"
 
 ####################################
 
-######################## TEXT TRANSLATE ####
+########################################## TEXT TRANSLATE ####################################################
 
 msgid "Text translate"
 msgstr "Traduire un texte"
@@ -320,3 +312,31 @@ msgid "Expert revision hint text"
 msgstr "En cliquant, vous recevrez par mail un devis pour la relecture de votre document, réalisée par un jurilinguiste expert dans votre domaine de droit."
 
 ###########################################
+
+
+################################################## DOCUMENT TRANSLATE #####################################################
+
+msgid "Following"
+msgstr "Next"
+
+msgid "Previous"
+msgstr "Précédent"
+
+############################# STEP 1 ####
+
+msgid "Drag and drop"
+msgstr "Déposez votre document ici"
+
+msgid "Supported formats"
+msgstr "Formats pris en charge: .txt, .docx, .xlsx, .pptx, .pdf"
+
+msgid "Choose file"
+msgstr "Chargez votre fichier"
+
+msgid "Upload the document"
+msgstr "Document"
+
+msgid "Documents uploaded"
+msgstr "Import de documents"
+
+#########################################

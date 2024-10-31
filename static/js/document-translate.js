@@ -64,7 +64,7 @@ $(document).ready(function () {
             $("#restart-text").hide();
 
             if (selectedFiles.length > 0) {
-                $("#next-step").show().text("Following");
+                $("#next-step").show().text(language_code === 'en'? "Next":"Suivant");
                 $actionList.css("justify-content", "flex-end");
             } else {
                 $("#next-step").hide();
@@ -78,7 +78,7 @@ $(document).ready(function () {
             $actionList.css("justify-content", "flex-start");
         } else {
             $("#prev-step").show();
-            $("#next-step").show().text("Following");
+            $("#next-step").show().text(language_code === 'en'? "Next":"Suivant");
             $("#restart").hide();
             $("#restart-text").hide();
 
@@ -229,7 +229,7 @@ $(document).ready(function () {
 
         if (filesExist && currentStep === 0) {
             $("#prev-step").hide();
-            $("#next-step").show().text("Following");
+            $("#next-step").show().text(language_code === 'en'? "Next":"Suivant");
             $("#restart").hide();
             $("#restart-text").hide();
 
