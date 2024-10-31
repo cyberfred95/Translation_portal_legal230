@@ -828,12 +828,17 @@ $(document).ready(function () {
                         $(this).removeClass('bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
                         selectedGlossary = '';
                         $('.terminology-step').text('').removeClass('hidden');
+                        $('#next-step').removeClass('border-green-400 text-green-400 ')
+                            .addClass('border-gray-225 text-gray-225 pointer-events-none')
+                            .prop("disabled", true);
                     } else {
                         $(".glossary-item").removeClass('bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
                         $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-green-500 text-white');
                         selectedGlossary = response.id;
                         $('.terminology-step').text(selectedGlossary).removeClass('hidden');
-
+                        $('#next-step').removeClass('border-gray-225 text-gray-225 pointer-events-none')
+                            .addClass('border-green-400 text-green-400')
+                            .prop("disabled", false);
                     }
                 });
 
