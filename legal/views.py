@@ -63,8 +63,7 @@ def form_glossary_object(request) -> Optional[dict]:
                 next(csv_reader, None)
 
                 for row in csv_reader:
-                    if len(row) >= 2:
-                        value.append(f"{row[0]}={row[1]}")
+                    value.append(f"{row[0]}={row[1]}")
 
                 return {
                     "file_name": glossary.file.name,

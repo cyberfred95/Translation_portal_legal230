@@ -5,13 +5,14 @@ from .models import Domain, DomainGroup
 class DomainAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "french_name"
+        "french_name",
+        "domain_group",
     )
     change_list_template = "admin/domains/Domain/change_list.html"
 
 
 class DomainGroupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'french_name')
+    list_display = ('name', 'french_name',)
 
 
 admin.site.register(DomainGroup, DomainGroupAdmin)
