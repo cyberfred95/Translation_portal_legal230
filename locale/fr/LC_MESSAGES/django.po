@@ -340,3 +340,11 @@ msgid "Documents uploaded"
 msgstr "Import de documents"
 
 #########################################
+
+############################# STEP 2 ###
+
+msgid "Language combination"
+msgstr "Langues"
+
+msgid "Select target language"
+msgstr "Sélectionnez votre langue cible"

@@ -349,7 +349,7 @@ $(document).ready(function () {
                     if (defaultValue && $selectedOption.val() === defaultValue) {
                         var newText = text + ' <span class="detected-text font-normal">(detected)</span>';
 
-                        $selectedOption.text(text + ' (detected)');
+                        $selectedOption.text(text + (language_code === 'en' ? ' (detected)' : ' (détecté)'));
                         $select.next('.select2-container').find('.select2-selection__rendered').html(newText);
                     } else {
                         $select.next('.select2-container').find('.select2-selection__rendered').text(text);

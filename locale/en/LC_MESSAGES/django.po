@@ -338,3 +338,12 @@ msgid "Documents uploaded"
 msgstr "Documents upload"
 
 #########################################
+
+
+############################# STEP 2 ###
+
+msgid "Language combination"
+msgstr "Language"
+
+msgid "Select target language"
+msgstr "Select target language"
