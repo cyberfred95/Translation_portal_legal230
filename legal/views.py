@@ -4,7 +4,6 @@ import time
 from datetime import datetime
 from urllib.parse import urlparse, unquote
 
-from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework.response import Response
 from rest_framework import status
 from django.views.generic import TemplateView
