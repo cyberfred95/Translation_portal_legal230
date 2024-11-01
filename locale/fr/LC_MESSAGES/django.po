@@ -205,10 +205,6 @@ msgstr "Votre demande a été transmise"
 msgid "Username"
 msgstr "Utilisateur"
 
-#: legal/templates/project_history:123
-msgid "Created"
-msgstr "Date de création"
-
 #: legal/templates/project_history:122
 msgid "Status"
 msgstr "Statut"
@@ -412,5 +408,24 @@ msgstr "En cliquant, vous recevrez un devis pour la relecture de votre document,
 
 msgid "Expert revision in popup"
 msgstr "Envoyer ma demande"
+
+#########################################
+
+################################################ GLOSSARIES ###############################################
+
+msgid "File name"
+msgstr "Nom du fichier"
+
+msgid "Languages"
+msgstr "Langues"
+
+msgid "Size"
+msgstr "Taille"
+
+msgid "Created"
+msgstr "Date de creation"
+
+msgid "Actions"
+msgstr "Action"
 
 #########################################

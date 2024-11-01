@@ -203,10 +203,6 @@ msgstr "Your request has been sent successfully"
 msgid "Username"
 msgstr "Username"
 
-#: legal/templates/project_history:123
-msgid "Created"
-msgstr "Created"
-
 #: legal/templates/project_history:122
 msgid "Status"
 msgstr "Status"
@@ -410,5 +406,24 @@ msgstr "By choosing the option below, you agree that you are sending a request f
 
 msgid "Expert revision in popup"
 msgstr "Ask for a quote"
+
+#########################################
+
+################################################ GLOSSARIES ###############################################
+
+msgid "File name"
+msgstr "File name"
+
+msgid "Languages"
+msgstr "Languages"
+
+msgid "Size"
+msgstr "Size"
+
+msgid "Created"
+msgstr "Created"
+
+msgid "Actions"
+msgstr "Actions"
 
 #########################################

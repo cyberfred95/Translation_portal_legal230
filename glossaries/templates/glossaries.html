@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 
@@ -14,25 +14,25 @@
             <tr class="border-gray-425">
                 <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
                     <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        File name <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        {% trans 'File name' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                     </div>
                 </th>
                 <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
                     <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        Languages <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        {% trans 'Languages' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                     </div>
                 </th>
                 <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
                     <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        Size <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        {% trans 'Size' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                     </div>
                 </th>
                 <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
                     <div class="flex items-center gap-1 w-auto">
-                        Created <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        {% trans 'Created' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                     </div>
                 </th>
-                <th class="border-b text-4 text-gray-600 font-semibold text-right pb-5">Actions</th>
+                <th class="border-b text-4 text-gray-600 font-semibold text-right pb-5">{% trans 'Actions' %}</th>
             </tr>
             </thead>
             <tbody>
