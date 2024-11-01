@@ -9,23 +9,23 @@ $(document).ready(function () {
                 statusElement.addClass('text-green-500');
                 break;
             case 'Translated':
-                statusElement.text('Translated');
+                statusElement.text(language_code=== 'en'?'Translated': 'Document traduit');
                 statusElement.addClass('bg-green-100 text-green-400');
                 break;
             case 'Sent to post-editing, not accepted yet':
-                statusElement.text('Request for post-editing sent');
+                statusElement.text(language_code=== 'en'?'Request for quote sent': 'Demande de devis envoyée');
                 statusElement.addClass('bg-yellow-100 text-yellow-400');
                 break;
             case 'Sent to post-editing, accepted':
-                statusElement.text('Request for post-editing accepted');
+                statusElement.text(language_code=== 'en'?'Request for quote accepted': 'Demande de devis acceptée');
                 statusElement.addClass('bg-blue-100 text-blue-400');
                 break;
             case 'Post-edited file uploaded':
-                statusElement.text('Post-edited file uploaded');
+                statusElement.text(language_code=== 'en'?'Proofread document uploaded': 'Document relu importé');
                 statusElement.addClass('bg-green-50 text-green-300');
                 break;
             case 'Error':
-                statusElement.text('Error');
+                statusElement.text(language_code=== 'en'?'Error': 'Erreur');
                 statusElement.addClass('bg-red-100 text-red-400');
                 break;
             default:

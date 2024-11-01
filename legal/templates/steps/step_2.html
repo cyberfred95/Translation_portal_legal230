@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load i18n %}
 <div class="step-2 hidden flex justify-between divide-x-0.5 divide-gray-200">
     <div class="md:flex-2 2xl:flex-1 pr-4">
         <div class="flex items-center justify-center flex-col gap-5 detective-language-list"></div>
@@ -14,7 +14,7 @@
                 </svg>
                 <select class="document-target-language" name="target_language" required
                         data-default-value="en">
-                    <option value="" disabled selected>Select target language</option>
+                    <option value="" disabled selected>{% trans 'Select target language' %}</option>
                     {% for translate_language in translate_languages %}
                     <option value="{{ translate_language.abbreviation|lower }}">
                         {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}

@@ -1,8 +1,8 @@
 $(document).ready(function () {
 
-    $(".source-language").attr("data-placeholder","Source language");
-    $(".target-language").attr("data-placeholder","Target language");
-    $(".domain-select").attr("data-placeholder","Domain");
+    $(".source-language").attr("data-placeholder",language_code === 'en'? "Source language":"Langue source");
+    $(".target-language").attr("data-placeholder",language_code === 'en'? "Target language":"Langue cible");
+    $(".domain-select").attr("data-placeholder",language_code === 'en'? "Practice":"Domaine");
 
     $(".source-language").select2();
     $(".target-language").select2();

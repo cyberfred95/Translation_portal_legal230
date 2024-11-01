@@ -4,7 +4,6 @@ import time
 from datetime import datetime
 from urllib.parse import urlparse, unquote
 
-from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework.response import Response
 from rest_framework import status
 from django.views.generic import TemplateView
@@ -77,6 +76,7 @@ def form_glossary_object(request) -> Optional[dict]:
 
 
 def file_translate(request):
+    print(form_glossary_object(request))
     data = {
         "user_custom_mt_token": request.user.uuid,
         **get_translate_data(request),
@@ -295,7 +295,6 @@ class LanguageDetectView(APIView):
         for file in files:
             api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
             text = StatsProcessor(api_key).get_texts(file=file)['texts'][0]['text']
-            print(text)
             tmp_language = langdetect.detect(text)
             language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
                 'abbreviation', flat=True).first()
@@ -309,7 +308,6 @@ class LanguageDetectView(APIView):
                     "abbreviation": language.upper()
                 }
             )
-            print(result)
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
 
 
