@@ -199,17 +199,6 @@ msgstr "Success"
 msgid "Request has been successfully"
 msgstr "Your request has been sent successfully"
 
-#: legal/templates/project_history:119
-msgid "Username"
-msgstr "Username"
-
-#: legal/templates/project_history:122
-msgid "Status"
-msgstr "Status"
-
-msgid "Translated"
-msgstr "Translated"
-
 msgid "Error"
 msgstr "Error"
 
@@ -414,8 +403,6 @@ msgstr "Ask for a quote"
 msgid "File name"
 msgstr "File name"
 
-msgid "Languages"
-msgstr "Languages"
 
 msgid "Size"
 msgstr "Size"
@@ -427,3 +414,35 @@ msgid "Actions"
 msgstr "Actions"
 
 #########################################
+
+################################################# PROJECT HISTORY #################################################
+
+msgid "Username"
+msgstr "Username"
+
+msgid "Project"
+msgstr "Document"
+
+msgid "Languages"
+msgstr "Languages"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Revision project history"
+msgstr "Revision"
+
+msgid "Expert revision project history"
+msgstr "Expert revision"
+
+msgid "Translated"
+msgstr "Translated"
+
+msgid "Post-edited"
+msgstr "Proofread"
+
+msgid "Prev"
+msgstr "Prev"
+
+msgid "Next"
+msgstr "Next"
