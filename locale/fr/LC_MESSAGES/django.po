@@ -448,3 +448,32 @@ msgstr "Prev"
 msgid "Next"
 msgstr "Next"
 
+###########################################
+
+############################################ USAGE #############################################
+
+msgid "Filter"
+msgstr "Filtre"
+
+msgid "User"
+msgstr "Utilisateur"
+
+msgid "Group"
+msgstr "Groupe"
+
+msgid "Characters"
+msgstr "Caractères"
+
+msgid "Tokens"
+msgstr "Tokens"
+
+msgid "Date"
+msgstr "Date"
+
+msgid "Clear"
+msgstr "Effacer"
+
+msgid "Apply"
+msgstr "Appliquer"
+
+################################################################################################

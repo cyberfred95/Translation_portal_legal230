@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load i18n %}
 {% load static %}
 
 {% block content %}
@@ -13,7 +13,7 @@
                     <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-1">
                         <path d="M13.4798 0.5H0.574219C0.272156 0.5 0.0273438 0.744812 0.0273438 1.04688C0.0273438 2.56979 0.680176 4.02371 1.81847 5.03554L4.2135 7.16429C4.62879 7.53343 4.86698 8.06386 4.86698 8.6196V13.9525C4.86698 14.3883 5.35404 14.6495 5.71709 14.4074L8.94355 12.2565C9.09565 12.1551 9.18708 11.9844 9.18708 11.8015V8.6196C9.18708 8.06386 9.42527 7.53343 9.84055 7.16429L12.2355 5.03554C13.3738 4.02371 14.0266 2.56979 14.0266 1.04688C14.0266 0.744812 13.7818 0.5 13.4798 0.5ZM11.5088 4.218L9.11391 6.34686C8.46535 6.92343 8.09333 7.75176 8.09333 8.61949V11.5089L5.96062 12.9306V8.6196C5.96062 7.75176 5.58859 6.92343 4.94003 6.34686L2.54511 4.21811C1.77756 3.53569 1.28761 2.60066 1.15645 1.59364H12.8975C12.7663 2.60066 12.2765 3.53569 11.5088 4.218Z" fill="#0D2B40" />
                     </svg>
-                    <span id="filter-button" class="flex items-center text-gray-575 gap-1.5">Filter</span>
+                    <span id="filter-button" class="flex items-center text-gray-575 gap-1.5">{% trans 'Filter' %}</span>
                 </button>
 
                 <!-- Dropdown -->
@@ -22,7 +22,7 @@
                                 {% if request.user.is_staff or is_group_admin %}
                             <li class="dropdown-item">
                                 <button id="doubleDropdownButton" data-dropdown-toggle="doubleDropdown" data-dropdown-placement="right-start" type="button"
-                                        class="flex items-center justify-between w-full px-4 py-2 text-black">User
+                                        class="flex items-center justify-between w-full px-4 py-2 text-black">{% trans 'User' %}
                                     <svg id="dropdownArrow" class="w-2.5 h-1.5 text-black origin-center transition duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                                     </svg>
@@ -54,7 +54,7 @@
                             <li class="dropdown-item">
                                 {% if request.user.is_staff %}
                                 <button id="doubleDropdownButtonn" data-dropdown-toggle="doubleDropdown" data-dropdown-placement="right-start" type="button"
-                                        class="flex items-center justify-between w-full px-4 py-2 text-black">Group
+                                        class="flex items-center justify-between w-full px-4 py-2 text-black">{% trans 'Group' %}
                                     <svg id="dropdownArroww" class="w-2.5 h-1.5 text-black origin-center transition duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                                     </svg>
@@ -87,7 +87,7 @@
                             </li>
                             <li class="dropdown-item">
                                 <button id="doubleDropdownButtonnn" data-dropdown-toggle="doubleDropdown" data-dropdown-placement="right-start" type="button"
-                                        class="flex items-center justify-between w-full px-4 py-2 text-black">File name
+                                        class="flex items-center justify-between w-full px-4 py-2 text-black">{% trans 'File name' %}
                                     <svg id="dropdownArrowww" class="w-2.5 h-1.5 text-black origin-center transition duration-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                                     </svg>
@@ -117,8 +117,8 @@
                                 </div>
                             </li>
                             <div class="flex space-x-2 pt-3">
-                                <button id="clear-button" class="h-9.25 w-24.75 px-5 py-2 bg-white border border-green-450 rounded-md text-green-450 ml-4">Clear</button>
-                                <button id="apply-button" class="h-9.25 w-24.75 bg-green-450 px-4 py-2 rounded-md text-white">Apply</button>
+                                <button id="clear-button" class="h-9.25 w-24.75 px-5 py-2 bg-white border border-green-450 rounded-md text-green-450 ml-4">{% trans 'Clear' %}</button>
+                                <button id="apply-button" class="h-9.25 w-24.75 bg-green-450 px-4 py-2 rounded-md text-white">{% trans 'Apply' %}</button>
                             </div>
                         </ul>
                 </div>
@@ -229,35 +229,35 @@
                     {% if request.user.is_staff or is_group_admin %}
                     <th class="text-4 text-gray-600 font-semibold text-left border-b pb-5 user-row">
                         <div class="flex items-center gap-1 w-auto cursor-pointer">
-                            User <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                            {% trans 'User' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                         </div>
                     </th>
                     {% if request.user.is_staff %}
                     <th class="text-4 text-gray-600 font-semibold text-left border-b pb-5">
                         <div class="flex items-center gap-1 w-auto cursor-pointer">
-                            Group <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                            {% trans 'Group' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                         </div>
                     </th>
                     {% endif %}
                     {% endif %}
                     <th class="text-4 text-gray-600 font-semibold text-left border-b pb-5">
                         <div class="flex items-center gap-1 w-auto cursor-pointer">
-                            File name <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                            {% trans 'File name' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                         </div>
                     </th>
                     <th class="text-4 text-gray-600 font-semibold text-left border-b pb-5">
                         <div class="flex items-center gap-1 w-auto cursor-pointer">
-                            Characters <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                            {% trans 'Characters' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                         </div>
                     </th>
                     <th class="text-4 text-gray-600 font-semibold text-left border-b pb-5">
                         <div class="flex items-center gap-1 w-auto cursor-pointer">
-                            Tokens <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                            {% trans 'Tokens' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                         </div>
                     </th>
                     <th class="text-4 text-gray-600 font-semibold text-left w-1 border-b pb-5">
                         <div class="flex items-center gap-1 w-auto cursor-pointer">
-                            Date <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                            {% trans 'Date' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                         </div>
                     </th>
                 </tr>
@@ -367,5 +367,8 @@
 <script src="{% static 'js/usage-history.js' %}"></script>
 <script src="{% static 'js/pagination.js' %}"></script>
 <script src="{% static 'js/datepicker.js' %}"></script>
+<script>
+    var language_code = "{{ request.LANGUAGE_CODE }}"
+</script>    
 
 {% endblock extra_js %}

@@ -187,11 +187,11 @@ $(document).ready(function () {
             if (checkedCheckboxes[category].length > 0) {
                 let categoryLabel;
                 if (category === 'file_name') {
-                    categoryLabel = 'File name';
+                    categoryLabel = language_code === 'en'?'File name':'Nom du fichier';
                 } else if (category === 'group') {
-                    categoryLabel = 'Groups';
+                    categoryLabel = language_code === 'en'?'Groups':'Groupes';
                 } else if (category === 'user') {
-                    categoryLabel = 'Users';
+                    categoryLabel = language_code === 'en'?'Users': 'Utilisateurs';
                 }
 
                 checkedCheckboxes[category].forEach(item => {
@@ -241,11 +241,11 @@ $(document).ready(function () {
 
         if (count > 0) {
             $('#selected-items').removeClass('hidden');
-            filterButton.html('Filter <span class="filter-count bg-white text-black text-3 rounded-full flex items-center justify-center w-5 h-5">' + count + '</span>');
+            filterButton.html(language_code === 'en'? 'Filter':'Filtre' +' <span class="filter-count bg-white text-black text-3 rounded-full flex items-center justify-center w-5 h-5">' + count + '</span>');
 
             dropdownButton.css('width', 'auto');
         } else {
-            filterButton.text('Filter');
+            filterButton.text(language_code === 'en'?'Filter':'Filtre');
 
             dropdownButton.css('width', '64px');
         }
