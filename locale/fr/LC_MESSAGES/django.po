@@ -401,3 +401,16 @@ msgid "Click the button to see options for improving the quality of the translat
 msgstr "Cliquez sur ce bouton pour afficher les options de relecture disponibles."
 
 #######################################
+
+############################ STEP 6 ###
+
+msgid "Quote for revision"
+msgstr "Demande de devis"
+
+msgid "By choosing the options below, you agree that you are sending a request for Quote  of the selected service to Legal230"
+msgstr "En cliquant, vous recevrez un devis pour la relecture de votre document, réalisée par un jurilinguiste expert dans votre domaine de droit."
+
+msgid "Expert revision in popup"
+msgstr "Envoyer ma demande"
+
+#########################################

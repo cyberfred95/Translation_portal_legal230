@@ -399,3 +399,16 @@ msgid "Click the button to see options for improving the quality of the translat
 msgstr "Click the button to see options for improving the quality of the translated file."
 
 #######################################
+
+############################ STEP 6 ###
+
+msgid "Quote for revision"
+msgstr "Request for quote"
+
+msgid "By choosing the options below, you agree that you are sending a request for Quote  of the selected service to Legal230"
+msgstr "By choosing the option below, you agree that you are sending a request for Quote of the selected service to Legal230"
+
+msgid "Expert revision in popup"
+msgstr "Ask for a quote"
+
+#########################################
