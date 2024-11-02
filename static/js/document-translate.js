@@ -394,14 +394,19 @@ $(document).ready(function () {
         $('.document-target-language').select2();
         $('.document-source-language').select2();
 
+        $targetSelect = $(".document-target-language").select2();
+
+        $targetSelect.data('select2').$container.addClass('languages');
+        $targetSelect.data('select2').$dropdown.addClass('languages');
+
         targetLanguageBlock.find('.error-message').remove();
 
         if (currentStep === 1) {
             if (!isConsistent) {
                 $('.document-source-language').select2().each(function () {
                     var $select = $(this);
-                    $select.data('select2').$container.addClass('error');
-                    $select.data('select2').$dropdown.addClass('error');
+                    $select.data('select2').$container.addClass('error languages');
+                    $select.data('select2').$dropdown.addClass('error languages');
                 });
 
                 $('.step-container').addClass('bg-red-150 text-red-200');
@@ -414,6 +419,8 @@ $(document).ready(function () {
             } else {
                 $('.document-source-language').select2().each(function () {
                     var $select = $(this);
+                    $select.data('select2').$container.addClass('languages');
+                    $select.data('select2').$dropdown.addClass('languages');
                     $select.data('select2').$container.removeClass('error');
                     $select.data('select2').$dropdown.removeClass('error');
                 });

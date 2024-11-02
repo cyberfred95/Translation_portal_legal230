@@ -434,3 +434,14 @@ input[type="checkbox"]:checked {
     background-repeat: no-repeat;
     background-size: 10px;
 }
+
+.select2-container.languages .select2-results__options {
+    width: 470px !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    padding: 8px !important;
+}
+
+.select2-container.languages .select2-dropdown {
+    width: 470px !important;
+}

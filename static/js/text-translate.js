@@ -8,10 +8,18 @@ $(document).ready(function () {
     $(".target-language").select2();
     $(".domain-select").select2();
 
-    $select = $(".domain-select").select2();
+    $domainSelect = $(".domain-select").select2();
+    $sourceSelect = $(".source-language").select2();
+    $targetSelect = $(".target-language").select2();
 
-    $select.data('select2').$container.addClass('action gray');
-    $select.data('select2').$dropdown.addClass('action gray');
+    $domainSelect.data('select2').$container.addClass('action gray');
+    $domainSelect.data('select2').$dropdown.addClass('action gray');
+
+    $sourceSelect.data('select2').$container.addClass('languages');
+    $sourceSelect.data('select2').$dropdown.addClass('languages');
+
+    $targetSelect.data('select2').$container.addClass('languages');
+    $targetSelect.data('select2').$dropdown.addClass('languages');
 
     let sourceLanguage, targetLanguage;
 
