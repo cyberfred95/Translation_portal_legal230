@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 
@@ -12,36 +13,36 @@
             <tr class="border-gray-425">
                 <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
                     <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        Username <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        {% trans 'Username' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                     </div>
                 </th>
                 <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
                     <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        Project <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        {% trans 'Project' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                     </div>
                 </th>
                 <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
                     <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        Languages <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        {% trans 'Languages' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                     </div>
                 </th>
                 <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
                     <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        Status <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        {% trans 'Status' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                     </div>
                 </th>
                 <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
                     <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        Revision <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        {% trans 'Revision project history' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                     </div>
                 </th>
                 <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
                     <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        Created <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        {% trans 'Created' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                     </div>
                 </th>
                 <th class="border-b text-4 text-gray-600 font-semibold text-right pb-5">
-                    Actions
+
                 </th>
             </tr>
             </thead>
@@ -87,7 +88,7 @@
                             class="flex gap-2.5 items-center text-gray-600 border border-gray-600 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision"
                             {% if not project.status == 'Translated' %}disabled{% endif %}
                     >
-                    Expert revision
+                    {% trans 'Expert revision project history' %}
                     <div class="relative group">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                              xmlns="http://www.w3.org/2000/svg">
@@ -96,7 +97,7 @@
                         </svg>
                         <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 py-3 px-4.5 bg-gray-600 text-white text-2.75 rounded-md bottom-30 left-1/2 transform -translate-x-1/2 translate-y-full">
                             <span class="text-justify text-wrap block">
-                                Click the button to see options for improving the quality of the translated file.
+                                {% trans 'Click the button to see options for improving the quality of the translated file.' %}
                             </span>
                             <div class="absolute w-3 h-3 bg-gray-600 transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5"></div>
                         </div>
@@ -125,12 +126,12 @@
                                 <button type="button"
                                         class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap"
                                         data-file-url="{{ project.translated_file }}">
-                                    Translated
+                                    {% trans 'Translated' %}
                                 </button>
                                 <button type="button"
                                         class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap"
                                         data-file-url="{{ project.reviewed_file }}">
-                                    Post-edited
+                                    {% trans 'Post-edited' %}
                                 </button>
                             </div>
                             {% endif %}
@@ -199,14 +200,14 @@
             </div>
 
             <div class="p-12.5 flex flex-col items-center gap-7.5">
-                <div class="text-5 font-semibold">Quote for revision</div>
-                <span class="text-center text-3.5">By choosing the options below, you agree that you are sending a request for Quote  of the selected service to Legal230</span>
+                <div class="text-5 font-semibold">{% trans 'Quote for revision' %}</div>
+                <span class="text-center text-3.5">{% trans 'By choosing the options below, you agree that you are sending a request for Quote  of the selected service to Legal230' %}</span>
                 <button
                         type="button"
                         data-translated-file="{{ project.translated_file }}"
                         data-id="{{ project.id }}"
                         class="flex gap-2.5 items-center text-gray-600 border border-gray-600 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision">
-                    Expert revision
+                    {% trans 'Expert revision' %}
                     <div class="relative group">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                              xmlns="http://www.w3.org/2000/svg">
@@ -215,7 +216,7 @@
                         </svg>
                         <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 py-3 px-4.5 bg-gray-600 text-white text-2.75 rounded-md bottom-22 left-1/2 transform -translate-x-1/2 translate-y-full">
                             <span class="text-justify text-pretty">
-                                Post-editing by professional editors
+                                {% trans 'Post-editing by professional editors' %}
                             </span>
                             <div class="absolute w-3 h-3 bg-gray-600 transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5"></div>
                         </div>
@@ -233,13 +234,13 @@
                 <path d="M0.286074 4.78962C0.336297 4.73904 0.3919 4.69635 0.449656 4.65922L4.32557 0.783488C4.70385 0.405564 5.31693 0.405385 5.69539 0.783667C6.07367 1.16177 6.07367 1.77502 5.69539 2.15348L2.35721 5.4913L5.71225 8.8467C6.09071 9.22462 6.09071 9.83805 5.71225 10.2165C5.52302 10.4054 5.27531 10.4999 5.02761 10.4999C4.7799 10.4999 4.53166 10.4054 4.34297 10.2162L0.449656 6.32338C0.3919 6.28625 0.336476 6.24374 0.286074 6.19298C0.0923591 5.99926 -0.000552654 5.74492 0.00375223 5.4913C-0.000731945 5.2375 0.0923591 4.9828 0.286074 4.78962Z"
                       fill="currentColor"/>
             </svg>
-            Prev
+            {% trans 'Prev' %}
         </a>
         <div id="page-numbers" class="flex space-x-3.5 text-3.25 items-end">
             <!-- Page numbers will be inserted here dynamically -->
         </div>
         <a href="#" id="next-page" class="flex items-center gap-2.5 text-3.25 text-gray-600">
-            Next
+            {% trans 'Next' %}
             <svg width="6" height="11" viewBox="0 0 6 11" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M5.71393 4.78962C5.6637 4.73904 5.6081 4.69635 5.55034 4.65922L1.67443 0.783488C1.29615 0.405564 0.683075 0.405385 0.304613 0.783667C-0.0736695 1.16177 -0.0736695 1.77502 0.304613 2.15348L3.64279 5.4913L0.287753 8.8467C-0.0907092 9.22462 -0.0907092 9.83805 0.287753 10.2165C0.476983 10.4054 0.724687 10.4999 0.972392 10.4999C1.2201 10.4999 1.46834 10.4054 1.65703 10.2162L5.55034 6.32338C5.6081 6.28625 5.66352 6.24374 5.71393 6.19298C5.90764 5.99926 6.00055 5.74492 5.99625 5.4913C6.00073 5.2375 5.90764 4.9828 5.71393 4.78962Z"
                       fill="currentColor"/>
@@ -255,6 +256,9 @@
 <script>
     var expert_revision_file_url = "{% url 'expert_revision_file' %}"
     var single_project = "{% url 'single_project' %}"
+</script>
+<script>
+    var language_code = "{{ request.LANGUAGE_CODE }}"
 </script>
 
 {% endblock %}

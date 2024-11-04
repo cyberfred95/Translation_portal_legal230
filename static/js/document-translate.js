@@ -64,7 +64,7 @@ $(document).ready(function () {
             $("#restart-text").hide();
 
             if (selectedFiles.length > 0) {
-                $("#next-step").show().text("Following");
+                $("#next-step").show().text(language_code === 'en'? "Next":"Suivant");
                 $actionList.css("justify-content", "flex-end");
             } else {
                 $("#next-step").hide();
@@ -72,13 +72,13 @@ $(document).ready(function () {
         } else if (currentStep === 4) {
             $("#prev-step").hide();
             $("#next-step").hide();
-            $("#restart").show().text("New translation");
+            $("#restart").show().text(language_code==='en'?"New translation":"Nouveau document");
             $("#restart-text").show();
 
             $actionList.css("justify-content", "flex-start");
         } else {
             $("#prev-step").show();
-            $("#next-step").show().text("Following");
+            $("#next-step").show().text(language_code === 'en'? "Next":"Suivant");
             $("#restart").hide();
             $("#restart-text").hide();
 
@@ -229,7 +229,7 @@ $(document).ready(function () {
 
         if (filesExist && currentStep === 0) {
             $("#prev-step").hide();
-            $("#next-step").show().text("Following");
+            $("#next-step").show().text(language_code === 'en'? "Next":"Suivant");
             $("#restart").hide();
             $("#restart-text").hide();
 
@@ -349,7 +349,7 @@ $(document).ready(function () {
                     if (defaultValue && $selectedOption.val() === defaultValue) {
                         var newText = text + ' <span class="detected-text font-normal">(detected)</span>';
 
-                        $selectedOption.text(text + ' (detected)');
+                        $selectedOption.text(text + (language_code === 'en' ? ' (detected)' : ' (détecté)'));
                         $select.next('.select2-container').find('.select2-selection__rendered').html(newText);
                     } else {
                         $select.next('.select2-container').find('.select2-selection__rendered').text(text);
@@ -394,14 +394,19 @@ $(document).ready(function () {
         $('.document-target-language').select2();
         $('.document-source-language').select2();
 
+        $targetSelect = $(".document-target-language").select2();
+
+        $targetSelect.data('select2').$container.addClass('languages');
+        $targetSelect.data('select2').$dropdown.addClass('languages');
+
         targetLanguageBlock.find('.error-message').remove();
 
         if (currentStep === 1) {
             if (!isConsistent) {
                 $('.document-source-language').select2().each(function () {
                     var $select = $(this);
-                    $select.data('select2').$container.addClass('error');
-                    $select.data('select2').$dropdown.addClass('error');
+                    $select.data('select2').$container.addClass('error languages');
+                    $select.data('select2').$dropdown.addClass('error languages');
                 });
 
                 $('.step-container').addClass('bg-red-150 text-red-200');
@@ -414,6 +419,8 @@ $(document).ready(function () {
             } else {
                 $('.document-source-language').select2().each(function () {
                     var $select = $(this);
+                    $select.data('select2').$container.addClass('languages');
+                    $select.data('select2').$dropdown.addClass('languages');
                     $select.data('select2').$container.removeClass('error');
                     $select.data('select2').$dropdown.removeClass('error');
                 });
@@ -960,7 +967,7 @@ $(document).ready(function () {
                         </clipPath>
                     </defs>
                 </svg>
-                Download
+                  ${language_code==='en' ? 'Download' : 'Télécharger'}
             </button>
         `);
             downloadButton.attr('data-translated-file', project.translated_file);
@@ -979,14 +986,14 @@ $(document).ready(function () {
                 class="flex gap-2.5 items-center text-gray-600 border border-gray-600 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision"
                 ${project.status !== 'Translated' ? 'disabled' : ''}
             >
-                Revision
+                ${language_code==='en'? "Human revision":"Relecture expert"}
                 <div class="relative group">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z" fill="currentColor"/>
                     </svg>
                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 py-3 px-4.5 bg-gray-600 text-white text-2.75 rounded-md bottom-30 left-1/2 transform -translate-x-1/2 translate-y-full">
                         <span class="text-justify text-wrap block">
-                            Click the button to see options for improving the quality of the translated file.
+                                              ${language_code==='en' ? 'Click the button to see options for improving the quality of the translated file.' : "Cliquez sur ce bouton pour afficher les options de relecture disponibles"}
                         </span>
                         <div class="absolute w-3 h-3 bg-gray-600 transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5"></div>
                     </div>

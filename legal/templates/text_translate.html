@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 
 <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-5 w-full h-full flex flex-col items-end">
     <form class="w-full flex flex-col">
@@ -10,9 +11,9 @@
                     <button id="detect-language"
                             type="button"
                             class="text-3.5 flex gap-2.5 items-center px-7.5 py-0.5 rounded-2.5 bg-transparent font-normal hover:bg-gray-600 text-gray-600 hover:text-white border border-gray-600 transition duration-300 ease-in-out">
-                        Detect language
+                        {% trans 'Detect language' %}
                     </button>
-                    <select class="source-language language-select" name="source_language" required>
+                    <select class="source-language" name="source_language" required>
                         <option value=""></option>
                         {% for translate_language in translate_languages %}
                         <option value="{{ translate_language.abbreviation|lower }}">
@@ -29,7 +30,7 @@
                           class="focus:border-transparent focus:ring-0 rounded-0.5 h-50 bg-gray-125 p-5 pr-10 text-gray-600 resize-none w-full placeholder:text-gray-325"
                           type="text"
 
-                          placeholder="Put text here"></textarea>
+                          placeholder="{% trans 'Put text here' %}"></textarea>
                     <svg id="clear" class="absolute top-5 right-5 cursor-pointer" width="14" height="14"
                          viewBox="0 0 14 14"
                          fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -41,7 +42,7 @@
                 </div>
             </div>
             <div class="w-full flex flex-col gap-4">
-                <select class="target-language language-select" name="target_language" required>
+                <select class="target-language" name="target_language" required>
                     <option value=""></option>
                     {% for translate_language in translate_languages %}
                     <option value="{{ translate_language.abbreviation|lower }}">
@@ -97,7 +98,7 @@
             <button type="submit"
                     class="flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-450 text-green-450 hover:text-white border border-green-450 transition-colors duration-300">
 
-                <span class="text-3.5">Translate</span>
+                <span class="text-3.5">{% trans 'Translate' %}</span>
             </button>
         </div>
     </form>

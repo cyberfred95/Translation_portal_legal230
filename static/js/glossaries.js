@@ -8,8 +8,8 @@ $(document).ready(function () {
 
     $('.glossary-language-select').select2().each(function () {
         var $select = $(this);
-        $select.data('select2').$container.addClass('glossary');
-        $select.data('select2').$dropdown.addClass('glossary');
+        $select.data('select2').$container.addClass('glossary languages');
+        $select.data('select2').$dropdown.addClass('glossary languages');
     });
 
     let file

@@ -1,17 +1,25 @@
 $(document).ready(function () {
 
-    $(".source-language").attr("data-placeholder","Source language");
-    $(".target-language").attr("data-placeholder","Target language");
-    $(".domain-select").attr("data-placeholder","Domain");
+    $(".source-language").attr("data-placeholder",language_code === 'en'? "Source language":"Langue source");
+    $(".target-language").attr("data-placeholder",language_code === 'en'? "Target language":"Langue cible");
+    $(".domain-select").attr("data-placeholder",language_code === 'en'? "Practice":"Domaine");
 
     $(".source-language").select2();
     $(".target-language").select2();
     $(".domain-select").select2();
 
-    $select = $(".domain-select").select2();
+    $domainSelect = $(".domain-select").select2();
+    $sourceSelect = $(".source-language").select2();
+    $targetSelect = $(".target-language").select2();
 
-    $select.data('select2').$container.addClass('action gray');
-    $select.data('select2').$dropdown.addClass('action gray');
+    $domainSelect.data('select2').$container.addClass('action gray');
+    $domainSelect.data('select2').$dropdown.addClass('action gray');
+
+    $sourceSelect.data('select2').$container.addClass('languages');
+    $sourceSelect.data('select2').$dropdown.addClass('languages');
+
+    $targetSelect.data('select2').$container.addClass('languages');
+    $targetSelect.data('select2').$dropdown.addClass('languages');
 
     let sourceLanguage, targetLanguage;
 

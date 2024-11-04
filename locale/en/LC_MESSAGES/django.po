@@ -19,29 +19,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Translated-Using: django-rosetta 0.9.7\n"
 
-#: legal/settings.py:132 legal/templates/translate.html:102
-msgid "English"
-msgstr "English"
-
-#: legal/settings.py:133 legal/templates/translate.html:105
-msgid "French"
-msgstr "French"
-
-#: legal/templates/translate.html:34
-msgid "Logout"
-msgstr "Logout"
-
 #: legal/templates/translate.html:43
 msgid "Translator"
 msgstr "Translator"
-
-#: legal/templates/translate.html:62
-msgid "Text translate"
-msgstr "Text translate"
-
-#: legal/templates/translate.html:71
-msgid "Document translate"
-msgstr "Document translate"
 
 #: legal/templates/translate.html:122
 msgid "Start typing"
@@ -54,18 +34,6 @@ msgstr "Text is required."
 #: legal/templates/translate.html:149
 msgid "Translate text btn"
 msgstr "Translate"
-
-#: legal/templates/translate.html:151 legal/templates/translate.html:233
-msgid "Expert Revision"
-msgstr "Expert Revision"
-
-#: legal/templates/translate.html:170 legal/templates/translate.html:191
-msgid "Drag and drop"
-msgstr "Drag and drop"
-
-#: legal/templates/translate.html:172 legal/templates/translate.html:193
-msgid "Supported formats"
-msgstr "Supported formats"
 
 #: legal/templates/translate.html:177
 msgid "Add file"
@@ -114,10 +82,6 @@ msgstr "Upload file"
 #: legal/templates/translate.html:329
 msgid "Action"
 msgstr "Action"
-
-#: legal/templates/translate.html:336
-msgid "Translate"
-msgstr "Translate"
 
 #: legal/templates/translate.html:337
 msgid "Translate into different language"
@@ -203,10 +167,6 @@ msgstr "2st person"
 msgid "3nd person"
 msgstr "3st person"
 
-#: legal/templates/translate.html:409
-msgid "Download"
-msgstr "Download"
-
 #: legal/templates/translate.html:411
 msgid "Process"
 msgstr "Process"
@@ -239,29 +199,6 @@ msgstr "Success"
 msgid "Request has been successfully"
 msgstr "Your request has been sent successfully"
 
-#: legal/templates/translate.html:88
-msgid "Writing"
-msgstr "Writing"
-
-#: legal/templates/translate.html:102
-msgid "Project history"
-msgstr "Project history"
-
-#: legal/templates/project_history:119
-msgid "Username"
-msgstr "Username"
-
-#: legal/templates/project_history:123
-msgid "Created"
-msgstr "Created"
-
-#: legal/templates/project_history:122
-msgid "Status"
-msgstr "Status"
-
-msgid "Translated"
-msgstr "Translated"
-
 msgid "Error"
 msgstr "Error"
 
@@ -270,15 +207,6 @@ msgstr "Please choose an action."
 
 msgid "Select from the list"
 msgstr "Select from the list"
-
-msgid "Source language"
-msgstr "Source language"
-
-msgid "Target language"
-msgstr "Target language"
-
-msgid "Practice"
-msgstr "Practice"
 
 msgid "PDF file"
 msgstr "Important! The quality of your document will have an impact on translation. Scanned or poorly legible PDFs cannot be processed to a high standard."
@@ -294,3 +222,257 @@ msgstr "Go to project history"
 
 msgid "review"
 msgstr "Once the review is completed, you will receive an updated file in an attachment via email used when logging in."
+
+######################## HEADER ###
+
+msgid "English"
+msgstr "English"
+
+msgid "French"
+msgstr "French"
+
+msgid "Logout"
+msgstr "Logout"
+
+#####################################
+
+######################### SIDEBAR ###
+
+msgid "Translation"
+msgstr "Translation"
+
+msgid "Glossaries"
+msgstr "Glossaries"
+
+msgid "Project history"
+msgstr "Project history"
+
+msgid "Writing"
+msgstr "Customization"
+
+msgid "Usage"
+msgstr "Usage"
+
+msgid "Support"
+msgstr "Support"
+
+####################################
+
+
+########################################## TEXT TRANSLATE ####################################################
+
+msgid "Text translate"
+msgstr "Text translate"
+
+msgid "Document translate"
+msgstr "Document translate"
+
+msgid "Detect language"
+msgstr "Detect language"
+
+msgid "Source language"
+msgstr "Source language"
+
+msgid "Target language"
+msgstr "Target language"
+
+msgid "Put text here"
+msgstr "Add your text here"
+
+msgid "Practice"
+msgstr "Practice"
+
+msgid "Translate"
+msgstr "Translate"
+
+msgid "Expert Revision"
+msgstr "Human revision"
+
+msgid "Expert revision hint text"
+msgstr "When clicking, you will receive a quote by mail for the proofreading of your document, undertaken by a legal translator."
+
+###########################################
+
+################################################## DOCUMENT TRANSLATE #####################################################
+
+msgid "Following"
+msgstr "Next"
+
+msgid "Previous"
+msgstr "Previous"
+
+############################# STEP 1 ####
+
+msgid "Drag and drop"
+msgstr "Drag and drop"
+
+msgid "Supported formats"
+msgstr "Supported formats: .txt, .docx, .xlsx, .pptx, .pdf"
+
+msgid "Choose file"
+msgstr "Choose file(s)"
+
+msgid "Upload the document"
+msgstr "Document"
+
+msgid "Documents uploaded"
+msgstr "Documents upload"
+
+#########################################
+
+
+############################# STEP 2 ###
+
+msgid "Language combination"
+msgstr "Language"
+
+msgid "Select target language"
+msgstr "Select target language"
+
+
+############################# STEP 3 ###
+
+msgid "Domain selection"
+msgstr "Practice"
+
+msgid "Domains"
+msgstr "Practice"
+
+msgid "Sub-Domains"
+msgstr "Sub-Domains"
+
+########################################
+
+######################## STEP 4 ########
+
+msgid "Terminology"
+msgstr "Glossaries"
+
+msgid "Default"
+msgstr "Glossaries"
+
+msgid "My glossaries"
+msgstr "My glossaries"
+
+msgid "Add glossary"
+msgstr "Add glossary"
+
+msgid "No glossary"
+msgstr "No glossary"
+
+msgid "Review"
+msgstr "Translation"
+
+#######################################
+
+
+############################ STEP 5 ###
+
+msgid "New translation"
+msgstr "New translation"
+
+msgid "You can leave the page and see your translation progress on the ‘Project history’ page"
+msgstr "You can leave the page and see your translation progress on the ‘Project history’ page"
+
+msgid "Revision"
+msgstr "Human revision"
+
+msgid "Download"
+msgstr "Download"
+
+msgid "Click the button to see options for improving the quality of the translated file."
+msgstr "Click the button to see options for improving the quality of the translated file."
+
+#######################################
+
+############################ STEP 6 ###
+
+msgid "Quote for revision"
+msgstr "Request for quote"
+
+msgid "By choosing the options below, you agree that you are sending a request for Quote  of the selected service to Legal230"
+msgstr "By choosing the option below, you agree that you are sending a request for Quote of the selected service to Legal230"
+
+msgid "Expert revision in popup"
+msgstr "Ask for a quote"
+
+#########################################
+
+################################################ GLOSSARIES ###############################################
+
+msgid "File name"
+msgstr "File name"
+
+
+msgid "Size"
+msgstr "Size"
+
+msgid "Created"
+msgstr "Created"
+
+msgid "Actions"
+msgstr "Actions"
+
+#########################################
+
+################################################# PROJECT HISTORY #################################################
+
+msgid "Username"
+msgstr "Username"
+
+msgid "Project"
+msgstr "Document"
+
+msgid "Languages"
+msgstr "Languages"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Revision project history"
+msgstr "Revision"
+
+msgid "Expert revision project history"
+msgstr "Expert revision"
+
+msgid "Translated"
+msgstr "Translated"
+
+msgid "Post-edited"
+msgstr "Proofread"
+
+msgid "Prev"
+msgstr "Prev"
+
+msgid "Next"
+msgstr "Next"
+
+############################################
+
+############################################ USAGE #############################################
+
+msgid "Filter"
+msgstr "Filter"
+
+msgid "User"
+msgstr "User"
+
+msgid "Group"
+msgstr "Group"
+
+msgid "Characters"
+msgstr "Characters"
+
+msgid "Tokens"
+msgstr "Tokens"
+
+msgid "Date"
+msgstr "Date"
+
+msgid "Clear"
+msgstr "Clear"
+
+msgid "Apply"
+msgstr "Apply"
+
+################################################################################################
