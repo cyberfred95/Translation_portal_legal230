@@ -133,7 +133,7 @@ $(document).ready(function () {
     // ------------- STEP-1 -------------
 
 
-    const allowedTypes = ['.txt', '.docx', '.xlsx', '.pptx'];
+    const allowedTypes = ['.txt', '.pdf', '.docx', '.xlsx', '.pptx'];
 
     const fileInput = $('<input>', {
         type: 'file',
