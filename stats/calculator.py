@@ -2,6 +2,7 @@ import os
 
 from django.conf import settings
 import requests
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from preferences import preferences
 
 
@@ -19,20 +20,35 @@ class StatsProcessor:
     }
 
     def get_files_processing_api_url(self, file_extension):
-        return f"{settings.FILES_PROCESSING_API_URL}/api/{self.file_extension_route_mapping[file_extension]}/export"
+        return f"{settings.FILES_PROCESSING_API_URL}/api/{self.file_extension_route_mapping[file_extension]}"
 
-    def get_texts(self, file):
+    def get_texts(self, file: InMemoryUploadedFile):
         file_extension = os.path.splitext(file.name)[1]
+        file_name = file.name
+        file_content = file.read()
+        if file_extension == '.pdf':
+            converted_file_response = requests.post(
+                f"{settings.FILES_PROCESSING_API_URL}/api/pdf/convert",
+                headers={
+                    "Content-Type": file_extension,
+                    "Content-Disposition": f'attachment; '
+                                           f'filename="{file_name}"',
+                },
+                data=file_content
+            )
+            file_content = converted_file_response.content
+            file_extension = '.docx'
 
         response = requests.post(
-            self.get_files_processing_api_url(file_extension),
+            self.get_files_processing_api_url(file_extension) + '/export',
             headers={
                 "Content-Type": file_extension,
                 "Content-Disposition": f'attachment; '
-                                       f'filename="{file.name}"',
+                                       f'filename="{file_name}"',
             },
-            data=file.read()
+            data=file_content
         )
+        print(response.text)
         return response.json()
 
     def get_chars(self, file):
