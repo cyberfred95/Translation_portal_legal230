@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $(".text-action-select").attr("data-placeholder", "Action");
+    $(".text-action-select").attr("data-placeholder", language_code === 'en'?"Action":'Action');
     var $sourceTextarea = $("#source-text");
     var $translatedTextarea = $("#translated-text");
 

@@ -80,10 +80,6 @@ msgstr "Texte"
 msgid "Upload file"
 msgstr "télécharger un document"
 
-#: legal/templates/translate.html:329
-msgid "Action"
-msgstr "Personnalisations disponibles"
-
 #: legal/templates/translate.html:337
 msgid "Translate into different language"
 msgstr "Traduire dans différentes langues"
@@ -169,9 +165,6 @@ msgstr "2ème personne"
 msgid "3nd person"
 msgstr "3ème personne"
 
-#: legal/templates/translate.html:411
-msgid "Process"
-msgstr "Confirmer"
 
 #: legal/templates/translate.html:416
 msgid "The task failed at some point"
@@ -477,3 +470,19 @@ msgid "Apply"
 msgstr "Appliquer"
 
 ################################################################################################
+
+##################################### WRITING ##################################################
+
+msgid "Text writing"
+msgstr "Texte"
+
+msgid "Action"
+msgstr "Action"
+
+msgid "Process"
+msgstr "Appliquer"
+
+msgid "Search"
+msgstr "Recherche"
+
+#############################################################################################
