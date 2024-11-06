@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load i18n %}
 {% load static %}
 
 {% block content %}
@@ -26,7 +26,7 @@
                     </clipPath>
                 </defs>
             </svg>
-            <span class="text-3.5">Text writing</span>
+            <span class="text-3.5">{% trans 'Text writing' %}</span>
         </button>
     </div>
 

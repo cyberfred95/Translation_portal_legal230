@@ -160,6 +160,9 @@
 
 <script src="{% static 'js/get-cookie.js' %}"></script>
 <script src="{% static 'js/index.js' %}"></script>
+<script>
+    var language_code = "{{ request.LANGUAGE_CODE }}"
+</script>
 
 {% block extra_js %} {% endblock %}
 </body>

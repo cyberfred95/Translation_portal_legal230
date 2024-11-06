@@ -5,7 +5,7 @@ $(document).ready(function () {
 
 
     $(document).on('select2:open', () => {
-        document.querySelector('.select2-search__field').setAttribute('placeholder', 'Search');
+        document.querySelector('.select2-search__field').setAttribute('placeholder',  language_code=== 'en'?'Search':'Recherche');
         $(".select2-search__field")[0].focus();
     });
 
