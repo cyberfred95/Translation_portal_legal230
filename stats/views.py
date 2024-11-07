@@ -16,6 +16,7 @@ class UsageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['stats'] = self.get_stats()
+        print(self.get_stats())
         context['stats']['filters'] = self.get_filters()
         context['date_from'] = self.request.GET.get("date_from", date.today())
         context['date_to'] = self.request.GET.get("date_to", date.today() + timedelta(days=30))
@@ -154,6 +155,7 @@ class UsageView(TemplateView):
         for stat in stats['results']:
             total_chars += stat['chars_count']
             total_tokens += stat['tokens_count']
+            total_tokens += stat['tokens_out_count']
         return {
             "chars": total_chars,
             "tokens": total_tokens,
