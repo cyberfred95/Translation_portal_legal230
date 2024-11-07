@@ -3,7 +3,7 @@ from .models import Glossary
 
 
 class GlossaryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'source_language', 'target_language', 'file_size')
+    list_display = ('name', 'source_language', 'target_language','domain', 'file_size')
     exclude = ('name',)
 
 
