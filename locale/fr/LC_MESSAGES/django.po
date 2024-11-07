@@ -469,6 +469,15 @@ msgstr "Effacer"
 msgid "Apply"
 msgstr "Appliquer"
 
+msgid "Out tokens"
+msgstr "Sortir tokens"
+
+msgid "total tokens"
+msgstr "tokens"
+
+msgid "total characters"
+msgstr "caractères"
+
 ################################################################################################
 
 ##################################### WRITING ##################################################
