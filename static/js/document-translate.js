@@ -584,7 +584,7 @@ $(document).ready(function () {
 
                         .addClass('border-gray-225 text-gray-225 pointer-events-none')
                         .prop("disabled", true);
-                    $('.domain-step').text('none').removeClass('hidden');
+                    $('.domain-step').text(language_code==='en'?'None':'Aucun').removeClass('hidden');
                 } else {
                     $('#next-step').removeClass('border-gray-225 text-gray-225 pointer-events-none')
                         .addClass('border-green-400 text-green-400')
@@ -619,7 +619,7 @@ $(document).ready(function () {
 
     $(".step-4 .none").click(function () {
         selectGlossaryType('none');
-        $('.terminology-step').text('none').removeClass('hidden');
+        $('.terminology-step').text(language_code === 'en'?'none':'aucun').removeClass('hidden');
         selectedGlossary = 'none';
 
         clearGlossaryList();
