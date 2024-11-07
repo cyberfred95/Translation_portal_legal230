@@ -467,6 +467,15 @@ msgstr "Clear"
 msgid "Apply"
 msgstr "Apply"
 
+msgid "Out tokens"
+msgstr "Out tokens"
+
+msgid "total tokens"
+msgstr "tokens"
+
+msgid "total characters"
+msgstr "characters"
+
 ################################################################################################
 
 ##################################### WRITING ##################################################
