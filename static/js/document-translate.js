@@ -389,7 +389,7 @@ $(document).ready(function () {
 
         // ------------- SELECT -------------
 
-        $('.document-target-language').attr("data-placeholder", "Target language");
+        $('.document-target-language').attr("data-placeholder",  language_code=== 'en'?"Target language":"Langue cible");
 
         $('.document-target-language').select2();
         $('.document-source-language').select2();
@@ -926,23 +926,23 @@ $(document).ready(function () {
                     statusSpan.addClass('text-green-500');
                     break;
                 case 'Translated':
-                    statusSpan.text('Translated');
+                    statusSpan.text(language_code=== 'en'?'Translated': 'Document traduit');
                     statusSpan.addClass('bg-green-100 text-green-400');
                     break;
                 case 'Sent to post-editing, not accepted yet':
-                    statusSpan.text('Request for post-editing sent');
+                    statusSpan.text(language_code === 'en'?'Request for quote sent': 'Demande de devis envoyée');
                     statusSpan.addClass('bg-yellow-100 text-yellow-400');
                     break;
                 case 'Sent to post-editing, accepted':
-                    statusSpan.text('Request for post-editing accepted');
+                    statusSpan.text(language_code === 'en'?'Request for quote accepted': 'Demande de devis acceptée');
                     statusSpan.addClass('bg-blue-100 text-blue-400');
                     break;
                 case 'Post-edited file uploaded':
-                    statusSpan.text('Post-edited file uploaded');
+                    statusSpan.text(language_code === 'en'?'Request for quote accepted': 'Demande de devis acceptée');
                     statusSpan.addClass('bg-green-50 text-green-300');
                     break;
                 case 'Error':
-                    statusSpan.text('Error');
+                    statusSpan.text(language_code === 'en'?'Error': 'Erreur');
                     statusSpan.addClass('bg-red-100 text-red-400');
                     break;
                 default:
