@@ -389,7 +389,7 @@ $(document).ready(function () {
 
         // ------------- SELECT -------------
 
-        $('.document-target-language').attr("data-placeholder", "Target language");
+        $('.document-target-language').attr("data-placeholder",  language_code=== 'en'?"Target language":"Langue cible");
 
         $('.document-target-language').select2();
         $('.document-source-language').select2();
