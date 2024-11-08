@@ -407,6 +407,9 @@ msgstr "Date de creation"
 msgid "Actions"
 msgstr "Action"
 
+msgid "There are currently no glossaries to display."
+msgstr "Il n'y a actuellement aucun glossaire à afficher"
+
 #########################################
 
 ################################################# PROJECT HISTORY #################################################
@@ -440,6 +443,12 @@ msgstr "Prev"
 
 msgid "Next"
 msgstr "Next"
+
+msgid "No data available"
+msgstr "Aucune donnée disponible"
+
+msgid "There are currently no projects to display."
+msgstr "Il n'y a actuellement aucun projets à afficher"
 
 ###########################################
 
@@ -477,6 +486,9 @@ msgstr "tokens"
 
 msgid "total characters"
 msgstr "caractères"
+
+msgid "There are currently no statistic to display."
+msgstr "Il n'y a actuellement aucun statistique à afficher"
 
 ################################################################################################
 
