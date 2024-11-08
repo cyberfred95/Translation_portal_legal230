@@ -155,10 +155,10 @@
                 <div class="text-5">{% trans 'Add glossary' %}</div>
                 <div class="flex w-full justify-between">
                     <div class="flex flex-col gap-2.5 ">
-                        <span>Source language</span>
+                        <span>{% trans 'Source language' %}</span>
                         <select class="glossary-language-source glossary-language-select" name="source_language"
                                 required>
-                            <option value="" disabled selected>Source language</option>
+                            <option value="" disabled selected>{% trans 'Source language' %}</option>
                             {% for translate_language in translate_languages %}
                             <option value="{{ translate_language.abbreviation|lower }}">
                                 {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
@@ -170,10 +170,10 @@
                         </select>
                     </div>
                     <div class="flex flex-col gap-2.5">
-                        <span>Target language</span>
+                        <span>{% trans 'Target language' %}</span>
                         <select class="glossary-language-target glossary-language-select" name="target_language"
                                 required>
-                            <option value="" disabled selected>Source language</option>
+                            <option value="" disabled selected>{% trans 'Source language' %}</option>
                             {% for translate_language in translate_languages %}
                             <option value="{{ translate_language.abbreviation|lower }}">
                                 {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
