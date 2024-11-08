@@ -11,6 +11,12 @@ class DomainSerializer(serializers.ModelSerializer):
 
 class DomainGroupSerializer(serializers.ModelSerializer):
     domains = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
+
+    def get_name(self, obj: DomainGroup):
+        if self.context['request'].LANGUAGE_CODE == 'fr':
+            return obj.french_name
+        return obj.name
 
     @staticmethod
     def get_domains(obj: DomainGroup):
