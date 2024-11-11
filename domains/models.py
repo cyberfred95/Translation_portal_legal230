@@ -16,8 +16,8 @@ class Domain(models.Model):
     domain_group = models.ForeignKey(DomainGroup, on_delete=models.SET_NULL, blank=True, null=True, related_name='domains')
 
     class Meta:
-        verbose_name = _("Domain")
-        verbose_name_plural = _("Domains")
+        verbose_name = "Domain"
+        verbose_name_plural = "Domains"
         ordering = ["name"]
 
     def __str__(self):
