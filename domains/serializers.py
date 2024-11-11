@@ -1,6 +1,13 @@
 from rest_framework import serializers
+from preferences import preferences
+from domains.models import Domain, DomainGroup, DefaultTranslation
 
-from domains.models import Domain, DomainGroup
+
+class DefaultDomainSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DefaultTranslation
+        fields = ['name', 'french_name']
 
 
 class DomainSerializer(serializers.ModelSerializer):
@@ -20,7 +27,10 @@ class DomainGroupSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_domains(obj: DomainGroup):
-        return DomainSerializer(obj.domains.all(), many=True).data
+        domains = obj.domains.all()
+        if domains.count() == 0 and preferences.DefaultTranslation.enabled:
+            return DefaultDomainSerializer(preferences.DefaultTranslation, many=False).data
+        return DomainSerializer(domains, many=True).data
 
     class Meta:
         model = DomainGroup

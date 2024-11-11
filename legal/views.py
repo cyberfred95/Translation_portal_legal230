@@ -185,8 +185,14 @@ class GetDomainsView(APIView):
             else:
                 domains = domains.filter(domain_group__name=self.request.query_params.get('domain_group'))
 
-
-
+        if domains.count() == 0 and preferences.DefaultTranslation.enabled:
+            if request.LANGUAGE_CODE == 'fr':
+                default_domain_name = preferences.DefaultTranslation.french_name if preferences.DefaultTranslation.french_name else preferences.DefaultTranslation.name
+                return Response(
+                        {"data": [default_domain_name]},
+                )
+            else:
+                return Response({"data": [preferences.DefaultTranslation.name]}, )
         if request.LANGUAGE_CODE == 'en':
             domain_names = domains.values_list('name', flat=True)
         elif request.LANGUAGE_CODE == 'fr':
