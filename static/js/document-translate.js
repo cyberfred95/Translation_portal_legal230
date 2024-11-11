@@ -657,11 +657,14 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
+                updateGlossaryList([response], true);
                 selectedGlossary = response?.id;
-                clearGlossaryList();
             },
             error: function () {
                 errorNotification();
+                $('#next-step').removeClass('border-gray-225 text-gray-225 pointer-events-none')
+                    .addClass('border-green-400 text-green-400')
+                    .prop("disabled", false);
             }
         });
     }
@@ -682,7 +685,7 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                updateGlossaryList(response);
+                updateGlossaryList(response, false);
                 selectedGlossary = '';
                 $('.terminology-step').text('default').removeClass('hidden');
                 $('#next-step').removeClass('border-green-400 text-white text-green-400')
@@ -695,12 +698,14 @@ $(document).ready(function () {
         });
     }
 
-    function updateGlossaryList(glossaries) {
+    function updateGlossaryList(glossaries, isDefault) {
+
         const $list = $(".glossary-list");
+
         $list.empty();
 
         glossaries.forEach(function (glossary) {
-            const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-175 text-gray-375 rounded-md hover:bg-green-500 hover:text-white transition duration-300 ease-in-out">${glossary.name}</button>`);
+            const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 ${isDefault ? "bg-green-500 text-white" : "bg-gray-175 text-gray-375"} rounded-md hover:bg-green-500 hover:text-white transition duration-300 ease-in-out">${glossary.name}</button>`);
             $item.click(function () {
                 if (selectedGlossary === glossary.id) {
                     $(this).removeClass('bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
