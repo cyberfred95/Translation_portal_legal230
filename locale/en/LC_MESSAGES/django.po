@@ -200,8 +200,11 @@ msgstr "Please choose an action."
 msgid "Select from the list"
 msgstr "Select from the list"
 
+msgid "Important"
+msgstr "Important"
+
 msgid "PDF file"
-msgstr "Important! The quality of your document will have an impact on translation. Scanned or poorly legible PDFs cannot be processed to a high standard."
+msgstr "The quality of your document will have an impact on translation. Scanned or poorly legible PDFs cannot be processed to a high standard."
 
 msgid "Expert revision"
 msgstr "Send translation result to an expert for review"
