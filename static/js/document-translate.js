@@ -64,7 +64,7 @@ $(document).ready(function () {
             $("#restart-text").hide();
 
             if (selectedFiles.length > 0) {
-                $("#next-step").show().text(language_code === 'en'? "Next":"Suivant");
+                $("#next-step").show().text(language_code === 'en' ? "Next" : "Suivant");
                 $actionList.css("justify-content", "flex-end");
             } else {
                 $("#next-step").hide();
@@ -72,13 +72,13 @@ $(document).ready(function () {
         } else if (currentStep === 4) {
             $("#prev-step").hide();
             $("#next-step").hide();
-            $("#restart").show().text(language_code==='en'?"New translation":"Nouveau document");
+            $("#restart").show().text(language_code === 'en' ? "New translation" : "Nouveau document");
             $("#restart-text").show();
 
             $actionList.css("justify-content", "flex-start");
         } else {
             $("#prev-step").show();
-            $("#next-step").show().text(language_code === 'en'? "Next":"Suivant");
+            $("#next-step").show().text(language_code === 'en' ? "Next" : "Suivant");
             $("#restart").hide();
             $("#restart-text").hide();
 
@@ -181,6 +181,9 @@ $(document).ready(function () {
         );
 
         selectedFiles = [...selectedFiles, ...newFiles];
+
+        checkPDF(selectedFiles);
+
         displayFiles(selectedFiles);
         toggleFollowingButton();
 
@@ -229,7 +232,7 @@ $(document).ready(function () {
 
         if (filesExist && currentStep === 0) {
             $("#prev-step").hide();
-            $("#next-step").show().text(language_code === 'en'? "Next":"Suivant");
+            $("#next-step").show().text(language_code === 'en' ? "Next" : "Suivant");
             $("#restart").hide();
             $("#restart-text").hide();
 
@@ -239,6 +242,36 @@ $(document).ready(function () {
         }
 
         $fileList.toggleClass('hidden', !filesExist);
+    }
+
+    function checkPDF(files) {
+        const isPdf = files.some(file => file.name.toLowerCase().endsWith('.pdf'));
+        $(".pdf-document").toggleClass('hidden', !isPdf);
+    }
+
+
+    function removeFile(fileId) {
+        selectedFiles = selectedFiles.filter(file => file.fileId !== fileId);
+
+        checkPDF(selectedFiles);
+
+        $(`.file[data-file-id="${fileId}"]`).remove();
+
+        const $detectedFile = $(`.flex.gap-5[data-file-id="${fileId}"]`);
+        if ($detectedFile.length) {
+            $detectedFile.remove();
+        }
+
+        toggleFollowingButton();
+
+        if (currentStep === 1) {
+            checkLanguagesConsistency();
+        }
+
+        if (selectedFiles.length === 0) {
+            currentStep = 0;
+            showStep(currentStep);
+        }
     }
 
 
@@ -389,7 +422,7 @@ $(document).ready(function () {
 
         // ------------- SELECT -------------
 
-        $('.document-target-language').attr("data-placeholder",  language_code=== 'en'?"Target language":"Langue cible");
+        $('.document-target-language').attr("data-placeholder", language_code === 'en' ? "Target language" : "Langue cible");
 
         $('.document-target-language').select2();
         $('.document-source-language').select2();
@@ -466,28 +499,6 @@ $(document).ready(function () {
             ${lang.name}
         </option>`
         ).join('');
-    }
-
-    function removeFile(fileId) {
-        selectedFiles = selectedFiles.filter(file => file.fileId !== fileId);
-
-        $(`.file[data-file-id="${fileId}"]`).remove();
-
-        const $detectedFile = $(`.flex.gap-5[data-file-id="${fileId}"]`);
-        if ($detectedFile.length) {
-            $detectedFile.remove();
-        }
-
-        toggleFollowingButton();
-
-        if (currentStep === 1) {
-            checkLanguagesConsistency();
-        }
-
-        if (selectedFiles.length === 0) {
-            currentStep = 0;
-            showStep(currentStep);
-        }
     }
 
 
@@ -584,7 +595,7 @@ $(document).ready(function () {
 
                         .addClass('border-gray-225 text-gray-225 pointer-events-none')
                         .prop("disabled", true);
-                    $('.domain-step').text(language_code==='en'?'None':'Aucun').removeClass('hidden');
+                    $('.domain-step').text(language_code === 'en' ? 'None' : 'Aucun').removeClass('hidden');
                 } else {
                     $('#next-step').removeClass('border-gray-225 text-gray-225 pointer-events-none')
                         .addClass('border-green-400 text-green-400')
@@ -619,7 +630,7 @@ $(document).ready(function () {
 
     $(".step-4 .none").click(function () {
         selectGlossaryType('none');
-        $('.terminology-step').text(language_code === 'en'?'none':'aucun').removeClass('hidden');
+        $('.terminology-step').text(language_code === 'en' ? 'none' : 'aucun').removeClass('hidden');
         selectedGlossary = 'none';
 
         clearGlossaryList();
@@ -931,23 +942,23 @@ $(document).ready(function () {
                     statusSpan.addClass('text-green-500');
                     break;
                 case 'Translated':
-                    statusSpan.text(language_code=== 'en'?'Translated': 'Document traduit');
+                    statusSpan.text(language_code === 'en' ? 'Translated' : 'Document traduit');
                     statusSpan.addClass('bg-green-100 text-green-400');
                     break;
                 case 'Sent to post-editing, not accepted yet':
-                    statusSpan.text(language_code === 'en'?'Request for quote sent': 'Demande de devis envoyée');
+                    statusSpan.text(language_code === 'en' ? 'Request for quote sent' : 'Demande de devis envoyée');
                     statusSpan.addClass('bg-yellow-100 text-yellow-400');
                     break;
                 case 'Sent to post-editing, accepted':
-                    statusSpan.text(language_code === 'en'?'Request for quote accepted': 'Demande de devis acceptée');
+                    statusSpan.text(language_code === 'en' ? 'Request for quote accepted' : 'Demande de devis acceptée');
                     statusSpan.addClass('bg-blue-100 text-blue-400');
                     break;
                 case 'Post-edited file uploaded':
-                    statusSpan.text(language_code === 'en'?'Request for quote accepted': 'Demande de devis acceptée');
+                    statusSpan.text(language_code === 'en' ? 'Request for quote accepted' : 'Demande de devis acceptée');
                     statusSpan.addClass('bg-green-50 text-green-300');
                     break;
                 case 'Error':
-                    statusSpan.text(language_code === 'en'?'Error': 'Erreur');
+                    statusSpan.text(language_code === 'en' ? 'Error' : 'Erreur');
                     statusSpan.addClass('bg-red-100 text-red-400');
                     break;
                 default:
@@ -972,7 +983,7 @@ $(document).ready(function () {
                         </clipPath>
                     </defs>
                 </svg>
-                  ${language_code==='en' ? 'Download' : 'Télécharger'}
+                  ${language_code === 'en' ? 'Download' : 'Télécharger'}
             </button>
         `);
             downloadButton.attr('data-translated-file', project.translated_file);
@@ -991,14 +1002,14 @@ $(document).ready(function () {
                 class="flex gap-2.5 items-center text-gray-600 border border-gray-600 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision"
                 ${project.status !== 'Translated' ? 'disabled' : ''}
             >
-                ${language_code==='en'? "Human revision":"Relecture expert"}
+                ${language_code === 'en' ? "Human revision" : "Relecture expert"}
                 <div class="relative group">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z" fill="currentColor"/>
                     </svg>
                     <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 py-3 px-4.5 bg-gray-600 text-white text-2.75 rounded-md bottom-30 left-1/2 transform -translate-x-1/2 translate-y-full">
                         <span class="text-justify text-wrap block">
-                                              ${language_code==='en' ? 'Click the button to see options for improving the quality of the translated file.' : "Cliquez sur ce bouton pour afficher les options de relecture disponibles"}
+                                              ${language_code === 'en' ? 'Click the button to see options for improving the quality of the translated file.' : "Cliquez sur ce bouton pour afficher les options de relecture disponibles"}
                         </span>
                         <div class="absolute w-3 h-3 bg-gray-600 transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5"></div>
                     </div>
