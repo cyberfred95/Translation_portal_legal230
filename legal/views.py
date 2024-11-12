@@ -35,6 +35,7 @@ PAGINATION_PAGE_SIZE = 20
 
 def text_translation(request):
     text = request.POST.get('text')
+    print("translate data", get_translate_data(request))
     api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
     response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
         "text": [text],
@@ -46,7 +47,7 @@ def text_translation(request):
     send_statistic_request(
         api_key, [text],
         request.user.uuid,
-        **get_translate_data(request)
+        **get_translate_data(request, for_statistic=True)
     )
     return response.json()
 
