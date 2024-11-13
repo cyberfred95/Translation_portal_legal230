@@ -2,7 +2,7 @@ $(document).ready(function () {
 
     $(".source-language").attr("data-placeholder",language_code === 'en'? "Source language":"Langue source");
     $(".target-language").attr("data-placeholder",language_code === 'en'? "Target language":"Langue cible");
-    $(".domain-select").attr("data-placeholder",language_code === 'en'? "Practice":"Domaine");
+    $(".domain-select").attr("data-placeholder",language_code === 'en'? "Glossary":"Glossaire");
 
     $(".source-language").select2();
     $(".target-language").select2();
