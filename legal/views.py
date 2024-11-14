@@ -193,7 +193,7 @@ class GetDomainsView(APIView):
                     {"data": [default_domain_name], "default_domain": True},
                 )
             else:
-                return Response({"data": [preferences.DefaultTranslation.name]}, )
+                return Response({"data": [preferences.DefaultTranslation.name], "default_domain": True}, )
         if request.LANGUAGE_CODE == 'en':
             domain_names = domains.values_list('name', flat=True)
         elif request.LANGUAGE_CODE == 'fr':
