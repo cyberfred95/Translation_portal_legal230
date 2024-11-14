@@ -35,6 +35,7 @@ PAGINATION_PAGE_SIZE = 20
 
 def text_translation(request):
     text = request.POST.get('text')
+    print("translate data", get_translate_data(request))
     api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
     response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
         "text": [text],
@@ -46,7 +47,7 @@ def text_translation(request):
     send_statistic_request(
         api_key, [text],
         request.user.uuid,
-        **get_translate_data(request)
+        **get_translate_data(request, for_statistic=True)
     )
     return response.json()
 
@@ -185,13 +186,19 @@ class GetDomainsView(APIView):
             else:
                 domains = domains.filter(domain_group__name=self.request.query_params.get('domain_group'))
 
-
-
+        if domains.count() == 0 and preferences.DefaultTranslation.enabled:
+            if request.LANGUAGE_CODE == 'fr':
+                default_domain_name = preferences.DefaultTranslation.french_name if preferences.DefaultTranslation.french_name else preferences.DefaultTranslation.name
+                return Response(
+                    {"data": [default_domain_name], "default_domain": True},
+                )
+            else:
+                return Response({"data": [preferences.DefaultTranslation.name], "default_domain": True}, )
         if request.LANGUAGE_CODE == 'en':
             domain_names = domains.values_list('name', flat=True)
         elif request.LANGUAGE_CODE == 'fr':
             domain_names = [domain.french_name if domain.french_name else domain.name for domain in domains]
-        return Response({"data": domain_names}, status=status.HTTP_200_OK)
+        return Response({"data": domain_names, "default_domain": False}, status=status.HTTP_200_OK)
 
 
 @csrf_exempt

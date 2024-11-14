@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Domain, DomainGroup
+from .models import Domain, DomainGroup, DefaultTranslation
+from preferences.admin import PreferencesAdmin
 
 
 class DomainAdmin(admin.ModelAdmin):
@@ -17,3 +18,8 @@ class DomainGroupAdmin(admin.ModelAdmin):
 
 admin.site.register(DomainGroup, DomainGroupAdmin)
 admin.site.register(Domain, DomainAdmin)
+
+
+@admin.register(DefaultTranslation)
+class DefaultTranslationAdmin(PreferencesAdmin):
+    exclude = ('sites',)
