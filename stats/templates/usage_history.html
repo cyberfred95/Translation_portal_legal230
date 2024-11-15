@@ -222,7 +222,7 @@
     </div>
     <label id="selected-items" class="display flex mr-2 text-gray-550 hidden mb-5"></label>
 
-    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md flex flex-col items-end px-5 pt-5 w-full h-full">
+    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md flex flex-col items-end px-5 pt-5 w-full h-full bg-white">
         <table id="sorting" class="border-collapse w-full border-separate border-spacing-y-5">
             <thead>
                 <tr class="border-gray-425">
@@ -377,6 +377,6 @@
 <script src="{% static 'js/datepicker.js' %}"></script>
 <script>
     var language_code = "{{ request.LANGUAGE_CODE }}"
-</script>    
+</script>
 
 {% endblock extra_js %}
