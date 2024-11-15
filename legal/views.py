@@ -230,7 +230,12 @@ def expert_revision_file(request):
         preferences.MainSettings.CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
         headers={
             "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
-        data={"email": preferences.MainSettings.sender_email})
+        data={
+            "email": preferences.MainSettings.sender_email,
+            "username": request.user.username,
+            "user_email": request.user.email,
+            "company": request.user.group.name
+        })
     return Response({"message": "Sent to post editing"}, status=status.HTTP_200_OK)
 
 
