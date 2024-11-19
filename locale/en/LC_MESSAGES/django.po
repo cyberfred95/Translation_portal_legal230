@@ -240,10 +240,10 @@ msgid "Glossaries"
 msgstr "Glossaries"
 
 msgid "Project history"
-msgstr "Project history"
+msgstr "History"
 
 msgid "Writing"
-msgstr "Customization"
+msgstr "Editing"
 
 msgid "Usage"
 msgstr "Usage"

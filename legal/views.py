@@ -44,11 +44,12 @@ def text_translation(request):
 
         "token": api_key})
     send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('domain_name'))
-    send_statistic_request(
-        api_key, [text],
-        request.user.uuid,
-        **get_translate_data(request, for_statistic=True)
-    )
+    if response.status_code == 200:
+        send_statistic_request(
+            api_key, [text],
+            request.user.uuid,
+            **get_translate_data(request, for_statistic=True)
+        )
     return response.json()
 
 
@@ -229,7 +230,12 @@ def expert_revision_file(request):
         preferences.MainSettings.CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
         headers={
             "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
-        data={"email": preferences.MainSettings.sender_email})
+        data={
+            "email": preferences.MainSettings.sender_email,
+            "username": request.user.username,
+            "user_email": request.user.email,
+            "company": request.user.group.name
+        })
     return Response({"message": "Sent to post editing"}, status=status.HTTP_200_OK)
 
 
