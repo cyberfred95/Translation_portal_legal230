@@ -24,8 +24,8 @@ $(document).ready(function () {
     });
 
     $('#closeModal, #closeIcon').on('click', function () {
-        $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-500');
-        $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-500 text-green-400 border border-green-400');
+        $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
+        $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-700 text-green-700 border border-green-700');
         $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
 
         $modal.addClass('hidden');
@@ -34,8 +34,8 @@ $(document).ready(function () {
 
     $(window).on('click', function (event) {
         if (event.target == $modal[0]) {
-            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-500');
-            $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-500 text-green-400 border border-green-400');
+            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
+            $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-700 text-green-700 border border-green-700');
             $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
 
             $modal.addClass('hidden');
@@ -44,14 +44,14 @@ $(document).ready(function () {
     });
 
     $('#uploadButton').on('click', function () {
-        $('.glossary-file').click();
+        $('.glossary-file').click();;
     });
 
     $('.glossary-file').on('change', function (e) {
         file = e.target.files[0];
         if (file) {
-            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-500');
-            $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-500 text-green-400 border border-green-400');
+            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
+            $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-700 text-green-700 border border-green-700');
             $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
             if (file.size <= maxFileSize) {
                 showUploadedFile(file.name);
@@ -201,8 +201,8 @@ $(document).ready(function () {
         e.preventDefault();
 
         if (!file) {
-            $('#uploadButton').removeClass('bg-green-500 border border-green-400').addClass('bg-transparent border border-red-400 text-red-400');
-            $('#downloadSample').removeClass('bg-green-500 text-green-400 ').addClass('bg-transparent border border-gray-200 text-gray-400');
+            $('#uploadButton').removeClass('bg-green-700').addClass('bg-transparent border border-red-400 text-red-400');
+            $('#downloadSample').removeClass('bg-green-700 text-green-700 border border-green-700').addClass('bg-transparent border border-gray-200 text-gray-400');
             $('.glossary-container').removeClass('bg-gray-25').addClass('bg-red-150');
             return;
         }
