@@ -9,6 +9,10 @@ $(document).ready(function () {
     let glossaryFile = '';
     let selectedFiles = [];
 
+    const nextStep = $("#next-step");
+    const prevStep = $("#prev-step");
+
+
     // ------------- PROGRESS BAT -------------
 
 
@@ -60,37 +64,37 @@ $(document).ready(function () {
         const $actionList = $(".action-list");
 
         if (step === 0) {
-            $("#prev-step").hide();
+            prevStep.hide();
             $("#restart").hide();
             $("#restart-text").hide();
 
             if (selectedFiles.length > 0) {
-                $("#next-step").show().text(language_code === 'en' ? "Next" : "Suivant");
+                nextStep.show().text(language_code === 'en' ? "Next" : "Suivant");
                 $actionList.css("justify-content", "flex-end");
             } else {
-                $("#next-step").hide();
+                nextStep.hide();
             }
         } else if (currentStep === 4) {
-            $("#prev-step").hide();
-            $("#next-step").hide();
+            prevStep.hide();
+            nextStep.hide();
             $("#restart").show().text(language_code === 'en' ? "New translation" : "Nouveau document");
             $("#restart-text").show();
 
             $actionList.css("justify-content", "flex-start");
         } else {
-            $("#prev-step").show();
-            $("#next-step").show().text(language_code === 'en' ? "Next" : "Suivant");
+            prevStep.show();
+            nextStep.show().text(language_code === 'en' ? "Next" : "Suivant");
             $("#restart").hide();
             $("#restart-text").hide();
 
             $actionList.css("justify-content", "space-between");
         }
 
-        $("#prev-step").toggleClass('hidden', step === 0);
-        $("#next-step").toggleClass('hidden', step === 4);
+        prevStep.toggleClass('hidden', step === 0);
+        nextStep.toggleClass('hidden', step === 4);
     }
 
-    $("#next-step").click(function () {
+    nextStep.click(function () {
         if (currentStep === 0 && selectedFiles.length === 0) {
             return;
         }
@@ -120,11 +124,11 @@ $(document).ready(function () {
         showStep(currentStep);
     });
 
-    $("#prev-step").click(function () {
+    prevStep.click(function () {
         if (currentStep > 0) {
             currentStep--;
             showStep(currentStep);
-            $("#next-step").removeClass('border-gray-225 text-gray-225 pointer-events-none').addClass('border-green-400 text-green-400').prop("disabled", false);
+            nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none').addClass('border-green-700 text-green-700').prop("disabled", false);
 
             $('.step-container').removeClass('bg-red-100 border-red-200');
         }
@@ -238,14 +242,14 @@ $(document).ready(function () {
         const $actionList = $(".action-list");
 
         if (filesExist && currentStep === 0) {
-            $("#prev-step").hide();
-            $("#next-step").show().text(language_code === 'en' ? "Next" : "Suivant");
+            prevStep.hide();
+            nextStep.show().text(language_code === 'en' ? "Next" : "Suivant");
             $("#restart").hide();
             $("#restart-text").hide();
 
             $actionList.css("justify-content", "flex-end");
         } else if (currentStep === 0) {
-            $("#next-step").hide();
+            nextStep.hide();
         }
 
         $fileList.toggleClass('hidden', !filesExist);
@@ -255,7 +259,6 @@ $(document).ready(function () {
         const isPdf = files.some(file => file.name.toLowerCase().endsWith('.pdf'));
         $(".pdf-document").toggleClass('hidden', !isPdf);
     }
-
 
     function removeFile(fileId) {
         selectedFiles = selectedFiles.filter(file => file.fileId !== fileId);
@@ -409,7 +412,6 @@ $(document).ready(function () {
         const sourceSelects = $('.document-source-language');
         const targetLanguageBlock = $('.target-language-container');
         const targetSelect = $('.select-block');
-        const nextButton = $('#next-step');
         const detectedFiles = $(".detected-file");
 
         let isConsistent = true;
@@ -476,12 +478,12 @@ $(document).ready(function () {
         let isSameAsTarget = firstValue === targetValue;
 
         if (!isConsistent || !targetValue || isSameAsTarget) {
-            nextButton.removeClass('border-green-400 text-white text-green-400')
+            nextStep.removeClass('border-green-700 text-white text-green-700')
                 .addClass('border-gray-225 text-gray-225 pointer-events-none')
                 .prop("disabled", true);
         } else {
-            nextButton.removeClass('border-gray-225 text-gray-225 pointer-events-none')
-                .addClass('border-green-400 text-green-400')
+            nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
+                .addClass('border-green-700 text-green-700')
                 .prop("disabled", false);
             $('.language-step').removeClass('hidden');
             $('.source').text(firstValue.toUpperCase());
@@ -519,12 +521,12 @@ $(document).ready(function () {
         domains.forEach((domain, index) => {
             const button = $('<button>', {
                 type: 'button',
-                class: 'domain-button text-3.5 py-3 px-7.5 bg-gray-100 text-gray-475 hover:bg-green-400 hover:text-white rounded-md focus:text-white focus:bg-green-400 transition duration-300 ease-in-out',
+                class: 'domain-button text-3.5 py-3 px-7.5 bg-gray-100 text-gray-475 hover:bg-gray-600 hover:text-white rounded-md focus:text-white focus:bg-gray-600 transition duration-300 ease-in-out',
                 text: domain.name,
                 'data-name': domain.name,
                 click: function () {
-                    $('.domain-button').removeClass('selected bg-green-400 text-white').addClass('bg-gray-100 text-gray-475');
-                    $(this).removeClass('bg-gray-100 text-gray-475').addClass('selected bg-green-400 text-white');
+                    $('.domain-button').removeClass('selected bg-gray-600 text-white').addClass('bg-gray-100 text-gray-475');
+                    $(this).removeClass('bg-gray-100 text-gray-475').addClass('selected bg-gray-600 text-white');
 
                     selectedDomain = $(this).data('name');
                     getDomains();
@@ -532,7 +534,7 @@ $(document).ready(function () {
             });
 
             if (index === 0) {
-                button.removeClass('bg-gray-100 text-gray-475').addClass('selected bg-green-400 text-white');
+                button.removeClass('bg-gray-100 text-gray-475').addClass('selected bg-gray-600 text-white');
 
                 selectedDomain = domain.name;
             }
@@ -550,19 +552,19 @@ $(document).ready(function () {
         subDomains.forEach((subDomain, index) => {
             const button = $('<button>', {
                 type: 'button',
-                class: 'sub-domain-button text-3.5 py-3 px-7.5 bg-gray-175 text-gray-375 hover:bg-green-500 hover:text-white rounded-md focus:text-white focus:bg-green-500 transition duration-300 ease-in-out',
+                class: 'sub-domain-button text-3.5 py-3 px-7.5 bg-gray-175 text-gray-375 hover:bg-gray-600 hover:text-white rounded-md focus:text-white focus:bg-gray-600 transition duration-300 ease-in-out',
                 text: subDomain,
                 'data-name': subDomain,
                 click: function () {
                     $('.sub-domain-button').removeClass('selected bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
-                    $(this).removeClass('bg-gray-175 text-gray-375').addClass('selected bg-green-500 text-white');
+                    $(this).removeClass('bg-gray-175 text-gray-375').addClass('selected bg-gray-600 text-white');
                     selectedSubDomain = $(this).data('name');
                     $('.domain-step').text(selectedSubDomain).removeClass('hidden');
                 }
             });
 
             if (index === 0) {
-                button.removeClass('bg-gray-175 text-gray-375').addClass('selected bg-green-500 text-white');
+                button.removeClass('bg-gray-175 text-gray-375').addClass('selected bg-gray-600 text-white');
                 selectedSubDomain = subDomain;
             }
 
@@ -610,14 +612,14 @@ $(document).ready(function () {
                 }
 
                 if (response.data && response.data.length === 0) {
-                    $('#next-step').removeClass('border-green-400 text-white text-green-400')
+                    nextStep.removeClass('border-green-700 text-white text-green-700')
 
                         .addClass('border-gray-225 text-gray-225 pointer-events-none')
                         .prop("disabled", true);
                     $('.domain-step').text(language_code === 'en' ? 'None' : 'Aucun').removeClass('hidden');
                 } else {
-                    $('#next-step').removeClass('border-gray-225 text-gray-225 pointer-events-none')
-                        .addClass('border-green-400 text-green-400')
+                    nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
+                        .addClass('border-green-700 text-green-700')
                         .prop("disabled", false);
                     $('.domain-step').text(response.data[0]).removeClass('hidden');
                 }
@@ -650,8 +652,8 @@ $(document).ready(function () {
         selectGlossaryType('none');
         $('.terminology-step').text(language_code === 'en' ? 'none' : 'aucun').removeClass('hidden');
         selectedGlossary = 'none';
-        $('#next-step').removeClass('border-gray-225 text-gray-225 pointer-events-none')
-            .addClass('border-green-400 text-green-400')
+        nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
+            .addClass('border-green-700 text-green-700')
             .prop("disabled", false);
         clearGlossaryList();
     });
@@ -693,8 +695,8 @@ $(document).ready(function () {
             },
             error: function () {
                 errorNotification();
-                $('#next-step').removeClass('border-gray-225 text-gray-225 pointer-events-none')
-                    .addClass('border-green-400 text-green-400')
+                nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
+                    .addClass('border-green-700 text-green-700')
                     .prop("disabled", false);
             }
         });
@@ -719,7 +721,7 @@ $(document).ready(function () {
                 updateGlossaryList(response, false);
                 selectedGlossary = '';
                 $('.terminology-step').text('default').removeClass('hidden');
-                $('#next-step').removeClass('border-green-400 text-white text-green-400')
+                nextStep.removeClass('border-green-700 text-white text-green-700')
                     .addClass('border-gray-225 text-gray-225 pointer-events-none')
                     .prop("disabled", true);
             },
@@ -736,26 +738,26 @@ $(document).ready(function () {
         $list.empty();
 
         glossaries.forEach(function (glossary) {
-            const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 ${isDefault ? "bg-green-500 text-white" : "bg-gray-175 text-gray-375"} rounded-md hover:bg-green-500 hover:text-white transition duration-300 ease-in-out">${glossary.name}</button>`);
+            const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 ${isDefault ? "bg-gray-600 text-white" : "bg-gray-175 text-gray-375"} rounded-md hover:bg-gray-600 hover:text-white transition duration-300 ease-in-out">${glossary.name}</button>`);
             $item.click(function () {
                 if (selectedGlossary === glossary.id) {
-                    $(this).removeClass('bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
+                    $(this).removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
                     selectedGlossary = '';
                     $('.terminology-step').text('').removeClass('hidden');
                     if (selectedGlossaryType === 'my-glossary') {
-                        $('#next-step').removeClass('border-green-400 text-white text-green-400')
+                        nextStep.removeClass('border-green-700 text-white text-green-700')
                             .addClass('border-gray-225 text-gray-225 pointer-events-none')
                             .prop("disabled", true);
                     }
                 } else {
-                    $(".glossary-item").removeClass('bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
-                    $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-green-500 text-white');
+                    $(".glossary-item").removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
+                    $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-gray-600 text-white');
                     selectedGlossary = glossary.id;
                     $('.terminology-step').text(selectedGlossary).removeClass('hidden');
 
                     if (selectedGlossaryType === 'my-glossary') {
-                        $('#next-step').removeClass('border-gray-225 text-gray-225 pointer-events-none')
-                            .addClass('border-green-400 text-green-400')
+                        nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
+                            .addClass('border-green-700 text-green-700')
                             .prop("disabled", false);
                     }
                 }
@@ -775,8 +777,8 @@ $(document).ready(function () {
     });
 
     $('#closeModal, #closeIcon').on('click', function () {
-        $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-500');
-        $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-500 text-green-400 border border-green-400');
+        $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
+        $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-700 text-green-700 border border-green-700');
         $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
         $modal.addClass('hidden');
         $closeIcon.addClass('hidden');
@@ -784,8 +786,8 @@ $(document).ready(function () {
 
     $(window).on('click', function (event) {
         if (event.target == $modal[0]) {
-            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-500');
-            $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-500 text-green-400 border border-green-400');
+            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
+            $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-700 text-green-700 border border-green-700');
             $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
             $modal.addClass('hidden');
             $closeIcon.addClass('hidden');
@@ -799,8 +801,8 @@ $(document).ready(function () {
     $('.glossary-file').on('change', function (e) {
         glossaryFile = e.target.files[0];
         if (glossaryFile) {
-            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-500');
-            $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-500 text-green-400 border border-green-400');
+            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
+            $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-700 text-green-700 border border-green-700');
             $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
             if (glossaryFile.size <= maxFileSize) {
                 showUploadedFile(glossaryFile.name);
@@ -831,8 +833,8 @@ $(document).ready(function () {
         e.preventDefault();
 
         if (!glossaryFile) {
-            $('#uploadButton').removeClass('bg-green-500 border border-green-400').addClass('bg-transparent border border-red-400 text-red-400');
-            $('#downloadSample').removeClass('bg-green-500 text-green-400 ').addClass('bg-transparent border border-gray-200 text-gray-400');
+            $('#uploadButton').removeClass('bg-green-700 border border-green-700').addClass('bg-transparent border border-red-400 text-red-400');
+            $('#downloadSample').removeClass('bg-green-700 text-green-700 ').addClass('bg-transparent border border-gray-200 text-gray-400');
             $('.glossary-container').removeClass('bg-gray-25').addClass('bg-red-150');
             return;
         }
@@ -864,23 +866,23 @@ $(document).ready(function () {
 
                 const $list = $(".glossary-list");
 
-                const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-175 text-gray-375 rounded-md hover:bg-green-500 hover:text-white">${response.name}</button>`);
+                const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-175 text-gray-375 rounded-md hover:bg-gray-600 hover:text-white">${response.name}</button>`);
 
                 $item.click(function () {
                     if (selectedGlossary === response.id) {
-                        $(this).removeClass('bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
+                        $(this).removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
                         selectedGlossary = '';
                         $('.terminology-step').text('').removeClass('hidden');
-                        $('#next-step').removeClass('border-green-400 text-green-400 ')
+                        nextStep.removeClass('border-green-700 text-green-700 ')
                             .addClass('border-gray-225 text-gray-225 pointer-events-none')
                             .prop("disabled", true);
                     } else {
-                        $(".glossary-item").removeClass('bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
-                        $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-green-500 text-white');
+                        $(".glossary-item").removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
+                        $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-gray-600 text-white');
                         selectedGlossary = response.id;
                         $('.terminology-step').text(selectedGlossary).removeClass('hidden');
-                        $('#next-step').removeClass('border-gray-225 text-gray-225 pointer-events-none')
-                            .addClass('border-green-400 text-green-400')
+                        nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
+                            .addClass('border-green-700 text-green-700')
                             .prop("disabled", false);
                     }
                 });
