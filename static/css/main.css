@@ -423,7 +423,7 @@ textarea:focus {
 #translated-text {
     resize: none;
     box-sizing: border-box;
-    min-height: 400px;
+    min-height: 320px;
     max-height: 100%;
     overflow: hidden;
 }
@@ -436,12 +436,29 @@ input[type="checkbox"]:checked {
 }
 
 .select2-container.languages .select2-results__options {
-    width: 470px !important;
+    width: 550px !important;
+    height: 400px !important;
+    max-height: 350px !important;
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
     padding: 8px !important;
 }
 
 .select2-container.languages .select2-dropdown {
-    width: 470px !important;
+    width: 550px !important;
+    height: 400px !important;
+}
+
+.select2-container.detect-languages .select2-results__options {
+    width: 400px !important;
+    height: 400px !important;
+    max-height: 350px !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    padding: 8px !important;
+}
+
+.select2-container.detect-languages .select2-dropdown {
+    width: 400px !important;
+    height: 400px !important;
 }
