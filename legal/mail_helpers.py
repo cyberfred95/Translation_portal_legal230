@@ -48,34 +48,33 @@ def send_text_translation(
         sg.send(message)
 
     else:
-        for user_to_send in users_to_send:
 
-            message = Mail(
-                from_email='support@custom.mt',
-                to_emails=[user_to_send.email],
-                subject=theme,
-                html_content=render_to_string(
-                    template,
-                    {
-                        "user_name": user_to_send.username,
-                        "text": text,
-                        "translation_name": translation_name,
-                        "sender_username": user.username,
-                        "file_ext": file_ext,
-                        "source_file_url": source_file_url,
-                        "translated_file_url": translated_file_url,
-                    }
-                )
+        message = Mail(
+            from_email='support@custom.mt',
+            to_emails=[preferences.MainSettings.sender_email],
+            subject=theme,
+            html_content=render_to_string(
+                template,
+                {
+                    "user_name": preferences.MainSettings.sender_email,
+                    "text": text,
+                    "translation_name": translation_name,
+                    "sender_username": user.username,
+                    "file_ext": file_ext,
+                    "source_file_url": source_file_url,
+                    "translated_file_url": translated_file_url,
+                }
             )
-            if attachment and file_name:
-                attachedFile = Attachment(
-                    file_content=FileContent(attachment),
-                    file_name=FileName(file_name),
-                    # FileType('application/pdf'),
-                    disposition=Disposition('attachment')
+        )
+        if attachment and file_name:
+            attachedFile = Attachment(
+                file_content=FileContent(attachment),
+                file_name=FileName(file_name),
+                # FileType('application/pdf'),
+                disposition=Disposition('attachment')
                 )
-                message.attachment = attachedFile
-            sg.send(message)
+            message.attachment = attachedFile
+        sg.send(message)
 
 
 def send_file_translation(user_id, source_file_url, file_name, file_ext, translation_name):
