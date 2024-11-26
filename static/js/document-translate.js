@@ -438,8 +438,8 @@ $(document).ready(function () {
 
         $targetSelect = $(".document-target-language").select2();
 
-        $targetSelect.data('select2').$container.addClass('languages');
-        $targetSelect.data('select2').$dropdown.addClass('languages');
+        $targetSelect.data('select2').$container.addClass('detect-languages');
+        $targetSelect.data('select2').$dropdown.addClass('detect-languages');
 
         targetLanguageBlock.find('.error-message').remove();
 
