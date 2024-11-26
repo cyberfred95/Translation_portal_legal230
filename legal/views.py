@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import time
 from datetime import datetime
 from urllib.parse import urlparse, unquote
@@ -306,16 +307,20 @@ class SingleProjectView(APIView):
 
 
 class LanguageDetectView(APIView):
+    WORDS_COUNT_FOR_DETECTION = 500
 
     def post(self, request):
         files = request.FILES.getlist('document[]', [])
         result = []
         for file in files:
             api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
-            text = StatsProcessor(api_key).get_texts(file=file)['texts'][0]['text']
-            tmp_language = langdetect.detect(text)
-            language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
-                'abbreviation', flat=True).first()
+            text_for_detection = self.get_text_for_detection(api_key=api_key, file=file)
+            try:
+                tmp_language = langdetect.detect(text_for_detection)
+                language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
+                    'abbreviation', flat=True).first()
+            except langdetect.LangDetectException:
+                language = Language.objects.values_list('abbreviation', flat=True).first()
             if not language:
                 language = Language.objects.all().values_list(
                     'abbreviation', flat=True).first()
@@ -327,6 +332,21 @@ class LanguageDetectView(APIView):
                 }
             )
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
+
+    def get_text_for_detection(self, file, api_key):
+        try:
+            texts = StatsProcessor(api_key).get_texts(file=file)
+        except UnicodeEncodeError:
+            return Response({"message": "Invalid characters in file name"}, status=status.HTTP_400_BAD_REQUEST)
+
+        formated_texts = [
+            word
+            for text in texts['texts']
+            for word in re.sub(r'<[^>]*>', '', text['text']).split()
+        ]
+        text_for_detection = ' '.join(formated_texts[:self.WORDS_COUNT_FOR_DETECTION])
+
+        return text_for_detection
 
 
 class DetectTextLanguageView(APIView):
