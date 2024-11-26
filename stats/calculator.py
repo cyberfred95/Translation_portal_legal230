@@ -48,7 +48,6 @@ class StatsProcessor:
             },
             data=file_content
         )
-        print(response.text)
         return response.json()
 
     def get_chars(self, file):
