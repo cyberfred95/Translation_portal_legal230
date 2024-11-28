@@ -265,7 +265,7 @@ msgid "Document translate"
 msgstr "Traduire un document"
 
 msgid "Detect language"
-msgstr "Langue détectée"
+msgstr "Détecter la langue"
 
 msgid "Source language"
 msgstr "Langue source"
