@@ -1,13 +1,13 @@
 {% load static %}
 {% load  i18n %}
 
-<div class="step-3 hidden flex justify-between">
+<div class="step-3 hidden flex justify-between gap-5">
     <div class="flex-1">
         <span class="text-4 text-gray-600 font-semibold">{% trans 'Domains' %}</span>
-        <div class="flex flex-wrap mt-5 gap-2.5 domains-list"></div>
+        <div class="grid grid-cols-2 xl:grid-cols-3 gap-2.5 domains-list mt-5"></div>
     </div>
     <div class="flex-1">
         <span class="text-4 text-gray-600 font-semibold">{% trans 'Sub-Domains' %}</span>
-        <div class="flex flex-wrap mt-5 gap-2.5 sub-domain-list"></div>
+        <div class="grid grid-cols-2 xl:grid-cols-3 gap-2.5 sub-domain-list mt-5"></div>
     </div>
 </div>

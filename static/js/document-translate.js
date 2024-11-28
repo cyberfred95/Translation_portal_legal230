@@ -521,7 +521,7 @@ $(document).ready(function () {
         domains.forEach((domain, index) => {
             const button = $('<button>', {
                 type: 'button',
-                class: 'domain-button text-3.5 py-3 px-7.5 bg-gray-100 text-gray-475 hover:bg-gray-600 hover:text-white rounded-md focus:text-white focus:bg-gray-600 transition duration-300 ease-in-out',
+                class: 'domain-button text-3.5 py-3 px-7.5 bg-gray-100 text-gray-475 hover:bg-gray-600 hover:text-white rounded-md focus:text-white focus:bg-gray-600 transition duration-300 ease-in-out truncate',
                 text: domain.name,
                 'data-name': domain.name,
                 click: function () {
@@ -552,7 +552,7 @@ $(document).ready(function () {
         subDomains.forEach((subDomain, index) => {
             const button = $('<button>', {
                 type: 'button',
-                class: 'sub-domain-button text-3.5 py-3 px-7.5 bg-gray-175 text-gray-375 hover:bg-gray-600 hover:text-white rounded-md focus:text-white focus:bg-gray-600 transition duration-300 ease-in-out',
+                class: 'sub-domain-button text-3.5 py-3 px-7.5 bg-gray-100 text-gray-475 hover:bg-gray-600 hover:text-white rounded-md focus:text-white focus:bg-gray-600 transition duration-300 ease-in-out truncate',
                 text: subDomain,
                 'data-name': subDomain,
                 click: function () {
