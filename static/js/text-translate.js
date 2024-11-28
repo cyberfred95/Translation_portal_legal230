@@ -1,8 +1,25 @@
 $(document).ready(function () {
 
-    $(".source-language").attr("data-placeholder",language_code === 'en'? "Source language":"Langue source");
-    $(".target-language").attr("data-placeholder",language_code === 'en'? "Target language":"Langue cible");
-    $(".domain-select").attr("data-placeholder",language_code === 'en'? "Glossary":"Glossaire");
+    let sourceQuill = new Quill('#source-text', {
+        theme: 'snow',
+        placeholder: 'Add you text here',
+        modules: {
+            toolbar: false
+        }
+    });
+
+    let translatedQuill = new Quill('#translated-text', {
+        theme: 'snow',
+        modules: {
+            toolbar: false
+        }
+    });
+
+    translatedQuill.enable(false);
+
+    $(".source-language").attr("data-placeholder", language_code === 'en' ? "Source language" : "Langue source");
+    $(".target-language").attr("data-placeholder", language_code === 'en' ? "Target language" : "Langue cible");
+    $(".domain-select").attr("data-placeholder", language_code === 'en' ? "Glossary" : "Glossaire");
 
     $(".source-language").select2();
     $(".target-language").select2();
@@ -65,6 +82,10 @@ $(document).ready(function () {
 
     $('form').on('submit', function (e) {
         e.preventDefault();
+        let htmlContent = sourceQuill.root.innerHTML;
+
+        $('#text').val(htmlContent);
+
         let form = $(this);
 
         let formData = new FormData(form[0]);
@@ -79,7 +100,8 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                $('#translated-text').val(response.translated_text);
+                translatedQuill.root.innerHTML = response.translated_text[0];
+
                 $('#expert-revision').removeClass('hidden');
             },
             error: function () {
@@ -89,8 +111,8 @@ $(document).ready(function () {
     });
 
     $('#expert-revision').click(function () {
-        const sourceText = $('#source-text').val();
-        const translatedText = $('#translated-text').val();
+        const sourceText = sourceQuill.getText();
+        const translatedText = translatedQuill.getText();
 
         const data = {result: translatedText, source_text: sourceText}
 
@@ -113,19 +135,25 @@ $(document).ready(function () {
         });
     });
 
-    $("#clear").on("click", function() {
-        $sourceTextarea.val('');
-        $translatedTextarea.val('');
+    $("#clear").on("click", function () {
+        translatedQuill.deleteText(0, translatedQuill.getLength());
+        sourceQuill.deleteText(0, sourceQuill.getLength());
+
         resizeTextAreas();
     });
 
+
     $('#copy').click(function () {
-        var translatedText = $('#translated-text').val();
-        if (translatedText) {
-            navigator.clipboard.writeText(translatedText).then(function () {
+        var translatedHtml = translatedQuill.root.innerHTML;
+
+        if (translatedHtml) {
+            var blob = new Blob([translatedHtml], { type: 'text/html' });
+            var data = [new ClipboardItem({ 'text/html': blob })];
+
+            navigator.clipboard.write(data).then(function () {
                 showTooltip();
-            }, function (error) {
-                console.error('Error: ', error);
+            }).catch(function (error) {
+                console.error('Error copying with formatting: ', error);
             });
         }
     });
@@ -138,7 +166,7 @@ $(document).ready(function () {
     }
 
     $('#detect-language').click(function () {
-        const sourceText = $('#source-text').val();
+        const sourceText = sourceQuill.getText();
 
         const data = {text: sourceText}
 
@@ -165,27 +193,27 @@ $(document).ready(function () {
         });
     });
 
-    var $sourceTextarea = $("#source-text");
-    var $translatedTextarea = $("#translated-text");
-
     function resizeTextAreas() {
-        $sourceTextarea.css("height", "auto");
-        $translatedTextarea.css("height", "auto");
+        var $sourceEditor = $("#source-text .ql-editor");
+        var $translatedEditor = $("#translated-text .ql-editor");
+
+        $sourceEditor.css("height", "auto");
+        $translatedEditor.css("height", "auto");
 
         var maxHeight = Math.max(
-            $sourceTextarea[0].scrollHeight,
-            $translatedTextarea[0].scrollHeight
+            $sourceEditor[0]?.scrollHeight || 0,
+            $translatedEditor[0]?.scrollHeight || 0
         );
 
         maxHeight = Math.max(maxHeight, 200);
 
-        $sourceTextarea.css("height", maxHeight + "px");
-        $translatedTextarea.css("height", maxHeight + "px");
+        $sourceEditor.css("height", maxHeight + "px");
+        $translatedEditor.css("height", maxHeight + "px");
     }
 
-    $sourceTextarea.on("input", function () {
-        resizeTextAreas();
-    });
+    sourceQuill.on("text-change", resizeTextAreas);
+    translatedQuill.on("text-change", resizeTextAreas);
 
     resizeTextAreas();
+
 });
