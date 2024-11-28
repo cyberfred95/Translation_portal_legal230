@@ -2,7 +2,7 @@ $(document).ready(function () {
 
     let sourceQuill = new Quill('#source-text', {
         theme: 'snow',
-        placeholder: 'Add you text here',
+        placeholder: language_code === 'en'?'Add your text here':'Ajoutez votre texte ici',
         modules: {
             toolbar: false
         }
