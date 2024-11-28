@@ -462,3 +462,24 @@ input[type="checkbox"]:checked {
     width: 400px !important;
     height: 400px !important;
 }
+
+.ql-editor {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    color: #0F3144;
+    transition: height 0.2s ease;
+    overflow-y: hidden;
+    padding: 0;
+    height: auto;
+}
+
+.ql-container.ql-snow {
+    border: none;
+}
+
+.ql-editor.ql-blank::before {
+    left: 20px;
+    color: #CACACA;
+    font-size: 16px;
+    font-style: normal;
+}
