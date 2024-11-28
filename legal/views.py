@@ -350,10 +350,11 @@ class LanguageDetectView(APIView):
 
 
 class DetectTextLanguageView(APIView):
+    WORDS_COUNT_FOR_DETECTION = 500
 
     def post(self, request):
         text = request.data.get('text')
-        tmp_language = langdetect.detect(text)
+        tmp_language = langdetect.detect(self.get_text_for_detection(text))
         language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
             'abbreviation', flat=True).first()
         if not language:
@@ -361,3 +362,10 @@ class DetectTextLanguageView(APIView):
                 'abbreviation', flat=True).first()
 
         return Response({"language": language.upper()})
+
+    def get_text_for_detection(self, text):
+        text = re.sub(r'<[^>]*>', '', text)
+        text = text.split()
+
+        text_for_detection = ' '.join(text[:self.WORDS_COUNT_FOR_DETECTION])
+        return text_for_detection
