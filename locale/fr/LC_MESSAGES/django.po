@@ -405,7 +405,7 @@ msgid "Size"
 msgstr "Taille"
 
 msgid "Created"
-msgstr "Date de creation"
+msgstr "Date de création"
 
 msgid "Actions"
 msgstr "Action"

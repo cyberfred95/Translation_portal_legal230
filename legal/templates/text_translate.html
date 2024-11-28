@@ -18,7 +18,7 @@
                         <option value=""></option>
                         {% for translate_language in translate_languages %}
                         <option value="{{ translate_language.abbreviation|lower }}">
-                            {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                            {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
                             {{ translate_language.french_name }}
                             {% else %} {{ translate_language.name }}
                             {% endif %}
@@ -45,7 +45,7 @@
                     <option value=""></option>
                     {% for translate_language in translate_languages %}
                     <option value="{{ translate_language.abbreviation|lower }}">
-                        {% if LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                        {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
                         {{ translate_language.french_name }}
                         {% else %} {{ translate_language.name }}
                         {% endif %}
