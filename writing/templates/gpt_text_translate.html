@@ -3,14 +3,14 @@
 
 <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md p-5 w-full h-full flex flex-col items-end">
     <form class="w-full flex flex-col">
+        <textarea id="text" name="text" style="display: none;"></textarea>
+
         <div class="flex w-full gap-1">
             <div class="w-full flex flex-col gap-4 item-center">
                 <div class="relative">
-                <textarea name="text" id="source-text" required
-                          class="focus:border-transparent focus:ring-0 rounded-0.5 h-50 bg-gray-125 p-5 pr-10 text-gray-600 resize-none w-full placeholder:text-gray-325"
-                          type="text"
-
-                          placeholder="{% trans 'Put text here' %}"></textarea>
+                    <div id="source-text"
+                         class="focus:border-transparent focus:ring-0 rounded bg-gray-100 p-5 pr-10 text-gray-600 resize-none w-full placeholder:text-gray-300 overflow-hidden">
+                    </div>
                     <svg id="clear" class="absolute top-5 right-5 cursor-pointer" width="14" height="14"
                          viewBox="0 0 14 14"
                          fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -23,10 +23,9 @@
             </div>
             <div class="w-full flex flex-col gap-4">
                 <div class="relative">
-                    <textarea readonly id="translated-text"
-                              class="rounded-0.5 h-50 bg-gray-125 p-5 pr-10 text-gray-600 resize-none w-full placeholder:text-gray-325"
-
-                              type="text"></textarea>
+                    <div id="translated-text"
+                         class="focus:border-transparent focus:ring-0 rounded bg-gray-100 p-5 pr-10 text-gray-600 resize-none w-full placeholder:text-gray-300 overflow-hidden">
+                    </div>
                     <svg id="copy" class="absolute top-5 right-5 cursor-pointer" width="30" height="30"
                          viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                         fill="none" xmlns="http://www.w3.org/2000/svg">
