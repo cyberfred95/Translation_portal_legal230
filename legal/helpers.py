@@ -1,3 +1,6 @@
+import os
+
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from preferences import preferences
 
 from domains.models import Domain
@@ -23,5 +26,13 @@ def get_translate_data(request, for_statistic=False):
             'domain_name')
 
 
-
     return translate_data
+
+
+def lowercase_file_extension(file: InMemoryUploadedFile) -> InMemoryUploadedFile:
+    # Split the file name and extension
+    name, ext = os.path.splitext(file.name)
+    # Lowercase the extension
+    file.name = f"{name}{ext.lower()}"
+    print(file.name)
+    return file
