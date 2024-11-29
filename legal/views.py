@@ -11,7 +11,7 @@ from django.views.generic import TemplateView
 from django.http import JsonResponse, HttpResponseBadRequest
 import django
 from rest_framework.views import APIView
-from .helpers import get_translate_data
+from .helpers import get_translate_data, lowercase_file_extension
 
 from domains.models import Domain
 from languages.models import Language
@@ -28,6 +28,7 @@ import langdetect
 from .tasks import send_statistic_request
 from glossaries.models import Glossary
 from typing import Optional
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 import csv
 
@@ -36,7 +37,6 @@ PAGINATION_PAGE_SIZE = 20
 
 def text_translation(request):
     text = request.POST.get('text')
-    print("translate data", get_translate_data(request))
     api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
     response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
         "text": [text],
@@ -88,6 +88,7 @@ def file_translate(request):
     projects = []
     files = request.FILES.getlist('document[]', [])
     for file in files:
+        file = lowercase_file_extension(file)
         response = requests.post(
             preferences.MainSettings.CLOUDSTORAGE_API_URL,
             data=data,
@@ -313,6 +314,8 @@ class LanguageDetectView(APIView):
         files = request.FILES.getlist('document[]', [])
         result = []
         for file in files:
+            file = lowercase_file_extension(file)
+
             api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
             text_for_detection = self.get_text_for_detection(api_key=api_key, file=file)
             try:
