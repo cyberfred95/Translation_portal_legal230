@@ -12,15 +12,6 @@ $(document).ready(function () {
         }
     });
 
-
-    $('select').select2({
-        language: {
-            noResults: function () {
-                return language_code === 'en' ? 'No results found' : 'Aucun résultat trouvé';
-            }
-        }
-    });
-
     // ------------- CHANGE LANGUAGE -------------
 
 
