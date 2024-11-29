@@ -8,8 +8,8 @@ class Language(models.Model):
     french_name = models.CharField(verbose_name=_("Name in French"), blank=True, null=True, max_length=255)
 
     class Meta:
-        verbose_name = _("Language")
-        verbose_name_plural = _("Languages")
+        verbose_name = "Language"
+        verbose_name_plural = "Languages"
         ordering = ["name"]
 
     def __str__(self):

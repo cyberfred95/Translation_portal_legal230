@@ -15,7 +15,7 @@ $(document).ready(function () {
         }
     });
 
-    translatedQuill.enable(false);
+    // translatedQuill.enable(false);
 
     $(".source-language").attr("data-placeholder", language_code === 'en' ? "Source language" : "Langue source");
     $(".target-language").attr("data-placeholder", language_code === 'en' ? "Target language" : "Langue cible");
@@ -144,19 +144,35 @@ $(document).ready(function () {
 
 
     $('#copy').click(function () {
+        var translatedText = translatedQuill.getText();
         var translatedHtml = translatedQuill.root.innerHTML;
+        console.log('translatedHtml', translatedHtml);
+        console.log('translatedText',translatedText);
 
         if (translatedHtml) {
-            var blob = new Blob([translatedHtml], { type: 'text/html' });
-            var data = [new ClipboardItem({ 'text/html': blob })];
+            if (navigator.clipboard && window.ClipboardItem) {
+                var htmlBlob = new Blob([translatedHtml], { type: 'text/html' });
+                var textBlob = new Blob([translatedText], { type: 'text/plain' });
+                var data = [
+                    new ClipboardItem({
+                        'text/html': htmlBlob,
+                        'text/plain': textBlob
+                    })
+                ];
 
-            navigator.clipboard.write(data).then(function () {
-                showTooltip();
-            }).catch(function (error) {
-                console.error('Error copying with formatting: ', error);
-            });
+                navigator.clipboard.write(data).then(function () {
+                    console.log('HTML і текст скопійовані успішно!');
+                    showTooltip(); // Показати підказку, якщо функція визначена
+                }).catch(function (error) {
+                    console.error('Помилка копіювання: ', error);
+                });
+            } else {
+                console.error('Clipboard API не підтримується у цьому браузері.');
+                alert('Ваш браузер не підтримує Clipboard API. Спробуйте оновити браузер.');
+            }
         }
     });
+
 
     const showTooltip = () => {
         $('#tooltip').removeClass('invisible opacity-0').addClass('visible opacity-100');

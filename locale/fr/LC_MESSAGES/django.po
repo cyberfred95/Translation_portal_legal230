@@ -265,7 +265,7 @@ msgid "Document translate"
 msgstr "Traduire un document"
 
 msgid "Detect language"
-msgstr "Langue détectée"
+msgstr "Détecter la langue"
 
 msgid "Source language"
 msgstr "Langue source"
@@ -405,7 +405,7 @@ msgid "Size"
 msgstr "Taille"
 
 msgid "Created"
-msgstr "Date de creation"
+msgstr "Date de création"
 
 msgid "Actions"
 msgstr "Action"
