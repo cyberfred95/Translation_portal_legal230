@@ -4,11 +4,22 @@ $(document).ready(function () {
     // ------------- SELECT -------------
 
 
-    $(document).on('select2:open', () => {
-        document.querySelector('.select2-search__field').setAttribute('placeholder',  language_code=== 'en'? 'Search':'Recherche');
-        $(".select2-search__field")[0].focus();
+    $(document).on('select2:open', function () {
+        var $searchField = $('.select2-search__field');
+        if ($searchField.length) {
+            $searchField.attr('placeholder', language_code === 'en' ? 'Search' : 'Recherche');
+            $searchField.focus();
+        }
     });
 
+
+    $('select').select2({
+        language: {
+            noResults: function () {
+                return language_code === 'en' ? 'No results found' : 'Aucun résultat trouvé';
+            }
+        }
+    });
 
     // ------------- CHANGE LANGUAGE -------------
 
