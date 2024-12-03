@@ -182,7 +182,7 @@ class GetDomainsView(APIView):
         domain_names = []
         for domain in domains.json():
             domain_names.append(domain['domain_name'])
-        domains = Domain.objects.filter(name__in=domain_names)
+        domains = Domain.objects.filter(name__in=domain_names).order_by('names')
         if self.request.query_params.get('domain_group'):
             if request.LANGUAGE_CODE == 'fr':
                 domains = domains.filter(domain_group__french_name=self.request.query_params.get('domain_group'))
@@ -340,7 +340,7 @@ class LanguageDetectView(APIView):
         try:
             texts = StatsProcessor(api_key).get_texts(file=file)
         except UnicodeEncodeError:
-            return Response({"message": "Invalid characters in file name"}, status=status.HTTP_400_BAD_REQUEST)
+            raise ValueError("Invalid characters in file name")
 
         formated_texts = [
             word
@@ -348,7 +348,7 @@ class LanguageDetectView(APIView):
             for word in re.sub(r'<[^>]*>', '', text['text']).split()
         ]
         text_for_detection = ' '.join(formated_texts[:self.WORDS_COUNT_FOR_DETECTION])
-
+        print(text_for_detection)
         return text_for_detection
 
 

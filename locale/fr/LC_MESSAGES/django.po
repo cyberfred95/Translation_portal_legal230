@@ -78,7 +78,7 @@ msgstr "Texte"
 
 #: legal/templates/translate.html:271
 msgid "Upload file"
-msgstr "télécharger un document"
+msgstr "Ajouter un fichier"
 
 #: legal/templates/translate.html:337
 msgid "Translate into different language"
@@ -409,6 +409,16 @@ msgstr "Date de création"
 
 msgid "Actions"
 msgstr "Action"
+
+msgid "Download sample"
+msgstr "Télécharger un modèle"
+
+msgid "Supported Files: .csv max 5mb"
+msgstr "Formats pris en charge : .csv max 5mb"
+
+msgid "Continue"
+msgstr "Continuer"
+
 
 msgid "There are currently no glossaries to display."
 msgstr "Il n'y a actuellement aucun glossaire à afficher"
