@@ -27,4 +27,4 @@ class DomainGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DomainGroup
-        fields = ['name', 'french_name', 'domains']
+        fields = ['name', 'french_name']

@@ -18,5 +18,6 @@ class DomainListView(ListAPIView):
     def get_queryset(self):
         if self.request.LANGUAGE_CODE == 'fr':
             return DomainGroup.objects.all().order_by('french_name')
-        return Domain.objects.all().order_by('name')
+        return DomainGroup.objects.all().order_by('name')
+
     serializer_class = DomainGroupSerializer
