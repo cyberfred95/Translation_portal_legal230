@@ -24,9 +24,16 @@ class UserGlossariesView(TemplateView):
         context = super().get_context_data(**kwargs)
         glossaries_data, pagination_context = self.get_glossaries()
         context['glossaries'] = glossaries_data
-        context['translate_languages'] = Language.objects.all()
+        context['translate_languages'] = self.get_languages()
         context['paginator'] = pagination_context
         return context
+
+    def get_languages(self):
+        if self.request.LANGUAGE_CODE == 'fr':
+            return Language.objects.order_by('french_name').all()
+        return Language.objects.order_by('name').all()
+
+
 
     def get_glossaries(self):
         tmp_glossaries = Glossary.objects.filter(user=self.request.user)
