@@ -764,7 +764,6 @@ $(document).ready(function () {
             });
             $list.append($item);
         });
-
     }
 
     const $modal = $('#modal');

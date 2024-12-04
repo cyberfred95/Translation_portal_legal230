@@ -40,7 +40,7 @@
                     <div id="uploadButtons" class="flex flex-col gap-2.5">
                         <button type="button" id="uploadButton"
                                 class="w-full bg-green-700 text-white py-2.5 rounded font-semibold">
-                            Upload file
+                            {% trans 'Upload file' %}
                         </button>
                         <div id="fileInfo"
                              class="hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-100 text-green-400 w-full">
@@ -65,17 +65,14 @@
                         </div>
                         <a href="{% static 'Gloss_en-de.csv' %}" type="button" id="downloadSample"
                            class="text-center w-full bg-white text-green-700 bg-green-700 py-2.5 rounded border border-green-700 font-semibold">
-                            Download sample
+                            {% trans 'Download sample' %}
                         </a>
-                        <p class="text-3.5 text-gray-400">Supported Files: .csv max 5mb</p>
+                        <p class="text-3.5 text-gray-400">{% trans 'Supported Files: .csv max 5mb' %}</p>
                     </div>
                 </div>
-                <span class="text-3.5 text-gray-575 text-center">
-                    The glossary function is based on the GPT. The number of tokens used for editing terminology can be found in the Usage History section.
-                </span>
                 <button type="submit"
                         class="bg-gray-600 px-6.5 py-2.5 rounded font-semibold text-4 text-white create-glossary">
-                    Continue
+                    {% trans 'Continue' %}
                 </button>
             </div>
 

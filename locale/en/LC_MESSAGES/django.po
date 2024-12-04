@@ -408,6 +408,15 @@ msgstr "Created"
 msgid "Actions"
 msgstr "Actions"
 
+msgid "Download sample"
+msgstr "Download sample"
+
+msgid "Supported Files: .csv max 5mb"
+msgstr "Supported Files: .csv max 5mb"
+
+msgid "Continue"
+msgstr "Continue"
+
 msgid "There are currently no glossaries to display."
 msgstr "There are currently no glossaries to display."
 
