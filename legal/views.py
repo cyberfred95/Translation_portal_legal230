@@ -125,8 +125,13 @@ class TranslateView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['languages'] = languages
-        context['translate_languages'] = Language.objects.all()
+        context['translate_languages'] = self.get_languages()
         return context
+
+    def get_languages(self):
+        if self.request.LANGUAGE_CODE == 'fr':
+            return Language.objects.order_by('french_name').all()
+        return Language.objects.order_by('name').all()
 
     def post(self, request):
         if not request.user.is_staff and not request.user.group:
