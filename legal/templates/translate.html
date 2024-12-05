@@ -109,7 +109,8 @@
     {
         "id": {{ language.id }},
         "abbreviation": "{{ language.abbreviation }}",
-        "name": "{{ language.name }}",
+        "name": "{% if request.LANGUAGE_CODE == 'fr' and language.french_name %}{{ language.french_name }} {% else %} {{ language.name }} {% endif %}",
+
     },
     {% endfor %}
     ]
