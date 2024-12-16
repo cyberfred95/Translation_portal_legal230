@@ -18,8 +18,6 @@ $(document).ready(function () {
     translatedQuill.enable(false);
 
     $(".text-action-select").attr("data-placeholder", language_code === 'en'?"Action":'Action');
-    var $sourceTextarea = $("#source-text");
-    var $translatedTextarea = $("#translated-text");
 
     $('.text-action-select').select2({
         templateResult: formatOption,
@@ -69,6 +67,8 @@ $(document).ready(function () {
 
         let formData = new FormData(form[0]);
 
+        $('#main-loader').removeClass('hidden');
+
         $.ajax({
             url: gpt_process,
             type: 'POST',
@@ -87,6 +87,9 @@ $(document).ready(function () {
             },
             error: function () {
                 errorNotification();
+            },
+            complete: function () {
+                $('#main-loader').addClass('hidden');
             }
         });
     });

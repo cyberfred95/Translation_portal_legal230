@@ -89,6 +89,9 @@ $(document).ready(function () {
         let form = $(this);
 
         let formData = new FormData(form[0]);
+
+        $('#main-loader').removeClass('hidden');
+
         $.ajax({
             url: translate,
             type: 'POST',
@@ -106,6 +109,9 @@ $(document).ready(function () {
             },
             error: function () {
                 errorNotification();
+            },
+            complete: function () {
+                $('#main-loader').addClass('hidden');
             }
         });
     });
@@ -186,6 +192,8 @@ $(document).ready(function () {
 
         const data = {text: sourceText}
 
+        $('#main-loader').removeClass('hidden');
+
         $.ajax({
             url: detect_text_language,
             type: 'POST',
@@ -205,6 +213,9 @@ $(document).ready(function () {
             },
             error: function () {
                 errorNotification();
+            },
+            complete: function () {
+                $('#main-loader').addClass('hidden');
             }
         });
     });
@@ -231,5 +242,4 @@ $(document).ready(function () {
     translatedQuill.on("text-change", resizeTextAreas);
 
     resizeTextAreas();
-
 });
