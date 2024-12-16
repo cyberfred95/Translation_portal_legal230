@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from subscriptions.models import SubscriptionType
 
 
 # Create your models here.
@@ -9,6 +10,7 @@ class UserGroup(models.Model):
     name = models.CharField(max_length=64)
     api_key = models.CharField(max_length=256)
     admin = models.ForeignKey('users.User', on_delete=models.SET_NULL, blank=True, null=True)
+    subscription = models.ForeignKey(SubscriptionType, on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Group'
