@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'stats.apps.StatsConfig',
     'glossaries.apps.GlossariesConfig',
     'writing.apps.WritingConfig',
+    'subscriptions.apps.SubscriptionsConfig',
 ]
 
 STATICFILES_FINDERS = (
