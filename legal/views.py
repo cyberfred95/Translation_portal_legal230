@@ -341,7 +341,20 @@ class LanguageDetectView(APIView):
             )
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
 
+    @staticmethod
+    def rename_file(file: InMemoryUploadedFile, file_name: str = None):
+        if not file_name:
+            file_extension = os.path.splitext(file.name)[1]
+            file.name = f'file{file_extension}'
+        else:
+            file.name = file_name
+        print(file.name)
+        return file
+
     def get_text_for_detection(self, file, api_key):
+        # rename file for language detection processing ( handles cases with specific symbols)
+        file_name = file.name
+        file = self.rename_file(file)
         try:
             texts = StatsProcessor(api_key).get_texts(file=file)
         except UnicodeEncodeError:
@@ -353,7 +366,9 @@ class LanguageDetectView(APIView):
             for word in re.sub(r'<[^>]*>', '', text['text']).split()
         ]
         text_for_detection = ' '.join(formated_texts[:self.WORDS_COUNT_FOR_DETECTION])
-        print(text_for_detection)
+
+        # rename file back to keep name
+        file = self.rename_file(file, file_name=file_name)
         return text_for_detection
 
 
