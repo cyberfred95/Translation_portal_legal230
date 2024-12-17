@@ -4,12 +4,14 @@ from django.views.generic import TemplateView
 
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import serializers
 
 from domains.models import Domain
 from languages.models import Language
+from subscriptions.permissions import SubscribedPermission
 from .models import Glossary
 from .serializers import GlossarySerializer
 from .paginators import APIViewPagination, TemplateViewPagination
@@ -33,8 +35,6 @@ class UserGlossariesView(TemplateView):
             return Language.objects.order_by('french_name').all()
         return Language.objects.order_by('name').all()
 
-
-
     def get_glossaries(self):
         tmp_glossaries = Glossary.objects.filter(user=self.request.user)
 
@@ -57,6 +57,7 @@ class UserGlossariesView(TemplateView):
 
 
 class AddGlossaryView(APIView):
+    permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def validate(self, request):
         errors = {}
@@ -95,6 +96,8 @@ class SingleGlossaryView(RetrieveUpdateDestroyAPIView):
 
 
 class GlossariesListAPIView(APIView):
+    permission_classes = (SubscribedPermission, IsAuthenticated)
+
 
     def post(self, request, *args, **kwargs):
         if 'source_language' and 'target_language' and 'domain_name' not in request.data:
@@ -119,6 +122,7 @@ class GlossariesListAPIView(APIView):
 
 
 class GetDefaultGlossaryView(APIView):
+    permission_classes = (SubscribedPermission, IsAuthenticated)
     serializer_class = GlossarySerializer
 
     def post(self, request):

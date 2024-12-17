@@ -5,6 +5,7 @@ import time
 from datetime import datetime
 from urllib.parse import urlparse, unquote
 
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.views.generic import TemplateView
@@ -29,6 +30,7 @@ from .tasks import send_statistic_request
 from glossaries.models import Glossary
 from typing import Optional
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from subscriptions.permissions import SubscribedPermission
 
 import csv
 
@@ -144,6 +146,7 @@ class TranslateView(TemplateView):
 
 
 class GetTemplatesView(APIView):
+    permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def get(self, request):
         if not request.user.is_staff and not request.user.group:
@@ -169,6 +172,7 @@ class GetTemplatesView(APIView):
 
 
 class GetDomainsView(APIView):
+    permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def get(self, request):
         if 'source_language' not in self.request.query_params or 'target_language' not in self.request.query_params:
@@ -285,6 +289,7 @@ class ProjectsHistoryView(TemplateView):
 
 
 class SingleProjectView(APIView):
+    permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def get(self, request):
         project_ids = request.query_params.getlist('project_id[]', [])
@@ -314,6 +319,7 @@ class SingleProjectView(APIView):
 
 class LanguageDetectView(APIView):
     WORDS_COUNT_FOR_DETECTION = 500
+    permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def post(self, request):
         files = request.FILES.getlist('document[]', [])
@@ -374,6 +380,7 @@ class LanguageDetectView(APIView):
 
 class DetectTextLanguageView(APIView):
     WORDS_COUNT_FOR_DETECTION = 500
+    permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def post(self, request):
         text = request.data.get('text')

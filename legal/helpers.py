@@ -25,7 +25,6 @@ def get_translate_data(request, for_statistic=False):
         translate_data['domain_name'] = domain.name if request.LANGUAGE_CODE == 'fr' else request.POST.get(
             'domain_name')
 
-
     return translate_data
 
 
