@@ -12,6 +12,7 @@ class SubscriptionType(models.Model):
 
     name = models.CharField(max_length=255)
     max_words_count = models.IntegerField(default=0)
+    words_used = models.IntegerField(default=0)
     price_type = models.CharField(max_length=255, choices=PriceTypeChoices.choices)
     price = models.DecimalField(max_digits=7, decimal_places=2)
     access_to_writing = models.BooleanField(default=False, verbose_name="Access to Writing")

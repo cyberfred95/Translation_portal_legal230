@@ -33,27 +33,31 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from subscriptions.permissions import SubscribedPermission
 
 import csv
+from subscriptions.helpers import translation_allowed, add_words
 
 PAGINATION_PAGE_SIZE = 20
 
 
 def text_translation(request):
     text = request.POST.get('text')
-    api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
-    response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
-        "text": [text],
-        **get_translate_data(request),
-    }, headers={
+    if translation_allowed(request, len(text)):
 
-        "token": api_key})
-    send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('domain_name'))
-    if response.status_code == 200:
-        send_statistic_request(
-            api_key, [text],
-            request.user.uuid,
-            **get_translate_data(request, for_statistic=True)
-        )
-    return response.json()
+        api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+        response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
+            "text": [text],
+            **get_translate_data(request),
+        }, headers={
+
+            "token": api_key})
+        send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('domain_name'))
+        if response.status_code == 200:
+            send_statistic_request(
+                api_key, [text],
+                request.user.uuid,
+                **get_translate_data(request, for_statistic=True)
+            )
+        add_words(request, len(text))
+        return response.json()
 
 
 def form_glossary_object(request) -> Optional[dict]:
