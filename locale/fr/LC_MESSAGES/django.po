@@ -480,7 +480,7 @@ msgid "Characters"
 msgstr "Caractères"
 
 msgid "Tokens"
-msgstr "Tokens"
+msgstr "Entrants tokens"
 
 msgid "Date"
 msgstr "Date"

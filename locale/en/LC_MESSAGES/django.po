@@ -477,7 +477,7 @@ msgid "Characters"
 msgstr "Characters"
 
 msgid "Tokens"
-msgstr "Tokens"
+msgstr "In tokens"
 
 msgid "Date"
 msgstr "Date"
