@@ -12,7 +12,8 @@ from django.views.generic import TemplateView
 from django.http import JsonResponse, HttpResponseBadRequest
 import django
 from rest_framework.views import APIView
-from .helpers import get_translate_data, lowercase_file_extension
+from .helpers import get_translate_data, lowercase_file_extension, get_word_count
+import uuid
 
 from domains.models import Domain
 from languages.models import Language
@@ -33,7 +34,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from subscriptions.permissions import SubscribedPermission
 
 import csv
-from subscriptions.helpers import translation_allowed, add_words
+from subscriptions.helpers import translation_allowed, add_translations
 
 PAGINATION_PAGE_SIZE = 20
 
@@ -56,8 +57,9 @@ def text_translation(request):
                 request.user.uuid,
                 **get_translate_data(request, for_statistic=True)
             )
-        add_words(request, len(text))
-        return response.json()
+        add_translations(request, words_count=get_word_count(text))
+        return JsonResponse(response.json())
+    return JsonResponse({"message": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def form_glossary_object(request) -> Optional[dict]:
@@ -85,44 +87,47 @@ def form_glossary_object(request) -> Optional[dict]:
 
 
 def file_translate(request):
-    print(form_glossary_object(request))
-    data = {
-        "user_custom_mt_token": request.user.uuid,
-        **get_translate_data(request),
-        "glossary": json.dumps(form_glossary_object(request))
-    }
-    projects = []
     files = request.FILES.getlist('document[]', [])
-    for file in files:
-        file = lowercase_file_extension(file)
-        response = requests.post(
-            preferences.MainSettings.CLOUDSTORAGE_API_URL,
-            data=data,
-            headers={
-                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key,
-                "X-API-Key": preferences.StatisticSettings.API_KEY
-            },
-            files={
-                'source_file': file
-            }
-        )
-        projects.append({
-            'id': response.json().get('id'),
-            'file_name': file.name,
-            'file_extension': os.path.splitext(file.name)[1]
-        })
+    if translation_allowed(request, words_count=1, files_count=len(files)):
 
-    time.sleep(0.1)
-    for project in projects:
-        project_id = project.get('id')
-        res = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
-                           headers={
-                               "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-        send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
-                              translation_name=request.POST.get('translation_name'),
-                              file_name=project['file_name'],
-                              file_ext=project['file_extension'])
-    return {"project_ids": [project.get('id') for project in projects]}
+        data = {
+            "user_custom_mt_token": request.user.uuid,
+            **get_translate_data(request),
+            "glossary": json.dumps(form_glossary_object(request))
+        }
+        projects = []
+        for file in files:
+            file = lowercase_file_extension(file)
+            response = requests.post(
+                preferences.MainSettings.CLOUDSTORAGE_API_URL,
+                data=data,
+                headers={
+                    "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key,
+                    "X-API-Key": preferences.StatisticSettings.API_KEY
+                },
+                files={
+                    'source_file': file
+                }
+            )
+            projects.append({
+                'id': response.json().get('id'),
+                'file_name': file.name,
+                'file_extension': os.path.splitext(file.name)[1]
+            })
+
+        time.sleep(0.1)
+        for project in projects:
+            project_id = project.get('id')
+            res = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+                               headers={
+                                   "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+            send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
+                                  translation_name=request.POST.get('translation_name'),
+                                  file_name=project['file_name'],
+                                  file_ext=project['file_extension'])
+        add_translations(request, words_count=1, files_count=len(files))
+        return JsonResponse({"project_ids": [project.get('id') for project in projects]})
+    return JsonResponse({"message": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TranslateView(TemplateView):
@@ -143,9 +148,9 @@ class TranslateView(TemplateView):
         if not request.user.is_staff and not request.user.group:
             return HttpResponseBadRequest({"message": "You have to be staff or to be in group"})
         if request.POST.get('action') == 'text_translate':
-            return JsonResponse(text_translation(request))
+            return text_translation(request)
         elif request.POST.get('action') == 'file_translate':
-            return JsonResponse(file_translate(request))
+            return file_translate(request)
         return JsonResponse({})
 
 
@@ -358,11 +363,9 @@ class LanguageDetectView(APIView):
             file.name = f'file{file_extension}'
         else:
             file.name = file_name
-        print(file.name)
         return file
 
     def get_text_for_detection(self, file, api_key):
-        # rename file for language detection processing ( handles cases with specific symbols)
         file_name = file.name
         file = self.rename_file(file)
         try:

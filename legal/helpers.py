@@ -35,3 +35,9 @@ def lowercase_file_extension(file: InMemoryUploadedFile) -> InMemoryUploadedFile
     file.name = f"{name}{ext.lower()}"
     print(file.name)
     return file
+
+
+def get_word_count(segment):
+    result = 0
+    result += len(str(segment).split())
+    return result
