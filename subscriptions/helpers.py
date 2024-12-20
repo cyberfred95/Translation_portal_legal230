@@ -20,4 +20,3 @@ def add_translations(request, words_count: int, files_count: int = None):
     if files_count:
         group_subscription.translated_files_count += files_count
     group_subscription.save()
-    
