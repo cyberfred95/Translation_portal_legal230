@@ -11,6 +11,6 @@ class SubscribedPermission(permissions.BasePermission):
         if not request.user.is_staff:
             if not request.user.group:
                 return False
-            if not request.user.group.subscription:
+            if not request.user.group.subscriptions.first():
                 return False
         return True
