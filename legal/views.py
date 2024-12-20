@@ -13,7 +13,6 @@ from django.http import JsonResponse, HttpResponseBadRequest
 import django
 from rest_framework.views import APIView
 from .helpers import get_translate_data, lowercase_file_extension, get_word_count
-import uuid
 
 from domains.models import Domain
 from languages.models import Language
