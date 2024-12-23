@@ -2,8 +2,8 @@ from rest_framework import permissions
 from .models import GroupSubscription
 from django.utils.timezone import datetime
 
-class SubscribedPermission(permissions.BasePermission):
 
+class SubscribedPermission(permissions.BasePermission):
     message = "You are not allowed to perform this action, please contact your group administrator"
 
     def has_permission(self, request, view):

@@ -1,5 +1,7 @@
 def translation_allowed(request, words_count: int, files_count: int = None) -> bool:
     group_subscription = request.user.group.subscriptions.first()
+    print(files_count)
+    print(words_count)
     if files_count:
         if group_subscription.max_files_count < 0 and group_subscription.max_files_count < 0:
             return True

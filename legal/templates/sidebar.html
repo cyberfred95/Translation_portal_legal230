@@ -60,6 +60,7 @@
                 {% trans 'Project history' %}
             </a>
         </li>
+        {% if group_subscription.access_to_writing %}
         <li>
             <a href="{% url 'writing' %}" class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer text-gray-600 group-hover:text-white ease-in-out {% if request.resolver_match.url_name == 'writing' %}bg-gray-600 text-white{% endif %}">
                 <svg class="h-8 w-8" id="Calque_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
@@ -81,6 +82,7 @@
                 {% trans 'Writing' %}
             </a>
         </li>
+        {% endif %}
     </ul>
     <ul>
         <li>

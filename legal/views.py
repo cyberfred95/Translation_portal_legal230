@@ -12,7 +12,7 @@ from django.views.generic import TemplateView
 from django.http import JsonResponse, HttpResponseBadRequest
 import django
 from rest_framework.views import APIView
-from .helpers import get_translate_data, lowercase_file_extension, get_word_count
+from .helpers import get_translate_data, lowercase_file_extension, get_word_count, get_text_from_file
 
 from domains.models import Domain
 from languages.models import Language
@@ -40,7 +40,7 @@ PAGINATION_PAGE_SIZE = 20
 
 def text_translation(request):
     text = request.POST.get('text')
-    if translation_allowed(request, len(text)):
+    if translation_allowed(request, get_word_count(text)):
 
         api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
         response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
@@ -58,7 +58,7 @@ def text_translation(request):
             )
         add_translations(request, words_count=get_word_count(text))
         return JsonResponse(response.json())
-    return JsonResponse({"message": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
+    return JsonResponse({"message": "You are not allowed to translate such amount of data"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def form_glossary_object(request) -> Optional[dict]:
@@ -87,7 +87,11 @@ def form_glossary_object(request) -> Optional[dict]:
 
 def file_translate(request):
     files = request.FILES.getlist('document[]', [])
-    if translation_allowed(request, words_count=1, files_count=len(files)):
+    api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+    words_count = 0
+    for file in files:
+        words_count += len(get_text_from_file(file, api_key=api_key))
+    if translation_allowed(request, words_count=words_count, files_count=len(files)):
 
         data = {
             "user_custom_mt_token": request.user.uuid,
@@ -124,7 +128,7 @@ def file_translate(request):
                                   translation_name=request.POST.get('translation_name'),
                                   file_name=project['file_name'],
                                   file_ext=project['file_extension'])
-        add_translations(request, words_count=1, files_count=len(files))
+        add_translations(request, words_count=words_count, files_count=len(files))
         return JsonResponse({"project_ids": [project.get('id') for project in projects]})
     return JsonResponse({"message": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -134,6 +138,7 @@ class TranslateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["group_subscription"] = self.request.user.group.subscriptions.first()
         context['languages'] = languages
         context['translate_languages'] = self.get_languages()
         return context
@@ -331,29 +336,35 @@ class LanguageDetectView(APIView):
 
     def post(self, request):
         files = request.FILES.getlist('document[]', [])
+        words_count = 0
         result = []
         for file in files:
             file = lowercase_file_extension(file)
 
             api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
-            text_for_detection = self.get_text_for_detection(api_key=api_key, file=file)
-            try:
-                tmp_language = langdetect.detect(text_for_detection)
-                language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
-                    'abbreviation', flat=True).first()
-            except langdetect.LangDetectException:
-                language = Language.objects.values_list('abbreviation', flat=True).first()
-            if not language:
-                language = Language.objects.all().values_list(
-                    'abbreviation', flat=True).first()
+            text_for_detection, words_count = self.get_text_for_detection(api_key=api_key, file=file,
+                                                                          words_count=words_count)
+            if translation_allowed(request, files_count=len(files), words_count=words_count):
 
-            result.append(
-                {
-                    "file_name": f'{file.name}',
-                    "abbreviation": language.upper()
-                }
-            )
-        return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
+                try:
+                    tmp_language = langdetect.detect(text_for_detection)
+                    language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
+                        'abbreviation', flat=True).first()
+                except langdetect.LangDetectException:
+                    language = Language.objects.values_list('abbreviation', flat=True).first()
+                if not language:
+                    language = Language.objects.all().values_list(
+                        'abbreviation', flat=True).first()
+
+                result.append(
+                    {
+                        "file_name": f'{file.name}',
+                        "abbreviation": language.upper()
+                    }
+                )
+                return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
+            return JsonResponse({"message": "You are not allowed to translate such amount of data"},
+                                status=status.HTTP_400_BAD_REQUEST)
 
     @staticmethod
     def rename_file(file: InMemoryUploadedFile, file_name: str = None):
@@ -364,44 +375,46 @@ class LanguageDetectView(APIView):
             file.name = file_name
         return file
 
-    def get_text_for_detection(self, file, api_key):
+    def get_text_for_detection(self, file, api_key, words_count):
         file_name = file.name
         file = self.rename_file(file)
-        try:
-            texts = StatsProcessor(api_key).get_texts(file=file)
-        except UnicodeEncodeError:
-            raise ValueError("Invalid characters in file name")
-
-        formated_texts = [
-            word
-            for text in texts['texts']
-            for word in re.sub(r'<[^>]*>', '', text['text']).split()
-        ]
+        formated_texts = get_text_from_file(file, api_key)
+        words_count += len(formated_texts)
         text_for_detection = ' '.join(formated_texts[:self.WORDS_COUNT_FOR_DETECTION])
-
-        # rename file back to keep name
         file = self.rename_file(file, file_name=file_name)
-        return text_for_detection
+        return text_for_detection, words_count
 
 
 class DetectTextLanguageView(APIView):
     WORDS_COUNT_FOR_DETECTION = 500
     permission_classes = (SubscribedPermission, IsAuthenticated)
 
-    def post(self, request):
-        text = request.data.get('text')
-        tmp_language = langdetect.detect(self.get_text_for_detection(text))
-        language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
-            'abbreviation', flat=True).first()
-        if not language:
-            language = Language.objects.all().values_list(
-                'abbreviation', flat=True).first()
-
-        return Response({"language": language.upper()})
-
-    def get_text_for_detection(self, text):
+    @staticmethod
+    def text_string_to_array(text):
         text = re.sub(r'<[^>]*>', '', text)
         text = text.split()
+        return text
+
+    def post(self, request):
+
+        text = request.data.get('text')
+        text_for_detection = self.get_text_for_detection(text)
+        texts = self.text_string_to_array(text)
+        if translation_allowed(request, words_count=len(texts)):
+
+            tmp_language = langdetect.detect(text_for_detection)
+            language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
+                'abbreviation', flat=True).first()
+            if not language:
+                language = Language.objects.all().values_list(
+                    'abbreviation', flat=True).first()
+
+            return Response({"language": language.upper()})
+        return Response({"message": "You are not allowed to translate such amount of data"},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    def get_text_for_detection(self, text):
+        text = self.text_string_to_array(text)
 
         text_for_detection = ' '.join(text[:self.WORDS_COUNT_FOR_DETECTION])
         return text_for_detection
