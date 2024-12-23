@@ -1,6 +1,6 @@
 from rest_framework import permissions
 from .models import GroupSubscription
-from django.utils.timezone import datetime
+from django.utils.timezone import now
 
 
 class SubscribedPermission(permissions.BasePermission):
@@ -17,8 +17,10 @@ class SubscribedPermission(permissions.BasePermission):
                 return False
             if subscription.status != GroupSubscription.GroupSubscriptionChoices.ACTIVE:
                 return False
-            # if datetime.now() > subscription.end_date or datetime.now() < subscription.start_date:
-            #     return False
+
+            current_time = now()
+            if current_time > subscription.end_date or current_time < subscription.start_date:
+                return False
             if hasattr(view, 'requires_writing_access') and view.requires_writing_access:
                 if not subscription.access_to_writing:
                     return False
