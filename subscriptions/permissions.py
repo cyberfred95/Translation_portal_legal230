@@ -17,7 +17,10 @@ class SubscribedPermission(permissions.BasePermission):
                 return False
             if subscription.status != GroupSubscription.GroupSubscriptionChoices.ACTIVE:
                 return False
-            if datetime.now() > subscription.end_date or datetime.now() < subscription.start_date:
-                return False
+            # if datetime.now() > subscription.end_date or datetime.now() < subscription.start_date:
+            #     return False
+            if hasattr(view, 'requires_writing_access') and view.requires_writing_access:
+                if not subscription.access_to_writing:
+                    return False
 
         return True
