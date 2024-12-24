@@ -62,7 +62,7 @@ $(document).ready(function () {
                     }
                 },
                 error: function (error) {
-                    errorNotification(error.status, error.responseJSON.detail);
+                    errorNotification(error?.status, error?.responseJSON?.detail);
                 },
             });
         }
@@ -106,7 +106,7 @@ $(document).ready(function () {
                 $('#expert-revision').removeClass('hidden');
             },
             error: function (error) {
-                errorNotification(error.status, error.responseJSON.detail);
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
             complete: function () {
                 $('#main-loader').addClass('hidden');
@@ -134,7 +134,7 @@ $(document).ready(function () {
                 $('#expert-revision').addClass('hidden');
             },
             error: function (error) {
-                errorNotification(error.status, error.responseJSON.detail);
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
         });
     });
@@ -207,7 +207,7 @@ $(document).ready(function () {
                 $select.val(detectedLanguage).trigger('change');
             },
             error: function (error) {
-                errorNotification(error.status, error.responseJSON.detail);
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
             complete: function () {
                 $('#main-loader').addClass('hidden');

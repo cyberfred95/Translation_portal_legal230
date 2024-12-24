@@ -330,7 +330,7 @@ $(document).ready(function () {
                 checkLanguagesConsistency();
             },
             error: function (error) {
-                errorNotification(error.status, error.responseJSON.detail);
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
         });
     }
@@ -585,7 +585,7 @@ $(document).ready(function () {
                 updateDomainsList(response);
             },
             error: function (error) {
-                errorNotification(error.status, error.responseJSON.detail);
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
         });
     }
@@ -628,7 +628,7 @@ $(document).ready(function () {
                 updateSubDomainsList(response.data);
             },
             error: function (error) {
-                errorNotification(error.status, error.responseJSON.detail);
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
         });
     }
@@ -695,7 +695,7 @@ $(document).ready(function () {
                 selectedGlossary = response?.id;
             },
             error: function (error) {
-                errorNotification(error.status, error.responseJSON.detail);
+                errorNotification(error?.status, error?.responseJSON?.detail);
                 nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
                     .addClass('border-green-700 text-green-700')
                     .prop("disabled", false);
@@ -727,7 +727,7 @@ $(document).ready(function () {
                     .prop("disabled", true);
             },
             error: function (error) {
-                errorNotification(error.status, error.responseJSON.detail);
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
         });
     }
@@ -890,7 +890,7 @@ $(document).ready(function () {
                 $list.append($item);
             },
             error: function (error) {
-                errorNotification(error.status, error.responseJSON.detail);
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
         });
     });
@@ -929,7 +929,7 @@ $(document).ready(function () {
                 }
             },
             error: function (error) {
-                errorNotification(error.status, error.responseJSON.detail);
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
             complete: function () {
                 $('#loader-row').addClass('hidden');
@@ -1158,7 +1158,7 @@ $(document).ready(function () {
                 $closeRevision.addClass('hidden');
             },
             error: function (error) {
-                errorNotification(error.status, error.responseJSON.detail);
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
         });
     });
@@ -1184,7 +1184,7 @@ $(document).ready(function () {
                     updateProjectTable(response);
                 },
                 error: function (error) {
-                    errorNotification(error.status, error.responseJSON.detail);
+                    errorNotification(error?.status, error?.responseJSON?.detail);
                 },
                 complete: function () {
                     $('#loader-row').addClass('hidden');

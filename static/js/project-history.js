@@ -84,7 +84,7 @@ $(document).ready(function () {
                 window.location.reload();
             },
             error: function (error) {
-                errorNotification(error.status, error.responseJSON.detail);
+                errorNotification(error?.status, error?.responseJSON?.detail);
             }
         });
 
@@ -125,7 +125,7 @@ $(document).ready(function () {
                 $deleteButton.closest('tr').remove();
             },
             error: function (error) {
-                errorNotification(error.status, error.responseJSON.detail);
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
         });
     });

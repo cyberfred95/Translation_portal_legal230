@@ -86,7 +86,7 @@ $(document).ready(function () {
                 $('#expert-revision').removeClass('hidden');
             },
             error: function (error) {
-                errorNotification(error.status, error.responseJSON.detail);
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
             complete: function () {
                 stopLoading();
