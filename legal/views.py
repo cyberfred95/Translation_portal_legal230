@@ -138,7 +138,6 @@ class TranslateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["group_subscription"] = self.request.user.group.subscriptions.first()
         context['languages'] = languages
         context['translate_languages'] = self.get_languages()
         return context
