@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'glossaries.apps.GlossariesConfig',
     'writing.apps.WritingConfig',
     'subscriptions.apps.SubscriptionsConfig',
-    'quoting.apps.QuotingConfig',
+    # 'quoting.apps.QuotingConfig',
 
 ]
 
