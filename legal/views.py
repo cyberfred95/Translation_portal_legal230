@@ -150,7 +150,21 @@ class TranslateView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['languages'] = languages
         context['translate_languages'] = self.get_languages()
+        context['access_to_default_glossaries'] = self.default_glossary_allowed()
         return context
+
+    def default_glossary_allowed(self):
+
+        if self.request.user.is_staff:
+            return True
+        group = self.request.user.group
+        if group:
+            group_subscription = group.subscriptions.first()
+            if group_subscription and group_subscription.access_to_default_glossaries:
+                return True
+        return False
+
+
 
     def get_languages(self):
         if self.request.LANGUAGE_CODE == 'fr':
