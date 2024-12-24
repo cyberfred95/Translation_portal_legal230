@@ -46,10 +46,10 @@ class WritingProcessAPIView(APIView):
     def post(self, request):
         data = request.data
         if not request.user.is_staff and not request.user.group:
-            return Response({"message": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
         prompt = Prompt.objects.filter(id=data['prompt']).first()
         if not prompt:
-            return Response({"message": "Prompt not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Prompt not found"}, status=status.HTTP_404_NOT_FOUND)
 
         response = requests.post(
             url=preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + 'gpt-processing/foreign_gpt_process/',
@@ -63,6 +63,7 @@ class WritingProcessAPIView(APIView):
 
             }
         )
+        print(response.json())
         result = response.json().get('result')
         if not result:
             result = []

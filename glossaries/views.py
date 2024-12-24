@@ -106,7 +106,7 @@ class GlossariesListAPIView(APIView):
     def post(self, request, *args, **kwargs):
         if 'source_language' and 'target_language' and 'domain_name' not in request.data:
             return Response(
-                {"message": "provide source_language, target_language and domain_name"},
+                {"detail": "provide source_language, target_language and domain_name"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         glossaries = Glossary.objects.filter(
