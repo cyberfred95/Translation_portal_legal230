@@ -15,8 +15,6 @@ $(document).ready(function () {
         }
     });
 
-    // translatedQuill.enable(false);
-
     $(".source-language").attr("data-placeholder", language_code === 'en' ? "Source language" : "Langue source");
     $(".target-language").attr("data-placeholder", language_code === 'en' ? "Target language" : "Langue cible");
     $(".domain-select").attr("data-placeholder", language_code === 'en' ? "Glossary" : "Glossaire");
@@ -152,8 +150,6 @@ $(document).ready(function () {
     $('#copy').click(function () {
         var translatedText = translatedQuill.getText();
         var translatedHtml = translatedQuill.root.innerHTML;
-        console.log('translatedHtml', translatedHtml);
-        console.log('translatedText',translatedText);
 
         if (translatedHtml) {
             if (navigator.clipboard && window.ClipboardItem) {
@@ -167,8 +163,7 @@ $(document).ready(function () {
                 ];
 
                 navigator.clipboard.write(data).then(function () {
-                    console.log('HTML і текст скопійовані успішно!');
-                    showTooltip(); // Показати підказку, якщо функція визначена
+                    showTooltip();
                 }).catch(function (error) {
                     console.error('Помилка копіювання: ', error);
                 });
