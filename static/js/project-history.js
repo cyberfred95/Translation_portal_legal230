@@ -121,7 +121,7 @@ $(document).ready(function () {
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
             },
-            success: function (response) {
+            success: function () {
                 $deleteButton.closest('tr').remove();
             },
             error: function (error) {

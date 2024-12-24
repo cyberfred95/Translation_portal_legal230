@@ -1,7 +1,4 @@
 const errorNotification = (status, message) => {
-    console.log('status', status);
-    console.log('message', message);
-
     const $modalError = $('#modal-error');
     const $closeModalError = $('#close-modal-error');
     const $errorMessage = $modalError.find('.error-text');
