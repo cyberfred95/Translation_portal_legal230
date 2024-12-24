@@ -23,8 +23,4 @@ const errorNotification = (status, message) => {
             $closeModalError.addClass('hidden');
         }
     });
-
-    $(document).on('click', '.reload', function () {
-        window.location.reload();
-    });
 };
