@@ -328,9 +328,9 @@ $(document).ready(function () {
                 }
                 checkLanguagesConsistency();
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
+            },
         });
     }
 
@@ -583,9 +583,9 @@ $(document).ready(function () {
             success: function (response) {
                 updateDomainsList(response);
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
+            },
         });
     }
 
@@ -626,9 +626,9 @@ $(document).ready(function () {
 
                 updateSubDomainsList(response.data);
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
+            },
         });
     }
 
@@ -693,8 +693,8 @@ $(document).ready(function () {
                 updateGlossaryList([response], true);
                 selectedGlossary = response?.id;
             },
-            error: function () {
-                errorNotification();
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
                 nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
                     .addClass('border-green-700 text-green-700')
                     .prop("disabled", false);
@@ -725,9 +725,9 @@ $(document).ready(function () {
                     .addClass('border-gray-225 text-gray-225 pointer-events-none')
                     .prop("disabled", true);
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
+            },
         });
     }
 
@@ -888,9 +888,9 @@ $(document).ready(function () {
 
                 $list.append($item);
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
+            },
         });
     });
 
@@ -911,6 +911,7 @@ $(document).ready(function () {
         formData.append('action', 'file_translate');
 
         $('#loader-row').removeClass('hidden');
+
         $.ajax({
             url: translate,
             type: 'POST',
@@ -926,10 +927,12 @@ $(document).ready(function () {
                     startStatusCheck(response.project_ids);
                 }
             },
-            error: function () {
-                $('#loader-row').addClass('hidden');
-                errorNotification();
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
             },
+            complete: function () {
+                $('#loader-row').addClass('hidden');
+            }
         });
     };
 
@@ -1153,9 +1156,9 @@ $(document).ready(function () {
                 $modalRevision.addClass('hidden');
                 $closeRevision.addClass('hidden');
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
+            },
         });
     });
 
@@ -1179,8 +1182,8 @@ $(document).ready(function () {
                 success: function (response) {
                     updateProjectTable(response);
                 },
-                error: function () {
-                    errorNotification();
+                error: function (error) {
+                    errorNotification(error.status, error.responseJSON.detail);
                 },
                 complete: function () {
                     $('#loader-row').addClass('hidden');

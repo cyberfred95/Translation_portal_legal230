@@ -127,9 +127,9 @@ $(document).ready(function () {
             success: function () {
                 $deleteButton.closest('tr').remove();
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
+            },
         });
     });
 
@@ -175,9 +175,9 @@ $(document).ready(function () {
                 $edit_modal.removeClass('flex').addClass('hidden');
                 window.location.reload();
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
+            },
         });
     });
 
@@ -226,9 +226,9 @@ $(document).ready(function () {
             success: function () {
                 window.location.reload();
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
+            },
         });
     });
 });
