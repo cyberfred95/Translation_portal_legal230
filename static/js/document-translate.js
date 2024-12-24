@@ -107,8 +107,9 @@ $(document).ready(function () {
             getDomainsGroups();
         }
         if (currentStep === 2) {
-            if (!defaultDomain || !access_to_default_glossaries) {
+            if (!defaultDomain && access_to_default_glossaries) {
                 loadDefaultGlossary();
+                $(".add-glossary-btn").removeClass('hidden');
                 $(".step-4 .default").addClass('bg-gray-600 text-white');
             } else {
                 loadMyGlossaries();
@@ -600,9 +601,10 @@ $(document).ready(function () {
             },
             success: function (response) {
                 defaultDomain = response.default_domain;
-                if (response.default_domain || access_to_default_glossaries) {
+                if (response.default_domain || !access_to_default_glossaries) {
                     $(".default").addClass('hidden');
                     $(".my-glossary").addClass('rounded-l-md');
+                    $(".add-glossary-btn").removeClass('hidden');
                     selectedGlossaryType = 'my-glossary'
                 } else {
                     $(".default").removeClass('hidden');
@@ -635,7 +637,7 @@ $(document).ready(function () {
     // ------------- STEP-4 -------------
 
     $(".step-4 .default").click(function () {
-        if (!defaultDomain || !access_to_default_glossaries) {
+        if (!defaultDomain || access_to_default_glossaries) {
             selectGlossaryType('default');
             loadDefaultGlossary();
             $('.terminology-step').text('default').removeClass('hidden');
@@ -719,7 +721,7 @@ $(document).ready(function () {
             success: function (response) {
                 updateGlossaryList(response, false);
                 selectedGlossary = '';
-                $('.terminology-step').text('default').removeClass('hidden');
+                $('.terminology-step').text('').removeClass('hidden');
                 nextStep.removeClass('border-green-700 text-white text-green-700')
                     .addClass('border-gray-225 text-gray-225 pointer-events-none')
                     .prop("disabled", true);
@@ -752,7 +754,7 @@ $(document).ready(function () {
                     $(".glossary-item").removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
                     $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-gray-600 text-white');
                     selectedGlossary = glossary.id;
-                    $('.terminology-step').text(selectedGlossary).removeClass('hidden');
+                    $('.terminology-step').text(glossary.name).removeClass('hidden');
 
                     if (selectedGlossaryType === 'my-glossary') {
                         nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
@@ -878,7 +880,7 @@ $(document).ready(function () {
                         $(".glossary-item").removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
                         $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-gray-600 text-white');
                         selectedGlossary = response.id;
-                        $('.terminology-step').text(selectedGlossary).removeClass('hidden');
+                        $('.terminology-step').text(response.name).removeClass('hidden');
                         nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
                             .addClass('border-green-700 text-green-700')
                             .prop("disabled", false);
