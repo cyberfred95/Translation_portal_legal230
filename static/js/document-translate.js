@@ -109,14 +109,13 @@ $(document).ready(function () {
         if (currentStep === 2) {
             if (!defaultDomain && access_to_default_glossaries) {
                 loadDefaultGlossary();
-                $(".add-glossary-btn").removeClass('hidden');
+                $(".add-glossary-btn").addClass('hidden');
                 $(".step-4 .default").addClass('bg-gray-600 text-white');
             } else {
                 loadMyGlossaries();
+                $(".add-glossary-btn").removeClass('hidden');
                 $(".step-4 .my-glossary").addClass('bg-gray-600 text-white');
             }
-            $('.terminology-step').text('default').removeClass('hidden');
-
         }
         if (currentStep === 3) {
             fileTranslate();
@@ -608,6 +607,7 @@ $(document).ready(function () {
                     selectedGlossaryType = 'my-glossary'
                 } else {
                     $(".default").removeClass('hidden');
+                    $(".add-glossary-btn").addClass('hidden');
                     $(".my-glossary").removeClass('rounded-l-md');
                     selectedGlossaryType = 'default'
                 }
@@ -693,6 +693,10 @@ $(document).ready(function () {
             success: function (response) {
                 updateGlossaryList([response], true);
                 selectedGlossary = response?.id;
+                $('.terminology-step').text('default').removeClass('hidden');
+                nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
+                    .addClass('border-green-700 text-green-700')
+                    .prop("disabled", false);
             },
             error: function (error) {
                 errorNotification(error?.status, error?.responseJSON?.detail);
