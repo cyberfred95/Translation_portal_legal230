@@ -56,5 +56,6 @@ def get_text_from_file(file: InMemoryUploadedFile, api_key) -> list:
         for text in texts['texts']
         for word in re.sub(r'<[^>]*>', '', text['text']).split()
     ]
+    file.seek(0)
     return formated_texts
 
