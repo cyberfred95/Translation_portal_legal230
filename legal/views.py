@@ -58,7 +58,7 @@ def text_translation(request):
             )
         add_translations(request, words_count=get_word_count(text))
         return JsonResponse(response.json())
-    return JsonResponse({"message": "You are not allowed to translate such amount of data"}, status=status.HTTP_400_BAD_REQUEST)
+    return JsonResponse({"detail": "You are not allowed to translate such amount of data"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def form_glossary_object(request) -> Optional[dict]:
@@ -130,7 +130,7 @@ def file_translate(request):
                                   file_ext=project['file_extension'])
         add_translations(request, words_count=words_count, files_count=len(files))
         return JsonResponse({"project_ids": [project.get('id') for project in projects]})
-    return JsonResponse({"message": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
+    return JsonResponse({"detail": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TranslateView(TemplateView):
@@ -149,7 +149,7 @@ class TranslateView(TemplateView):
 
     def post(self, request):
         if not request.user.is_staff and not request.user.group:
-            return HttpResponseBadRequest({"message": "You have to be staff or to be in group"})
+            return HttpResponseBadRequest({"detail": "You have to be staff or to be in group"})
         if request.POST.get('action') == 'text_translate':
             return text_translation(request)
         elif request.POST.get('action') == 'file_translate':
@@ -162,9 +162,9 @@ class GetTemplatesView(APIView):
 
     def get(self, request):
         if not request.user.is_staff and not request.user.group:
-            return Response({"message": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
         if 'source_language' not in self.request.query_params or 'target_language' not in self.request.query_params:
-            return Response({"message": "Missing source language or target language"},
+            return Response({"detail": "Missing source language or target language"},
                             status=status.HTTP_400_BAD_REQUEST)
         templates = requests.post(
             url=preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/get-templates",
@@ -240,7 +240,7 @@ def expert_revision(request):
 @api_view(['POST'])
 def expert_revision_file(request):
     if not request.user.is_staff and not request.user.group:
-        return Response({"message": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"detail": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
     project_id = request.POST['project_id']
     project = requests.get(
         preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
@@ -259,7 +259,7 @@ def expert_revision_file(request):
             "user_email": request.user.email,
             "company": request.user.group.name
         })
-    return Response({"message": "Sent to post editing"}, status=status.HTTP_200_OK)
+    return Response({"detail": "Sent to post editing"}, status=status.HTTP_200_OK)
 
 
 class ProjectsHistoryView(TemplateView):
@@ -326,7 +326,7 @@ class SingleProjectView(APIView):
                                    headers={
                                        "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
 
-        return Response({"message": "Sucessfully deleted"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"detail": "Sucessfully deleted"}, status=status.HTTP_204_NO_CONTENT)
 
 
 class LanguageDetectView(APIView):
@@ -362,7 +362,7 @@ class LanguageDetectView(APIView):
                     }
                 )
                 return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
-            return JsonResponse({"message": "You are not allowed to translate such amount of data"},
+            return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
                                 status=status.HTTP_400_BAD_REQUEST)
 
     @staticmethod
@@ -409,7 +409,7 @@ class DetectTextLanguageView(APIView):
                     'abbreviation', flat=True).first()
 
             return Response({"language": language.upper()})
-        return Response({"message": "You are not allowed to translate such amount of data"},
+        return Response({"detail": "You are not allowed to translate such amount of data"},
                         status=status.HTTP_400_BAD_REQUEST)
 
     def get_text_for_detection(self, text):
