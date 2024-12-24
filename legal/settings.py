@@ -228,3 +228,10 @@ FILES_PROCESSING_API_URL = 'https://office.fileprocessing.custom.mt'
 
 USE_X_FORWARDED_HOST=True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
