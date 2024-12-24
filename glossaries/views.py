@@ -64,19 +64,15 @@ class AddGlossaryView(APIView):
         group_subscription = request.user.group.subscriptions.first()
         user_glossaries_count = Glossary.objects.filter(user=request.user).count()
         if user_glossaries_count + 1 > group_subscription.custom_glossaries_count:
-            errors[
-                'glossaries_count'] = "You are not allowed to add more glossaries. Please contanct your group administator"
+            raise serializers.ValidationError({"detail":"You are not allowed to add more glossaries. Please contanct your group administator"})
 
         languages_list = Language.objects.all().values_list(Lower('abbreviation'), flat=True)
         if request.data["source_language"] == request.data["target_language"]:
-            errors["language_pair"] = "Source and target languages cannot be the same"
+            raise serializers.ValidationError({"detail":"Source and target languages cannot be the same"})
         if request.data["source_language"] not in languages_list:
-            errors["source_language"] = "Invalid source language"
+            raise serializers.ValidationError({"detail":"Invalid source language"})
         if request.data["target_language"] not in languages_list:
-            errors["target_language"] = "Invalid target language"
-
-        if errors:
-            raise serializers.ValidationError(errors)
+            raise serializers.ValidationError({"detail":"Invalid target language"})
 
     def post(self, request):
         self.validate(request)
