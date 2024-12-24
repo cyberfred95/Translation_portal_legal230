@@ -83,8 +83,9 @@ $(document).ready(function () {
             success: function () {
                 window.location.reload();
             },
-            error: function () {
-                errorNotification();            }
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
+            }
         });
 
         $modal.addClass('hidden');
@@ -123,9 +124,9 @@ $(document).ready(function () {
             success: function (response) {
                 $deleteButton.closest('tr').remove();
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
+            },
         });
     });
 

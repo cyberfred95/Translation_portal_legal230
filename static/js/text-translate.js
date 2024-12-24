@@ -63,9 +63,9 @@ $(document).ready(function () {
                         domainSelect.find('option:not(:disabled):first').prop('selected', true);
                     }
                 },
-                error: function () {
-                    errorNotification();
-                }
+                error: function (error) {
+                    errorNotification(error.status, error.responseJSON.detail);
+                },
             });
         }
     }
@@ -107,8 +107,8 @@ $(document).ready(function () {
 
                 $('#expert-revision').removeClass('hidden');
             },
-            error: function () {
-                errorNotification();
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
             },
             complete: function () {
                 $('#main-loader').addClass('hidden');
@@ -135,9 +135,9 @@ $(document).ready(function () {
             success: function () {
                 $('#expert-revision').addClass('hidden');
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
+            },
         });
     });
 
@@ -211,8 +211,8 @@ $(document).ready(function () {
 
                 $select.val(detectedLanguage).trigger('change');
             },
-            error: function () {
-                errorNotification();
+            error: function (error) {
+                errorNotification(error.status, error.responseJSON.detail);
             },
             complete: function () {
                 $('#main-loader').addClass('hidden');
