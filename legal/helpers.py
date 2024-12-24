@@ -49,7 +49,7 @@ def get_text_from_file(file: InMemoryUploadedFile, api_key) -> list:
     try:
         texts = StatsProcessor(api_key).get_texts(file=file)
     except UnicodeEncodeError:
-        raise ValueError("Invalid characters in file name")
+        raise ValueError({"detail":"Invalid characters in file name"})
 
     formated_texts = [
         word
