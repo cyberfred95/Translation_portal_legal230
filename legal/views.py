@@ -91,6 +91,7 @@ def file_translate(request):
     files = request.FILES.getlist('document[]', [])
     api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
     cache_data = cache.get(f"{request.user.uuid}")
+    print(cache_data)
 
     if cache_data:
         words_count = cache_data.get('words_count')
@@ -160,7 +161,7 @@ class TranslateView(TemplateView):
         group = self.request.user.group
         if group:
             group_subscription = group.subscriptions.first()
-            if group_subscription and group_subscription.access_to_default_glossaries:
+            if group_subscription and group_subscription.access_to_official_glossaries:
                 return True
         return False
 
