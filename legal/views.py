@@ -31,14 +31,13 @@ from glossaries.models import Glossary
 from typing import Optional
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from subscriptions.permissions import SubscribedPermission
+from django.core.cache import cache
 
 import csv
 from subscriptions.helpers import translation_allowed, add_translations
-from django.core.cache import cache
-
 
 PAGINATION_PAGE_SIZE = 20
-CACHE_TIMEOUT_IN_SECONDS = 3600
+CACHE_TTL=3600
 
 
 def text_translation(request):
@@ -61,8 +60,7 @@ def text_translation(request):
             )
         add_translations(request, words_count=get_word_count(text))
         return JsonResponse(response.json())
-    return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
-                        status=status.HTTP_400_BAD_REQUEST)
+    return JsonResponse({"detail": "You are not allowed to translate such amount of data"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def form_glossary_object(request) -> Optional[dict]:
@@ -95,10 +93,15 @@ def file_translate(request):
     cache_data = cache.get(f"{request.user.uuid}")
 
     if cache_data:
+        words_count = cache_data.get('words_count')
         cache.delete(f"{request.user.uuid}")
+    else:
+        words_count = 0
+        for file in files:
+            files = request.FILES.getlist('document[]', [])
+            words_count += get_text_from_file(file, api_key)
 
-    if translation_allowed(request, words_count=cache_data.get('words_count'), files_count=len(files)):
-
+    if translation_allowed(request, words_count=words_count, files_count=len(files)):
 
         data = {
             "user_custom_mt_token": request.user.uuid,
@@ -135,10 +138,8 @@ def file_translate(request):
                                   translation_name=request.POST.get('translation_name'),
                                   file_name=project['file_name'],
                                   file_ext=project['file_extension'])
-        add_translations(request, words_count=cache_data.get('words_count'), files_count=len(files))
+        add_translations(request, words_count=words_count, files_count=len(files))
         return JsonResponse({"project_ids": [project.get('id') for project in projects]})
-
-
     return JsonResponse({"detail": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -370,7 +371,7 @@ class LanguageDetectView(APIView):
                         "abbreviation": language.upper()
                     }
                 )
-                cache.set(f"{request.user.uuid}", {"words_count": words_count}, timeout=CACHE_TIMEOUT_IN_SECONDS)
+                cache.set(f"{request.user.uuid}", {"words_count", words_count}, timeout=CACHE_TTL)
                 return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
             return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
                                 status=status.HTTP_400_BAD_REQUEST)
