@@ -20,7 +20,7 @@ urlpatterns = i18n_patterns(
     path('project/', login_required(SingleProjectView.as_view()), name='single_project'),
     path('get-templates/', login_required(GetTemplatesView.as_view()), name='get-templates'),
     path('get-domains/', login_required(GetDomainsView.as_view()), name='get_domains'),
-    path('profile_details/', login_required(ProfileDetailsView.as_view()), name='profile_details'),
+    path('profile-details/', login_required(ProfileDetailsView.as_view()), name='profile_details'),
 
     path('refresh_domains/', update_domains_view, name='refresh_domains'),
     path('refresh_prompts/', refresh_prompts_view, name='refresh_prompts'),
