@@ -39,7 +39,7 @@
         <td width="236"
             style="width:177.20000000000002pt;background-color:#ffffff;padding:0pt 5.3858267716535435pt 0pt 5.3858267716535435pt;border-left:0.5pt solid #000000;border-top:none;border-right:0.5pt solid #000000;border-bottom:none;">
             <p style="margin-top:0pt;margin-bottom:0pt;border:none;mso-border-left-alt:none;mso-border-top-alt:none;mso-border-right-alt:none;mso-border-bottom-alt:none;mso-border-between:none">
-                <span style="font-family:'Arial';font-size:10pt;background-color:#ffff00;color:#000000;mso-style-textfill-fill-color:#000000">COMPANY NAME</span>
+                <span style="font-family:'Arial';font-size:10pt;background-color:#ffff00;color:#000000;mso-style-textfill-fill-color:#000000">{{ company }}</span>
             </p></td>
     </tr>
     <tr style="height:20.400000000000002pt;">
@@ -56,7 +56,7 @@
             <p style="margin-top:0pt;margin-bottom:0pt;border:none;mso-border-left-alt:none;mso-border-top-alt:none;mso-border-right-alt:none;mso-border-bottom-alt:none;mso-border-between:none">
                 <span style="font-family:'Arial';font-size:10pt;color:#000000;mso-style-textfill-fill-color:#000000">Created</span><span
                     style="font-family:'Arial';font-size:10pt;color:#000000;mso-style-textfill-fill-color:#000000">: </span><span
-                    style="font-family:'Arial';font-size:10pt;background-color:#ffff00;color:#000000;mso-style-textfill-fill-color:#000000">XX/XX/XXXX</span>
+                    style="font-family:'Arial';font-size:10pt;background-color:#ffff00;color:#000000;mso-style-textfill-fill-color:#000000">{{ created_at|date:"d/m/Y" }}</span>
             </p></td>
     </tr>
 </table>
