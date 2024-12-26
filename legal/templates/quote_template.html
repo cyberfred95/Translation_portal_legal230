@@ -21,9 +21,6 @@
             background-color: #2f9d6f;
             color: #ffffff;
         }
-        .highlight {
-            background-color: #ffff00;
-        }
         .header-table td {
             border: none;
             padding: 5px;
@@ -42,21 +39,20 @@
             <p>75 Boulevard Haussmann</p>
             <p>75008 Paris</p>
         </td>
-        <td class="bordered"><strong>QUOTE:</strong> <span class="highlight">XXXX</span></td>
+        <td class="bordered"><strong>QUOTE:</strong> <span>XXXX</span></td>
     </tr>
     <tr>
-        <td class="bordered highlight">{{ company }}</td>
+        <td class="bordered">{{ company }}</td>
     </tr>
     <tr>
-        <td class="bordered highlight">Contact name</td>
+        <td class="bordered">Contact name</td>
     </tr>
     <tr>
-        <td class="bordered">Created: <span class="highlight">{{ created_at|date:"d/m/Y" }}</span></td>
+        <td class="bordered">Created: <span>{{ created_at|date:"d/m/Y" }}</span></td>
     </tr>
 </table>
 
-<!-- Quote Details -->
-<p>Dear <span class="highlight">XXX</span>,</p>
+<p>Dear <span>XXX</span>,</p>
 <p>We are pleased to send you a quote for the proofreading of your document.</p>
 
 <table>
@@ -67,10 +63,10 @@
         <th>Total ex. VAT</th>
     </tr>
     <tr>
-        <td class="highlight">{{ file_name }}</td>
-        <td class="highlight">{{ words_count }} words</td>
-        <td class="highlight">{{ word_price }} €</td>
-        <td class="highlight">{{ total_price }} €</td>
+        <td>{{ file_name }}</td>
+        <td>{{ words_count }} words</td>
+        <td>{{ word_price }} €</td>
+        <td>{{ total_price }} €</td>
     </tr>
 </table>
 
