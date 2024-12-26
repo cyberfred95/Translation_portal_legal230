@@ -4,6 +4,8 @@ import re
 import time
 from datetime import datetime
 from urllib.parse import urlparse, unquote
+from quoting.models import LanguageQuote
+from django.utils.timezone import now
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -60,7 +62,8 @@ def text_translation(request):
             )
         add_translations(request, words_count=get_word_count(text))
         return JsonResponse(response.json())
-    return JsonResponse({"detail": "You are not allowed to translate such amount of data"}, status=status.HTTP_400_BAD_REQUEST)
+    return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 def form_glossary_object(request) -> Optional[dict]:
@@ -165,8 +168,6 @@ class TranslateView(TemplateView):
                 return True
         return False
 
-
-
     def get_languages(self):
         if self.request.LANGUAGE_CODE == 'fr':
             return Language.objects.order_by('french_name').all()
@@ -261,30 +262,46 @@ def expert_revision(request):
     return JsonResponse({})
 
 
-@csrf_exempt
-@api_view(['POST'])
-def expert_revision_file(request):
-    if not request.user.is_staff and not request.user.group:
-        return Response({"detail": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
-    project_id = request.POST['project_id']
-    project = requests.get(
-        preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
-        headers={
-            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
-        }
+class FileExpertRevisionView(APIView):
 
-    ).json()
-    response = requests.post(
-        preferences.MainSettings.CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
-        headers={
-            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
-        data={
-            "email": preferences.MainSettings.sender_email,
-            "username": request.user.username,
-            "user_email": request.user.email,
-            "company": request.user.group.name
-        })
-    return Response({"detail": "Sent to post editing"}, status=status.HTTP_200_OK)
+    @staticmethod
+    def get_quote(project: dict, file:InMemoryUploadedFile) -> Optional[dict]:
+        language_quote = LanguageQuote.objects.filter(
+            source_language__abbreviation__iexact=project.get('source_language'),
+            target_language__abbreviation__iexact=project.get('target_language')).first()
+        if language_quote:
+            api_key = None
+            words_count = get_text_from_file(file, api_key=api_key)
+            return {
+                'word_price': language_quote.price,
+                'words_count': words_count,
+                'total_price': words_count * language_quote.price,
+                'created_at': now(),
+            }
+        return
+
+    def post(self, request):
+        if not request.user.is_staff and not request.user.group:
+            return Response({"detail": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
+        project_id = request.POST['project_id']
+        project = requests.get(
+            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+            headers={
+                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+            }
+
+        ).json()
+        response = requests.post(
+            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
+            headers={
+                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
+            data={
+                "email": preferences.MainSettings.sender_email,
+                "username": request.user.username,
+                "user_email": request.user.email,
+                "company": request.user.group.name
+            })
+        return Response({"detail": "Sent to post editing"}, status=status.HTTP_200_OK)
 
 
 class ProjectsHistoryView(TemplateView):

@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static, serve
-from .views import TranslateView, expert_revision, expert_revision_file, ProjectsHistoryView, SingleProjectView, \
+from .views import TranslateView, expert_revision, FileExpertRevisionView, ProjectsHistoryView, SingleProjectView, \
     GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
@@ -15,7 +15,7 @@ urlpatterns = i18n_patterns(
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
     path("expert-revision", login_required(expert_revision), name='expert_revision'),
-    path('expert-revision-file', login_required(expert_revision_file), name='expert_revision_file'),
+    path('expert-revision-file', login_required(FileExpertRevisionView.as_view()), name='expert_revision_file'),
     path('project-history/', login_required(ProjectsHistoryView.as_view()), name='project_history'),
     path('project/', login_required(SingleProjectView.as_view()), name='single_project'),
     path('get-templates/', login_required(GetTemplatesView.as_view()), name='get-templates'),
