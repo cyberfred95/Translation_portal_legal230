@@ -83,8 +83,9 @@ $(document).ready(function () {
             success: function () {
                 window.location.reload();
             },
-            error: function () {
-                errorNotification();            }
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
+            }
         });
 
         $modal.addClass('hidden');
@@ -120,12 +121,12 @@ $(document).ready(function () {
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
             },
-            success: function (response) {
+            success: function () {
                 $deleteButton.closest('tr').remove();
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
+            },
         });
     });
 

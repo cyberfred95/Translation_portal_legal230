@@ -107,15 +107,15 @@ $(document).ready(function () {
             getDomainsGroups();
         }
         if (currentStep === 2) {
-            if (!defaultDomain) {
+            if (!defaultDomain && access_to_default_glossaries) {
                 loadDefaultGlossary();
+                $(".add-glossary-btn").addClass('hidden');
                 $(".step-4 .default").addClass('bg-gray-600 text-white');
             } else {
                 loadMyGlossaries();
+                $(".add-glossary-btn").removeClass('hidden');
                 $(".step-4 .my-glossary").addClass('bg-gray-600 text-white');
             }
-            $('.terminology-step').text('default').removeClass('hidden');
-
         }
         if (currentStep === 3) {
             fileTranslate();
@@ -328,9 +328,9 @@ $(document).ready(function () {
                 }
                 checkLanguagesConsistency();
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
+            },
         });
     }
 
@@ -583,9 +583,9 @@ $(document).ready(function () {
             success: function (response) {
                 updateDomainsList(response);
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
+            },
         });
     }
 
@@ -600,13 +600,14 @@ $(document).ready(function () {
             },
             success: function (response) {
                 defaultDomain = response.default_domain;
-
-                if (response.default_domain) {
+                if (response.default_domain || !access_to_default_glossaries) {
                     $(".default").addClass('hidden');
                     $(".my-glossary").addClass('rounded-l-md');
+                    $(".add-glossary-btn").removeClass('hidden');
                     selectedGlossaryType = 'my-glossary'
                 } else {
                     $(".default").removeClass('hidden');
+                    $(".add-glossary-btn").addClass('hidden');
                     $(".my-glossary").removeClass('rounded-l-md');
                     selectedGlossaryType = 'default'
                 }
@@ -626,9 +627,9 @@ $(document).ready(function () {
 
                 updateSubDomainsList(response.data);
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
+            },
         });
     }
 
@@ -636,7 +637,7 @@ $(document).ready(function () {
     // ------------- STEP-4 -------------
 
     $(".step-4 .default").click(function () {
-        if (!defaultDomain) {
+        if (!defaultDomain || access_to_default_glossaries) {
             selectGlossaryType('default');
             loadDefaultGlossary();
             $('.terminology-step').text('default').removeClass('hidden');
@@ -692,9 +693,13 @@ $(document).ready(function () {
             success: function (response) {
                 updateGlossaryList([response], true);
                 selectedGlossary = response?.id;
+                $('.terminology-step').text('default').removeClass('hidden');
+                nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
+                    .addClass('border-green-700 text-green-700')
+                    .prop("disabled", false);
             },
-            error: function () {
-                errorNotification();
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
                 nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
                     .addClass('border-green-700 text-green-700')
                     .prop("disabled", false);
@@ -720,14 +725,14 @@ $(document).ready(function () {
             success: function (response) {
                 updateGlossaryList(response, false);
                 selectedGlossary = '';
-                $('.terminology-step').text('default').removeClass('hidden');
+                $('.terminology-step').text('').removeClass('hidden');
                 nextStep.removeClass('border-green-700 text-white text-green-700')
                     .addClass('border-gray-225 text-gray-225 pointer-events-none')
                     .prop("disabled", true);
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
+            },
         });
     }
 
@@ -753,7 +758,7 @@ $(document).ready(function () {
                     $(".glossary-item").removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
                     $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-gray-600 text-white');
                     selectedGlossary = glossary.id;
-                    $('.terminology-step').text(selectedGlossary).removeClass('hidden');
+                    $('.terminology-step').text(glossary.name).removeClass('hidden');
 
                     if (selectedGlossaryType === 'my-glossary') {
                         nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
@@ -879,7 +884,7 @@ $(document).ready(function () {
                         $(".glossary-item").removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
                         $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-gray-600 text-white');
                         selectedGlossary = response.id;
-                        $('.terminology-step').text(selectedGlossary).removeClass('hidden');
+                        $('.terminology-step').text(response.name).removeClass('hidden');
                         nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
                             .addClass('border-green-700 text-green-700')
                             .prop("disabled", false);
@@ -888,9 +893,9 @@ $(document).ready(function () {
 
                 $list.append($item);
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
+            },
         });
     });
 
@@ -911,6 +916,7 @@ $(document).ready(function () {
         formData.append('action', 'file_translate');
 
         $('#loader-row').removeClass('hidden');
+
         $.ajax({
             url: translate,
             type: 'POST',
@@ -926,10 +932,12 @@ $(document).ready(function () {
                     startStatusCheck(response.project_ids);
                 }
             },
-            error: function () {
-                $('#loader-row').addClass('hidden');
-                errorNotification();
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
+            complete: function () {
+                $('#loader-row').addClass('hidden');
+            }
         });
     };
 
@@ -1153,9 +1161,9 @@ $(document).ready(function () {
                 $modalRevision.addClass('hidden');
                 $closeRevision.addClass('hidden');
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
+            },
         });
     });
 
@@ -1179,8 +1187,8 @@ $(document).ready(function () {
                 success: function (response) {
                     updateProjectTable(response);
                 },
-                error: function () {
-                    errorNotification();
+                error: function (error) {
+                    errorNotification(error?.status, error?.responseJSON?.detail);
                 },
                 complete: function () {
                     $('#loader-row').addClass('hidden');

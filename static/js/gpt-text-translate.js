@@ -2,7 +2,7 @@ $(document).ready(function () {
 
     let sourceQuill = new Quill('#source-text', {
         theme: 'snow',
-        placeholder: language_code === 'en'?'Add your text here':'Ajoutez votre texte ici',
+        placeholder: language_code === 'en' ? 'Add your text here' : 'Ajoutez votre texte ici',
         modules: {
             toolbar: false
         }
@@ -17,7 +17,7 @@ $(document).ready(function () {
 
     translatedQuill.enable(false);
 
-    $(".text-action-select").attr("data-placeholder", language_code === 'en'?"Action":'Action');
+    $(".text-action-select").attr('data-placeholder', language_code === 'en' ? 'Action' : 'Action');
 
     $('.text-action-select').select2({
         templateResult: formatOption,
@@ -67,7 +67,7 @@ $(document).ready(function () {
 
         let formData = new FormData(form[0]);
 
-        $('#main-loader').removeClass('hidden');
+        startLoading();
 
         $.ajax({
             url: gpt_process,
@@ -85,16 +85,16 @@ $(document).ready(function () {
 
                 $('#expert-revision').removeClass('hidden');
             },
-            error: function () {
-                errorNotification();
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
             complete: function () {
-                $('#main-loader').addClass('hidden');
+                stopLoading();
             }
         });
     });
 
-    $("#clear").on("click", function () {
+    $("#clear").on('click', function () {
         translatedQuill.deleteText(0, translatedQuill.getLength());
         sourceQuill.deleteText(0, sourceQuill.getLength());
 
@@ -106,8 +106,8 @@ $(document).ready(function () {
         var translatedHtml = translatedQuill.root.innerHTML;
 
         if (translatedHtml) {
-            var blob = new Blob([translatedHtml], { type: 'text/html' });
-            var data = [new ClipboardItem({ 'text/html': blob })];
+            var blob = new Blob([translatedHtml], {type: 'text/html'});
+            var data = [new ClipboardItem({'text/html': blob})];
 
             navigator.clipboard.write(data).then(function () {
                 showTooltip();
@@ -129,8 +129,8 @@ $(document).ready(function () {
         var $sourceEditor = $("#source-text .ql-editor");
         var $translatedEditor = $("#translated-text .ql-editor");
 
-        $sourceEditor.css("height", "auto");
-        $translatedEditor.css("height", "auto");
+        $sourceEditor.css('height', 'auto');
+        $translatedEditor.css('height', 'auto');
 
         var maxHeight = Math.max(
             $sourceEditor[0]?.scrollHeight || 0,
@@ -139,12 +139,12 @@ $(document).ready(function () {
 
         maxHeight = Math.max(maxHeight, 200);
 
-        $sourceEditor.css("height", maxHeight + "px");
-        $translatedEditor.css("height", maxHeight + "px");
+        $sourceEditor.css('height', maxHeight + 'px');
+        $translatedEditor.css('height', maxHeight + 'px');
     }
 
-    sourceQuill.on("text-change", resizeTextAreas);
-    translatedQuill.on("text-change", resizeTextAreas);
+    sourceQuill.on('text-change', resizeTextAreas);
+    translatedQuill.on('text-change', resizeTextAreas);
 
     resizeTextAreas();
 });
