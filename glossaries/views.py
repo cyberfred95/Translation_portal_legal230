@@ -4,12 +4,14 @@ from django.views.generic import TemplateView
 
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import serializers
 
 from domains.models import Domain
 from languages.models import Language
+from subscriptions.permissions import SubscribedPermission
 from .models import Glossary
 from .serializers import GlossarySerializer
 from .paginators import APIViewPagination, TemplateViewPagination
@@ -33,8 +35,6 @@ class UserGlossariesView(TemplateView):
             return Language.objects.order_by('french_name').all()
         return Language.objects.order_by('name').all()
 
-
-
     def get_glossaries(self):
         tmp_glossaries = Glossary.objects.filter(user=self.request.user)
 
@@ -57,20 +57,22 @@ class UserGlossariesView(TemplateView):
 
 
 class AddGlossaryView(APIView):
+    permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def validate(self, request):
-        errors = {}
+        if not request.user.is_staff:
+            group_subscription = request.user.group.subscriptions.first()
+            user_glossaries_count = Glossary.objects.filter(user=request.user).count()
+            if user_glossaries_count + 1 > group_subscription.custom_glossaries_count:
+                raise serializers.ValidationError({"detail":"You are not allowed to add more glossaries. Please contanct your group administator"})
 
         languages_list = Language.objects.all().values_list(Lower('abbreviation'), flat=True)
         if request.data["source_language"] == request.data["target_language"]:
-            errors["language_pair"] = "Source and target languages cannot be the same"
+            raise serializers.ValidationError({"detail":"Source and target languages cannot be the same"})
         if request.data["source_language"] not in languages_list:
-            errors["source_language"] = "Invalid source language"
+            raise serializers.ValidationError({"detail":"Invalid source language"})
         if request.data["target_language"] not in languages_list:
-            errors["target_language"] = "Invalid target language"
-
-        if errors:
-            raise serializers.ValidationError(errors)
+            raise serializers.ValidationError({"detail":"Invalid target language"})
 
     def post(self, request):
         self.validate(request)
@@ -95,11 +97,12 @@ class SingleGlossaryView(RetrieveUpdateDestroyAPIView):
 
 
 class GlossariesListAPIView(APIView):
+    permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def post(self, request, *args, **kwargs):
         if 'source_language' and 'target_language' and 'domain_name' not in request.data:
             return Response(
-                {"message": "provide source_language, target_language and domain_name"},
+                {"detail": "provide source_language, target_language and domain_name"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         glossaries = Glossary.objects.filter(
@@ -119,6 +122,7 @@ class GlossariesListAPIView(APIView):
 
 
 class GetDefaultGlossaryView(APIView):
+    permission_classes = (SubscribedPermission, IsAuthenticated)
     serializer_class = GlossarySerializer
 
     def post(self, request):

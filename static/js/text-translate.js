@@ -15,8 +15,6 @@ $(document).ready(function () {
         }
     });
 
-    // translatedQuill.enable(false);
-
     $(".source-language").attr("data-placeholder", language_code === 'en' ? "Source language" : "Langue source");
     $(".target-language").attr("data-placeholder", language_code === 'en' ? "Target language" : "Langue cible");
     $(".domain-select").attr("data-placeholder", language_code === 'en' ? "Glossary" : "Glossaire");
@@ -63,9 +61,9 @@ $(document).ready(function () {
                         domainSelect.find('option:not(:disabled):first').prop('selected', true);
                     }
                 },
-                error: function () {
-                    errorNotification();
-                }
+                error: function (error) {
+                    errorNotification(error?.status, error?.responseJSON?.detail);
+                },
             });
         }
     }
@@ -107,8 +105,8 @@ $(document).ready(function () {
 
                 $('#expert-revision').removeClass('hidden');
             },
-            error: function () {
-                errorNotification();
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
             complete: function () {
                 $('#main-loader').addClass('hidden');
@@ -135,9 +133,9 @@ $(document).ready(function () {
             success: function () {
                 $('#expert-revision').addClass('hidden');
             },
-            error: function () {
-                errorNotification();
-            }
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
+            },
         });
     });
 
@@ -152,8 +150,6 @@ $(document).ready(function () {
     $('#copy').click(function () {
         var translatedText = translatedQuill.getText();
         var translatedHtml = translatedQuill.root.innerHTML;
-        console.log('translatedHtml', translatedHtml);
-        console.log('translatedText',translatedText);
 
         if (translatedHtml) {
             if (navigator.clipboard && window.ClipboardItem) {
@@ -167,8 +163,7 @@ $(document).ready(function () {
                 ];
 
                 navigator.clipboard.write(data).then(function () {
-                    console.log('HTML і текст скопійовані успішно!');
-                    showTooltip(); // Показати підказку, якщо функція визначена
+                    showTooltip();
                 }).catch(function (error) {
                     console.error('Помилка копіювання: ', error);
                 });
@@ -211,8 +206,8 @@ $(document).ready(function () {
 
                 $select.val(detectedLanguage).trigger('change');
             },
-            error: function () {
-                errorNotification();
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
             },
             complete: function () {
                 $('#main-loader').addClass('hidden');

@@ -16,4 +16,4 @@ class UsersListView(APIView):
                 return Response(GroupSerializer(request.user.group).data)
             return Response(UserSerializer(request.user))
 
-        return Response({"message": "You have to be in group"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"detail": "You have to be in group"}, status=status.HTTP_403_FORBIDDEN)
