@@ -133,6 +133,7 @@
                         <div class="w-full max-w-47.25">
 
                             {#@ TODO AJAX WITH POST METHOD AND SHOW ENDPOINT RESPONSE IN POPUP#}
+                            {#@TODO MODAL#}
                             <form action="{% url 'delete_all_data' %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit"
@@ -149,7 +150,9 @@
                             <span class="text-xs text-gray-400">Permanently delete all your Translation Portal data. </span>
                         </div>
                         <div class="w-full max-w-47.25">
-<!--                            <form action="{% url 'user' id=request.user.id %}" method="POST">-->
+                            
+                            {#@TODO AJAX#}
+<!--                            <form action="{% url 'user' id=request.user.id %}" method="DELETE">-->
                                 <button type="submit" id="modal1-open"
                                         class="w-full border border-green-700 text-green-700 text-4 rounded-md py-2.5 px-5 transition duration-300 ease-in-out hover:bg-green-700 hover:text-white">
                                     Delete Account
@@ -169,6 +172,7 @@
     <script>
         var delete_user_url = "{% url 'user' id=request.user.id %}"
         var delete_data_url = "{% url 'delete_all_data' %}"
+        var change_password_url = "{% url 'change_password' %}"
     </script>
 
 {% endblock %}
