@@ -1,3 +1,4 @@
+import json
 import os
 
 from django.conf import settings
@@ -93,9 +94,11 @@ class StatsProcessor:
                 "uuid": user_uuid,
                 'template_name': template_name,
                 'file_name': file_name,
-                'meta': {
-                    words_count: words_count
-                }
+                'meta': json.dumps(
+                    {
+                        "words_count": words_count
+                    }
+                )
             }
         )
         print(response.text)

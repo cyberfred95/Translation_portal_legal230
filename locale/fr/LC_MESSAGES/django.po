@@ -479,6 +479,9 @@ msgstr "Groupe"
 msgid "Characters"
 msgstr "Caractères"
 
+msgid "Words"
+msgstr "Mots"
+
 msgid "Tokens"
 msgstr "Tokens"
 
