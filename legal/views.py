@@ -26,7 +26,6 @@ from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from preferences import preferences
-from stats.calculator import StatsProcessor
 import langdetect
 from .tasks import send_statistic_request
 from glossaries.models import Glossary
@@ -56,9 +55,11 @@ def text_translation(request):
         send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('domain_name'))
         if response.status_code == 200:
             send_statistic_request(
-                api_key, [text],
-                request.user.uuid,
-                **get_translate_data(request, for_statistic=True)
+                api_key=api_key, texts=[text],
+                user_uuid=request.user.uuid,
+                words_count=get_word_count(text),
+                **get_translate_data(request, for_statistic=True),
+
             )
         add_translations(request, words_count=get_word_count(text))
         return JsonResponse(response.json())
