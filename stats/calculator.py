@@ -79,7 +79,7 @@ class StatsProcessor:
                      source_language,
                      target_language,
                      file_name='Text translate',
-
+                     words_count=None,
                      ):
         template_name = self.get_template_name(source_language, target_language, domain_name)
         response = requests.post(
@@ -92,7 +92,10 @@ class StatsProcessor:
                 "messages": texts,
                 "uuid": user_uuid,
                 'template_name': template_name,
-                'file_name': file_name
+                'file_name': file_name,
+                'meta': {
+                    words_count: words_count
+                }
             }
         )
         print(response.text)
