@@ -46,24 +46,31 @@ $(document).ready(function () {
     });
 
 
-    $('.modal').each(function () {
-        let modal = $(this);
-        modal.find('[id$="-close"]').click(function () {
-            modal.addClass('hidden');
-        });
-        modal.find('[id$="-close-btn"]').click(function () {
-            modal.addClass('hidden');
-        });
+    $(document).on('click', '[id$="-open"]', function () {
+        const modalId = $(this).attr('id').replace('-open', '');
+        $(`#${modalId}`).removeClass('hidden');
     });
 
-    $(window).click(function (event) {
-        $('.modal').each(function () {
-            let modal = $(this);
-            if ($(event.target).is(modal)) {
-                modal.addClass('hidden');
-            }
-        });
+    $(document).on('click', '[id$="-close"]', function () {
+        const modalId = $(this).attr('id').replace('-close', '');
+        $(`#${modalId}`).addClass('hidden');
     });
+
+    $(document).on('click', '.modal', function (e) {
+        if ($(e.target).hasClass('modal')) {
+            $(this).addClass('hidden');
+        }
+    });
+
+    $(document).on('click', '.modal button', function () {
+        const action = $(this).text().trim().toLowerCase();
+        if (action === 'так') {
+            alert('Акаунт буде видалено!');
+        } else if (action === 'ні') {
+            $(this).closest('.modal').addClass('hidden');
+        }
+    });
+
 });
 
 

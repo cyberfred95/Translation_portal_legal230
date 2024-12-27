@@ -149,20 +149,18 @@
                             <span class="text-xs text-gray-400">Permanently delete all your Translation Portal data. </span>
                         </div>
                         <div class="w-full max-w-47.25">
-
-                            <form action="{% url 'user' id=request.user.id %}" method="POST">
-                                <button type="submit" id="openModal1"
+<!--                            <form action="{% url 'user' id=request.user.id %}" method="POST">-->
+                                <button type="submit" id="modal1-open"
                                         class="w-full border border-green-700 text-green-700 text-4 rounded-md py-2.5 px-5 transition duration-300 ease-in-out hover:bg-green-700 hover:text-white">
                                     Delete Account
                                 </button>
-                            </form>
-
+<!--                            </form>-->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        {% include 'modal.html' with modal_id="modal1" title="Видалити акаунт" content="Ви впевнені, що хочете видалити акаунт?" footer='<button class="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-600">Так</button><button class="px-4 py-2 text-white bg-gray-500 rounded-md hover:bg-gray-600">Ні</button>' %}
+        {% include 'modal.html' with modal_id="modal1" title="Видалити акаунт" content="" footer='<button class="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-600">Так</button><button class="px-4 py-2 text-white bg-gray-500 rounded-md hover:bg-gray-600">Ні</button>' %}
 
     </div>
 
