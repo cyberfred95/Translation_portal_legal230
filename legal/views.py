@@ -3,6 +3,8 @@ import os
 import re
 import time
 from datetime import datetime
+from decimal import Decimal
+from io import BytesIO
 from urllib.parse import urlparse, unquote
 from quoting.models import LanguageQuote
 from django.utils.timezone import now
@@ -264,22 +266,45 @@ def expert_revision(request):
 
 
 class FileExpertRevisionView(APIView):
+    permission_classes = (SubscribedPermission, IsAuthenticated)
 
-    @staticmethod
-    def get_quote(project: dict, file:InMemoryUploadedFile) -> Optional[dict]:
+    def get_quote(self, project: dict) -> Optional[dict]:
         language_quote = LanguageQuote.objects.filter(
             source_language__abbreviation__iexact=project.get('source_language'),
             target_language__abbreviation__iexact=project.get('target_language')).first()
         if language_quote:
             api_key = None
-            words_count = get_text_from_file(file, api_key=api_key)
+            file = self.get_file(file_url=project['source_file'])
+            words_count = len(get_text_from_file(file, api_key=api_key))
+            print(words_count)
             return {
+                'contract_name': self.request.user.group.name if self.request.user.group else "Administrator",
                 'word_price': language_quote.price,
                 'words_count': words_count,
                 'total_price': words_count * language_quote.price,
-                'created_at': now(),
+                'created_at': now().strftime('%Y-%m-%d %H:%M:%S'),
+                'quote_number': self.request.user.group.generate_quoting_number() if self.request.user.group else f"{now().strftime('%Y/%m')}/0"
             }
         return
+
+    @staticmethod
+    def get_file(file_url) -> InMemoryUploadedFile:
+        response = requests.get(file_url)
+        file_content = BytesIO(response.content)
+
+        object_key = urlparse(file_url).path.lstrip('/')
+        file_name = object_key.split('/')[-1]
+
+        in_memory_file = InMemoryUploadedFile(
+            file_content,
+            None,
+            file_name,
+            response.headers.get('Content-Type', 'application/octet-stream'),
+            len(response.content),
+            None
+        )
+
+        return in_memory_file
 
     def post(self, request):
         if not request.user.is_staff and not request.user.group:
@@ -300,7 +325,8 @@ class FileExpertRevisionView(APIView):
                 "email": preferences.MainSettings.sender_email,
                 "username": request.user.username,
                 "user_email": request.user.email,
-                "company": request.user.group.name
+                "company": request.user.group.name if request.user.group else "Administrator",
+                **self.get_quote(project)
             })
         return Response({"detail": "Sent to post editing"}, status=status.HTTP_200_OK)
 
