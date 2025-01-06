@@ -17,7 +17,7 @@ class UserGroup(models.Model):
     def generate_quoting_number(self):
         self.quote_monthly_number += 1
         self.save()
-        return f"{now().strftime('Y/m')}/{self.quote_monthly_number}"
+        return f"{now().strftime('%Y/%m')}/{self.quote_monthly_number}"
 
     class Meta:
         verbose_name = 'Group'
