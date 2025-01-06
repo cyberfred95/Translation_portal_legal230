@@ -178,6 +178,29 @@
             </div>
         </div>
     </div>
+
+    <!-- Invite Modal -->
+    <div id="invite-modal"
+         class="z-1000 fixed inset-0 bg-gray-425 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
+        <div class="relative bg-white rounded-lg shadow-xl max-w-172.5 w-full mx-4">
+            <div class="p-12.5 flex flex-col gap-5">
+                <div class="flex flex-col items-center">
+                    <div class="text-5 font-semibold">Invite people by email</div>
+                </div>
+                <div>
+                    <label for="email" class="text-4 font-semibold text-gray-600">Email</label>
+                    <input type="email" name="email" id="email" placeholder="Start typing..."
+                           class="mt-1.5 placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300 bg-gray-75"/>
+                </div>
+                <div><span>Add emails separated by commas to send multiple invitations to the Translation Portal. The invitation will be valid for 72 hours.</span></div>
+                <button
+                        type="button"
+                        class="w-40 text-gray-500 border border-gray-500 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision">
+                    Invite
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="{% static 'js/get-cookie.js' %}"></script>

@@ -44,33 +44,6 @@ $(document).ready(function () {
             $('#dropdown').addClass('hidden');
         }
     });
-
-
-    $(document).on('click', '[id$="-open"]', function () {
-        const modalId = $(this).attr('id').replace('-open', '');
-        $(`#${modalId}`).removeClass('hidden');
-    });
-
-    $(document).on('click', '[id$="-close"]', function () {
-        const modalId = $(this).attr('id').replace('-close', '');
-        $(`#${modalId}`).addClass('hidden');
-    });
-
-    $(document).on('click', '.modal', function (e) {
-        if ($(e.target).hasClass('modal')) {
-            $(this).addClass('hidden');
-        }
-    });
-
-    $(document).on('click', '.modal button', function () {
-        const action = $(this).text().trim().toLowerCase();
-        if (action === 'так') {
-            alert('Акаунт буде видалено!');
-        } else if (action === 'ні') {
-            $(this).closest('.modal').addClass('hidden');
-        }
-    });
-
 });
 
 
