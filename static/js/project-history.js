@@ -70,7 +70,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: 'POST',
-            url: expert_revision_file_url,
+            url: expert_revision_file,
             data: formData,
             processData: false,
             contentType: false,
