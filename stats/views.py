@@ -129,7 +129,10 @@ class UsageView(TemplateView):
             user = User.objects.filter(uuid=stat.get('user_portal_uuid')).first()
             stat['user'] = user.username if user else 'Unknown'
             print(stat['metadata'])
-            stat['metadata'] = json.loads(stat['metadata'])
+            try:
+                stat['metadata'] = json.loads(stat['metadata'])
+            except:
+                pass
             stat['created_at'] = datetime.fromisoformat(stat['created_at'].replace('Z', '+00:00'))
 
             try:
