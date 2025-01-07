@@ -247,7 +247,7 @@
                     </th>
                     <th class="text-4 text-gray-600 font-semibold text-left border-b pb-5">
                         <div class="flex items-center gap-1 w-auto cursor-pointer">
-                            {% trans 'Characters' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                            {% trans 'Words' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                         </div>
                     </th>
                     <th class="text-4 text-gray-600 font-semibold text-left border-b pb-5">
@@ -286,7 +286,7 @@
                         {{ stat.file_name }}
                     </td>
                     <td class="text-3.25 text-gray-600">
-                        {{ stat.chars_count }}
+                        {{ stat.metadata.words_count }}
                     </td>
                     <td class="text-3.25 text-gray-600">
                         {{ stat.tokens_count }}

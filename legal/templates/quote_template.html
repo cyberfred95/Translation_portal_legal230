@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #000000;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #2f9d6f;
+            color: #ffffff;
+        }
+
+        .header-table td {
+            border: none;
+            padding: 5px;
+        }
+
+        .header-table .bordered {
+            border: 1px solid #000000;
+        }
+    </style>
+</head>
+<body>
+
+<table class="header-table">
+    <tr>
+        <img style="width: 175px; height: 40px; margin-bottom: 79px;"
+             src="https://ghfkgfdhkgdkgdhg.s3.eu-north-1.amazonaws.com/logo.png" alt="Logo">
+    </tr>
+
+    <tr>
+        <td rowspan="4">
+            <p><strong>LEGAL 230</strong></p>
+            <p>75 Boulevard Haussmann</p>
+            <p>75008 Paris</p>
+        </td>
+        <td><strong>QUOTE:</strong> <span>XXXX</span></td>
+    </tr>
+    <tr>
+        <td>{{ company }}</td>
+    </tr>
+    <tr>
+        <td>Contact name</td>
+    </tr>
+    <tr>
+        <td>Created: <span>{{ created_at|date:"d/m/Y" }}</span></td>
+    </tr>
+</table>
+
+<p>Dear <span>XXX</span>,</p>
+<p>We are pleased to send you a quote for the proofreading of your document.</p>
+
+<table>
+    <tr>
+        <th>Document</th>
+        <th>Unit</th>
+        <th>Unit Price</th>
+        <th>Total ex. VAT</th>
+    </tr>
+    <tr>
+        <td>{{ file_name }}</td>
+        <td>{{ words_count }} words</td>
+        <td>{{ word_price }} €</td>
+        <td>{{ total_price }} €</td>
+    </tr>
+</table>
+
+<p>The proofreading will be fully carried out by one of our law specialized translators. All of our translators only
+    undertake translations in their native language (target language). Once the proofreading is done, the whole document
+    is carefully reviewed by a Project Manager with legal background, to make sure of its compliance with the source
+    text.</p>
+
+<p><strong>Disclaimer:</strong></p>
+<p>1° Quotes from the portal do not calculate possible repetitions between documents at the moment. Feel free to ask our
+    team here (link).<br>
+    2° Quotes from the portal are calculated with a normal delivery turnaround. If your project is urgent, please ask our
+    team here (link).
+</p>
+
+<p><strong>Delivery of your documents:</strong></p>
+<p>Unless otherwise ordered by you, your documents will be delivered both by email and will be made available on the
+    portal.</p>
+
+<p><strong>Terms & Agreement:</strong></p>
+<p>The validation of this quote implies full and complete acceptance of Legal 230's Terms and Conditions, at this link:
+    <a href="https://legal230.com/conditions-generales-de-vente">https://legal230.com/conditions-generales-de-vente</a>), or on simple request and accepting them unreservedly.
+</p>
+
+<p><strong>Validation:</strong></p>
+<p>If you agree, please click on “<strong>accept the quote</strong>” or send us a confirmation email at <a
+        href="mailto:XXX@legal230.com">XXX@legal230.com</a> including the number of the quote and the words “<strong>good for translation for the sum of X euros excluding tax</strong>”.</p>
+
+<p><strong>Payment terms:</strong></p>
+<p>Upon receipt of the invoice, the term of payment is 30 days. It is possible to invoice your customer directly if the
+    conditions to do so are met (valid contact details, email address, purchase order).
+    Any amount not paid on its due date will automatically generate late payment interest equivalent to three times the
+    statutory rate of interest for the current year, as well as the payment of a sum of €40 due for recovery costs.
+</p>
+
+
+<p style="text-align:right;"><strong>Accept the quote</strong></p>
+
+<p style="text-align:center; font-size:9pt;">
+    Legal 230 - 75, boulevard Haussmann - 75008 PARIS<br>
+    Phone: 01 84 80 21 20 - E-mail: <a href="mailto:contact@legal230.com">contact@legal230.com</a> - SIRET 885 324 129
+    00018 -<br>
+    VAT Number: FR73885324129
+</p>
+</body>
+</html>

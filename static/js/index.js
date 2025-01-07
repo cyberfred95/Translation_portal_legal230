@@ -12,6 +12,7 @@ $(document).ready(function () {
         }
     });
 
+
     // ------------- CHANGE LANGUAGE -------------
 
 
@@ -31,7 +32,9 @@ $(document).ready(function () {
 
 });
 
+
 // ------------- LOADING -------------
+
 
 const startLoading = () => {
     $('#main-loader').removeClass('hidden');
