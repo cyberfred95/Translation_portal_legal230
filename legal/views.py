@@ -276,13 +276,12 @@ class FileExpertRevisionView(APIView):
             api_key = None
             file = self.get_file(file_url=project['source_file'])
             words_count = len(get_text_from_file(file, api_key=api_key))
-            print(words_count)
             return {
                 'contract_name': self.request.user.group.name if self.request.user.group else "Administrator",
                 'word_price': language_quote.price,
                 'words_count': words_count,
                 'total_price': words_count * language_quote.price,
-                'created_at': now().strftime('%Y-%m-%d %H:%M:%S'),
+                'created_at': now(),
                 'quote_number': self.request.user.group.generate_quoting_number() if self.request.user.group else f"{now().strftime('%Y/%m')}/0"
             }
         return
