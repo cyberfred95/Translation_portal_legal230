@@ -33,6 +33,7 @@ urlpatterns = i18n_patterns(
     path('usage/', include('stats.urls')),
     path('users/', include('users.urls')),
     path('writing/', include('writing.urls')),
+    path('quoting', include('quoting.urls')),
 
     re_path(r'^rosetta/', include('rosetta.urls'))
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
