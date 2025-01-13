@@ -33,3 +33,4 @@ static/scss/CACHE/
 .env_dev
 /Script/
 celerybeat-schedule
+.DS_Store
