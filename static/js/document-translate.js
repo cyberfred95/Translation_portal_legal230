@@ -42,15 +42,15 @@ $(document).ready(function () {
 
         $("#progress-bar").css("width", percentage + "%");
 
-        $(".progress-point").parent().find("svg").removeClass("text-green-400").addClass("text-green-250");
-        $(".progress-point").parent().find(".text-3\\.25, .text-xs").removeClass("text-green-400").addClass("text-green-200");
+        $(".progress-point").parent().find("svg").removeClass("text-green-700").addClass("text-green-250");
+        $(".progress-point").parent().find(".text-3\\.25, .text-xs").removeClass("text-green-700").addClass("text-green-200");
 
-        $("#point-1").find("svg").removeClass("text-green-250").addClass("text-green-400");
-        $("#point-1").find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-400");
+        $("#point-1").find("svg").removeClass("text-green-250").addClass("text-green-700");
+        $("#point-1").find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-700");
 
         for (let i = 0; i <= step; i++) {
-            $(`#point-${i + 1}`).find("svg").removeClass("text-green-250").addClass("text-green-400");
-            $(`#point-${i + 1}`).find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-400");
+            $(`#point-${i + 1}`).find("svg").removeClass("text-green-250").addClass("text-green-700");
+            $(`#point-${i + 1}`).find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-700");
 
         }
     }

@@ -122,32 +122,29 @@
 
 <body class="font-montserrat font-medium">
 
-<div class="flex flex-col h-screen overflow-hidden">
-    <!-- Header -->
-    {% include 'header.html' %}
+<div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <div class="flex-shrink-0">
+        {% include 'sidebar.html' %}
+    </div>
 
-    <!-- Main container -->
-    <div class="flex flex-1 overflow-hidden">
-        <!-- Sidebar -->
-        <div class="flex-shrink-0 h-full overflow-y-auto">
-            {% include 'sidebar.html' %}
-        </div>
+    <!-- Main content -->
+    <div class="flex-1 overflow-hidden bg-gray-60">
+        <!-- Header -->
+        {% include 'header.html' %}
 
-        <!-- Main content -->
-        <div class="flex-1 overflow-hidden bg-gray-60">
-            <!-- Scrollable content -->
-            <main class="h-full overflow-y-auto relative">
-                <div id="main-loader" class="absolute inset-0 bg-gray-500 bg-opacity-50 hidden flex items-center justify-center z-50">
-                    <div class="bg-white rounded-lg p-8 flex flex-col items-center shadow-lg">
-                        <span class="loader mb-4"></span>
-                        <p class="text-gray-700">Processing request...</p>
-                    </div>
+        <!-- Scrollable content -->
+        <main class="h-full overflow-y-auto relative">
+            <div id="main-loader" class="absolute inset-0 bg-gray-500 bg-opacity-50 hidden flex items-center justify-center z-50">
+                <div class="bg-white rounded-lg p-8 flex flex-col items-center shadow-lg">
+                    <span class="loader mb-4"></span>
+                    <p class="text-gray-700">Processing request...</p>
                 </div>
-                {% block content %}
-                <!-- Page content -->
-                {% endblock %}
-            </main>
-        </div>
+            </div>
+            {% block content %}
+            <!-- Page content -->
+            {% endblock %}
+        </main>
     </div>
 
     <!-- Error Modal -->

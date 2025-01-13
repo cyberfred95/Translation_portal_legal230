@@ -473,10 +473,6 @@ input[type="checkbox"]:checked {
     height: auto;
 }
 
-.ql-container.ql-snow {
-    border: none;
-}
-
 .ql-editor.ql-blank::before {
     left: 20px;
     color: #CACACA;
