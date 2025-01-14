@@ -16,7 +16,7 @@ from django.views.generic import TemplateView
 from django.http import JsonResponse, HttpResponseBadRequest
 import django
 from rest_framework.views import APIView
-from .helpers import get_translate_data, lowercase_file_extension, get_word_count, get_text_from_file
+from .helpers import get_translate_data, lowercase_file_extension, get_word_count, get_text_from_file, get_project_file
 
 from domains.models import Domain
 from languages.models import Language
@@ -276,7 +276,7 @@ class FileExpertRevisionView(APIView):
             target_language__abbreviation__iexact=project.get('target_language')).first()
         if language_quote:
             api_key = None
-            file = self.get_file(file_url=project['source_file'])
+            file = get_project_file(file_url=project['source_file'])
             words_count = len(get_text_from_file(file, api_key=api_key))
             if self.request.data.get('company'):
                 group = UserGroup.objects.filter(name=self.request.data.get('company')).first()
@@ -293,25 +293,6 @@ class FileExpertRevisionView(APIView):
                 'quote_number': group.generate_quoting_number() if group else f"{now().strftime('%Y/%m')}/0"
             }
         return
-
-    @staticmethod
-    def get_file(file_url) -> InMemoryUploadedFile:
-        response = requests.get(file_url)
-        file_content = BytesIO(response.content)
-
-        object_key = urlparse(file_url).path.lstrip('/')
-        file_name = object_key.split('/')[-1]
-
-        in_memory_file = InMemoryUploadedFile(
-            file_content,
-            None,
-            file_name,
-            response.headers.get('Content-Type', 'application/octet-stream'),
-            len(response.content),
-            None
-        )
-
-        return in_memory_file
 
     def post(self, request):
         if not request.user.is_staff and not request.user.group:

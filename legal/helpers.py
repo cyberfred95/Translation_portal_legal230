@@ -1,6 +1,9 @@
 import os
 import re
+from io import BytesIO
+from urllib.parse import urlparse
 
+import requests
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from preferences import preferences
 
@@ -49,7 +52,7 @@ def get_text_from_file(file: InMemoryUploadedFile, api_key) -> list:
     try:
         texts = StatsProcessor(api_key).get_texts(file=file)
     except UnicodeEncodeError:
-        raise ValueError({"detail":"Invalid characters in file name"})
+        raise ValueError({"detail": "Invalid characters in file name"})
 
     formated_texts = [
         word
@@ -59,3 +62,21 @@ def get_text_from_file(file: InMemoryUploadedFile, api_key) -> list:
     file.seek(0)
     return formated_texts
 
+
+def get_project_file(file_url) -> InMemoryUploadedFile:
+    response = requests.get(file_url)
+    file_content = BytesIO(response.content)
+
+    object_key = urlparse(file_url).path.lstrip('/')
+    file_name = object_key.split('/')[-1]
+
+    in_memory_file = InMemoryUploadedFile(
+        file_content,
+        None,
+        file_name,
+        response.headers.get('Content-Type', 'application/octet-stream'),
+        len(response.content),
+        None
+    )
+
+    return in_memory_file
