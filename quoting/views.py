@@ -1,4 +1,7 @@
+import os
+
 import requests
+from django.urls import reverse
 from django.utils.timezone import now
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -8,14 +11,21 @@ from subscriptions.permissions import SubscribedPermission
 from .helpers import get_price_by_language_pair
 from preferences import preferences
 from legal.helpers import get_project_file, get_text_from_file
-from .services import PDFService
 from .mail_helpers import send_quote_email
+from urllib.parse import urlencode
 
 
 # Create your views here.
 
 class FormQuoteView(APIView):
     permission_classes = (IsAuthenticated, SubscribedPermission)
+
+    @staticmethod
+    def expert_revision_url(project_id, request):
+        params = {
+            'project_id': project_id,
+        }
+        return f"{request.build_absolute_uri(reverse('expert_revision_file'))}?{urlencode(params)}"
 
     def post(self, request):
         project_id = request.data.get('project_id')
@@ -34,17 +44,19 @@ class FormQuoteView(APIView):
         if quote_price:
             context_variables = {
 
-                    "email": preferences.MainSettings.sender_email,
-                    "username": request.user.username,
-                    "user_email": request.user.email,
-                    "company": request.user.group.name if request.user.group else "Administrator",
-                    'contract_name': self.request.data.get('company',
-                                                           request.user.group.name if request.user.group else "Administrator"),
-                    'word_price': quote_price.price,
-                    'words_count': words_count,
-                    'total_price': words_count * quote_price.price,
-                    'created_at': now(),
-                    'quote_number': request.user.group.generate_quoting_number() if request.user.group else f"{now().strftime('%Y/%m')}/0"
+                "email": preferences.MainSettings.sender_email,
+                "username": request.user.username,
+                "user_email": request.user.email,
+                "company": request.user.group.name if request.user.group else "Administrator",
+                'contract_name': self.request.data.get('company',
+                                                       request.user.group.name if request.user.group else "Administrator"),
+                'file_name': file.name,
+                'word_price': quote_price.price,
+                'words_count': words_count,
+                'total_price': words_count * quote_price.price,
+                'created_at': now(),
+                'expert_revision_file_absolute_url': self.expert_revision_url(project_id, request),
+                'quote_number': request.user.group.generate_quoting_number() if request.user.group else f"{now().strftime('%Y/%m')}/0"
 
             }
             send_quote_email(request.user.id, context_variables)
