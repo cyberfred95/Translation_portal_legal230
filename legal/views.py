@@ -20,7 +20,7 @@ from .helpers import get_translate_data, lowercase_file_extension, get_word_coun
 
 from domains.models import Domain
 from languages.models import Language
-from users.models import User
+from users.models import User, UserGroup
 from .credentials import languages
 from .mail_helpers import send_expert_revision_text, \
     send_file_translation, send_text_translation
@@ -35,6 +35,7 @@ from typing import Optional
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from subscriptions.permissions import SubscribedPermission
 from django.core.cache import cache
+from quoting.helpers import get_price_by_language_pair
 
 import csv
 from subscriptions.helpers import translation_allowed, add_translations
@@ -97,7 +98,6 @@ def file_translate(request):
     files = request.FILES.getlist('document[]', [])
     api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
     cache_data = cache.get(f"{request.user.uuid}")
-    print(cache_data)
 
     if cache_data:
         words_count = cache_data
@@ -146,7 +146,10 @@ def file_translate(request):
                                   file_name=project['file_name'],
                                   file_ext=project['file_extension'])
         add_translations(request, words_count=words_count, files_count=len(files))
-        return JsonResponse({"project_ids": [project.get('id') for project in projects]})
+        return JsonResponse({"project_ids": [project.get('id') for project in projects],
+                             "display_popup": True if get_price_by_language_pair(
+                                 source_language=request.POST.get('source_language'),
+                                 target_language=request.POST.get('target_language')) else False})
     return JsonResponse({"detail": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -266,7 +269,6 @@ def expert_revision(request):
 
 
 class FileExpertRevisionView(APIView):
-    permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def get_quote(self, project: dict) -> Optional[dict]:
         language_quote = LanguageQuote.objects.filter(
@@ -276,13 +278,19 @@ class FileExpertRevisionView(APIView):
             api_key = None
             file = self.get_file(file_url=project['source_file'])
             words_count = len(get_text_from_file(file, api_key=api_key))
+            if self.request.data.get('company'):
+                group = UserGroup.objects.filter(name=self.request.data.get('company')).first()
+            else:
+                group = self.request.user.group
             return {
-                'contract_name': self.request.user.group.name if self.request.user.group else "Administrator",
-                'word_price': language_quote.price,
-                'words_count': words_count,
-                'total_price': words_count * language_quote.price,
+                'contract_name': self.request.data.get('company',
+                                                       self.request.user.group.name if self.request.user.group else "Administrator"),
+                'word_price': self.request.data.get('price', language_quote.price),
+                'words_count': self.request.data.get('words"count', words_count),
+                'total_price': self.request.data.get('words"count', words_count) * self.request.data.get('price',
+                                                                                                         language_quote.price),
                 'created_at': now(),
-                'quote_number': self.request.user.group.generate_quoting_number() if self.request.user.group else f"{now().strftime('%Y/%m')}/0"
+                'quote_number': group.generate_quoting_number() if group else f"{now().strftime('%Y/%m')}/0"
             }
         return
 
@@ -355,7 +363,10 @@ class ProjectsHistoryView(TemplateView):
                 original_filename = unquote(file_name)
                 project['source_file_name'] = original_filename
                 project['created_at'] = datetime.fromisoformat(project['created_at'].replace('Z', '+00:00'))
-
+                project['display_popup'] = True if get_price_by_language_pair(
+                    source_language=project['source_language'],
+                    target_language=project['target_language']
+                ) else False
                 if user.is_staff:
                     try:
                         project['username'] = User.objects.get(uuid=project['user_custom_mt_token'])
@@ -383,6 +394,7 @@ class SingleProjectView(APIView):
             file_name = urlparse(response.json()['source_file']).path.lstrip('/').split('/')[-1]
             original_filename = unquote(file_name)
             res['source_file_name'] = original_filename
+            res['display_popup'] = True if get_price_by_language_pair(source_language=res['source_language'], target_language=res['target_language']) else False
 
             responses.append(res)
         return Response(responses, status=status.HTTP_200_OK)
