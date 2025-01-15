@@ -22,14 +22,28 @@ $(document).ready(function () {
 
     $(".en").click(function () {
         const url = getCurrentURL();
-        window.location.href = url.replace("fr", 'en');
+        window.location.href = url.replace('fr', 'en');
     });
 
     $(".fr").click(function () {
         const url = getCurrentURL();
-        window.location.href = url.replace("en", 'fr');
+        window.location.href = url.replace('en', 'fr');
     });
 
+
+    // ------------- HEADER -------------
+
+
+    $('.profile-trigger').on('click', function (e) {
+        e.stopPropagation();
+        $('#dropdown').toggleClass('hidden');
+    });
+
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.profile-container').length) {
+            $('#dropdown').addClass('hidden');
+        }
+    });
 });
 
 
