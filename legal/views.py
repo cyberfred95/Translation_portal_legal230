@@ -317,7 +317,8 @@ class FileExpertRevisionView(APIView):
                 "company": request.user.group.name if request.user.group else "Administrator",
                 **self.get_quote(project)
             })
-        return HttpResponse(f'<h1>Sent to post-editing</h1><br/><a href="{request.build_absolute_uri(reverse("main_index"))}">Return to main page</a>')
+        return HttpResponse(
+            f'<h1>Sent to post-editing</h1><br/><a href="{request.build_absolute_uri(reverse("main_index"))}">Return to main page</a>')
 
     def post(self, request):
         if not request.user.is_staff and not request.user.group:
@@ -505,6 +506,7 @@ class DetectTextLanguageView(APIView):
 
         text_for_detection = ' '.join(text[:self.WORDS_COUNT_FOR_DETECTION])
         return text_for_detection
+
 
 class ProfileDetailsView(TemplateView):
     template_name = 'profile_details.html'

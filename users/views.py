@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 import requests
 from glossaries.models import Glossary
+from subscriptions.permissions import SubscribedPermission
 from .models import UserGroup
 from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer
 from legal.views import PAGINATION_PAGE_SIZE
@@ -75,3 +76,16 @@ class SingleAccountView(RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class InviteUserAPIView(APIView):
+    permission_classes = (SubscribedPermission,)
+
+    def post(self, request):
+        if request.user.group and request.user.group.admin == request.user:
+            emails = request.data.getlist('email[]')
+            if not emails:
+                return Response({"detail": "Emails list should not be empty"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"detail": "You have to be group admin to provide this action"},
+                        status=status.HTTP_403_FORBIDDEN)

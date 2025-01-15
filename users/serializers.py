@@ -6,6 +6,17 @@ from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
+
+    def validate(self, attrs) -> dict:
+        if 'email' not in attrs:
+            raise serializers.ValidationError({"detail": "Email is required"})
+        return attrs
+
+    def create(self, validated_data):
+        user = User.objects.create(**validated_data)
+        user.group = self.context['request'].user.group
+        user.save()
+
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'username', 'email']
