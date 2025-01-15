@@ -505,3 +505,6 @@ class DetectTextLanguageView(APIView):
 
         text_for_detection = ' '.join(text[:self.WORDS_COUNT_FOR_DETECTION])
         return text_for_detection
+
+class ProfileDetailsView(TemplateView):
+    template_name = 'profile_details.html'
