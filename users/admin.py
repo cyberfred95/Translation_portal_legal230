@@ -3,7 +3,12 @@ from django.contrib.auth.admin import UserAdmin
 from .models import User
 from .models import UserGroup
 
-admin.site.register(UserGroup)
+
+class UserGroupAdmin(admin.ModelAdmin):
+    fields = ['name', 'api_key', 'admin']
+
+
+admin.site.register(UserGroup, UserGroupAdmin)
 
 
 class CustomUserAdmin(UserAdmin):

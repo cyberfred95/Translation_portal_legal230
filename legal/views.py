@@ -3,20 +3,27 @@ import os
 import re
 import time
 from datetime import datetime
+from decimal import Decimal
+from io import BytesIO
 from urllib.parse import urlparse, unquote
+
+from django.urls import reverse
+
+from quoting.models import LanguageQuote
+from django.utils.timezone import now
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.views.generic import TemplateView
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
 import django
 from rest_framework.views import APIView
-from .helpers import get_translate_data, lowercase_file_extension, get_word_count, get_text_from_file
+from .helpers import get_translate_data, lowercase_file_extension, get_word_count, get_text_from_file, get_project_file
 
 from domains.models import Domain
 from languages.models import Language
-from users.models import User
+from users.models import User, UserGroup
 from .credentials import languages
 from .mail_helpers import send_expert_revision_text, \
     send_file_translation, send_text_translation
@@ -24,7 +31,6 @@ from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from preferences import preferences
-from stats.calculator import StatsProcessor
 import langdetect
 from .tasks import send_statistic_request
 from glossaries.models import Glossary
@@ -32,6 +38,7 @@ from typing import Optional
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from subscriptions.permissions import SubscribedPermission
 from django.core.cache import cache
+from quoting.helpers import get_price_by_language_pair
 
 import csv
 from subscriptions.helpers import translation_allowed, add_translations
@@ -54,13 +61,16 @@ def text_translation(request):
         send_text_translation(user_id=request.user.id, text=text, translation_name=request.POST.get('domain_name'))
         if response.status_code == 200:
             send_statistic_request(
-                api_key, [text],
-                request.user.uuid,
-                **get_translate_data(request, for_statistic=True)
+                api_key=api_key, texts=[text],
+                user_uuid=request.user.uuid,
+                words_count=get_word_count(text),
+                **get_translate_data(request, for_statistic=True),
+
             )
         add_translations(request, words_count=get_word_count(text))
         return JsonResponse(response.json())
-    return JsonResponse({"detail": "You are not allowed to translate such amount of data"}, status=status.HTTP_400_BAD_REQUEST)
+    return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 def form_glossary_object(request) -> Optional[dict]:
@@ -91,7 +101,6 @@ def file_translate(request):
     files = request.FILES.getlist('document[]', [])
     api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
     cache_data = cache.get(f"{request.user.uuid}")
-    print(cache_data)
 
     if cache_data:
         words_count = cache_data
@@ -140,7 +149,10 @@ def file_translate(request):
                                   file_name=project['file_name'],
                                   file_ext=project['file_extension'])
         add_translations(request, words_count=words_count, files_count=len(files))
-        return JsonResponse({"project_ids": [project.get('id') for project in projects]})
+        return JsonResponse({"project_ids": [project.get('id') for project in projects],
+                             "display_popup": True if get_price_by_language_pair(
+                                 source_language=request.POST.get('source_language'),
+                                 target_language=request.POST.get('target_language')) else False})
     return JsonResponse({"detail": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -164,8 +176,6 @@ class TranslateView(TemplateView):
             if group_subscription and group_subscription.access_to_official_glossaries:
                 return True
         return False
-
-
 
     def get_languages(self):
         if self.request.LANGUAGE_CODE == 'fr':
@@ -261,30 +271,77 @@ def expert_revision(request):
     return JsonResponse({})
 
 
-@csrf_exempt
-@api_view(['POST'])
-def expert_revision_file(request):
-    if not request.user.is_staff and not request.user.group:
-        return Response({"detail": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
-    project_id = request.POST['project_id']
-    project = requests.get(
-        preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
-        headers={
-            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
-        }
+class FileExpertRevisionView(APIView):
 
-    ).json()
-    response = requests.post(
-        preferences.MainSettings.CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
-        headers={
-            "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
-        data={
-            "email": preferences.MainSettings.sender_email,
-            "username": request.user.username,
-            "user_email": request.user.email,
-            "company": request.user.group.name
-        })
-    return Response({"detail": "Sent to post editing"}, status=status.HTTP_200_OK)
+    def get_quote(self, project: dict) -> Optional[dict]:
+        language_quote = LanguageQuote.objects.filter(
+            source_language__abbreviation__iexact=project.get('source_language'),
+            target_language__abbreviation__iexact=project.get('target_language')).first()
+        if language_quote:
+            api_key = None
+            file = get_project_file(file_url=project['source_file'])
+            words_count = len(get_text_from_file(file, api_key=api_key))
+            if self.request.data.get('company'):
+                group = UserGroup.objects.filter(name=self.request.data.get('company')).first()
+            else:
+                group = self.request.user.group
+            return {
+                'contract_name': self.request.data.get('company',
+                                                       self.request.user.group.name if self.request.user.group else "Administrator"),
+                'word_price': self.request.data.get('price', language_quote.price),
+                'words_count': self.request.data.get('words"count', words_count),
+                'total_price': self.request.data.get('words"count', words_count) * self.request.data.get('price',
+                                                                                                         language_quote.price),
+                'created_at': now(),
+                'quote_number': group.generate_quoting_number() if group else f"{now().strftime('%Y/%m')}/0"
+            }
+        return
+
+    def get(self, request):
+        project_id = request.query_params.get('project_id')
+        project = requests.get(
+            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+            headers={
+                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+            }
+
+        ).json()
+        response = requests.post(
+            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
+            headers={
+                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
+            data={
+                "email": preferences.MainSettings.sender_email,
+                "username": request.user.username,
+                "user_email": request.user.email,
+                "company": request.user.group.name if request.user.group else "Administrator",
+                **self.get_quote(project)
+            })
+        return HttpResponse(f'<h1>Sent to post-editing</h1><br/><a href="{request.build_absolute_uri(reverse("main_index"))}">Return to main page</a>')
+
+    def post(self, request):
+        if not request.user.is_staff and not request.user.group:
+            return Response({"detail": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
+        project_id = request.POST['project_id']
+        project = requests.get(
+            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+            headers={
+                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+            }
+
+        ).json()
+        response = requests.post(
+            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
+            headers={
+                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
+            data={
+                "email": preferences.MainSettings.sender_email,
+                "username": request.user.username,
+                "user_email": request.user.email,
+                "company": request.user.group.name if request.user.group else "Administrator",
+                **self.get_quote(project)
+            })
+        return Response({"detail": "Sent to post editing"}, status=status.HTTP_200_OK)
 
 
 class ProjectsHistoryView(TemplateView):
@@ -312,7 +369,10 @@ class ProjectsHistoryView(TemplateView):
                 original_filename = unquote(file_name)
                 project['source_file_name'] = original_filename
                 project['created_at'] = datetime.fromisoformat(project['created_at'].replace('Z', '+00:00'))
-
+                project['display_popup'] = True if get_price_by_language_pair(
+                    source_language=project['source_language'],
+                    target_language=project['target_language']
+                ) else False
                 if user.is_staff:
                     try:
                         project['username'] = User.objects.get(uuid=project['user_custom_mt_token'])
@@ -340,6 +400,8 @@ class SingleProjectView(APIView):
             file_name = urlparse(response.json()['source_file']).path.lstrip('/').split('/')[-1]
             original_filename = unquote(file_name)
             res['source_file_name'] = original_filename
+            res['display_popup'] = True if get_price_by_language_pair(source_language=res['source_language'],
+                                                                      target_language=res['target_language']) else False
 
             responses.append(res)
         return Response(responses, status=status.HTTP_200_OK)

@@ -476,8 +476,11 @@ msgstr "Group"
 msgid "Characters"
 msgstr "Characters"
 
+msgid "Words"
+msgstr "Words"
+
 msgid "Tokens"
-msgstr "Tokens"
+msgstr "In tokens"
 
 msgid "Date"
 msgstr "Date"

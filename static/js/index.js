@@ -49,6 +49,7 @@ $(document).ready(function () {
 
 // ------------- LOADING -------------
 
+
 const startLoading = () => {
     $('#main-loader').removeClass('hidden');
 }

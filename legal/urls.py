@@ -3,8 +3,9 @@ from django.contrib import admin
 from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static, serve
-from .views import TranslateView, expert_revision, expert_revision_file, ProjectsHistoryView, SingleProjectView, \
-    GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView, ProfileDetailsView
+from .views import TranslateView, expert_revision, FileExpertRevisionView, ProjectsHistoryView, SingleProjectView, \
+    GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView
+
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
 from domains.views import update_domains_view
@@ -15,7 +16,7 @@ urlpatterns = i18n_patterns(
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
     path("expert-revision", login_required(expert_revision), name='expert_revision'),
-    path('expert-revision-file', login_required(expert_revision_file), name='expert_revision_file'),
+    path('expert-revision-file', login_required(FileExpertRevisionView.as_view()), name='expert_revision_file'),
     path('project-history/', login_required(ProjectsHistoryView.as_view()), name='project_history'),
     path('project/', login_required(SingleProjectView.as_view()), name='single_project'),
     path('get-templates/', login_required(GetTemplatesView.as_view()), name='get-templates'),
@@ -34,6 +35,7 @@ urlpatterns = i18n_patterns(
     path('usage/', include('stats.urls')),
     path('users/', include('users.urls')),
     path('writing/', include('writing.urls')),
+    path('quoting/', include('quoting.urls')),
 
     re_path(r'^rosetta/', include('rosetta.urls'))
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \

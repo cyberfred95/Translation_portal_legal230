@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, date, timedelta
 from django.views.generic import TemplateView
 
@@ -127,7 +128,11 @@ class UsageView(TemplateView):
         for stat in stats['results']:
             user = User.objects.filter(uuid=stat.get('user_portal_uuid')).first()
             stat['user'] = user.username if user else 'Unknown'
-
+            print(stat['metadata'])
+            try:
+                stat['metadata'] = json.loads(stat['metadata'])
+            except:
+                pass
             stat['created_at'] = datetime.fromisoformat(stat['created_at'].replace('Z', '+00:00'))
 
             try:
