@@ -21,7 +21,7 @@ class FormQuoteView(APIView):
     permission_classes = (IsAuthenticated, SubscribedPermission)
 
     @staticmethod
-    def expert_revision_url(project_id, request):
+    def get_expert_revision_url(project_id, request):
         params = {
             'project_id': project_id,
         }
@@ -55,7 +55,7 @@ class FormQuoteView(APIView):
                 'words_count': words_count,
                 'total_price': words_count * quote_price.price,
                 'created_at': now(),
-                'expert_revision_file_absolute_url': self.expert_revision_url(project_id, request),
+                'expert_revision_file_absolute_url': self.get_expert_revision_url(project_id, request),
                 'quote_number': request.user.group.generate_quoting_number() if request.user.group else f"{now().strftime('%Y/%m')}/0"
 
             }

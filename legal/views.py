@@ -6,6 +6,9 @@ from datetime import datetime
 from decimal import Decimal
 from io import BytesIO
 from urllib.parse import urlparse, unquote
+
+from django.urls import reverse
+
 from quoting.models import LanguageQuote
 from django.utils.timezone import now
 
@@ -13,7 +16,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.views.generic import TemplateView
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
 import django
 from rest_framework.views import APIView
 from .helpers import get_translate_data, lowercase_file_extension, get_word_count, get_text_from_file, get_project_file
@@ -294,6 +297,28 @@ class FileExpertRevisionView(APIView):
             }
         return
 
+    def get(self, request):
+        project_id = request.query_params.get('project_id')
+        project = requests.get(
+            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+            headers={
+                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+            }
+
+        ).json()
+        response = requests.post(
+            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
+            headers={
+                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
+            data={
+                "email": preferences.MainSettings.sender_email,
+                "username": request.user.username,
+                "user_email": request.user.email,
+                "company": request.user.group.name if request.user.group else "Administrator",
+                **self.get_quote(project)
+            })
+        return HttpResponse(f'<h1>Sent to post-editing</h1><br/><a href="{request.build_absolute_uri(reverse("main_index"))}">Return to main page</a>')
+
     def post(self, request):
         if not request.user.is_staff and not request.user.group:
             return Response({"detail": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
@@ -375,7 +400,8 @@ class SingleProjectView(APIView):
             file_name = urlparse(response.json()['source_file']).path.lstrip('/').split('/')[-1]
             original_filename = unquote(file_name)
             res['source_file_name'] = original_filename
-            res['display_popup'] = True if get_price_by_language_pair(source_language=res['source_language'], target_language=res['target_language']) else False
+            res['display_popup'] = True if get_price_by_language_pair(source_language=res['source_language'],
+                                                                      target_language=res['target_language']) else False
 
             responses.append(res)
         return Response(responses, status=status.HTTP_200_OK)
