@@ -40,7 +40,7 @@
             </div>
             <div class="p-12.5 flex flex-col items-center gap-7.5 show-modal-false hidden">
                 <div class="text-5 font-semibold text-gray-600">{% trans 'Quote for revision' %}</div>
-                <span class="text-center text-3.5 text-gray-600">Sorry, you are unable to create automatic expert revision, Please contact this email:</span>
+                <span class="text-center text-3.5 text-gray-600">Sorry, you are unable to create automatic expert revision, Please contact this email: <a href="mailto:{{ preferences.MainSettings.sender_email }}">{{ preferences.MainSettings.sender_email }}</a></span>
             </div>
         </div>
     </div>

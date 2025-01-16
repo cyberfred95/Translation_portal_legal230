@@ -1138,7 +1138,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: 'POST',
-            url: expert_revision_file,
+            url: form_quote_url,
             data: formData,
             processData: false,
             contentType: false,

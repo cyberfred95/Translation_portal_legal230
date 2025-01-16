@@ -1,3 +1,5 @@
+from django.urls import reverse
+from django.views.generic import TemplateView
 from preferences import preferences
 from rest_framework import status
 from rest_framework.generics import DestroyAPIView, RetrieveUpdateDestroyAPIView
@@ -10,6 +12,7 @@ from subscriptions.permissions import SubscribedPermission
 from .models import UserGroup
 from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer
 from legal.views import PAGINATION_PAGE_SIZE
+from .mail_helpers import send_invitation_email
 
 
 # Create your views here.
@@ -83,9 +86,26 @@ class InviteUserAPIView(APIView):
 
     def post(self, request):
         if request.user.group and request.user.group.admin == request.user:
-            emails = request.data.getlist('email[]')
+            emails = request.data.get('emails', [])
+            if isinstance(emails, str):
+                emails = emails.split(',')
             if not emails:
                 return Response({"detail": "Emails list should not be empty"}, status=status.HTTP_400_BAD_REQUEST)
-
+            send_invitation_email(emails=emails, register_user_absolute_uri=self.get_register_user_absolute_uri(request))
+            return Response({"message": "Invitation has been successfully sent"}, status=status.HTTP_200_OK)
         return Response({"detail": "You have to be group admin to provide this action"},
                         status=status.HTTP_403_FORBIDDEN)
+
+    @staticmethod
+    def get_register_user_absolute_uri(request):
+        print(request.build_absolute_uri(reverse('register-user')))
+        return request.build_absolute_uri(reverse('register-user'))
+
+
+class RegisterUserView(TemplateView):
+    template_name = 'registration/register.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["email"] = self.request.GET.get('email')
+        return context
