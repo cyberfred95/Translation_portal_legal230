@@ -556,7 +556,7 @@ $(document).ready(function () {
                 text: subDomain,
                 'data-name': subDomain,
                 click: function () {
-                    $('.sub-domain-button').removeClass('selected bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
+                    $('.sub-domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-175 text-gray-375');
                     $(this).removeClass('bg-gray-175 text-gray-375').addClass('selected bg-gray-600 text-white');
                     selectedSubDomain = $(this).data('name');
                     $('.domain-step').text(selectedSubDomain).removeClass('hidden');

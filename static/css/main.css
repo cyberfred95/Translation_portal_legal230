@@ -479,3 +479,19 @@ input[type="checkbox"]:checked {
     font-size: 16px;
     font-style: normal;
 }
+
+.border-vertical {
+    background-image: repeating-linear-gradient(
+            to bottom,
+            currentColor,
+            currentColor 5px,
+            transparent 5px,
+            transparent 10px
+    );
+    background-size: 1px 100%; /* Вертикальна лінія */
+    background-repeat: no-repeat;
+    background-position: center; /* Центрування по горизонталі */
+    width: 1px; /* Ширина лінії */
+    height: 100%; /* Висота на весь контейнер */
+    display: block;
+}
