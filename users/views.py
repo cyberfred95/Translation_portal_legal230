@@ -1,3 +1,7 @@
+from urllib.parse import urlencode
+
+from django.contrib.auth import login
+from django.http import JsonResponse
 from django.urls import reverse
 from django.views.generic import TemplateView
 from preferences import preferences
@@ -10,7 +14,7 @@ import requests
 from glossaries.models import Glossary
 from subscriptions.permissions import SubscribedPermission
 from .models import UserGroup
-from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer
+from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer, RegisterUserSerializer
 from legal.views import PAGINATION_PAGE_SIZE
 from .mail_helpers import send_invitation_email
 
@@ -91,15 +95,23 @@ class InviteUserAPIView(APIView):
                 emails = emails.split(',')
             if not emails:
                 return Response({"detail": "Emails list should not be empty"}, status=status.HTTP_400_BAD_REQUEST)
-            send_invitation_email(emails=emails, register_user_absolute_uri=self.get_register_user_absolute_uri(request))
+            for email in emails:
+                params = {
+                    "email": email,
+                    "group": request.user.group.id
+                }
+                send_invitation_email(email=email,
+                                      register_user_absolute_uri=self.get_register_user_absolute_uri(request, params=params))
             return Response({"message": "Invitation has been successfully sent"}, status=status.HTTP_200_OK)
         return Response({"detail": "You have to be group admin to provide this action"},
                         status=status.HTTP_403_FORBIDDEN)
 
     @staticmethod
-    def get_register_user_absolute_uri(request):
-        print(request.build_absolute_uri(reverse('register-user')))
-        return request.build_absolute_uri(reverse('register-user'))
+    def get_register_user_absolute_uri(request, params: dict = None):
+        url = f"{request.build_absolute_uri(reverse('register-user'))}"
+        if params:
+            url = f"{url}?{urlencode(params)}"
+        return url
 
 
 class RegisterUserView(TemplateView):
@@ -108,4 +120,12 @@ class RegisterUserView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["email"] = self.request.GET.get('email')
+        context["group"] = self.request.GET.get('group')
         return context
+
+    def post(self, request, *args, **kwargs):
+        serializer = RegisterUserSerializer(data=request.POST)
+        if serializer.is_valid():
+            user = serializer.create(serializer.validated_data)
+            return JsonResponse({"message": "User has been registered successfully"}, status=status.HTTP_200_OK)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
