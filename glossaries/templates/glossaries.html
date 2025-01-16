@@ -7,7 +7,7 @@
 <div class="mx-5 mb-11.5">
     <div class="flex justify-end items-center my-5">
         <button
-                type="button" id="openModal" class="flex gap-2.5 items-center px-6.5 py-2 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 text-3.5">
+                type="button" id="openModal" class="flex gap-2.5 items-center px-6.5 py-1 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 text-3.5">
             + {% trans 'Add glossary' %}
         </button>
     </div>
@@ -217,14 +217,14 @@
                             </button>
                         </div>
                         <a href="{% static 'Gloss_en-de.csv' %}" type="button" id="downloadSample"
-                           class="px-6.5 text-center bg-white text-green-700 bg-green-700 py-2.5 rounded border border-green-700 font-semibold">
+                           class="px-6.5 text-center bg-white text-green-700 bg-green-700 py-1 rounded border border-green-700 font-semibold">
                             {% trans 'Download sample' %}
                         </a>
                         <p class="text-3.5 text-gray-400">{% trans 'Supported Files: .csv max 5mb' %}</p>
                     </div>
                 </div>
                 <button type="submit" id="continueButton"
-                        class="bg-gray-600 px-6.5 py-2.5 rounded font-semibold text-4 text-white create-glossary">
+                        class="bg-gray-600 px-6.5 py-1 rounded font-semibold text-4 text-white create-glossary">
                     {% trans 'Continue' %}
                 </button>
             </form>
@@ -253,7 +253,7 @@
                         placeholder="name"
                 >
                 <button type="submit" id="edit-glossary"
-                        class="bg-gray-600 px-6.5 py-2.5 rounded font-semibold text-4 text-white">
+                        class="bg-gray-600 px-6.5 py-1 rounded font-semibold text-4 text-white">
                     {% trans 'Continue' %}
                 </button>
             </form>
