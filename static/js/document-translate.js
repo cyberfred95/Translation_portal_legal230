@@ -1185,6 +1185,11 @@ $(document).ready(function () {
                     'X-CSRFToken': getCookie('csrftoken'),
                 },
                 success: function (response) {
+                    if (response[0].display_popup) {
+                        $('.show-modal-false').removeClass('hidden');
+                    } else {
+                        $('.show-modal-true').removeClass('hidden');
+                    }
                     updateProjectTable(response);
                 },
                 error: function (error) {
