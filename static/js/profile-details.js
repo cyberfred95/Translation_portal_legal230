@@ -74,4 +74,56 @@ $(document).ready(function () {
             },
         });
     });
+
+    let clickedOnce = false;
+
+    $('#modal-delete-account').on('click', function (event) {
+        event.stopPropagation();
+        $('#delete-account-modal').removeClass('hidden');
+    });
+
+    $(document).on('click', function () {
+        $('#delete-account-modal').addClass('hidden');
+    });
+
+    $('.modal-content').on('click', function (event) {
+        event.stopPropagation();
+    });
+
+    $('#cancel-account-btn').on('click', function () {
+        $('#delete-account-modal').addClass('hidden');
+    });
+
+    $('#delete-account-btn').on('click', function () {
+        const $button = $(this);
+        const $inputContainer = $('#input-container');
+        const $hiddenInput = $('#delete-confirmation');
+
+        if (!clickedOnce) {
+            clickedOnce = true;
+
+            $button.text('Confirm Deletion');
+            $button.attr('type', 'submit');
+            $inputContainer.removeClass('hidden');
+        } else {
+            const inputValue = $hiddenInput.val();
+
+            if (inputValue) {
+                $.ajax({
+                    url: '/delete-resources',
+                    type: 'POST',
+                    data: { confirmation: inputValue },
+                    success: function () {
+                        alert('Resources deleted successfully!');
+                        $('#delete-account-modal').addClass('hidden');
+                    },
+                    error: function () {
+                        alert('Error deleting resources.');
+                    }
+                });
+            } else {
+                alert("Please enter your password to confirm.");
+            }
+        }
+    });
 });
