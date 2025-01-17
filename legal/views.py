@@ -6,6 +6,9 @@ from datetime import datetime
 from decimal import Decimal
 from io import BytesIO
 from urllib.parse import urlparse, unquote
+
+from django.urls import reverse
+
 from quoting.models import LanguageQuote
 from django.utils.timezone import now
 
@@ -13,14 +16,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.views.generic import TemplateView
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
 import django
 from rest_framework.views import APIView
-from .helpers import get_translate_data, lowercase_file_extension, get_word_count, get_text_from_file
+from .helpers import get_translate_data, lowercase_file_extension, get_word_count, get_text_from_file, get_project_file
 
 from domains.models import Domain
 from languages.models import Language
-from users.models import User
+from users.models import User, UserGroup
 from .credentials import languages
 from .mail_helpers import send_expert_revision_text, \
     send_file_translation, send_text_translation
@@ -35,6 +38,7 @@ from typing import Optional
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from subscriptions.permissions import SubscribedPermission
 from django.core.cache import cache
+from quoting.helpers import get_price_by_language_pair
 
 import csv
 from subscriptions.helpers import translation_allowed, add_translations
@@ -97,7 +101,6 @@ def file_translate(request):
     files = request.FILES.getlist('document[]', [])
     api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
     cache_data = cache.get(f"{request.user.uuid}")
-    print(cache_data)
 
     if cache_data:
         words_count = cache_data
@@ -146,7 +149,10 @@ def file_translate(request):
                                   file_name=project['file_name'],
                                   file_ext=project['file_extension'])
         add_translations(request, words_count=words_count, files_count=len(files))
-        return JsonResponse({"project_ids": [project.get('id') for project in projects]})
+        return JsonResponse({"project_ids": [project.get('id') for project in projects],
+                             "display_popup": False if get_price_by_language_pair(
+                                 source_language=request.POST.get('source_language'),
+                                 target_language=request.POST.get('target_language')) else True})
     return JsonResponse({"detail": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -266,7 +272,6 @@ def expert_revision(request):
 
 
 class FileExpertRevisionView(APIView):
-    permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def get_quote(self, project: dict) -> Optional[dict]:
         language_quote = LanguageQuote.objects.filter(
@@ -274,36 +279,46 @@ class FileExpertRevisionView(APIView):
             target_language__abbreviation__iexact=project.get('target_language')).first()
         if language_quote:
             api_key = None
-            file = self.get_file(file_url=project['source_file'])
+            file = get_project_file(file_url=project['source_file'])
             words_count = len(get_text_from_file(file, api_key=api_key))
+            if self.request.data.get('company'):
+                group = UserGroup.objects.filter(name=self.request.data.get('company')).first()
+            else:
+                group = self.request.user.group
             return {
-                'contract_name': self.request.user.group.name if self.request.user.group else "Administrator",
-                'word_price': language_quote.price,
-                'words_count': words_count,
-                'total_price': words_count * language_quote.price,
+                'contract_name': self.request.data.get('company',
+                                                       self.request.user.group.name if self.request.user.group else "Administrator"),
+                'word_price': self.request.data.get('price', language_quote.price),
+                'words_count': self.request.data.get('words"count', words_count),
+                'total_price': self.request.data.get('words"count', words_count) * self.request.data.get('price',
+                                                                                                         language_quote.price),
                 'created_at': now(),
-                'quote_number': self.request.user.group.generate_quoting_number() if self.request.user.group else f"{now().strftime('%Y/%m')}/0"
+                'quote_number': group.generate_quoting_number() if group else f"{now().strftime('%Y/%m')}/0"
             }
         return
 
-    @staticmethod
-    def get_file(file_url) -> InMemoryUploadedFile:
-        response = requests.get(file_url)
-        file_content = BytesIO(response.content)
+    def get(self, request):
+        project_id = request.query_params.get('project_id')
+        project = requests.get(
+            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+            headers={
+                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+            }
 
-        object_key = urlparse(file_url).path.lstrip('/')
-        file_name = object_key.split('/')[-1]
-
-        in_memory_file = InMemoryUploadedFile(
-            file_content,
-            None,
-            file_name,
-            response.headers.get('Content-Type', 'application/octet-stream'),
-            len(response.content),
-            None
-        )
-
-        return in_memory_file
+        ).json()
+        response = requests.post(
+            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"post_editing/{project_id}/",
+            headers={
+                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
+            data={
+                "email": preferences.MainSettings.sender_email,
+                "username": request.user.username,
+                "user_email": request.user.email,
+                "company": request.user.group.name if request.user.group else "Administrator",
+                **self.get_quote(project)
+            })
+        return HttpResponse(
+            f'<h1>Sent to post-editing</h1><br/><a href="{request.build_absolute_uri(reverse("main_index"))}">Return to main page</a>')
 
     def post(self, request):
         if not request.user.is_staff and not request.user.group:
@@ -355,7 +370,10 @@ class ProjectsHistoryView(TemplateView):
                 original_filename = unquote(file_name)
                 project['source_file_name'] = original_filename
                 project['created_at'] = datetime.fromisoformat(project['created_at'].replace('Z', '+00:00'))
-
+                project['display_popup'] = False if get_price_by_language_pair(
+                    source_language=project['source_language'],
+                    target_language=project['target_language']
+                ) else True
                 if user.is_staff:
                     try:
                         project['username'] = User.objects.get(uuid=project['user_custom_mt_token'])
@@ -383,6 +401,8 @@ class SingleProjectView(APIView):
             file_name = urlparse(response.json()['source_file']).path.lstrip('/').split('/')[-1]
             original_filename = unquote(file_name)
             res['source_file_name'] = original_filename
+            res['display_popup'] = False if get_price_by_language_pair(source_language=res['source_language'],
+                                                                      target_language=res['target_language']) else True
 
             responses.append(res)
         return Response(responses, status=status.HTTP_200_OK)
@@ -486,3 +506,7 @@ class DetectTextLanguageView(APIView):
 
         text_for_detection = ' '.join(text[:self.WORDS_COUNT_FOR_DETECTION])
         return text_for_detection
+
+
+class ProfileDetailsView(TemplateView):
+    template_name = 'profile_details.html'

@@ -7,8 +7,20 @@ RUN useradd -m django
 WORKDIR /home/django/
 
 # i18n
-RUN apt update && apt -y install gettext
-
+RUN apt-get update && apt-get -y upgrade && \
+    apt-get -y install --no-install-recommends \
+        gettext \
+        musl-dev \
+        libcairo2-dev \
+        libpango1.0-dev \
+        libgdk-pixbuf2.0-dev \
+        libffi-dev \
+        shared-mime-info \
+        zlib1g-dev \
+        libjpeg-dev \
+        fonts-noto-core && \
+    fc-cache -f && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy cache contents (if any) from local machine
 # ADD pip-cache.tar.gz .cache/
@@ -25,10 +37,9 @@ RUN chown -R django:django /home/django/
 USER django:django
 
 
-RUN pip install --default-timeout=100 --user -r ./requirements.txt \
+RUN pip install --user -r ./requirements.txt \
     && mkdir ~/app \
     && PATH=$PATH:~/home/django/.local/bin
-
 
 WORKDIR /home/django/app/
 
