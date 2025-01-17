@@ -4,7 +4,7 @@ from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static, serve
 from .views import TranslateView, expert_revision, FileExpertRevisionView, ProjectsHistoryView, SingleProjectView, \
-    GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView
+    GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView, ProfileDetailsView
 
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
