@@ -1,0 +1,11 @@
+{% load static %}
+
+<img src="{% static 'images/logo.png' %}"><br>
+<p>You have been invited to join Legal230 translation portal</p><br>
+<p>To join the portal please press this button</p>
+<a style="padding: 10px 26px;background: #176C77;text-decoration: unset;text-align: center;border-radius: 4px; color: white;font-size: 16px;font-weight: 600;line-height: 20px;" href="{{ register_user_absolute_uri }}" >Join translation portal </a><br>
+<p>If button does not work please use this link</p>
+<a href="{{ register_user_absolute_uri }}">{{ register_user_absolute_uri }}</a><br>
+
+<p>If you received a letter by mistake, simply ignore it</p><br>
+<p>Legal230</p>

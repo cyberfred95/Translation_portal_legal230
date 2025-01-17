@@ -150,9 +150,9 @@ def file_translate(request):
                                   file_ext=project['file_extension'])
         add_translations(request, words_count=words_count, files_count=len(files))
         return JsonResponse({"project_ids": [project.get('id') for project in projects],
-                             "display_popup": True if get_price_by_language_pair(
+                             "display_popup": False if get_price_by_language_pair(
                                  source_language=request.POST.get('source_language'),
-                                 target_language=request.POST.get('target_language')) else False})
+                                 target_language=request.POST.get('target_language')) else True})
     return JsonResponse({"detail": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -307,7 +307,7 @@ class FileExpertRevisionView(APIView):
 
         ).json()
         response = requests.post(
-            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
+            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"post_editing/{project_id}/",
             headers={
                 "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
             data={
@@ -317,7 +317,8 @@ class FileExpertRevisionView(APIView):
                 "company": request.user.group.name if request.user.group else "Administrator",
                 **self.get_quote(project)
             })
-        return HttpResponse(f'<h1>Sent to post-editing</h1><br/><a href="{request.build_absolute_uri(reverse("main_index"))}">Return to main page</a>')
+        return HttpResponse(
+            f'<h1>Sent to post-editing</h1><br/><a href="{request.build_absolute_uri(reverse("main_index"))}">Return to main page</a>')
 
     def post(self, request):
         if not request.user.is_staff and not request.user.group:
@@ -369,10 +370,10 @@ class ProjectsHistoryView(TemplateView):
                 original_filename = unquote(file_name)
                 project['source_file_name'] = original_filename
                 project['created_at'] = datetime.fromisoformat(project['created_at'].replace('Z', '+00:00'))
-                project['display_popup'] = True if get_price_by_language_pair(
+                project['display_popup'] = False if get_price_by_language_pair(
                     source_language=project['source_language'],
                     target_language=project['target_language']
-                ) else False
+                ) else True
                 if user.is_staff:
                     try:
                         project['username'] = User.objects.get(uuid=project['user_custom_mt_token'])
@@ -400,8 +401,8 @@ class SingleProjectView(APIView):
             file_name = urlparse(response.json()['source_file']).path.lstrip('/').split('/')[-1]
             original_filename = unquote(file_name)
             res['source_file_name'] = original_filename
-            res['display_popup'] = True if get_price_by_language_pair(source_language=res['source_language'],
-                                                                      target_language=res['target_language']) else False
+            res['display_popup'] = False if get_price_by_language_pair(source_language=res['source_language'],
+                                                                      target_language=res['target_language']) else True
 
             responses.append(res)
         return Response(responses, status=status.HTTP_200_OK)
@@ -505,6 +506,7 @@ class DetectTextLanguageView(APIView):
 
         text_for_detection = ' '.join(text[:self.WORDS_COUNT_FOR_DETECTION])
         return text_for_detection
+
 
 class ProfileDetailsView(TemplateView):
     template_name = 'profile_details.html'
