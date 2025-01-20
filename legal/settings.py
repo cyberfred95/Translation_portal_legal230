@@ -36,6 +36,9 @@ INSTALLED_APPS = [
     'compressor',
     'django_filters',
     'rosetta',
+
+    'django_cleanup.apps.CleanupConfig',
+    
     'settings.apps.SettingsConfig',
     'preferences',
     'users.apps.UsersConfig',
