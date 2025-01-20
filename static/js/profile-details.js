@@ -99,7 +99,7 @@ $(document).ready(function () {
 
         const $button = $(this);
         const $inputContainer = $('#input-container');
-        const $hiddenInput = $('#delete-confirmation');
+        const $hiddenInput = $('#delete-account');
 
         if (!clickedOnce) {
             clickedOnce = true;
