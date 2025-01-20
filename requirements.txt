@@ -75,3 +75,6 @@ azure-storage-blob == 12.12.0
 aiohttp == 3.8.1
 openai == 0.27.0
 langdetect == 1.0.9
+weasyprint==61.2
+pydyf ==0.8.0
+django-cleanup == 9.0.0

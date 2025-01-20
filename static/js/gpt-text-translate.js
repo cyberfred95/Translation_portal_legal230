@@ -56,7 +56,7 @@ $(document).ready(function () {
         return splitText[0];
     }
 
-    $('form').on('submit', function (e) {
+    $('form[name="gpt-text-translate"]').on('submit', function (e) {
         e.preventDefault();
 
         let htmlContent = sourceQuill.root.innerHTML;

@@ -42,15 +42,15 @@ $(document).ready(function () {
 
         $("#progress-bar").css("width", percentage + "%");
 
-        $(".progress-point").parent().find("svg").removeClass("text-green-400").addClass("text-green-250");
-        $(".progress-point").parent().find(".text-3\\.25, .text-xs").removeClass("text-green-400").addClass("text-green-200");
+        $(".progress-point").parent().find("svg").removeClass("text-green-700").addClass("text-green-250");
+        $(".progress-point").parent().find(".text-3\\.25, .text-xs").removeClass("text-green-700").addClass("text-green-200");
 
-        $("#point-1").find("svg").removeClass("text-green-250").addClass("text-green-400");
-        $("#point-1").find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-400");
+        $("#point-1").find("svg").removeClass("text-green-250").addClass("text-green-700");
+        $("#point-1").find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-700");
 
         for (let i = 0; i <= step; i++) {
-            $(`#point-${i + 1}`).find("svg").removeClass("text-green-250").addClass("text-green-400");
-            $(`#point-${i + 1}`).find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-400");
+            $(`#point-${i + 1}`).find("svg").removeClass("text-green-250").addClass("text-green-700");
+            $(`#point-${i + 1}`).find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-700");
 
         }
     }
@@ -521,12 +521,12 @@ $(document).ready(function () {
         domains.forEach((domain, index) => {
             const button = $('<button>', {
                 type: 'button',
-                class: 'domain-button text-3.5 py-3 px-7.5 bg-gray-100 text-gray-475 hover:bg-gray-600 hover:text-white rounded-md focus:text-white focus:bg-gray-600 transition duration-300 ease-in-out truncate',
+                class: 'border border-gray-300 domain-button text-3.5 py-3 px-7.5 bg-gray-100 text-gray-475 hover:bg-green-700 hover:text-white rounded-md focus:text-white focus:bg-green-700 transition duration-300 ease-in-out truncate',
                 text: domain.name,
                 'data-name': domain.name,
                 click: function () {
-                    $('.domain-button').removeClass('selected bg-gray-600 text-white').addClass('bg-gray-100 text-gray-475');
-                    $(this).removeClass('bg-gray-100 text-gray-475').addClass('selected bg-gray-600 text-white');
+                    $('.domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-100 text-gray-475');
+                    $(this).removeClass('bg-gray-100 text-gray-475').addClass('selected bg-green-700 text-white');
 
                     selectedDomain = $(this).data('name');
                     getDomains();
@@ -534,7 +534,7 @@ $(document).ready(function () {
             });
 
             if (index === 0) {
-                button.removeClass('bg-gray-100 text-gray-475').addClass('selected bg-gray-600 text-white');
+                button.removeClass('bg-gray-100 text-gray-475').addClass('selected bg-green-700 text-white');
 
                 selectedDomain = domain.name;
             }
@@ -552,19 +552,19 @@ $(document).ready(function () {
         subDomains.forEach((subDomain, index) => {
             const button = $('<button>', {
                 type: 'button',
-                class: 'sub-domain-button text-3.5 py-3 px-7.5 bg-gray-100 text-gray-475 hover:bg-gray-600 hover:text-white rounded-md focus:text-white focus:bg-gray-600 transition duration-300 ease-in-out truncate',
+                class: 'sub-domain-button text-3.5 py-3 px-7.5 bg-gray-100 text-gray-475 hover:bg-green-700 hover:text-white rounded-md focus:text-white focus:bg-green-700 transition duration-300 ease-in-out truncate',
                 text: subDomain,
                 'data-name': subDomain,
                 click: function () {
-                    $('.sub-domain-button').removeClass('selected bg-green-500 text-white').addClass('bg-gray-175 text-gray-375');
-                    $(this).removeClass('bg-gray-175 text-gray-375').addClass('selected bg-gray-600 text-white');
+                    $('.sub-domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-175 text-gray-375');
+                    $(this).removeClass('bg-gray-175 text-gray-375').addClass('selected bg-green-700 text-white');
                     selectedSubDomain = $(this).data('name');
                     $('.domain-step').text(selectedSubDomain).removeClass('hidden');
                 }
             });
 
             if (index === 0) {
-                button.removeClass('bg-gray-175 text-gray-375').addClass('selected bg-gray-600 text-white');
+                button.removeClass('bg-gray-175 text-gray-375').addClass('selected bg-green-700 text-white');
                 selectedSubDomain = subDomain;
             }
 
@@ -743,10 +743,10 @@ $(document).ready(function () {
         $list.empty();
 
         glossaries.forEach(function (glossary) {
-            const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 ${isDefault ? "bg-gray-600 text-white" : "bg-gray-175 text-gray-375"} rounded-md hover:bg-gray-600 hover:text-white transition duration-300 ease-in-out">${glossary.name}</button>`);
+            const $item = $(`<button type="button" class="border border-gray-300  glossary-item text-3.5 py-3 px-7.5 ${isDefault ? "bg-green-700 text-white" : "bg-gray-175 text-gray-375"} rounded-md hover:bg-green-700 hover:text-white transition duration-300 ease-in-out">${glossary.name}</button>`);
             $item.click(function () {
                 if (selectedGlossary === glossary.id) {
-                    $(this).removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
+                    $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-175 text-gray-375');
                     selectedGlossary = '';
                     $('.terminology-step').text('').removeClass('hidden');
                     if (selectedGlossaryType === 'my-glossary') {
@@ -755,8 +755,8 @@ $(document).ready(function () {
                             .prop("disabled", true);
                     }
                 } else {
-                    $(".glossary-item").removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
-                    $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-gray-600 text-white');
+                    $(".glossary-item").removeClass('bg-green-700 text-white').addClass('bg-gray-175 text-gray-375');
+                    $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-green-700 text-white');
                     selectedGlossary = glossary.id;
                     $('.terminology-step').text(glossary.name).removeClass('hidden');
 
@@ -870,19 +870,19 @@ $(document).ready(function () {
 
                 const $list = $(".glossary-list");
 
-                const $item = $(`<button type="button" class="glossary-item text-3.5 py-3 px-7.5 bg-gray-175 text-gray-375 rounded-md hover:bg-gray-600 hover:text-white">${response.name}</button>`);
+                const $item = $(`<button type="button" class="border border-gray-300  border border-gray-300 glossary-item text-3.5 py-3 px-7.5 bg-gray-175 text-gray-375 rounded-md hover:bg-green-700 hover:text-white">${response.name}</button>`);
 
                 $item.click(function () {
                     if (selectedGlossary === response.id) {
-                        $(this).removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
+                        $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-175 text-gray-375');
                         selectedGlossary = '';
                         $('.terminology-step').text('').removeClass('hidden');
                         nextStep.removeClass('border-green-700 text-green-700 ')
                             .addClass('border-gray-225 text-gray-225 pointer-events-none')
                             .prop("disabled", true);
                     } else {
-                        $(".glossary-item").removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
-                        $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-gray-600 text-white');
+                        $(".glossary-item").removeClass('bg-green-700 text-white').addClass('bg-gray-175 text-gray-375');
+                        $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-green-700 text-white');
                         selectedGlossary = response.id;
                         $('.terminology-step').text(response.name).removeClass('hidden');
                         nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
@@ -954,7 +954,7 @@ $(document).ready(function () {
 
             row.append(`
             <td>
-                <div class="rounded-md text-green-400 py-3 px-4 md:w-50 2xl:w-80 truncate text-3.25">
+                <div class="border border-gray-300  border border-gray-300 glossary-item py-3 px-7.5 bg-gray-175 text-white rounded-md md:w-50 2xl:w-80 truncate text-3.25">
 
                     ${project.source_file_name}
                 </div>
@@ -962,7 +962,7 @@ $(document).ready(function () {
         `);
 
             const statusColumn = $('<td></td>');
-            const statusSpan = $('<span class="rounded-md py-1.5 px-2.5 text-3.25 font-medium"></span>');
+            const statusSpan = $('<span class="border border-gray-300  border border-gray-300 glossary-item py-3 px-7.5 bg-gray-175 rounded-md text-white font-medium"></span>');
 
 
             switch (project.status) {
@@ -1000,7 +1000,8 @@ $(document).ready(function () {
 
             const downloadColumn = $('<td></td>');
             const downloadButton = $(`
-            <button type=button class="flex gap-2.5 items-center text-green-500 download-file disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225" ${project.status !== 'Translated' ? 'disabled' : ''}>
+            <button type=button class="bg-gray-600 disabled:bg-gray-225 flex gap-2.5 items-center text-white px-7.5 py-3 rounded-md download-file disabled:pointer-events-none" ${project.status !== 'Translated' ? 'disabled' : ''}>
+                 ${language_code === 'en' ? 'Download' : 'Télécharger'}
                 <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_759_2185)">
                         <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z" fill="currentColor"/>
@@ -1012,7 +1013,6 @@ $(document).ready(function () {
                         </clipPath>
                     </defs>
                 </svg>
-                  ${language_code === 'en' ? 'Download' : 'Télécharger'}
             </button>
         `);
             downloadButton.attr('data-translated-file', project.translated_file);
@@ -1028,7 +1028,7 @@ $(document).ready(function () {
                 type="button"
                 data-translated-file="${project.translated_file}"
                 data-id="${project.id}"
-                class="flex gap-2.5 items-center text-gray-600 border border-gray-600 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision"
+                class="text-white flex gap-2.5 items-center bg-green-700 border border-green-700 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none expert-revision"
                 ${project.status !== 'Translated' ? 'disabled' : ''}
             >
                 ${language_code === 'en' ? "Human revision" : "Relecture expert"}
@@ -1036,11 +1036,11 @@ $(document).ready(function () {
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z" fill="currentColor"/>
                     </svg>
-                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 bg-gray-600 text-white text-2.75 rounded-md bottom-30 left-1/2 transform -translate-x-1/2 translate-y-full">
+                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 bg-green-700 text-white text-2.75 rounded-md bottom-30 left-1/2 transform -translate-x-1/2 translate-y-full">
                         <span class="py-4 px-4.5 text-justify text-wrap block">
                                               ${language_code === 'en' ? 'Click the button to see options for improving the quality of the translated file.' : "Cliquez sur ce bouton pour afficher les options de relecture disponibles"}
                         </span>
-                        <div class="absolute w-3 h-3 bg-gray-600 transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5"></div>
+                        <div class="absolute w-3 h-3 bg-green-700 transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5"></div>
                     </div>
                 </div>
             </button>
@@ -1138,7 +1138,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: 'POST',
-            url: expert_revision_file,
+            url: form_quote_url,
             data: formData,
             processData: false,
             contentType: false,
@@ -1185,6 +1185,11 @@ $(document).ready(function () {
                     'X-CSRFToken': getCookie('csrftoken'),
                 },
                 success: function (response) {
+                    if (response[0].display_popup) {
+                        $('.show-modal-false').removeClass('hidden');
+                    } else {
+                        $('.show-modal-true').removeClass('hidden');
+                    }
                     updateProjectTable(response);
                 },
                 error: function (error) {

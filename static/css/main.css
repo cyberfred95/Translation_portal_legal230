@@ -123,7 +123,7 @@
 }
 
 .select2-results__option {
-    color: #0D2B40;
+    color: #0F3144;
     font-weight: 400;
     font-size: 16px;
     padding: 8px 12px;
@@ -348,7 +348,7 @@ body {
 }
 
 .login-body button:hover {
-    background: #0D2B40;
+    background: #0F3144;
 }
 
 .login-body ul {
@@ -473,13 +473,25 @@ input[type="checkbox"]:checked {
     height: auto;
 }
 
-.ql-container.ql-snow {
-    border: none;
-}
-
 .ql-editor.ql-blank::before {
     left: 20px;
     color: #CACACA;
     font-size: 16px;
     font-style: normal;
+}
+
+.border-vertical {
+    background-image: repeating-linear-gradient(
+            to bottom,
+            currentColor,
+            currentColor 5px,
+            transparent 5px,
+            transparent 10px
+    );
+    background-size: 1px 100%; /* Вертикальна лінія */
+    background-repeat: no-repeat;
+    background-position: center; /* Центрування по горизонталі */
+    width: 1px; /* Ширина лінії */
+    height: 100%; /* Висота на весь контейнер */
+    display: block;
 }

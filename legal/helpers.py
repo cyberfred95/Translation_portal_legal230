@@ -1,9 +1,13 @@
 import os
 import re
+from io import BytesIO
+from urllib.parse import urlparse
 
+import requests
+from django.contrib.auth.hashers import check_password
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from preferences import preferences
-
+import base64
 from domains.models import Domain
 from stats.calculator import StatsProcessor
 
@@ -49,7 +53,7 @@ def get_text_from_file(file: InMemoryUploadedFile, api_key) -> list:
     try:
         texts = StatsProcessor(api_key).get_texts(file=file)
     except UnicodeEncodeError:
-        raise ValueError({"detail":"Invalid characters in file name"})
+        raise ValueError({"detail": "Invalid characters in file name"})
 
     formated_texts = [
         word
@@ -59,3 +63,31 @@ def get_text_from_file(file: InMemoryUploadedFile, api_key) -> list:
     file.seek(0)
     return formated_texts
 
+
+def get_project_file(file_url) -> InMemoryUploadedFile:
+    response = requests.get(file_url)
+    file_content = BytesIO(response.content)
+
+    object_key = urlparse(file_url).path.lstrip('/')
+    file_name = object_key.split('/')[-1]
+
+    in_memory_file = InMemoryUploadedFile(
+        file_content,
+        None,
+        file_name,
+        response.headers.get('Content-Type', 'application/octet-stream'),
+        len(response.content),
+        None
+    )
+
+    return in_memory_file
+
+
+def password_valid(request):
+    if not request.data.get('password'):
+        return False
+    password = base64.b64decode(request.data.get('password'))
+    print(password)
+    if not check_password(password, request.user.password):
+        return False
+    return True
