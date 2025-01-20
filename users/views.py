@@ -37,22 +37,12 @@ class UsersListView(APIView):
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def validate(self, attrs):
-        if 'current_password' not in attrs and 'new_password' not in attrs and 'confirm_password' not in attrs:
-            raise serializers.ValidationError({"detail": "Fill all data for password change"})
-        if attrs['new_password'] != attrs['confirm_password']:
-            raise serializers.ValidationError({"detail": "Passwords do not match"})
-        if not check_password(attrs['current_password'], self.request.user.password):
-            raise serializers.ValidationError({"detail": "Invalid current password"})
-        return attrs
-
     def post(self, request):
-        # serializer = ChangePasswordSerializer(data=self.request.data)
-        self.validate(request.data)
-        request.user.set_password(request.data['new_password'])
-        request.user.save()
-        return Response({"message": "password changed successfully"}, status=status.HTTP_200_OK)
-
+        serializer = ChangePasswordSerializer(data=self.request.POST, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "password changed successfully"}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DeleteAllDataView(APIView):

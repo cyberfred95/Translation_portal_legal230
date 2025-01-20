@@ -7,10 +7,9 @@ from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email']
+        fields = ['username', 'email']
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -68,13 +67,17 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 class ChangePasswordSerializer(serializers.Serializer):
+    current_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        if 'current_password' not in attrs and 'new_password' not in attrs and 'confirm_password' not in attrs:
+        print(attrs)
+        if 'current_password' not in attrs or 'new_password' not in attrs or 'confirm_password' not in attrs:
             raise serializers.ValidationError({"detail": "Fill all data for password change"})
         if attrs['new_password'] != attrs['confirm_password']:
             raise serializers.ValidationError({"detail": "Passwords do not match"})
-        if not check_password(attrs['current_password']):
+        if not check_password(attrs['current_password'], self.context['request'].user.password):
             raise serializers.ValidationError({"detail": "Invalid current password"})
         return attrs
 
