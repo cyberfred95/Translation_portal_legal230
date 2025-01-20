@@ -122,8 +122,10 @@ class RegisterUserView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["email"] = self.request.GET.get('email')
-        context["group"] = self.request.GET.get('group')
+        if self.request.GET.get('email'):
+            context["email"] = self.request.GET.get('email')
+        if self.request.GET.get('group'):
+            context["group"] = self.request.GET.get('group')
         return context
 
     def post(self, request, *args, **kwargs):
