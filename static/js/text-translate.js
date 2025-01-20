@@ -74,7 +74,7 @@ $(document).ready(function () {
         getDomains();
     });
 
-    $('form').on('submit', function (e) {
+    $('form[name="text-translate"]').on('submit', function (e) {
         e.preventDefault();
         let htmlContent = sourceQuill.root.innerHTML;
 

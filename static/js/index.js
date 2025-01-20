@@ -77,7 +77,7 @@ $(document).ready(function () {
                 $.ajax({
                     url: '/delete-accounts',
                     type: 'POST',
-                    data: { confirmation: inputValue },
+                    data: {confirmation: inputValue},
                     success: function () {
                         alert('Resources deleted successfully!');
                         $('#invite-modal').addClass('hidden');
@@ -90,6 +90,30 @@ $(document).ready(function () {
                 alert("Please enter your password to confirm.");
             }
         }
+    });
+
+    $('form[name="invite"]').on('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        $.ajax({
+            url: invite_user_url,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function () {
+                $('#invite-modal').addClass('hidden');
+            },
+            error: function (error) {
+                $('#invite-modal').addClass('hidden');
+                errorNotification(error?.status, error?.responseJSON?.detail);
+            }
+        });
     });
 });
 

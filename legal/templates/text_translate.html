@@ -2,7 +2,7 @@
 {% load i18n %}
 
 <div class="pb-5 w-full h-full flex flex-col items-end">
-    <form class="w-full flex flex-col">
+    <form name="text-translate" class="w-full flex flex-col">
         <textarea id="text" name="text" style="display: none;"></textarea>
         <input type="hidden" name="action" value="text_translate">
         {% csrf_token %}
