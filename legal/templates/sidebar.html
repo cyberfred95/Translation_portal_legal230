@@ -18,7 +18,7 @@
         </li>
         <li>
             <a href="{% url 'main_index' %}"
-               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white">
+               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white {% if request.resolver_match.url_name == 'main_index' %}{% endif %}">
                 <div class="bg-white rounded">
                     <svg class="h-10 w-10" id="Calque_3" data-name="Calque 3" xmlns="http://www.w3.org/2000/svg"
                          viewBox="0 0 520 548">
@@ -41,7 +41,7 @@
 
         <li>
             <a href="{% url 'glossaries' %}"
-               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white">
+               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white {% if request.resolver_match.url_name == 'glossaries' %}{% endif %}">
                 <div class="bg-white rounded">
                     <svg class="h-10 w-10" id="Calque_3" data-name="Calque 3" xmlns="http://www.w3.org/2000/svg"
                          viewBox="0 0 500 500">
@@ -84,7 +84,7 @@
 
         <li>
             <a href="{% url 'project_history' %}"
-               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white">
+               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white {% if request.resolver_match.url_name == 'project_history' %}{% endif %}">
                 <div class="bg-white rounded">
                     <svg class="h-10 w-10" id="Calque_3" data-name="Calque 3" xmlns="http://www.w3.org/2000/svg"
                          viewBox="0 0 520 548">
@@ -104,7 +104,7 @@
 
         <li>
             <a href="{% url 'writing' %}"
-               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white">
+               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white {% if request.resolver_match.url_name == 'writing' %}{% endif %}">
                 <div class="bg-white rounded">
                     <svg class="h-10 w-10" id="Calque_3" data-name="Calque 3" xmlns="http://www.w3.org/2000/svg"
                          viewBox="0 0 520 548">
@@ -134,10 +134,9 @@
     <ul>
         <li>
             <a href="{% url 'usage' %}?date_from={{ request.GET.date_from|default:''|date:'Y-m-d'|default:'' }}{% if not request.GET.date_from %}{% now 'Y-m-01' %}{% endif %}&date_to={{ request.GET.date_to|default:''|date:'Y-m-d'|default:'' }}{% if not request.GET.date_to %}{% now 'Y-m-t' %}{% endif %}"
-               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white">
+               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white {% if request.resolver_match.url_name == 'usage' %}{% endif %}">
                 <div class="bg-white rounded">
-                    <svg class="h-10 w-10" id="Calque_1" xmlns="http://www.w3.org/2000/svg"
-                         xmlns:i="http://ns.adobe.com/AdobeIllustrator/10.0/" version="1.1" viewBox="0 0 500 500">
+                    <svg class="h-10 w-10" id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 500 500">
 
                         <path fill="#FFFFFF"
                               d="M408.3,8H87.7c-44.3,0-80.2,35.9-80.2,80.2v320.7c0,44.3,35.9,80.2,80.2,80.2h320.7c44.3,0,80.2-35.9,80.2-80.2V88.2c0-44.3-35.9-80.2-80.2-80.2Z"/>
