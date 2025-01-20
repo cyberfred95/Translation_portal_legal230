@@ -87,6 +87,7 @@ def password_valid(request):
     if not request.data.get('password'):
         return False
     password = base64.b64decode(request.data.get('password'))
+    print(password)
     if not check_password(password, request.user.password):
         return False
     return True

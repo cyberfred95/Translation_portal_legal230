@@ -94,7 +94,7 @@ class SingleAccountView(RetrieveUpdateDestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         if password_valid(request):
-            return self.delete(request, *args, **kwargs)
+            return super().delete(request, *args, **kwargs)
         else:
             return Response({"detail": "Invalid password"}, status=status.HTTP_403_FORBIDDEN)
 
