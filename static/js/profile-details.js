@@ -72,6 +72,12 @@ $(document).ready(function () {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': getCookie('csrftoken'),
             },
+            success: function () {
+                $('#success-change-password').removeClass('hidden');
+            },
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
+            }
         });
     });
 
@@ -80,6 +86,17 @@ $(document).ready(function () {
     $('#modal-delete-account').on('click', function (event) {
         event.stopPropagation();
         $('#delete-account-modal').removeClass('hidden');
+    });
+
+    $('#success-update-btn').on('click', function (event) {
+        event.stopPropagation();
+        $('#success-update-user-data').addClass('hidden');
+        window.location.reload();
+    });
+
+    $('#success-change-password-btn').on('click', function (event) {
+        event.stopPropagation();
+        $('#success-change-password').addClass('hidden');
     });
 
     $(document).on('click', function () {
@@ -214,7 +231,7 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function () {
-                window.location.reload();
+                $('#success-update-user-data').removeClass('hidden');
             },
             error: function (error) {
                 errorNotification(error?.status, error?.responseJSON?.detail);
