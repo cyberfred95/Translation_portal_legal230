@@ -198,6 +198,7 @@
          class="fixed inset-0 bg-gray-425 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
         <div class="relative bg-white rounded-lg shadow-xl max-w-200 w-full mx-4 modal-content">
             <form autocomplete="off" class="p-17.5 flex flex-col items-center gap-10">
+                {% csrf_token %}
                 <div class="text-5 font-semibold">Delete Account</div>
                 <div class="flex flex-col gap-1.5 w-full">
                     <div class="text-center leading-none">
@@ -274,10 +275,11 @@
          class="fixed inset-0 bg-gray-425 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
         <div class="relative bg-white rounded-lg shadow-xl max-w-200 w-full mx-4 modal-content">
             <form autocomplete="off" class="p-17.5 flex flex-col items-center gap-10">
+                {% csrf_token %}
                 <div class="text-5 font-semibold">Delete Resources</div>
                 <div class="flex flex-col gap-1.5 w-full">
                     <div class="text-center leading-none">
-                        <span class="text-4 leading-none">Deleting your account is an irreversible operation. Any data synced to your account will be deleted and no longer be accessible. </span>
+                        <span class="text-4 leading-none">Deleting your resources is an irreversible operation. Any data synced to your account will be deleted and no longer be accessible. </span>
                     </div>
                     <div class="flex items-start">
                         <span>
@@ -304,19 +306,19 @@
                     </div>
                 </div>
                 <div class="w-full hidden" id="input-resources">
-                    <label for="delete-account" class="text-4 font-semibold text-gray-600 mb-1.5">
+                    <label for="delete-resources" class="text-4 font-semibold text-gray-600 mb-1.5">
                         Enter your password to confirm
                     </label>
                     <div class="relative mt-1">
                         <input
                                 type="password"
                                 id="delete-resources"
-                                name="delete-account"
+                                name="delete-resources"
                                 placeholder="Start typing..."
                                 required
                                 class="placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300 bg-gray-75"
                         />
-                        <span class="absolute inset-y-0 right-3 flex items-center cursor-pointer toggle-visibility" data-target="delete-account">
+                        <span class="absolute inset-y-0 right-3 flex items-center cursor-pointer toggle-visibility" data-target="delete-resources">
                             <svg class="eye-icon open hidden" width="17" height="11" viewBox="0 0 17 11" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M8.5 10.8125C2.93874 10.8125 0.181555 5.96431 0.0669375 5.75805C-0.0223125 5.59748 -0.0223125 5.40238 0.0669375 5.24181C0.181555 5.03569 2.93874 0.1875 8.5 0.1875C14.0613 0.1875 16.8184 5.03569 16.9331 5.24195C17.0223 5.40252 17.0223 5.59762 16.9331 5.75819C16.8184 5.96431 14.0613 10.8125 8.5 10.8125ZM1.1564 5.4992C1.78832 6.45691 4.26939 9.75 8.5 9.75C12.744 9.75 15.2141 6.45957 15.8436 5.5008C15.2117 4.54309 12.7306 1.25 8.5 1.25C4.25598 1.25 1.78593 4.54043 1.1564 5.4992ZM8.5 8.6875C6.74236 8.6875 5.3125 7.25764 5.3125 5.5C5.3125 3.74236 6.74236 2.3125 8.5 2.3125C10.2576 2.3125 11.6875 3.74236 11.6875 5.5C11.6875 7.25764 10.2576 8.6875 8.5 8.6875ZM8.5 3.375C7.32833 3.375 6.375 4.32833 6.375 5.5C6.375 6.67167 7.32833 7.625 8.5 7.625C9.67167 7.625 10.625 6.67167 10.625 5.5C10.625 4.32833 9.67167 3.375 8.5 3.375Z" fill="black"/>
                             </svg>
@@ -347,9 +349,9 @@
 
 <script src="{% static 'js/profile-details.js' %}"></script>
 <script>
-    var delete_user = "{% url 'user' id=request.user.id %}"
-    var delete_data = "{% url 'delete_all_data' %}"
-    var change_password = "{% url 'change_password' %}"
+    var delete_user_url = "{% url 'user' id=request.user.id %}"
+    var delete_resources_url = "{% url 'delete_all_data' %}"
+    var change_password_url = "{% url 'change_password' %}"
     var change_data = "{% url 'user' id=request.user.id %}"
 </script>
 

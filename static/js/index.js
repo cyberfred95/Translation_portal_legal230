@@ -59,39 +59,6 @@ $(document).ready(function () {
         event.stopPropagation();
     });
 
-    $('#delete-resources-btn').on('click', function () {
-        const $button = $(this);
-        const $inputContainer = $('#input-invite');
-        const $hiddenInput = $('#delete-confirmation');
-
-        if (!clickedResourcesOnce) {
-            clickedResourcesOnce = true;
-
-            $button.text('Confirm Deletion');
-            $button.attr('type', 'submit');
-            $inputContainer.removeClass('hidden');
-        } else {
-            const inputValue = $hiddenInput.val();
-
-            if (inputValue) {
-                $.ajax({
-                    url: '/delete-accounts',
-                    type: 'POST',
-                    data: {confirmation: inputValue},
-                    success: function () {
-                        alert('Resources deleted successfully!');
-                        $('#invite-modal').addClass('hidden');
-                    },
-                    error: function () {
-                        alert('Error deleting accounts.');
-                    }
-                });
-            } else {
-                alert("Please enter your password to confirm.");
-            }
-        }
-    });
-
     $('form[name="invite"]').on('submit', function (e) {
         e.preventDefault();
 

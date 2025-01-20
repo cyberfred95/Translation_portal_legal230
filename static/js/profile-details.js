@@ -63,7 +63,7 @@ $(document).ready(function () {
         formData.append('confirm_password', $confirmPwd.val());
 
         $.ajax({
-            url: change_password,
+            url: change_password_url,
             type: 'POST',
             data: formData,
             processData: false,
@@ -107,23 +107,29 @@ $(document).ready(function () {
             $inputContainer.removeClass('hidden');
         } else {
             const inputValue = $hiddenInput.val();
+            const encodedValue = btoa(inputValue);
 
-            if (inputValue) {
-                $.ajax({
-                    url: '/delete-accounts',
-                    type: 'POST',
-                    data: { confirmation: inputValue },
-                    success: function () {
-                        alert('Resources deleted successfully!');
-                        $('#delete-account-modal').addClass('hidden');
-                    },
-                    error: function () {
-                        alert('Error deleting accounts.');
-                    }
-                });
-            } else {
-                alert("Please enter your password to confirm.");
-            }
+            const formData = new FormData();
+
+            formData.append('password', encodedValue);
+
+            $.ajax({
+                url: delete_user_url,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                success: function () {
+                    $('#delete-account-modal').addClass('hidden');
+                },
+                error: function (error) {
+                    errorNotification(error?.status, error?.responseJSON?.detail);
+                }
+            });
         }
     });
 
@@ -146,10 +152,12 @@ $(document).ready(function () {
         $('#delete-resources-modal').addClass('hidden');
     });
 
-    $('#delete-resources-btn').on('click', function () {
+    $('#delete-resources-btn').on('click', function (event) {
+        event.preventDefault();
+
         const $button = $(this);
         const $inputContainer = $('#input-resources');
-        const $hiddenInput = $('#delete-confirmation');
+        const $hiddenInput = $('#delete-resources');
 
         if (!clickedResourcesOnce) {
             clickedResourcesOnce = true;
@@ -159,22 +167,30 @@ $(document).ready(function () {
             $inputContainer.removeClass('hidden');
         } else {
             const inputValue = $hiddenInput.val();
+            const encodedValue = btoa(inputValue);
+
+            const formData = new FormData();
+
+            formData.append('password', encodedValue);
 
             if (inputValue) {
                 $.ajax({
-                    url: '/delete-accounts',
+                    url: delete_resources_url,
                     type: 'POST',
-                    data: { confirmation: inputValue },
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
                     success: function () {
-                        alert('Resources deleted successfully!');
                         $('#delete-resources-modal').addClass('hidden');
                     },
-                    error: function () {
-                        alert('Error deleting accounts.');
+                    error: function (error) {
+                        errorNotification(error?.status, error?.responseJSON?.detail);
                     }
                 });
-            } else {
-                alert("Please enter your password to confirm.");
             }
         }
     });
