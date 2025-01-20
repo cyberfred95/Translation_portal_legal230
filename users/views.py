@@ -1,11 +1,12 @@
 from urllib.parse import urlencode
 
 from django.contrib.auth import login
+from django.contrib.auth.hashers import check_password
 from django.http import JsonResponse
 from django.urls import reverse
 from django.views.generic import TemplateView
 from preferences import preferences
-from rest_framework import status
+from rest_framework import status, serializers
 from rest_framework.generics import DestroyAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -36,11 +37,22 @@ class UsersListView(APIView):
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
+    def validate(self, attrs):
+        if 'current_password' not in attrs and 'new_password' not in attrs and 'confirm_password' not in attrs:
+            raise serializers.ValidationError({"detail": "Fill all data for password change"})
+        if attrs['new_password'] != attrs['confirm_password']:
+            raise serializers.ValidationError({"detail": "Passwords do not match"})
+        if not check_password(attrs['current_password'], self.request.user.password):
+            raise serializers.ValidationError({"detail": "Invalid current password"})
+        return attrs
+
     def post(self, request):
-        serializer = ChangePasswordSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-        return Response(status=status.HTTP_200_OK)
+        # serializer = ChangePasswordSerializer(data=self.request.data)
+        self.validate(request.data)
+        request.user.set_password(request.data['new_password'])
+        request.user.save()
+        return Response({"message": "password changed successfully"}, status=status.HTTP_200_OK)
+
 
 
 class DeleteAllDataView(APIView):
@@ -101,7 +113,8 @@ class InviteUserAPIView(APIView):
                     "group": request.user.group.id
                 }
                 send_invitation_email(email=email,
-                                      register_user_absolute_uri=self.get_register_user_absolute_uri(request, params=params))
+                                      register_user_absolute_uri=self.get_register_user_absolute_uri(request,
+                                                                                                     params=params))
             return Response({"message": "Invitation has been successfully sent"}, status=status.HTTP_200_OK)
         return Response({"detail": "You have to be group admin to provide this action"},
                         status=status.HTTP_403_FORBIDDEN)
