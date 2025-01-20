@@ -27,7 +27,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         if User.objects.filter(email=attrs['email']).exists():
             raise serializers.ValidationError({"detail": "Email already taken"})
 
-        if User.objects.filter(email=attrs['email']).exists():
+        if User.objects.filter(email=attrs['username']).exists():
             raise serializers.ValidationError({"detail": "Username already taken"})
 
         if 'confirm_password' in attrs and attrs['password'] != attrs['confirm_password']:
@@ -36,9 +36,8 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             validate_password(attrs['password'])
         except ValidationError as e:
             raise serializers.ValidationError({"detail": str(e)})
-
-        # if UserGroup.objects.filter(id=attrs['group']).exists():
-        #     raise serializers.ValidationError({"detail": "Invalid group"})
+        if not UserGroup.objects.filter(id=int(attrs['group'])).exists():
+            raise serializers.ValidationError({"detail": "Invalid group"})
 
         return attrs
 
@@ -51,6 +50,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+
 
 
 class GroupSerializer(serializers.ModelSerializer):

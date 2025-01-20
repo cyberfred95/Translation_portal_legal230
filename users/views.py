@@ -1,8 +1,10 @@
 from urllib.parse import urlencode
 
+from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth.hashers import check_password
 from django.http import JsonResponse
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 from preferences import preferences
@@ -132,5 +134,6 @@ class RegisterUserView(TemplateView):
         serializer = RegisterUserSerializer(data=request.POST)
         if serializer.is_valid():
             user = serializer.create(serializer.validated_data)
-            return JsonResponse({"message": "User has been registered successfully"}, status=status.HTTP_200_OK)
+            login(request, user)
+            return redirect(settings.LOGIN_REDIRECT_URL)
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
