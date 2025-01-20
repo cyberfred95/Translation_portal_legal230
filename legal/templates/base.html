@@ -179,17 +179,18 @@
     <div id="invite-modal"
          class="fixed inset-0 bg-gray-425 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
         <div class="relative bg-white rounded-lg shadow-xl max-w-200 w-full mx-4 modal-content">
-            <form autocomplete="off" class="p-17.5 flex flex-col items-center gap-10">
+            <form name="invite" autocomplete="off" class="p-17.5 flex flex-col items-center gap-10">
+                {% csrf_token %}
                 <div class="text-5 font-semibold">Invite people by email</div>
                 <div class="w-full" id="input-invite">
-                    <label for="invite" class="text-4 font-semibold text-gray-600 mb-1.5">
+                    <label for="emails" class="text-4 font-semibold text-gray-600 mb-1.5">
                         Email
                     </label>
                     <div class="mt-1">
                         <input
                                 type="email"
-                                id="invite"
-                                name="invite"
+                                id="emails"
+                                name="emails"
                                 placeholder="Start typing..."
                                 required
                                 class="placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300 bg-gray-75"
@@ -221,7 +222,7 @@
                 <div class="flex items-center justify-start w-full">
                     <div>
                         <button
-                                type="button"
+                                type="submit"
                                 id="invite-btn"
                                 class="flex-1 bg-green-700 text-white border border-green-700 rounded-1.5 py-2.5 px-6.5 text-4 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision">
                             Invite
@@ -239,6 +240,7 @@
 
 <script>
     var language_code = "{{ request.LANGUAGE_CODE }}"
+    var invite_user_url = "{% url 'invite-user'%}"
 </script>
 
 {% block extra_js %} {% endblock %}
