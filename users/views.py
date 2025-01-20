@@ -1,7 +1,7 @@
 from urllib.parse import urlencode
 
 from django.conf import settings
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import JsonResponse
 from django.shortcuts import redirect
@@ -20,6 +20,7 @@ from .models import UserGroup
 from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer, RegisterUserSerializer
 from legal.views import PAGINATION_PAGE_SIZE
 from .mail_helpers import send_invitation_email
+from legal.helpers import password_valid
 
 
 # Create your views here.
@@ -48,6 +49,7 @@ class ChangePasswordView(APIView):
 
 
 class DeleteAllDataView(APIView):
+    permission_classes = [IsAuthenticated]
 
     @staticmethod
     def delete_all_projects(user):
@@ -75,10 +77,12 @@ class DeleteAllDataView(APIView):
                     )
 
     def post(self, request):
-        user = request.user
-        Glossary.objects.filter(user=request.user).delete()
-        self.delete_all_projects(user)
-        return Response({"message": "All data deleted successfully"}, status=status.HTTP_200_OK)
+        if password_valid(request):
+            user = request.user
+            Glossary.objects.filter(user=request.user).delete()
+            self.delete_all_projects(user)
+            return Response({"message": "All data deleted successfully"}, status=status.HTTP_200_OK)
+        return Response({"detail": "invalid password"}, status=status.HTTP_403_FORBIDDEN)
 
 
 class SingleAccountView(RetrieveUpdateDestroyAPIView):
@@ -87,6 +91,12 @@ class SingleAccountView(RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         return self.request.user
+
+    def delete(self, request, *args, **kwargs):
+        if password_valid(request):
+            return self.delete(request, *args, **kwargs)
+        else:
+            return Response({"detail": "Invalid password"}, status=status.HTTP_403_FORBIDDEN)
 
 
 class InviteUserAPIView(APIView):

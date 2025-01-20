@@ -83,9 +83,10 @@ def get_project_file(file_url) -> InMemoryUploadedFile:
     return in_memory_file
 
 
-def validate_password(request):
-    if not request.POST.get('password'):
+def password_valid(request):
+    if not request.data.get('password'):
         return False
-    password = base64.b64decode(request.POST.get('password'))
+    password = base64.b64decode(request.data.get('password'))
     if not check_password(password, request.user.password):
         return False
+    return True
