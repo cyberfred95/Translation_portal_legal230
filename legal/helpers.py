@@ -4,9 +4,10 @@ from io import BytesIO
 from urllib.parse import urlparse
 
 import requests
+from django.contrib.auth.hashers import check_password
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from preferences import preferences
-
+import base64
 from domains.models import Domain
 from stats.calculator import StatsProcessor
 
@@ -80,3 +81,11 @@ def get_project_file(file_url) -> InMemoryUploadedFile:
     )
 
     return in_memory_file
+
+
+def validate_password(request):
+    if not request.POST.get('password'):
+        return False
+    password = base64.b64decode(request.POST.get('password'))
+    if not check_password(password, request.user.password):
+        return False
