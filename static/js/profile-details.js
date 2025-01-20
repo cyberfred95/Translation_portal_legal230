@@ -94,7 +94,9 @@ $(document).ready(function () {
         $('#delete-account-modal').addClass('hidden');
     });
 
-    $('#delete-account-btn').on('click', function () {
+    $('#delete-account-btn').on('click', function (event) {
+        event.preventDefault();
+
         const $button = $(this);
         const $inputContainer = $('#input-container');
         const $hiddenInput = $('#delete-confirmation');
