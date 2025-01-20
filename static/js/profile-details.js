@@ -115,7 +115,7 @@ $(document).ready(function () {
 
             $.ajax({
                 url: delete_user_url,
-                type: 'POST',
+                type: 'DELETE',
                 data: formData,
                 processData: false,
                 contentType: false,
