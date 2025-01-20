@@ -45,7 +45,6 @@ $(document).ready(function () {
         }
     });
 
-    let clickedResourcesOnce = false;
     $('#open-invite-modal').on('click', function (event) {
         event.stopPropagation();
         $('#invite-modal').removeClass('hidden');

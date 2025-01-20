@@ -195,4 +195,28 @@ $(document).ready(function () {
             }
         }
     });
+
+    $('form[name="change-user-data"]').on('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        $.ajax({
+            url: change_data_url,
+            type: 'PUT',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function () {
+                window.location.reload();
+            },
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
+            }
+        });
+    });
 });

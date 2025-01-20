@@ -7,16 +7,16 @@
 
 <div class="mx-41 my-10 max-w-142.5">
     <div class="flex flex-col items-start gap-12.5">
-        <div class="w-full">
+        <form name="change-user-data" class="w-full">
             <p class="text-5 font-bold">Profile details</p>
             <div class="flex flex-col gap-7.5 mt-7.5">
                 <div>
                     <div class="flex flex-col gap-1.5">
-                        <label for="name" class="text-4 font-semibold text-gray-600">Name</label>
+                        <label for="username" class="text-4 font-semibold text-gray-600">Name</label>
                         <label class="text-xs text-gray-400">
                             Your name as you'd like it to be displayed on Translation Portal.</label>
                     </div>
-                    <input type="text" name="name" id="name" placeholder="Name"
+                    <input type="text" name="username" id="username" placeholder="Name"
                            value="{{ request.user.username }}"
                            class="mt-1.5 placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300"/>
                 </div>
@@ -26,11 +26,11 @@
                            class="mt-1.5 placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300"/>
                 </div>
             </div>
-            <button type="button"
+            <button type="submit"
                     class="mt-4 bg-green-700 text-white text-4 rounded-md py-2.5 px-6.5 transition duration-300 ease-in-out hover:bg-gray-600">
                 Update Email Address
             </button>
-        </div>
+        </form>
         <div class="w-full">
             <p class="text-5 font-bold">Security</p>
             <div class="flex flex-col gap-7.5 mt-7.5">
@@ -352,7 +352,7 @@
     var delete_user_url = "{% url 'user' id=request.user.id %}"
     var delete_resources_url = "{% url 'delete_all_data' %}"
     var change_password_url = "{% url 'change_password' %}"
-    var change_data = "{% url 'user' id=request.user.id %}"
+    var change_data_url = "{% url 'user' id=request.user.id %}"
 </script>
 
 {% endblock %}
