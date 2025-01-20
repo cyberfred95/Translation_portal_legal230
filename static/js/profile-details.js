@@ -125,6 +125,7 @@ $(document).ready(function () {
                 },
                 success: function () {
                     $('#delete-account-modal').addClass('hidden');
+                    window.location.reload();
                 },
                 error: function (error) {
                     errorNotification(error?.status, error?.responseJSON?.detail);
