@@ -24,7 +24,7 @@ def send_invitation_email(email: str, register_user_absolute_uri: str):
         pass
 
 
-def send_reset_password_email(email: str, username:str, ):
+def send_reset_password_email(email: str, username:str, reset_password_absolute_uri:str ):
     sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
     try:
         message = Mail(
@@ -36,6 +36,7 @@ def send_reset_password_email(email: str, username:str, ):
                 context={
                     'username': username,
                     'support_email': preferences.MainSettings.support_email,
+                    'reset_password_absolute_uri': reset_password_absolute_uri,
                 }
             )
         )
@@ -44,8 +45,7 @@ def send_reset_password_email(email: str, username:str, ):
         pass
 
 
-def register_success_email(email: str, password: str, username: str, logo_url: str):
-    print(logo_url)
+def register_success_email(email: str, password: str, username: str):
     sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
     try:
         message = Mail(
