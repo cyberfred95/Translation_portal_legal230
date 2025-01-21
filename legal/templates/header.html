@@ -1,7 +1,7 @@
 {% load static %}
 {% load i18n %}
 
-<header class="flex justify-end items-center px-31.25 py-3 border-b border-gray-600">
+<header class="flex justify-end items-center px-31.25 py-3">
     <div class="flex gap-7.5 items-center font-semibold">
         {% if request.user.group and request.user.group.admin == request.user %}
         <button type="button" class="flex items-center gap-2 cursor-pointer text-gray-600" id="open-invite-modal">
