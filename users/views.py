@@ -21,7 +21,7 @@ from .models import UserGroup, User, ResetPasswordCode
 from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer, RegisterUserSerializer, \
     LoginSerializer, ForgotPasswordSerializer, ResetPasswordSerializer
 from legal.views import PAGINATION_PAGE_SIZE
-from .mail_helpers import send_invitation_email, send_reset_password_code, register_success_email
+from .mail_helpers import send_invitation_email, send_reset_password_email, register_success_email
 from legal.helpers import password_valid
 
 
@@ -180,6 +180,7 @@ class ForgotPasswordView(TemplateView):
             return JsonResponse({"message": "Code sent successfully"}, status=status.HTTP_200_OK)
         else:
             return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ResetPasswordView(TemplateView):
     template_name = 'registration/reset_password.html'
