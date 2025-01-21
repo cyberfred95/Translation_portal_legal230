@@ -41,3 +41,26 @@ def send_reset_password_code(email: str, code: int):
         sg.send(message)
     except:
         pass
+
+
+def register_success_email(email: str, password: str, username: str, logo_url: str):
+    print(logo_url)
+    sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+    try:
+        message = Mail(
+            from_email='support@custom.mt',
+            to_emails=[email],
+            subject="Legal230 translation portal successful registration",
+            html_content=render_to_string(
+                'register_success_email.html',
+                context={
+                    'username': username,
+                    'password': password,
+                    'email': email,
+                    'support_email': preferences.MainSettings.support_email,
+                }
+            )
+        )
+        sg.send(message)
+    except:
+        pass

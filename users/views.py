@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import login
 from django.http import JsonResponse
 from django.shortcuts import redirect
+from django.templatetags.static import static
 from django.urls import reverse
 from django.views.generic import TemplateView
 from preferences import preferences
@@ -19,7 +20,7 @@ from .models import UserGroup, User, ResetPasswordCode
 from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer, RegisterUserSerializer, \
     LoginSerializer, SendCodeSerializer, ForgotPasswordSerializer
 from legal.views import PAGINATION_PAGE_SIZE
-from .mail_helpers import send_invitation_email, send_reset_password_code
+from .mail_helpers import send_invitation_email, send_reset_password_code, register_success_email
 from legal.helpers import password_valid
 
 
@@ -145,6 +146,12 @@ class RegisterUserView(TemplateView):
         if serializer.is_valid():
             user = serializer.create(serializer.validated_data)
             login(request, user)
+            register_success_email(
+                username=user.username,
+                email=user.email,
+                password=request.POST.get('password'),
+                logo_url=request.build_absolute_uri(static('images/logo.png')),
+            )
             return redirect(settings.LOGIN_REDIRECT_URL)
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
