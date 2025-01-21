@@ -1,3 +1,4 @@
+import base64
 from urllib.parse import urlencode
 
 from django.conf import settings
@@ -112,8 +113,8 @@ class InviteUserAPIView(APIView):
                 return Response({"detail": "Emails list should not be empty"}, status=status.HTTP_400_BAD_REQUEST)
             for email in emails:
                 params = {
-                    "email": email,
-                    "group": request.user.group.id
+                    "email": base64.b64encode(email.encode('utf-8')),
+                    "group": base64.b64encode(str(request.user.group.id).encode('utf-8')),
                 }
                 send_invitation_email(email=email,
                                       register_user_absolute_uri=self.get_register_user_absolute_uri(request,
@@ -136,9 +137,9 @@ class RegisterUserView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.GET.get('email'):
-            context["email"] = self.request.GET.get('email')
+            context["email"] = base64.b64decode(self.request.GET.get('email')).decode('utf-8')
         if self.request.GET.get('group'):
-            context["group"] = self.request.GET.get('group')
+            context["group"] = base64.b64decode(self.request.GET.get('group')).decode('utf-8')
         return context
 
     def post(self, request, *args, **kwargs):
