@@ -176,7 +176,7 @@ class ForgotPasswordView(TemplateView):
         serializer = ForgotPasswordSerializer(data=self.request.POST)
         if serializer.is_valid():
             user = User.objects.filter(email=self.request.POST.get('email')).first()
-            send_reset_password_email(email=user.email)
+            # send_reset_password_email(email=user.email)
             return JsonResponse({"message": "Code sent successfully"}, status=status.HTTP_200_OK)
         else:
             return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -185,3 +185,4 @@ class ResetPasswordView(TemplateView):
     template_name = 'registration/reset_password.html'
 
     def post(self, request, *args, **kwargs):
+        pass
