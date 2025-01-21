@@ -52,7 +52,6 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         return user
 
 
-
 class GroupSerializer(serializers.ModelSerializer):
     users = serializers.SerializerMethodField()
 
@@ -86,3 +85,23 @@ class ChangePasswordSerializer(serializers.Serializer):
         user.set_password(self.validated_data['new_password'])
         user.save()
         return user
+
+
+class LoginSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email', 'password']
+
+    def validate(self, attrs):
+        if 'email' not in attrs or 'password' not in attrs:
+            raise serializers.ValidationError({"detail": "Fill all data for login"})
+        user = User.objects.filter(email=attrs['email']).first()
+
+        if not user:
+            raise serializers.ValidationError({"detail": "Invalid credentials"})
+
+        if not check_password(attrs['password'], user.password):
+            raise serializers.ValidationError({"detail": "Invalid credentials"})
+
+        return attrs
+

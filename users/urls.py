@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth.decorators import login_required
 from .views import UsersListView, DeleteAllDataView, SingleAccountView, ChangePasswordView, InviteUserAPIView, \
-    RegisterUserView
+    RegisterUserView, LoginView
 
 urlpatterns = [
     path('', login_required(UsersListView.as_view()), name='groups'),
@@ -10,4 +10,5 @@ urlpatterns = [
     path('<int:id>/', SingleAccountView.as_view(), name='user'),
     path('register/', RegisterUserView.as_view(), name='register-user'),
     path('invite/', login_required(InviteUserAPIView.as_view()), name='invite-user'),
+    path('login/', LoginView.as_view(), name='login'),
 ]
