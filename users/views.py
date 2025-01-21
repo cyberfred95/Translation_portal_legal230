@@ -19,7 +19,7 @@ from glossaries.models import Glossary
 from subscriptions.permissions import SubscribedPermission
 from .models import UserGroup, User, ResetPasswordCode
 from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer, RegisterUserSerializer, \
-    LoginSerializer, SendCodeSerializer, ForgotPasswordSerializer
+    LoginSerializer, ForgotPasswordSerializer, ResetPasswordSerializer
 from legal.views import PAGINATION_PAGE_SIZE
 from .mail_helpers import send_invitation_email, send_reset_password_code, register_success_email
 from legal.helpers import password_valid
@@ -173,22 +173,15 @@ class ForgotPasswordView(TemplateView):
     template_name = 'registration/forgot_password.html'
 
     def post(self, request, *args, **kwargs):
-
-        if self.request.POST.get('action') == 'receive_code':
-            serializer = SendCodeSerializer(data=self.request.POST)
-            if serializer.is_valid():
-                user = User.objects.filter(email=self.request.POST.get('email')).first()
-                reset_password_code = ResetPasswordCode.create(user=user)
-                send_reset_password_code(email=user.email, code=reset_password_code.code)
-                return JsonResponse({"message":"Code sent successfully"}, status=status.HTTP_200_OK)
-            else:
-                return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        elif self.request.POST.get('action') == 'set_new_password':
-            serializer = ForgotPasswordSerializer(data=self.request.POST)
-            if serializer.is_valid():
-                serializer.save()
-                return redirect(reverse('login'))
-            else:
-                return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ForgotPasswordSerializer(data=self.request.POST)
+        if serializer.is_valid():
+            user = User.objects.filter(email=self.request.POST.get('email')).first()
+            send_reset_password_email(email=user.email)
+            return JsonResponse({"message": "Code sent successfully"}, status=status.HTTP_200_OK)
         else:
-            return JsonResponse({"detail": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ResetPasswordView(TemplateView):
+    template_name = 'registration/reset_password.html'
+
+    def post(self, request, *args, **kwargs):

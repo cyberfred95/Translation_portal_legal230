@@ -24,17 +24,18 @@ def send_invitation_email(email: str, register_user_absolute_uri: str):
         pass
 
 
-def send_reset_password_code(email: str, code: int):
+def send_reset_password_email(email: str, username:str, ):
     sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
     try:
         message = Mail(
             from_email='support@custom.mt',
             to_emails=[email],
-            subject="Legal230 translation portal password change",
+            subject="Legal230 translation portal forgot password",
             html_content=render_to_string(
                 'forgot_password_email.html',
                 context={
-                    'code': code,
+                    'username': username,
+                    'support_email': preferences.MainSettings.support_email,
                 }
             )
         )

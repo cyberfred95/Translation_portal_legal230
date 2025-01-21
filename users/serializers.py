@@ -106,7 +106,7 @@ class LoginSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class SendCodeSerializer(serializers.ModelSerializer):
+class ForgotPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email']
@@ -117,7 +117,7 @@ class SendCodeSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class ForgotPasswordSerializer(serializers.Serializer):
+class ResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(write_only=True)
     new_password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
