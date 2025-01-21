@@ -1,4 +1,6 @@
 import uuid
+from django.utils import timezone
+import random
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models

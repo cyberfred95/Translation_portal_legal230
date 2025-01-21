@@ -16,19 +16,15 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
     email = serializers.EmailField(write_only=True)
-    username = serializers.CharField(write_only=True)
     group = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'password', 'confirm_password', 'group']
+        fields = ['email', 'password', 'confirm_password', 'group']
 
     def validate(self, attrs) -> dict:
         if User.objects.filter(email=attrs['email']).exists():
             raise serializers.ValidationError({"detail": "Email already taken"})
-
-        if User.objects.filter(email=attrs['username']).exists():
-            raise serializers.ValidationError({"detail": "Username already taken"})
 
         if 'confirm_password' in attrs and attrs['password'] != attrs['confirm_password']:
             raise serializers.ValidationError({"detail": "Passwords do not match"})
@@ -46,11 +42,10 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         confirm_password = validated_data.pop('confirm_password', None)
         group_id = validated_data.pop('group', None)
         group = UserGroup.objects.get(id=group_id)
-        user = User.objects.create_user(**validated_data, group=group)
+        user = User.objects.create_user(**validated_data, group=group, username=validated_data['email'])
         user.set_password(password)
         user.save()
         return user
-
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -86,3 +81,48 @@ class ChangePasswordSerializer(serializers.Serializer):
         user.set_password(self.validated_data['new_password'])
         user.save()
         return user
+
+
+class LoginSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email', 'password']
+
+    def validate(self, attrs):
+        if 'email' not in attrs or 'password' not in attrs:
+            raise serializers.ValidationError({"detail": "Fill all data for login"})
+        user = User.objects.filter(email=attrs['email']).first()
+
+        if not user:
+            raise serializers.ValidationError({"detail": "Invalid credentials"})
+
+        if not check_password(attrs['password'], user.password):
+            raise serializers.ValidationError({"detail": "Invalid credentials"})
+
+        return attrs
+
+
+class ForgotPasswordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email']
+
+    def validate(self, attrs):
+        if not User.objects.filter(email=attrs['email']).exists():
+            raise serializers.ValidationError({"detail": "Invalid credentials"})
+        return attrs
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        if not User.objects.filter(email=attrs['email']).exists():
+            raise serializers.ValidationError({"detail": "Invalid credentials"})
+        return attrs
+
+    def save(self):
+        user = User.objects.filter(email=self.validated_data['email']).first()
+        user.set_password(self.validated_data['password'])
+        user.save()

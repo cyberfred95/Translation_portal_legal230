@@ -266,122 +266,6 @@ body {
     padding: 0;
 }
 
-.login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    min-height: 100vh;
-}
-
-.login-body {
-    width: 100%;
-    max-width: 510px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 50px;
-    border-radius: 2px;
-    gap: 30px;
-    box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
-}
-
-.login-body h2 {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 24px;
-    margin: 0;
-}
-
-.login-body p {
-    margin: 0;
-}
-
-.form-group {
-    text-align: left;
-    margin-bottom: 15px;
-    width: 100%;
-}
-
-.login-body label {
-    display: block;
-    font-size: 14px;
-    font-weight: 400;
-    margin-bottom: 10px;
-    color: #000000;
-}
-
-.login-body input {
-    background: #EBEFF0;
-    padding: 16px 10px;
-    border-radius: 5px;
-    width: 100%;
-    border: none;
-    font-size: 16px;
-    font-family: 'Montserrat', sans-serif;
-    box-sizing: border-box;
-    color: #000000;
-}
-
-.login-body input::placeholder {
-    color: #CACACA;
-}
-
-.login-body input:focus {
-    outline: none;
-    background: #EBEFF0;
-    border: none;
-}
-
-.login-body button {
-    border-radius: 5px;
-    background: #176C77;
-    color: #FFFFFF;
-    padding: 20px;
-    width: 100%;
-    font-weight: 600;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    box-sizing: border-box;
-}
-
-.login-body button:hover {
-    background: #0F3144;
-}
-
-.login-body ul {
-    color: #FFFFFF;
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-
-.login-body li {
-    color: #ff6b6b;
-    font-size: 14px;
-    margin-top: 5px;
-}
-
-.login-body input:-webkit-autofill,
-.login-body input:-webkit-autofill:hover,
-.login-body input:-webkit-autofill:focus,
-.login-body input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px #EBEFF0 inset !important;
-    -webkit-text-fill-color: #000000 !important;
-    transition: background-color 5000s ease-in-out 0s;
-}
-
-.login-body input:-webkit-autofill::first-line {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-}
-
-.login-body input:-webkit-autofill {
-    -webkit-text-fill-color: #000000 !important;
-}
-
 button:focus,
 select:focus,
 input:focus,
@@ -494,4 +378,15 @@ input[type="checkbox"]:checked {
     width: 1px; /* Ширина лінії */
     height: 100%; /* Висота на весь контейнер */
     display: block;
+}
+
+.no-ring {
+    --tw-ring-inset: initial;
+    --tw-ring-offset-width: initial;
+    --tw-ring-offset-color: initial;
+    --tw-ring-color: initial;
+    --tw-ring-offset-shadow: initial;
+    --tw-ring-shadow: initial;
+    --tw-shadow: initial;
+    --tw-shadow-colored: initial;
 }

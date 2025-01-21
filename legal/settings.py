@@ -127,6 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 ACCOUNT_ADAPTER = 'core.account_adapter.NoNewUsersAccountAdapter'
 
+
 SITE_ID = 1
 
 ACCOUNT_EMAIL_VERIFICATION = 'none'
@@ -170,8 +171,8 @@ COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = False
 
 
-LOGIN_URL = '/accounts/login/'
-LOGOUT_REDIRECT_URL = "/accounts/login/"
+LOGIN_URL = '/users/login/'
+LOGOUT_REDIRECT_URL = "/users/login/"
 LOGIN_REDIRECT_URL = '/'
 
 DEV_MODE = True

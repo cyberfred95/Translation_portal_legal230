@@ -57,10 +57,7 @@ $(document).ready(function () {
     $('#password-form').on('submit', function (e) {
         e.preventDefault();
 
-        const formData = new FormData();
-        formData.append('current_password', $currentPwd.val());
-        formData.append('new_password', $newPwd.val());
-        formData.append('confirm_password', $confirmPwd.val());
+        const formData = new FormData(this);
 
         $.ajax({
             url: change_password_url,
@@ -72,6 +69,12 @@ $(document).ready(function () {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': getCookie('csrftoken'),
             },
+            success: function () {
+                $('#success-change-password').removeClass('hidden');
+            },
+            error: function (error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
+            }
         });
     });
 
@@ -80,6 +83,31 @@ $(document).ready(function () {
     $('#modal-delete-account').on('click', function (event) {
         event.stopPropagation();
         $('#delete-account-modal').removeClass('hidden');
+    });
+
+    $('#success-update-btn').on('click', function (event) {
+        event.stopPropagation();
+        $('#success-update-user-data').addClass('hidden');
+        window.location.reload();
+    });
+
+    $('#success-change-password-btn').on('click', function (event) {
+        event.stopPropagation();
+        $('#success-change-password').addClass('hidden');
+    });
+
+    $(document).on('click', function () {
+        $('#success-change-password').addClass('hidden');
+    });
+
+    $(document).on('click', function () {
+        const $element = $('#success-update-user-data');
+
+        if ($element.hasClass('hidden')) {
+            $element.addClass('hidden');
+        } else {
+            window.location.reload();
+        }
     });
 
     $(document).on('click', function () {
@@ -214,7 +242,7 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function () {
-                window.location.reload();
+                $('#success-update-user-data').removeClass('hidden');
             },
             error: function (error) {
                 errorNotification(error?.status, error?.responseJSON?.detail);

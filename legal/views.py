@@ -402,7 +402,7 @@ class SingleProjectView(APIView):
             original_filename = unquote(file_name)
             res['source_file_name'] = original_filename
             res['display_popup'] = False if get_price_by_language_pair(source_language=res['source_language'],
-                                                                      target_language=res['target_language']) else True
+                                                                       target_language=res['target_language']) else True
 
             responses.append(res)
         return Response(responses, status=status.HTTP_200_OK)
@@ -449,10 +449,11 @@ class LanguageDetectView(APIView):
                         "abbreviation": language.upper()
                     }
                 )
-                cache.set(f"{request.user.uuid}", words_count, timeout=CACHE_TTL)
-                return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
-            return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
-                                status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
+                                    status=status.HTTP_400_BAD_REQUEST)
+        cache.set(f"{request.user.uuid}", words_count, timeout=CACHE_TTL)
+        return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
 
     @staticmethod
     def rename_file(file: InMemoryUploadedFile, file_name: str = None):

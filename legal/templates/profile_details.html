@@ -8,6 +8,7 @@
 <div class="mx-41 my-10 max-w-142.5">
     <div class="flex flex-col items-start gap-12.5">
         <form name="change-user-data" class="w-full">
+            {% csrf_token %}
             <p class="text-5 font-bold">Profile details</p>
             <div class="flex flex-col gap-7.5 mt-7.5">
                 <div>
@@ -46,8 +47,8 @@
                 </div>
 
                 <form id="password-form" class="hidden w-full border border-green-225 rounded-2.5 mt-4 password-form">
+                    {% csrf_token %}
                     <div class="flex flex-col gap-5 p-5">
-
                         <div>
                             <label for="current-password" class="text-4 font-semibold text-gray-600 mb-1.5">
                                 Current password
@@ -56,7 +57,7 @@
                                 <input
                                         type="password"
                                         id="current-password"
-                                        name="current-password"
+                                        name="current_password"
                                         placeholder="Start typing..."
                                         required
                                         class="placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300"
@@ -85,7 +86,7 @@
                                 <input
                                         type="password"
                                         id="new-password"
-                                        name="new-password"
+                                        name="new_password"
                                         placeholder="Start typing..."
                                         required
                                         class="placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300"
@@ -114,7 +115,7 @@
                                 <input
                                         type="password"
                                         id="confirm-password"
-                                        name="confirm-password"
+                                        name="confirm_password"
                                         placeholder="Start typing..."
                                         required
                                         class="placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300"
@@ -343,6 +344,41 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!--     RESOURCES MODAL    -->
+
+    <div id="success-update-user-data"
+         class="fixed inset-0 bg-gray-425 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
+        <div class="relative bg-white rounded-lg shadow-xl max-w-200 w-full mx-4 modal-content">
+            <div class="p-17.5 flex flex-col items-center gap-10">
+                <div class="text-5 font-semibold">Your data has been successfully changed</div>
+                <button
+                        type="button"
+                        id="success-update-btn"
+                        class="flex-1 text-white border border-green-700 bg-green-700 rounded-1.5 py-2.5 px-6.5 text-4 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision">
+                    Okay
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!--     RESOURCES MODAL    -->
+
+    <div id="success-change-password"
+         class="fixed inset-0 bg-gray-425 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
+        <div class="relative bg-white rounded-lg shadow-xl max-w-200 w-full mx-4 modal-content">
+            <div class="p-17.5 flex flex-col items-center gap-10">
+                <div class="text-5 font-semibold">Your password has been successfully changed</div>
+                <button
+                        type="button"
+                        id="success-change-password-btn"
+                        class="flex-1 text-white border border-green-700 bg-green-700 rounded-1.5 py-2.5 px-6.5 text-4 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision">
+                    Okay
+                </button>
+            </div>
         </div>
     </div>
 </div>

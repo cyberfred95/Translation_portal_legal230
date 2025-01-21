@@ -1,10 +1,11 @@
+import base64
 from urllib.parse import urlencode
 
 from django.conf import settings
-from django.contrib.auth import login, logout
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth import login
 from django.http import JsonResponse
 from django.shortcuts import redirect
+from django.templatetags.static import static
 from django.urls import reverse
 from django.views.generic import TemplateView
 from preferences import preferences
@@ -16,10 +17,11 @@ from rest_framework.response import Response
 import requests
 from glossaries.models import Glossary
 from subscriptions.permissions import SubscribedPermission
-from .models import UserGroup
-from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer, RegisterUserSerializer
+from .models import UserGroup, User
+from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer, RegisterUserSerializer, \
+    LoginSerializer, ForgotPasswordSerializer, ResetPasswordSerializer
 from legal.views import PAGINATION_PAGE_SIZE
-from .mail_helpers import send_invitation_email
+from .mail_helpers import send_invitation_email, send_reset_password_email, register_success_email
 from legal.helpers import password_valid
 
 
@@ -111,8 +113,8 @@ class InviteUserAPIView(APIView):
                 return Response({"detail": "Emails list should not be empty"}, status=status.HTTP_400_BAD_REQUEST)
             for email in emails:
                 params = {
-                    "email": email,
-                    "group": request.user.group.id
+                    "email": base64.b64encode(email.encode('utf-8')),
+                    "group": base64.b64encode(str(request.user.group.id).encode('utf-8')),
                 }
                 send_invitation_email(email=email,
                                       register_user_absolute_uri=self.get_register_user_absolute_uri(request,
@@ -135,9 +137,9 @@ class RegisterUserView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.GET.get('email'):
-            context["email"] = self.request.GET.get('email')
+            context["email"] = base64.b64decode(self.request.GET.get('email')).decode('utf-8')
         if self.request.GET.get('group'):
-            context["group"] = self.request.GET.get('group')
+            context["group"] = base64.b64decode(self.request.GET.get('group')).decode('utf-8')
         return context
 
     def post(self, request, *args, **kwargs):
@@ -145,5 +147,68 @@ class RegisterUserView(TemplateView):
         if serializer.is_valid():
             user = serializer.create(serializer.validated_data)
             login(request, user)
+            register_success_email(
+                username=user.username,
+                email=user.email,
+                password=request.POST.get('password'),
+            )
             return redirect(settings.LOGIN_REDIRECT_URL)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LoginView(TemplateView):
+    template_name = 'registration/login.html'
+
+    def post(self, request, *args, **kwargs):
+        serializer = LoginSerializer(data=self.request.POST)
+        if serializer.is_valid():
+            user = User.objects.filter(email=self.request.POST.get('email')).first()
+            login(request, user)
+            return redirect(settings.LOGIN_REDIRECT_URL)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ForgotPasswordView(TemplateView):
+    template_name = 'registration/forgot_password.html'
+
+    def post(self, request, *args, **kwargs):
+        serializer = ForgotPasswordSerializer(data=self.request.POST)
+        if serializer.is_valid():
+            user = User.objects.filter(email=self.request.POST.get('email')).first()
+
+            params = {
+                "email": base64.b64encode(user.email.encode('utf-8')),
+            }
+
+            send_reset_password_email(
+                email=user.email,
+                username=user.username,
+                reset_password_absolute_uri=self.get_reset_password_absolute_url(request=request, params=params),
+            )
+            return JsonResponse({"message": "Code sent successfully"}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @staticmethod
+    def get_reset_password_absolute_url(request, params: dict = None) -> str:
+        url = f"{request.build_absolute_uri(reverse('reset-password'))}"
+        if params:
+            url = f"{url}?{urlencode(params)}"
+        return url
+
+
+class ResetPasswordView(TemplateView):
+    template_name = 'registration/reset_password.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.GET.get('email'):
+            context["email"] = base64.b64decode(self.request.GET.get('email')).decode('utf-8')
+        return context
+
+    def post(self, request, *args, **kwargs):
+        serializer = ResetPasswordSerializer(data=self.request.POST)
+        if serializer.is_valid():
+            serializer.save()
+            return redirect(reverse('login'))
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

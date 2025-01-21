@@ -1,7 +1,7 @@
 {% load static %}
 {% load i18n %}
 
-<header class="flex justify-end items-center px-31.25 py-3 border-b border-gray-600">
+<header class="flex justify-end items-center px-31.25 py-3">
     <div class="flex gap-7.5 items-center font-semibold">
         {% if request.user.group and request.user.group.admin == request.user %}
         <button type="button" class="flex items-center gap-2 cursor-pointer text-gray-600" id="open-invite-modal">
@@ -24,22 +24,22 @@
                     <path d="M9.66669 8.74999C9.66669 10.3154 10.9346 11.5833 12.5 11.5833C14.0654 11.5833 15.3334 10.3154 15.3334 8.74999C15.3334 7.18457 14.0654 5.91666 12.5 5.91666C10.9346 5.91666 9.66669 7.18457 9.66669 8.74999Z"
                           fill="currentColor"/>
                 </svg>
-                <span class="text-gray-600">{{ request.user.username }}</span>
+                <a href="{% url 'profile_details' %}" class="text-gray-600 ">{{ request.user.username }}</a>
             </div>
 
-            <div id="dropdown" class="z-10 hidden absolute top-10 left-0 bg-white rounded-2.5 border border-green-400 p-5">
-                <ul class="flex flex-col items-start gap-7.5 font-normal whitespace-nowrap text-gray-600">
-                    <li class="hover:text-green-400 cursor-pointer w-full">
-                        <a href="{% url 'profile_details' %}" class="block w-full">Profile details</a>
-                    </li>
-                    <li class="hover:text-green-400 cursor-pointer w-full">
-                        <a href="/billing-and-plans" class="block w-full">Billing and plans</a>
-                    </li>
-                    <li class="hover:text-green-400 cursor-pointer w-full">
-                        <a href="/manage-users" class="block w-full">Manage users</a>
-                    </li>
-                </ul>
-            </div>
+<!--            <div id="dropdown" class="z-10 hidden absolute top-10 left-0 bg-white rounded-2.5 border border-green-400 p-5">-->
+<!--                <ul class="flex flex-col items-start gap-7.5 font-normal whitespace-nowrap text-gray-600">-->
+<!--                    <li class="hover:text-green-400 cursor-pointer w-full">-->
+<!--                        <a href="{% url 'profile_details' %}" class="block w-full">Profile details</a>-->
+<!--                    </li>-->
+<!--{#                    <li class="hover:text-green-400 cursor-pointer w-full">#}-->
+<!--{#                        <a href="/billing-and-plans" class="block w-full">Billing and plans</a>#}-->
+<!--{#                    </li>#}-->
+<!--{#                    <li class="hover:text-green-400 cursor-pointer w-full">#}-->
+<!--{#                        <a href="/manage-users" class="block w-full">Manage users</a>#}-->
+<!--{#                    </li>#}-->
+<!--                </ul>-->
+<!--            </div>-->
         </div>
 
         <div class="text-green-700">
