@@ -449,10 +449,11 @@ class LanguageDetectView(APIView):
                         "abbreviation": language.upper()
                     }
                 )
-                cache.set(f"{request.user.uuid}", words_count, timeout=CACHE_TTL)
-                return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
-            return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
+            else:
+                return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
                                 status=status.HTTP_400_BAD_REQUEST)
+        cache.set(f"{request.user.uuid}", words_count, timeout=CACHE_TTL)
+        return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
 
     @staticmethod
     def rename_file(file: InMemoryUploadedFile, file_name: str = None):
