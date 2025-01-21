@@ -1,5 +1,6 @@
 {% load i18n %}
-<nav class="w-20 text-white h-full pb-5 flex flex-col justify-between bg-gray-600 overflow-y-auto h-screen">
+<nav class="relative w-22 text-white h-full pb-5 flex flex-col justify-between bg-gray-600 overflow-y-auto h-screen">
+    <div class="absolute top-0 bottom-0 right-0 w-2 bg-gray-60"></div>
     <ul>
         <li class="flex items-center justify-center">
             <a href="/">
@@ -16,9 +17,9 @@
                 </svg>
             </a>
         </li>
-        <li>
+        <li class="relative">
             <a href="{% url 'main_index' %}"
-               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white {% if request.resolver_match.url_name == 'main_index' %}{% endif %}">
+               class="text-2.5 py-5 flex flex-col gap-y-2 items-center transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white {% if request.resolver_match.url_name == 'main_index' %}{% endif %}">
                 <div class="bg-white rounded">
                     <svg class="h-10 w-10" id="Calque_3" data-name="Calque 3" xmlns="http://www.w3.org/2000/svg"
                          viewBox="0 0 520 548">
@@ -34,14 +35,17 @@
                         <path fill="#2F9D6F"
                               d="M180.62,420.04c1.9.48-27.66-28.17-27.76-28.5-2.72-2.61-7.04-2.53-9.65.19-2.54,2.64-2.54,6.82,0,9.46l14.64,14.64h-61.33c-3.77,0-6.82,3.06-6.82,6.82s3.06,6.82,6.82,6.82h61.36l-14.68,14.72c-2.61,2.72-2.51,7.05.22,9.65,2.64,2.53,6.81,2.52,9.45-.01l26.27-26.35c1.93-1.96,2.51-4.89,1.48-7.44h0Z"/>
                     </svg>
+                    {% if request.resolver_match.url_name == 'main_index' %}
+                    <div class="absolute top-0 bottom-0 right-0 w-2 bg-gray-600 z-10 transition-transform duration-300 ease-in-out rounded-r-full"></div>
+                    {% endif %}
                 </div>
                 {% trans 'Translation' %}
             </a>
         </li>
 
-        <li>
+        <li class="relative">
             <a href="{% url 'glossaries' %}"
-               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white {% if request.resolver_match.url_name == 'glossaries' %}{% endif %}">
+               class="text-2.5 py-5 flex flex-col gap-y-2 items-center transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white">
                 <div class="bg-white rounded">
                     <svg class="h-10 w-10" id="Calque_3" data-name="Calque 3" xmlns="http://www.w3.org/2000/svg"
                          viewBox="0 0 500 500">
@@ -77,14 +81,17 @@
                         <path id="path64" fill="#2F9D6F"
                               d="M156.75,442.62c-21.58,0-39.1-17.52-39.1-39.1v-96.17l38.45-38.45-4.61-4.61,27.98-27.99c10.3,6.83,22.66,10.81,35.94,10.81,35.97,0,65.17-29.2,65.17-65.17,0-2.2-.11-4.37-.33-6.52h85.05v143.38h-6.52v19.55c0,6.52-6.52,13.03-13.03,13.03h-16.29v6.52h-166.19c-17.99,0-32.59,14.6-32.59,32.59,0,15.75,11.2,28.91,26.07,31.93v20.2ZM254.51,279.69h36.41l-41.01,41.01c-1.86,1.86-2.42,4.67-1.41,7.1,1.01,2.43,3.39,4.02,6.02,4.02h52.14c3.6,0,6.52-2.92,6.52-6.52s-2.92-6.52-6.52-6.52h-36.41l41.01-41.01c1.86-1.86,2.42-4.67,1.41-7.1-1.01-2.43-3.39-4.02-6.02-4.02h-52.14c-3.6,0-6.52,2.92-6.52,6.52s2.92,6.52,6.52,6.52ZM234.95,325.31v-26.07c0-1.73-.68-3.39-1.91-4.61l-26.07-26.07c-2.54-2.55-6.67-2.55-9.22,0l-26.07,26.07c-1.23,1.22-1.91,2.88-1.91,4.61v26.07c0,3.6,2.92,6.52,6.52,6.52s6.52-2.92,6.52-6.52v-13.03h39.1v13.03c0,3.6,2.92,6.52,6.52,6.52s6.52-2.92,6.52-6.52ZM219.22,299.24h-33.71l16.85-16.85,16.85,16.85Z"/>
                     </svg>
+                    {% if request.resolver_match.url_name == 'glossaries' %}
+                    <div class="absolute top-0 bottom-0 right-0 w-2 bg-gray-600 z-10 transition-transform duration-300 ease-in-out rounded-r-full"></div>
+                    {% endif %}
                 </div>
                 {% trans 'Glossaries' %}
             </a>
         </li>
 
-        <li>
+        <li class="relative">
             <a href="{% url 'project_history' %}"
-               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white {% if request.resolver_match.url_name == 'project_history' %}{% endif %}">
+               class="text-2.5 py-5 flex flex-col gap-y-2 items-center transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white">
                 <div class="bg-white rounded">
                     <svg class="h-10 w-10" id="Calque_3" data-name="Calque 3" xmlns="http://www.w3.org/2000/svg"
                          viewBox="0 0 520 548">
@@ -97,14 +104,17 @@
                                   d="M253,249.02c-40.93,0-74.18,33.24-74.18,74.18s33.24,74.18,74.18,74.18,74.18-33.24,74.18-74.18-33.24-74.18-74.18-74.18ZM282.97,336.46h-34.3c-3.89,0-7.25-2.92-7.25-6.81v-45c0-3.89,3.18-7.07,7.07-7.07s7.07,3.18,7.07,7.07v37.66h27.32c3.89,0,7.07,3.18,7.07,7.07s-3.1,7.07-6.99,7.07Z"/>
                         </g>
                     </svg>
+                    {% if request.resolver_match.url_name == 'project_history' %}
+                    <div class="absolute top-0 bottom-0 right-0 w-2 bg-gray-600 z-10 transition-transform duration-300 ease-in-out rounded-r-full"></div>
+                    {% endif %}
                 </div>
                 {% trans 'Project history' %}
             </a>
         </li>
 
-        <li>
+        <li class="relative">
             <a href="{% url 'writing' %}"
-               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white {% if request.resolver_match.url_name == 'writing' %}{% endif %}">
+               class="text-2.5 py-5 flex flex-col gap-y-2 items-center transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white">
                 <div class="bg-white rounded">
                     <svg class="h-10 w-10" id="Calque_3" data-name="Calque 3" xmlns="http://www.w3.org/2000/svg"
                          viewBox="0 0 520 548">
@@ -126,15 +136,18 @@
                             </g>
                         </g>
                     </svg>
+                    {% if request.resolver_match.url_name == 'writing' %}
+                    <div class="absolute top-0 bottom-0 right-0 w-2 bg-gray-600 z-10 transition-transform duration-300 ease-in-out rounded-r-full"></div>
+                    {% endif %}
                 </div>
                 {% trans 'Writing' %}
             </a>
         </li>
     </ul>
     <ul>
-        <li>
+        <li class="relative">
             <a href="{% url 'usage' %}?date_from={{ request.GET.date_from|default:''|date:'Y-m-d'|default:'' }}{% if not request.GET.date_from %}{% now 'Y-m-01' %}{% endif %}&date_to={{ request.GET.date_to|default:''|date:'Y-m-d'|default:'' }}{% if not request.GET.date_to %}{% now 'Y-m-t' %}{% endif %}"
-               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white {% if request.resolver_match.url_name == 'usage' %}{% endif %}">
+               class="text-2.5 py-5 flex flex-col gap-y-2 items-center transition duration-300 hover:text-white group cursor-pointer group-hover:text-white ease-in-out text-white">
                 <div class="bg-white rounded">
                     <svg class="h-10 w-10" id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 500 500">
 
@@ -152,13 +165,15 @@
                             <circle fill="#0F3144" cx="116" cy="117" r="45"/>
                         </g>
                     </svg>
+                    {% if request.resolver_match.url_name == 'usage' %}
+                    <div class="absolute top-0 bottom-0 right-0 w-2 bg-gray-600 z-10 transition-transform duration-300 ease-in-out rounded-r-full"></div>
+                    {% endif %}
                 </div>
                 {% trans 'Usage' %}
             </a>
         </li>
-        <li>
             <a href="mailto:{{ preferences.MainSettings.support_email }}"
-               class="text-2.5 py-5 flex flex-col gap-y-2 items-center hover:bg-gray-600 transition duration-300 text-white group cursor-pointer group-hover:text-white ease-in-out">
+               class="text-2.5 py-5 flex flex-col gap-y-2 items-center transition duration-300 text-white group cursor-pointer group-hover:text-white ease-in-out">
                 <div class="bg-white rounded">
                     <svg class="h-10 w-10" id="Calque_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
                         <path fill="#FFFFFF"
