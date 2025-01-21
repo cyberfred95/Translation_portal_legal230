@@ -129,6 +129,7 @@
                 placeholder="Enter email"
                 id="email"
                 name="email"
+                {% if email %} value="{{ email }}" {% endif %}
                 required
                 class="mb-2.5 w-100 bg-gray-75 px-3.5 py-3.5 border border-none rounded-2.5 focus:outline-none focus:ring focus:ring-none">
         <input
@@ -144,7 +145,7 @@
                 type="password"
                 placeholder="Confirm password"
                 id="confirm_password"
-                name="password"
+                name="confirm_password"
                 required
                 class="mb-5 w-100 bg-gray-75 px-3.5 py-3.5 border border-none rounded-2.5 focus:outline-none focus:ring focus:ring-none">
         <input type="hidden" name="group" id="group" {% if group %} value="{{ group }}" {% endif %}>
