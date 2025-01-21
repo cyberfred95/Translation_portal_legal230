@@ -97,6 +97,20 @@ $(document).ready(function () {
     });
 
     $(document).on('click', function () {
+        $('#success-change-password').addClass('hidden');
+    });
+
+    $(document).on('click', function () {
+        const $element = $('#success-update-user-data');
+
+        if ($element.hasClass('hidden')) {
+            $element.addClass('hidden');
+        } else {
+            window.location.reload();
+        }
+    });
+
+    $(document).on('click', function () {
         $('#delete-account-modal').addClass('hidden');
     });
 
