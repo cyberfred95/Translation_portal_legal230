@@ -57,10 +57,7 @@ $(document).ready(function () {
     $('#password-form').on('submit', function (e) {
         e.preventDefault();
 
-        const formData = new FormData();
-        formData.append('current_password', $currentPwd.val());
-        formData.append('new_password', $newPwd.val());
-        formData.append('confirm_password', $confirmPwd.val());
+        const formData = new FormData(this);
 
         $.ajax({
             url: change_password_url,
