@@ -1,4 +1,6 @@
 import uuid
+from django.utils import timezone
+import random
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -30,3 +32,23 @@ class UserGroup(models.Model):
 class User(AbstractUser):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
     group = models.ForeignKey(UserGroup, on_delete=models.CASCADE, blank=True, null=True)
+
+
+class ResetPasswordCode(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    code = models.IntegerField()
+    created_at = models.DateTimeField(default=timezone.now)
+
+    @classmethod
+    def generate_unique_code(cls):
+        while True:
+            code = random.randint(100000, 999999)
+            if not cls.objects.filter(code=code).exists():
+                return code
+
+    @classmethod
+    def create(cls, user):
+        code = cls.generate_unique_code()
+        verification_code = cls(user=user, code=code)
+        verification_code.save()
+        return verification_code

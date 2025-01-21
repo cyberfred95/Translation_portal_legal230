@@ -1,7 +1,7 @@
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import UserGroup, User
+from .models import UserGroup, User, ResetPasswordCode
 
 from rest_framework import serializers
 
@@ -105,3 +105,35 @@ class LoginSerializer(serializers.ModelSerializer):
 
         return attrs
 
+
+class SendCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email']
+
+    def validate(self, attrs):
+        if not User.objects.filter(email=attrs['email']).exists():
+            raise serializers.ValidationError({"detail": "Invalid credentials"})
+        return attrs
+
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(write_only=True)
+    new_password = serializers.CharField(write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
+    code = serializers.IntegerField(write_only=True)
+
+    def validate(self, attrs):
+        if not User.objects.filter(email=attrs['email']).exists():
+            raise serializers.ValidationError({"detail": "Invalid credentials"})
+        if attrs['new_password'] != attrs['confirm_password']:
+            raise serializers.ValidationError({"detail": "Passwords do not match"})
+        if not ResetPasswordCode.objects.filter(code=int(attrs['code']), user__email=attrs['email']).exists():
+            raise serializers.ValidationError({"detail": "Invalid code"})
+        return attrs
+
+    def save(self):
+        ResetPasswordCode.objects.filter(user__email=self.validated_data['email']).delete()
+        user = User.objects.filter(email=self.validated_data['email']).first()
+        user.set_password(self.validated_data['new_password'])
+        user.save()

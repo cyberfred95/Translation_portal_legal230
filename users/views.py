@@ -1,8 +1,7 @@
 from urllib.parse import urlencode
 
 from django.conf import settings
-from django.contrib.auth import login, logout
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth import login
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -16,11 +15,11 @@ from rest_framework.response import Response
 import requests
 from glossaries.models import Glossary
 from subscriptions.permissions import SubscribedPermission
-from .models import UserGroup, User
+from .models import UserGroup, User, ResetPasswordCode
 from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer, RegisterUserSerializer, \
-    LoginSerializer
+    LoginSerializer, SendCodeSerializer, ForgotPasswordSerializer
 from legal.views import PAGINATION_PAGE_SIZE
-from .mail_helpers import send_invitation_email
+from .mail_helpers import send_invitation_email, send_reset_password_code
 from legal.helpers import password_valid
 
 
@@ -160,3 +159,28 @@ class LoginView(TemplateView):
             login(request, user)
             return redirect(settings.LOGIN_REDIRECT_URL)
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ForgotPasswordView(TemplateView):
+    template_name = 'registration/forgot_password.html'
+
+    def post(self, request, *args, **kwargs):
+
+        if self.request.POST.get('action') == 'receive_code':
+            serializer = SendCodeSerializer(data=self.request.POST)
+            if serializer.is_valid():
+                user = User.objects.filter(email=self.request.POST.get('email')).first()
+                reset_password_code = ResetPasswordCode.create(user=user)
+                send_reset_password_code(email=user.email, code=reset_password_code.code)
+                return JsonResponse({"message":"Code sent successfully"}, status=status.HTTP_200_OK)
+            else:
+                return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        elif self.request.POST.get('action') == 'set_new_password':
+            serializer = ForgotPasswordSerializer(data=self.request.POST)
+            if serializer.is_valid():
+                serializer.save()
+                return redirect(reverse('login'))
+            else:
+                return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return JsonResponse({"detail": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User
+from .models import User, ResetPasswordCode
 from .models import UserGroup
 
 
@@ -25,3 +25,5 @@ class CustomUserAdmin(UserAdmin):
 
 # Register the User model with the custom admin class
 admin.site.register(User, CustomUserAdmin)
+
+admin.site.register(ResetPasswordCode)

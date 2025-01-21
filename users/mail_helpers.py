@@ -22,3 +22,22 @@ def send_invitation_email(email: str, register_user_absolute_uri: str):
         sg.send(message)
     except:
         pass
+
+
+def send_reset_password_code(email: str, code: int):
+    sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+    try:
+        message = Mail(
+            from_email='support@custom.mt',
+            to_emails=[email],
+            subject="Legal230 translation portal password change",
+            html_content=render_to_string(
+                'forgot_password_email.html',
+                context={
+                    'code': code,
+                }
+            )
+        )
+        sg.send(message)
+    except:
+        pass
