@@ -179,10 +179,6 @@ msgstr "Oops ! Something went wrong."
 msgid "Please try again later."
 msgstr "Please try again later."
 
-#: legal/templates/translate.html:446 legal/templates/translate.html:462
-msgid "Close"
-msgstr "Close"
-
 #: legal/templates/translate.html:458
 msgid "Success"
 msgstr "Success"
@@ -228,6 +224,15 @@ msgstr "French"
 
 msgid "Logout"
 msgstr "Logout"
+
+msgid "Billing and plans"
+msgstr "Billing and plans"
+
+msgid "Manage users"
+msgstr "Manage users"
+
+msgid "Profile details"
+msgstr "Profile details"
 
 #####################################
 
@@ -525,3 +530,77 @@ msgstr "Search"
 
 msgid "Copied"
 msgstr "Copied"
+
+################################# PROFILE DETAILS #####################################
+
+msgid "Name"
+msgstr "User name"
+
+msgid "Your name as you'd like it to be displayed on Translation Portal."
+msgstr "Your name as you'd like it to be displayed on Translation Portal."
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Update Email Address"
+msgstr "Update Email address"
+
+msgid "Security"
+msgstr "Security"
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Change your password."
+msgstr "Change your password."
+
+msgid "Current password"
+msgstr "Current password"
+
+msgid "New password"
+msgstr "New password"
+
+msgid "Confirm password"
+msgstr "Confirm password"
+
+msgid "Update password"
+msgstr "Update password"
+
+msgid "Passwords do not match"
+msgstr "Passwords do not match"
+
+msgid "Close"
+msgstr "Close"
+
+msgid "Your password has been successfully changed"
+msgstr "Your password has been successfully changed"
+
+msgid "Delete Resources"
+msgstr "Delete Resources"
+
+msgid "Delete your resources"
+msgstr "Delete your resources"
+
+msgid "Permanently delete your files and glossaries."
+msgstr "Permanently delete your files and glossaries."
+
+msgid "Deleting your resources is an irreversible operation. Any data synced to your account will be deleted and no longer be accessible."
+msgstr "Deleting your resources is an irreversible operation. Any data synced to your account will be deleted and no longer be accessible."
+
+msgid "For Security reasons, you'll be asked to sign in again so that we can make sure the account belongs to you."
+msgstr "For Security reasons, you'll be asked to sign in again so that we can make sure the account belongs to you."
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Confirm Deletion"
+msgstr "Confirm Deletion"
+
+msgid "Enter your password to confirm"
+msgstr "Enter your password to confirm"
+
+msgid "Start typing…"
+msgstr "Start typing…"
+
+msgid "Your data has been successfully changed"
+msgstr "Your resources have been deleted successfully"

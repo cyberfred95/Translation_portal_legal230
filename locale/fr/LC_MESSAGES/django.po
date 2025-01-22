@@ -182,10 +182,6 @@ msgstr "Oups ! Quelque chose s’est mal passé."
 msgid "Please try again later."
 msgstr "Veuillez réessayer plus tard."
 
-#: legal/templates/translate.html:446 legal/templates/translate.html:462
-msgid "Close"
-msgstr "Fermer"
-
 #: legal/templates/translate.html:458
 msgid "Success"
 msgstr "Message envoyé !"
@@ -231,6 +227,15 @@ msgstr "Français"
 
 msgid "Logout"
 msgstr "Déconnexion"
+
+msgid "Billing and plans"
+msgstr "Facturation"
+
+msgid "Manage users"
+msgstr "Gestion d’équipe"
+
+msgid "Profile details"
+msgstr "Profil"
 
 #####################################
 
@@ -526,3 +531,78 @@ msgstr "Recherche"
 
 msgid "Copied"
 msgstr "Copié"
+
+################################# PROFILE DETAILS #####################################
+
+msgid "Name"
+msgstr "Nom d’utilisateur"
+
+msgid "Your name as you'd like it to be displayed on Translation Portal."
+msgstr "Choisissez le nom qui s’affichera sur Lexa."
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "Update Email Address"
+msgstr "Modifier l’e-mail"
+
+
+msgid "Security"
+msgstr "Sécurité"
+
+msgid "Password"
+msgstr "Mot de passe"
+
+msgid "Change your password."
+msgstr "Modifier le mot de passe"
+
+msgid "Current password"
+msgstr "Mot de passe actuel"
+
+msgid "New password"
+msgstr "Nouveau mot de passe"
+
+msgid "Confirm password"
+msgstr "Confirmer le mot de passe"
+
+msgid "Update password"
+msgstr "Modifier le mot de passe"
+
+msgid "Passwords do not match"
+msgstr "Les mots de passe ne correspondent pas"
+
+msgid "Close"
+msgstr "Fermer"
+
+msgid "Your password has been successfully changed"
+msgstr "Votre mot de passe a été correctement modifié."
+
+msgid "Delete Resources"
+msgstr "Supprimer le contenu"
+
+msgid "Delete your resources"
+msgstr "Supprimer"
+
+msgid "Permanently delete your files and glossaries."
+msgstr "Supprime de manière permanente vos traductions et glossaires."
+
+msgid "Deleting your resources is an irreversible operation. Any data synced to your account will be deleted and no longer be accessible."
+msgstr "Supprimer votre contenu est une action irréversible. Toutes les données liées à votre compte seront également supprimées et ne seront plus accessible."
+
+msgid "For Security reasons, you'll be asked to sign in again so that we can make sure the account belongs to you."
+msgstr "Pour des raisons de sécurité vous devrez vous connecter à nouveau. Ceci nous permet de vérifier que ce compte vous appartient."
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Confirm Deletion"
+msgstr "Confirmer la suppression"
+
+msgid "Enter your password to confirm"
+msgstr "Saisissez votre mot de passe"
+
+msgid "Start typing…"
+msgstr "Ecrivez ici"
+
+msgid "Your data has been successfully changed"
+msgstr "Votre contenu a été supprimé."
