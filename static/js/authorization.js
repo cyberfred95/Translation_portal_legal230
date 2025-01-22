@@ -182,7 +182,7 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function () {
-                window.location.href = '/login/';
+                window.location.href = '/en/users/login/';
             },
             error: function (error) {
                 const detailMessage = error?.responseJSON?.detail || 'An unknown error occurred.';
