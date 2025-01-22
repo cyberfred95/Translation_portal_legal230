@@ -9,40 +9,41 @@
     <div class="flex flex-col items-start gap-12.5">
         <form name="change-user-data" class="w-full">
             {% csrf_token %}
-            <p class="text-5 font-bold">Profile details</p>
+            <p class="text-5 font-bold">{% trans 'Profile details' %}</p>
             <div class="flex flex-col gap-7.5 mt-7.5">
                 <div>
                     <div class="flex flex-col gap-1.5">
-                        <label for="username" class="text-4 font-semibold text-gray-600">Name</label>
+                        <label for="username" class="text-4 font-semibold text-gray-600">{% trans 'Name' %}</label>
                         <label class="text-xs text-gray-400">
-                            Your name as you'd like it to be displayed on Translation Portal.</label>
+                            {% trans "Your name as you'd like it to be displayed on Translation Portal." %}
+                            </label>
                     </div>
                     <input type="text" name="username" id="username" placeholder="Name"
                            value="{{ request.user.username }}"
                            class="mt-1.5 placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300"/>
                 </div>
                 <div>
-                    <label for="email" class="text-4 font-semibold text-gray-600">Email</label>
+                    <label for="email" class="text-4 font-semibold text-gray-600">{% trans 'Email' %}</label>
                     <input type="email" name="email" id="email" placeholder="Email" value="{{ request.user.email }}"
                            class="mt-1.5 placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300"/>
                 </div>
             </div>
             <button type="submit"
                     class="mt-4 bg-green-700 text-white text-4 rounded-md py-2.5 px-6.5 transition duration-300 ease-in-out hover:bg-gray-600">
-                Update Email Address
+                {% trans 'Update Email Address' %}
             </button>
         </form>
         <div class="w-full">
-            <p class="text-5 font-bold">Security</p>
+            <p class="text-5 font-bold">{% trans 'Security' %}</p>
             <div class="flex flex-col gap-7.5 mt-7.5">
                 <div class="flex justify-between items-end">
                     <div class="flex flex-col items-start gap-1.5">
-                        <span class="text-lg font-semibold text-gray-600">Password</span>
-                        <span class="text-sm text-gray-400">Change your password.</span>
+                        <span class="text-lg font-semibold text-gray-600">{% trans 'Password' %}</span>
+                        <span class="text-sm text-gray-400">{% trans 'Change your password.' %}</span>
                     </div>
                     <button id="toggle-password-btn" type="button"
                             class="border border-green-700 text-green-700 rounded-md py-2.5 px-5 transition duration-300 ease-in-out hover:bg-green-700 hover:text-white">
-                        Change Password
+                        {% trans 'Change Password' %}
                     </button>
                 </div>
 
@@ -51,14 +52,14 @@
                     <div class="flex flex-col gap-5 p-5">
                         <div>
                             <label for="current-password" class="text-4 font-semibold text-gray-600 mb-1.5">
-                                Current password
+                                {% trans 'Current password' %}
                             </label>
                             <div class="relative mt-1">
                                 <input
                                         type="password"
                                         id="current-password"
                                         name="current_password"
-                                        placeholder="Start typing..."
+                                        placeholder="{% trans 'Start typing...' %}"
                                         required
                                         class="placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300"
                                 />
@@ -80,14 +81,14 @@
 
                         <div>
                             <label for="new-password" class="text-4 font-semibold text-gray-600 mb-1.5">
-                                New password
+                                {% trans 'New password' %}
                             </label>
                             <div class="relative mt-1">
                                 <input
                                         type="password"
                                         id="new-password"
                                         name="new_password"
-                                        placeholder="Start typing..."
+                                        placeholder="{% trans 'Start typing...' %}"
                                         required
                                         class="placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300"
                                 />
@@ -109,14 +110,14 @@
                         </div>
                         <div>
                             <label for="confirm-password" class="text-4 font-semibold text-gray-600 mb-1.5">
-                                Confirm password
+                                {% trans 'Confirm password' %}
                             </label>
                             <div class="relative mt-1">
                                 <input
                                         type="password"
                                         id="confirm-password"
                                         name="confirm_password"
-                                        placeholder="Start typing..."
+                                        placeholder="{% trans 'Start typing...' %}"
                                         required
                                         class="placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300"
                                 />
@@ -145,7 +146,7 @@
                                     class="bg-green-700 text-white py-2.5 px-6.5 rounded-md transition hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed block"
                                     disabled
                             >
-                                Update Password
+                                {% trans 'Update password' %}
                             </button>
                         </div>
                         <div id="server-response" class="mt-2 text-sm hidden"></div>
@@ -156,20 +157,16 @@
 
                 <div class="flex justify-between items-end">
                     <div class="flex flex-col items-start gap-1.5">
-                        <span class="text-4 font-semibold text-gray-600">Delete your resources</span>
-                        <span class="text-xs text-gray-400">Permanently delete your files and glossaries.</span>
+                        <span class="text-4 font-semibold text-gray-600">{% trans 'Delete your resources' %}</span>
+                        <span class="text-xs text-gray-400">{% trans 'Permanently delete your files and glossaries.' %}</span>
                     </div>
                     <div class="w-full max-w-47.25">
 
-                        {#@ TODO AJAX WITH POST METHOD AND SHOW ENDPOINT RESPONSE IN POPUP#}
-                        {#@TODO MODAL#}
-                        <!--                            <form action="{% url 'delete_all_data' %}" method="post">-->
                         {% csrf_token %}
                         <button type="submit" id="modal-delete-resources"
                                 class="w-full border border-green-700 text-green-700 text-4 rounded-md py-2.5 px-5 transition duration-300 ease-in-out hover:bg-green-700 hover:text-white">
                             Delete Resources
                         </button>
-                        <!--                            </form>-->
 
                     </div>
                 </div>
@@ -179,14 +176,10 @@
                         <span class="text-xs text-gray-400">Permanently delete all your Translation Portal data. </span>
                     </div>
                     <div class="w-full max-w-47.25">
-
-                        {#@TODO AJAX#}
-                        <!--                            <form action="{% url 'user' id=request.user.id %}" method="DELETE">-->
                         <button type="submit" id="modal-delete-account"
                                 class="w-full border border-green-700 text-green-700 text-4 rounded-md py-2.5 px-5 transition duration-300 ease-in-out hover:bg-green-700 hover:text-white">
                             Delete Account
                         </button>
-                        <!--                            </form>-->
                     </div>
                 </div>
             </div>
@@ -238,7 +231,7 @@
                                 type="password"
                                 id="delete-account"
                                 name="delete-account"
-                                placeholder="Start typing..."
+                                placeholder="{% trans 'Start typing...' %}"
                                 required
                                 class="placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300 bg-gray-75"
                         />
@@ -257,7 +250,7 @@
                             type="button"
                             id="cancel-account-btn"
                             class="flex-1 text-green-700 border border-green-700 rounded-1.5 py-2.5 text-4 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision">
-                        Cancel
+                        {% trans 'Cancel' %}
                     </button>
                     <button
                             type="button"
@@ -315,7 +308,7 @@
                                 type="password"
                                 id="delete-resources"
                                 name="delete-resources"
-                                placeholder="Start typing..."
+                                placeholder="{% trans 'Start typing...' %}"
                                 required
                                 class="placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300 bg-gray-75"
                         />

@@ -234,6 +234,21 @@ msgstr "Manage users"
 msgid "Profile details"
 msgstr "Profile details"
 
+msgid "Invite"
+msgstr "Invite"
+
+msgid "Invite people by email"
+msgstr "Invite people by email"
+
+msgid "Add emails separated by commas to send multiple invitations to the Translation Portal. The invitation will be valid for"
+msgstr "Add emails separated by commas to send multiple invitations to use Lexa. The invitation will be valid for "
+
+msgid "72 hours"
+msgstr "72 hours."
+
+msgid "You are not allowed to perform this action, please contact your group administrator"
+msgstr "You are not allowed to perform this action, please contact your group administrator"
+
 #####################################
 
 ######################### SIDEBAR ###
@@ -533,6 +548,7 @@ msgstr "Copied"
 
 ################################# PROFILE DETAILS #####################################
 
+# change account data
 msgid "Name"
 msgstr "User name"
 
@@ -545,8 +561,12 @@ msgstr "Email"
 msgid "Update Email Address"
 msgstr "Update Email address"
 
+##################
+
 msgid "Security"
 msgstr "Security"
+
+# change password
 
 msgid "Password"
 msgstr "Password"
@@ -575,7 +595,11 @@ msgstr "Close"
 msgid "Your password has been successfully changed"
 msgstr "Your password has been successfully changed"
 
-msgid "Delete Resources"
+################
+
+#delete  resources
+
+msgid "Delete resources"
 msgstr "Delete Resources"
 
 msgid "Delete your resources"
@@ -599,8 +623,29 @@ msgstr "Confirm Deletion"
 msgid "Enter your password to confirm"
 msgstr "Enter your password to confirm"
 
-msgid "Start typing…"
-msgstr "Start typing…"
+msgid "Start typing..."
+msgstr "Start typing..."
 
 msgid "Your data has been successfully changed"
 msgstr "Your resources have been deleted successfully"
+
+#########
+
+
+msgid "Delete account"
+msgstr "Delete account"
+
+msgid "Delete your account"
+msgstr "Delete your account"
+
+msgid "Permanently delete your account and all your portal data."
+msgstr "Permanently delete your account and all your portal data."
+
+msgid "Deleting your account is an irreversible operation. Any data synced to your account will be deleted and no longer be accessible."
+msgstr "Deleting your account is an irreversible operation. Any data synced to your account will be deleted and no longer be accessible."
+
+msgid "Delete account button"
+msgstr "Delete account"
+
+msgid "Your account has been deleted successfully"
+msgstr "Your account has been deleted successfully"

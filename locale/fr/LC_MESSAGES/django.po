@@ -237,6 +237,24 @@ msgstr "Gestion d’équipe"
 msgid "Profile details"
 msgstr "Profil"
 
+msgid "Invite"
+msgstr "Inviter"
+
+msgid "Invite people by email"
+msgstr "Inviter par e-mail"
+
+msgid "Add emails separated by commas to send multiple invitations to the Translation Portal. The invitation will be valid for 72 hours."
+msgstr "Vous pouvez envoyer plusieurs invitations en séparant les adresses e-mail par des virgules. Le mail d’invitation sera valide pendant 72 heures."
+
+msgid "Add emails separated by commas to send multiple invitations to the Translation Portal. The invitation will be valid for"
+msgstr "Vous pouvez envoyer plusieurs invitations en séparant les adresses e-mail par des virgules. Le mail d’invitation sera valide pendant "
+
+msgid "72 hours"
+msgstr "72 heures."
+
+msgid "You are not allowed to perform this action, please contact your group administrator"
+msgstr "Vous n’avez pas l’autorisation nécessaire pour effectuer cette action. Veuillez contacter l’administrateur de votre groupe."
+
 #####################################
 
 ######################### SIDEBAR ###
@@ -534,6 +552,7 @@ msgstr "Copié"
 
 ################################# PROFILE DETAILS #####################################
 
+#change data
 msgid "Name"
 msgstr "Nom d’utilisateur"
 
@@ -546,9 +565,13 @@ msgstr "E-mail"
 msgid "Update Email Address"
 msgstr "Modifier l’e-mail"
 
+##############
+
 
 msgid "Security"
 msgstr "Sécurité"
+
+#change password
 
 msgid "Password"
 msgstr "Mot de passe"
@@ -577,7 +600,11 @@ msgstr "Fermer"
 msgid "Your password has been successfully changed"
 msgstr "Votre mot de passe a été correctement modifié."
 
-msgid "Delete Resources"
+##################
+
+#delete resources
+
+msgid "Delete resources"
 msgstr "Supprimer le contenu"
 
 msgid "Delete your resources"
@@ -601,8 +628,33 @@ msgstr "Confirmer la suppression"
 msgid "Enter your password to confirm"
 msgstr "Saisissez votre mot de passe"
 
-msgid "Start typing…"
+msgid "Start typing..."
 msgstr "Ecrivez ici"
 
 msgid "Your data has been successfully changed"
 msgstr "Votre contenu a été supprimé."
+
+########
+
+#delete account
+
+msgid "Delete account"
+msgstr "Supprimer le compte"
+
+msgid "Delete your account"
+msgstr "Supprimer"
+
+msgid "Permanently delete your account and all your portal data."
+msgstr "Supprime de manière permanente votre compte et toutes les données liées."
+
+msgid "Deleting your account is an irreversible operation. Any data synced to your account will be deleted and no longer be accessible."
+msgstr "Supprimer votre compte est une action irréversible. Toutes les données liées à votre compte seront également supprimées et ne seront plus accessible."
+
+msgid "Delete account button"
+msgstr "Confirmer la suppression"
+
+msgid "Your account has been deleted successfully"
+msgstr "Votre compte a été supprimé."
+
+
+#################
