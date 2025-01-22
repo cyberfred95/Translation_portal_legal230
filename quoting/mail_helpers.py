@@ -13,7 +13,7 @@ def send_quote_email(user_id: int, context_variables: dict, template_name: str =
         sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
         message = Mail(
             from_email='support@custom.mt',
-            to_emails=[user.email],
+            to_emails=[user.email, 'andrea.marangolo@legal230.com'],
             subject="Expert revision quote",
             html_content=f"Dear {user.email},<br>"
                     f"To start the expert revision please press the accept quote link inside the attached PDF file"
