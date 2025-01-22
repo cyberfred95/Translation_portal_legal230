@@ -138,7 +138,8 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function () {
-                // window.location.href = '/';
+                $('form').addClass('hidden');
+                $('.success-email').removeClass('hidden');
             },
             error: function (error) {
                 const detailMessage = error?.responseJSON?.detail || 'An unknown error occurred.';
@@ -181,7 +182,6 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function () {
-                alert('Your password has been reset successfully!');
                 window.location.href = '/login/';
             },
             error: function (error) {
