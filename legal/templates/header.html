@@ -1,7 +1,7 @@
 {% load static %}
 {% load i18n %}
 
-<header class="flex justify-end items-center px-31.25 py-3">
+<header class="flex justify-end items-center px-31.25 py-4.5">
     <div class="flex gap-7.5 items-center font-semibold">
         {% if request.user.group and request.user.group.admin == request.user %}
         <button type="button" class="flex items-center gap-2 cursor-pointer text-gray-600" id="open-invite-modal">
@@ -52,7 +52,7 @@
             </span>
         </div>
         <a href="/accounts/logout/"
-           class="bg-green-700 text-white text-4 rounded-md py-2.5 px-6.5 transition duration-300 ease-in-out">
+           class="bg-green-700 text-white text-4 rounded-md py-1 px-6.5 transition duration-300 ease-in-out">
             {% trans 'Logout' %}
         </a>
     </div>
