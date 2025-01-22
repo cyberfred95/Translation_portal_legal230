@@ -1150,11 +1150,6 @@ $(document).ready(function () {
             dataType: 'json',
             success: function () {
                 const projectRow = $(`button[data-id="${id}"]`).closest('tr');
-                const statusSpan = projectRow.find('td:eq(1) span');
-
-                statusSpan.text('Request for post-editing sent');
-                statusSpan.removeClass().addClass('rounded-md py-1.5 px-2.5 text-3.25 bg-yellow-100 text-yellow-400');
-
 
                 projectRow.find('.expert-revision').prop('disabled', true).addClass('disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225');
 
