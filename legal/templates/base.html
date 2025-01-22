@@ -185,17 +185,17 @@
         <div class="relative bg-white rounded-lg shadow-xl max-w-200 w-full mx-4 modal-content">
             <form name="invite" autocomplete="off" class="p-17.5 flex flex-col items-center gap-10">
                 {% csrf_token %}
-                <div class="text-5 font-semibold">Invite people by email</div>
+                <div class="text-5 font-semibold">{% trans 'Invite people by email' %}</div>
                 <div class="w-full" id="input-invite">
                     <label for="emails" class="text-4 font-semibold text-gray-600 mb-1.5">
-                        Email
+                        {% trans 'Email' %}
                     </label>
                     <div class="mt-1">
                         <input
                                 type="email"
                                 id="emails"
                                 name="emails"
-                                placeholder="Start typing..."
+                                placeholder="{% trans 'Start typing...' %}"
                                 required
                                 class="placeholder:text-gray-480 font-normal text-3.5 p-3.5 w-full rounded-2.5 border-gray-300 bg-gray-75"
                         />
@@ -218,8 +218,8 @@
                             </defs>
                         </svg>
                         <span class="text-gray-400 text-3.5 leading-none text-start font-normal">
-                        Add emails separated by commas to send multiple invitations to the Translation Portal. The invitation will be valid for <span
-                                class="text-gray-400 font-bold">72 hours</span>.
+                        {% trans 'Add emails separated by commas to send multiple invitations to the Translation Portal. The invitation will be valid for' %} <span
+                                class="text-gray-400 font-bold">{% trans '72 hours' %}</span>.
                     </span>
                     </div>
                 </div>
@@ -229,7 +229,7 @@
                                 type="submit"
                                 id="invite-btn"
                                 class="flex-1 bg-green-700 text-white border border-green-700 rounded-1.5 py-2.5 px-6.5 text-4 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision">
-                            Invite
+                            {% trans 'Invite' %}
                         </button>
                     </div>
                 </div>

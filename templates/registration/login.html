@@ -120,27 +120,41 @@
 </head>
 <body>
 <div class="flex items-center justify-center min-h-screen bg-gray-100">
-    <form method="post" autocomplete="off" class="flex flex-col bg-white shadow-lg py-17.5 px-32.5 rounded-5">
+    <form name="login" action="{% url 'login' %}" method="post" autocomplete="off" class="flex flex-col bg-white shadow-lg py-17.5 px-32.5 rounded-5">
         <h2 class="text-6 font-bold mb-10 text-center">SIGN IN</h2>
         {% csrf_token %}
+        <div>
         <input
                 type="email"
-                placeholder="Enter email"
+                placeholder="Email"
                 id="email"
                 name="email"
                 required
-                class="mb-2.5 w-100 bg-gray-75 px-3.5 py-3.5 border border-none rounded-2.5 focus:outline-none focus:ring focus:ring-none">
-        <input
-                type="password"
-                placeholder="Password"
-                id="password"
-                name="password"
-                required
-                class="mb-5 w-100 bg-gray-75 px-3.5 py-3.5 border border-none rounded-2.5 focus:outline-none focus:ring focus:ring-none">
-        <a class="mb-5 text-3.5 text-green-700 font-medium" href="{% url 'forgot-password' %}">Forgot password?</a>
+                class="min-w-100 mb-2.5 bg-gray-75 px-3.5 text-3.5 py-3.5 border rounded-2.5 focus:outline-none focus:ring focus:ring-none">
+        </div>
+        <div class="relative mt-1">
+            <input
+                    type="password"
+                    placeholder="Password"
+                    id="password"
+                    name="password"
+                    required
+                    class="min-w-100 font-normal border text-3.5 px-3.5 p-3.5 w-full rounded-2.5 bg-gray-75"
+            />
+            <span class="absolute inset-y-0 right-3 flex items-center cursor-pointer toggle-visibility" data-target="password">
+                <svg class="eye-icon open hidden" width="17" height="11" viewBox="0 0 17 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8.5 10.8125C2.93874 10.8125 0.181555 5.96431 0.0669375 5.75805C-0.0223125 5.59748 -0.0223125 5.40238 0.0669375 5.24181C0.181555 5.03569 2.93874 0.1875 8.5 0.1875C14.0613 0.1875 16.8184 5.03569 16.9331 5.24195C17.0223 5.40252 17.0223 5.59762 16.9331 5.75819C16.8184 5.96431 14.0613 10.8125 8.5 10.8125ZM1.1564 5.4992C1.78832 6.45691 4.26939 9.75 8.5 9.75C12.744 9.75 15.2141 6.45957 15.8436 5.5008C15.2117 4.54309 12.7306 1.25 8.5 1.25C4.25598 1.25 1.78593 4.54043 1.1564 5.4992ZM8.5 8.6875C6.74236 8.6875 5.3125 7.25764 5.3125 5.5C5.3125 3.74236 6.74236 2.3125 8.5 2.3125C10.2576 2.3125 11.6875 3.74236 11.6875 5.5C11.6875 7.25764 10.2576 8.6875 8.5 8.6875ZM8.5 3.375C7.32833 3.375 6.375 4.32833 6.375 5.5C6.375 6.67167 7.32833 7.625 8.5 7.625C9.67167 7.625 10.625 6.67167 10.625 5.5C10.625 4.32833 9.67167 3.375 8.5 3.375Z" fill="black"/>
+                </svg>
+                <svg class="eye-icon closed" width="17" height="13" viewBox="0 0 17 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.6105 6.64321L11.5761 5.67766C11.6463 5.94049 11.6875 6.21528 11.6875 6.50003C11.6875 8.25767 10.2576 9.68753 8.5 9.68753C8.21525 9.68753 7.94046 9.64636 7.67762 9.5761L8.64317 8.61056C9.6989 8.53857 10.5385 7.69893 10.6105 6.64321ZM16.9331 6.24198C16.8677 6.12444 15.941 4.50054 14.1294 3.12434L13.3563 3.89744C14.6772 4.8687 15.5142 6.00145 15.8437 6.50083C15.2141 7.4596 12.744 10.75 8.5 10.75C7.86356 10.75 7.27175 10.6686 6.71487 10.5387L5.84189 11.4117C6.64448 11.6578 7.52662 11.8125 8.5 11.8125C14.0613 11.8125 16.8184 6.96435 16.9331 6.75809C17.0223 6.59752 17.0223 6.40255 16.9331 6.24198ZM14.7193 1.03188L3.03184 12.7194C2.92812 12.8231 2.79212 12.875 2.65625 12.875C2.52038 12.875 2.38438 12.8231 2.28066 12.7194C2.07307 12.5118 2.07307 12.1756 2.28066 11.9682L3.76763 10.4812C1.36372 9.02998 0.142242 6.89369 0.0669375 6.75809C-0.0223125 6.59752 -0.0223125 6.40242 0.0669375 6.24185C0.181555 6.03572 2.93874 1.18753 8.5 1.18753C9.93796 1.18753 11.1835 1.51558 12.2482 2.00061L13.9682 0.280689C14.1757 0.0731035 14.5119 0.0731035 14.7193 0.280689C14.9268 0.488275 14.9269 0.824424 14.7193 1.03188ZM4.55985 9.68899L5.90484 8.344C5.53337 7.82285 5.3125 7.18734 5.3125 6.50003C5.3125 4.74239 6.74236 3.31253 8.5 3.31253C9.1873 3.31253 9.82281 3.5334 10.344 3.90474L11.4316 2.81714C10.5723 2.47303 9.59584 2.25003 8.5 2.25003C4.25598 2.25003 1.78593 5.54046 1.1564 6.49924C1.55616 7.10513 2.70526 8.63885 4.55985 9.68899ZM6.67609 7.57263L9.57259 4.67612C9.25663 4.48952 8.89286 4.37503 8.5 4.37503C7.32833 4.37503 6.375 5.32836 6.375 6.50003C6.375 6.89289 6.48948 7.25667 6.67609 7.57263Z" fill="black"/>
+                </svg>
+            </span>
+        </div>
+        <p class="error-message text-red-400 text-3 mt-2.5 hidden"></p>
+        <a class="my-5 text-3.5 text-green-700 font-medium" href="{% url 'forgot-password' %}">Forgot password?</a>
         <button
                 type="submit"
-                class="font-semibold bg-green-700 py-2 text-4 text-white rounded-7 hover:bg-green-800">
+                class="font-semibold bg-green-700 py-2 text-4 text-white rounded-7 hover:bg-gray-600 duration-300 ease-in-out">
             Sign In
         </button>
     </form>
@@ -148,6 +162,7 @@
 
 
 <script src="{% static 'js/authorization.js' %}"></script>
+<script src="{% static 'js/get-cookie.js' %}"></script>
 
 </body>
 </html>

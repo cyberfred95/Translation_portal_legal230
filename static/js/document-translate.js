@@ -954,7 +954,7 @@ $(document).ready(function () {
 
             row.append(`
             <td>
-                <div class="border border-gray-300  border border-gray-300 glossary-item py-3 px-7.5 bg-gray-175 text-white rounded-md md:w-50 2xl:w-80 truncate text-3.25">
+                <div class="border border-gray-300  border border-gray-300 glossary-item py-3 px-7.5 bg-gray-60 text-gray-600 rounded-md md:w-50 2xl:w-80 truncate text-3.25">
 
                     ${project.source_file_name}
                 </div>
@@ -962,7 +962,7 @@ $(document).ready(function () {
         `);
 
             const statusColumn = $('<td></td>');
-            const statusSpan = $('<span class="border border-gray-300  border border-gray-300 glossary-item py-3 px-7.5 bg-gray-175 rounded-md text-white font-medium"></span>');
+            const statusSpan = $('<span class="border border-gray-300 glossary-item py-3 px-7.5 bg-gray-175 rounded-md text-gray-600 font-medium"></span>');
 
 
             switch (project.status) {
@@ -972,27 +972,27 @@ $(document).ready(function () {
                     break;
                 case 'Translated':
                     statusSpan.text(language_code === 'en' ? 'Translated' : 'Document traduit');
-                    statusSpan.addClass('bg-green-100 text-green-400');
+                    statusSpan.addClass('text-green-400');
                     break;
                 case 'Sent to post-editing, not accepted yet':
                     statusSpan.text(language_code === 'en' ? 'Request for quote sent' : 'Demande de devis envoyée');
-                    statusSpan.addClass('bg-yellow-100 text-yellow-400');
+                    statusSpan.addClass('text-yellow-400');
                     break;
                 case 'Sent to post-editing, accepted':
                     statusSpan.text(language_code === 'en' ? 'Request for quote accepted' : 'Demande de devis acceptée');
-                    statusSpan.addClass('bg-blue-100 text-blue-400');
+                    statusSpan.addClass('text-blue-400');
                     break;
                 case 'Post-edited file uploaded':
                     statusSpan.text(language_code === 'en' ? 'Request for quote accepted' : 'Demande de devis acceptée');
-                    statusSpan.addClass('bg-green-50 text-green-300');
+                    statusSpan.addClass('text-green-300');
                     break;
                 case 'Error':
                     statusSpan.text(language_code === 'en' ? 'Error' : 'Erreur');
-                    statusSpan.addClass('bg-red-100 text-red-400');
+                    statusSpan.addClass('text-red-400');
                     break;
                 default:
                     statusSpan.text(project.status);
-                    statusSpan.addClass('bg-gray-175 text-gray-600');
+                    statusSpan.addClass('text-gray-600');
                     break;
             }
             statusColumn.append(statusSpan);
@@ -1150,11 +1150,6 @@ $(document).ready(function () {
             dataType: 'json',
             success: function () {
                 const projectRow = $(`button[data-id="${id}"]`).closest('tr');
-                const statusSpan = projectRow.find('td:eq(1) span');
-
-                statusSpan.text('Request for post-editing sent');
-                statusSpan.removeClass().addClass('rounded-md py-1.5 px-2.5 text-3.25 bg-yellow-100 text-yellow-400');
-
 
                 projectRow.find('.expert-revision').prop('disabled', true).addClass('disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225');
 

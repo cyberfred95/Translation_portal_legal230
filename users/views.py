@@ -150,7 +150,6 @@ class RegisterUserView(TemplateView):
             register_success_email(
                 username=user.username,
                 email=user.email,
-                password=request.POST.get('password'),
             )
             return redirect(settings.LOGIN_REDIRECT_URL)
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

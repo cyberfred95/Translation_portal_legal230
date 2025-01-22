@@ -45,7 +45,7 @@ def send_reset_password_email(email: str, username:str, reset_password_absolute_
         pass
 
 
-def register_success_email(email: str, password: str, username: str):
+def register_success_email(email: str,  username: str):
     sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
     try:
         message = Mail(
@@ -56,7 +56,6 @@ def register_success_email(email: str, password: str, username: str):
                 'register_success_email.html',
                 context={
                     'username': username,
-                    'password': password,
                     'email': email,
                     'support_email': preferences.MainSettings.support_email,
                 }

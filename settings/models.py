@@ -8,6 +8,7 @@ class MainSettings(Preferences):
         domains = 'domain', 'Domain'
 
     sender_email = models.EmailField()
+    quote_cc_email = models.EmailField(blank=True, null=True)
     support_email = models.EmailField(blank=True, null=True)
     api_key = models.CharField(max_length=256)
     algorithm = models.CharField(choices=AlgorithmChoices.choices, default=AlgorithmChoices.template, max_length=32)

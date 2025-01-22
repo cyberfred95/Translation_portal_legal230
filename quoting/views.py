@@ -55,6 +55,7 @@ class FormQuoteView(APIView):
                 'words_count': words_count,
                 'total_price': words_count * quote_price.price,
                 'created_at': now(),
+                'seller_email': preferences.MainSettings.sender_email,
                 'expert_revision_file_absolute_url': self.get_expert_revision_url(project_id, request),
                 'quote_number': request.user.group.generate_quoting_number() if request.user.group else f"{now().strftime('%Y/%m')}/0"
 

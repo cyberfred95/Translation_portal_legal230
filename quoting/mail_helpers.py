@@ -5,15 +5,19 @@ from sendgrid import SendGridAPIClient, Mail, FileName, Attachment, FileType, Fi
 from legal import settings
 from quoting.services import PDFService
 from users.models import User
+from preferences import preferences
 
 
 def send_quote_email(user_id: int, context_variables: dict, template_name: str = 'quote_template.html'):
-    user = User.objects.filter(id=user_id).first()
+    user:User = User.objects.filter(id=user_id).first()
     if user and user.email:
+        to_emails = [user.email]
+        if preferences.MainSettings.quote_cc_email:
+            to_emails.append(preferences.MainSettings.quote_cc_email)
         sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
         message = Mail(
             from_email='support@custom.mt',
-            to_emails=[user.email],
+            to_emails=to_emails,
             subject="Expert revision quote",
             html_content=f"Dear {user.email},<br>"
                     f"To start the expert revision please press the accept quote link inside the attached PDF file"
