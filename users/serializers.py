@@ -94,10 +94,10 @@ class LoginSerializer(serializers.ModelSerializer):
         user = User.objects.filter(email=attrs['email']).first()
 
         if not user:
-            raise serializers.ValidationError({"detail": "Invalid credentials"})
+            raise serializers.ValidationError({"detail": "That email and password combination didn't work. Try again."})
 
         if not check_password(attrs['password'], user.password):
-            raise serializers.ValidationError({"detail": "Invalid credentials"})
+            raise serializers.ValidationError({"detail": "That email and password combination didn't work. Try again."})
 
         return attrs
 
@@ -109,7 +109,7 @@ class ForgotPasswordSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if not User.objects.filter(email=attrs['email']).exists():
-            raise serializers.ValidationError({"detail": "Invalid credentials"})
+            raise serializers.ValidationError({"detail": "Sorry, you cannot use this email"})
         return attrs
 
 
