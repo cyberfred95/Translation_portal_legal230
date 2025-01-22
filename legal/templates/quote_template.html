@@ -49,7 +49,7 @@
             <p>75 Boulevard Haussmann</p>
             <p>75008 Paris</p>
         </td>
-        <td><strong>QUOTE:</strong> <span>XXXX</span></td>
+        <td><strong>QUOTE:</strong> <span>{{ quote_number }}</span></td>
     </tr>
     <tr>
         <td>{{ company }}</td>
@@ -62,7 +62,7 @@
     </tr>
 </table>
 
-<p>Dear <span>XXX</span>,</p>
+<p>Dear <span>{{ username }}</span>,</p>
 <p>We are pleased to send you a quote for the proofreading of your document.</p>
 
 <table>
@@ -103,7 +103,7 @@
 
 <p><strong>Validation:</strong></p>
 <p>If you agree, please click on “<strong>accept the quote</strong>” or send us a confirmation email at <a
-        href="mailto:XXX@legal230.com">XXX@legal230.com</a> including the number of the quote and the words “<strong>good for translation for the sum of X euros excluding tax</strong>”.</p>
+        href="mailto:{{ seller_email }}">{{ seller_email }}</a> including the number of the quote and the words “<strong>good for translation for the sum of X euros excluding tax</strong>”.</p>
 
 <p><strong>Payment terms:</strong></p>
 <p>Upon receipt of the invoice, the term of payment is 30 days. It is possible to invoice your customer directly if the
