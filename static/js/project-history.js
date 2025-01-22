@@ -40,6 +40,7 @@ $(document).ready(function () {
         const button = $(this);
         const translatedFile = button.data('translated-file');
         const display = button.data('display');
+        console.log(typeof display);
         if (display === 'False') {
             $('.quote-hide').removeClass('hidden');
         } else if (display === 'True') {
