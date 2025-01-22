@@ -39,6 +39,12 @@ $(document).ready(function () {
     $('table').on('click', '.expert-revision', function () {
         const button = $(this);
         const translatedFile = button.data('translated-file');
+        const display = button.data('display');
+        if (display === 'False') {
+            $('.quote-hide').removeClass('hidden');
+        } else if (display === 'True') {
+            $('.quote-display').removeClass('hidden');
+        }
         const id = button.data('id');
 
         $modal.data('translatedFile', translatedFile);
