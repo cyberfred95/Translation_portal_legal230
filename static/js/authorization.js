@@ -63,6 +63,7 @@ $(document).ready(function () {
 
     // ------------- REGISTER -------------
 
+
     $('form[name="register"]').on('submit', function (e) {
         e.preventDefault();
 
@@ -108,6 +109,93 @@ $(document).ready(function () {
     });
 
     $('form[name="register"] input').on('input', function () {
+        const form = $(this).closest('form');
+        form.find('input').removeClass('border-red-400 text-red-400');
+        form.find('.error-message').addClass('hidden').text('');
+    });
+
+
+    // ------------- FORGOT PASSWORD -------------
+
+
+    $('form[name="forgot-password"]').on('submit', function (e) {
+        e.preventDefault();
+
+        const form = $(this);
+        const formData = new FormData(this);
+
+        form.find('input').removeClass('border-red-400 text-red-400');
+        form.find('.error-message').addClass('hidden').text('');
+
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function () {
+                // window.location.href = '/';
+            },
+            error: function (error) {
+                const detailMessage = error?.responseJSON?.detail || 'An unknown error occurred.';
+
+                const errorElement = form.find('.error-message');
+                errorElement.removeClass('hidden').text(detailMessage);
+
+                form.find('input').addClass('border-red-400 text-red-400');
+            },
+        });
+    });
+
+    $('form[name="forgot-password"] input').on('input', function () {
+        const form = $(this).closest('form');
+        form.find('input').removeClass('border-red-400 text-red-400');
+        form.find('.error-message').addClass('hidden').text('');
+    });
+
+
+    // ------------- RESET PASSWORD -------------
+
+
+    $('form[name="reset-password"]').on('submit', function (e) {
+        e.preventDefault();
+
+        const form = $(this);
+        const formData = new FormData(this);
+
+        form.find('input').removeClass('border-red-400 text-red-400');
+        form.find('.error-message').addClass('hidden').text('');
+
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function () {
+                alert('Your password has been reset successfully!');
+                window.location.href = '/login/';
+            },
+            error: function (error) {
+                const detailMessage = error?.responseJSON?.detail || 'An unknown error occurred.';
+
+                const errorElement = form.find('.error-message');
+                errorElement.removeClass('hidden').text(detailMessage);
+
+                form.find('#password').addClass('border-red-400 text-red-400');
+            },
+        });
+    });
+
+    $('form[name="reset-password"] input').on('input', function () {
         const form = $(this).closest('form');
         form.find('input').removeClass('border-red-400 text-red-400');
         form.find('.error-message').addClass('hidden').text('');
