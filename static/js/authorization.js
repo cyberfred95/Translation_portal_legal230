@@ -45,7 +45,7 @@ $(document).ready(function () {
                 const detailMessage = error?.responseJSON?.detail || 'An unknown error occurred.';
 
                 form.find('a[href*="forgot-password"]').before(`
-                    <p class="error-message text-red-400 text-sm mb-4">${detailMessage}</p>
+                    <p class="error-message text-red-400 text-3 mt-2.5">${detailMessage}</p>
                 `);
 
                 form.find('input').each(function () {
