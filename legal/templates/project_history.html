@@ -12,11 +12,13 @@
 
             <thead>
             <tr class="border-gray-425">
-                <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
-                    <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        {% trans 'Username' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
-                    </div>
-                </th>
+                {% if request.user.is_staff %}
+                    <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
+                        <div class="flex items-center gap-1 w-auto cursor-pointer">
+                            {% trans 'Username' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                        </div>
+                    </th>
+                {% endif %}
                 <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
                     <div class="flex items-center gap-1 w-auto cursor-pointer">
                         {% trans 'Project' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
@@ -52,14 +54,16 @@
             {% if projects.results %}
             {% for project in projects.results %}
             <tr>
-                {% if project.username %}
-                <td class="text-3.25 text-gray-600">
-                    {{ project.username }}
-                </td>
-                {% else %}
-                <td class="text-3.25 text-gray-600">
-                    Unknown
-                </td>
+                {% if request.user.is_staff %}
+                    {% if project.username %}
+                        <td class="text-3.25 text-gray-600">
+                            {{ project.username }}
+                        </td>
+                    {% else %}
+                        <td class="text-3.25 text-gray-600">
+                            Unknown
+                        </td>
+                    {% endif %}
                 {% endif %}
                 <td class="text-3.25 text-gray-600 ">
                     <div class="md:w-30 2xl:w-50 truncate">
