@@ -526,6 +526,9 @@ msgstr "tokens"
 msgid "total characters"
 msgstr "caractères"
 
+msgid "total words"
+msgstr "mots"
+
 msgid "There are currently no statistic to display."
 msgstr "Il n'y a actuellement aucun statistique à afficher"
 
