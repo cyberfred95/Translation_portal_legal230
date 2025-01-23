@@ -17,7 +17,6 @@ class UsageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['stats'] = self.get_stats()
-        print(self.get_stats())
         context['stats']['filters'] = self.get_filters()
         context['date_from'] = self.request.GET.get("date_from", date.today())
         context['date_to'] = self.request.GET.get("date_to", date.today() + timedelta(days=30))
@@ -32,7 +31,6 @@ class UsageView(TemplateView):
 
         def get_responses():
             additional_url_params = self.set_additional_url_params(exclude_page_param=True)
-            print(additional_url_params)
 
             responses = []
             response = requests.get(
@@ -62,12 +60,11 @@ class UsageView(TemplateView):
                     )
             return list(set(responses))
 
-
         responses = get_responses()
 
         file_names = []
         for response in responses:
-            for usage in response.json().get('results',[]):
+            for usage in response.json().get('results', []):
                 file_names.append(usage['file_name'])
 
         file_names = list(set(file_names))
@@ -90,14 +87,18 @@ class UsageView(TemplateView):
 
     def get_users(self) -> list:
         group_user_uuids = []
+        # get all users in groups
         if self.request.user.is_staff:
             group_names = self.request.GET.getlist('group', [])
             users = User.objects.filter(group__name__in=group_names)
             group_user_uuids = [str(user.uuid) for user in users]
+
+        # get all users in dediсated group
         if self.request.user.is_staff or (
                 self.request.user.group and self.request.user.group.admin == self.request.user):
-            user_names = self.request.GET.getlist('user', [])
+            user_names = self.request.GET.getlist('user', User.objects.filter(group__id=self.request.user.group.id).values_list('username', flat=True))
             users = User.objects.filter(username__in=user_names)
+            print(users)
             user_uuids = [str(user.uuid) for user in users]
 
             if self.request.user.is_staff:
@@ -105,30 +106,14 @@ class UsageView(TemplateView):
             return user_uuids
         return [str(self.request.user.uuid)]
 
-    def get_stats(self):
-        files = self.request.GET.getlist('file_name', [])
-        additional_url_params = self.set_additional_url_params()
 
-        response = requests.get(
-            preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params,
-            headers={
-                'token': preferences.StatisticSettings.API_KEY,
-                'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
-            },
-            json={
-                "uuid": self.get_users(),
-                "file_name": files
-            }
-        )
-        stats = dict(response.json())
-
+    def prepare_stats(self, stats:dict) -> dict:
         unique_file_names = set()
         unique_user_file_names = {}
 
         for stat in stats['results']:
             user = User.objects.filter(uuid=stat.get('user_portal_uuid')).first()
             stat['user'] = user.username if user else 'Unknown'
-            print(stat['metadata'])
             try:
                 stat['metadata'] = json.loads(stat['metadata'])
             except:
@@ -154,8 +139,28 @@ class UsageView(TemplateView):
 
         return stats
 
+    def get_stats(self) -> dict:
+        files = self.request.GET.getlist('file_name', [])
+        additional_url_params = self.set_additional_url_params()
+        print(self.get_users())
+        response = requests.get(
+            preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params,
+            headers={
+                'token': preferences.StatisticSettings.API_KEY,
+                'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
+            },
+            json={
+                "uuid": self.get_users(),
+                "file_name": files
+            }
+        )
+        stats = dict(response.json())
+        return self.prepare_stats(stats)
 
-    def calculate_total_chars_and_tokens(self, stats):
+
+
+    @staticmethod
+    def calculate_total_chars_and_tokens(stats) -> dict:
         total_chars = 0
         total_tokens = 0
         words_count = 0
@@ -163,7 +168,6 @@ class UsageView(TemplateView):
             total_chars += stat['chars_count']
             total_tokens += stat['tokens_count']
             total_tokens += stat['tokens_out_count']
-            print(stat['metadata'])
             if stat['metadata'] and stat['metadata']['words_count']:
                 words_count += stat['metadata']['words_count']
         return {
@@ -172,7 +176,14 @@ class UsageView(TemplateView):
             "words": words_count,
         }
 
-    def set_additional_url_params(self, exclude_page_param=False):
+    def set_additional_url_params(self, exclude_page_param=False) -> str:
+
+        params = {
+            'date_from': self.request.GET.get("date_from", date.today()),
+            'date_to': self.request.GET.get("date_to", date.today()),
+            'page': self.request.GET.get("page"),
+            'page_size': PAGINATION_PAGE_SIZE,
+        }
         date_from = self.request.GET.get("date_from", date.today())
         date_to = self.request.GET.get("date_to", date.today() + timedelta(days=30))
         page = self.request.GET.get('page')
