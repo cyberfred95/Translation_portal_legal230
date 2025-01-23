@@ -96,7 +96,11 @@ class UsageView(TemplateView):
         # get all users in dediсated group
         if self.request.user.is_staff or (
                 self.request.user.group and self.request.user.group.admin == self.request.user):
-            user_names = self.request.GET.getlist('user', User.objects.filter(group__id=self.request.user.group.id).values_list('username', flat=True))
+            if self.request.user.group:
+                user_names = self.request.GET.getlist('user', User.objects.filter(
+                    group__id=self.request.user.group.id).values_list('username',flat=True))
+            else:
+                user_names = self.request.GET.getlist('user', [])
             users = User.objects.filter(username__in=user_names)
             print(users)
             user_uuids = [str(user.uuid) for user in users]
@@ -104,10 +108,11 @@ class UsageView(TemplateView):
             if self.request.user.is_staff:
                 user_uuids = list(set(user_uuids + group_user_uuids))
             return user_uuids
+
         return [str(self.request.user.uuid)]
 
 
-    def prepare_stats(self, stats:dict) -> dict:
+    def prepare_stats(self, stats: dict) -> dict:
         unique_file_names = set()
         unique_user_file_names = {}
 
@@ -139,6 +144,7 @@ class UsageView(TemplateView):
 
         return stats
 
+
     def get_stats(self) -> dict:
         files = self.request.GET.getlist('file_name', [])
         additional_url_params = self.set_additional_url_params()
@@ -158,7 +164,6 @@ class UsageView(TemplateView):
         return self.prepare_stats(stats)
 
 
-
     @staticmethod
     def calculate_total_chars_and_tokens(stats) -> dict:
         total_chars = 0
@@ -176,8 +181,8 @@ class UsageView(TemplateView):
             "words": words_count,
         }
 
-    def set_additional_url_params(self, exclude_page_param=False) -> str:
 
+    def set_additional_url_params(self, exclude_page_param=False) -> str:
         params = {
             'date_from': self.request.GET.get("date_from", date.today()),
             'date_to': self.request.GET.get("date_to", date.today()),
