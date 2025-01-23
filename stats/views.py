@@ -154,16 +154,22 @@ class UsageView(TemplateView):
 
         return stats
 
+
     def calculate_total_chars_and_tokens(self, stats):
         total_chars = 0
         total_tokens = 0
+        words_count = 0
         for stat in stats['results']:
             total_chars += stat['chars_count']
             total_tokens += stat['tokens_count']
             total_tokens += stat['tokens_out_count']
+            print(stat['metadata'])
+            if stat['metadata'] and stat['metadata']['words_count']:
+                words_count += stat['metadata']['words_count']
         return {
             "chars": total_chars,
             "tokens": total_tokens,
+            "words": words_count,
         }
 
     def set_additional_url_params(self, exclude_page_param=False):
