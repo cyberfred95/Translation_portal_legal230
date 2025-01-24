@@ -1150,7 +1150,10 @@ $(document).ready(function () {
             dataType: 'json',
             success: function () {
                 const projectRow = $(`button[data-id="${id}"]`).closest('tr');
+                const statusSpan = projectRow.find('td:eq(1) span');
+                statusSpan.addClass('text-yellow-400');
 
+                statusSpan.text('request for quote sent');
                 projectRow.find('.expert-revision').prop('disabled', true).addClass('disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225');
 
                 $modalRevision.addClass('hidden');
