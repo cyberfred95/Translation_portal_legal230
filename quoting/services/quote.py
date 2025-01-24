@@ -11,9 +11,8 @@ from django.utils.timezone import now
 class FormQuoteService:
 
     @staticmethod
-    def get_expert_revision_url(project_id, user_email:str)->str:
-
-        return f"{preferences.MainSettings.CLOUDSTORAGE_API_URL}post_editing/{project_id}/accept/?user_email={user_email}"
+    def get_expert_revision_url(project_id, user_email: str) -> str:
+        return f"{preferences.MainSettings.CLOUDSTORAGE_API_URL}post_editing/{project_id}/accept/?user_email={user_email}&email={preferences.MainSettings.sender_email}"
 
     def send_quote_to_user(self, request):
         project_id = request.data.get('project_id')
@@ -43,7 +42,8 @@ class FormQuoteService:
                 'total_price': words_count * quote_price.price,
                 'created_at': now(),
                 'seller_email': preferences.MainSettings.sender_email,
-                'accept_expert_revision_file_absolute_url': self.get_expert_revision_url(project_id,user_email=request.user.email),
+                'accept_expert_revision_file_absolute_url': self.get_expert_revision_url(project_id,
+                                                                                         user_email=request.user.email),
                 'quote_number': request.user.group.generate_quoting_number() if request.user.group else f"{now().strftime('%Y/%m')}/0"
 
             }
