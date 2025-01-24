@@ -11,8 +11,10 @@ from django.utils.timezone import now
 class FormQuoteService:
 
     @staticmethod
-    def get_expert_revision_url(project_id, user_email: str) -> str:
-        return f"{preferences.MainSettings.CLOUDSTORAGE_API_URL}post_editing/{project_id}/accept/?user_email={user_email}&email={preferences.MainSettings.sender_email}"
+    def get_expert_revision_url(project_id, context_variables: dict) -> str:
+        base_url = f"{preferences.MainSettings.CLOUDSTORAGE_API_URL}post_editing/{project_id}/accept/"
+        print(f"{base_url}?{urlencode(context_variables)}")
+        return f"{base_url}?{urlencode(context_variables)}"
 
     def send_quote_to_user(self, request):
         project_id = request.data.get('project_id')
@@ -28,7 +30,6 @@ class FormQuoteService:
         words_count = len(get_text_from_file(file, api_key=None))
         if quote_price:
             context_variables = {
-
                 "email": preferences.MainSettings.sender_email,
                 "username": request.user.username,
                 "user_email": request.user.email,
@@ -42,9 +43,10 @@ class FormQuoteService:
                 'total_price': words_count * quote_price.price,
                 'created_at': now(),
                 'seller_email': preferences.MainSettings.sender_email,
-                'accept_expert_revision_file_absolute_url': self.get_expert_revision_url(project_id,
-                                                                                         user_email=request.user.email),
                 'quote_number': request.user.group.generate_quoting_number() if request.user.group else f"{now().strftime('%Y/%m')}/0"
 
             }
+            context_variables['accept_expert_revision_file_absolute_url'] = self.get_expert_revision_url(project_id,
+                                                                                                         context_variables=context_variables)
+
             send_quote_email(request.user.id, context_variables)
