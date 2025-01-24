@@ -32,6 +32,8 @@ from django.views.decorators.csrf import csrf_exempt
 import requests
 from preferences import preferences
 import langdetect
+
+from .services.post_editing import FileExpertRevisionService
 from .tasks import send_statistic_request
 from glossaries.models import Glossary
 from typing import Optional
@@ -42,6 +44,8 @@ from quoting.helpers import get_price_by_language_pair
 
 import csv
 from subscriptions.helpers import translation_allowed, add_translations
+
+from quoting.services.quote import FormQuoteService
 
 PAGINATION_PAGE_SIZE = 20
 CACHE_TTL = 3600
@@ -273,50 +277,12 @@ def expert_revision(request):
 
 class FileExpertRevisionView(APIView):
 
-    def get_quote(self, project: dict) -> Optional[dict]:
-        language_quote = LanguageQuote.objects.filter(
-            source_language__abbreviation__iexact=project.get('source_language'),
-            target_language__abbreviation__iexact=project.get('target_language')).first()
-        if language_quote:
-            api_key = None
-            file = get_project_file(file_url=project['source_file'])
-            words_count = len(get_text_from_file(file, api_key=api_key))
-            if self.request.data.get('company'):
-                group = UserGroup.objects.filter(name=self.request.data.get('company')).first()
-            else:
-                group = self.request.user.group
-            return {
-                'contract_name': self.request.data.get('company',
-                                                       self.request.user.group.name if self.request.user.group else "Administrator"),
-                'word_price': self.request.data.get('price', language_quote.price),
-                'words_count': self.request.data.get('words"count', words_count),
-                'total_price': self.request.data.get('words"count', words_count) * self.request.data.get('price',
-                                                                                                         language_quote.price),
-                'created_at': now(),
-                'quote_number': group.generate_quoting_number() if group else f"{now().strftime('%Y/%m')}/0"
-            }
-        return
-
     def get(self, request):
         project_id = request.query_params.get('project_id')
-        project = requests.get(
-            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
-            headers={
-                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
-            }
-
-        ).json()
-        response = requests.post(
-            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"post_editing/{project_id}/",
-            headers={
-                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
-            data={
-                "email": preferences.MainSettings.sender_email,
-                "username": request.user.username,
-                "user_email": request.user.email,
-                "company": request.user.group.name if request.user.group else "Administrator",
-                **self.get_quote(project)
-            })
+        post_editing_service = FileExpertRevisionService()
+        post_editing_service.send_to_post_editing(request=request, project_id=project_id)
+        quote_service = FormQuoteService()
+        quote_service.send_quote_to_user(request)
         return HttpResponse(
             f'<h1>Sent to post-editing</h1><br/><a href="{request.build_absolute_uri(reverse("main_index"))}">Return to main page</a>')
 
@@ -324,24 +290,10 @@ class FileExpertRevisionView(APIView):
         if not request.user.is_staff and not request.user.group:
             return Response({"detail": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
         project_id = request.POST['project_id']
-        project = requests.get(
-            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
-            headers={
-                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
-            }
-
-        ).json()
-        response = requests.post(
-            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"post_editing/{request.POST.get('project_id')}/",
-            headers={
-                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
-            data={
-                "email": preferences.MainSettings.sender_email,
-                "username": request.user.username,
-                "user_email": request.user.email,
-                "company": request.user.group.name if request.user.group else "Administrator",
-                **self.get_quote(project)
-            })
+        post_editing_service = FileExpertRevisionService()
+        post_editing_service.send_to_post_editing(request=request, project_id=project_id)
+        quote_service = FormQuoteService()
+        quote_service.send_quote_to_user(request)
         return Response({"detail": "Sent to post editing"}, status=status.HTTP_200_OK)
 
 
