@@ -207,7 +207,7 @@
 
             <div class="p-12.5 flex flex-col items-center gap-7.5">
                 <div class="text-5 font-semibold">{% trans 'Quote for revision' %}</div>
-                <span class="quote-display hidden text-center text-3.5 text-gray-600">Sorry, you are unable to create automatic expert revision, Please contact this email: <a href="mailto:{{ preferences.MainSettings.sender_email }}">{{ preferences.MainSettings.sender_email }}</a></span>
+                <span class="quote-display hidden text-center text-3.5 text-gray-600">{% trans 'We can not provide an automatic quote for this language pair. Please ask' %} <a href="mailto:contact@lexamt.com">contact@lexamt.com</a> {% trans 'to receive a quote in less than 30 minutes.' %}</span>
                     <div class="quote-hide hidden flex flex-col items-center gap-7.5">
                         <span class="text-center text-3.5">{% trans 'By choosing the options below, you agree that you are sending a request for Quote  of the selected service to Legal230' %}</span>
                         <button

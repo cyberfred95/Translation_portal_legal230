@@ -1,10 +1,11 @@
 from rest_framework import permissions
 from .models import GroupSubscription
 from django.utils.timezone import now
+from django.utils.translation import gettext_lazy as _
 
 
 class SubscribedPermission(permissions.BasePermission):
-    message = "You are not allowed to perform this action, please contact your group administrator"
+    message = _("You are not allowed to perform this action, please contact your group administrator")
 
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
