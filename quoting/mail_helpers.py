@@ -3,7 +3,7 @@ import os.path
 from sendgrid import SendGridAPIClient, Mail, FileName, Attachment, FileType, FileContent
 
 from legal import settings
-from quoting.services import PDFService
+from quoting.services.pdf import PDFService
 from users.models import User
 from preferences import preferences
 
@@ -28,7 +28,7 @@ def send_quote_email(user_id: int, context_variables: dict, template_name: str =
         )
         attached_file = Attachment(
             FileContent(base64.b64encode(pdf_bytes).decode()),
-            FileName(f"{context_variables['company']} quote.pdf"),
+            FileName(f"{context_variables['company']} quote no.{context_variables['quote_number']}.pdf"),
             FileType("application/pdf")
         )
         message.attachment = attached_file

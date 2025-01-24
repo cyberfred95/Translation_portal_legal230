@@ -77,7 +77,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: 'POST',
-            url: form_quote_url,
+            url: expert_revision_file_url,
             data: formData,
             processData: false,
             contentType: false,
