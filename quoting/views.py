@@ -50,6 +50,7 @@ class FormQuoteView(APIView):
                 "company": request.user.group.name if request.user.group else "Administrator",
                 'contract_name': self.request.data.get('company',
                                                        request.user.group.name if request.user.group else "Administrator"),
+                "language_pair": f"{str(project['source_language']).upper()} -> {str(project['target_language']).upper()}",
                 'file_name': file.name,
                 'word_price': quote_price.price,
                 'words_count': words_count,
