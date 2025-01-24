@@ -480,6 +480,12 @@ msgstr "No data available"
 msgid "There are currently no projects to display."
 msgstr "There are currently no projects to display."
 
+msgid "We can not provide an automatic quote for this language pair. Please ask"
+msgstr "We can not provide an automatic quote for this language pair. Please ask"
+
+msgid "to receive a quote in less than 30 minutes."
+msgstr "to receive a quote in less than 30 minutes."
+
 ############################################
 
 ############################################ USAGE #############################################
@@ -652,3 +658,4 @@ msgstr "Delete account"
 
 msgid "Your account has been deleted successfully"
 msgstr "Your account has been deleted successfully"
+######################

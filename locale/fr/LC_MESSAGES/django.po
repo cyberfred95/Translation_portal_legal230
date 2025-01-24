@@ -317,7 +317,7 @@ msgstr "En cliquant, vous recevrez par mail un devis pour la relecture de votre 
 ################################################## DOCUMENT TRANSLATE #####################################################
 
 msgid "Following"
-msgstr "Next"
+msgstr "Suivant"
 
 msgid "Previous"
 msgstr "Précédent"
@@ -475,16 +475,22 @@ msgid "Post-edited"
 msgstr "Proofread"
 
 msgid "Prev"
-msgstr "Prev"
+msgstr "Précédent"
 
 msgid "Next"
-msgstr "Next"
+msgstr "Suivant"
 
 msgid "No data available"
 msgstr "Aucune donnée disponible"
 
 msgid "There are currently no projects to display."
 msgstr "Il n'y a actuellement aucun projets à afficher"
+
+msgid "We can not provide an automatic quote for this language pair. Please ask"
+msgstr "Le devis automatique n'est pas disponible pour cette paire de langue. Veuillez contacter"
+
+msgid "to receive a quote in less than 30 minutes."
+msgstr "pour un devis personnalisé."
 
 ###########################################
 
@@ -661,3 +667,4 @@ msgstr "Votre compte a été supprimé."
 
 
 #################
+
