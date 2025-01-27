@@ -1153,7 +1153,7 @@ $(document).ready(function () {
                 const statusSpan = projectRow.find('td:eq(1) span');
                 statusSpan.addClass('text-yellow-400');
 
-                statusSpan.text('request for quote sent');
+                statusSpan.text(language_code === 'en'?'Request for quote sent': 'Demande de devis envoyée');
                 projectRow.find('.expert-revision').prop('disabled', true).addClass('disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225');
 
                 $modalRevision.addClass('hidden');
