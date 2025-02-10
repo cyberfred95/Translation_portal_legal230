@@ -1,3 +1,4 @@
+import preferences
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.timezone import now
@@ -18,3 +19,12 @@ class LanguageQuote(models.Model):
 
     def __str__(self):
         return f"{self.source_language.abbreviation} -> {self.target_language.abbreviation}"
+
+
+class QuoteConfig(Preferences):
+    daily_performance = models.IntegerField(default=100, help_text="words")
+    additional_time_for_order_processing = models.IntegerField(default=7, help_text="days")
+
+    class Meta:
+        verbose_name = 'Quote Config'
+        verbose_name_plural = 'Quote Config'
