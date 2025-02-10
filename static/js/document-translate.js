@@ -293,6 +293,8 @@ $(document).ready(function () {
             return;
         }
 
+        startLoading();
+
         const formData = new FormData();
         selectedFiles.forEach((file) => {
             formData.append(`document[]`, file);
@@ -330,6 +332,9 @@ $(document).ready(function () {
             },
             error: function (error) {
                 errorNotification(error?.status, error?.responseJSON?.detail);
+            },
+            complete: function () {
+                stopLoading();
             },
         });
     }

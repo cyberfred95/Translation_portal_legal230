@@ -28,7 +28,7 @@ def send_text_translation(
 
     if action == 'expert_revision':
         message = Mail(
-            from_email='support@custom.mt',
+            from_email='christelle.mandet@lexamt.com',
             to_emails=[preferences.MainSettings.sender_email],
             subject=theme,
             html_content=render_to_string(
@@ -50,7 +50,7 @@ def send_text_translation(
     else:
 
         message = Mail(
-            from_email='support@custom.mt',
+            from_email='christelle.mandet@lexamt.com',
             to_emails=[preferences.MainSettings.sender_email],
             subject=theme,
             html_content=render_to_string(

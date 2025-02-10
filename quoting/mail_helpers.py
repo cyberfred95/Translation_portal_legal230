@@ -18,7 +18,7 @@ def send_quote_email(user_id: int, context_variables: dict, template_name: str =
             to_emails.append(preferences.MainSettings.quote_cc_email)
         sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
         message = Mail(
-            from_email='support@custom.mt',
+            from_email='christelle.mandet@lexamt.com',
             to_emails=to_emails,
             subject="Expert revision quote",
             html_content=render_to_string(
