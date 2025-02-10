@@ -561,7 +561,7 @@ msgstr "Copié"
 
 ################################# PROFILE DETAILS #####################################
 
-#change data
+# change data
 msgid "Name"
 msgstr "Nom d’utilisateur"
 
@@ -580,7 +580,7 @@ msgstr "Modifier l’e-mail"
 msgid "Security"
 msgstr "Sécurité"
 
-#change password
+# change password
 
 msgid "Password"
 msgstr "Mot de passe"
@@ -611,7 +611,7 @@ msgstr "Votre mot de passe a été correctement modifié."
 
 ##################
 
-#delete resources
+# delete resources
 
 msgid "Delete resources"
 msgstr "Supprimer le contenu"
@@ -645,7 +645,7 @@ msgstr "Votre contenu a été supprimé."
 
 ########
 
-#delete account
+# delete account
 
 msgid "Delete account"
 msgstr "Supprimer le compte"

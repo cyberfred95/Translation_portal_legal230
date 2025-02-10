@@ -606,7 +606,7 @@ msgstr "Your password has been successfully changed"
 
 ################
 
-#delete  resources
+# delete  resources
 
 msgid "Delete resources"
 msgstr "Delete Resources"
