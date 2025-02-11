@@ -16,6 +16,7 @@ class Domain(models.Model):
     french_name = models.CharField(max_length=255, blank=True, null=True)
     domain_group = models.ForeignKey(DomainGroup, on_delete=models.SET_NULL, blank=True, null=True,
                                      related_name='domains')
+    featured = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "Domain"
