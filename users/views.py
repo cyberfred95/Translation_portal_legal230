@@ -8,6 +8,8 @@ from django.shortcuts import redirect
 from django.templatetags.static import static
 from django.urls import reverse
 from django.views.generic import TemplateView
+from django.utils.translation import gettext_lazy as _
+
 from preferences import preferences
 from rest_framework import status, serializers
 from rest_framework.generics import DestroyAPIView, RetrieveUpdateDestroyAPIView
@@ -90,6 +92,24 @@ class DeleteAllDataView(APIView):
 class SingleAccountView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
+
+    def validate(self, attrs):
+        if not attrs['username'] or not attrs['email']:
+            raise serializers.ValidationError({"detail": _("Username and email are required.")})
+        if (User.objects.filter(username=attrs['username']).exists()
+                and self.request.user.username != attrs['username']):
+            raise serializers.ValidationError({"detail": _("This username is already used.")})
+        if (User.objects.filter(email=attrs['email']).exists()
+                and self.request.user.email != attrs['email']):
+            raise serializers.ValidationError({"detail": _("This email is already used.")})
+        return attrs
+
+    def put(self, request, *args, **kwargs):
+        self.validate(request.data)
+        user = request.user
+        user.username = request.data['username']
+        user.email = request.data['email']
+        return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
 
     def get_object(self):
         return self.request.user

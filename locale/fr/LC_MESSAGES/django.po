@@ -668,3 +668,14 @@ msgstr "Votre compte a été supprimé."
 
 #################
 
+
+###################### ERRORS #########################
+
+msgid "Username and email are required."
+msgstr "Le nom d'utilisateur et l'adresse électronique sont requis."
+
+msgid "This username is already used."
+msgstr "Ce nom d'utilisateur est déjà utilisé."
+
+msgid "This email is already used."
+msgstr "Cet email est déjà utilisé."

@@ -659,3 +659,15 @@ msgstr "Delete account"
 msgid "Your account has been deleted successfully"
 msgstr "Your account has been deleted successfully"
 ######################
+
+
+###################### ERRORS #########################
+
+msgid "Username and email are required."
+msgstr "Username and email are required."
+
+msgid "This username is already used."
+msgstr "This username is already used."
+
+msgid "This email is already used."
+msgstr "This email is already used."
