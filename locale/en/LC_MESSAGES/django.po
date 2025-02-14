@@ -203,7 +203,7 @@ msgid "PDF file"
 msgstr "The quality of your document will have an impact on translation. Scanned or poorly legible PDFs cannot be processed to a high standard."
 
 msgid "Expert revision"
-msgstr "Send translation result to an expert for review"
+msgstr "Get a quote"
 
 msgid "Post-editing is completed!"
 msgstr "Post-editing is completed!"
@@ -277,10 +277,10 @@ msgstr "Support"
 ########################################## TEXT TRANSLATE ####################################################
 
 msgid "Text translate"
-msgstr "Text translate"
+msgstr "Translate text"
 
 msgid "Document translate"
-msgstr "Document translate"
+msgstr "Translate document"
 
 msgid "Detect language"
 msgstr "Detect language"
@@ -530,7 +530,7 @@ msgid "total words"
 msgstr "words"
 
 msgid "There are currently no statistic to display."
-msgstr "There are currently no statistic to display."
+msgstr "There are currently no statistics to display."
 
 ################################################################################################
 
@@ -568,7 +568,7 @@ msgid "Email"
 msgstr "Email"
 
 msgid "Update Email Address"
-msgstr "Update Email address"
+msgstr "Apply changes"
 
 ##################
 

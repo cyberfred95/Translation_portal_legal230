@@ -206,7 +206,7 @@ msgid "PDF file"
 msgstr "La qualité de votre document affecte le résultat de la traduction. Les PDFs scannés ou peu lisibles ne permettent pas un rendu de qualité."
 
 msgid "Expert revision"
-msgstr "Envoyer le résultat de la traduction à un expert pour révision"
+msgstr "Recevoir un devis"
 
 msgid "Post-editing is completed!"
 msgstr "La post-édition est terminée !"
@@ -572,7 +572,7 @@ msgid "Email"
 msgstr "E-mail"
 
 msgid "Update Email Address"
-msgstr "Modifier l’e-mail"
+msgstr "Appliquer les changements"
 
 ##############
 
