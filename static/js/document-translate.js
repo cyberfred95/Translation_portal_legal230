@@ -460,7 +460,7 @@ $(document).ready(function () {
 
                 targetSelect.hide();
 
-                targetLanguageBlock.prepend('<div class="error-message text-red-400">One or more files have different language, please fix it.</div>');
+                targetLanguageBlock.prepend(language_code === 'en'?'<div class="error-message text-red-400">One or more files have different language, please fix it.</div>': '<div class="error-message text-red-400">Vous ne pouvez pas importer des documents ayant des langues différentes</div>');
 
                 detectedFiles.removeClass('bg-green-150 text-green-500').addClass('bg-red-150 text-red-400 border border-red-400');
             } else {
