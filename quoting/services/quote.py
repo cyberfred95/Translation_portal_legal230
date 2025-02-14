@@ -1,3 +1,4 @@
+import math
 from urllib.parse import urlencode
 from preferences import preferences
 from legal.helpers import get_project_file, get_text_from_file
@@ -15,6 +16,12 @@ class FormQuoteService:
         base_url = f"{preferences.MainSettings.CLOUDSTORAGE_API_URL}post_editing/{project_id}/accept/"
         print(f"{base_url}?{urlencode(context_variables)}")
         return f"{base_url}?{urlencode(context_variables)}"
+
+    @staticmethod
+    def get_working_days(words_count: int) -> int:
+        working_days_count = math.ceil(words_count / preferences.QuoteConfig.daily_performance)
+        working_days_count += preferences.QuoteConfig.additional_time_for_order_processing
+        return working_days_count
 
     def send_quote_to_user(self, request):
         project_id = request.data.get('project_id')
@@ -40,6 +47,7 @@ class FormQuoteService:
                 'file_name': file.name,
                 'word_price': quote_price.price,
                 'words_count': words_count,
+                'working_days': self.get_working_days(words_count),
                 'total_price': words_count * quote_price.price,
                 'created_at': now(),
                 'seller_email': preferences.MainSettings.sender_email,

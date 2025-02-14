@@ -242,7 +242,8 @@ class GetDomainsView(APIView):
         domain_names = []
         for domain in domains.json():
             domain_names.append(domain['domain_name'])
-        domains = Domain.objects.filter(name__in=domain_names).order_by('name')
+        domains = Domain.objects.filter(name__in=domain_names).order_by('-featured','name')
+        print(domains)
         if self.request.query_params.get('domain_group'):
             if request.LANGUAGE_CODE == 'fr':
                 domains = domains.filter(domain_group__french_name=self.request.query_params.get('domain_group'))
