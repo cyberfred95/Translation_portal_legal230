@@ -388,7 +388,7 @@ class LanguageDetectView(APIView):
 
                 try:
                     tmp_language = langdetect.detect(text_for_detection)
-                    language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
+                    language = Language.objects.filter(abbreviation__iexact=tmp_language.upper()).values_list(
                         'abbreviation', flat=True).first()
                 except langdetect.LangDetectException:
                     language = Language.objects.values_list('abbreviation', flat=True).first()
@@ -445,7 +445,7 @@ class DetectTextLanguageView(APIView):
         if translation_allowed(request, words_count=len(texts)):
 
             tmp_language = langdetect.detect(text_for_detection)
-            language = Language.objects.filter(abbreviation__exact=tmp_language.upper()).values_list(
+            language = Language.objects.filter(abbreviation__iexact=tmp_language.upper()).values_list(
                 'abbreviation', flat=True).first()
             if not language:
                 language = Language.objects.all().values_list(
