@@ -78,8 +78,8 @@ class AddGlossaryView(APIView):
     def post(self, request):
         self.validate(request)
 
-        source_language = Language.objects.get(abbreviation=request.data.get('source_language').upper())
-        target_language = Language.objects.get(abbreviation=request.data.get('target_language').upper())
+        source_language = Language.objects.get(abbreviation__iexact=request.data.get('source_language').upper())
+        target_language = Language.objects.get(abbreviation__iexact=request.data.get('target_language').upper())
 
         glossary = Glossary.objects.create(
             user=request.user,
