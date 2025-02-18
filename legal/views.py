@@ -317,6 +317,7 @@ class ProjectsHistoryView(TemplateView):
             params["page"] = int(page)
 
         response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
+        print(response['results'])
         if 'results' in response:
             for project in response['results']:
                 file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
