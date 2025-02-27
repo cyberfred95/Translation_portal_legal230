@@ -1,4 +1,5 @@
 import math
+from typing import Optional
 from urllib.parse import urlencode
 from preferences import preferences
 from legal.helpers import get_project_file, get_text_from_file
@@ -7,6 +8,8 @@ from quoting.mail_helpers import send_quote_email
 import requests
 from django.urls import reverse
 from django.utils.timezone import now
+
+from quoting.models import LanguageQuote
 
 
 class FormQuoteService:
@@ -18,9 +21,10 @@ class FormQuoteService:
         return f"{base_url}?{urlencode(context_variables)}"
 
     @staticmethod
-    def get_working_days(words_count: int) -> int:
-        working_days_count = math.ceil(words_count / preferences.QuoteConfig.daily_performance)
-        working_days_count += preferences.QuoteConfig.additional_time_for_order_processing
+    def get_working_days(words_count: int, quote_price: LanguageQuote) -> int:
+
+        working_days_count = math.ceil(words_count / quote_price.daily_performance)
+        working_days_count += quote_price.additional_time_for_order_processing
         return working_days_count
 
     def send_quote_to_user(self, request):
@@ -47,7 +51,7 @@ class FormQuoteService:
                 'file_name': file.name,
                 'word_price': quote_price.price,
                 'words_count': words_count,
-                'working_days': self.get_working_days(words_count),
+                'working_days': self.get_working_days(words_count, quote_price=quote_price),
                 'total_price': words_count * quote_price.price,
                 'created_at': now(),
                 'seller_email': preferences.MainSettings.sender_email,

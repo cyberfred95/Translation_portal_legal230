@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import LanguageQuote, QuoteConfig
+from .models import LanguageQuote
 from preferences.admin import PreferencesAdmin
 
 
@@ -8,8 +8,3 @@ from preferences.admin import PreferencesAdmin
 @admin.register(LanguageQuote)
 class LanguageQuoteAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'price')
-
-
-@admin.register(QuoteConfig)
-class QuoteConfigAdmin(PreferencesAdmin):
-    exclude = ('sites',)
