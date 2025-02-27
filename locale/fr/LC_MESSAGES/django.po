@@ -415,7 +415,7 @@ msgid "By choosing the options below, you agree that you are sending a request f
 msgstr "En cliquant, vous recevrez un devis pour la relecture de votre document, réalisée par un jurilinguiste expert dans votre domaine de droit."
 
 msgid "Expert revision in popup"
-msgstr "Envoyer ma demande"
+msgstr "Recevoir un devis"
 
 #########################################
 
