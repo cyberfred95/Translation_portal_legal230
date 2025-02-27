@@ -409,7 +409,7 @@ msgid "By choosing the options below, you agree that you are sending a request f
 msgstr "By choosing the option below, you agree that you are sending a request for Quote of the selected service to Legal230"
 
 msgid "Expert revision in popup"
-msgstr "Ask for a quote"
+msgstr "Get a quote"
 
 #########################################
 
