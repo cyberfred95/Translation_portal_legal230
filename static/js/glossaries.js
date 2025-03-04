@@ -1,7 +1,7 @@
 $(document).ready(function () {
 
-    $(".glossary-language-source").attr("data-placeholder", "Select from the list");
-    $(".glossary-language-target").attr("data-placeholder", "Select from the list");
+    $(".glossary-language-source").attr("data-placeholder", language_code === 'en'? "Select from the list": "Sélectionner dans la liste");
+    $(".glossary-language-target").attr("data-placeholder", language_code === 'en'? "Select from the list": "Sélectionner dans la liste");
 
     $(".glossary-language-source").select2();
     $(".glossary-language-target").select2();

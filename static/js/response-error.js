@@ -4,7 +4,8 @@ const errorNotification = (status, message) => {
     const errorMessage = modalError.find('.error-text');
 
     if (!message || !status || status >= 500) {
-        message = 'Something went wrong';
+
+        message = language_code === 'en'? 'Something went wrong': "Quelque chose s’est mal passé.";
     }
 
     errorMessage.text(message);
