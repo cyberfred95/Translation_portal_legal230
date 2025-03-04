@@ -617,7 +617,7 @@ msgid "Delete resources"
 msgstr "Supprimer le contenu"
 
 msgid "Delete your resources"
-msgstr "Supprimer"
+msgstr "Supprimer le contenu"
 
 msgid "Permanently delete your files and glossaries."
 msgstr "Supprime de manière permanente vos traductions et glossaires."
@@ -651,7 +651,7 @@ msgid "Delete account"
 msgstr "Supprimer le compte"
 
 msgid "Delete your account"
-msgstr "Supprimer"
+msgstr "Supprimer le compte"
 
 msgid "Permanently delete your account and all your portal data."
 msgstr "Supprime de manière permanente votre compte et toutes les données liées."
