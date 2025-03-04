@@ -41,8 +41,8 @@
 
 <table class="header-table">
     <tr>
-        <img style="width: 175px; height: 40px; margin-bottom: 79px;"
-             src="https://ghfkgfdhkgdkgdhg.s3.eu-north-1.amazonaws.com/logo.png" alt="Logo">
+        <img style="width: 120px; height: 40px; margin-bottom: 39px;"
+             src="https://s3fileprocessinglogos.s3.eu-north-1.amazonaws.com/lexa.jpg" alt="Logo">
     </tr>
 
     <tr>
@@ -51,7 +51,7 @@
             <p>75 Boulevard Haussmann</p>
             <p>75008 Paris</p>
         </td>
-        <td><strong>QUOTE:</strong> <span>{{ quote_number }}</span></td>
+        <td><strong>DEVIS №:</strong> <span>{{ quote_number }}</span></td>
     </tr>
     <tr>
         <td>{{ company }}</td>
@@ -60,72 +60,84 @@
         <td>{{ company }}</td>
     </tr>
     <tr>
-        <td>Created: <span>{{ created_at|date:"d/m/Y" }}</span></td>
+        <td>Date: <span>{{ created_at|date:"d/m/Y" }}</span></td>
     </tr>
 </table>
 
-<p>Dear <span>{{ username }}</span>,</p>
-<p>We are pleased to send you a quote for the proofreading of your document.</p>
+<p>Cher <span>{{ username }}</span>,</p>
+<p>Nous vous remercions de vous avoir consulté pour cette demande.</p>
 
 <table>
     <tr>
         <th>Document</th>
-        <th>Language pair</th>
-        <th>Working days</th>
-        <th>Total of words</th>
-        <th>Unit Price</th>
-        <th>Total ex. VAT</th>
+        <th>Langues</th>
+{#        <th>Working days</th>#}
+        <th>Unité</th>
+        <th>Prix à l’unité</th>
+        <th>Total HT</th>
     </tr>
     <tr>
         <td>{{ file_name }}</td>
         <td>{{ language_pair }}</td>
-        <td>{{ working_days }}</td>
+{#        <td>{{ working_days }}</td>#}
         <td>{{ words_count }}</td>
         <td>{{ word_price }} €</td>
         <td>{{ total_price }} €</td>
     </tr>
 </table>
 
-<p>The proofreading will be fully carried out by one of our law specialized translators. All of our translators only
-    undertake translations in their native language (target language). Once the proofreading is done, the whole document
-    is carefully reviewed by a Project Manager with legal background, to make sure of its compliance with the source
-    text.</p>
-
-<p><strong>Disclaimer:</strong></p>
-<p>1° Quotes from the portal do not calculate possible repetitions between documents at the moment. Feel free to ask our
-    team here (link).<br>
-    2° Quotes from the portal are calculated with a normal delivery turnaround. If your project is urgent, please ask our
-    team here (link).
+<p>La relecture sera effectuée par l’un de nos traducteurs juridiques expert.
+    Nos traducteurs traduisent exclusivement vers leur langue maternelle (langue source).
+    Une fois la relecture terminée, le document intégral est revu par un chef de projet de notre équipe.
+    Nos chefs de projet ont une formation juridique et vérifient la conformité de la traduction avec le document source.
 </p>
 
-<p><strong>Delivery of your documents:</strong></p>
-<p>Unless otherwise ordered by you, your documents will be delivered both by email and will be made available on the
-    portal.</p>
+<p><strong>Cas particuliers:</strong></p>
+<p>1°  Pour le moment, les devis automatiques générés par Lexa ne calculent pas les répétitions éventuelles entre les documents.
+    N’hésitez pas à demander à notre équipe un devis ajusté en répondant directement à l’e-mail que vous avez reçu.
+    <br>
+    2° Les devis automatiques générés par Lexa sont calculés sur la base d’une livraison en délai normal.
+    Si votre projet est urgent, n’hésitez pas à demander à notre équipe un devis ajusté en répondant directement à l’e-mail que vous avez reçu.
+</p>
 
-<p><strong>Terms & Agreement:</strong></p>
-<p>The validation of this quote implies full and complete acceptance of Legal 230's Terms and Conditions, at this link:
-    <a href="https://legal230.com/conditions-generales-de-vente">https://legal230.com/conditions-generales-de-vente</a>), or on simple request and accepting them unreservedly.
+<p><strong>Livraison de vos documents:</strong></p>
+<p>Sauf instruction spécifique de votre part, vos documents relus seront mis à disposition sur le portail.</p>
+
+<p><strong>Conditions générales:</strong></p>
+<p>TLa validation du présent devis emporte acceptation pleine et entière des conditions générales de LEGAL 230, disponibles sur ce lien
+    <a href="https://legal230.com/conditions-generales-de-vente">https://legal230.com/conditions-generales-de-vente</a>
 </p>
 
 <p><strong>Validation:</strong></p>
-<p>If you agree, please click on “<strong>accept the quote</strong>” or send us a confirmation email at <a
-        href="mailto:{{ seller_email }}">{{ seller_email }}</a> including the number of the quote and the words “<strong>good for translation for the sum of X euros excluding tax</strong>”.</p>
-
-<p><strong>Payment terms:</strong></p>
-<p>Upon receipt of the invoice, the term of payment is 30 days. It is possible to invoice your customer directly if the
-    conditions to do so are met (valid contact details, email address, purchase order).
-    Any amount not paid on its due date will automatically generate late payment interest equivalent to three times the
-    statutory rate of interest for the current year, as well as the payment of a sum of €40 due for recovery costs.
+<p>Si vous souhaitez accepter ce devis,
+    cliquez sur le bouton <strong>“Accepter le devis”</strong> en bas de cet e-mail
+    ou répondez directement à l’e-mail que vous avez reçu en indiquant
+    <strong>«Bon pour accord pour la somme de XXX HT».</strong>
 </p>
 
+<p><strong>Conditions de paiement:</strong></p>
+<p>A réception de la facture, le délai de paiement est de 30 jours.
+    Il est envisageable de facturer directement votre client
+    si les conditions sont réunies pour procéder de la sorte (coordonnées valides, adresse email, bon de commande).
+    Toute somme non payée à sa date d'exigibilité produira de plein
+    droit des intérêts de retard équivalents au triple du taux d'intérêts légal de l'année en cours ainsi
+    que le paiement d'une somme de 40 € due au titre des frais de recouvrement.
+    Dans tous les cas, vous recevrez un mail de confirmation de commande.
+    Nous espérons vivement que cette proposition répondra à vos attentes.
+    Nous serions très heureux de pouvoir vous assister et demeurons
+    bien entendu à votre entière disposition pour répondre à toutes questions complémentaires que vous pourriez avoir.
+</p>
 
-<p style="text-align:right;"><strong><a href="{{ accept_expert_revision_file_absolute_url }}">Accept the quote</a></strong></p>
+<p style="text-align:right;">Vous remerciant de votre confiance</p>
+<p>Christelle Mandet</p>
+<p>Directrice Commerciale</p>
+<p style="text-align:right;"><strong><a href="{{ accept_expert_revision_file_absolute_url }}">Accepter le devis</a></strong></p>
+
 
 <p style="text-align:center; font-size:9pt;">
     Legal 230 - 75, boulevard Haussmann - 75008 PARIS<br>
-    Phone: 01 84 80 21 20 - E-mail: <a href="mailto:contact@legal230.com">contact@legal230.com</a> - SIRET 885 324 129
-    00018 -<br>
-    VAT Number: FR73885324129
+    Téléphone: 01 84 80 21 20 - E-mail: contact@legal230.com - SIRET 885 324 129 00018 <br>
+    N° intracommunautaire: FR73885324129
 </p>
 </body>
 </html>
