@@ -1,4 +1,5 @@
 import math
+import os
 from typing import Optional
 from urllib.parse import urlencode
 from preferences import preferences
@@ -39,6 +40,7 @@ class FormQuoteService:
                                                  target_language=project['target_language'])
         file = get_project_file(file_url=project['source_file'])
         words_count = len(get_text_from_file(file, api_key=None))
+        file_name, extension = os.path.splitext(file.name)
         if quote_price:
             context_variables = {
                 "email": preferences.MainSettings.sender_email,
@@ -48,7 +50,7 @@ class FormQuoteService:
                 'contract_name': request.data.get('company',
                                                   request.user.group.name if request.user.group else "Administrator"),
                 "language_pair": f"{str(project['source_language']).upper()} -> {str(project['target_language']).upper()}",
-                'file_name': file.name,
+                'file_name': file.name if len(str(file_name)) < 20 else f"{file_name[:20]}...-{extension}",
                 'word_price': quote_price.price,
                 'words_count': words_count,
                 'working_days': self.get_working_days(words_count, quote_price=quote_price),
