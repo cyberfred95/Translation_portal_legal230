@@ -1,4 +1,5 @@
 import preferences
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.timezone import now
@@ -18,6 +19,13 @@ class LanguageQuote(models.Model):
 
     class Meta:
         ordering = ['price']
+
+    def clean(self):
+        if LanguageQuote.objects.filter(
+                source_language=self.source_language,
+                target_language=self.target_language
+        ).exclude(pk=self.pk).exists():
+            raise ValidationError("A quote with this source and target language already exists.")
 
     def __str__(self):
         return f"{self.source_language.abbreviation} -> {self.target_language.abbreviation}"
