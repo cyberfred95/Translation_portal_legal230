@@ -1,6 +1,7 @@
 from django.db.models.functions import Lower
 from django.core.paginator import Paginator
 from django.views.generic import TemplateView
+from django.utils.translation import gettext_lazy as _
 
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
@@ -69,11 +70,11 @@ class AddGlossaryView(APIView):
 
         languages_list = Language.objects.all().values_list(Lower('abbreviation'), flat=True)
         if request.data["source_language"] == request.data["target_language"]:
-            raise serializers.ValidationError({"detail":"Source and target languages cannot be the same"})
+            raise serializers.ValidationError({"detail":_("Source and target languages cannot be the same")})
         if request.data["source_language"] not in languages_list:
-            raise serializers.ValidationError({"detail":"Invalid source language"})
+            raise serializers.ValidationError({"detail":_("Invalid source language")})
         if request.data["target_language"] not in languages_list:
-            raise serializers.ValidationError({"detail":"Invalid target language"})
+            raise serializers.ValidationError({"detail":_("Invalid target language")})
 
     def post(self, request):
         self.validate(request)

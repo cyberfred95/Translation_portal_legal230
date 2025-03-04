@@ -671,3 +671,12 @@ msgstr "This username is already used."
 
 msgid "This email is already used."
 msgstr "This email is already used."
+
+msgid "Source and target languages cannot be the same"
+msgstr "Source and target languages cannot be the same"
+
+msgid "Invalid source language"
+msgstr "Invalid source language"
+
+msgid "Invalid target language"
+msgstr "Invalid target language"

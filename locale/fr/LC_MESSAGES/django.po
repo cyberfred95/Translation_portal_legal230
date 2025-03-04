@@ -679,3 +679,12 @@ msgstr "Ce nom d'utilisateur est déjà utilisé."
 
 msgid "This email is already used."
 msgstr "Cet email est déjà utilisé."
+
+msgid "Source and target languages cannot be the same"
+msgstr "Les langues source et cible ne sont pas les mêmes"
+
+msgid "Invalid source language"
+msgstr "Langue source non valide"
+
+msgid "Invalid target language"
+msgstr "Langue cible non valide"
