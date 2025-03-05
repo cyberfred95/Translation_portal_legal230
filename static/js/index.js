@@ -22,12 +22,12 @@ $(document).ready(function () {
 
     $(".en").click(function () {
         const url = getCurrentURL();
-        window.location.href = url.replace('fr', 'en');
+        window.location.href = url.replace('/fr/', '/en/');
     });
 
     $(".fr").click(function () {
         const url = getCurrentURL();
-        window.location.href = url.replace('en', 'fr');
+        window.location.href = url.replace('/en/', '/fr/');
     });
 
 
