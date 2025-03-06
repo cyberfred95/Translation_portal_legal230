@@ -67,11 +67,12 @@ services:
       - DJANGO_PG_PASSWOR=datasvitend
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
-      - type: bind
-        source: ./postgres
-        target: /tmp/
+      - postgres_data:/var/lib/postgresql/data/
     restart: unless-stopped
 
   redis:
     image: redis:6
     restart: unless-stopped
+
+volumes:
+  postgres_data:
