@@ -223,3 +223,4 @@ docker cp /path/to/your/dump.sql <db_container_id>:dump.sql
 ```
 psql -U <db_user> -d <db_name> < dump.sql
 ```
+5) Run the migrations to add new fields using ```python manage.py migrate ``` command inside runserver container
