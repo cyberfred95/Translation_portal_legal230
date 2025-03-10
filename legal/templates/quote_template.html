@@ -71,7 +71,7 @@
     <tr>
         <th>Document</th>
         <th>Langues</th>
-{#        <th>Working days</th>#}
+{#        <th>Jours ouvrables</th>#}
         <th>Unité</th>
         <th>Prix à l’unité</th>
         <th>Total HT</th>
@@ -85,6 +85,10 @@
         <td>{{ total_price }} €</td>
     </tr>
 </table>
+
+<div style="text-align: right">
+    <span><strong>Délai:</strong> {{ working_days }} jour(s) ouvrés</span>
+</div>
 
 <p>La relecture sera effectuée par l’un de nos traducteurs juridiques expert.
     Nos traducteurs traduisent exclusivement vers leur langue maternelle (langue source).
