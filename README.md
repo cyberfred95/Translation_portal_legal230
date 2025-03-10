@@ -205,8 +205,9 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 Enter your username, email and password to create a super user
+5) Run the ```python manage.py collectstatic --no-input``` to set your static files (.html, .css, .js)
 
-5) Go to your portal url and add ```/admin/``` in the end, and type your username and password 
+6) Go to your portal url and add ```/admin/``` in the end, and type your username and password 
 
 #### If you already have a portal
 
@@ -224,3 +225,4 @@ docker cp /path/to/your/dump.sql <db_container_id>:dump.sql
 psql -U <db_user> -d <db_name> < dump.sql
 ```
 5) Run the migrations to add new fields using ```python manage.py migrate ``` command inside runserver container
+6) Run the ```python manage.py collectstatic --no-input``` to set your static files (.html, .css, .js)

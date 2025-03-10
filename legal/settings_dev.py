@@ -12,7 +12,7 @@ DATABASES = {
     }
 }
 
-DEBUG = True
+DEBUG = False
 
 DEV_MODE = True
 
