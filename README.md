@@ -186,7 +186,12 @@ sudo certbot --nginx
 ```
 docker-compose -f docker-compose.prod.yaml up
 ```
-3) Open another terminal and conect to your server
+3) Open another terminal and connect to your server
+4) type ```docker ps``` and go into runserver container using ```docker exec``` command like it was shown before
+5) Type this command to collect static files (.css and .js):
+```
+python manage.py collectstatic --no-input
+```
 
 #### If did not have a portal before
 
