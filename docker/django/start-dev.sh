@@ -10,4 +10,5 @@ python manage.py makemigrations --no-input
 #bash utility/load_data.sh
 #bash utility/make_pip_cache.sh
 
-python manage.py runserver --settings=legal.settings_dev 0.0.0.0:8000
+export DJANGO_SETTINGS_MODULE=legal.settings_dev
+gunicorn --bind 0.0.0.0:8099 --reload -w 5 -t 50 legal.wsgi:application

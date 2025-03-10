@@ -53,7 +53,7 @@ services:
     <<: *django
     command: [ "bash", "./docker/django/start-dev.sh" ]
     ports:
-      - 8099:8000
+      - 8099:8099
     depends_on:
       - dockerize
       - celery
