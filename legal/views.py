@@ -114,7 +114,7 @@ def file_translate(request):
         words_count = 0
         for file in files:
             files = request.FILES.getlist('document[]', [])
-            words_count += get_text_from_file(file, api_key)
+            words_count += len(get_text_from_file(file, api_key))
 
     if translation_allowed(request, words_count=words_count, files_count=len(files)):
 
