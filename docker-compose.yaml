@@ -15,7 +15,7 @@ services:
       - DJANGO_PG_PASSWOR=datasvitend
       - DJANGO_PG_HOST=postgres
       - USE_DOCKER=yes
-      - DJANGO_SETTINGS_MODULE=legal.settings_dev
+      - DJANGO_SETTINGS_MODULE=legal.settings
       - DOCKER=true
     networks:
       - file_process
@@ -57,7 +57,7 @@ services:
     
   runserver:
     <<: *django
-    command: [ "bash", "./docker/django/start-dev.sh" ]
+    command: python manage.py runserver 0.0.0.0:8000
     ports:
       - 8000:8000
     depends_on:

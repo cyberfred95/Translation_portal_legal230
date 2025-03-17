@@ -243,7 +243,7 @@ class GetDomainsView(APIView):
         domain_names = []
         for domain in domains.json():
             domain_names.append(domain['domain_name'])
-        domains = Domain.objects.filter(name__in=domain_names).order_by('-featured','name')
+        domains = Domain.objects.filter(name__in=domain_names).order_by('-featured', 'name')
         print(domains)
         if self.request.query_params.get('domain_group'):
             if request.LANGUAGE_CODE == 'fr':
@@ -445,14 +445,15 @@ class DetectTextLanguageView(APIView):
         text_for_detection = self.get_text_for_detection(text)
         texts = self.text_string_to_array(text)
         if translation_allowed(request, words_count=len(texts)):
-
-            tmp_language = langdetect.detect(text_for_detection)
-            language = Language.objects.filter(abbreviation__iexact=tmp_language.upper()).values_list(
-                'abbreviation', flat=True).first()
-            if not language:
-                language = Language.objects.all().values_list(
+            try:
+                tmp_language = langdetect.detect(text_for_detection)
+                language = Language.objects.filter(abbreviation__iexact=tmp_language.upper()).values_list(
                     'abbreviation', flat=True).first()
-
+                if not language:
+                    language = Language.objects.all().values_list(
+                        'abbreviation', flat=True).first()
+            except langdetect.LangDetectException:
+                return Response({"detail": "Value should not be blank"}, status=status.HTTP_400_BAD_REQUEST)
             return Response({"language": language.upper()})
         return Response({"detail": "You are not allowed to translate such amount of data"},
                         status=status.HTTP_400_BAD_REQUEST)
