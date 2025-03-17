@@ -453,7 +453,7 @@ class DetectTextLanguageView(APIView):
                     language = Language.objects.all().values_list(
                         'abbreviation', flat=True).first()
             except langdetect.LangDetectException:
-                return Response({"detail": "Value should not be blank"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"detail": "Source text should not be blank"}, status=status.HTTP_400_BAD_REQUEST)
             return Response({"language": language.upper()})
         return Response({"detail": "You are not allowed to translate such amount of data"},
                         status=status.HTTP_400_BAD_REQUEST)
