@@ -1,6 +1,6 @@
 $(document).ready(function () {
 
-    let sourceQuill = new Quill('#source-text', {
+    let sourceQuill = new Quill('#pre-text', {
         theme: 'snow',
         placeholder: language_code === 'en' ? 'Add your text here' : 'Ajoutez votre texte ici',
         modules: {
@@ -8,7 +8,7 @@ $(document).ready(function () {
         }
     });
 
-    let translatedQuill = new Quill('#translated-text', {
+    let translatedQuill = new Quill('#post-text', {
         theme: 'snow',
         modules: {
             toolbar: false
@@ -81,7 +81,7 @@ $(document).ready(function () {
             processData: false,
             contentType: false,
             success: function (response) {
-                translatedQuill.root.innerHTML = response.result;
+                translatedQuill.clipboard.dangerouslyPasteHTML(response.result);
 
                 $('#expert-revision').removeClass('hidden');
             },
@@ -103,16 +103,13 @@ $(document).ready(function () {
 
 
     $('#copy').click(function () {
-        var translatedHtml = translatedQuill.root.innerHTML;
+        var translatedText = translatedQuill.getText();
 
-        if (translatedHtml) {
-            var blob = new Blob([translatedHtml], {type: 'text/html'});
-            var data = [new ClipboardItem({'text/html': blob})];
-
-            navigator.clipboard.write(data).then(function () {
+        if (translatedText) {
+            navigator.clipboard.writeText(translatedText).then(function () {
                 showTooltip();
             }).catch(function (error) {
-                console.error('Error copying with formatting: ', error);
+                console.error('Error copying: ', error);
             });
         }
     });
@@ -126,8 +123,8 @@ $(document).ready(function () {
     }
 
     function resizeTextAreas() {
-        var $sourceEditor = $("#source-text .ql-editor");
-        var $translatedEditor = $("#translated-text .ql-editor");
+        var $sourceEditor = $("#pre-text .ql-editor");
+        var $translatedEditor = $("#post-text .ql-editor");
 
         $sourceEditor.css('height', 'auto');
         $translatedEditor.css('height', 'auto');

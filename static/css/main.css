@@ -312,6 +312,15 @@ textarea:focus {
     overflow: hidden;
 }
 
+#pre-text,
+#post-text {
+    resize: none;
+    box-sizing: border-box;
+    min-height: 200px;
+    max-height: 100%;
+    overflow: hidden;
+}
+
 input[type="checkbox"]:checked {
     background-image: url("/static/images/ico-check.svg");
     background-position: center;
