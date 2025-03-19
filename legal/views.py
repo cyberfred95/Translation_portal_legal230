@@ -64,8 +64,10 @@ def text_translation(request):
     prepared_text = text[request.POST.get('text')]
     print(prepared_text)
     print(len(prepared_text))
+    words_count = get_word_count(prepared_text)
+    symbols_count = len(prepared_text)
 
-    if translation_allowed(request, get_word_count(prepared_text)):
+    if translation_allowed(request=request, words_count=words_count, symbols_count=symbols_count):
         api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
         response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
             "text": [prepared_text],
@@ -78,8 +80,8 @@ def text_translation(request):
                 user_uuid=request.user.uuid,
                 words_count=get_word_count(prepared_text),
                 **get_translate_data(request, for_statistic=True),
-
             )
+            add_translations(request, words_count=words_count, symbols_count=symbols_count)
         result = response.json()
         translated_text = result["translated_text"]
         result['translated_text'] = [request.POST.get('text').replace(prepared_text, translated_text[0])]
@@ -390,14 +392,21 @@ class LanguageDetectView(APIView):
     def post(self, request):
         files = request.FILES.getlist('document[]', [])
         words_count = 0
+        symbols_count = 0
         result = []
         for file in files:
             file = lowercase_file_extension(file)
 
             api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
-            text_for_detection, words_count = self.get_text_for_detection(api_key=api_key, file=file,
-                                                                          words_count=words_count)
-            if translation_allowed(request, files_count=len(files), words_count=words_count):
+            text_for_detection, words_count, symbols_count = self.get_text_for_detection(
+                api_key=api_key,
+                file=file,
+                words_count=words_count,
+                symbols_count=symbols_count
+            )
+            print(text_for_detection)
+            if translation_allowed(request, files_count=len(files), words_count=words_count,
+                                   symbols_count=symbols_count):
 
                 try:
                     tmp_language = langdetect.detect(text_for_detection)
@@ -418,7 +427,7 @@ class LanguageDetectView(APIView):
             else:
                 return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
                                     status=status.HTTP_400_BAD_REQUEST)
-        cache.set(f"{request.user.uuid}", words_count, timeout=CACHE_TTL)
+        cache.set(f"{request.user.uuid}", {"words_count":words_count, "symbols_count":symbols_count}, timeout=CACHE_TTL)
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
 
     @staticmethod
@@ -430,14 +439,15 @@ class LanguageDetectView(APIView):
             file.name = file_name
         return file
 
-    def get_text_for_detection(self, file, api_key, words_count):
+    def get_text_for_detection(self, file, api_key, words_count, symbols_count):
         file_name = file.name
         file = self.rename_file(file)
         formated_texts = get_text_from_file(file, api_key)
         words_count += len(formated_texts)
+        symbols_count += sum(len(word) for word in formated_texts)
         text_for_detection = ' '.join(formated_texts[:self.WORDS_COUNT_FOR_DETECTION])
         file = self.rename_file(file, file_name=file_name)
-        return text_for_detection, words_count
+        return text_for_detection, words_count, symbols_count
 
 
 class DetectTextLanguageView(APIView):
@@ -454,8 +464,9 @@ class DetectTextLanguageView(APIView):
 
         text = request.data.get('text')
         text_for_detection = self.get_text_for_detection(text)
+        symbols_count = len(text_for_detection)
         texts = self.text_string_to_array(text)
-        if translation_allowed(request, words_count=len(texts)):
+        if translation_allowed(request, words_count=len(texts), symbols_count=symbols_count):
             try:
                 tmp_language = langdetect.detect(text_for_detection)
                 language = Language.objects.filter(abbreviation__iexact=tmp_language.upper()).values_list(

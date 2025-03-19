@@ -15,6 +15,7 @@ class SubscriptionType(models.Model):
 
     name = models.CharField(max_length=255)
 
+    max_symbols_count = models.IntegerField(default=0)
     max_words_count = models.IntegerField(default=0)
     max_files_count = models.IntegerField(default=0)
     custom_glossaries_count = models.IntegerField(default=0, verbose_name="Custom Glossaries Count")
@@ -41,10 +42,12 @@ class GroupSubscription(models.Model):
     subscription = models.ForeignKey(SubscriptionType, on_delete=models.CASCADE, related_name='groups')
     status = models.CharField(max_length=255, choices=GroupSubscriptionChoices.choices)
 
+    max_symbols_count = models.IntegerField(default=0)
     max_files_count = models.IntegerField(default=0)
     max_words_count = models.IntegerField(default=0)
     custom_glossaries_count = models.IntegerField(default=0, verbose_name="Custom Glossaries Count")
 
+    translated_symbols_count = models.IntegerField(default=0)
     translated_words_count = models.IntegerField(default=0)
     translated_files_count = models.IntegerField(default=0)
 
