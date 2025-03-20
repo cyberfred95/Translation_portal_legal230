@@ -20,7 +20,8 @@ from django.views.generic import TemplateView
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
 import django
 from rest_framework.views import APIView
-from .helpers import get_translate_data, lowercase_file_extension, get_word_count, get_text_from_file, get_project_file
+from .helpers import get_translate_data, lowercase_file_extension, get_word_count, get_text_from_file, get_project_file, \
+    rename_file
 
 from domains.models import Domain
 from languages.models import Language
@@ -121,13 +122,20 @@ def file_translate(request):
     cache_data = cache.get(f"{request.user.uuid}")
 
     if cache_data:
-        words_count = cache_data
+        words_count = cache_data['words_count']
+        symbols_count = cache_data['symbols_count']
         cache.delete(f"{request.user.uuid}")
     else:
         words_count = 0
+        symbols_count = 0
         for file in files:
             files = request.FILES.getlist('document[]', [])
-            words_count += len(get_text_from_file(file, api_key))
+            file_name = file.name
+            file = rename_file(file=file)
+            file_texts = get_text_from_file(file, api_key)
+            words_count += len(file_texts)
+            symbols_count += sum(len(word) for word in file_texts)
+            file = rename_file(file=file, file_name=file_name)
 
     if translation_allowed(request, words_count=words_count, files_count=len(files)):
 
@@ -166,7 +174,7 @@ def file_translate(request):
                                   translation_name=request.POST.get('translation_name'),
                                   file_name=project['file_name'],
                                   file_ext=project['file_extension'])
-        add_translations(request, words_count=words_count, files_count=len(files))
+        add_translations(request, words_count=words_count, files_count=len(files), symbols_count=symbols_count)
         return JsonResponse({"project_ids": [project.get('id') for project in projects],
                              "display_popup": False if get_price_by_language_pair(
                                  source_language=request.POST.get('source_language'),

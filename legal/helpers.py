@@ -91,3 +91,12 @@ def password_valid(request):
     if not check_password(password, request.user.password):
         return False
     return True
+
+
+def rename_file(file: InMemoryUploadedFile, file_name: str = None):
+    if not file_name:
+        file_extension = os.path.splitext(file.name)[1]
+        file.name = f'file{file_extension}'
+    else:
+        file.name = file_name
+    return file
