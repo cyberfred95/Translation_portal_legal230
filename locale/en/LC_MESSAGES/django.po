@@ -636,7 +636,7 @@ msgid "Start typing..."
 msgstr "Start typing..."
 
 msgid "Your data has been successfully changed"
-msgstr "Your resources have been deleted successfully"
+msgstr "Your data has been successfully changed"
 
 #########
 

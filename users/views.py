@@ -109,6 +109,7 @@ class SingleAccountView(RetrieveUpdateDestroyAPIView):
         user = request.user
         user.username = request.data['username']
         user.email = request.data['email']
+        user.save()
         return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
 
     def get_object(self):

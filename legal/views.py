@@ -137,7 +137,7 @@ def file_translate(request):
             symbols_count += sum(len(word) for word in file_texts)
             file = rename_file(file=file, file_name=file_name)
 
-    if translation_allowed(request, words_count=words_count, files_count=len(files)):
+    if translation_allowed(request, words_count=words_count, files_count=len(files), symbols_count=symbols_count):
 
         data = {
             "user_custom_mt_token": request.user.uuid,
@@ -435,7 +435,8 @@ class LanguageDetectView(APIView):
             else:
                 return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
                                     status=status.HTTP_400_BAD_REQUEST)
-        cache.set(f"{request.user.uuid}", {"words_count":words_count, "symbols_count":symbols_count}, timeout=CACHE_TTL)
+        cache.set(f"{request.user.uuid}", {"words_count": words_count, "symbols_count": symbols_count},
+                  timeout=CACHE_TTL)
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
 
     @staticmethod

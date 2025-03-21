@@ -641,7 +641,7 @@ msgid "Start typing..."
 msgstr "Ecrivez ici"
 
 msgid "Your data has been successfully changed"
-msgstr "Votre contenu a été supprimé."
+msgstr "Vos données ont été modifiées avec succès."
 
 ########
 
