@@ -24,10 +24,11 @@ def translation_allowed(request, symbols_count: int, words_count: int, files_cou
 
 
 def add_translations(request, words_count: int, symbols_count: int, files_count: int = None):
-    group_subscription = request.user.group.subscriptions.first() # detects if user is admin because
-    if group_subscription:                                  # only admin can use portal without subscription
-        group_subscription.translated_words_count += words_count
-        group_subscription.translated_symbols_count += symbols_count
-        if files_count:
-            group_subscription.translated_files_count += files_count
-        group_subscription.save()
+    if request.user.group:
+        group_subscription = request.user.group.subscriptions.first() # detects if user is admin because
+        if group_subscription:                                  # only admin can use portal without subscription
+            group_subscription.translated_words_count += words_count
+            group_subscription.translated_symbols_count += symbols_count
+            if files_count:
+                group_subscription.translated_files_count += files_count
+            group_subscription.save()
