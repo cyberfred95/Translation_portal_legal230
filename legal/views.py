@@ -53,40 +53,27 @@ PAGINATION_PAGE_SIZE = 20
 CACHE_TTL = 3600
 
 
-def prepare_text(text: str) -> dict:
-    texts_dict = {
-        text: f"{re.sub(re.compile('<.*?>'), '', text)}"
-    }
-    return texts_dict
-
-
 def text_translation(request):
-    text = prepare_text(request.POST.get('text'))
-    prepared_text = text[request.POST.get('text')]
-    print(prepared_text)
-    print(len(prepared_text))
-    words_count = get_word_count(prepared_text)
-    symbols_count = len(prepared_text)
+    text = request.POST.get('text')
+    words_count = get_word_count(text)
+    symbols_count = len(text)
 
     if translation_allowed(request=request, words_count=words_count, symbols_count=symbols_count):
         api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
         response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
-            "text": [prepared_text],
+            "text": [text],
             **get_translate_data(request)
         }, headers={
             "token": api_key})
         if response.status_code == 200:
             send_statistic_request(
-                api_key=api_key, texts=[prepared_text],
+                api_key=api_key, texts=[text],
                 user_uuid=request.user.uuid,
-                words_count=get_word_count(prepared_text),
+                words_count=get_word_count(text),
                 **get_translate_data(request, for_statistic=True),
             )
             add_translations(request, words_count=words_count, symbols_count=symbols_count)
         result = response.json()
-        translated_text = result["translated_text"]
-        result['translated_text'] = [request.POST.get('text').replace(prepared_text, translated_text[0])]
-        print(result)
         return JsonResponse(result)
     return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
                         status=status.HTTP_400_BAD_REQUEST)
