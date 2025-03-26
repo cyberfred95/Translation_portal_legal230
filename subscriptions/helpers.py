@@ -3,24 +3,38 @@ def translation_allowed(request, symbols_count: int, words_count: int, files_cou
         return True
 
     group_subscription = request.user.group.subscriptions.first()
-    if files_count:
-        if (group_subscription.max_files_count < 0
-                and group_subscription.max_words_count < 0
-                and group_subscription.max_symbols_count < 0):
+
+    def files_allowed() -> bool:
+        if group_subscription.max_files_count < 0 or group_subscription.translated_files_count + files_count < group_subscription.max_files_count:
             return True
-        elif (group_subscription.translated_files_count + files_count > group_subscription.max_files_count
-              or group_subscription.translated_words_count + words_count > group_subscription.max_words_count
-              or group_subscription.translated_symbols_count + symbols_count > group_subscription.max_symbols_count):
+        print("files")
+
+        return False
+
+    def words_allowed() -> bool:
+        if group_subscription.max_words_count < 0 or group_subscription.translated_words_count + words_count < group_subscription.max_words_count:
+            return True
+        print("words")
+        return False
+
+    def symbols_allowed() -> bool:
+        if group_subscription.max_symbols_count < 0 or group_subscription.translated_symbols_count + symbols_count < group_subscription.max_symbols_count:
+            return True
+        print("symbols")
+        return False
+
+
+    if files_count:
+        if files_allowed() and words_allowed() and symbols_allowed():
+            return True
+        else:
             return False
     else:
 
-        if (group_subscription.max_words_count < 0
-                and group_subscription.max_symbols_count < 0):
+        if words_allowed() and symbols_allowed():
             return True
-        elif (group_subscription.translated_words_count + words_count > group_subscription.max_words_count
-              or group_subscription.translated_symbols_count + symbols_count > group_subscription.max_symbols_count):
+        else:
             return False
-    return True
 
 
 def add_translations(request, words_count: int, symbols_count: int, files_count: int = None):
