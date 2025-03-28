@@ -121,7 +121,6 @@ class AddGlossaryView(APIView):
     def post(self, request):
         self.validate(request)
         gloss_file = request.FILES.get('file')
-        file_name = gloss_file.name
         source_language = Language.objects.get(abbreviation__iexact=request.data.get('source_language').upper())
         target_language = Language.objects.get(abbreviation__iexact=request.data.get('target_language').upper())
 
