@@ -1,3 +1,8 @@
+import csv
+import io
+import os.path
+
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.functions import Lower
 from django.core.paginator import Paginator
 from django.views.generic import TemplateView
@@ -60,35 +65,66 @@ class UserGlossariesView(TemplateView):
 class AddGlossaryView(APIView):
     permission_classes = (SubscribedPermission, IsAuthenticated)
 
+    def validate_csv_file(self, gloss_file: InMemoryUploadedFile):
+        text_file = io.TextIOWrapper(gloss_file, encoding='utf-8')
+        csv_reader = csv.reader(text_file)
+
+        for row_number, row in enumerate(csv_reader, start=2):
+            if len(row) < 2 or (len(row) == 3 and row[2] != '') or len(row) > 3:
+                raise serializers.ValidationError({
+                    "detail": f"Invalid row at line {row_number}: {row}. "
+                              f"Expected two columns."
+                })
+
+        text_file.detach()  # Prevent issues with Django reusing the file
+
+    def validate_xlsx_file(self, gloss_file:InMemoryUploadedFile):
+        pass
+
     def validate(self, request):
         if not request.user.is_staff:
             group_subscription = request.user.group.subscriptions.first()
-            if group_subscription.custom_glossaries_count >0:
+            if group_subscription.custom_glossaries_count > 0:
                 user_glossaries_count = Glossary.objects.filter(user=request.user).count()
                 if user_glossaries_count + 1 > group_subscription.custom_glossaries_count:
-                    raise serializers.ValidationError({"detail":"You are not allowed to add more glossaries. Please contact your group administator"})
+                    raise serializers.ValidationError({
+                        "detail": "You are not allowed to add more glossaries. Please contact your group administator"})
 
         languages_list = Language.objects.all().values_list(Lower('abbreviation'), flat=True)
         if request.data["source_language"] == request.data["target_language"]:
-            raise serializers.ValidationError({"detail":_("Source and target languages cannot be the same")})
+            raise serializers.ValidationError({"detail": _("Source and target languages cannot be the same")})
         if request.data["source_language"] not in languages_list:
-            raise serializers.ValidationError({"detail":_("Invalid source language")})
+            raise serializers.ValidationError({"detail": _("Invalid source language")})
         if request.data["target_language"] not in languages_list:
-            raise serializers.ValidationError({"detail":_("Invalid target language")})
+            raise serializers.ValidationError({"detail": _("Invalid target language")})
+
+        gloss_file = request.FILES.get('file')
+        gloss_file_extension = os.path.splitext(gloss_file.name)[1]
+        if gloss_file_extension == '.csv':
+            self.validate_csv_file(gloss_file=gloss_file)
+        elif gloss_file_extension == '.xlsx':
+            self.validate_xlsx_file(gloss_file=gloss_file)
+        else:
+            raise serializers.ValidationError({"detail": _("Invalid file extension")})
 
     def post(self, request):
         self.validate(request)
+        gloss_file = request.FILES.get('file')
+        file_name = gloss_file.name
+        if os.path.splitext(file_name)[1] == '.csv':
+            source_language = Language.objects.get(abbreviation__iexact=request.data.get('source_language').upper())
+            target_language = Language.objects.get(abbreviation__iexact=request.data.get('target_language').upper())
 
-        source_language = Language.objects.get(abbreviation__iexact=request.data.get('source_language').upper())
-        target_language = Language.objects.get(abbreviation__iexact=request.data.get('target_language').upper())
-
-        glossary = Glossary.objects.create(
-            user=request.user,
-            source_language=source_language,
-            target_language=target_language,
-            file=request.FILES.get('file'),
-        )
-        return Response(GlossarySerializer(glossary).data, status=status.HTTP_201_CREATED)
+            glossary = Glossary.objects.create(
+                user=request.user,
+                source_language=source_language,
+                target_language=target_language,
+                file=gloss_file,
+            )
+            return Response(GlossarySerializer(glossary).data, status=status.HTTP_201_CREATED)
+        elif os.path.splitext(file_name)[1] == '.xlsx':
+            print("xlsx")
+            return Response({"file": "xlsx file"})
 
 
 class SingleGlossaryView(RetrieveUpdateDestroyAPIView):

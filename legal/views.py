@@ -57,7 +57,6 @@ def text_translation(request):
     text = request.POST.get('text')
     words_count = get_word_count(text)
     symbols_count = len(text)
-
     if translation_allowed(request=request, words_count=words_count, symbols_count=symbols_count):
         api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
         response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
@@ -131,6 +130,7 @@ def file_translate(request):
             **get_translate_data(request),
             "glossary": json.dumps(form_glossary_object(request))
         }
+        pprint(data)
         projects = []
         for file in files:
             file = lowercase_file_extension(file)
