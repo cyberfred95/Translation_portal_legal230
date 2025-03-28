@@ -21,10 +21,6 @@ def get_translate_data(request, for_statistic=False):
     if not domain:
         domain = Domain.objects.filter(name=request.POST.get('domain_name')).first()
 
-    print("DOMAIN")
-    print(domain)
-
-
     if not domain and preferences.DefaultTranslation.enabled:
         if for_statistic:
             translate_data['domain_name'] = preferences.DefaultTranslation.name
