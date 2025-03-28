@@ -76,9 +76,9 @@ class AddGlossaryView(APIView):
                               f"Expected two columns."
                 })
 
-        text_file.detach()  # Prevent issues with Django reusing the file
+        text_file.detach()
 
-    def validate_xlsx_file(self, gloss_file:InMemoryUploadedFile):
+    def validate_xlsx_file(self, gloss_file: InMemoryUploadedFile):
         pass
 
     def validate(self, request):
@@ -111,20 +111,16 @@ class AddGlossaryView(APIView):
         self.validate(request)
         gloss_file = request.FILES.get('file')
         file_name = gloss_file.name
-        if os.path.splitext(file_name)[1] == '.csv':
-            source_language = Language.objects.get(abbreviation__iexact=request.data.get('source_language').upper())
-            target_language = Language.objects.get(abbreviation__iexact=request.data.get('target_language').upper())
+        source_language = Language.objects.get(abbreviation__iexact=request.data.get('source_language').upper())
+        target_language = Language.objects.get(abbreviation__iexact=request.data.get('target_language').upper())
 
-            glossary = Glossary.objects.create(
-                user=request.user,
-                source_language=source_language,
-                target_language=target_language,
-                file=gloss_file,
-            )
-            return Response(GlossarySerializer(glossary).data, status=status.HTTP_201_CREATED)
-        elif os.path.splitext(file_name)[1] == '.xlsx':
-            print("xlsx")
-            return Response({"file": "xlsx file"})
+        glossary = Glossary.objects.create(
+            user=request.user,
+            source_language=source_language,
+            target_language=target_language,
+            file=gloss_file,
+        )
+        return Response(GlossarySerializer(glossary).data, status=status.HTTP_201_CREATED)
 
 
 class SingleGlossaryView(RetrieveUpdateDestroyAPIView):

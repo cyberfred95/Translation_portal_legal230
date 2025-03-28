@@ -130,7 +130,6 @@ def file_translate(request):
             **get_translate_data(request),
             "glossary": json.dumps(form_glossary_object(request))
         }
-        pprint(data)
         projects = []
         for file in files:
             file = lowercase_file_extension(file)
@@ -145,11 +144,13 @@ def file_translate(request):
                     'source_file': file
                 }
             )
+            print(response.json())
             projects.append({
                 'id': response.json().get('id'),
                 'file_name': file.name,
                 'file_extension': os.path.splitext(file.name)[1]
             })
+        print(projects)
 
         time.sleep(0.1)
         for project in projects:

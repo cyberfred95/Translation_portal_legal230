@@ -21,6 +21,10 @@ def get_translate_data(request, for_statistic=False):
     if not domain:
         domain = Domain.objects.filter(name=request.POST.get('domain_name')).first()
 
+    print("DOMAIN")
+    print(domain)
+
+
     if not domain and preferences.DefaultTranslation.enabled:
         if for_statistic:
             translate_data['domain_name'] = preferences.DefaultTranslation.name
@@ -28,7 +32,8 @@ def get_translate_data(request, for_statistic=False):
             translate_data[
                 'template_name'] = f"Custom.MT Default Template {request.POST.get('source_language')} {request.POST.get('target_language')}"
     else:
-        translate_data = {}
+        translate_data['domain_name'] = domain.name if request.LANGUAGE_CODE == 'fr' else request.POST.get(
+            'domain_name')
 
     return translate_data
 
