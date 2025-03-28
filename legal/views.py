@@ -11,6 +11,7 @@ from urllib.parse import urlparse, unquote
 import openpyxl
 from django.urls import reverse
 
+from glossaries.processor import GlossaryProcessor
 from quoting.models import LanguageQuote
 from django.utils.timezone import now
 
@@ -83,37 +84,8 @@ def form_glossary_object(request) -> Optional[dict]:
     try:
         glossary = Glossary.objects.get(id=request.POST.get('glossary'))
         if glossary:
-            gloss_file_extension = os.path.splitext(glossary.file.name)[1]
-            if gloss_file_extension == '.csv':
-                value = []
-                with glossary.file.open(mode='r') as file:
-                    csv_reader = csv.reader(file)
-                    next(csv_reader, None)  # Skip header
-
-                    for row in csv_reader:
-                        value.append(f"{row[0]}={row[1]}")
-
-                return {
-                    "file_name": glossary.file.name,
-                    "value": value,
-                    "adaptive": True,
-                }
-
-            elif gloss_file_extension in ['.xlsx', '.xls']:
-                value = []
-                with glossary.file.open(mode='rb') as file:
-                    workbook = openpyxl.load_workbook(file, data_only=True)
-                    sheet = workbook.active
-
-                    for row in sheet.iter_rows(min_row=2, values_only=True):
-                        if row[0] is not None and row[1] is not None:
-                            value.append(f"{row[0]}={row[1]}")
-
-                return {
-                    "file_name": glossary.file.name,
-                    "value": value,
-                    "adaptive": True,
-                }
+            processor = GlossaryProcessor()
+            return processor.form_glossary_object(glossary.file)
     except Glossary.DoesNotExist:
         return {}
     except ValueError:
@@ -142,7 +114,6 @@ def file_translate(request):
             file = rename_file(file=file, file_name=file_name)
 
     if translation_allowed(request, words_count=words_count, files_count=len(files), symbols_count=symbols_count):
-        print(form_glossary_object(request))
         data = {
             "user_custom_mt_token": request.user.uuid,
             **get_translate_data(request),
@@ -162,13 +133,11 @@ def file_translate(request):
                     'source_file': file
                 }
             )
-            print(response.json())
             projects.append({
                 'id': response.json().get('id'),
                 'file_name': file.name,
                 'file_extension': os.path.splitext(file.name)[1]
             })
-        print(projects)
 
         time.sleep(0.1)
         for project in projects:

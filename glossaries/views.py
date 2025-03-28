@@ -20,6 +20,7 @@ from domains.models import Domain
 from languages.models import Language
 from subscriptions.permissions import SubscribedPermission
 from .models import Glossary
+from .processor import GlossaryProcessor
 from .serializers import GlossarySerializer
 from .paginators import APIViewPagination, TemplateViewPagination
 
@@ -67,32 +68,7 @@ class AddGlossaryView(APIView):
     permission_classes = (SubscribedPermission, IsAuthenticated)
 
     @staticmethod
-    def validate_csv_file(gloss_file: InMemoryUploadedFile):
-        text_file = io.TextIOWrapper(gloss_file, encoding='utf-8')
-        csv_reader = csv.reader(text_file)
-
-        for row_number, row in enumerate(csv_reader, start=2):
-            if len(row) < 2 or (len(row) == 3 and row[2] != '') or len(row) > 3:
-                raise serializers.ValidationError({
-                    "detail": f"Invalid row at line {row_number}: {row}. "
-                              f"Expected two columns."
-                })
-
-        text_file.detach()
-
-    @staticmethod
-    def validate_xlsx_file(gloss_file: InMemoryUploadedFile):
-        workbook = openpyxl.load_workbook(gloss_file, data_only=True)
-        sheet = workbook.active
-
-        for row_number, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
-            if len(row) < 2 or (len(row) == 3 and row[2]) or len(row) > 3:
-                raise serializers.ValidationError({
-                    "detail": f"Invalid row at line {row_number}: {row}. "
-                              f"Expected two columns."
-                })
-
-    def validate(self, request):
+    def validate(request):
         if not request.user.is_staff:
             group_subscription = request.user.group.subscriptions.first()
             if group_subscription.custom_glossaries_count > 0:
@@ -110,13 +86,9 @@ class AddGlossaryView(APIView):
             raise serializers.ValidationError({"detail": _("Invalid target language")})
 
         gloss_file = request.FILES.get('file')
-        gloss_file_extension = os.path.splitext(gloss_file.name)[1]
-        if gloss_file_extension == '.csv':
-            self.validate_csv_file(gloss_file=gloss_file)
-        elif gloss_file_extension == '.xlsx':
-            self.validate_xlsx_file(gloss_file=gloss_file)
-        else:
-            raise serializers.ValidationError({"detail": _("Invalid file extension")})
+
+        processor = GlossaryProcessor()
+        processor.validate_file(gloss_file)
 
     def post(self, request):
         self.validate(request)
