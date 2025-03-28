@@ -436,8 +436,8 @@ msgstr "Action"
 msgid "Download sample"
 msgstr "Télécharger un modèle"
 
-msgid "Supported Files: .csv max 5mb"
-msgstr "Formats pris en charge : .csv max 5mb"
+msgid "Supported Files: .csv, .xlsx max 5mb"
+msgstr "Formats pris en charge : .csv, .xlsx max 5mb"
 
 msgid "Continue"
 msgstr "Continuer"
