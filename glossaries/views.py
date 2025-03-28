@@ -2,6 +2,7 @@ import csv
 import io
 import os.path
 
+import openpyxl
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.functions import Lower
 from django.core.paginator import Paginator
@@ -65,7 +66,8 @@ class UserGlossariesView(TemplateView):
 class AddGlossaryView(APIView):
     permission_classes = (SubscribedPermission, IsAuthenticated)
 
-    def validate_csv_file(self, gloss_file: InMemoryUploadedFile):
+    @staticmethod
+    def validate_csv_file(gloss_file: InMemoryUploadedFile):
         text_file = io.TextIOWrapper(gloss_file, encoding='utf-8')
         csv_reader = csv.reader(text_file)
 
@@ -78,8 +80,17 @@ class AddGlossaryView(APIView):
 
         text_file.detach()
 
-    def validate_xlsx_file(self, gloss_file: InMemoryUploadedFile):
-        pass
+    @staticmethod
+    def validate_xlsx_file(gloss_file: InMemoryUploadedFile):
+        workbook = openpyxl.load_workbook(gloss_file, data_only=True)
+        sheet = workbook.active
+
+        for row_number, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
+            if len(row) < 2 or (len(row) == 3 and row[2]) or len(row) > 3:
+                raise serializers.ValidationError({
+                    "detail": f"Invalid row at line {row_number}: {row}. "
+                              f"Expected two columns."
+                })
 
     def validate(self, request):
         if not request.user.is_staff:
