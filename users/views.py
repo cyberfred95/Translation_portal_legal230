@@ -1,4 +1,5 @@
 import base64
+import re
 from urllib.parse import urlencode
 
 from django.conf import settings
@@ -125,21 +126,28 @@ class SingleAccountView(RetrieveUpdateDestroyAPIView):
 class InviteUserAPIView(APIView):
     permission_classes = (SubscribedPermission,)
 
+    @staticmethod
+    def is_email_valid(email: str):
+        pattern = r'^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$'
+        return bool(re.match(pattern, email))
+
     def post(self, request):
         if request.user.group and request.user.group.admin == request.user:
             emails = request.data.get('emails', [])
             if isinstance(emails, str):
                 emails = emails.split(',')
+                emails = list(set(emails))
             if not emails:
                 return Response({"detail": "Emails list should not be empty"}, status=status.HTTP_400_BAD_REQUEST)
             for email in emails:
-                params = {
-                    "email": base64.b64encode(email.encode('utf-8')),
-                    "group": base64.b64encode(str(request.user.group.id).encode('utf-8')),
-                }
-                send_invitation_email(email=email,
-                                      register_user_absolute_uri=self.get_register_user_absolute_uri(request,
-                                                                                                     params=params))
+                if self.is_email_valid(email):
+                    params = {
+                        "email": base64.b64encode(email.encode('utf-8')),
+                        "group": base64.b64encode(str(request.user.group.id).encode('utf-8')),
+                    }
+                    send_invitation_email(email=email,
+                                          register_user_absolute_uri=self.get_register_user_absolute_uri(request,
+                                                                                                         params=params))
             return Response({"message": "Invitation has been successfully sent"}, status=status.HTTP_200_OK)
         return Response({"detail": "You have to be group admin to provide this action"},
                         status=status.HTTP_403_FORBIDDEN)
