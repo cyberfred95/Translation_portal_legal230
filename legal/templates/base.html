@@ -124,9 +124,9 @@
 
 <body class="font-montserrat font-medium">
 
-<div class="flex min-h-screen overflow-hidden relative">
+<div class="flex h-screen overflow-hidden relative">
     <!-- Sidebar -->
-    <div class="fixed top-0 left-0 h-screen w-sidebar">
+    <div class="flex-shrink-0">
         {% include 'sidebar.html' %}
     </div>
 
@@ -135,12 +135,12 @@
         <!-- Header -->
         {% include 'header.html' %}
 
-        <!-- Header Line -->
-        <div class="absolute top-17.5 left-0 w-full h-0.25 bg-gray-600 z-70"></div>
+        <!-- Горизонтальна лінія -->
+        <div class="absolute top-17.5 left-0 w-full h-0.25 bg-gray-600"></div>
 
 
         <!-- Scrollable content -->
-        <main class="flex-1 overflow-y-auto relative ml-20">
+        <main class="h-full overflow-y-auto relative">
             <div id="main-loader" class="absolute inset-0 bg-gray-500 bg-opacity-50 hidden flex items-center justify-center z-50">
                 <div class="bg-white rounded-lg p-8 flex flex-col items-center shadow-lg">
                     <span class="loader mb-4"></span>
