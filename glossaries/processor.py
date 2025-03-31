@@ -18,6 +18,17 @@ class GlossaryProcessor:
             raise serializers.ValidationError({"detail": f"Source value {value} is duplicated in column {row_number}"})
 
     @staticmethod
+    def check_on_unsupported_symbols(row: list, row_number: int):
+        for column in row:
+            try:
+                column = column.decode('utf-8')
+            except UnicodeDecodeError as e:
+                raise serializers.ValidationError(
+                    {
+                        "detail": f"Invalid UTF-8 character at position {e.start}: {column[e.start:e.end]} on line {row_number}"
+                    })
+
+    @staticmethod
     def validate_on_empy_columns(row: list, row_number: int):
         if row[0] is None or row[0] == '' or row[0] == ' ':
             raise serializers.ValidationError({
@@ -44,7 +55,7 @@ class GlossaryProcessor:
                     column = column.strip()
             self.validate_on_empy_columns(row=row, row_number=row_number)
             self.check_on_duplicate(source_values=source_values, value=row[0], row_number=row_number)
-
+            self.check_on_unsupported_symbols(row)
         text_file.detach()
 
     def _validate_xlsx_file(self, glossary_file):
@@ -63,6 +74,7 @@ class GlossaryProcessor:
                     column = column.strip()
             self.validate_on_empy_columns(row=row, row_number=row_number)
             self.check_on_duplicate(source_values=source_values, value=row[0], row_number=row_number)
+            self.check_on_unsupported_symbols(row)
 
     def validate_file(self, glossary_file):
         file_extension = os.path.splitext(glossary_file.name)[1]
