@@ -55,7 +55,7 @@ class GlossaryProcessor:
                     column = column.strip()
             self.validate_on_empy_columns(row=row, row_number=row_number)
             self.check_on_duplicate(source_values=source_values, value=row[0], row_number=row_number)
-            self.check_on_unsupported_symbols(row)
+            self.check_on_unsupported_symbols(row, row_number=row_number)
         text_file.detach()
 
     def _validate_xlsx_file(self, glossary_file):
@@ -74,7 +74,7 @@ class GlossaryProcessor:
                     column = column.strip()
             self.validate_on_empy_columns(row=row, row_number=row_number)
             self.check_on_duplicate(source_values=source_values, value=row[0], row_number=row_number)
-            self.check_on_unsupported_symbols(row)
+            self.check_on_unsupported_symbols(row, row_number=row_number)
 
     def validate_file(self, glossary_file):
         file_extension = os.path.splitext(glossary_file.name)[1]
