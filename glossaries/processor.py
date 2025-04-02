@@ -3,11 +3,19 @@ import io
 import os.path
 from typing import Optional
 
+import chardet
 import openpyxl
 from rest_framework import serializers
+import pandas as pd
+from io import StringIO
 
 
 class GlossaryProcessor:
+
+    # def get_file_encoding(self, glossary_file):
+    #     with open(glossary_file.name, "rb") as f:
+    #         result = chardet.detect(f.read(100000))
+    #         print(result["encoding"])
 
     @staticmethod
     def check_on_duplicate(source_values: list, value, row_number):
@@ -17,11 +25,27 @@ class GlossaryProcessor:
         else:
             raise serializers.ValidationError({"detail": f"Source value {value} is duplicated in column {row_number}"})
 
+    # @staticmethod
+    # def convert_file_to_utf_8(glossary_file):
+    #     file_extension = os.path.splitext(glossary_file.name)[1]
+    #     if file_extension == ".csv":
+    #         file_content = glossary_file.read().decode("ISO-8859-1")
+    #         file_stream = StringIO(file_content)
+    #         df = pd.read_csv(file_stream)
+    #         output_stream = StringIO()
+    #         df.to_csv(output_stream, encoding="utf-8", index=False)
+    #         output_stream.seek(0)
+    #         with open(glossary_file.name, "w") as converted_file:
+    #             converted_file.write(output_stream.getvalue())
+    #         return converted_file
+    #     elif file_extension == ".xlsx":
+    #         pass
+
     @staticmethod
     def check_on_unsupported_symbols(row: list, row_number: int):
         for column in row:
             try:
-                column = column.decode('utf-8')
+                column.encode('utf-8').decode('utf-8')
             except UnicodeDecodeError as e:
                 raise serializers.ValidationError(
                     {
@@ -77,6 +101,7 @@ class GlossaryProcessor:
             self.check_on_unsupported_symbols(row, row_number=row_number)
 
     def validate_file(self, glossary_file):
+        # glossary_file = self.convert_file_to_utf_8(glossary_file=glossary_file)
         file_extension = os.path.splitext(glossary_file.name)[1]
         if file_extension == '.csv':
             self._validate_csv_file(glossary_file)
