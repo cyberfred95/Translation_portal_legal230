@@ -88,6 +88,8 @@ def form_glossary_object(request) -> Optional[dict]:
             return processor.form_glossary_object(glossary.file)
     except Glossary.DoesNotExist:
         return {}
+    except ValueError:
+        return {}
 
 
 def file_translate(request):
