@@ -29,14 +29,15 @@ class GlossaryProcessor:
             raise serializers.ValidationError({"detail": f"Source value {value} is duplicated in column {row_number}"})
 
     def convert_file_to_utf_8(self, csv_glossary_file):
-        file_extension = os.path.splitext(csv_glossary_file.name)[1]
         encoding = self.__get_csv_file_encoding(csv_glossary_file)
 
         file_content = csv_glossary_file.read().decode(encoding)
         csv_glossary_file.seek(0)
-
-        file_stream = io.StringIO(file_content)
-        df = pd.read_csv(file_stream)
+        try:
+            file_stream = io.StringIO(file_content)
+            df = pd.read_csv(file_stream)
+        except pd.errors.ParserError as e:
+            raise serializers.ValidationError({"detail": str(e)})
 
         output_stream = io.StringIO()
         df.to_csv(output_stream, encoding="utf-8", index=False)
@@ -54,7 +55,7 @@ class GlossaryProcessor:
 
     @staticmethod
     def __check_on_unsupported_symbols(row: list, row_number: int):
-        for column in row:
+        for column in row[:1]:
             try:
                 column.encode('utf-8').decode('utf-8')
             except UnicodeDecodeError as e:
@@ -65,6 +66,7 @@ class GlossaryProcessor:
 
     @staticmethod
     def __validate_on_empy_columns(row: list, row_number: int):
+        print(row)
         if row[0] is None or row[0] == '' or row[0] == ' ':
             raise serializers.ValidationError({
                 "detail": f"Source column is blank at line {row_number}."})
@@ -88,10 +90,10 @@ class GlossaryProcessor:
                     raise serializers.ValidationError({
                         "detail": f"Invalid row at line {row_number}: {row}. Expected two columns."
                     })
-                for column in row:
-                    if row:
-                        column = column.strip()
                 self.__validate_on_empy_columns(row=row, row_number=row_number)
+                for column in row:
+                    if column:
+                        column = column.strip()
                 self.__check_on_duplicate(source_values=source_values, value=row[0], row_number=row_number)
                 self.__check_on_unsupported_symbols(row, row_number=row_number)
             text_file.detach()
@@ -111,10 +113,10 @@ class GlossaryProcessor:
                     "detail": f"Invalid row at line {row_number}: {row}. "
                               f"Expected two columns."
                 })
-            for column in row:
-                if row:
-                    column = column.strip()
             self.__validate_on_empy_columns(row=row, row_number=row_number)
+            for column in row:
+                if column:
+                    column = column.strip()
             self.__check_on_duplicate(source_values=source_values, value=row[0], row_number=row_number)
             self.__check_on_unsupported_symbols(row, row_number=row_number)
 
