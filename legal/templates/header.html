@@ -3,7 +3,7 @@
 
 <header class="flex justify-end items-center px-31.25 py-4.5">
     <div class="flex gap-7.5 items-center font-semibold">
-        {% if request.user.group and request.user.group.admin == request.user %}
+        {% if request.user.group and request.user in request.user.group.admin.all %}
         <button type="button" class="flex items-center gap-2 cursor-pointer text-gray-600" id="open-invite-modal">
             <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd"

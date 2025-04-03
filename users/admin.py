@@ -2,12 +2,10 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import User
 from .models import UserGroup
-from .forms import GroupForm
 
 
 class UserGroupAdmin(admin.ModelAdmin):
     fields = ['name', 'api_key', 'admin']
-    form = GroupForm
 
 
 admin.site.register(UserGroup, UserGroupAdmin)

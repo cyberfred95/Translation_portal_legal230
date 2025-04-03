@@ -35,7 +35,7 @@ class UsersListView(APIView):
         if request.user.is_staff:
             return Response(GroupSerializer(UserGroup.objects.all(), many=True).data, status=status.HTTP_200_OK)
         if request.user.group:
-            if request.user.group.admin and request.user.group.admin == request.user:
+            if request.user in request.user.group.admin.all():
                 return Response(GroupSerializer(request.user.group).data)
             return Response(UserSerializer(request.user))
 
@@ -132,7 +132,7 @@ class InviteUserAPIView(APIView):
         return bool(re.match(pattern, email))
 
     def post(self, request):
-        if request.user.group and request.user.group.admin == request.user:
+        if request.user.group and request.user in request.user.group.admin.all():
             emails = request.data.get('emails', [])
             if isinstance(emails, str):
                 emails = emails.split(',')

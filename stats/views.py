@@ -25,7 +25,7 @@ class UsageView(TemplateView):
         return context
 
     def get_is_group_admin(self):
-        return self.request.user.group and self.request.user.group.admin and self.request.user.group.admin == self.request.user
+        return self.request.user.group and self.request.user in self.request.user.group.admin.all()
 
     def get_filters(self):
 
@@ -75,7 +75,7 @@ class UsageView(TemplateView):
                 'groups': [group.name for group in UserGroup.objects.all()],
                 'file_name': file_names,
             }
-        elif self.request.user.group and self.request.user.group.admin == self.request.user:
+        elif self.request.user.group and self.request.user in self.request.user.group.admin.all():
             return {
                 'users': [user.username for user in User.objects.filter(group=self.request.user.group)],
                 'file_name': file_names,
@@ -95,7 +95,7 @@ class UsageView(TemplateView):
 
         # get all users in dediсated group
         if self.request.user.is_staff or (
-                self.request.user.group and self.request.user.group.admin == self.request.user):
+                self.request.user.group and self.request.user in self.request.user.group.admin.all()):
             if self.request.user.group:
                 user_names = self.request.GET.getlist('user', User.objects.filter(
                     group__id=self.request.user.group.id).values_list('username',flat=True))
@@ -208,7 +208,7 @@ class UsageView(TemplateView):
         if self.request.user.is_staff:
             additional_url_params += f"&portal_admin=true"
 
-        elif self.request.user.group and self.request.user.group.admin == self.request.user:
+        elif self.request.user.group and self.request.user in self.request.user.group.admin.all():
             additional_url_params += "&group_admin=true"
 
         return additional_url_params
