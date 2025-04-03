@@ -86,8 +86,9 @@ class AddGlossaryView(APIView):
             raise serializers.ValidationError({"detail": _("Invalid target language")})
 
         gloss_file = request.FILES.get('file')
-
         processor = GlossaryProcessor()
+        if os.path.splitext(gloss_file.name)[1] == '.csv':
+            request.FILES['file'] = processor.convert_file_to_utf_8(gloss_file)
         processor.validate_file(gloss_file)
 
     def post(self, request):

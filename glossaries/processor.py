@@ -29,30 +29,27 @@ class GlossaryProcessor:
 
     def convert_file_to_utf_8(self, csv_glossary_file):
         file_extension = os.path.splitext(csv_glossary_file.name)[1]
-        if file_extension == ".csv":
-            encoding = self.__get_csv_file_encoding(csv_glossary_file)
+        encoding = self.__get_csv_file_encoding(csv_glossary_file)
 
-            file_content = csv_glossary_file.read().decode(encoding)
-            csv_glossary_file.seek(0)
+        file_content = csv_glossary_file.read().decode(encoding)
+        csv_glossary_file.seek(0)
 
-            file_stream = io.StringIO(file_content)
-            df = pd.read_csv(file_stream)
+        file_stream = io.StringIO(file_content)
+        df = pd.read_csv(file_stream)
 
-            output_stream = io.StringIO()
-            df.to_csv(output_stream, encoding="utf-8", index=False)
-            output_stream.seek(0)
+        output_stream = io.StringIO()
+        df.to_csv(output_stream, encoding="utf-8", index=False)
+        output_stream.seek(0)
 
-            converted_file = InMemoryUploadedFile(
-                file=io.BytesIO(output_stream.getvalue().encode("utf-8")),  # Convert to BytesIO
-                field_name=csv_glossary_file.field_name,
-                name=csv_glossary_file.name,
-                content_type="text/csv",
-                size=len(output_stream.getvalue()),
-                charset="utf-8",
-            )
-            return converted_file
-        elif file_extension == ".xlsx":
-            pass
+        converted_file = InMemoryUploadedFile(
+            file=io.BytesIO(output_stream.getvalue().encode("utf-8")),  # Convert to BytesIO
+            field_name=csv_glossary_file.field_name,
+            name=csv_glossary_file.name,
+            content_type="text/csv",
+            size=len(output_stream.getvalue()),
+            charset="utf-8",
+        )
+        return converted_file
 
     @staticmethod
     def __check_on_unsupported_symbols(row: list, row_number: int):
@@ -116,7 +113,6 @@ class GlossaryProcessor:
     def validate_file(self, glossary_file):
         file_extension = os.path.splitext(glossary_file.name)[1]
         if file_extension == '.csv':
-            glossary_file = self.convert_file_to_utf_8(csv_glossary_file=glossary_file)
             self.__validate_csv_file(glossary_file)
         elif file_extension in ['.xlsx', '.xls']:
             self.__validate_xlsx_file(glossary_file)
