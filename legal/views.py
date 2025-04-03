@@ -88,8 +88,6 @@ def form_glossary_object(request) -> Optional[dict]:
             return processor.form_glossary_object(glossary.file)
     except Glossary.DoesNotExist:
         return {}
-    except ValueError:
-        return {}
 
 
 def file_translate(request):
@@ -112,7 +110,7 @@ def file_translate(request):
             words_count += len(file_texts)
             symbols_count += sum(len(word) for word in file_texts)
             file = rename_file(file=file, file_name=file_name)
-
+    print(form_glossary_object(request))
     if translation_allowed(request, words_count=words_count, files_count=len(files), symbols_count=symbols_count):
         data = {
             "user_custom_mt_token": request.user.uuid,

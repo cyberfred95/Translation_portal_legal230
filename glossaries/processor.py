@@ -3,6 +3,7 @@ import io
 import os.path
 import openpyxl
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.db.models.fields.files import FieldFile
 from rest_framework import serializers
 import pandas as pd
 from io import StringIO
@@ -73,24 +74,31 @@ class GlossaryProcessor:
             })
 
     def __validate_csv_file(self, glossary_file):
-        text_file = io.TextIOWrapper(glossary_file, encoding='utf-8')
-        source_values = []
-        csv_reader = csv.reader(text_file)
-        next(csv_reader, None)
+        if isinstance(glossary_file, FieldFile):
+            glossary_file.open('rb')
 
-        for row_number, row in enumerate(csv_reader, start=2):
-            if len(row) < 2 or (len(row) == 3 and row[2] != '') or len(row) > 3:
-                raise serializers.ValidationError({
-                    "detail": f"Invalid row at line {row_number}: {row}. "
-                              f"Expected two columns."
-                })
-            for column in row:
-                if row:
-                    column = column.strip()
-            self.__validate_on_empy_columns(row=row, row_number=row_number)
-            self.__check_on_duplicate(source_values=source_values, value=row[0], row_number=row_number)
-            self.__check_on_unsupported_symbols(row, row_number=row_number)
-        text_file.detach()
+        try:
+            text_file = io.TextIOWrapper(glossary_file, encoding='utf-8')
+            source_values = []
+            csv_reader = csv.reader(text_file)
+            next(csv_reader, None)
+
+            for row_number, row in enumerate(csv_reader, start=2):
+                if len(row) < 2 or (len(row) == 3 and row[2] != '') or len(row) > 3:
+                    raise serializers.ValidationError({
+                        "detail": f"Invalid row at line {row_number}: {row}. Expected two columns."
+                    })
+                for column in row:
+                    if row:
+                        column = column.strip()
+                self.__validate_on_empy_columns(row=row, row_number=row_number)
+                self.__check_on_duplicate(source_values=source_values, value=row[0], row_number=row_number)
+                self.__check_on_unsupported_symbols(row, row_number=row_number)
+            text_file.detach()
+
+        finally:
+            if isinstance(glossary_file, FieldFile):
+                glossary_file.close()
 
     def __validate_xlsx_file(self, glossary_file):
         workbook = openpyxl.load_workbook(glossary_file, data_only=True)
@@ -120,14 +128,15 @@ class GlossaryProcessor:
             raise serializers.ValidationError({"detail": "Invalid file type"})
 
     @staticmethod
-    def _form_glossary_from_csv(glossary_file):
+    def __form_glossary_from_csv(glossary_file):
         value = []
         with glossary_file.open(mode='r') as file:
             csv_reader = csv.reader(file)
-            next(csv_reader, None)  # Skip header
+            next(csv_reader, None)
 
             for row in csv_reader:
                 value.append(f"{row[0]}={row[1]}")
+                print(value)
 
             return {
                 "file_name": glossary_file.name,
@@ -136,7 +145,7 @@ class GlossaryProcessor:
             }
 
     @staticmethod
-    def _form_glossary_from_xlsx(glossary_file) -> dict:
+    def __form_glossary_from_xlsx(glossary_file) -> dict:
         value = []
         with glossary_file.open(mode='rb') as file:
             workbook = openpyxl.load_workbook(file, data_only=True)
@@ -156,7 +165,7 @@ class GlossaryProcessor:
         self.validate_file(glossary_file)
         file_extension = os.path.splitext(glossary_file.name)[1]
         if file_extension == '.csv':
-            return self._form_glossary_from_csv(glossary_file=glossary_file)
+            return self.__form_glossary_from_csv(glossary_file=glossary_file)
 
         elif file_extension in ['.xlsx', '.xls']:
-            return self._form_glossary_from_xlsx(glossary_file=glossary_file)
+            return self.__form_glossary_from_xlsx(glossary_file=glossary_file)
