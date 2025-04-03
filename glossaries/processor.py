@@ -1,48 +1,61 @@
 import csv
 import io
 import os.path
-from typing import Optional
-
-import chardet
 import openpyxl
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework import serializers
 import pandas as pd
 from io import StringIO
+from charset_normalizer import from_bytes
 
 
 class GlossaryProcessor:
 
-    # def get_file_encoding(self, glossary_file):
-    #     with open(glossary_file.name, "rb") as f:
-    #         result = chardet.detect(f.read(100000))
-    #         print(result["encoding"])
+    @staticmethod
+    def __get_csv_file_encoding(glossary_file):
+
+        result = from_bytes(glossary_file.read())
+        glossary_file.seek(0)
+        print(result[0].encoding)
+        return result[0].encoding
 
     @staticmethod
-    def check_on_duplicate(source_values: list, value, row_number):
+    def __check_on_duplicate(source_values: list, value, row_number):
         if value not in source_values:
             source_values.append(value)
             return source_values
         else:
             raise serializers.ValidationError({"detail": f"Source value {value} is duplicated in column {row_number}"})
 
-    # @staticmethod
-    # def convert_file_to_utf_8(glossary_file):
-    #     file_extension = os.path.splitext(glossary_file.name)[1]
-    #     if file_extension == ".csv":
-    #         file_content = glossary_file.read().decode("ISO-8859-1")
-    #         file_stream = StringIO(file_content)
-    #         df = pd.read_csv(file_stream)
-    #         output_stream = StringIO()
-    #         df.to_csv(output_stream, encoding="utf-8", index=False)
-    #         output_stream.seek(0)
-    #         with open(glossary_file.name, "w") as converted_file:
-    #             converted_file.write(output_stream.getvalue())
-    #         return converted_file
-    #     elif file_extension == ".xlsx":
-    #         pass
+    def convert_file_to_utf_8(self, csv_glossary_file):
+        file_extension = os.path.splitext(csv_glossary_file.name)[1]
+        if file_extension == ".csv":
+            encoding = self.__get_csv_file_encoding(csv_glossary_file)
+
+            file_content = csv_glossary_file.read().decode(encoding)
+            csv_glossary_file.seek(0)
+
+            file_stream = io.StringIO(file_content)
+            df = pd.read_csv(file_stream)
+
+            output_stream = io.StringIO()
+            df.to_csv(output_stream, encoding="utf-8", index=False)
+            output_stream.seek(0)
+
+            converted_file = InMemoryUploadedFile(
+                file=io.BytesIO(output_stream.getvalue().encode("utf-8")),  # Convert to BytesIO
+                field_name=csv_glossary_file.field_name,
+                name=csv_glossary_file.name,
+                content_type="text/csv",
+                size=len(output_stream.getvalue()),
+                charset="utf-8",
+            )
+            return converted_file
+        elif file_extension == ".xlsx":
+            pass
 
     @staticmethod
-    def check_on_unsupported_symbols(row: list, row_number: int):
+    def __check_on_unsupported_symbols(row: list, row_number: int):
         for column in row:
             try:
                 column.encode('utf-8').decode('utf-8')
@@ -53,7 +66,7 @@ class GlossaryProcessor:
                     })
 
     @staticmethod
-    def validate_on_empy_columns(row: list, row_number: int):
+    def __validate_on_empy_columns(row: list, row_number: int):
         if row[0] is None or row[0] == '' or row[0] == ' ':
             raise serializers.ValidationError({
                 "detail": f"Source column is blank at line {row_number}."})
@@ -62,7 +75,7 @@ class GlossaryProcessor:
                 "detail": f"Target column is blank at line {row_number}."
             })
 
-    def _validate_csv_file(self, glossary_file):
+    def __validate_csv_file(self, glossary_file):
         text_file = io.TextIOWrapper(glossary_file, encoding='utf-8')
         source_values = []
         csv_reader = csv.reader(text_file)
@@ -77,12 +90,12 @@ class GlossaryProcessor:
             for column in row:
                 if row:
                     column = column.strip()
-            self.validate_on_empy_columns(row=row, row_number=row_number)
-            self.check_on_duplicate(source_values=source_values, value=row[0], row_number=row_number)
-            self.check_on_unsupported_symbols(row, row_number=row_number)
+            self.__validate_on_empy_columns(row=row, row_number=row_number)
+            self.__check_on_duplicate(source_values=source_values, value=row[0], row_number=row_number)
+            self.__check_on_unsupported_symbols(row, row_number=row_number)
         text_file.detach()
 
-    def _validate_xlsx_file(self, glossary_file):
+    def __validate_xlsx_file(self, glossary_file):
         workbook = openpyxl.load_workbook(glossary_file, data_only=True)
         sheet = workbook.active
         source_values = []
@@ -96,17 +109,17 @@ class GlossaryProcessor:
             for column in row:
                 if row:
                     column = column.strip()
-            self.validate_on_empy_columns(row=row, row_number=row_number)
-            self.check_on_duplicate(source_values=source_values, value=row[0], row_number=row_number)
-            self.check_on_unsupported_symbols(row, row_number=row_number)
+            self.__validate_on_empy_columns(row=row, row_number=row_number)
+            self.__check_on_duplicate(source_values=source_values, value=row[0], row_number=row_number)
+            self.__check_on_unsupported_symbols(row, row_number=row_number)
 
     def validate_file(self, glossary_file):
-        # glossary_file = self.convert_file_to_utf_8(glossary_file=glossary_file)
         file_extension = os.path.splitext(glossary_file.name)[1]
         if file_extension == '.csv':
-            self._validate_csv_file(glossary_file)
+            glossary_file = self.convert_file_to_utf_8(csv_glossary_file=glossary_file)
+            self.__validate_csv_file(glossary_file)
         elif file_extension in ['.xlsx', '.xls']:
-            self._validate_xlsx_file(glossary_file)
+            self.__validate_xlsx_file(glossary_file)
         else:
             raise serializers.ValidationError({"detail": "Invalid file type"})
 

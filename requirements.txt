@@ -78,3 +78,4 @@ weasyprint==61.2
 pydyf ==0.8.0
 django-cleanup == 9.0.0
 openpyxl==3.1.5
+charset-normalizer==2.0.12
