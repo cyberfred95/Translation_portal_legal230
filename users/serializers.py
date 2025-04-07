@@ -67,7 +67,6 @@ class ChangePasswordSerializer(serializers.Serializer):
     confirm_password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        print(attrs)
         if 'current_password' not in attrs or 'new_password' not in attrs or 'confirm_password' not in attrs:
             raise serializers.ValidationError({"detail": "Fill all data for password change"})
         if attrs['new_password'] != attrs['confirm_password']:

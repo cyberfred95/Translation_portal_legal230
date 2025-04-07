@@ -101,8 +101,6 @@ class StatsProcessor:
                 )
             }
         )
-        print(response.text)
-        print(response.status_code)
 
     def send_writing_request(self,
                              texts: list,

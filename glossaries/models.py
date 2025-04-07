@@ -14,7 +14,7 @@ class Glossary(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     group = models.ForeignKey(UserGroup, on_delete=models.SET_NULL, blank=True, null=True)
-    file = models.FileField(upload_to='glossaries/', validators=[FileExtensionValidator(['csv'])])
+    file = models.FileField(upload_to='glossaries/', validators=[FileExtensionValidator(['csv', 'xlsx'])])
     source_language = models.ForeignKey(
         Language,
         on_delete=models.SET_NULL,

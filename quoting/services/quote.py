@@ -18,7 +18,6 @@ class FormQuoteService:
     @staticmethod
     def get_expert_revision_url(project_id, context_variables: dict) -> str:
         base_url = f"{preferences.MainSettings.CLOUDSTORAGE_API_URL}post_editing/{project_id}/accept/"
-        print(f"{base_url}?{urlencode(context_variables)}")
         return f"{base_url}?{urlencode(context_variables)}"
 
     @staticmethod

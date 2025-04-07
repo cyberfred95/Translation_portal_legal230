@@ -63,7 +63,6 @@ class WritingProcessAPIView(APIView):
 
             }
         )
-        print(response.json())
         result = response.json().get('result')
         if not result:
             result = []

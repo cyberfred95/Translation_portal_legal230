@@ -39,7 +39,6 @@ def lowercase_file_extension(file: InMemoryUploadedFile) -> InMemoryUploadedFile
     name, ext = os.path.splitext(file.name)
     # Lowercase the extension
     file.name = f"{name}{ext.lower()}"
-    print(file.name)
     return file
 
 
@@ -87,7 +86,6 @@ def password_valid(request):
     if not request.data.get('password'):
         return False
     password = base64.b64decode(request.data.get('password'))
-    print(password)
     if not check_password(password, request.user.password):
         return False
     return True

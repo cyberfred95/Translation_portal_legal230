@@ -112,7 +112,7 @@ def file_translate(request):
             words_count += len(file_texts)
             symbols_count += sum(len(word) for word in file_texts)
             file = rename_file(file=file, file_name=file_name)
-    print(form_glossary_object(request))
+    print(json.dumps(form_glossary_object(request)))
     if translation_allowed(request, words_count=words_count, files_count=len(files), symbols_count=symbols_count):
         data = {
             "user_custom_mt_token": request.user.uuid,
@@ -314,7 +314,6 @@ class ProjectsHistoryView(TemplateView):
             params["page"] = int(page)
 
         response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
-        pprint(response['results'])
         if 'results' in response:
             for project in response['results']:
                 file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
@@ -344,7 +343,6 @@ class SingleProjectView(APIView):
         project_ids = request.query_params.getlist('project_id[]', [])
         responses = []
         for project_id in project_ids:
-            print(project_id)
             response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                                     headers={
                                         "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
@@ -387,7 +385,6 @@ class LanguageDetectView(APIView):
                 words_count=words_count,
                 symbols_count=symbols_count
             )
-            print(text_for_detection)
             if translation_allowed(request, files_count=len(files), words_count=words_count,
                                    symbols_count=symbols_count):
 

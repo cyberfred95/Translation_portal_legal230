@@ -102,7 +102,6 @@ class UsageView(TemplateView):
             else:
                 user_names = self.request.GET.getlist('user', [])
             users = User.objects.filter(username__in=user_names)
-            print(users)
             user_uuids = [str(user.uuid) for user in users]
 
             if self.request.user.is_staff:
@@ -148,7 +147,6 @@ class UsageView(TemplateView):
     def get_stats(self) -> dict:
         files = self.request.GET.getlist('file_name', [])
         additional_url_params = self.set_additional_url_params()
-        print(self.get_users())
         response = requests.get(
             preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params,
             headers={

@@ -17,7 +17,6 @@ class GlossaryProcessor:
 
         result = from_bytes(glossary_file.read())
         glossary_file.seek(0)
-        print(result[0].encoding)
         return result[0].encoding
 
     @staticmethod
@@ -66,7 +65,6 @@ class GlossaryProcessor:
 
     @staticmethod
     def __validate_on_empy_columns(row: list, row_number: int):
-        print(row)
         if row[0] is None or row[0] == '' or row[0] == ' ':
             raise serializers.ValidationError({
                 "detail": f"Source column is blank at line {row_number}."})
@@ -138,7 +136,6 @@ class GlossaryProcessor:
 
             for row in csv_reader:
                 value.append(f"{row[0]}={row[1]}")
-                print(value)
 
             return {
                 "file_name": glossary_file.name,
