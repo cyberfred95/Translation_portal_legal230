@@ -21,11 +21,12 @@ class GlossaryProcessor:
 
     @staticmethod
     def __check_on_duplicate(source_values: list, value, row_number):
-        if value not in source_values:
-            source_values.append(value)
-            return source_values
-        else:
-            raise serializers.ValidationError({"detail": f"Source value {value} is duplicated in column {row_number}"})
+        if value:
+            if value not in source_values:
+                source_values.append(value)
+                return source_values
+            else:
+                raise serializers.ValidationError({"detail": f"Source value {value} is duplicated in column {row_number}"})
 
     def convert_file_to_utf_8(self, csv_glossary_file):
         encoding = self.__get_csv_file_encoding(csv_glossary_file)
@@ -55,13 +56,15 @@ class GlossaryProcessor:
     @staticmethod
     def __check_on_unsupported_symbols(row: list, row_number: int):
         for column in row[:1]:
-            try:
-                column.encode('utf-8').decode('utf-8')
-            except UnicodeDecodeError as e:
-                raise serializers.ValidationError(
-                    {
-                        "detail": f"Invalid UTF-8 character at position {e.start}: {column[e.start:e.end]} on line {row_number}"
-                    })
+            if column:
+                if column.startswith("#"):
+                    try:
+                        column.encode('utf-8').decode('utf-8')
+                    except UnicodeDecodeError as e:
+                        raise serializers.ValidationError(
+                            {
+                                "detail": f"Invalid UTF-8 character at position {e.start}: {column[e.start:e.end]} on line {row_number}"
+                            })
 
     @staticmethod
     def __validate_on_empy_columns(row: list, row_number: int):
@@ -111,7 +114,6 @@ class GlossaryProcessor:
                     "detail": f"Invalid row at line {row_number}: {row}. "
                               f"Expected two columns."
                 })
-            self.__validate_on_empy_columns(row=row, row_number=row_number)
             for column in row:
                 if column:
                     column = column.strip()
