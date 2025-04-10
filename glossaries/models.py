@@ -1,6 +1,8 @@
 import os
 
 from django.db import models
+
+from glossaries.processor import GlossaryProcessor
 from languages.models import Language
 from users.models import User, UserGroup
 from django.core.validators import FileExtensionValidator
@@ -64,7 +66,6 @@ class Glossary(models.Model):
             )
             if not self.group and not self.user:
                 existing_default_glossaries = existing_default_glossaries.exclude(pk=self.pk)
-                print(existing_default_glossaries)
 
                 if existing_default_glossaries.exists():
                     raise ValidationError("A default glossary for this language pair and domain already exists.")
