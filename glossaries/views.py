@@ -2,6 +2,7 @@ import csv
 import io
 import os.path
 
+import django.core.exceptions
 import openpyxl
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.functions import Lower
@@ -89,7 +90,10 @@ class AddGlossaryView(APIView):
         processor = GlossaryProcessor()
         if os.path.splitext(gloss_file.name)[1] == '.csv':
             request.FILES['file'] = processor.convert_file_to_utf_8(gloss_file)
-        processor.validate_file(gloss_file)
+        try:
+            processor.validate_file(gloss_file)
+        except django.core.exceptions.ValidationError as e:
+            raise serializers.ValidationError({"detail":str(list(e)[0])})
 
     def post(self, request):
         self.validate(request)

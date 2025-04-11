@@ -4,10 +4,10 @@ import os.path
 import openpyxl
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.fields.files import FieldFile
-from rest_framework import serializers
 import pandas as pd
 from io import StringIO
 from charset_normalizer import from_bytes
+from django.core.exceptions import ValidationError
 
 
 class GlossaryProcessor:
@@ -26,7 +26,7 @@ class GlossaryProcessor:
                 source_values.append(value)
                 return source_values
             else:
-                raise serializers.ValidationError({"detail": f"Source value {value} is duplicated in column {row_number}"})
+                raise ValidationError(f"Source value {value} is duplicated in line {row_number}")
 
     def convert_file_to_utf_8(self, csv_glossary_file):
         encoding = self.__get_csv_file_encoding(csv_glossary_file)
@@ -37,7 +37,7 @@ class GlossaryProcessor:
             file_stream = io.StringIO(file_content)
             df = pd.read_csv(file_stream)
         except pd.errors.ParserError as e:
-            raise serializers.ValidationError({"detail": str(e)})
+            raise ValidationError(str(e))
 
         output_stream = io.StringIO()
         df.to_csv(output_stream, encoding="utf-8", index=False)
@@ -61,20 +61,19 @@ class GlossaryProcessor:
                     try:
                         column.encode('utf-8').decode('utf-8')
                     except UnicodeDecodeError as e:
-                        raise serializers.ValidationError(
-                            {
-                                "detail": f"Invalid UTF-8 character at position {e.start}: {column[e.start:e.end]} on line {row_number}"
-                            })
+                        raise ValidationError(
+                            f"Invalid UTF-8 character at position {e.start}: {column[e.start:e.end]} on line {row_number}"
+                            )
 
     @staticmethod
     def __validate_on_empy_columns(row: list, row_number: int):
         if row[0] is None or row[0] == '' or row[0] == ' ':
-            raise serializers.ValidationError({
-                "detail": f"Source column is blank at line {row_number}."})
+            raise ValidationError(
+                f"Source column is blank at line {row_number}.")
         elif row[1] is None or row[1] == '' or row[1] == ' ':
-            raise serializers.ValidationError({
-                "detail": f"Target column is blank at line {row_number}."
-            })
+            raise ValidationError(
+                f"Target column is blank at line {row_number}."
+            )
 
     def __validate_csv_file(self, glossary_file):
         if isinstance(glossary_file, FieldFile):
@@ -88,9 +87,8 @@ class GlossaryProcessor:
 
             for row_number, row in enumerate(csv_reader, start=2):
                 if len(row) < 2 or (len(row) == 3 and row[2] != '') or len(row) > 3:
-                    raise serializers.ValidationError({
-                        "detail": f"Invalid row at line {row_number}: {row}. Expected two columns."
-                    })
+                    raise ValidationError(f"Invalid row at line {row_number}: {row}. Expected two columns."
+                    )
                 self.__validate_on_empy_columns(row=row, row_number=row_number)
                 for column in row:
                     if column:
@@ -110,10 +108,10 @@ class GlossaryProcessor:
 
         for row_number, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
             if len(row) < 2 or (len(row) == 3 and row[2]) or len(row) > 3:
-                raise serializers.ValidationError({
-                    "detail": f"Invalid row at line {row_number}: {row}. "
+                raise ValidationError(
+                    f"Invalid row at line {row_number}: {row}. "
                               f"Expected two columns."
-                })
+                )
             for column in row:
                 if column:
                     column = column.strip()
@@ -127,7 +125,7 @@ class GlossaryProcessor:
         elif file_extension in ['.xlsx', '.xls']:
             self.__validate_xlsx_file(glossary_file)
         else:
-            raise serializers.ValidationError({"detail": "Invalid file type"})
+            raise ValidationError("Invalid file type")
 
     @staticmethod
     def __form_glossary_from_csv(glossary_file):
