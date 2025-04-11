@@ -70,6 +70,16 @@
                         <p class="text-3.5 text-gray-400">{% trans 'Supported Files: .csv, .xlsx max 5mb' %}</p>
                     </div>
                 </div>
+                <ul class="list-disc">
+                    <li>The first row of the file should start with the language (i.e: French or FR)</li>
+                    <li>Your file should not include any comments</li>
+                    <li>Your file should have only 2 columns</li>
+                    <li>Your file should include only one entry per each source text (no duplicates are allowed)</li>
+                    <li>Your file must not contain empty lines, empty sources or empty targets</li>
+                    <li>Entries must not have leading or trailing empty spaces</li>
+                    <li>Table formatting is not allowed, only plain text</li>
+                    <li>Commas are not allowed</li>
+                </ul>
                 <button type="submit"
                         class="bg-gray-600 px-6.5 py-1 rounded font-semibold text-4 text-white create-glossary">
                     {% trans 'Continue' %}
