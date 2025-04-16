@@ -446,6 +446,31 @@ msgstr "Continuer"
 msgid "There are currently no glossaries to display."
 msgstr "Il n'y a actuellement aucun glossaire à afficher"
 
+msgid "The first row of the file should start with the language (i.e: French or FR)"
+msgstr "La première ligne de votre lexique doit contenir les codes de langue"
+
+msgid "Your file should not include any comments"
+msgstr "Le lexique ne doit contenir aucun commentaires"
+
+msgid "Your file should have only 2 columns"
+msgstr "Le lexique ne doit pas avoir plus de deux colonnes"
+
+msgid "Your file should include only one entry per each source text (no duplicates are allowed)"
+msgstr "Un même terme ne doit pas être répété plusieurs fois"
+
+msgid "Your file must not contain empty lines, empty sources or empty targets"
+msgstr "Votre lexique ne doit pas contenir de lignes ou de cellules vides"
+
+msgid "Entries must not have leading or trailing empty spaces"
+msgstr "Les termes de votre lexique ne doivent ni commencer ni finir par un espace"
+
+msgid "Table formatting is not allowed, only plain text"
+msgstr "Votre lexique ne doit pas contenir de tableau formaté, uniquement du texte"
+
+msgid "Commas are not allowed"
+msgstr "Le lexique ne doit pas contenir de virgules"
+
+
 #########################################
 
 ################################################# PROJECT HISTORY #################################################

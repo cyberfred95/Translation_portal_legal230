@@ -440,6 +440,31 @@ msgstr "Continue"
 msgid "There are currently no glossaries to display."
 msgstr "There are currently no glossaries to display."
 
+msgid "The first row of the file should start with the language (i.e: French or FR)"
+msgstr "The first row of the file should start with the language (i.e: French or FR)"
+
+msgid "Your file should not include any comments"
+msgstr "Your file should not include any comments"
+
+msgid "Your file should have only 2 columns"
+msgstr "Your file should have only 2 columns"
+
+msgid "Your file should include only one entry per each source text (no duplicates are allowed)"
+msgstr "Your file should include only one entry per each source text (no duplicates are allowed)"
+
+msgid "Your file must not contain empty lines, empty sources or empty targets"
+msgstr "Your file must not contain empty lines, empty sources or empty targets"
+
+msgid "Entries must not have leading or trailing empty spaces"
+msgstr "Entries must not have leading or trailing empty spaces"
+
+msgid "Table formatting is not allowed, only plain text"
+msgstr "Table formatting is not allowed, only plain text"
+
+msgid "Commas are not allowed"
+msgstr "Commas are not allowed"
+
+
 #########################################
 
 ################################################# PROJECT HISTORY #################################################
