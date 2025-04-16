@@ -381,11 +381,11 @@ input[type="checkbox"]:checked {
             transparent 5px,
             transparent 10px
     );
-    background-size: 1px 100%; /* Вертикальна лінія */
+    background-size: 1px 100%;
     background-repeat: no-repeat;
-    background-position: center; /* Центрування по горизонталі */
-    width: 1px; /* Ширина лінії */
-    height: 100%; /* Висота на весь контейнер */
+    background-position: center;
+    width: 1px;
+    height: 100%;
     display: block;
 }
 
@@ -398,4 +398,17 @@ input[type="checkbox"]:checked {
     --tw-ring-shadow: initial;
     --tw-shadow: initial;
     --tw-shadow-colored: initial;
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+nav::-webkit-scrollbar {
+    display: none;
 }
