@@ -1,3 +1,5 @@
+import json
+
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -50,18 +52,21 @@ class WritingProcessAPIView(APIView):
         prompt = Prompt.objects.filter(id=data['prompt']).first()
         if not prompt:
             return Response({"detail": "Prompt not found"}, status=status.HTTP_404_NOT_FOUND)
-
+        prompt.variables['text'] = data.get('text')
+        data = {
+                "text": data['text'],
+                "prompt": prompt.prompt,
+                "gpt_model": prompt.gpt_model,
+                "temperature": int(prompt.temperature),
+                "variables": prompt.variables,
+            }
+        print(data)
         response = requests.post(
             url=preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + 'gpt-processing/foreign_gpt_process/',
             headers={
                 'token': preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
             },
-            data={
-                "text": data['text'],
-                "prompt": prompt.prompt,
-                "gpt_model": prompt.gpt_model
-
-            }
+            json=data
         )
         result = response.json().get('result')
         if not result:
