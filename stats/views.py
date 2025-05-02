@@ -158,6 +158,7 @@ class UsageView(TemplateView):
                 "file_name": files
             }
         )
+        print(response.json())
         stats = dict(response.json())
         return self.prepare_stats(stats)
 

@@ -48,7 +48,7 @@ def get_word_count(segment):
     return result
 
 
-def get_text_from_file(file: InMemoryUploadedFile, api_key) -> list:
+def get_text_from_file(file: InMemoryUploadedFile, api_key):
     try:
         texts = StatsProcessor(api_key).get_texts(file=file)
     except UnicodeEncodeError:
@@ -60,7 +60,7 @@ def get_text_from_file(file: InMemoryUploadedFile, api_key) -> list:
         for word in re.sub(r'<[^>]*>', '', text['text']).split()
     ]
     file.seek(0)
-    return formated_texts
+    return formated_texts, [text['text'] for text in texts['texts']]
 
 
 def get_project_file(file_url) -> InMemoryUploadedFile:

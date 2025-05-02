@@ -101,16 +101,19 @@ def file_translate(request):
         words_count = cache_data['words_count']
         symbols_count = cache_data['symbols_count']
         cache.delete(f"{request.user.uuid}")
-    else:
-        words_count = 0
-        symbols_count = 0
-        for file in files:
+        print(symbols_count)
+        print(words_count)
+    # else:
+    words_count = 0
+    symbols_count = 0
+    for file in files:
             files = request.FILES.getlist('document[]', [])
             file_name = file.name
             file = rename_file(file=file)
-            file_texts = get_text_from_file(file, api_key)
-            words_count += len(file_texts)
+            file_words, file_texts = get_text_from_file(file, api_key)
+            words_count += len(file_words)
             symbols_count += sum(len(word) for word in file_texts)
+            print(symbols_count)
             file = rename_file(file=file, file_name=file_name)
     print(json.dumps(form_glossary_object(request)))
     if translation_allowed(request, words_count=words_count, files_count=len(files), symbols_count=symbols_count):
@@ -423,9 +426,9 @@ class LanguageDetectView(APIView):
     def get_text_for_detection(self, file, api_key, words_count, symbols_count):
         file_name = file.name
         file = self.rename_file(file)
-        formated_texts = get_text_from_file(file, api_key)
+        formated_texts, full_text = get_text_from_file(file, api_key)
         words_count += len(formated_texts)
-        symbols_count += sum(len(word) for word in formated_texts)
+        symbols_count += sum(len(word) for word in full_text)
         text_for_detection = ' '.join(formated_texts[:self.WORDS_COUNT_FOR_DETECTION])
         file = self.rename_file(file, file_name=file_name)
         return text_for_detection, words_count, symbols_count

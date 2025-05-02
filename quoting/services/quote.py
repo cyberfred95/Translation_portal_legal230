@@ -38,7 +38,7 @@ class FormQuoteService:
         quote_price = get_price_by_language_pair(source_language=project['source_language'],
                                                  target_language=project['target_language'])
         file = get_project_file(file_url=project['source_file'])
-        words_count = len(get_text_from_file(file, api_key=None))
+        words_count = len(get_text_from_file(file, api_key=None))[0]
         file_name, extension = os.path.splitext(file.name)
         if quote_price:
             context_variables = {
