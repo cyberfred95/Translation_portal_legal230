@@ -17,7 +17,7 @@ class FileExpertRevisionService:
         if language_quote:
             api_key = None
             file = get_project_file(file_url=project['source_file'])
-            words_count = len(get_text_from_file(file, api_key=api_key))[0]
+            words_count = len(get_text_from_file(file, api_key=api_key)[1])
             if request.data.get('company'):
                 group = UserGroup.objects.filter(name=request.data.get('company')).first()
             else:
