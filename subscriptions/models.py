@@ -1,18 +1,16 @@
 from datetime import timezone
 
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 
-from users.models import UserGroup
+from users.models import UserGroup, User
 
 
 # Create your models here.
 
 
 class SubscriptionType(models.Model):
-    class PriceTypeChoices(models.TextChoices):
-        PUMP = 'PER_USER_PER_MONTH', 'Per-user per month (PUMP)'
-        AU = 'AS_USE', 'As use (AU)',
-
     name = models.CharField(max_length=255)
 
     max_symbols_count = models.IntegerField(default=0)
@@ -20,8 +18,6 @@ class SubscriptionType(models.Model):
     max_files_count = models.IntegerField(default=0)
     custom_glossaries_count = models.IntegerField(default=0, verbose_name="Custom Glossaries Count")
 
-
-    price_type = models.CharField(max_length=255, choices=PriceTypeChoices.choices)
     price = models.DecimalField(max_digits=7, decimal_places=2)
 
     access_to_writing = models.BooleanField(default=False, verbose_name="Access to Writing")
@@ -32,15 +28,15 @@ class SubscriptionType(models.Model):
         return self.name
 
 
-class GroupSubscription(models.Model):
+class UserSubscription(models.Model):
 
-    class GroupSubscriptionChoices(models.TextChoices):
+    class UserSubscriptionChoices(models.TextChoices):
         ACTIVE = 'ACTIVE', 'Active'
         INACTIVE = 'INACTIVE', 'Inactive'
 
-    group = models.ForeignKey(UserGroup, on_delete=models.CASCADE, related_name='subscriptions')
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='subscriptions')
     subscription = models.ForeignKey(SubscriptionType, on_delete=models.CASCADE, related_name='groups')
-    status = models.CharField(max_length=255, choices=GroupSubscriptionChoices.choices)
+    status = models.CharField(max_length=255, choices=UserSubscriptionChoices.choices)
 
     max_symbols_count = models.IntegerField(default=0)
     max_files_count = models.IntegerField(default=0)
@@ -58,6 +54,9 @@ class GroupSubscription(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
 
-
     def __str__(self):
-        return self.group.name
+        return self.user.__str__()
+
+    def clean(self):
+        if self.user.subscriptions.all().exclude(id=self.id).exists():
+            raise ValidationError("Subscription for this user already exists")

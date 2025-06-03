@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from .models import GroupSubscription
+from .models import UserSubscription
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
@@ -16,7 +16,7 @@ class SubscribedPermission(permissions.BasePermission):
             subscription = request.user.group.subscriptions.first()
             if not subscription:
                 return False
-            if subscription.status != GroupSubscription.GroupSubscriptionChoices.ACTIVE:
+            if subscription.status != UserSubscription.UserSubscriptionChoices.ACTIVE:
                 return False
 
             current_time = now()
