@@ -35,7 +35,7 @@ class UserSubscription(models.Model):
         INACTIVE = 'INACTIVE', 'Inactive'
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='subscriptions')
-    subscription = models.ForeignKey(SubscriptionType, on_delete=models.CASCADE, related_name='groups')
+    subscription = models.ForeignKey(SubscriptionType, on_delete=models.CASCADE, related_name='users')
     status = models.CharField(max_length=255, choices=UserSubscriptionChoices.choices)
 
     max_symbols_count = models.IntegerField(default=0)
