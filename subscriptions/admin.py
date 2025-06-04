@@ -6,6 +6,7 @@ admin.site.register(SubscriptionType)
 
 
 class UserSubscriptionAdmin(admin.ModelAdmin):
+    list_display = ('user', 'subscription')
     fieldsets = (
         (None, {'fields': ('user', 'subscription', 'status')}),
         ('Allowed', {'fields': ('max_symbols_count', 'max_words_count', 'max_files_count', 'custom_glossaries_count',)}),

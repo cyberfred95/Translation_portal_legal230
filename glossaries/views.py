@@ -71,10 +71,10 @@ class AddGlossaryView(APIView):
     @staticmethod
     def validate(request):
         if not request.user.is_staff:
-            group_subscription = request.user.group.subscriptions.first()
-            if group_subscription.custom_glossaries_count > 0:
+            user_subscription = request.user.subscriptions.first()
+            if user_subscription.custom_glossaries_count > 0:
                 user_glossaries_count = Glossary.objects.filter(user=request.user).count()
-                if user_glossaries_count + 1 > group_subscription.custom_glossaries_count:
+                if user_glossaries_count + 1 > user_subscription.custom_glossaries_count:
                     raise serializers.ValidationError({
                         "detail": "You are not allowed to add more glossaries. Please contact your group administator"})
 

@@ -13,17 +13,17 @@ class SubscribedPermission(permissions.BasePermission):
         if not request.user.is_staff:
             if not request.user.group:
                 return False
-            subscription = request.user.group.subscriptions.first()
-            if not subscription:
+            user_subscription = request.user.subscriptions.first()
+            if not user_subscription:
                 return False
-            if subscription.status != UserSubscription.UserSubscriptionChoices.ACTIVE:
+            if user_subscription.status != UserSubscription.UserSubscriptionChoices.ACTIVE:
                 return False
 
             current_time = now()
-            if current_time > subscription.end_date or current_time < subscription.start_date:
+            if current_time > user_subscription.end_date or current_time < user_subscription.start_date:
                 return False
             if hasattr(view, 'requires_writing_access') and view.requires_writing_access:
-                if not subscription.access_to_writing:
+                if not user_subscription.access_to_writing:
                     return False
 
         return True

@@ -174,10 +174,10 @@ class TranslateView(TemplateView):
 
         if self.request.user.is_staff:
             return True
-        group = self.request.user.group
-        if group:
-            group_subscription = group.subscriptions.first()
-            if group_subscription and group_subscription.access_to_official_glossaries:
+
+        user_subscription = self.request.user.subscriptions.first()
+        if self.request.user.group:
+            if user_subscription and user_subscription.access_to_official_glossaries:
                 return True
         return False
 
