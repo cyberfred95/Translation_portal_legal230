@@ -223,14 +223,11 @@
                         </div>
                     </div>
                     <div class="flex flex-col gap-2.5 mt-5">
-                        <select class="glossary-language-source glossary-language-select" name="action" required>
+                        <select class="glossary-language-source glossary-language-select" name="subscription_type_id" required>
                             <option value="" disabled selected>Select subscription type</option>
-                            {% for translate_language in translate_languages %}
-                            <option value="{{ translate_language.abbreviation|lower }}">
-                                {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                                {{ translate_language.french_name }}
-                                {% else %} {{ translate_language.name }}
-                                {% endif %}
+                            {% for subscription_type in subscription_types %}
+                            <option value="{{ subscription_type.id }}">
+                                {{ subscription_type.name }}
                             </option>
                             {% endfor %}
                         </select>

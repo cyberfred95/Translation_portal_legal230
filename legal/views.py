@@ -22,6 +22,8 @@ from django.views.generic import TemplateView
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
 import django
 from rest_framework.views import APIView
+
+from subscriptions.models import SubscriptionType
 from .helpers import get_translate_data, lowercase_file_extension, get_word_count, get_text_from_file, get_project_file, \
     rename_file
 
@@ -168,6 +170,7 @@ class TranslateView(TemplateView):
         context['languages'] = languages
         context['translate_languages'] = self.get_languages()
         context['access_to_default_glossaries'] = self.default_glossary_allowed()
+        context['subscription_types'] = SubscriptionType.objects.all()
         return context
 
     def default_glossary_allowed(self):

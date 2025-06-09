@@ -57,6 +57,17 @@ class UserSubscription(models.Model):
     def __str__(self):
         return self.user.__str__()
 
+    def save(self, *args, **kwargs):
+        if self.subscription:
+            self.max_files_count = self.subscription.max_files_count
+            self.max_words_count = self.subscription.max_words_count
+            self.max_symbols_count = self.subscription.max_symbols_count
+            self.custom_glossaries_count = self.subscription.custom_glossaries_count
+            self.access_to_writing = self.subscription.access_to_writing
+            self.access_to_official_glossaries = self.subscription.access_to_official_glossaries
+            self.access_to_sso = self.subscription.access_to_sso
+        super().save(*args, **kwargs)
+
     def clean(self):
         if self.user.subscriptions.all().exclude(id=self.id).exists():
             raise ValidationError("Subscription for this user already exists")
