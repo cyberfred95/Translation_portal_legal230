@@ -12,6 +12,16 @@ $(document).ready(function () {
         }
     });
 
+    $(".glossary-language-source").attr("data-placeholder", language_code === 'en'? "Select subscription type": "Sélectionner dans la liste");
+
+    $(".glossary-language-source").select2();
+
+    $('.glossary-language-select').select2().each(function () {
+        var $select = $(this);
+        $select.data('select2').$container.addClass('glossary');
+        $select.data('select2').$dropdown.addClass('glossary');
+    });
+
 
     // ------------- CHANGE LANGUAGE -------------
 
