@@ -17,6 +17,8 @@ services:
       - USE_DOCKER=yes
       - DJANGO_SETTINGS_MODULE=legal.settings_dev
       - DOCKER=true
+    env_file:
+      - .env
 
   dockerize:
     image: jwilder/dockerize
