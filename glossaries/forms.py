@@ -14,4 +14,4 @@ class GlossaryAdminForm(ModelForm):
         print("CLEANED FILE")
         print(self.cleaned_data['file'])
         processor.validate_file(self.cleaned_data['file'])
-
+        return self.cleaned_data['file']

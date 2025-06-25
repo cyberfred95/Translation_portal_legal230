@@ -70,8 +70,8 @@ class Glossary(models.Model):
                 if existing_default_glossaries.exists():
                     raise ValidationError("A default glossary for this language pair and domain already exists.")
 
-                if not self.domain:
-                    raise ValidationError("You have to choose domain for default glossary")
+        if not self.domain and not self.user and not self.group:
+            raise ValidationError("You have to choose domain or user or group")
 
         existing_glossary_filters = {
             'domain': self.domain,
@@ -92,7 +92,7 @@ class Glossary(models.Model):
 
     def save(self, *args, **kwargs):
 
-        if not self.name and self.file:
+        if self.file:
             # Get the file name without the extension
             self.name = os.path.splitext(os.path.basename(self.file.name))[0]
 
