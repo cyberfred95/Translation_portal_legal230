@@ -70,6 +70,9 @@ class Glossary(models.Model):
                 if existing_default_glossaries.exists():
                     raise ValidationError("A default glossary for this language pair and domain already exists.")
 
+                if not self.domain:
+                    raise ValidationError("You must choose a domain for default glossary.")
+
         if not self.domain and not self.user and not self.group:
             raise ValidationError("You have to choose domain or user or group")
 
