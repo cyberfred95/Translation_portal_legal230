@@ -235,3 +235,6 @@ CACHES = {
         'LOCATION': 'unique-snowflake',
     }
 }
+
+GLOSSARY_SYSTEM = os.environ.get("GLOSSARY_SYSTEM")
+GLOSSARY_API_KEY = os.environ.get("GLOSSARY_API_KEY")

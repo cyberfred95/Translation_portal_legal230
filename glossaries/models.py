@@ -1,13 +1,18 @@
 import os
 
+import requests
+from django.conf import settings
 from django.db import models
 
+from glossaries.helpers import get_glossary_username
 from glossaries.processor import GlossaryProcessor
+from glossaries.services import AIGlossaryService
 from languages.models import Language
 from users.models import User, UserGroup
 from django.core.validators import FileExtensionValidator
 from domains.models import Domain
 from django.core.exceptions import ValidationError
+from preferences import preferences
 
 
 # Create your models here.
@@ -17,6 +22,7 @@ class Glossary(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     group = models.ForeignKey(UserGroup, on_delete=models.SET_NULL, blank=True, null=True)
     file = models.FileField(upload_to='glossaries/', validators=[FileExtensionValidator(['csv', 'xlsx'])])
+    glossary_id = models.CharField(max_length=255, blank=True, null=True)
     source_language = models.ForeignKey(
         Language,
         on_delete=models.SET_NULL,
@@ -35,21 +41,6 @@ class Glossary(models.Model):
     class Meta:
         verbose_name = 'Glossary'
         verbose_name_plural = 'Glossaries'
-
-    def __str__(self):
-        return self.name
-
-    def file_size(self):
-        if self.file:
-            size = self.file.size
-
-            if size >= 1024 * 1024:
-                return f"{round(size / (1024 * 1024), 2)} MB"
-            elif size >= 1024:
-                return f"{round(size / 1024, 2)} KB"
-            else:
-                return f"{size} bytes"
-        return None
 
     def clean(self):
         if self.user and self.group:
@@ -93,10 +84,3 @@ class Glossary(models.Model):
 
         super().clean()
 
-    def save(self, *args, **kwargs):
-
-        if self.file:
-            # Get the file name without the extension
-            self.name = os.path.splitext(os.path.basename(self.file.name))[0]
-
-        super(Glossary, self).save(*args, **kwargs)
