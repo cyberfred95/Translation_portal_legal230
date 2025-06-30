@@ -104,15 +104,27 @@ class GlossaryProcessor:
                 glossary_file.close()
 
     def __validate_xlsx_file(self, glossary_file):
-        workbook = openpyxl.load_workbook(glossary_file, data_only=True)
+        if hasattr(glossary_file, 'file'):
+            file_obj = glossary_file.file
+        else:
+            file_obj = glossary_file
+
+        if hasattr(file_obj, 'seek'):
+            try:
+                file_obj.seek(0)
+            except ValueError:
+                glossary_file.open('rb')
+                file_obj = glossary_file.file
+                file_obj.seek(0)
+
+        workbook = openpyxl.load_workbook(file_obj, data_only=True)
         sheet = workbook.active
         source_values = []
 
         for row_number, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
             if len(row) < 2 or (len(row) == 3 and row[2]) or len(row) > 3:
                 raise ValidationError(
-                    f"Invalid row at line {row_number}: {row}. "
-                    f"Expected two columns."
+                    f"Invalid row at line {row_number}: {row}. Expected two columns."
                 )
             self.__validate_on_empy_columns(row=row, row_number=row_number)
             for column in row:

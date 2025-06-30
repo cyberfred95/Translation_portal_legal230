@@ -53,11 +53,9 @@ class UserGlossariesView(TemplateView):
         formatted_glossaries = [
             {
                 "id": glossary.id,
-                "file_url": self.request.build_absolute_uri(glossary.file.url),
                 "name": glossary.name,
                 "source_language": glossary.source_language.abbreviation.upper(),
                 "target_language": glossary.target_language.abbreviation.upper(),
-                "file_size": glossary.file_size(),
                 "created_at": glossary.created_at,
             }
             for glossary in paginated_glossaries
