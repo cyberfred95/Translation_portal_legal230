@@ -84,7 +84,7 @@ def text_translation(request):
                         status=status.HTTP_400_BAD_REQUEST)
 
 
-def form_glossary_object(self, request) -> Optional[dict]:
+def form_glossary_object(request) -> Optional[dict]:
     try:
         glossary = Glossary.objects.get(id=request.POST.get('glossary'))
         if glossary:
