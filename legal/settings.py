@@ -286,6 +286,9 @@ CACHES = {
     }
 }
 
+GLOSSARY_SYSTEM = os.environ.get("GLOSSARY_SYSTEM")
+GLOSSARY_API_KEY = os.environ.get("GLOSSARY_API_KEY")
+
 # Stripe Configuration
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY')
@@ -302,3 +305,4 @@ ACTIVE_TRAIL_API_KEY = os.environ.get('ACTIVE_TRAIL_API_KEY')
 # Lexa Api Configuration (waiting on custom.mt, will be deprecated soon)
 LEXA_API_GROUP_DEFAULT_API_KEY = os.environ.get(
     'LEXA_API_GROUP_DEFAULT_API_KEY')
+

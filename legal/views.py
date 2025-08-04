@@ -9,8 +9,10 @@ from pprint import pprint
 from urllib.parse import urlparse, unquote
 
 import openpyxl
+from django.conf import settings
 from django.urls import reverse
 
+from glossaries.helpers import get_glossary_username
 from glossaries.processor import GlossaryProcessor
 from quoting.models import LanguageQuote
 from django.utils.timezone import now
@@ -87,8 +89,11 @@ def form_glossary_object(request) -> Optional[dict]:
     try:
         glossary = Glossary.objects.get(id=request.POST.get('glossary'))
         if glossary:
-            processor = GlossaryProcessor()
-            return processor.form_glossary_object(glossary.file)
+            return {
+                "system": settings.GLOSSARY_SYSTEM,
+                "username": get_glossary_username(glossary),
+                "glossary_id": glossary.glossary_id,
+            }
     except Glossary.DoesNotExist:
         return {}
     except ValueError:

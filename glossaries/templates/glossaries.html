@@ -26,11 +26,6 @@
                     </div>
                 </th>
                 <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
-                    <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        {% trans 'Size' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
-                    </div>
-                </th>
-                <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
                     <div class="flex items-center gap-1 w-auto">
                         {% trans 'Created' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                     </div>
@@ -75,9 +70,6 @@
                         <span class="text-3 text-green-500">{{ glossary.target_language }}</span>
                     </div>
 
-                </td>
-                <td class="text-3.25 text-gray-600 ">
-                    {{ glossary.file_size }}
                 </td>
                 <td class="text-3.25 text-gray-600 created-at">
                     {{ glossary.created_at | date:"d/m/Y" }}

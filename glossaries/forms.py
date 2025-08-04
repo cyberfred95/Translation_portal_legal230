@@ -12,3 +12,4 @@ class GlossaryAdminForm(ModelForm):
     def clean_file(self):
         processor = GlossaryProcessor()
         processor.validate_file(self.cleaned_data['file'])
+        return self.cleaned_data['file']
