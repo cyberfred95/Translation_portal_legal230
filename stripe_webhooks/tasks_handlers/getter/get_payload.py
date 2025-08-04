@@ -106,17 +106,14 @@ def get_payload_email(payload: dict) -> tuple[HttpResponse | None, str | None]:
         or None and empty string if email is missing or empty.
     """
 
-    # TMP should be ""
-    tmp = ""
-
     if 'email' not in payload:
-        return None, tmp
+        return None, ""
     email_value = payload.get('email', "")
     if not isinstance(email_value, str):
-        return None, tmp
+        return None, ""
     payload_email = email_value.strip()
     if not payload_email:
-        return None, tmp
+        return None, ""
 
     return None, payload_email
 
@@ -220,8 +217,6 @@ def get_item_data_product_id(item_data: dict) -> tuple[HttpResponse | None, str 
     """
     payload_product_id = item_data.get('plan', {}).get('product', "")
     if not payload_product_id:
-        # TMP
-        # payload_product_id = "prod_RLNaO5758eaXOU"
         return error_message("not_found_stripe_product_id"), None
     return None, payload_product_id
 

@@ -71,7 +71,6 @@ class CustomUserAdmin(UserDisplayMixin, UserAdmin):
 
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        # TMP 'languages_favorites'
         ('Personal info', {'fields': ('email', 'uuid', 'language')}),
         ('Permissions', {
             'fields': ('is_active', 'is_staff', 'is_superuser', 'group'),

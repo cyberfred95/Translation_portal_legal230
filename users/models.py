@@ -37,10 +37,3 @@ class User(AbstractUser):
         UserGroup, on_delete=models.CASCADE, blank=True, null=True)
     language = models.CharField(max_length=32,
                                 choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE, verbose_name="Language")
-    # TMP
-    # languages_favorites = models.ManyToManyField(
-    #     'languages.Language',
-    #     blank=True,
-    #     verbose_name="Favorite Languages",
-    #     help_text="Select your favorite languages for translation"
-    # )

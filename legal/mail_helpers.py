@@ -50,8 +50,6 @@ def send_text_translation(
         try:
             sg.send(message)
         except Exception as e:
-            # Log the error but don't crash the application
-            print(f"SendGrid error: {e}")
             pass
 
     else:
@@ -83,8 +81,6 @@ def send_text_translation(
         try:
             sg.send(message)
         except Exception as e:
-            # Log the error but don't crash the application
-            print(f"SendGrid error: {e}")
             pass
 
 

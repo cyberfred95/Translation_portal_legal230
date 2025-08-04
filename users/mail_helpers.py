@@ -21,8 +21,7 @@ def send_invitation_email(email: str, register_user_absolute_uri: str):
         )
         sg.send(message)
     except Exception as e:
-        # Log the error but don't crash the application
-        print(f"SendGrid error: {e}")
+        
         pass
 
 
@@ -44,8 +43,6 @@ def send_reset_password_email(email: str, username: str, reset_password_absolute
         )
         sg.send(message)
     except Exception as e:
-        # Log the error but don't crash the application
-        print(f"SendGrid error: {e}")
         pass
 
 
@@ -67,6 +64,5 @@ def register_success_email(email: str,  username: str):
         )
         sg.send(message)
     except Exception as e:
-        # Log the error but don't crash the application
-        print(f"SendGrid error: {e}")
+        
         pass

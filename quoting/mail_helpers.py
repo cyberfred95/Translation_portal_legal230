@@ -42,6 +42,4 @@ def send_quote_email(user_id: int, context_variables: dict, template_name: str =
         try:
             sg.send(message)
         except Exception as e:
-            # Log the error but don't crash the application
-            print(f"SendGrid error: {e}")
             pass
