@@ -169,6 +169,7 @@
             </span>
         </div>
         <input type="hidden" name="group" id="group" {% if group %} value="{{ group }}" {% endif %}>
+        <input type="hidden" name="subscription_type_id" {% if subscription_type_id %} value="{{ subscription_type_id }}" {% endif %}>
         <p class="error-message text-red-400 text-3 mt-2.5 hidden"></p>
         <button
                 type="submit"

@@ -54,15 +54,15 @@ class WritingProcessAPIView(APIView):
             return Response({"detail": "Prompt not found"}, status=status.HTTP_404_NOT_FOUND)
         prompt.variables['text'] = data.get('text')
         data = {
-                "text": data['text'],
-                "prompt": prompt.prompt,
-                "gpt_model": prompt.gpt_model,
-                "temperature": int(prompt.temperature),
-                "variables": prompt.variables,
-            }
-        print(data)
+            "text": data['text'],
+            "prompt": prompt.prompt,
+            "gpt_model": prompt.gpt_model,
+            "temperature": int(prompt.temperature),
+            "variables": prompt.variables,
+        }
         response = requests.post(
-            url=preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + 'gpt-processing/foreign_gpt_process/',
+            url=preferences.MainSettings.CUSTOM_MT_CONSOLE_URL +
+            'gpt-processing/foreign_gpt_process/',
             headers={
                 'token': preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
             },

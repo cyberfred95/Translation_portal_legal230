@@ -15,6 +15,7 @@ class Prompt(models.Model):
 
 class PromptTranslation(models.Model):
     language = models.CharField(max_length=2, choices=LANGUAGES)
-    prompt = models.ForeignKey(Prompt, on_delete=models.CASCADE, related_name='translations')
+    prompt = models.ForeignKey(
+        Prompt, on_delete=models.CASCADE, related_name='translations')
     name = models.CharField(max_length=100)
     description = models.TextField()

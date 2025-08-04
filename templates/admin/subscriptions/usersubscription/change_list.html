@@ -1,0 +1,144 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static %}
+
+{% block object-tools-items %}
+<li>
+    <a href="#" id="manual-renewal-btn" class="addlink" title="Execute manual subscription renewal task">
+        Manual Renewal
+    </a>
+</li>
+{{ block.super }}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    #manual-renewal-btn {
+        background-color: #ffc107;
+        color: #212529;
+        border-color: #ffc107;
+    }
+    #manual-renewal-btn:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+    }
+    .renewal-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
+    .renewal-modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 400px;
+        border-radius: 5px;
+        text-align: center;
+    }
+    .renewal-modal-buttons {
+        margin-top: 20px;
+    }
+    .renewal-modal-buttons button {
+        margin: 0 10px;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    .btn-confirm {
+        background-color: #007cba;
+        color: white;
+    }
+    .btn-cancel {
+        background-color: #666;
+        color: white;
+    }
+    .loading {
+        display: none;
+        margin-top: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+
+<!-- Modal for confirmation -->
+<div id="renewal-modal" class="renewal-modal">
+    <div class="renewal-modal-content">
+        <h3>Manual Subscription Renewal</h3>
+        <p>This will manually execute the daily subscription renewal task.</p>
+        <p><strong>Are you sure you want to proceed?</strong></p>
+        <div class="loading" id="loading-indicator">
+            <p>Processing renewals, please wait...</p>
+            <div style="text-align: center;">🔄 Loading...</div>
+        </div>
+        <div class="renewal-modal-buttons" id="modal-buttons">
+            <button type="button" class="btn-confirm" id="confirm-renewal">Yes, Execute</button>
+            <button type="button" class="btn-cancel" id="cancel-renewal">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const manualRenewalBtn = document.getElementById('manual-renewal-btn');
+    const modal = document.getElementById('renewal-modal');
+    const confirmBtn = document.getElementById('confirm-renewal');
+    const cancelBtn = document.getElementById('cancel-renewal');
+    const loadingIndicator = document.getElementById('loading-indicator');
+    const modalButtons = document.getElementById('modal-buttons');
+
+    // Show modal on button click
+    manualRenewalBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        modal.style.display = 'block';
+    });
+
+    // Hide modal on cancel
+    cancelBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+        loadingIndicator.style.display = 'none';
+        modalButtons.style.display = 'block';
+    });
+
+    // Hide modal when clicking outside
+    window.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            loadingIndicator.style.display = 'none';
+            modalButtons.style.display = 'block';
+        }
+    });
+
+    // Execute renewal on confirm
+    confirmBtn.addEventListener('click', function() {
+        // Show loading indicator
+        loadingIndicator.style.display = 'block';
+        modalButtons.style.display = 'none';
+
+        // Create and submit form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{% url "admin:subscriptions_usersubscription_manual_renewal" %}';
+        
+        // Add CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    });
+});
+</script>
+{% endblock %}

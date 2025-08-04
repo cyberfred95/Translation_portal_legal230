@@ -1,0 +1,441 @@
+openapi: 3.0.3
+info:
+  title: Lexamt API
+  version: '1.0'
+  description: API de traduction et gestion de glossaires Lexamt
+
+servers:
+  - url: https://test.portail.lexamt.fr
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Clé API au format Bearer (Bearer <votre_cle_api>)
+  schemas:
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+    TranslateTextRequest:
+      type: object
+      required: [action, text, source_language, target_language]
+      properties:
+        action:
+          type: string
+          enum: [text_translate]
+          maxLength: 32
+        text:
+          type: string
+          maxLength: 2000
+          description: Texte à traduire (maximum 2000 caractères)
+        source_language:
+          type: string
+          maxLength: 10
+          description: Code de langue source (ex en, fr)
+        target_language:
+          type: string
+          maxLength: 10
+          description: Code de langue cible (ex en, fr)
+        domain_name:
+          type: string
+          maxLength: 128
+          description: Nom du domaine optionnel
+    TranslateFileRequest:
+      type: object
+      required: [action, document, source_language, target_language]
+      properties:
+        action:
+          type: string
+          enum: [file_translate]
+          maxLength: 32
+        document:
+          type: array
+          maxItems: 10
+          description: Maximum 10 fichiers par requête
+          items:
+            type: string
+            description: Fichier encodé en base64 (max 50MB par fichier)
+        source_language:
+          type: string
+          maxLength: 10
+        target_language:
+          type: string
+          maxLength: 10
+        domain_name:
+          type: string
+          maxLength: 128
+    TranslateTextResponse:
+      type: object
+      properties:
+        translated_text:
+          type: string
+    TranslateFileResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          project_id:
+            type: string
+          status:
+            type: string
+          translated_file_url:
+            type: string
+    GlossaryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        source_language:
+          type: string
+        target_language:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    Domain:
+      type: object
+      properties:
+        id:
+          type: integer
+        domain_group:
+          type: string
+          nullable: true
+        name:
+          type: string
+    DefaultGlossary:
+      type: object
+      properties:
+        id:
+          type: integer
+        file_url:
+          type: string
+          format: uri
+        name:
+          type: string
+        source_language:
+          type: string
+        target_language:
+          type: string
+        file_size:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    GlossaryRequest:
+      type: object
+      required: [name, source_language, target_language, file]
+      properties:
+        name:
+          type: string
+          maxLength: 128
+          description: Nom du glossaire (maximum 128 caractères)
+        source_language:
+          type: string
+          maxLength: 10
+        target_language:
+          type: string
+          maxLength: 10
+        file:
+          type: string
+          description: Fichier CSV ou XLSX encodé en base64 (maximum 10MB)
+
+security:
+  - BearerAuth: []
+
+paths:
+  /api/v1/domains/:
+    get:
+      summary: Liste des domaines disponibles
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Liste des domaines
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Domain'
+        '400':
+          description: Erreur de validation (API Key invalide)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/domain/{id_domain}/glossaries/:
+    get:
+      summary: Liste des glossaires par défaut pour un domaine
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id_domain
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 2147483647
+            description: ID du domaine (entier PostgreSQL valide)
+        - in: query
+          name: source_language
+          required: false
+          schema:
+            type: string
+            maxLength: 10
+        - in: query
+          name: target_language
+          required: false
+          schema:
+            type: string
+            maxLength: 10
+      responses:
+        '200':
+          description: Liste des glossaires pour le domaine
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DefaultGlossary'
+        '400':
+          description: Erreur de validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/glossary/:
+    post:
+      summary: Ajouter un glossaire utilisateur
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [name, source_language, target_language, file]
+              properties:
+                name:
+                  type: string
+                  maxLength: 128
+                source_language:
+                  type: string
+                  maxLength: 10
+                target_language:
+                  type: string
+                  maxLength: 10
+                file:
+                  type: string
+                  format: binary
+                  description: Fichier CSV ou XLSX (maximum 10MB)
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlossaryRequest'
+      responses:
+        '200':
+          description: Glossaire ajouté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GlossaryResponse'
+        '400':
+          description: Erreur de validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/glossary/{id_glossary}/:
+    delete:
+      summary: Supprimer un glossaire utilisateur
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id_glossary
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 2147483647
+            description: ID du glossaire (entier PostgreSQL valide)
+      responses:
+        '204':
+          description: Glossaire supprimé
+        '400':
+          description: Erreur de validation (ID invalide)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Glossaire non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      summary: Récupérer un glossaire utilisateur
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id_glossary
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 2147483647
+      responses:
+        '200':
+          description: Glossaire trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GlossaryResponse'
+        '400':
+          description: Erreur de validation (ID invalide)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Glossaire non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/glossaries/:
+    get:
+      summary: Liste des glossaires de l'utilisateur
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Liste des glossaires
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DefaultGlossary'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/languages/:
+    get:
+      summary: Liste des langues disponibles
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Liste des langues
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    language_code:
+                      type: string
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/translate/:
+    post:
+      summary: Traduction de texte ou de fichier
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/TranslateTextRequest'
+                - type: object
+                  required: [action, document, source_language, target_language]
+                  properties:
+                    action:
+                      type: string
+                      enum: [file_translate]
+                      maxLength: 32
+                    document:
+                      type: array
+                      maxItems: 10
+                      items:
+                        type: string
+                        description: Fichier encodé en base64 (formats supportés TXT, DOCX, XLSX, PPTX, PDF - max 50MB par fichier)
+                    source_language:
+                      type: string
+                      maxLength: 10
+                    target_language:
+                      type: string
+                      maxLength: 10
+                    domain_name:
+                      type: string
+                      maxLength: 128
+          multipart/form-data:
+            schema:
+              type: object
+              required: [action, document, source_language, target_language]
+              properties:
+                action:
+                  type: string
+                  enum: [file_translate]
+                  maxLength: 32
+                document:
+                  type: array
+                  maxItems: 10
+                  items:
+                    type: string
+                    format: binary
+                    description: Fichiers TXT, DOCX, XLSX, PPTX ou PDF (maximum 10 fichiers, 50MB par fichier)
+                source_language:
+                  type: string
+                  maxLength: 10
+                target_language:
+                  type: string
+                  maxLength: 10
+                domain_name:
+                  type: string
+                  maxLength: 128
+                glossary:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Traduction réussie
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/TranslateTextResponse'
+                  - $ref: '#/components/schemas/TranslateFileResponse'
+        '400':
+          description: Erreur de validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

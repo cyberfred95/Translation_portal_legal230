@@ -22,9 +22,14 @@ app.conf.beat_schedule = {
         "schedule": crontab(minute='0', hour='0'),
         "args": (),
     },
-    'reset_quote_counter': {
-        'task': "quoting.tasks.reset_quote_counter",
-        "schedule": crontab(minute='0', hour='0', day_of_month=1),
+    # 'reset_quote_counter': {
+    #    'task': "quoting.tasks.reset_quote_counter",
+    #    "schedule": crontab(minute='0', hour='0', day_of_month=1),
+    #    "args": (),
+    # },
+    'process_daily_subscription_renewals': {
+        'task': "subscriptions.tasks.process_daily_subscription_renewals",
+        "schedule": crontab(minute='0', hour='0'),
         "args": (),
     }
 }

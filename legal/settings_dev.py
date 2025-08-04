@@ -1,6 +1,5 @@
 from .settings import *
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -12,7 +11,7 @@ DATABASES = {
     }
 }
 
-DEBUG = False
+DEBUG = True
 
 DEV_MODE = True
 

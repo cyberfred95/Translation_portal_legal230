@@ -19,7 +19,8 @@ class UsageView(TemplateView):
         context['stats'] = self.get_stats()
         context['stats']['filters'] = self.get_filters()
         context['date_from'] = self.request.GET.get("date_from", date.today())
-        context['date_to'] = self.request.GET.get("date_to", date.today() + timedelta(days=30))
+        context['date_to'] = self.request.GET.get(
+            "date_to", date.today() + timedelta(days=30))
         context['is_group_admin'] = self.get_is_group_admin()
 
         return context
@@ -30,7 +31,8 @@ class UsageView(TemplateView):
     def get_filters(self):
 
         def get_responses():
-            additional_url_params = self.set_additional_url_params(exclude_page_param=True)
+            additional_url_params = self.set_additional_url_params(
+                exclude_page_param=True)
 
             responses = []
             response = requests.get(
@@ -48,7 +50,8 @@ class UsageView(TemplateView):
                 for page in range(1, int(response.json().get('num_pages'))):
                     responses.append(
                         requests.get(
-                            preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params + f"&page={page}",
+                            preferences.StatisticSettings.URL + "statistics_list/" +
+                            additional_url_params + f"&page={page}",
                             headers={
                                 'token': preferences.StatisticSettings.API_KEY,
                                 'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
@@ -98,7 +101,7 @@ class UsageView(TemplateView):
                 self.request.user.group and self.request.user in self.request.user.group.admin.all()):
             if self.request.user.group:
                 user_names = self.request.GET.getlist('user', User.objects.filter(
-                    group__id=self.request.user.group.id).values_list('username',flat=True))
+                    group__id=self.request.user.group.id).values_list('username', flat=True))
             else:
                 user_names = self.request.GET.getlist('user', [])
             users = User.objects.filter(username__in=user_names)
@@ -110,19 +113,20 @@ class UsageView(TemplateView):
 
         return [str(self.request.user.uuid)]
 
-
     def prepare_stats(self, stats: dict) -> dict:
         unique_file_names = set()
         unique_user_file_names = {}
 
         for stat in stats['results']:
-            user = User.objects.filter(uuid=stat.get('user_portal_uuid')).first()
+            user = User.objects.filter(
+                uuid=stat.get('user_portal_uuid')).first()
             stat['user'] = user.username if user else 'Unknown'
             try:
                 stat['metadata'] = json.loads(stat['metadata'])
             except:
                 pass
-            stat['created_at'] = datetime.fromisoformat(stat['created_at'].replace('Z', '+00:00'))
+            stat['created_at'] = datetime.fromisoformat(
+                stat['created_at'].replace('Z', '+00:00'))
 
             try:
                 stat['group'] = user.group.name
@@ -143,7 +147,6 @@ class UsageView(TemplateView):
 
         return stats
 
-
     def get_stats(self) -> dict:
         files = self.request.GET.getlist('file_name', [])
         additional_url_params = self.set_additional_url_params()
@@ -158,10 +161,8 @@ class UsageView(TemplateView):
                 "file_name": files
             }
         )
-        print(response.json())
         stats = dict(response.json())
         return self.prepare_stats(stats)
-
 
     @staticmethod
     def calculate_total_chars_and_tokens(stats) -> dict:
@@ -180,7 +181,6 @@ class UsageView(TemplateView):
             "words": words_count,
         }
 
-
     def set_additional_url_params(self, exclude_page_param=False) -> str:
         params = {
             'date_from': self.request.GET.get("date_from", date.today()),
@@ -189,7 +189,8 @@ class UsageView(TemplateView):
             'page_size': PAGINATION_PAGE_SIZE,
         }
         date_from = self.request.GET.get("date_from", date.today())
-        date_to = self.request.GET.get("date_to", date.today() + timedelta(days=30))
+        date_to = self.request.GET.get(
+            "date_to", date.today() + timedelta(days=30))
         page = self.request.GET.get('page')
         additional_url_params = f"?page_size={PAGINATION_PAGE_SIZE}"
 

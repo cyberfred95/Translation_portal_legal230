@@ -1,9 +1,11 @@
 import base64
 import re
+from datetime import datetime, timedelta
 from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib.auth import login
+from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.templatetags.static import static
@@ -19,6 +21,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 import requests
 from glossaries.models import Glossary
+from subscriptions.models import SubscriptionType, UserSubscription
 from subscriptions.permissions import SubscribedPermission
 from .models import UserGroup, User
 from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer, RegisterUserSerializer, \
@@ -139,11 +142,16 @@ class InviteUserAPIView(APIView):
                 emails = list(set(emails))
             if not emails:
                 return Response({"detail": "Emails list should not be empty"}, status=status.HTTP_400_BAD_REQUEST)
+            if not request.data.get('subscription_type_id'):
+                return Response({"detail": "Subscription type is required"}, status=status.HTTP_400_BAD_REQUEST)
+            if not SubscriptionType.objects.filter(id=int(request.data.get('subscription_type_id', 0))).exists():
+                return Response({"detail": "Invalid subscription type"}, status=status.HTTP_400_BAD_REQUEST)
             for email in emails:
                 if self.is_email_valid(email):
                     params = {
                         "email": base64.b64encode(email.encode('utf-8')),
                         "group": base64.b64encode(str(request.user.group.id).encode('utf-8')),
+                        "subscription_type_id": base64.b64encode(request.data.get('subscription_type_id').encode('utf-8')),
                     }
                     send_invitation_email(email=email,
                                           register_user_absolute_uri=self.get_register_user_absolute_uri(request,
@@ -169,18 +177,35 @@ class RegisterUserView(TemplateView):
             context["email"] = base64.b64decode(self.request.GET.get('email')).decode('utf-8')
         if self.request.GET.get('group'):
             context["group"] = base64.b64decode(self.request.GET.get('group')).decode('utf-8')
+        if self.request.GET.get('subscription_type_id'):
+            context["subscription_type_id"] = base64.b64decode(self.request.GET.get('subscription_type_id')).decode(
+                'utf-8')
         return context
 
     def post(self, request, *args, **kwargs):
+        if not request.POST.get('subscription_type_id'):
+            return JsonResponse({"detail":"Subscription type is required"}, status=status.HTTP_400_BAD_REQUEST)
+        subscription_type = SubscriptionType.objects.get(id=int(request.POST.get('subscription_type_id', 0)))
+        if not subscription_type:
+            return JsonResponse({"detail": "Invalid subscription type"}, status=status.HTTP_400_BAD_REQUEST)
         serializer = RegisterUserSerializer(data=request.POST)
         if serializer.is_valid():
-            user = serializer.create(serializer.validated_data)
-            login(request, user)
-            register_success_email(
-                username=user.username,
-                email=user.email,
-            )
-            return redirect(settings.LOGIN_REDIRECT_URL)
+            with transaction.atomic():
+                user = serializer.create(serializer.validated_data)
+                user_subscription = UserSubscription.objects.create(
+                    user=user,
+                    subscription=subscription_type,
+                    status=UserSubscription.UserSubscriptionChoices.ACTIVE,
+                    start_date=datetime.now(),
+                    end_date = datetime.now() + timedelta(days=30)
+                )
+                user_subscription.save()
+                login(request, user)
+                register_success_email(
+                    username=user.username,
+                    email=user.email,
+                )
+                return redirect(settings.LOGIN_REDIRECT_URL)
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

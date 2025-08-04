@@ -2,7 +2,8 @@ from sendgrid import SendGridAPIClient
 from users.models import User
 from django.conf import settings
 from django.template.loader import render_to_string
-from sendgrid.helpers.mail import (Mail, Attachment, FileContent, FileName, FileType, Disposition)
+from sendgrid.helpers.mail import (
+    Mail, Attachment, FileContent, FileName, FileType, Disposition)
 from preferences import preferences
 
 
@@ -22,14 +23,15 @@ def send_text_translation(
 
 ):
     user = User.objects.get(pk=user_id)
-    users_to_send = User.objects.filter(is_staff=True, email__isnull=False).exclude(email="")
+    users_to_send = User.objects.filter(
+        is_staff=True, email__isnull=False).exclude(email="")
 
     sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
 
     if action == 'expert_revision':
         message = Mail(
-            from_email='christelle.mandet@lexamt.com',
-            to_emails=[preferences.MainSettings.sender_email],
+            from_email=preferences.MainSettings.sender_email,
+            to_emails=[preferences.MainSettings.quote_cc_email],
             subject=theme,
             html_content=render_to_string(
                 template,
@@ -45,13 +47,17 @@ def send_text_translation(
                 }
             )
         )
-        sg.send(message)
+        try:
+            sg.send(message)
+        except Exception as e:
+            # Log the error but don't crash the application
+            print(f"SendGrid error: {e}")
+            pass
 
     else:
-
         message = Mail(
-            from_email='christelle.mandet@lexamt.com',
-            to_emails=[preferences.MainSettings.sender_email],
+            from_email=preferences.MainSettings.sender_email,
+            to_emails=[preferences.MainSettings.quote_cc_email],
             subject=theme,
             html_content=render_to_string(
                 template,
@@ -72,9 +78,14 @@ def send_text_translation(
                 file_name=FileName(file_name),
                 # FileType('application/pdf'),
                 disposition=Disposition('attachment')
-                )
+            )
             message.attachment = attachedFile
-        sg.send(message)
+        try:
+            sg.send(message)
+        except Exception as e:
+            # Log the error but don't crash the application
+            print(f"SendGrid error: {e}")
+            pass
 
 
 def send_file_translation(user_id, source_file_url, file_name, file_ext, translation_name):

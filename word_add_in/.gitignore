@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+test_standalone/
+npm-debug.log*
+
+# Build outputs
+dist/
+*.tgz
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Office Add-in
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Certificates
+certs/
