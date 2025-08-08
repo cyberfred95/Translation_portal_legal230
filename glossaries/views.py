@@ -48,16 +48,11 @@ class UserGlossariesView(TemplateView):
         tmp_glossaries = Glossary.objects.filter(user=self.request.user)
 
         paginator = TemplateViewPagination()
-        paginated_glossaries = paginator.paginate_queryset(tmp_glossaries, self.request)
+        paginated_glossaries = paginator.paginate_queryset(
+            tmp_glossaries, self.request)
 
         formatted_glossaries = [
-            {
-                "id": glossary.id,
-                "name": glossary.name,
-                "source_language": glossary.source_language.abbreviation.upper(),
-                "target_language": glossary.target_language.abbreviation.upper(),
-                "created_at": glossary.created_at,
-            }
+            glossary.to_json(self.request)
             for glossary in paginated_glossaries
         ]
         return formatted_glossaries, paginator.get_paginated_context()
@@ -71,18 +66,23 @@ class AddGlossaryView(APIView):
         if not request.user.is_staff:
             user_subscription = request.user.subscriptions.first()
             if user_subscription.custom_glossaries_count > 0:
-                user_glossaries_count = Glossary.objects.filter(user=request.user).count()
+                user_glossaries_count = Glossary.objects.filter(
+                    user=request.user).count()
                 if user_glossaries_count + 1 > user_subscription.custom_glossaries_count:
                     raise serializers.ValidationError({
                         "detail": "You are not allowed to add more glossaries. Please contact your group administator"})
 
-        languages_list = Language.objects.all().values_list(Lower('abbreviation'), flat=True)
+        languages_list = Language.objects.all().values_list(
+            Lower('abbreviation'), flat=True)
         if request.data["source_language"] == request.data["target_language"]:
-            raise serializers.ValidationError({"detail": _("Source and target languages cannot be the same")})
+            raise serializers.ValidationError(
+                {"detail": _("Source and target languages cannot be the same")})
         if request.data["source_language"] not in languages_list:
-            raise serializers.ValidationError({"detail": _("Invalid source language")})
+            raise serializers.ValidationError(
+                {"detail": _("Invalid source language")})
         if request.data["target_language"] not in languages_list:
-            raise serializers.ValidationError({"detail": _("Invalid target language")})
+            raise serializers.ValidationError(
+                {"detail": _("Invalid target language")})
 
         gloss_file = request.FILES.get('file')
         processor = GlossaryProcessor()
@@ -91,13 +91,15 @@ class AddGlossaryView(APIView):
         try:
             processor.validate_file(gloss_file)
         except django.core.exceptions.ValidationError as e:
-            raise serializers.ValidationError({"detail":str(list(e)[0])})
+            raise serializers.ValidationError({"detail": str(list(e)[0])})
 
     def post(self, request):
         self.validate(request)
         gloss_file = request.FILES.get('file')
-        source_language = Language.objects.get(abbreviation__iexact=request.data.get('source_language').upper())
-        target_language = Language.objects.get(abbreviation__iexact=request.data.get('target_language').upper())
+        source_language = Language.objects.get(
+            abbreviation__iexact=request.data.get('source_language').upper())
+        target_language = Language.objects.get(
+            abbreviation__iexact=request.data.get('target_language').upper())
 
         glossary = Glossary.objects.create(
             user=request.user,
@@ -125,8 +127,10 @@ class GlossariesListAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         glossaries = Glossary.objects.filter(
-            source_language__abbreviation=request.data.get('source_language').upper(),
-            target_language__abbreviation=request.data.get('target_language').upper()
+            source_language__abbreviation=request.data.get(
+                'source_language').upper(),
+            target_language__abbreviation=request.data.get(
+                'target_language').upper()
         )
         user_glossaries = glossaries.filter(
             user=request.user, group__isnull=True
@@ -147,8 +151,10 @@ class GetDefaultGlossaryView(APIView):
     def post(self, request):
         domain_name = request.data.get('domain_name')
         glossary = Glossary.objects.filter(
-            source_language__abbreviation=request.data.get('source_language').upper(),
-            target_language__abbreviation=request.data.get('target_language').upper()
+            source_language__abbreviation=request.data.get(
+                'source_language').upper(),
+            target_language__abbreviation=request.data.get(
+                'target_language').upper()
         ).all()
         if request.LANGUAGE_CODE == 'fr':
             default_glossary = glossary.filter(domain__french_name=domain_name)

@@ -27,9 +27,11 @@ static/scss/CACHE/
 
 # Ignore staticfiles
 /staticfiles/
+/static_collected/
 
 # Secret
 .env
 .env_dev
 /Script/
 celerybeat-schedule
+.bashrc_lexamt.sh

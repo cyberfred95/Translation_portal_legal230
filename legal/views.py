@@ -77,7 +77,8 @@ def text_translation(request):
                 words_count=get_word_count(text),
                 **get_translate_data(request, for_statistic=True),
             )
-            add_translations(request, words_count=words_count, symbols_count=symbols_count)
+            add_translations(request, words_count=words_count,
+                             symbols_count=symbols_count)
         result = response.json()
         return JsonResponse(result)
     return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
@@ -108,21 +109,17 @@ def file_translate(request):
         words_count = cache_data['words_count']
         symbols_count = cache_data['symbols_count']
         cache.delete(f"{request.user.uuid}")
-        print(symbols_count)
-        print(words_count)
-    # else:
     words_count = 0
     symbols_count = 0
     for file in files:
-            files = request.FILES.getlist('document[]', [])
-            file_name = file.name
-            file = rename_file(file=file)
-            file_words, file_texts = get_text_from_file(file, api_key)
-            words_count += len(file_words)
-            symbols_count += sum(len(word) for word in file_texts)
-            print(symbols_count)
-            file = rename_file(file=file, file_name=file_name)
-    print(json.dumps(form_glossary_object(request)))
+        files = request.FILES.getlist('document[]', [])
+        file_name = file.name
+        file = rename_file(file=file)
+        file_words, file_texts = get_text_from_file(file, api_key)
+        words_count += len(file_words)
+        symbols_count += sum(len(word) for word in file_texts)
+        file = rename_file(file=file, file_name=file_name)
+
     if translation_allowed(request, words_count=words_count, files_count=len(files), symbols_count=symbols_count):
         data = {
             "user_custom_mt_token": request.user.uuid,
@@ -148,7 +145,6 @@ def file_translate(request):
                 'file_name': file.name,
                 'file_extension': os.path.splitext(file.name)[1]
             })
-
         time.sleep(0.1)
         for project in projects:
             project_id = project.get('id')
@@ -156,14 +152,17 @@ def file_translate(request):
                                headers={
                                    "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
             send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
-                                  translation_name=request.POST.get('translation_name'),
+                                  translation_name=request.POST.get(
+                                      'translation_name'),
                                   file_name=project['file_name'],
                                   file_ext=project['file_extension'])
-        add_translations(request, words_count=words_count, files_count=len(files), symbols_count=symbols_count)
+        add_translations(request, words_count=words_count,
+                         files_count=len(files), symbols_count=symbols_count)
         return JsonResponse({"project_ids": [project.get('id') for project in projects],
-                             "display_popup": False if get_price_by_language_pair(
-                                 source_language=request.POST.get('source_language'),
-                                 target_language=request.POST.get('target_language')) else True})
+                            "display_popup": False if get_price_by_language_pair(
+            source_language=request.POST.get(
+                'source_language'),
+            target_language=request.POST.get('target_language')) else True})
     return JsonResponse({"detail": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -179,7 +178,6 @@ class TranslateView(TemplateView):
         return context
 
     def default_glossary_allowed(self):
-
         if self.request.user.is_staff:
             return True
 
@@ -196,7 +194,7 @@ class TranslateView(TemplateView):
 
     def post(self, request):
         if not request.user.is_staff and not request.user.group:
-            return HttpResponseBadRequest({"detail": "You have to be staff or to be in group"})
+            return JsonResponse({"detail": "You have to be staff or to be in group"}, status=400)
         if request.POST.get('action') == 'text_translate':
             return text_translation(request)
         elif request.POST.get('action') == 'file_translate':
@@ -250,13 +248,15 @@ class GetDomainsView(APIView):
         domain_names = []
         for domain in domains.json():
             domain_names.append(domain['domain_name'])
-        domains = Domain.objects.filter(name__in=domain_names).order_by('-featured', 'name')
-        print(domains)
+        domains = Domain.objects.filter(
+            name__in=domain_names).order_by('-featured', 'name')
         if self.request.query_params.get('domain_group'):
             if request.LANGUAGE_CODE == 'fr':
-                domains = domains.filter(domain_group__french_name=self.request.query_params.get('domain_group'))
+                domains = domains.filter(
+                    domain_group__french_name=self.request.query_params.get('domain_group'))
             else:
-                domains = domains.filter(domain_group__name=self.request.query_params.get('domain_group'))
+                domains = domains.filter(
+                    domain_group__name=self.request.query_params.get('domain_group'))
 
         if domains.count() == 0 and preferences.DefaultTranslation.enabled:
             if request.LANGUAGE_CODE == 'fr':
@@ -269,7 +269,8 @@ class GetDomainsView(APIView):
         if request.LANGUAGE_CODE == 'en':
             domain_names = domains.values_list('name', flat=True)
         elif request.LANGUAGE_CODE == 'fr':
-            domain_names = [domain.french_name if domain.french_name else domain.name for domain in domains]
+            domain_names = [
+                domain.french_name if domain.french_name else domain.name for domain in domains]
         return Response({"data": domain_names, "default_domain": False}, status=status.HTTP_200_OK)
 
 
@@ -289,7 +290,8 @@ class FileExpertRevisionView(APIView):
     def get(self, request):
         project_id = request.query_params.get('project_id')
         post_editing_service = FileExpertRevisionService()
-        post_editing_service.send_to_post_editing(request=request, project_id=project_id)
+        post_editing_service.send_to_post_editing(
+            request=request, project_id=project_id)
         quote_service = FormQuoteService()
         quote_service.send_quote_to_user(request)
         return HttpResponse(
@@ -300,7 +302,8 @@ class FileExpertRevisionView(APIView):
             return Response({"detail": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
         project_id = request.POST['project_id']
         post_editing_service = FileExpertRevisionService()
-        post_editing_service.send_to_post_editing(request=request, project_id=project_id)
+        post_editing_service.send_to_post_editing(
+            request=request, project_id=project_id)
         quote_service = FormQuoteService()
         quote_service.send_quote_to_user(request)
         return Response({"detail": "Sent to post editing"}, status=status.HTTP_200_OK)
@@ -319,25 +322,30 @@ class ProjectsHistoryView(TemplateView):
             "page": page,
             "user_custom_mt_token": user.uuid if not user.is_staff else None
         }
-        headers = {"token": preferences.MainSettings.api_key if user.is_staff else user.group.api_key}
+        headers = {
+            "token": preferences.MainSettings.api_key if user.is_staff else user.group.api_key}
 
         if page is not None:
             params["page"] = int(page)
 
-        response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
+        response = requests.get(
+            preferences.MainSettings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
         if 'results' in response:
             for project in response['results']:
-                file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
+                file_name = urlparse(project['source_file']).path.lstrip(
+                    '/').split('/')[-1]
                 original_filename = unquote(file_name)
                 project['source_file_name'] = original_filename
-                project['created_at'] = datetime.fromisoformat(project['created_at'].replace('Z', '+00:00'))
+                project['created_at'] = datetime.fromisoformat(
+                    project['created_at'].replace('Z', '+00:00'))
                 project['display_popup'] = False if get_price_by_language_pair(
                     source_language=project['source_language'],
                     target_language=project['target_language']
                 ) else True
                 if user.is_staff:
                     try:
-                        project['username'] = User.objects.get(uuid=project['user_custom_mt_token'])
+                        project['username'] = User.objects.get(
+                            uuid=project['user_custom_mt_token'])
                     except User.DoesNotExist:
                         project['username'] = None
                     except django.core.exceptions.ValidationError:
@@ -347,24 +355,30 @@ class ProjectsHistoryView(TemplateView):
         return context
 
 
+def get_projects_by_ids(request):
+    project_ids = request.query_params.getlist('project_id[]', [])
+    responses = []
+    for project_id in project_ids:
+        response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+                                headers={
+                                    "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+        res = response.json()
+        file_name = urlparse(response.json()['source_file']).path.lstrip(
+            '/').split('/')[-1]
+        original_filename = unquote(file_name)
+        res['source_file_name'] = original_filename
+        res['display_popup'] = False if get_price_by_language_pair(source_language=res['source_language'],
+                                                                   target_language=res['target_language']) else True
+
+        responses.append(res)
+    return responses
+
+
 class SingleProjectView(APIView):
     permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def get(self, request):
-        project_ids = request.query_params.getlist('project_id[]', [])
-        responses = []
-        for project_id in project_ids:
-            response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
-                                    headers={
-                                        "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-            res = response.json()
-            file_name = urlparse(response.json()['source_file']).path.lstrip('/').split('/')[-1]
-            original_filename = unquote(file_name)
-            res['source_file_name'] = original_filename
-            res['display_popup'] = False if get_price_by_language_pair(source_language=res['source_language'],
-                                                                       target_language=res['target_language']) else True
-
-            responses.append(res)
+        responses = get_projects_by_ids(request)
         return Response(responses, status=status.HTTP_200_OK)
 
     def delete(self, request):
@@ -404,7 +418,8 @@ class LanguageDetectView(APIView):
                     language = Language.objects.filter(abbreviation__iexact=tmp_language.upper()).values_list(
                         'abbreviation', flat=True).first()
                 except langdetect.LangDetectException:
-                    language = Language.objects.values_list('abbreviation', flat=True).first()
+                    language = Language.objects.values_list(
+                        'abbreviation', flat=True).first()
                 if not language:
                     language = Language.objects.all().values_list(
                         'abbreviation', flat=True).first()
@@ -437,7 +452,8 @@ class LanguageDetectView(APIView):
         formated_texts, full_text = get_text_from_file(file, api_key)
         words_count += len(formated_texts)
         symbols_count += sum(len(word) for word in full_text)
-        text_for_detection = ' '.join(formated_texts[:self.WORDS_COUNT_FOR_DETECTION])
+        text_for_detection = ' '.join(
+            formated_texts[:self.WORDS_COUNT_FOR_DETECTION])
         file = self.rename_file(file, file_name=file_name)
         return text_for_detection, words_count, symbols_count
 

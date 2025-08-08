@@ -18,7 +18,7 @@ def send_quote_email(user_id: int, context_variables: dict, template_name: str =
             to_emails.append(preferences.MainSettings.quote_cc_email)
         sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
         message = Mail(
-            from_email='christelle.mandet@lexamt.com',
+            from_email=preferences.MainSettings.sender_email,
             to_emails=to_emails,
             subject="Expert revision quote",
             html_content=render_to_string(
@@ -34,8 +34,12 @@ def send_quote_email(user_id: int, context_variables: dict, template_name: str =
         )
         attached_file = Attachment(
             FileContent(base64.b64encode(pdf_bytes).decode()),
-            FileName(f"{context_variables['company']} quote no.{context_variables['quote_number']}.pdf"),
+            FileName(
+                f"{context_variables['company']} quote no.{context_variables['quote_number']}.pdf"),
             FileType("application/pdf")
         )
         message.attachment = attached_file
-        sg.send(message)
+        try:
+            sg.send(message)
+        except Exception as e:
+            pass

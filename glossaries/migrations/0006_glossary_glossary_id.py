@@ -11,12 +11,10 @@ def fill_glossary_ids(apps, schema_editor):
 
     for glossary in glossaries:
         try:
-            print("GLOSSARY_NAME", glossary.name)
             glossary.glossary_id = AIGlossaryService().create_glossary(glossary)
             glossary.save()
         except ValidationError:
             glossary.delete()
-            print("DELETED")
 
 
 class Migration(migrations.Migration):

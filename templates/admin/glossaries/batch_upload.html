@@ -1,0 +1,330 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block title %}{{ title|default:"Chargement batch glossaires" }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+
+    a.bouton-annuler {
+        padding: 10px 15px;
+    }
+    
+    .form-row {
+        margin-bottom: 15px;
+    }
+    .form-row label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .help {
+        color: #666;
+        font-size: 11px;
+        margin-top: 5px;
+    }
+    .alert {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+    }
+    .alert-error {
+        background: #fdd;
+        border: 1px solid #f44;
+    }
+    .errorlist {
+        color: #ba2121;
+        margin: 5px 0;
+        list-style: none;
+        padding: 0;
+    }
+    .errorlist li {
+        margin: 2px 0;
+    }
+    #progress-section, #results-section {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    #progress-bar {
+        background: #007cba;
+        height: 100%;
+        transition: width 0.3s;
+    }
+    .progress-container {
+        background: #f0f0f0;
+        border: 1px solid #ccc;
+        height: 20px;
+        margin: 10px 0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .module {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+    .module h2 {
+        background: #f8f8f8;
+        border-bottom: 1px solid #ddd;
+        margin: 0;
+        padding: 10px 15px;
+        font-size: 13px;
+        text-transform: uppercase;
+        font-weight: normal;
+        color: #666;
+    }
+    .module .aligned {
+        padding: 15px;
+    }
+    .submit-row {
+        background: #f8f8f8;
+        border-top: 1px solid #ddd;
+        margin-top: 15px;
+        padding: 10px 15px;
+        text-align: right;
+    }
+    .submit-row input, .submit-row button, .submit-row .button {
+        margin-left: 15px;
+        display: inline-flex;
+    }
+
+    
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label='glossaries' %}">Glossaries</a>
+    &rsaquo; <a href="{% url 'admin:glossaries_glossary_changelist' %}">Glossaires</a>
+    &rsaquo; {{ title|default:"Chargement batch" }}
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>{{ title|default:"Chargement batch glossaires" }}</h1>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% if not ready_to_process %}
+<div class="module">
+    <h2>Sélectionner les fichiers</h2>
+    
+    <div class="aligned">
+        {% if form.errors %}
+            <div class="alert alert-error">
+                <h4>❌ Erreurs de validation:</h4>
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li><strong>{{ field }}:</strong> {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        
+        <form method="post" enctype="multipart/form-data" id="batch-upload-form">
+            {% csrf_token %}
+            <div class="form-row">
+                <div>
+                    <label for="{{ form.csv_file.id_for_label }}" class="required">{{ form.csv_file.label }}:</label>
+                    {{ form.csv_file }}
+                    <p class="help">{{ form.csv_file.help_text }}</p>
+                    <p class="help" style="font-style: italic;">
+                        <strong>Note:</strong> Les glossaires existants avec la même combinaison domaine/langues seront remplacés.
+                    </p>
+                    {% if form.csv_file.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.csv_file.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label for="{{ form.zip_file.id_for_label }}" class="required">{{ form.zip_file.label }}:</label>
+                    {{ form.zip_file }}
+                    <p class="help">{{ form.zip_file.help_text }}</p>
+                    {% if form.zip_file.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.zip_file.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <div class="submit-row">
+        <a href="{% url 'admin:glossaries_glossary_changelist' %}" class="button bouton-annuler">Annuler</a>
+        <input type="submit" value="Charger les fichiers" class="default" id="submit-btn" form="batch-upload-form" />
+        
+    </div>
+
+
+<script>
+document.getElementById('batch-upload-form').addEventListener('submit', function(e) {
+    const csvFile = document.getElementById('{{ form.csv_file.id_for_label }}').files[0];
+    const zipFile = document.getElementById('{{ form.zip_file.id_for_label }}').files[0];
+    
+    if (!csvFile) {
+        alert('Veuillez sélectionner un fichier CSV.');
+        e.preventDefault();
+        return;
+    }
+    
+    if (!zipFile) {
+        alert('Veuillez sélectionner un fichier ZIP.');
+        e.preventDefault();
+        return;
+    }
+    
+    if (csvFile.size === 0) {
+        alert('Le fichier CSV sélectionné est vide.');
+        e.preventDefault();
+        return;
+    }
+    
+    if (zipFile.size === 0) {
+        alert('Le fichier ZIP sélectionné est vide.');
+        e.preventDefault();
+        return;
+    }
+    
+    document.getElementById('submit-btn').disabled = true;
+    document.getElementById('submit-btn').value = 'Chargement en cours...';
+});
+</script>
+{% else %}
+<div class="module">
+    <h2>Fichiers prêts pour traitement</h2>
+    <div class="aligned">
+        <p><strong>Fichier CSV:</strong> {{ csv_filename }}</p>
+        <p><strong>Fichier ZIP:</strong> {{ zip_filename }}</p>
+        
+        <div id="progress-section" style="display: none;">
+            <h3>Avancement du traitement</h3>
+            <div id="progress-info">
+                <p>Traitement en cours...</p>
+                <div class="progress-container">
+                    <div id="progress-bar" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="results-section" style="display: none;">
+            <h3>Résultats du traitement</h3>
+            <div id="results-info"></div>
+        </div>
+    </div>
+    
+    <div class="submit-row">
+        <a href="{% url 'admin:glossary_batch_upload' %}" class="button bouton-annuler">Recommencer</a>
+        <input type="submit" id="start-batch" class="default" value="Démarrer le traitement" />
+        
+    </div>
+</div>
+
+<script>
+document.getElementById('start-batch').addEventListener('click', function() {
+    const button = this;
+    const progressSection = document.getElementById('progress-section');
+    const resultsSection = document.getElementById('results-section');
+    const progressBar = document.getElementById('progress-bar');
+    
+    button.disabled = true;
+    button.textContent = 'Traitement en cours...';
+    progressSection.style.display = 'block';
+    progressBar.style.width = '30%';
+    
+    fetch('{% url "admin:glossary_process_batch" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        progressBar.style.width = '70%';
+        return response.json();
+    })
+    .then(data => {
+        progressBar.style.width = '100%';
+        setTimeout(() => {
+            progressSection.style.display = 'none';
+            resultsSection.style.display = 'block';
+            
+            const resultsInfo = document.getElementById('results-info');
+            
+            if (data.success) {
+                resultsInfo.innerHTML = `
+                    <div style="background: #dfd; border: 1px solid #4f4; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                        <h4>✅ Traitement terminé avec succès!</h4>
+                        <p><strong>Glossaires créés:</strong> ${data.created}</p>
+                        <p><strong>Lignes traitées:</strong> ${data.total_rows}</p>
+                    </div>
+                `;
+                
+                if (data.errors.length > 0) {
+                    resultsInfo.innerHTML += `
+                        <div style="background: #ffd; border: 1px solid #ff4; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                            <h4>⚠️ Erreurs rencontrées:</h4>
+                            <ul style="margin: 0; padding-left: 20px;">
+                                ${data.errors.map(error => `<li>${error}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                resultsInfo.innerHTML += `
+                    <div style="margin-top: 15px;">
+                        <a href="{% url 'admin:glossaries_glossary_changelist' %}" class="button default">Voir les glossaires</a>
+                        <a href="{% url 'admin:glossary_batch_upload' %}" class="button">Nouveau chargement</a>
+                    </div>
+                `;
+            } else {
+                resultsInfo.innerHTML = `
+                    <div style="background: #fdd; border: 1px solid #f44; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                        <h4>❌ Erreur:</h4>
+                        <p>${data.error}</p>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <a href="{% url 'admin:glossary_batch_upload' %}" class="button cancel-link">Recommencer</a>
+                    </div>
+                `;
+            }
+        }, 500);
+    })
+    .catch(error => {
+        progressSection.style.display = 'none';
+        resultsSection.style.display = 'block';
+        
+        document.getElementById('results-info').innerHTML = `
+            <div style="background: #fdd; border: 1px solid #f44; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                <h4>❌ Erreur de communication:</h4>
+                <p>${error.message}</p>
+            </div>
+            <div style="margin-top: 15px;">
+                <a href="{% url 'admin:glossary_batch_upload' %}" class="button cancel-link">Recommencer</a>
+            </div>
+        `;
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

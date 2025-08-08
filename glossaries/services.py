@@ -33,11 +33,9 @@ class AIGlossaryService:
                 }
             }
         )
-        print(response.text)
         if response.status_code // 100 != 2:
             raise Exception(response.text)
         else:
-            print(response.json())
             return response.json().get("glossary_id")
 
     def update_glossary(self, glossary):
@@ -61,8 +59,6 @@ class AIGlossaryService:
 
         if response.status_code // 100 != 2:
             raise Exception(response.text)
-        else:
-            print(response.text)
 
     def delete_glossary(self, glossary):
         response = requests.post(
@@ -77,5 +73,3 @@ class AIGlossaryService:
 
         if response.status_code // 100 != 2:
             raise Exception(response.text)
-        else:
-            print(response.text)

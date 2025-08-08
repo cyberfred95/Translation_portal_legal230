@@ -17,9 +17,11 @@ def get_translate_data(request, for_statistic=False):
         'source_language': request.POST.get('source_language'),
         'target_language': request.POST.get('target_language'),
     }
-    domain = Domain.objects.filter(french_name=request.POST.get('domain_name')).first()
+    domain = Domain.objects.filter(
+        french_name=request.POST.get('domain_name')).first()
     if not domain:
-        domain = Domain.objects.filter(name=request.POST.get('domain_name')).first()
+        domain = Domain.objects.filter(
+            name=request.POST.get('domain_name')).first()
 
     if not domain and preferences.DefaultTranslation.enabled:
         if for_statistic:

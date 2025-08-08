@@ -81,7 +81,9 @@ class GlossaryProcessor:
             glossary_file.open('rb')
 
         try:
-            text_file = io.TextIOWrapper(glossary_file, encoding='utf-8')
+            # Automatically detect file encoding
+            encoding = self.__get_csv_file_encoding(glossary_file)
+            text_file = io.TextIOWrapper(glossary_file, encoding=encoding)
             source_values = []
             csv_reader = csv.reader(text_file)
             next(csv_reader, None)
@@ -142,17 +144,27 @@ class GlossaryProcessor:
         else:
             raise ValidationError("Invalid file type")
 
-    @staticmethod
-    def __form_glossary_from_csv(glossary_file) -> list:
+    def __form_glossary_from_csv(self, glossary_file) -> list:
         value = []
-        with glossary_file.open(mode='r') as file:
-            csv_reader = csv.reader(file)
+        if isinstance(glossary_file, FieldFile):
+            glossary_file.open('rb')
+        
+        try:
+            # Automatically detect file encoding
+            encoding = self.__get_csv_file_encoding(glossary_file)
+            text_file = io.TextIOWrapper(glossary_file, encoding=encoding)
+            csv_reader = csv.reader(text_file)
             next(csv_reader, None)
 
             for row in csv_reader:
                 value.append([row[0], row[1]])
 
+            text_file.detach()
             return value
+            
+        finally:
+            if isinstance(glossary_file, FieldFile):
+                glossary_file.close()
 
     @staticmethod
     def __form_glossary_from_xlsx(glossary_file) -> list:

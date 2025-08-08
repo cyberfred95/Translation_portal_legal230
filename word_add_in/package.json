@@ -1,0 +1,36 @@
+{
+  "name": "lexa-add-in-for-word",
+  "version": "1.0.0",
+  "description": "Extension Word pour la traduction Lexa",
+  "main": "src/taskpane/taskpane.js",
+  "scripts": {
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development",
+    "start": "webpack serve --mode development --port 3000",
+    "serve": "python -m http.server 3000",
+    "validate": "echo 'Validation du manifeste...'",
+    "sideload": "echo 'Chargement latéral - Utilisez le manifeste.xml dans Word'"
+  },
+  "dependencies": {
+    "core-js": "^3.32.0",
+    "regenerator-runtime": "^0.13.11"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.0",
+    "@babel/preset-env": "^7.22.0",
+    "babel-loader": "^9.1.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.8.0",
+    "html-loader": "^4.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "style-loader": "^3.3.0",
+    "webpack": "^5.100.2",
+    "webpack-cli": "^5.1.0",
+    "webpack-dev-server": "^4.15.0"
+  },
+  "browserslist": [
+    "ie 11"
+  ],
+  "author": "Legal 230",
+  "license": "MIT"
+}

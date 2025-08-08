@@ -112,24 +112,34 @@ cd /etc/nginx/sites-available
 touch <portal_name>
 ```
 4) Copy an example file content to your config 
-Here is an example file:
+Here is an example file. The sample below able to host the application running https.
 
 ```
+
 server {
-    server_name <your_domain>;
+    listen 80;
+    server_name <your_domain>
+    return 301 https://$host$request_uri;
+}
 
-    location = /favicon.ico { access_log off; log_not_found off; }
-    
-    client_max_body_size 30M;
+server {
+    listen 443 ssl;
+    server_name <your_domain>
+    add_header Access-Control-Allow-Origin "*" always;
 
-    location / {
-          proxy_pass http://localhost:<your_runserver_container_port>;
-          proxy_set_header Host $http_host;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
+    access_log /var/log/nginx/access.log combined;
+    error_log /var/log/nginx/error.log debug;
+
+    client_max_body_size 31M;
+
+    ssl_certificate <path_to_your_public certificate>fullchain.pem;
+    ssl_certificate_key <path_to_your_private key>/privkey.pem;
+
+    location = /favicon.ico {
+        log_not_found off;
+        access_log off;
     }
-    
+
     location /static/ {
         alias <path_to_your_files>/static_collected/;
     }
@@ -137,7 +147,38 @@ server {
     location /media/ {
         alias <path_to_your_files>/media/;
     }
+
+    location / {
+        proxy_pass http://127.0.0.1:<your_runserver_container_port>;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    location /api/v1/ {
+        proxy_pass http://127.0.0.1:<your_runserver_container_port>;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        add_header 'Access-Control-Allow-Origin' '*' always; 
+        add_header 'Access-Control-Allow-Methods' 'GET,POST,DELETE,PUT,OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Content-Type, Authorization, api-key' always; 
+        
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow-Methods' 'GET,POST,DELETE,PUT,OPTIONS';
+            add_header 'Access-Control-Allow-Headers' 'Content-Type, Authorization, api-key';
+            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Content-Type' 'text/plain; charset=utf-8';
+            add_header 'Content-Length' 0;
+            return 204;
+        }    
+    } 
 }
+
 ```
 
 5) check if configuration is correct:

@@ -3,6 +3,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 from django.db import transaction
 
+
 def create_user_subscriptions_for_group(apps, schema_editor):
     GroupSubscription = apps.get_model('subscriptions', 'GroupSubscription')
     UserSubscription = apps.get_model('subscriptions', 'UserSubscription')
@@ -16,7 +17,6 @@ def create_user_subscriptions_for_group(apps, schema_editor):
             users_in_group = User.objects.filter(group=group)
 
             for user in users_in_group:
-                print(f"Creating UserSubscription for user {user.id}")
                 UserSubscription.objects.create(
                     user=user,
                     subscription=group_subscription.subscription,
@@ -37,6 +37,7 @@ def create_user_subscriptions_for_group(apps, schema_editor):
 
         GroupSubscription.objects.all().delete()
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -48,18 +49,24 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='UserSubscription',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(choices=[('ACTIVE', 'Active'), ('INACTIVE', 'Inactive')], max_length=255)),
+                ('id', models.AutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
+                ('status', models.CharField(choices=[
+                 ('ACTIVE', 'Active'), ('INACTIVE', 'Inactive')], max_length=255)),
                 ('max_symbols_count', models.IntegerField(default=0)),
                 ('max_files_count', models.IntegerField(default=0)),
                 ('max_words_count', models.IntegerField(default=0)),
-                ('custom_glossaries_count', models.IntegerField(default=0, verbose_name='Custom Glossaries Count')),
+                ('custom_glossaries_count', models.IntegerField(
+                    default=0, verbose_name='Custom Glossaries Count')),
                 ('translated_symbols_count', models.IntegerField(default=0)),
                 ('translated_words_count', models.IntegerField(default=0)),
                 ('translated_files_count', models.IntegerField(default=0)),
-                ('access_to_writing', models.BooleanField(default=False, verbose_name='Access to Writing')),
-                ('access_to_official_glossaries', models.BooleanField(default=False, verbose_name='Access to Official Glossaries')),
-                ('access_to_sso', models.BooleanField(default=False, verbose_name='Possible access by SSO authentication logic')),
+                ('access_to_writing', models.BooleanField(
+                    default=False, verbose_name='Access to Writing')),
+                ('access_to_official_glossaries', models.BooleanField(
+                    default=False, verbose_name='Access to Official Glossaries')),
+                ('access_to_sso', models.BooleanField(default=False,
+                 verbose_name='Possible access by SSO authentication logic')),
                 ('start_date', models.DateTimeField()),
                 ('end_date', models.DateTimeField()),
             ],
@@ -67,12 +74,14 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='usersubscription',
             name='subscription',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='users', to='subscriptions.subscriptiontype'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='users', to='subscriptions.subscriptiontype'),
         ),
         migrations.AddField(
             model_name='usersubscription',
             name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subscriptions', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='subscriptions', to=settings.AUTH_USER_MODEL),
         ),
         migrations.RunPython(create_user_subscriptions_for_group),
         migrations.DeleteModel(
