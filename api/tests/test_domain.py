@@ -59,7 +59,10 @@ from .settings import (
     TEST_PASSWORD,
     TEST_SUBSCRIPTION_NAME,
     TEST_USERNAME,
+    create_test_main_settings,
     get_auth_headers,
+    setup_glossary_service_patches,
+    teardown_glossary_service_patches,
 )
 
 User = get_user_model()
@@ -68,7 +71,13 @@ User = get_user_model()
 class DomainAPITestCase(TestCase):
 
     def setUp(self):
+        # Set up patches and main settings using helper functions
+        setup_glossary_service_patches(self)
+        
         self.factory = RequestFactory()
+
+        # Create MainSettings for the test
+        self.main_settings = create_test_main_settings()
 
         # Create test languages
         self.english = Language.objects.create(
@@ -139,6 +148,10 @@ class DomainAPITestCase(TestCase):
             group=None,
             file=test_file
         )
+
+    def tearDown(self):
+        """Clean up patches after each test."""
+        teardown_glossary_service_patches(self)
 
     def test_partial_domain_to_json_with_group(self):
         """Test that partial_domain_to_json returns correct JSON for domain with group."""

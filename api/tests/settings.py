@@ -142,3 +142,62 @@ CSV_CONTENT_TYPE = 'text/csv'
 TEST_GLOSSARY_ID = 1
 TEST_DOMAIN_ID = 1
 MAX_GLOSSARY_ID_FOR_TEST = 99999
+
+# MainSettings Test Constants
+TEST_MAIN_SETTINGS = {
+    'sender_email': 'sender@legal230test.com',
+    'quote_cc_email': 'quotes@legal230test.com',
+    'support_email': 'support@legal230test.com',
+    'api_key': 'test-main-api-key-123456',
+    'algorithm': 'template',  # MainSettings.AlgorithmChoices.template
+    'CUSTOM_MT_CONSOLE_URL': 'https://console.custom.mt/',
+    'CLOUDSTORAGE_API_URL': 'https://cloudstorage.fileprocessing.custom.mt/translate/legal230/',
+    'glossaries_url': 'https://glossaries-api.legal230test.com/api/v1/'
+}
+
+
+def create_test_main_settings():
+    """
+    Create a MainSettings instance with realistic test values.
+    This should be used in test setUp methods to ensure consistent test data.
+    """
+    from settings.models import MainSettings
+    return MainSettings.objects.create(**TEST_MAIN_SETTINGS)
+
+
+def setup_glossary_service_patches(test_case):
+    """
+    Set up patches for glossary service to avoid external API calls.
+    Call this in your test setUp method.
+    
+    Example:
+        def setUp(self):
+            setup_glossary_service_patches(self)
+            # rest of your setup...
+            
+        def tearDown(self):
+            teardown_glossary_service_patches(self)
+    """
+    from unittest.mock import patch
+    
+    test_case.create_glossary_patcher = patch('glossaries.services.AIGlossaryService.create_glossary')
+    test_case.update_glossary_patcher = patch('glossaries.services.AIGlossaryService.update_glossary')
+    test_case.delete_glossary_patcher = patch('glossaries.services.AIGlossaryService.delete_glossary')
+    
+    test_case.mock_create_glossary = test_case.create_glossary_patcher.start()
+    test_case.mock_update_glossary = test_case.update_glossary_patcher.start()
+    test_case.mock_delete_glossary = test_case.delete_glossary_patcher.start()
+    
+    test_case.mock_create_glossary.return_value = "mock_glossary_id"
+    test_case.mock_update_glossary.return_value = None
+    test_case.mock_delete_glossary.return_value = None
+
+
+def teardown_glossary_service_patches(test_case):
+    """
+    Clean up glossary service patches.
+    Call this in your test tearDown method.
+    """
+    test_case.create_glossary_patcher.stop()
+    test_case.update_glossary_patcher.stop()
+    test_case.delete_glossary_patcher.stop()
