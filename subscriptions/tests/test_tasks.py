@@ -13,6 +13,7 @@ from django.utils import timezone
 from subscriptions.models import UserSubscription, SubscriptionType, CountHistory
 from subscriptions.tasks import process_daily_subscription_renewals
 from users.models import User, UserGroup
+from tests.mock import create_test_user_group
 
 
 class ProcessDailySubscriptionRenewalsTestCase(TestCase):
@@ -21,7 +22,7 @@ class ProcessDailySubscriptionRenewalsTestCase(TestCase):
     def setUp(self):
         """Set up test data."""
         # Create a user group
-        self.group = UserGroup.objects.create(name="Test Group")
+        self.group = create_test_user_group(name="Test Group")
 
         # Create a user
         self.user = User.objects.create(

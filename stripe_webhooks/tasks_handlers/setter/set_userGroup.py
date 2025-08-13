@@ -30,7 +30,6 @@ def create_userGroup(group_name: str) -> tuple[HttpResponse | None, UserGroup | 
     try:
         group = UserGroup.objects.create(
             name=group_name,
-            api_key=settings.LEXA_API_GROUP_DEFAULT_API_KEY
         )
         return None, group
 

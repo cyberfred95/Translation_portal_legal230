@@ -11,6 +11,7 @@ from django.test import TestCase
 
 from subscriptions.models import SubscriptionType, UserSubscription
 from users.models import User, UserGroup
+from tests.mock import create_test_user_group, mock_api_key_generation
 
 # Constants simplifiées
 TEST_STRIPE_CUSTOMER_ID = 'cus_test123456789'
@@ -60,7 +61,7 @@ class SimpleGettersTestCase(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.group = UserGroup.objects.create(name=TEST_GROUP_NAME)
+        self.group = create_test_user_group(name=TEST_GROUP_NAME)
 
         self.user = User.objects.create_user(
             username=TEST_USERNAME,
@@ -185,7 +186,7 @@ class SimpleSettersTestCase(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.group = UserGroup.objects.create(name=TEST_GROUP_NAME)
+        self.group = create_test_user_group(name=TEST_GROUP_NAME)
 
     def test_create_user_success(self):
         """Test successful user creation."""
@@ -209,17 +210,17 @@ class SimpleSettersTestCase(TestCase):
         self.assertEqual(user.group_id, self.group.id)
         self.assertTrue(user.username.startswith('lexa'))
 
-    def test_create_userGroup_success(self):
+    @mock_api_key_generation
+    def test_create_userGroup_success(self, mock_requests_post, mock_get_main_settings):
         """Test successful user group creation."""
         from stripe_webhooks.tasks_handlers.setter.set_userGroup import create_userGroup
 
-        with patch('stripe_webhooks.tasks_handlers.setter.set_userGroup.settings.LEXA_API_GROUP_DEFAULT_API_KEY', 'test-key'):
-            error, group = create_userGroup("NEW GROUP")
+        error, group = create_userGroup("NEW GROUP")
 
-            self.assertIsNone(error)
-            self.assertIsNotNone(group)
-            self.assertEqual(group.name, "NEW GROUP")
-            self.assertEqual(group.api_key, "test-key")
+        self.assertIsNone(error)
+        self.assertIsNotNone(group)
+        self.assertEqual(group.name, "NEW GROUP")
+        self.assertIsNotNone(group.api_key)  # API key should be generated
 
 
 class SimpleHelpersTestCase(TestCase):

@@ -34,6 +34,7 @@ from stripe_webhooks.tests.settings import (
 )
 from subscriptions.models import CountHistory, SubscriptionType, UserSubscription
 from users.models import User, UserGroup
+from tests.mock import create_test_user_group
 
 
 class InvoicePaymentSucceededTestCase(TestCase):
@@ -41,7 +42,7 @@ class InvoicePaymentSucceededTestCase(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.group = UserGroup.objects.create(name=TEST_GROUP_NAME)
+        self.group = create_test_user_group(name=TEST_GROUP_NAME)
         self.user = User.objects.create(
             username='testuser',
             email=TEST_EMAIL,
@@ -189,7 +190,7 @@ class ResetSubscriptionsTestCase(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.group = UserGroup.objects.create(name=TEST_GROUP_NAME)
+        self.group = create_test_user_group(name=TEST_GROUP_NAME)
         self.user = User.objects.create(
             username='testuser',
             email=TEST_EMAIL,
@@ -346,7 +347,7 @@ class CreateCountHistoryTestCase(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.group = UserGroup.objects.create(name=TEST_GROUP_NAME)
+        self.group = create_test_user_group(name=TEST_GROUP_NAME)
         self.user = User.objects.create(
             username='testuser',
             email=TEST_EMAIL,
@@ -444,7 +445,7 @@ class ResetUserSubscriptionCountsTestCase(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.group = UserGroup.objects.create(name=TEST_GROUP_NAME)
+        self.group = create_test_user_group(name=TEST_GROUP_NAME)
         self.user = User.objects.create(
             username='testuser',
             email=TEST_EMAIL,
