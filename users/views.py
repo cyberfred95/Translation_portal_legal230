@@ -27,11 +27,11 @@ from .models import UserGroup, User
 from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer, RegisterUserSerializer, \
     LoginSerializer, ForgotPasswordSerializer, ResetPasswordSerializer
 from legal.views import PAGINATION_PAGE_SIZE
-from .mail_helpers import send_invitation_email, send_reset_password_email, register_success_email
 from legal.helpers import password_valid
 
+from emails.models import EmailType
+from emails.send_email import send_email
 
-# Create your views here.
 
 class UsersListView(APIView):
     def get(self, request):
@@ -153,9 +153,16 @@ class InviteUserAPIView(APIView):
                         "group": base64.b64encode(str(request.user.group.id).encode('utf-8')),
                         "subscription_type_id": base64.b64encode(request.data.get('subscription_type_id').encode('utf-8')),
                     }
-                    send_invitation_email(email=email,
-                                          register_user_absolute_uri=self.get_register_user_absolute_uri(request,
-                                                                                                         params=params))
+                    send_email(
+                        email,
+                        EmailType.USER_MANAGEMENT_INVITATION,
+                        request.user.language,
+                        {
+                            # TMP : Need to be replaced with actual values when figma integration is done
+                            "lexa_username": "name",
+                            "url_reset_password" : self.get_register_user_absolute_uri(request, params=params),
+                        }
+                    )
             return Response({"message": "Invitation has been successfully sent"}, status=status.HTTP_200_OK)
         return Response({"detail": "You have to be group admin to provide this action"},
                         status=status.HTTP_403_FORBIDDEN)
@@ -201,10 +208,6 @@ class RegisterUserView(TemplateView):
                 )
                 user_subscription.save()
                 login(request, user)
-                register_success_email(
-                    username=user.username,
-                    email=user.email,
-                )
                 return redirect(settings.LOGIN_REDIRECT_URL)
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -232,11 +235,15 @@ class ForgotPasswordView(TemplateView):
             params = {
                 "email": base64.b64encode(user.email.encode('utf-8')),
             }
-
-            send_reset_password_email(
-                email=user.email,
-                username=user.username,
-                reset_password_absolute_uri=self.get_reset_password_absolute_url(request=request, params=params),
+            send_email(
+                email,
+                EmailType.USER_MANAGEMENT_RESET_PASSWORD,
+                request.user.language,
+                {
+                    # TMP : Need to be replaced with actual values when figma integration is done
+                    "lexa_username": user.username,
+                    "url_reset_password": self.get_register_user_absolute_uri(request, params=params),
+                }
             )
             return JsonResponse({"message": "Code sent successfully"}, status=status.HTTP_200_OK)
         else:
