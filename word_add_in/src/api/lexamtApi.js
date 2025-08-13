@@ -1,6 +1,14 @@
 // Fonctions pour interagir avec l'API Lexa
 // Toutes les fonctions ici gèrent les appels réseau à l'API Lexa
 
+// Configuration de l'environnement
+const TEST = false;
+const URL = 'portail.lexamt.fr/api/'
+const API_VERSION = 'v1/';
+
+const URL_TEST = TEST ? 'test.' : ''
+const BASE_URL = `https://${URL_TEST}${URL}${API_VERSION}`;
+
 async function fetchWithApiKey(url, apiKey) {
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${apiKey}` },
@@ -36,7 +44,7 @@ async function fetchWithApiKey(url, apiKey) {
  * @returns {Promise<Array>} - Un tableau d'objets langue.
  */
 export async function loadLanguages(apiKey) {
-  return fetchWithApiKey('https://test.portail.lexamt.fr/api/v1/languages/', apiKey);
+  return fetchWithApiKey(`${BASE_URL}languages/`, apiKey);
 }
 
 /**
@@ -45,7 +53,7 @@ export async function loadLanguages(apiKey) {
  * @returns {Promise<Array>} - Un tableau d'objets domaine.
  */
 export async function loadDomains(apiKey) {
-  return fetchWithApiKey('https://test.portail.lexamt.fr/api/v1/domains/', apiKey);
+  return fetchWithApiKey(`${BASE_URL}domains/`, apiKey);
 }
 
 /**
@@ -54,7 +62,7 @@ export async function loadDomains(apiKey) {
  * @returns {Promise<boolean>} - true si la clé est valide, sinon false.
  */
 export async function testApiKey(apiKey) {
-  const response = await fetch(`https://test.portail.lexamt.fr/api/v1/languages/`, {
+  const response = await fetch(`${BASE_URL}languages/`, {
     headers: { Authorization: `Bearer ${apiKey}` },
   });
   return response.ok;
@@ -70,7 +78,7 @@ export async function testApiKey(apiKey) {
  * @returns {Promise<string>} - Le texte traduit.
  */
 export async function callLexaAPI(apiKey, text, sourceLang, targetLang, domain) {
-  const response = await fetch(`https://test.portail.lexamt.fr/api/v1/translate/`, {
+  const response = await fetch(`${BASE_URL}translate/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

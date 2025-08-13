@@ -5,7 +5,7 @@ info:
   description: API de traduction et gestion de glossaires Lexamt
 
 servers:
-  - url: https://test.portail.lexamt.fr
+  - url: https://portail.lexamt.fr
 
 components:
   securitySchemes:
