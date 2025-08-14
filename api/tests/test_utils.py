@@ -31,7 +31,8 @@ from api.views.error.error_messages import (
     SOURCE_LANGUAGE_TOO_LONG,
 )
 from subscriptions.models import SubscriptionType, UserSubscription
-from users.models import UserGroup
+from users.models import User, UserGroup
+from tests.mock import create_test_user_group
 
 from .settings import (
     CSV_EXTENSION,
@@ -70,7 +71,7 @@ class APIUtilsTestCase(TestCase):
         self.factory = RequestFactory()
 
         # Create API group with key
-        self.group = UserGroup.objects.create(
+        self.group = create_test_user_group(
             name=TEST_GROUP_NAME,
             api_key=TEST_API_KEY
         )

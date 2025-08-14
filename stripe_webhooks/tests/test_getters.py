@@ -70,6 +70,7 @@ from stripe_webhooks.tests.settings import (
 )
 from subscriptions.models import SubscriptionType, UserSubscription
 from users.models import User, UserGroup
+from tests.mock import create_test_user_group
 
 
 class GetDataTestCase(TestCase):
@@ -78,7 +79,7 @@ class GetDataTestCase(TestCase):
     def setUp(self):
         """Set up test data."""
         # Create test user group
-        self.group = UserGroup.objects.create(name=TEST_GROUP_NAME)
+        self.group = create_test_user_group(name=TEST_GROUP_NAME)
 
         # Create test user
         self.user = User.objects.create_user(

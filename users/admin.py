@@ -50,7 +50,7 @@ class UserInline(UserDisplayMixin, admin.TabularInline):
 
 class UserGroupAdmin(admin.ModelAdmin):
     fields = ['name', 'api_key', 'admin']
-    list_display = ('name', 'user_count')
+    list_display = ('name', 'id', 'user_count')
     inlines = [UserInline]
 
     def user_count(self, obj):

@@ -33,7 +33,8 @@ from api.views.translate import (
 from domains.models import Domain
 from languages.models import Language
 from subscriptions.models import SubscriptionType, UserSubscription
-from users.models import UserGroup
+from users.models import User, UserGroup
+from tests.mock import create_test_user_group
 
 from .settings import (
     ENGLISH_LANG_CODE,
@@ -84,7 +85,7 @@ class TranslateAPITestCase(TestCase):
         self.domain = Domain.objects.create(name=TEST_DOMAIN_GROUP_NAME)
 
         # Create API group with key
-        self.group = UserGroup.objects.create(
+        self.group = create_test_user_group(
             name=TEST_GROUP_NAME,
             api_key=TEST_API_KEY
         )

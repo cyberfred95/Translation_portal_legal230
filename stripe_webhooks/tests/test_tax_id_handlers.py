@@ -21,15 +21,17 @@ from stripe_webhooks.tests.settings import (
     TEST_USERNAME,
 )
 from users.models import User, UserGroup
+from tests.mock import create_test_user_group, suppress_api_calls
 
 
+@suppress_api_calls
 class CustomerTaxIdHandlersTestCase(TestCase):
     """Test case for customer tax ID webhook handlers."""
 
     def setUp(self):
         """Set up test data."""
         # Create test user group
-        self.group = UserGroup.objects.create(name=TEST_GROUP_NAME)
+        self.group = create_test_user_group(name=TEST_GROUP_NAME)
 
         # Create test user
         self.user = User.objects.create_user(
