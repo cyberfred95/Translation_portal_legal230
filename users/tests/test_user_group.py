@@ -7,32 +7,48 @@ from django.test import TestCase
 from users.models import UserGroup
 from tests.mock import mock_api_key_generation, mock_api_key_generation_failure, mock_no_settings
 
+# Import des constantes centralisées
+from .settings import (
+    TEST_GROUP_NAME,
+    TEST_API_KEY,
+    EXISTING_API_KEY,
+    GENERATED_API_KEY,
+    USER_GROUP_VERBOSE_NAME,
+    USER_GROUP_VERBOSE_NAME_PLURAL,
+    EXPECTED_API_TIMEOUT,
+    EXPECTED_LABEL_ID,
+    API_CREATE_KEY_ENDPOINT,
+    API_HEADERS_CONTENT_TYPE,
+    API_TOKEN_KEY,
+    API_MAIN_TOKEN,
+)
+
 
 class UserGroupAPIKeyTestCase(TestCase):
     """Test case for UserGroup API key auto-generation."""
 
-    @mock_api_key_generation('generated-api-key-12345')
+    @mock_api_key_generation(GENERATED_API_KEY)
     def test_api_key_auto_generation_success(self, mock_post, mock_get_settings):
         """Test that API key is auto-generated when UserGroup is saved without one."""
         
         # Create UserGroup without api_key
-        group = UserGroup(name='Test Group')
+        group = UserGroup(name=TEST_GROUP_NAME)
         
         # Save should trigger API key generation
         group.save()
         
         # Verify API key was set
-        self.assertEqual(group.api_key, 'generated-api-key-12345')
+        self.assertEqual(group.api_key, GENERATED_API_KEY)
         
         # Verify API call was made correctly
         mock_post.assert_called_once_with(
-            'https://console.custom.mt/cabinet_api/create_api_key/',
-            json={'label': '1'},  # Now uses the group ID
+            API_CREATE_KEY_ENDPOINT,
+            json={'label': EXPECTED_LABEL_ID},  # Now uses the group ID
             headers={
-                'token': 'main-api-key-123',
-                'Content-Type': 'application/json'
+                API_TOKEN_KEY: API_MAIN_TOKEN,
+                'Content-Type': API_HEADERS_CONTENT_TYPE
             },
-            timeout=30
+            timeout=EXPECTED_API_TIMEOUT
         )
 
     @mock_api_key_generation_failure()
@@ -40,7 +56,7 @@ class UserGroupAPIKeyTestCase(TestCase):
         """Test that UUID fallback is used when API call fails."""
         
         # Create UserGroup without api_key
-        group = UserGroup(name='Test Group')
+        group = UserGroup(name=TEST_GROUP_NAME)
         
         # Save should trigger API key generation with UUID fallback
         group.save()
@@ -54,21 +70,19 @@ class UserGroupAPIKeyTestCase(TestCase):
     def test_existing_api_key_not_overwritten(self):
         """Test that existing API key is not overwritten."""
         
-        existing_key = 'existing-api-key-123'
-        
         # Create UserGroup with existing api_key
-        group = UserGroup(name='Test Group', api_key=existing_key)
+        group = UserGroup(name=TEST_GROUP_NAME, api_key=EXISTING_API_KEY)
         group.save()
         
         # Verify API key was not changed
-        self.assertEqual(group.api_key, existing_key)
+        self.assertEqual(group.api_key, EXISTING_API_KEY)
 
     @mock_no_settings()
     def test_api_key_generation_no_settings(self, mock_get_settings):
         """Test fallback to UUID when main settings are not available."""
         
         # Create UserGroup without api_key
-        group = UserGroup(name='Test Group')
+        group = UserGroup(name=TEST_GROUP_NAME)
         group.save()
         
         # Verify API key was set to UUID fallback
@@ -78,7 +92,7 @@ class UserGroupAPIKeyTestCase(TestCase):
     def test_generate_quoting_number(self):
         """Test that quoting number generation works correctly."""
         
-        group = UserGroup(name='Test Group', api_key='test-key')
+        group = UserGroup(name=TEST_GROUP_NAME, api_key=TEST_API_KEY)
         group.save()
         
         # Test initial quoting number generation
@@ -97,11 +111,11 @@ class UserGroupAPIKeyTestCase(TestCase):
     def test_user_group_str_representation(self):
         """Test UserGroup string representation."""
         
-        group = UserGroup(name='Test Group', api_key='test-key')
-        self.assertEqual(str(group), 'Test Group')
+        group = UserGroup(name=TEST_GROUP_NAME, api_key=TEST_API_KEY)
+        self.assertEqual(str(group), TEST_GROUP_NAME)
 
     def test_user_group_meta(self):
         """Test UserGroup meta information."""
         
-        self.assertEqual(UserGroup._meta.verbose_name, 'Group')
-        self.assertEqual(UserGroup._meta.verbose_name_plural, 'Groups')
+        self.assertEqual(UserGroup._meta.verbose_name, USER_GROUP_VERBOSE_NAME)
+        self.assertEqual(UserGroup._meta.verbose_name_plural, USER_GROUP_VERBOSE_NAME_PLURAL)

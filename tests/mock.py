@@ -9,6 +9,33 @@ from unittest.mock import Mock, patch
 from functools import wraps
 
 
+# Common mock configurations
+def _create_mock_settings():
+    """Create a mock settings object with standard configuration."""
+    mock_settings = Mock()
+    mock_settings.CUSTOM_MT_CONSOLE_URL = 'https://console.custom.mt/'
+    mock_settings.api_key = 'main-api-key-123'
+    return mock_settings
+
+
+def _create_mock_api_response(api_key, success=True):
+    """Create a mock API response object."""
+    mock_response = Mock()
+    if success:
+        mock_response.status_code = 200
+        mock_response.json.return_value = {'api_key': api_key}
+    else:
+        mock_response.status_code = 400
+        mock_response.text = 'Bad Request'
+    return mock_response
+
+
+def _api_key_decorator_base(test_func, api_key, success=True, silent=False, with_requests=True):
+    """Base decorator logic for API key mocking to reduce code duplication."""
+    # Cette fonction n'est plus utilisée - on garde les décorateurs séparés pour maintenir les signatures
+    pass
+
+
 def mock_api_key_generation(api_key='test-api-key-mock'):
     """
     Decorator to mock API key generation for UserGroup creation.
@@ -21,17 +48,9 @@ def mock_api_key_generation(api_key='test-api-key-mock'):
         @patch('users.models.get_main_settings')
         @patch('users.models.requests.post')
         def wrapper(self, mock_post, mock_get_settings, *args, **kwargs):
-            # Mock the main settings
-            mock_settings = Mock()
-            mock_settings.CUSTOM_MT_CONSOLE_URL = 'https://console.custom.mt/'
-            mock_settings.api_key = 'main-api-key-123'
-            mock_get_settings.return_value = mock_settings
-            
-            # Mock successful API response
-            mock_response = Mock()
-            mock_response.status_code = 200
-            mock_response.json.return_value = {'api_key': api_key}
-            mock_post.return_value = mock_response
+            # Use shared configuration functions
+            mock_get_settings.return_value = _create_mock_settings()
+            mock_post.return_value = _create_mock_api_response(api_key, success=True)
             
             # Pass mocks to the test function
             return test_func(self, mock_post, mock_get_settings, *args, **kwargs)
@@ -53,17 +72,9 @@ def mock_api_key_generation_silent(api_key='test-api-key-silent'):
         @patch('users.models.requests.post')
         @patch('builtins.print')  # Suppress print statements
         def wrapper(self, mock_print, mock_post, mock_get_settings, *args, **kwargs):
-            # Mock the main settings
-            mock_settings = Mock()
-            mock_settings.CUSTOM_MT_CONSOLE_URL = 'https://console.custom.mt/'
-            mock_settings.api_key = 'main-api-key-123'
-            mock_get_settings.return_value = mock_settings
-            
-            # Mock successful API response
-            mock_response = Mock()
-            mock_response.status_code = 200
-            mock_response.json.return_value = {'api_key': api_key}
-            mock_post.return_value = mock_response
+            # Use shared configuration functions
+            mock_get_settings.return_value = _create_mock_settings()
+            mock_post.return_value = _create_mock_api_response(api_key, success=True)
             
             # Pass mocks to the test function
             return test_func(self, mock_post, mock_get_settings, *args, **kwargs)
@@ -82,17 +93,9 @@ def mock_api_key_generation_failure():
         @patch('users.models.requests.post')
         @patch('builtins.print')  # Suppress print statements
         def wrapper(self, mock_print, mock_post, mock_get_settings, *args, **kwargs):
-            # Mock the main settings
-            mock_settings = Mock()
-            mock_settings.CUSTOM_MT_CONSOLE_URL = 'https://console.custom.mt/'
-            mock_settings.api_key = 'main-api-key-123'
-            mock_get_settings.return_value = mock_settings
-            
-            # Mock failed API response
-            mock_response = Mock()
-            mock_response.status_code = 400
-            mock_response.text = 'Bad Request'
-            mock_post.return_value = mock_response
+            # Use shared configuration functions
+            mock_get_settings.return_value = _create_mock_settings()
+            mock_post.return_value = _create_mock_api_response('', success=False)
             
             # Pass mocks to the test function
             return test_func(self, mock_post, mock_get_settings, *args, **kwargs)
@@ -163,27 +166,16 @@ def suppress_api_calls(test_class):
         self._api_mock_post = self._api_patcher_requests.start()
         self._api_mock_print = self._api_patcher_print.start()
         
-        # Mock the main settings
-        mock_settings = Mock()
-        mock_settings.CUSTOM_MT_CONSOLE_URL = 'https://console.custom.mt/'
-        mock_settings.api_key = 'main-api-key-123'
-        self._api_mock_get_settings.return_value = mock_settings
-        
-        # Mock successful API response
-        mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {'api_key': 'test-mocked-api-key'}
-        self._api_mock_post.return_value = mock_response
+        # Use common mock setup functions
+        self._api_mock_get_settings.return_value = _create_mock_settings()
+        self._api_mock_post.return_value = _create_mock_api_response('test-mocked-api-key')
     
     def new_tearDown(self):
         """Enhanced tearDown with patch cleanup."""
         # Stop patches first
-        if hasattr(self, '_api_patcher_settings'):
-            self._api_patcher_settings.stop()
-        if hasattr(self, '_api_patcher_requests'):
-            self._api_patcher_requests.stop()
-        if hasattr(self, '_api_patcher_print'):
-            self._api_patcher_print.stop()
+        for patcher_name in ['_api_patcher_settings', '_api_patcher_requests', '_api_patcher_print']:
+            if hasattr(self, patcher_name):
+                getattr(self, patcher_name).stop()
         
         # Call original tearDown
         if original_tearDown:

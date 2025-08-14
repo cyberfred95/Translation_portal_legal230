@@ -5,7 +5,6 @@ Cette version corrige les problèmes identifiés dans les tests précédents.
 """
 
 from datetime import datetime, timezone
-from unittest.mock import MagicMock, patch
 
 from django.test import TestCase
 
@@ -13,47 +12,27 @@ from subscriptions.models import SubscriptionType, UserSubscription
 from users.models import User, UserGroup
 from tests.mock import create_test_user_group, mock_api_key_generation
 
-# Constants simplifiées
-TEST_STRIPE_CUSTOMER_ID = 'cus_test123456789'
-INVALID_STRIPE_CUSTOMER_ID = 'cus_invalid'
-TEST_STRIPE_PRODUCT_ID = 'prod_test123456789'
-INVALID_STRIPE_PRODUCT_ID = 'prod_invalid'
-TEST_STRIPE_SUBSCRIPTION_ID = 'sub_test123456789'
-INVALID_STRIPE_SUBSCRIPTION_ID = 'sub_invalid'
-
-TEST_USERNAME = 'testuser'
-TEST_EMAIL = 'test@example.com'
-TEST_PASSWORD = 'testpass123'
-TEST_GROUP_NAME = 'TEST GROUP'
-TEST_SUBSCRIPTION_NAME = 'Test Subscription'
-TEST_SUBSCRIPTION_PRICE = 99.99
-ENGLISH_LANG_CODE = 'en'
-TEST_FULL_NAME = 'John Doe'
-
-# Payloads de test
-TEST_CUSTOMER_PAYLOAD = {
-    'id': TEST_STRIPE_CUSTOMER_ID,
-    'name': TEST_FULL_NAME,
-    'email': TEST_EMAIL,
-    'preferred_locales': [ENGLISH_LANG_CODE]
-}
-
-TEST_CUSTOMER_PAYLOAD_NO_EMAIL = {
-    'id': TEST_STRIPE_CUSTOMER_ID,
-    'name': TEST_FULL_NAME,
-    'preferred_locales': [ENGLISH_LANG_CODE]
-}
-
-TEST_CUSTOMER_PAYLOAD_NO_NAME = {
-    'id': TEST_STRIPE_CUSTOMER_ID,
-    'email': TEST_EMAIL,
-    'preferred_locales': [ENGLISH_LANG_CODE]
-}
-
-INVALID_CUSTOMER_PAYLOAD = {
-    'name': TEST_FULL_NAME,
-    'email': TEST_EMAIL
-}
+# Import des constantes centralisées
+from .settings import (
+    TEST_STRIPE_CUSTOMER_ID,
+    INVALID_STRIPE_CUSTOMER_ID,
+    TEST_STRIPE_PRODUCT_ID,
+    INVALID_STRIPE_PRODUCT_ID,
+    TEST_STRIPE_SUBSCRIPTION_ID,
+    INVALID_STRIPE_SUBSCRIPTION_ID,
+    TEST_USERNAME,
+    TEST_EMAIL,
+    TEST_PASSWORD,
+    TEST_GROUP_NAME,
+    TEST_SUBSCRIPTION_NAME,
+    TEST_SUBSCRIPTION_PRICE,
+    ENGLISH_LANG_CODE,
+    TEST_FULL_NAME,
+    TEST_CUSTOMER_PAYLOAD,
+    TEST_CUSTOMER_PAYLOAD_NO_EMAIL,
+    TEST_CUSTOMER_PAYLOAD_NO_NAME,
+    INVALID_CUSTOMER_PAYLOAD,
+)
 
 
 class SimpleGettersTestCase(TestCase):
