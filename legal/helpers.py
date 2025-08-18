@@ -100,3 +100,15 @@ def rename_file(file: InMemoryUploadedFile, file_name: str = None):
     else:
         file.name = file_name
     return file
+
+
+def get_main_settings():
+    """
+    Get the main settings instance.
+    Returns None if no settings are configured.
+    """
+    try:
+        from settings.models import MainSettings
+        return MainSettings.objects.first()
+    except Exception:
+        return None

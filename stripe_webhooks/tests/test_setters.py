@@ -5,7 +5,7 @@ This module contains tests for setter functions used to create and modify
 users, user groups, and user subscriptions.
 """
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, Mock
 
 from django.conf import settings
 from django.test import TestCase
@@ -45,6 +45,7 @@ from stripe_webhooks.tests.settings import (
 )
 from subscriptions.models import SubscriptionType, UserSubscription
 from users.models import User, UserGroup
+from tests.mock import create_test_user_group, mock_api_key_generation
 
 
 class SetUserTestCase(TestCase):
@@ -52,7 +53,7 @@ class SetUserTestCase(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.group = UserGroup.objects.create(name=TEST_GROUP_NAME)
+        self.group = create_test_user_group(name=TEST_GROUP_NAME)
 
     def test_create_user_success_with_all_data(self):
         """Test successful user creation with all data provided."""
@@ -213,15 +214,17 @@ class SetUserTestCase(TestCase):
 class SetUserGroupTestCase(TestCase):
     """Test case for set_userGroup functions."""
 
-    @patch('stripe_webhooks.tasks_handlers.setter.set_userGroup.settings.LEXA_API_GROUP_DEFAULT_API_KEY', TEST_API_KEY)
-    def test_create_userGroup_success(self):
-        """Test successful user group creation."""
+    @mock_api_key_generation('generated-api-key-12345')
+    def test_create_userGroup_success(self, mock_post, mock_get_settings):
+        """Test successful user group creation with automatic API key generation."""
+        
         error, group = create_userGroup(TEST_GROUP_NAME)
 
         self.assertIsNone(error)
         self.assertIsNotNone(group)
         self.assertEqual(group.name, TEST_GROUP_NAME)
-        self.assertEqual(group.api_key, TEST_API_KEY)
+        # Verify API key was auto-generated
+        self.assertEqual(group.api_key, 'generated-api-key-12345')
 
     @patch('stripe_webhooks.tasks_handlers.setter.set_userGroup.UserGroup.objects.create')
     def test_create_userGroup_exception_handling(self, mock_create):
@@ -234,8 +237,10 @@ class SetUserGroupTestCase(TestCase):
         self.assertIsNone(group)
         self.assertEqual(error.code, 500)  # exception code
 
-    def test_create_userGroup_if_not_exists_new_group(self):
+    @mock_api_key_generation()
+    def test_create_userGroup_if_not_exists_new_group(self, mock_post, mock_get_settings):
         """Test creating user group when it doesn't exist."""
+        
         error, group, is_found = create_userGroup_if_not_exists(
             TEST_GROUP_NAME.lower())
 
@@ -247,7 +252,7 @@ class SetUserGroupTestCase(TestCase):
     def test_create_userGroup_if_not_exists_existing_group(self):
         """Test creating user group when it already exists."""
         # Create existing group
-        existing_group = UserGroup.objects.create(name=TEST_GROUP_NAME)
+        existing_group = create_test_user_group(name=TEST_GROUP_NAME)
 
         error, group, is_found = create_userGroup_if_not_exists(
             TEST_GROUP_NAME.lower())
@@ -299,7 +304,7 @@ class SetUserSubscriptionTestCase(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.group = UserGroup.objects.create(name=TEST_GROUP_NAME)
+        self.group = create_test_user_group(name=TEST_GROUP_NAME)
         self.user = User.objects.create_user(
             username=TEST_USERNAME,
             email=TEST_EMAIL,

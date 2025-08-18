@@ -18,7 +18,8 @@ from api.views.error.error_messages import INVALID_API_KEY
 from api.views.language import LanguageAPIView
 from languages.models import Language
 from subscriptions.models import SubscriptionType, UserSubscription
-from users.models import UserGroup
+from users.models import User, UserGroup
+from tests.mock import create_test_user_group
 
 from .settings import (
     ENGLISH_FRENCH_NAME,
@@ -70,7 +71,7 @@ class LanguageAPITestCase(TestCase):
         )
 
         # Create API group with key
-        self.group = UserGroup.objects.create(
+        self.group = create_test_user_group(
             name=TEST_GROUP_NAME,
             api_key=TEST_API_KEY
         )

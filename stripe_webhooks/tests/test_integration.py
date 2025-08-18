@@ -18,6 +18,7 @@ from stripe_webhooks.tasks_handlers.customer_subscription_handlers import (
 )
 from subscriptions.models import SubscriptionType, UserSubscription
 from users.models import User, UserGroup
+from tests.mock import create_test_user_group, suppress_api_calls
 from stripe_webhooks.tests.settings import (
     TEST_STRIPE_PRODUCT_ID,
     TEST_SUBSCRIPTION_NAME,
@@ -30,6 +31,7 @@ from stripe_webhooks.tests.settings import (
 )
 
 
+@suppress_api_calls
 class StripeWebhooksIntegrationTestCase(TransactionTestCase):
     """Integration test case for complete webhook workflows."""
 
@@ -174,7 +176,7 @@ class StripeWebhooksIntegrationTestCase(TransactionTestCase):
 
         # Pre-create group
         group_name = unique_name.upper()
-        existing_group = UserGroup.objects.create(name=group_name)
+        existing_group = create_test_user_group(name=group_name)
         existing_user_count = existing_group.user_set.count()
 
         # Create customer
@@ -202,8 +204,8 @@ class StripeWebhooksIntegrationTestCase(TransactionTestCase):
         unique_product_id = 'prod_multiple_test_001'
 
         # Create test data
-        group1 = UserGroup.objects.create(name="GROUP_MULTIPLE_1")
-        group2 = UserGroup.objects.create(name="GROUP_MULTIPLE_2")
+        group1 = create_test_user_group(name="GROUP_MULTIPLE_1")
+        group2 = create_test_user_group(name="GROUP_MULTIPLE_2")
 
         user1 = User.objects.create_user(
             username="multiple_user1",

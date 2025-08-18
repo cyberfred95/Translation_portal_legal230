@@ -32,7 +32,8 @@ from domains.models import Domain, DomainGroup
 from glossaries.models import Glossary
 from languages.models import Language
 from subscriptions.models import SubscriptionType, UserSubscription
-from users.models import UserGroup
+from users.models import User, UserGroup
+from tests.mock import create_test_user_group
 
 from .settings import (
     ANOTHER_INVALID_LANGUAGE_CODE,
@@ -54,7 +55,10 @@ from .settings import (
     TEST_PASSWORD,
     TEST_SUBSCRIPTION_NAME,
     TEST_USERNAME,
+    create_test_main_settings,
     get_auth_headers,
+    setup_glossary_service_patches,
+    teardown_glossary_service_patches,
 )
 
 User = get_user_model()
@@ -69,7 +73,13 @@ class GlossaryAPITestCase(TestCase):
 
     def setUp(self):
         """Set up test data for glossary API tests."""
+        # Set up patches and main settings using helper functions
+        setup_glossary_service_patches(self)
+        
         self.factory = RequestFactory()
+
+        # Create MainSettings for the test
+        self.main_settings = create_test_main_settings()
 
         # Create test languages
         self.english = Language.objects.create(
@@ -91,7 +101,7 @@ class GlossaryAPITestCase(TestCase):
         )
 
         # Create API group
-        self.group = UserGroup.objects.create(
+        self.group = create_test_user_group(
             name=TEST_GROUP_NAME,
             api_key=TEST_API_KEY
         )
@@ -136,6 +146,10 @@ class GlossaryAPITestCase(TestCase):
             user=self.user,
             file=test_file
         )
+
+    def tearDown(self):
+        """Clean up patches after each test."""
+        teardown_glossary_service_patches(self)
 
     def test_validate_glossary_id_valid(self):
         """Test glossary ID validation with valid ID."""

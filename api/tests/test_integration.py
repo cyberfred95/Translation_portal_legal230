@@ -17,7 +17,8 @@ from domains.models import Domain, DomainGroup
 from glossaries.models import Glossary
 from languages.models import Language
 from subscriptions.models import SubscriptionType, UserSubscription
-from users.models import UserGroup
+from users.models import User, UserGroup
+from tests.mock import create_test_user_group
 
 from .settings import (
     ENGLISH_LANG_CODE,
@@ -82,7 +83,7 @@ class APIIntegrationTestCase(TransactionTestCase):
         )
 
         # Create group with API key
-        self.group = UserGroup.objects.create(
+        self.group = create_test_user_group(
             name=INTEGRATION_GROUP_NAME,
             api_key=INTEGRATION_API_KEY
         )
@@ -286,7 +287,7 @@ class APIPerformanceTestCase(TestCase):
         self.client = Client()
 
         # Minimal setup for performance tests
-        self.group = UserGroup.objects.create(
+        self.group = create_test_user_group(
             name=PERF_GROUP_NAME,
             api_key=PERF_API_KEY
         )

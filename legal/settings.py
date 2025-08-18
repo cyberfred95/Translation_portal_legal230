@@ -302,7 +302,4 @@ ACTIVE_TRAIL_USER_PROFILE_FROMNAME = os.environ.get(
 ACTIVE_TRAIL_SEND_EMAIL_REQUEST_URL = 'https://webapi.mymarketing.co.il/api/OperationalMessage/Message'
 ACTIVE_TRAIL_API_KEY = os.environ.get('ACTIVE_TRAIL_API_KEY')
 
-# Lexa Api Configuration (waiting on custom.mt, will be deprecated soon)
-LEXA_API_GROUP_DEFAULT_API_KEY = os.environ.get(
-    'LEXA_API_GROUP_DEFAULT_API_KEY')
 

@@ -34,8 +34,10 @@ from stripe_webhooks.tests.settings import (
     TEST_USERNAME,
 )
 from users.models import User, UserGroup
+from tests.mock import create_test_user_group, suppress_api_calls
 
 
+@suppress_api_calls
 class CustomerHandlersTestCase(TestCase):
     """Test case for customer webhook handlers."""
 
@@ -85,7 +87,7 @@ class CustomerHandlersTestCase(TestCase):
         """Test successful customer creation with existing group."""
         # Create existing group
         group_name = TEST_FULL_NAME.upper()
-        existing_group = UserGroup.objects.create(name=group_name)
+        existing_group = create_test_user_group(name=group_name)
 
         mock_session_url.return_value = "https://billing.stripe.com/session/test"
         mock_send_email.return_value = None
@@ -182,7 +184,7 @@ class CustomerHandlersTestCase(TestCase):
     def test_handle_customer_updated_success(self):
         """Test successful customer update."""
         # Create existing user
-        group = UserGroup.objects.create(name=TEST_GROUP_NAME)
+        group = create_test_user_group(name=TEST_GROUP_NAME)
         user = User.objects.create_user(
             username=TEST_USERNAME,
             email=TEST_EMAIL,
