@@ -205,6 +205,9 @@ msgstr "Attention"
 msgid "PDF file"
 msgstr "La qualité de votre document affecte le résultat de la traduction. Les PDFs scannés ou peu lisibles ne permettent pas un rendu de qualité."
 
+msgid "Expert revision"
+msgstr "Recevoir un devis"
+
 msgid "Post-editing is completed!"
 msgstr "La post-édition est terminée !"
 
@@ -301,6 +304,12 @@ msgstr "Domaine"
 
 msgid "Translate"
 msgstr "Traduire"
+
+msgid "Expert Revision"
+msgstr "Relecture expert"
+
+msgid "Expert revision hint text"
+msgstr "En cliquant, vous recevrez par mail un devis pour la relecture de votre document, réalisée par un jurilinguiste expert dans votre domaine de droit."
 
 ###########################################
 

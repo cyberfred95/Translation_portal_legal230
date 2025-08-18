@@ -29,11 +29,12 @@ from subscriptions.models import SubscriptionType
 from .helpers import get_translate_data, lowercase_file_extension, get_word_count, get_text_from_file, get_project_file, \
     rename_file
 
+from emails.models import EmailType
+from emails.send_email import send_email
 from domains.models import Domain
 from languages.models import Language
 from users.models import User, UserGroup
 from .credentials import languages
-from .mail_helpers import send_file_translation
 import requests
 from preferences import preferences
 import langdetect
@@ -148,11 +149,20 @@ def file_translate(request):
             res = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                                headers={
                                    "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
-            send_file_translation(user_id=request.user.id, source_file_url=res.json().get('source_file'),
-                                  translation_name=request.POST.get(
-                                      'translation_name'),
-                                  file_name=project['file_name'],
-                                  file_ext=project['file_extension'])
+            
+            send_email(
+                preferences.MainSettings.quote_cc_email,
+                EmailType.USER_ADM_TR_FILE,
+                'fr',
+                {
+                    "lexa_username": 'admin',
+                    "lexa_sender_email": request.user.email if request.user.email else '(no email)',
+                    "url_source_file": res.json().get('source_file'),
+                    "translation_name": project['file_name'],
+                    "file_ext": project['file_extension']
+                }
+            )
+            
         add_translations(request, words_count=words_count,
                          files_count=len(files), symbols_count=symbols_count)
         return JsonResponse({"project_ids": [project.get('id') for project in projects],
