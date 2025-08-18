@@ -33,10 +33,7 @@ from domains.models import Domain
 from languages.models import Language
 from users.models import User, UserGroup
 from .credentials import languages
-from .mail_helpers import send_expert_revision_text, \
-    send_file_translation, send_text_translation
-from rest_framework.decorators import api_view
-from django.views.decorators.csrf import csrf_exempt
+from .mail_helpers import send_file_translation
 import requests
 from preferences import preferences
 import langdetect
@@ -272,17 +269,6 @@ class GetDomainsView(APIView):
             domain_names = [
                 domain.french_name if domain.french_name else domain.name for domain in domains]
         return Response({"data": domain_names, "default_domain": False}, status=status.HTTP_200_OK)
-
-
-@csrf_exempt
-@api_view(['POST'])
-def expert_revision(request):
-    send_expert_revision_text(
-        user_id=request.user.id,
-        text=request.POST['result'],
-        source_text=request.POST['source_text']
-    )
-    return JsonResponse({})
 
 
 class FileExpertRevisionView(APIView):

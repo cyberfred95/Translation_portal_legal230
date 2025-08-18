@@ -39,7 +39,7 @@ def send_text_translation(
                     "user_name": preferences.MainSettings.sender_email,
                     "text": text,
                     "translation_name": translation_name,
-                    'source_text': source_text,
+                    'source_text': source_text, # source text
                     "sender_username": user.username,
                     "file_ext": file_ext,
                     "source_file_url": source_file_url,
@@ -70,14 +70,14 @@ def send_text_translation(
                 }
             )
         )
-        if attachment and file_name:
-            attachedFile = Attachment(
-                file_content=FileContent(attachment),
-                file_name=FileName(file_name),
-                # FileType('application/pdf'),
-                disposition=Disposition('attachment')
-            )
-            message.attachment = attachedFile
+        # if attachment and file_name:
+        #    attachedFile = Attachment(
+        #       file_content=FileContent(attachment),
+        #       file_name=FileName(file_name),
+        #       # FileType('application/pdf'),
+        #       disposition=Disposition('attachment')
+        #   )
+        #   message.attachment = attachedFile
         try:
             sg.send(message)
         except Exception as e:
@@ -89,8 +89,8 @@ def send_file_translation(user_id, source_file_url, file_name, file_ext, transla
                           translation_name=translation_name, file_ext=file_ext, template='file_email.html')
 
 
-def send_gpt_processing(user_id, text):
-    send_text_translation(user_id=user_id, text=text, theme='GPT Processing')
+# def send_gpt_processing(user_id, text):
+#    send_text_translation(user_id=user_id, text=text, theme='GPT Processing')
 
 
 def send_expert_revision_text(user_id, text, source_text):
@@ -105,12 +105,12 @@ def send_expert_revision_text(user_id, text, source_text):
     )
 
 
-def send_expert_revision_file(user_id, source_file_url, translated_file_url):
-    send_text_translation(
-        user_id=user_id,
-        theme='Revision request for File translation',
-        template="expert_revision_email.html",
-        source_file_url=source_file_url,
-        translated_file_url=translated_file_url,
-        action="expert_revision"
-    )
+# def send_expert_revision_file(user_id, source_file_url, translated_file_url):
+#    send_text_translation(
+#        user_id=user_id,
+#        theme='Revision request for File translation',
+#        template="expert_revision_email.html",
+#        source_file_url=source_file_url,
+#        translated_file_url=translated_file_url,
+#        action="expert_revision"
+#    )

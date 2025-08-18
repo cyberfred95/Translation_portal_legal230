@@ -160,6 +160,7 @@ class InviteUserAPIView(APIView):
                         {
                             # TMP : Need to be replaced with actual values when figma integration is done
                             "lexa_username": "name",
+                            "lexa_email": user.email,
                             "url_reset_password" : self.get_register_user_absolute_uri(request, params=params),
                         }
                     )
@@ -242,6 +243,7 @@ class ForgotPasswordView(TemplateView):
                 {
                     # TMP : Need to be replaced with actual values when figma integration is done
                     "lexa_username": user.username,
+                    "lexa_email": user.email,
                     "url_reset_password": self.get_register_user_absolute_uri(request, params=params),
                 }
             )
