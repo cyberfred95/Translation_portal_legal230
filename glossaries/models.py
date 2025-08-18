@@ -101,11 +101,9 @@ class Glossary(models.Model):
     def to_json(self, request):
         return {
             "id": self.id,
-            "file_url": request.build_absolute_uri(self.file.url) if self.file else None,
             "name": self.name,
             "source_language": self.source_language.abbreviation.upper(),
             "target_language": self.target_language.abbreviation.upper(),
-            "file_size": self.file_size() if self.file else 0,
             "created_at": self.created_at,
         }
 
