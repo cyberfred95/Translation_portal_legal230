@@ -28,14 +28,12 @@ class Glossary(models.Model):
     glossary_id = models.CharField(max_length=255, blank=True, null=True)
     source_language = models.ForeignKey(
         Language,
-        on_delete=models.SET_NULL,
-        blank=True, null=True,
+        on_delete=models.CASCADE,
         related_name='source_language_glossaries'
     )
     target_language = models.ForeignKey(
         Language,
-        on_delete=models.SET_NULL,
-        blank=True, null=True,
+        on_delete=models.CASCADE,
         related_name='target_language_glossaries'
     )
     created_at = models.DateTimeField(auto_now_add=True)
@@ -101,11 +99,9 @@ class Glossary(models.Model):
     def to_json(self, request):
         return {
             "id": self.id,
-            "file_url": request.build_absolute_uri(self.file.url) if self.file else None,
             "name": self.name,
             "source_language": self.source_language.abbreviation.upper(),
             "target_language": self.target_language.abbreviation.upper(),
-            "file_size": self.file_size() if self.file else 0,
             "created_at": self.created_at,
         }
 
