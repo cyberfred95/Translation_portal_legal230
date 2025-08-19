@@ -62,4 +62,4 @@ class FormQuoteService:
             context_variables['accept_expert_revision_file_absolute_url'] = self.get_expert_revision_url(project_id,
                                                                                                          context_variables=context_variables)
 
-            send_quote_email(request.user.id, context_variables)
+            send_quote_email(request.user.id, request, context_variables)

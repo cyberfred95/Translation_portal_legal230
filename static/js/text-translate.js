@@ -98,8 +98,6 @@ $(document).ready(function () {
             },
             success: function (response) {
                 translatedQuill.root.innerHTML = response.translated_text[0];
-
-                $('#expert-revision').removeClass('hidden');
             },
             error: function (error) {
                 errorNotification(error?.status, error?.responseJSON?.detail);
@@ -107,31 +105,6 @@ $(document).ready(function () {
             complete: function () {
                 $('#main-loader').addClass('hidden');
             }
-        });
-    });
-
-    $('#expert-revision').click(function () {
-        const sourceText = sourceQuill.getText();
-        const translatedText = translatedQuill.getText();
-
-        const data = {result: translatedText, source_text: sourceText}
-
-        $.ajax({
-            url: expert_revision,
-            type: 'POST',
-            data: data,
-            dataType: 'json',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Accept': 'application/json',
-            },
-            success: function () {
-                $('#expert-revision').addClass('hidden');
-            },
-            error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
-            },
         });
     });
 

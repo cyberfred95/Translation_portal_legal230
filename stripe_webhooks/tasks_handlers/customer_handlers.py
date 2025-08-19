@@ -133,6 +133,7 @@ def handle_customer_created(payload: dict) -> HttpResponse:
         user.language,
         {
             "lexa_username": user.username,
+            "lexa_email": user.email,
             "lexa_password": password
         }
     )
