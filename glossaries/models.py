@@ -28,14 +28,12 @@ class Glossary(models.Model):
     glossary_id = models.CharField(max_length=255, blank=True, null=True)
     source_language = models.ForeignKey(
         Language,
-        on_delete=models.SET_NULL,
-        blank=True, null=True,
+        on_delete=models.CASCADE,
         related_name='source_language_glossaries'
     )
     target_language = models.ForeignKey(
         Language,
-        on_delete=models.SET_NULL,
-        blank=True, null=True,
+        on_delete=models.CASCADE,
         related_name='target_language_glossaries'
     )
     created_at = models.DateTimeField(auto_now_add=True)
