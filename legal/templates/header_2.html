@@ -1,0 +1,164 @@
+{% load static %}
+{% load i18n %}
+
+<header class="fixed top-0 left-22 right-0 z-30 flex px-3 py-2 justify-between items-center border-b border-black/10 bg-white h-14">
+    <!-- Left section - Breadcrumbs -->
+    <div class="flex items-center gap-1">
+        <div class="flex h-10 px-3 items-center gap-2 rounded-md">
+            <nav class="flex items-center">
+                <div class="flex px-2 py-1 items-center gap-1.5 rounded-md">
+                    <span class="text-[#181932] font-poppins text-sm font-normal leading-6 tracking-[-0.084px]">
+                        {% trans 'Home' %}
+                    </span>
+                </div>
+                <div class="flex w-4 h-6 px-0 py-1 flex-col justify-center items-center">
+                    <svg class="w-4 h-4 text-black/25" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </div>
+                <div class="flex px-2 py-1 items-center gap-1.5 rounded-md">
+                    <span class="text-[#181932] font-poppins text-sm font-normal leading-6 tracking-[-0.084px]">
+                        {% trans 'Text Translation' %}
+                    </span>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Center section - Search -->
+    <div class="flex justify-center items-center gap-1 flex-1">
+        <div class="flex h-8 px-2 items-center gap-2 rounded-md">
+            <div class="flex w-56 flex-col items-start gap-1">
+                <div class="flex h-8 items-center self-stretch rounded-md border border-black/10 bg-white">
+                    <div class="flex px-1.5 py-1.5 justify-center items-center gap-2 self-stretch">
+                        <svg class="w-5 h-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="{% trans 'Search' %}"
+                        class="h-6 flex-1 overflow-hidden text-[#5a5a78] text-ellipsis whitespace-nowrap font-poppins text-sm font-normal leading-6 tracking-[-0.084px] bg-transparent border-none outline-none placeholder:text-[#5a5a78]"
+                        id="header-search"
+                    />
+                    <div class="flex w-px px-2 items-start gap-2 self-stretch"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right section - Actions and Profile -->
+    <div class="flex justify-end items-center gap-1">
+               
+
+        <!-- Language switcher -->
+        <div class="flex h-10 px-2 justify-center items-center rounded-md">
+            <div class="flex px-1 justify-center items-center gap-2">
+                <svg class="w-6 h-6 text-black/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <div class="flex items-center gap-1 ml-1">
+                <span class="en {% if request.LANGUAGE_CODE == 'en' %}text-[#181932] font-medium{% else %}text-[#5a5a78] hover:text-[#181932] transition duration-300 ease-in-out{% endif %} cursor-pointer text-sm leading-6 tracking-[-0.084px]">
+                    EN
+                </span>
+                <span class="text-[#5a5a78] text-sm">|</span>
+                <span class="fr {% if request.LANGUAGE_CODE == 'fr' %}text-[#181932] font-medium{% else %}text-[#5a5a78] hover:text-[#181932] transition duration-300 ease-in-out{% endif %} cursor-pointer text-sm leading-6 tracking-[-0.084px]">
+                    FR
+                </span>
+            </div>
+        </div>
+
+        <!-- Profile section -->
+        <div class="flex h-10 px-2 justify-center items-center rounded-md">
+            <div class="relative profile-container">
+                <a href="{% url 'profile_details' %}" class="flex pr-1 justify-center items-center gap-2 cursor-pointer profile-trigger hover:bg-[#f8fafc] rounded-md transition-colors">
+                    <div class="flex w-8 h-8 px-0.5 py-1 justify-center items-center rounded-full border-[0.5px] border-black/10 bg-[#f8fafc]">
+                        <span class="text-[#5a5a78] text-center font-inter text-sm font-semibold leading-6 tracking-[-0.084px]">
+                            {{ request.user.username|slice:":2"|upper }}
+                        </span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Language switcher functionality
+    const langSwitchers = document.querySelectorAll('.en, .fr');
+    langSwitchers.forEach(function(switcher) {
+        switcher.addEventListener('click', function() {
+            const lang = this.classList.contains('en') ? 'en' : 'fr';
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/i18n/setlang/';
+            
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (csrfToken) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = csrfToken.value;
+                form.appendChild(csrfInput);
+            }
+            
+            const langInput = document.createElement('input');
+            langInput.type = 'hidden';
+            langInput.name = 'language';
+            langInput.value = lang;
+            form.appendChild(langInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+        });
+    });
+
+    // Profile dropdown functionality
+    const profileTrigger = document.querySelector('.profile-trigger');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    
+    if (profileTrigger && profileDropdown) {
+        profileTrigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            profileDropdown.classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!profileTrigger.contains(e.target) && !profileDropdown.contains(e.target)) {
+                profileDropdown.classList.add('hidden');
+            }
+        });
+    }
+
+    // Search functionality
+    const searchInput = document.getElementById('header-search');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const searchTerm = this.value.trim();
+                if (searchTerm) {
+                    // Implement search functionality here
+                    console.log('Searching for:', searchTerm);
+                    // You can redirect to a search page or implement inline search
+                    // window.location.href = '/search/?q=' + encodeURIComponent(searchTerm);
+                }
+            }
+        });
+    }
+
+    // Invite modal functionality (if admin)
+    const inviteButton = document.getElementById('open-invite-modal');
+    if (inviteButton) {
+        inviteButton.addEventListener('click', function() {
+            // Implement invite modal functionality here
+            console.log('Opening invite modal');
+            // You can show a modal or redirect to invite page
+        });
+    }
+});
+</script>
