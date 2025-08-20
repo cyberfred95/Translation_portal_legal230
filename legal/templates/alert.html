@@ -1,0 +1,119 @@
+{% load static %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="{{ request.LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans 'Alert' %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Poppins', -apple-system, Roboto, Helvetica, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen bg-black bg-opacity-20 flex items-center justify-center p-4">
+        <!-- Modal Container with Border -->
+        <div 
+            class="bg-white rounded-md min-w-[280px] max-w-[420px] w-full relative border border-gray-200"
+            style="box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.24), 0 40px 64px 0 rgba(0, 0, 0, 0.20);"
+        >
+            <!-- Close button -->
+            <button
+                onclick="closeModal()"
+                class="absolute top-4 right-4 w-12 h-12 flex items-center justify-center hover:bg-gray-50 rounded-md transition-colors"
+            >
+                <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+
+            <!-- Content -->
+            <div class="px-8 pt-8 pb-6 flex flex-col items-center gap-6">
+                <!-- Icon -->
+                <div class="w-12 h-12 rounded-full border-4 flex items-center justify-center shadow-sm" 
+                     style="border-color: {{ icon_border_color }}; background-color: {{ icon_bg_color }};">
+                    {{ icon_svg|safe }}
+                </div>
+
+                <!-- Text content -->
+                <div class="flex flex-col gap-2 text-center min-w-[216px]">
+                    <h2 class="text-lg font-semibold text-[#181932] leading-6 tracking-[-0.252px]">
+                        {{ title }}
+                    </h2>
+                    <p class="text-sm font-normal text-[#181932] leading-5 tracking-[-0.084px]">
+                        {{ message }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="px-8 pb-8 flex justify-end gap-4">
+                <button
+                    onclick="selectButton(1)"
+                    class="flex-1 max-w-[170px] px-[18px] py-2 rounded-full border border-black border-opacity-10 text-sm font-semibold leading-6 tracking-[-0.084px] hover:opacity-80 transition-colors flex items-center justify-center gap-2"
+                    style="background-color: {{ button1_bg_color }}; color: {{ button1_text_color }};"
+                >
+                    {% if button1_icon_svg %}
+                        {{ button1_icon_svg|safe }}
+                    {% endif %}
+                    {{ button1_text }}
+                </button>
+                <button
+                    onclick="selectButton(2)"
+                    class="flex-1 px-[18px] py-2 rounded-full text-sm font-semibold leading-6 tracking-[-0.084px] hover:opacity-80 transition-colors flex items-center justify-center gap-2"
+                    style="background-color: {{ button2_bg_color }}; color: {{ button2_text_color }};"
+                >
+                    {% if button2_icon_svg %}
+                        {{ button2_icon_svg|safe }}
+                    {% endif %}
+                    {{ button2_text }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectButton(buttonNumber) {
+            // Send the selection back to the server
+            fetch('{% url "alert" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    'selection': buttonNumber
+                })
+            }).then(response => {
+                if (response.ok) {
+                    window.parent.postMessage({
+                        type: 'alert_response',
+                        selection: buttonNumber
+                    }, '*');
+                    closeModal();
+                }
+            });
+        }
+
+        function closeModal() {
+            window.parent.postMessage({
+                type: 'alert_response',
+                selection: 0
+            }, '*');
+            window.close();
+        }
+
+        // Handle escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

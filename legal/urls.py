@@ -6,7 +6,6 @@ from django.conf.urls.static import static
 from .views import TranslateView, FileExpertRevisionView, ProjectsHistoryView, SingleProjectView, \
      GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView, ProfileDetailsView, \
      DashboardView, TextTranslate2View, ProfileDetails2View, DisplayMessage
-from .test_views import TestAlertView, TestAlertDisplayView
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
 from domains.views import update_domains_view
@@ -37,10 +36,6 @@ urlpatterns = i18n_patterns(
          name='profile_details_2'),
     
     path('alert/', DisplayMessage.as_view(), name='alert'),
-    
-    # URLs de test pour les alertes
-    path('test-alerts/', TestAlertView.as_view(), name='test_alerts'),
-    path('test-alert-display/', TestAlertDisplayView.as_view(), name='test_alert_display'),
 
     path('refresh_domains/', update_domains_view, name='refresh_domains'),
     path('refresh_prompts/', refresh_prompts_view, name='refresh_prompts'),
