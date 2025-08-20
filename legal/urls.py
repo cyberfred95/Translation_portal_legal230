@@ -4,7 +4,7 @@ from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from .views import TranslateView, FileExpertRevisionView, ProjectsHistoryView, SingleProjectView, \
-     GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView, ProfileDetailsView, DashboardView
+     GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView, ProfileDetailsView, DashboardView, TextTranslate2View
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
 from domains.views import update_domains_view
@@ -17,6 +17,8 @@ urlpatterns = i18n_patterns(
     
     path('dashboard/', login_required(DashboardView.as_view()),
          name='dashboard'),
+    path('translate-2/', login_required(TextTranslate2View.as_view()),
+         name='translate_2'),
     path('expert-revision-file', login_required(FileExpertRevisionView.as_view()),
          name='expert_revision_file'),
     path('project-history/', login_required(ProjectsHistoryView.as_view()),

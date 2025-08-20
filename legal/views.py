@@ -503,3 +503,12 @@ class DashboardView(TemplateView):
         context = super().get_context_data(**kwargs)
     # Add context variables here if needed
         return context
+
+
+class TextTranslate2View(TemplateView):
+    template_name = "translate_2.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add context variables here if needed
+        return context

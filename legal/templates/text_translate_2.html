@@ -1,0 +1,241 @@
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-12 xl:px-20 py-6">
+
+        <!-- Translation Interface -->
+        <div class="bg-white rounded-lg p-4 sm:p-6">
+            <!-- Language selection and controls -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-100 mb-0 gap-4 sm:gap-0">
+                <!-- Left side - Language selection -->
+                <div class="flex items-center gap-4 sm:gap-8 lg:gap-12 overflow-x-auto">
+                    <!-- Detected Language Tab -->
+                    <div class="relative">
+                        <div class="flex items-center gap-2 px-0 py-2 text-sm font-medium text-gray-900">
+                            <span>Detected Language</span>
+                            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 h-px bg-gray-900"></div>
+                    </div>
+
+                    <!-- Target Language Tab -->
+                    <div class="flex items-center gap-6">
+                        <div class="relative">
+                            <div class="flex items-center gap-2 px-0 py-2 text-sm font-medium text-gray-900">
+                                <span>English (UK)</span>
+                                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/>
+                                </svg>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 h-px bg-gray-900"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right side - Glossary toggle -->
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <button onclick="toggleGlossary()" class="relative w-8 h-5 rounded-full transition-colors bg-blue-600" id="glossaryToggle">
+                        <div class="absolute top-0.5 w-4 h-4 bg-white rounded-full transition-transform translate-x-3.5" id="glossaryKnob"></div>
+                    </button>
+                    <span class="text-sm text-gray-900">Glossary</span>
+                </div>
+            </div>
+
+            <!-- Translation area -->
+            <div class="flex flex-col lg:flex-row gap-0 mt-0 relative">
+                <!-- Input area -->
+                <div class="flex-1 flex flex-col justify-between p-4 sm:p-6 lg:pr-6 min-h-[200px] sm:min-h-[287px]">
+                    <textarea
+                        id="inputText"
+                        placeholder="Write or paste your text here&#10;To translate PDF, Word (.docx), PowerPoint (.pptx) files, simply drop them directly into our document translation interface."
+                        class="w-full h-full resize-none text-sm text-gray-500 placeholder:text-gray-500 focus:outline-none leading-5 tracking-tight min-h-[120px] sm:min-h-[180px]"
+                        maxlength="2000"
+                        oninput="updateCharCount()"
+                    ></textarea>
+
+                    <div class="flex items-end justify-between mt-6 sm:mt-10">
+                        <span class="text-sm text-gray-500 leading-5 tracking-tight" id="charCount">
+                            0/2000
+                        </span>
+
+                        <button
+                            id="translateBtn"
+                            onclick="translateText()"
+                            disabled
+                            class="px-3 sm:px-4 py-2 rounded-full text-sm font-semibold text-white tracking-tight transition-all bg-blue-300 cursor-not-allowed"
+                        >
+                            Translate
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="w-full h-px lg:w-px lg:h-auto bg-gray-100 my-4 lg:my-6"></div>
+
+                <!-- Output area -->
+                <div class="flex-1 p-4 sm:p-6 lg:pl-6 min-h-[200px] sm:min-h-[287px] flex flex-col justify-between">
+                    <div class="flex-1" id="translationOutput"></div>
+
+                    <div class="flex justify-end gap-2">
+                        <!-- Download button -->
+                        <button
+                            onclick="downloadTranslation()"
+                            class="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                            title="Download"
+                        >
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                        </button>
+
+                        <!-- Copy button -->
+                        <button
+                            onclick="copyTranslation()"
+                            class="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                            title="Copy"
+                        >
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                        </button>
+
+                        <!-- Edit button -->
+                        <button
+                            onclick="editTranslation()"
+                            class="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                            title="Edit"
+                        >
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Swap languages button -->
+                <button 
+                    onclick="swapLanguages()" 
+                    class="absolute left-1/2 top-4 sm:top-6 lg:top-6 transform -translate-x-1/2 bg-white rounded-full p-2 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow lg:translate-y-0"
+                    title="Swap languages"
+                >
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let glossaryEnabled = true;
+
+function updateCharCount() {
+    const inputText = document.getElementById('inputText');
+    const charCount = document.getElementById('charCount');
+    const translateBtn = document.getElementById('translateBtn');
+    
+    const currentLength = inputText.value.length;
+    charCount.textContent = `${currentLength}/2000`;
+    
+    // Enable/disable translate button based on input
+    if (inputText.value.trim()) {
+        translateBtn.disabled = false;
+        translateBtn.className = 'px-3 sm:px-4 py-2 rounded-full text-sm font-semibold text-white tracking-tight transition-all bg-blue-600 hover:bg-blue-700';
+    } else {
+        translateBtn.disabled = true;
+        translateBtn.className = 'px-3 sm:px-4 py-2 rounded-full text-sm font-semibold text-white tracking-tight transition-all bg-blue-300 cursor-not-allowed';
+    }
+}
+
+function toggleGlossary() {
+    const toggle = document.getElementById('glossaryToggle');
+    const knob = document.getElementById('glossaryKnob');
+    
+    glossaryEnabled = !glossaryEnabled;
+    
+    if (glossaryEnabled) {
+        toggle.className = 'relative w-8 h-5 rounded-full transition-colors bg-blue-600';
+        knob.className = 'absolute top-0.5 w-4 h-4 bg-white rounded-full transition-transform translate-x-3.5';
+    } else {
+        toggle.className = 'relative w-8 h-5 rounded-full transition-colors bg-gray-300';
+        knob.className = 'absolute top-0.5 w-4 h-4 bg-white rounded-full transition-transform translate-x-0.5';
+    }
+}
+
+function translateText() {
+    const inputText = document.getElementById('inputText').value;
+    const outputArea = document.getElementById('translationOutput');
+    
+    if (!inputText.trim()) return;
+    
+    // Simulate translation process
+    outputArea.innerHTML = '<div class="text-gray-500 italic">Translating...</div>';
+    
+    // Here you would typically make an AJAX call to your Django translation endpoint
+    setTimeout(() => {
+        outputArea.innerHTML = '<div class="text-sm text-gray-800 leading-5">' + 
+                              'Translated text would appear here...' + 
+                              '</div>';
+    }, 1000);
+}
+
+function swapLanguages() {
+    // Logic to swap source and target languages
+    console.log('Swapping languages...');
+}
+
+function downloadTranslation() {
+    const translation = document.getElementById('translationOutput').textContent;
+    if (!translation || translation.includes('Translating...')) return;
+    
+    const blob = new Blob([translation], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'translation.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+
+function copyTranslation() {
+    const translation = document.getElementById('translationOutput').textContent;
+    if (!translation || translation.includes('Translating...')) return;
+    
+    navigator.clipboard.writeText(translation).then(() => {
+        // Show a brief success message
+        const button = event.target.closest('button');
+        const originalTitle = button.title;
+        button.title = 'Copied!';
+        setTimeout(() => {
+            button.title = originalTitle;
+        }, 2000);
+    });
+}
+
+function editTranslation() {
+    const outputArea = document.getElementById('translationOutput');
+    const currentText = outputArea.textContent;
+    
+    if (!currentText || currentText.includes('Translating...')) return;
+    
+    // Create an editable textarea
+    outputArea.innerHTML = `
+        <textarea class="w-full h-full resize-none text-sm text-gray-800 focus:outline-none leading-5 tracking-tight" 
+                  onblur="saveEdit(this)">${currentText}</textarea>
+    `;
+    outputArea.querySelector('textarea').focus();
+}
+
+function saveEdit(textarea) {
+    const outputArea = document.getElementById('translationOutput');
+    outputArea.innerHTML = '<div class="text-sm text-gray-800 leading-5">' + 
+                          textarea.value + 
+                          '</div>';
+}
+</script>
+{% endblock %}

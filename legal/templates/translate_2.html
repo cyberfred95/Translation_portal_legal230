@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+
+<div class="mx-5 mb-11.5 mt-5">
+    <div class="flex justify-between items-center mt-10">
+        <div class="space-y-2.5">
+
+            <!-- Header -->
+            <div class="mb-6">
+                <h1 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-2 tracking-tight">
+                Translation
+                </h1>
+                <p class="text-gray-600 text-sm sm:text-base leading-6 tracking-tight max-w-4xl">
+                    Instantly translate your texts and documents into multiple languages.
+                </p>
+            </div>
+
+            <!-- Main tabs -->
+            <div class="bg-blue-50 rounded-full p-0.5 mb-6 inline-flex">
+                <button type="button" id="text-translate" class="flex items-center justify-center px-3 py-2 text-sm font-medium rounded-full transition-all bg-white text-gray-900 shadow-sm border border-gray-200">
+                    Text Translation
+                </button>
+                <button type="button" id="document-translate" class="flex items-center justify-center px-3 py-2 text-sm font-medium rounded-full transition-all text-gray-900 hover:bg-white/50">
+                    Document Translation
+                </button>
+            </div>
+           
+        </div>
+    </div>
+
+    <div class="my-5">
+        <!--  ------------- TAB-1 -------------  -->
+
+
+        <div id="text-translate-content" class="tab-content hidden">
+            {% include 'text_translate_2.html' %}
+        </div>
+
+
+        <!--  ------------- TAB-2 -------------  -->
+
+
+        <div id="document-translate-content" class="tab-content hidden">
+            {% include 'document_translate.html' %}
+        </div>
+
+    </div>
+
+</div>
+<script src="{% static 'js/text-translate.js' %}"></script>
+<script src="{% static 'js/translate.js' %}"></script>
+<script>
+    let get_domains = "{% url 'get_domains' %}"
+    let translate = "{% url 'main_index' %}"
+    let single_project = "{% url 'single_project' %}"
+    let detect_language = "{% url 'detect_language' %}"
+    let detect_text_language = "{% url 'detect_text_language' %}"
+    let domain_groups = "{% url 'domain_groups' %}"
+    let get_default_glossary = "{% url 'get_default_glossary' %}"
+    let api_list_glossaries = "{% url 'api_list_glossaries' %}"
+    let expert_revision_file_url = "{% url 'expert_revision_file' %}"
+    let add_glossary = "{% url 'add_glossary' %}"
+</script>
+<script>
+    var languages = [
+        {% for language in translate_languages %}
+    {
+        "id": {{ language.id }},
+        "abbreviation": "{{ language.abbreviation }}",
+        "name": "{% if request.LANGUAGE_CODE == 'fr' and language.french_name %}{{ language.french_name }} {% else %} {{ language.name }} {% endif %}",
+
+    },
+    {% endfor %}
+    ]
+    var language_code = "{{  request.LANGUAGE_CODE }}"
+
+    var access_to_default_glossaries = {{ access_to_default_glossaries|yesno:"true,false" }}
+</script>
+{% endblock %}
