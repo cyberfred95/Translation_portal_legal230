@@ -4,7 +4,7 @@ from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from .views import TranslateView, FileExpertRevisionView, ProjectsHistoryView, SingleProjectView, \
-    GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView, ProfileDetailsView, dashboard
+     GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView, ProfileDetailsView, DashboardView
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
 from domains.views import update_domains_view
@@ -14,6 +14,9 @@ urlpatterns = i18n_patterns(
     path("", login_required(TranslateView.as_view()), name="main_index"),
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
+    
+    path('dashboard/', login_required(DashboardView.as_view()),
+         name='dashboard'),
     path('expert-revision-file', login_required(FileExpertRevisionView.as_view()),
          name='expert_revision_file'),
     path('project-history/', login_required(ProjectsHistoryView.as_view()),
@@ -46,7 +49,6 @@ urlpatterns = i18n_patterns(
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns += [
-    path("stripe/", include('stripe_webhooks.urls')),
-    path("api/", include('api.urls')),
-    path('dashboard/', dashboard, name='dashboard'),
+     path("stripe/", include('stripe_webhooks.urls')),
+     path("api/", include('api.urls')),
 ]

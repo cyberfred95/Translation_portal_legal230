@@ -496,5 +496,10 @@ class ProfileDetailsView(TemplateView):
     template_name = 'profile_details.html'
 
 
-def dashboard(request):
-    return render(request, "dashboard.html")
+class DashboardView(TemplateView):
+    template_name = "dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+    # Add context variables here if needed
+        return context
