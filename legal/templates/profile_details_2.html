@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+
+<div class="mx-5 mb-11.5 mt-5">
+    <div class="flex justify-between items-center mt-10">
+        <div class="space-y-2.5">
+
+            <!-- Header -->
+            <div class="mb-6">
+                <h1 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-2 tracking-tight">
+                Profile Details
+                </h1>
+                <p class="text-gray-600 text-sm sm:text-base leading-6 tracking-tight max-w-4xl">
+                    Manage your account information and security settings.
+                </p>
+            </div>
+
+            <!-- Main tabs -->
+            <div class="bg-blue-50 rounded-full p-0.5 mb-6 inline-flex">
+                <button type="button" id="profile-information" class="tab flex items-center justify-center px-3 py-2 text-sm font-medium rounded-full transition-all bg-white text-gray-900 shadow-sm border border-gray-200">
+                    Profile Information
+                </button>
+                <button type="button" id="profile-security" class="tab flex items-center justify-center px-3 py-2 text-sm font-medium rounded-full transition-all text-gray-900 hover:bg-white/50">
+                    Security
+                </button>
+            </div>
+           
+        </div>
+    </div>
+
+    <div class="my-5">
+        <!--  ------------- TAB-1 -------------  -->
+        <div id="profile-information-content" class="tab-content hidden">
+            {% include 'profile_information.html' %}
+        </div>
+
+        <!--  ------------- TAB-2 -------------  -->
+        <div id="profile-security-content" class="tab-content hidden">
+            {% include 'profile_security.html' %}
+        </div>
+
+    </div>
+
+</div>
+
+<script src="{% static 'js/profile-details-2.js' %}"></script>
+
+
+{% endblock %}

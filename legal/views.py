@@ -494,6 +494,14 @@ class DetectTextLanguageView(APIView):
 
 class ProfileDetailsView(TemplateView):
     template_name = 'profile_details.html'
+    
+class ProfileDetails2View(TemplateView):
+    template_name = 'profile_details_2.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+    # Add context variables here if needed
+        return context
 
 
 class DashboardView(TemplateView):
@@ -512,3 +520,154 @@ class TextTranslate2View(TemplateView):
         context = super().get_context_data(**kwargs)
         # Add context variables here if needed
         return context
+
+
+class DisplayMessage(TemplateView):
+    template_name = "alert.html"
+    
+    # SVG Icons dictionary
+    ICONS = {
+        'EXCLAMATION_POINT': {
+            'svg': '<span class="text-white font-bold text-xl leading-none select-none">!</span>',
+            'bg_color': '#EF4444',
+            'border_color': '#FCA5A5'
+        },
+        'CHECK': {
+            'svg': '<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>',
+            'bg_color': '#10B981',
+            'border_color': '#86EFAC'
+        },
+        'QUESTION': {
+            'svg': '<span class="text-white font-bold text-xl leading-none select-none">?</span>',
+            'bg_color': '#3B82F6',
+            'border_color': '#93C5FD'
+        },
+        'INFO': {
+            'svg': '<span class="text-white font-bold text-xl leading-none select-none">i</span>',
+            'bg_color': '#0EA5E9',
+            'border_color': '#7DD3FC'
+        },
+        'TRASH': {
+            'svg': '<svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M20.25 4.5H16.5V3.75C16.5 3.15326 16.2629 2.58097 15.841 2.15901C15.419 1.73705 14.8467 1.5 14.25 1.5H9.75C9.15326 1.5 8.58097 1.73705 8.15901 2.15901C7.73705 2.58097 7.5 3.15326 7.5 3.75V4.5H3.75C3.55109 4.5 3.36032 4.57902 3.21967 4.71967C3.07902 4.86032 3 5.05109 3 5.25C3 5.44891 3.07902 5.63968 3.21967 5.78033C3.36032 5.92098 3.55109 6 3.75 6H4.5V19.5C4.5 19.8978 4.65804 20.2794 4.93934 20.5607C5.22064 20.842 5.60218 21 6 21H18C18.3978 21 18.7794 20.842 19.0607 20.5607C19.342 20.2794 19.5 19.8978 19.5 19.5V6H20.25C20.4489 6 20.6397 5.92098 20.7803 5.78033C20.921 5.63968 21 5.44891 21 5.25C21 5.05109 20.921 4.86032 20.7803 4.71967C20.6397 4.57902 20.4489 4.5 20.25 4.5ZM9 3.75C9 3.55109 9.07902 3.36032 9.21967 3.21967C9.36032 3.07902 9.55109 3 9.75 3H14.25C14.4489 3 14.6397 3.07902 14.7803 3.21967C14.921 3.36032 15 3.55109 15 3.75V4.5H9V3.75ZM18 19.5H6V6H18V19.5ZM10.5 9.75V15.75C10.5 15.9489 10.421 16.1397 10.2803 16.2803C10.1397 16.421 9.94891 16.5 9.75 16.5C9.55109 16.5 9.36032 16.421 9.21967 16.2803C9.07902 16.1397 9 15.9489 9 15.75V9.75C9 9.55109 9.07902 9.36032 9.21967 9.21967C9.36032 9.07902 9.55109 9 9.75 9C9.94891 9 10.1397 9.07902 10.2803 9.21967C10.421 9.36032 10.5 9.55109 10.5 9.75ZM15 9.75V15.75C15 15.9489 14.921 16.1397 14.7803 16.2803C14.6397 16.421 14.4489 16.5 14.25 16.5C14.0511 16.5 13.8603 16.421 13.7197 16.2803C13.579 16.1397 13.5 15.9489 13.5 15.75V9.75C13.5 9.55109 13.579 9.36032 13.7197 9.21967C13.8603 9.07902 14.0511 9 14.25 9C14.4489 9 14.6397 9.07902 14.7803 9.21967C14.921 9.36032 15 9.55109 15 9.75Z"/></svg>',
+            'bg_color': '#EF4444',
+            'border_color': '#FCA5A5'
+        },
+        'X': {
+            'svg': '<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>',
+            'bg_color': '#6B7280',
+            'border_color': '#D1D5DB'
+        },
+        'SAVE': {
+            'svg': '<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>',
+            'bg_color': '#10B981',
+            'border_color': '#86EFAC'
+        }
+    }
+    
+    def __init__(self, icon_name='EXCLAMATION_POINT', title='', message='', 
+                 button1_text='Cancel', button1_bg_color='#FFFFFF', button1_text_color='#181932', button1_icon_name=None,
+                 button2_text='Confirm', button2_bg_color='#EF4444', button2_text_color='#FFFFFF', button2_icon_name=None):
+        super().__init__()
+        self.icon_name = icon_name
+        self.title = title
+        self.message = message
+        self.button1_text = button1_text
+        self.button1_bg_color = button1_bg_color
+        self.button1_text_color = button1_text_color
+        self.button1_icon_name = button1_icon_name
+        self.button2_text = button2_text
+        self.button2_bg_color = button2_bg_color
+        self.button2_text_color = button2_text_color
+        self.button2_icon_name = button2_icon_name
+        self.user_selection = 0
+    
+    def get_icon_data(self, icon_name):
+        """Get icon data from the ICONS dictionary"""
+        return self.ICONS.get(icon_name, self.ICONS['EXCLAMATION_POINT'])
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Main icon
+        icon_data = self.get_icon_data(self.icon_name)
+        context['icon_svg'] = icon_data['svg']
+        context['icon_bg_color'] = icon_data['bg_color']
+        context['icon_border_color'] = icon_data['border_color']
+        
+        # Text content
+        context['title'] = self.title
+        context['message'] = self.message
+        
+        # Button 1
+        context['button1_text'] = self.button1_text
+        context['button1_bg_color'] = self.button1_bg_color
+        context['button1_text_color'] = self.button1_text_color
+        if self.button1_icon_name:
+            button1_icon_data = self.get_icon_data(self.button1_icon_name)
+            context['button1_icon_svg'] = button1_icon_data['svg']
+        else:
+            context['button1_icon_svg'] = None
+        
+        # Button 2
+        context['button2_text'] = self.button2_text
+        context['button2_bg_color'] = self.button2_bg_color
+        context['button2_text_color'] = self.button2_text_color
+        if self.button2_icon_name:
+            button2_icon_data = self.get_icon_data(self.button2_icon_name)
+            context['button2_icon_svg'] = button2_icon_data['svg']
+        else:
+            context['button2_icon_svg'] = None
+            
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        """Handle button selection"""
+        try:
+            data = json.loads(request.body)
+            selection = data.get('selection', 0)
+            self.user_selection = selection
+            return JsonResponse({'status': 'success', 'selection': selection})
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+    def get_user_selection(self):
+        """Return the user's selection (1 or 2)"""
+        return self.user_selection
+
+
+# Function to create and display a message dialog
+def show_alert_dialog(icon_name='EXCLAMATION_POINT', title='', message='', 
+                      button1_text='Cancel', button1_bg_color='#FFFFFF', button1_text_color='#181932', button1_icon_name=None,
+                      button2_text='Confirm', button2_bg_color='#EF4444', button2_text_color='#FFFFFF', button2_icon_name=None):
+    """
+    Create and return a DisplayMessage instance with the specified parameters
+    
+    Parameters:
+    - icon_name: Icon to display at top of modal (from ICONS dictionary)
+    - title: Title of the message
+    - message: Message text below title
+    - button1_text: Text for first button
+    - button1_bg_color: Background color for first button
+    - button1_text_color: Text color for first button
+    - button1_icon_name: Icon for first button (optional)
+    - button2_text: Text for second button
+    - button2_bg_color: Background color for second button
+    - button2_text_color: Text color for second button
+    - button2_icon_name: Icon for second button (optional)
+    
+    Returns:
+    - DisplayMessage instance
+    """
+    return DisplayMessage(
+        icon_name=icon_name,
+        title=title,
+        message=message,
+        button1_text=button1_text,
+        button1_bg_color=button1_bg_color,
+        button1_text_color=button1_text_color,
+        button1_icon_name=button1_icon_name,
+        button2_text=button2_text,
+        button2_bg_color=button2_bg_color,
+        button2_text_color=button2_text_color,
+        button2_icon_name=button2_icon_name
+    )
