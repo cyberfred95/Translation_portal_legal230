@@ -4,7 +4,7 @@ from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from .views import TranslateView, FileExpertRevisionView, ProjectsHistoryView, SingleProjectView, \
-    GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView, ProfileDetailsView
+    GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView, ProfileDetailsView, dashboard
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
 from domains.views import update_domains_view
@@ -48,4 +48,5 @@ urlpatterns = i18n_patterns(
 urlpatterns += [
     path("stripe/", include('stripe_webhooks.urls')),
     path("api/", include('api.urls')),
+    path('dashboard/', dashboard, name='dashboard'),
 ]

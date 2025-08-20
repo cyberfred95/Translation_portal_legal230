@@ -11,6 +11,7 @@ from urllib.parse import urlparse, unquote
 import openpyxl
 from django.conf import settings
 from django.urls import reverse
+from django.shortcuts import render
 
 from glossaries.helpers import get_glossary_username
 from glossaries.processor import GlossaryProcessor
@@ -493,3 +494,7 @@ class DetectTextLanguageView(APIView):
 
 class ProfileDetailsView(TemplateView):
     template_name = 'profile_details.html'
+
+
+def dashboard(request):
+    return render(request, "dashboard.html")
