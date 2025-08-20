@@ -1,0 +1,102 @@
+{% load i18n %}
+<div class="flex h-screen w-22 flex-col justify-between items-center bg-green-950 border-r border-black/10 py-6 px-4 flex-shrink-0">
+    <!-- Top area -->
+    <div class="flex flex-col items-center gap-6">
+        <!-- Logo -->
+        <div class="w-[63px] h-[37px] rounded-md flex items-center justify-center">
+            <a href="/">
+                <svg height="37" width="63" id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1920 1080">
+                    <path fill="#FFFFFF"
+                          d="M242,325v402.5h227.1c18.1,0,32,4.4,41.7,13.2,9.7,8.8,14.5,19.9,14.5,33.2s-4.8,24.6-14.3,33c-9.6,8.4-23.5,12.6-41.9,12.6H198.7c-24.4,0-41.9-5.4-52.6-16.2-10.7-10.8-16-28.3-16-52.4v-425.9c0-22.6,5.1-39.6,15.3-50.9,10.2-11.3,23.6-17,40.2-17s30.5,5.6,40.9,16.8c10.4,11.2,15.6,28.2,15.6,51.1Z"/>
+                    <path fill="#FFFFFF"
+                          d="M879.3,644.9h-201.5c.2,23.4,5,44,14.1,61.9,9.2,17.9,21.4,31.3,36.6,40.4,15.2,9.1,32,13.6,50.4,13.6s23.6-1.4,33.8-4.3c10.2-2.9,20.1-7.4,29.6-13.6,9.6-6.2,18.4-12.8,26.4-19.8,8-7,18.5-16.6,31.3-28.7,5.3-4.5,12.8-6.8,22.6-6.8s19.1,2.9,25.7,8.7c6.5,5.8,9.8,14,9.8,24.5s-3.7,20.2-10.9,32.6c-7.3,12.4-18.3,24.4-33,35.8-14.7,11.4-33.2,20.9-55.5,28.5-22.3,7.5-47.9,11.3-76.8,11.3-66.2,0-117.6-18.9-154.3-56.6-36.7-37.7-55.1-88.9-55.1-153.5s4.5-58.7,13.6-84.7c9.1-26,22.3-48.4,39.6-67,17.4-18.6,38.7-32.9,64.1-42.8,25.4-9.9,53.6-14.9,84.5-14.9s74.8,8.5,103.6,25.5c28.8,17,50.4,38.9,64.7,65.8,14.3,26.9,21.5,54.3,21.5,82.2s-7.4,42.7-22.3,50.4c-14.8,7.7-35.7,11.5-62.6,11.5ZM677.8,586.5h186.7c-2.5-35.2-12-61.6-28.5-79-16.5-17.5-38.2-26.2-65.1-26.2s-46.7,8.9-63.2,26.6c-16.5,17.7-26.5,44-30,78.7Z"/>
+                    <path fill="#FFFFFF"
+                          d="M1264.1,786.4l-74.7-109.8-76.6,109.8c-11.1,15.3-20.4,26.3-28.1,32.8-7.7,6.5-17.4,9.8-29.2,9.8s-24.2-4.1-33.4-12.3c-9.2-8.2-13.8-17.5-13.8-28.1s7-26.3,21.1-46.4l93.2-133.6-82.6-111.3c-14.3-18.4-21.5-34.3-21.5-47.9s4.3-19.7,12.8-27.5c8.5-7.8,19.7-11.7,33.6-11.7s22.1,3.4,30,10.2c7.9,6.8,17.2,17.5,27.7,32.1l66.8,91.3,64.9-91.3c10.8-15.1,20.2-25.9,28.1-32.4,7.9-6.5,17.8-9.8,29.6-9.8s24.8,3.8,33.8,11.5c8.9,7.7,13.4,16.9,13.4,27.7s-1.8,15.3-5.5,22.4c-3.7,7.2-9.2,15.7-16.8,25.5l-82.6,111.3,93.2,133.6c14.6,20.9,21.9,36.6,21.9,47.2s-4.5,20.1-13.6,27.9c-9.1,7.8-20.3,11.7-33.6,11.7s-21.8-3.4-30-10.2c-8.2-6.8-17.5-17.6-28.1-32.4Z"/>
+                    <path fill="#FFFFFF"
+                          d="M1695.2,770.9c-24.9,19.4-49,33.9-72.3,43.6-23.3,9.7-49.4,14.5-78.3,14.5s-49.6-5.2-69.6-15.7c-20-10.4-35.4-24.6-46.2-42.4-10.8-17.9-16.2-37.2-16.2-58.1s8.9-52.2,26.8-72.1c17.9-19.9,42.4-33.2,73.6-40,6.5-1.5,22.8-4.9,48.7-10.2,25.9-5.3,48.1-10.1,66.6-14.5,18.5-4.4,38.5-9.7,60.2-16-1.3-27.2-6.7-47.1-16.4-59.8-9.7-12.7-29.7-19.1-60.2-19.1s-45.8,3.6-59.1,10.9c-13.2,7.3-24.5,18.2-34,32.8-9.4,14.6-16.1,24.2-20,28.9-3.9,4.7-12.3,7-25.1,7s-21.6-3.7-30-11.1c-8.4-7.4-12.6-16.9-12.6-28.5,0-18.1,6.4-35.7,19.2-52.8,12.8-17.1,32.8-31.2,60-42.3,27.2-11.1,61-16.6,101.5-16.6s80.9,5.3,106.8,16c25.9,10.7,44.2,27.6,54.9,50.7,10.7,23.1,16,53.8,16,92.1s0,44.6-.2,61.5c-.1,16.8-.3,35.6-.6,56.2,0,19.4,3.2,39.6,9.6,60.6,6.4,21,9.6,34.5,9.6,40.6,0,10.6-5,20.2-14.9,28.9-9.9,8.7-21.2,13-33.8,13s-21-5-31.3-14.9c-10.3-9.9-21.3-24.3-32.8-43.2ZM1688.4,621.9c-15.1,5.5-37,11.4-65.8,17.5-28.8,6.2-48.7,10.7-59.8,13.6-11.1,2.9-21.6,8.5-31.7,17-10.1,8.4-15.1,20.2-15.1,35.3s5.9,28.9,17.7,39.8c11.8,10.9,27.3,16.4,46.4,16.4s39.2-4.5,56.4-13.4c17.2-8.9,29.9-20.4,37.9-34.5,9.3-15.6,14-41.3,14-77v-14.7Z"/>
+                </svg>
+            </a>
+        </div>
+
+        <!-- Navigation icons -->
+        <div class="flex flex-col items-center gap-2">
+            <!-- Home/Dashboard -->
+            <a href="{% url 'dashboard' %}"
+               class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'dashboard' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
+               aria-label="{% trans 'Dashboard' %}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="{% if request.resolver_match.url_name == 'dashboard' %}text-black/80{% else %}text-white{% endif %}">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+
+            <!-- Translate -->
+            <a href="{% url 'main_index' %}"
+               class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'main_index' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
+               aria-label="{% trans 'Translation' %}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="{% if request.resolver_match.url_name == 'main_index' %}text-black/80{% else %}text-white{% endif %}">
+                    <path d="m5 8 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="m4 14 6-6 2-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 5h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 2h1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="m22 22-5-10-5 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14 18h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+
+            <!-- Glossaries/Books -->
+            <a href="{% url 'glossaries' %}"
+               class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'glossaries' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
+               aria-label="{% trans 'Glossaries' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{% if request.resolver_match.url_name == 'glossaries' %}text-black/80{% else %}text-white{% endif %}">
+                     <path d="M18.2172 16.239L15.1056 1.44525C15.0654 1.25179 14.9873 1.06818 14.8759 0.904986C14.7645 0.741788 14.6219 0.602213 14.4564 0.494277C14.2909 0.386341 14.1057 0.312173 13.9114 0.276033C13.7171 0.239893 13.5176 0.242494 13.3244 0.283685L8.93594 1.22681C8.54776 1.3118 8.20885 1.54662 7.99291 1.8802C7.77696 2.21377 7.70146 2.61911 7.78281 3.00806L10.8944 17.8018C10.9637 18.1393 11.1471 18.4427 11.4138 18.6609C11.6805 18.8791 12.0142 18.9988 12.3588 18.9999C12.4653 18.9998 12.5715 18.9885 12.6756 18.9662L17.0641 18.0231C17.4527 17.9379 17.792 17.7026 18.0079 17.3684C18.2239 17.0343 18.2991 16.6283 18.2172 16.239ZM9.25 2.7015C9.25 2.69587 9.25 2.69306 9.25 2.69306L13.6375 1.75556L13.9497 3.24337L9.56219 4.18744L9.25 2.7015ZM10.1875 7.14337L9.87344 5.65275L14.2628 4.70962L14.5759 6.20025L10.1875 7.14337ZM16.75 16.5568L12.3625 17.4943L12.0503 16.0065L16.4378 15.0624L16.75 16.5484C16.75 16.554 16.75 16.5568 16.75 16.5568ZM6.25 0.999935H1.75C1.35218 0.999935 0.970644 1.15797 0.68934 1.43928C0.408035 1.72058 0.25 2.10211 0.25 2.49994V17.4999C0.25 17.8978 0.408035 18.2793 0.68934 18.5606C0.970644 18.8419 1.35218 18.9999 1.75 18.9999H6.25C6.64782 18.9999 7.02936 18.8419 7.31066 18.5606C7.59196 18.2793 7.75 17.8978 7.75 17.4999V2.49994C7.75 2.10211 7.59196 1.72058 7.31066 1.43928C7.02936 1.15797 6.64782 0.999935 6.25 0.999935ZM1.75 2.49994H6.25V3.99994H1.75V2.49994ZM6.25 17.4999H1.75V15.9999H6.25V17.4999Z" fill="white"/>
+                </svg>
+            </a>
+
+            <!-- Archive/Project History -->
+            <a href="{% url 'project_history' %}"
+               class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'project_history' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
+               aria-label="{% trans 'Project history' %}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="{% if request.resolver_match.url_name == 'project_history' %}text-black/80{% else %}text-white{% endif %}">
+                    <rect width="20" height="5" x="2" y="3" rx="1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10 12v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14 12v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+
+            <!-- Edit/Writing -->
+            <a href="{% url 'writing' %}"
+               class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'writing' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
+               aria-label="{% trans 'Writing' %}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="{% if request.resolver_match.url_name == 'writing' %}text-black/80{% else %}text-white{% endif %}">
+                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="m15 5 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+
+            <!-- Usage/Align -->
+            <a href="{% url 'usage' %}?date_from={{ request.GET.date_from|default:''|date:'Y-m-d'|default:'' }}{% if not request.GET.date_from %}{% now 'Y-m-01' %}{% endif %}&date_to={{ request.GET.date_to|default:''|date:'Y-m-d'|default:'' }}{% if not request.GET.date_to %}{% now 'Y-m-t' %}{% endif %}"
+               class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'usage' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
+               aria-label="{% trans 'Usage' %}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="{% if request.resolver_match.url_name == 'usage' %}text-black/80{% else %}text-white{% endif %}">
+                    <rect width="6" height="14" x="2" y="5" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect width="6" height="10" x="16" y="9" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 2v20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <!-- Bottom support icon -->
+    <div class="flex p-2 justify-center items-center gap-1.5 rounded-lg hover:bg-white/10 transition-colors">
+        <a href="mailto:{{ preferences.MainSettings.support_email }}" aria-label="{% trans 'Support' %}">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-white">
+                <path d="M3 11v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="m19 10-2 2-2-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="m9 10-2 2-2-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </a>
+    </div>
+</div>
