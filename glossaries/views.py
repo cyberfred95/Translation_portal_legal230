@@ -58,6 +58,36 @@ class UserGlossariesView(TemplateView):
         return formatted_glossaries, paginator.get_paginated_context()
 
 
+class UserGlossariesView2(TemplateView):
+    template_name = 'glossaries_2.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        glossaries_data, pagination_context = self.get_glossaries()
+        context['glossaries'] = glossaries_data
+        context['translate_languages'] = self.get_languages()
+        context['paginator'] = pagination_context
+        return context
+
+    def get_languages(self):
+        if self.request.LANGUAGE_CODE == 'fr':
+            return Language.objects.order_by('french_name').all()
+        return Language.objects.order_by('name').all()
+
+    def get_glossaries(self):
+        tmp_glossaries = Glossary.objects.filter(user=self.request.user)
+
+        paginator = TemplateViewPagination()
+        paginated_glossaries = paginator.paginate_queryset(
+            tmp_glossaries, self.request)
+
+        formatted_glossaries = [
+            glossary.to_json(self.request)
+            for glossary in paginated_glossaries
+        ]
+        return formatted_glossaries, paginator.get_paginated_context()
+
+
 class AddGlossaryView(APIView):
     permission_classes = (SubscribedPermission, IsAuthenticated)
 
