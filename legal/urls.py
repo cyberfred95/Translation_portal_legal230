@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
 from domains.views import update_domains_view
 from writing.views import refresh_prompts_view
+from glossaries.views import MyTeamView
 
 urlpatterns = i18n_patterns(
     path("", login_required(TranslateView.as_view()), name="main_index"),
@@ -48,6 +49,8 @@ urlpatterns = i18n_patterns(
          name='detect_language'),
     path('detect_text_language/', login_required(DetectTextLanguageView.as_view()),
          name='detect_text_language'),
+
+    path('myteam/', login_required(MyTeamView.as_view()), name='myteam'),
 
     path('statistics/', include('stats.urls')),
     path('glossaries/', include('glossaries.urls')),

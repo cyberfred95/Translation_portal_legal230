@@ -9,6 +9,9 @@ from django.db.models.functions import Lower
 from django.core.paginator import Paginator
 from django.views.generic import TemplateView
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import Group
+from django.db.models import Count, Q
 
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
@@ -20,6 +23,7 @@ from rest_framework import serializers
 from domains.models import Domain
 from languages.models import Language
 from subscriptions.permissions import SubscribedPermission
+from users.models import User
 from .models import Glossary
 from .processor import GlossaryProcessor
 from .serializers import GlossarySerializer
@@ -196,3 +200,159 @@ class GetDefaultGlossaryView(APIView):
         if glossary:
             return Response(GlossarySerializer(glossary).data, status=status.HTTP_200_OK)
         return Response({}, status=status.HTTP_200_OK)
+
+
+class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    """
+    Team management view for administrators.
+    Only group administrators can access this view.
+    """
+    template_name = 'myteam.html'
+    
+    def test_func(self):
+        """Check if user is an admin of any group"""
+        # Check if user is staff or is admin of their group
+        if self.request.user.is_staff:
+            return True
+        
+        # Check if user is admin of their group
+        user_group = getattr(self.request.user, 'group', None)
+        if user_group:
+            return user_group.admin.filter(id=self.request.user.id).exists()
+        
+        return False
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Get team members based on user's group membership
+        team_members, paginator_info = self.get_team_members()
+        
+        # Calculate stats on the full dataset, not just the current page
+        stats = self.get_team_stats()
+        
+        # Get search query to preserve it in the template
+        search_query = self.request.GET.get('search', '')
+        
+        context.update({
+            'team_members': team_members,
+            'stats': stats,
+            'paginator': paginator_info,
+            'search_query': search_query
+        })
+        
+        return context
+    
+    def get_team_members(self):
+        """Get team members with pagination and search"""
+        # If user is staff, show all users; otherwise show group members
+        if self.request.user.is_staff:
+            queryset = User.objects.all()
+        else:
+            # Get users from the same group
+            user_group = getattr(self.request.user, 'group', None)
+            if user_group:
+                queryset = User.objects.filter(group=user_group)
+            else:
+                queryset = User.objects.none()
+        
+        # Apply search filter if search parameter is provided
+        search_query = self.request.GET.get('search', '').strip()
+        if search_query:
+            # Search in first_name, last_name, and email fields
+            queryset = queryset.filter(
+                Q(first_name__icontains=search_query) |
+                Q(last_name__icontains=search_query) |
+                Q(email__icontains=search_query)
+            )
+        
+        # Add annotations for better performance
+        queryset = queryset.select_related('group').order_by('first_name', 'last_name')
+        
+        # Pagination
+        paginator = Paginator(queryset, 10)  # 10 users per page
+        page_number = self.request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+        
+        # Add computed fields for each member
+        members_with_data = []
+        for user in page_obj:
+            member_data = {
+                'id': user.id,
+                'first_name': user.first_name or 'Unknown',
+                'last_name': user.last_name or 'User',
+                'email': user.email,
+                'initials': self.get_user_initials(user),
+                'is_admin': self.check_admin_status(user),
+                'is_premium': self.check_premium_status(user),
+                'date_joined': user.date_joined,
+            }
+            members_with_data.append(member_data)
+        
+        paginator_info = {
+            'current_page': page_obj.number,
+            'total_pages': paginator.num_pages,
+            'has_previous': page_obj.has_previous(),
+            'has_next': page_obj.has_next(),
+            'previous_page_number': page_obj.previous_page_number() if page_obj.has_previous() else None,
+            'next_page_number': page_obj.next_page_number() if page_obj.has_next() else None,
+            'page_range': paginator.page_range,
+            'has_multiple_pages': paginator.num_pages > 1,
+        }
+        
+        return members_with_data, paginator_info
+    
+    def get_team_stats(self):
+        """Calculate team statistics from the full dataset"""
+        # Get the same queryset used for team members, but without pagination
+        if self.request.user.is_staff:
+            queryset = User.objects.all()
+        else:
+            # Get users from the same group
+            user_group = getattr(self.request.user, 'group', None)
+            if user_group:
+                queryset = User.objects.filter(group=user_group)
+            else:
+                queryset = User.objects.none()
+        
+        # Calculate statistics on the full queryset
+        total_users = queryset.count()
+        
+        # Count admin users
+        admin_users = 0
+        premium_users = 0
+        
+        for user in queryset:
+            if self.check_admin_status(user):
+                admin_users += 1
+            if self.check_premium_status(user):
+                premium_users += 1
+        
+        return {
+            'total_users': total_users,
+            'admin_users': admin_users,
+            'premium_users': premium_users,
+        }
+    
+    def get_user_initials(self, user):
+        """Generate user initials from first and last name"""
+        first_initial = user.first_name[0].upper() if user.first_name else 'U'
+        last_initial = user.last_name[0].upper() if user.last_name else 'U'
+        return f"{first_initial}{last_initial}"
+    
+    def check_admin_status(self, user):
+        """Check if user is admin of their group"""
+        if user.is_staff or user.is_superuser:
+            return True
+        
+        user_group = getattr(user, 'group', None)
+        if user_group:
+            return user_group.admin.filter(id=user.id).exists()
+        
+        return False
+    
+    def check_premium_status(self, user):
+        """Check if user has premium subscription"""
+        # This would be replaced with actual subscription logic
+        # For now, we'll consider staff users as premium
+        return user.is_staff or hasattr(user, 'subscription') and getattr(user.subscription, 'is_premium', False)

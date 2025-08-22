@@ -2,6 +2,16 @@
 {% load static %}
 {% load i18n %}
 
+{% block extra_head %}
+<!-- Poppins font for Builder.io modal design -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.font-poppins {
+    font-family: 'Poppins', sans-serif;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="min-h-screen bg-gray-50">
     <!-- Main Content -->
@@ -393,24 +403,49 @@
     </main>
 </div>
 
-<!-- Modal from original template -->
-<div id="modal" class="fixed inset-0 bg-gray-500 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
-    <div class="relative bg-white rounded-lg shadow-xl max-w-172.5 w-full mx-4">
-        <div class="absolute -top-4.5 -right-4.5 -mr-4 -mt-4 z-10">
-            <button type="button" id="closeIcon" class="p-2 text-gray-500 hover:text-gray-900 focus:outline-none">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M11.7688 10.0003L19.6335 2.13553C20.1222 1.64732 20.1222 0.855171 19.6335 0.36696C19.1449 -0.121669 18.3536 -0.121669 17.865 0.36696L10.0002 8.23171L2.13504 0.36696C1.64641 -0.121669 0.8551 -0.121669 0.366471 0.36696C-0.122157 0.855171 -0.122157 1.64732 0.366471 2.13553L8.23164 10.0003L0.366471 17.865C-0.122157 18.3532 -0.122157 19.1454 0.366471 19.6336C0.610786 19.8775 0.930979 19.9997 1.25076 19.9997C1.57053 19.9997 1.89073 19.8775 2.13504 19.6332L10.0002 11.7684L17.865 19.6332C18.1093 19.8775 18.4295 19.9997 18.7492 19.9997C19.069 19.9997 19.3892 19.8775 19.6335 19.6332C20.1222 19.145 20.1222 18.3528 19.6335 17.8646L11.7688 10.0003Z" fill="white"/>
+<!-- Add Glossary Modal with Builder.io Design -->
+<div id="modal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-md flex flex-col gap-6 p-6 pb-8 max-w-lg w-full max-h-[90vh] overflow-y-auto sm:p-8 sm:pb-8">
+        {% csrf_token %}
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <!-- FolderPlus Icon SVG -->
+                <svg class="w-6 h-6 text-black/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-5l-2-2H5a2 2 0 00-2 2z"/>
+                </svg>
+                <h1 class="font-poppins text-2xl font-bold text-gray-900 leading-8 tracking-[-0.456px]">
+                    {% trans 'Add a glossary' %}
+                </h1>
+            </div>
+            <button 
+                type="button"
+                id="closeIcon"
+                class="flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                aria-label="Close modal"
+            >
+                <!-- X Icon SVG -->
+                <svg class="w-6 h-6 text-black/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
         </div>
 
-        <form class="p-12.5 flex flex-col items-center gap-7.5">
-            <div class="text-5">{% trans 'Add glossary' %}</div>
-            <div class="flex w-full justify-between">
+        <!-- Subtitle -->
+        <p class="font-poppins text-sm font-normal text-gray-600 leading-5 tracking-[-0.084px]">
+            {% trans 'Step 1 of 2: How would you like to add a glossary to your collection?' %}
+        </p>
+
+        <!-- Form -->
+        <form id="glossary-form" class="flex flex-col gap-6">
+            <!-- Language Selection -->
+            <div class="flex flex-col gap-4">
                 <div class="flex flex-col gap-2.5">
-                    <span>{% trans 'Source language' %}</span>
-                    <select class="glossary-language-source glossary-language-select" name="source_language" required>
-                        <option value="" disabled selected>{% trans 'Source language' %}</option>
+                    <span class="font-poppins text-sm font-medium text-gray-900">{% trans 'Source language' %}</span>
+                    <select class="glossary-language-source glossary-language-select w-full p-3 border border-gray-300 rounded-md" name="source_language" required>
+                        <option value="" disabled selected>{% trans 'Select source language' %}</option>
                         {% for translate_language in translate_languages %}
                         <option value="{{ translate_language.abbreviation|lower }}">
                             {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
@@ -422,9 +457,9 @@
                     </select>
                 </div>
                 <div class="flex flex-col gap-2.5">
-                    <span>{% trans 'Target language' %}</span>
-                    <select class="glossary-language-target glossary-language-select" name="target_language" required>
-                        <option value="" disabled selected>{% trans 'Target language' %}</option>
+                    <span class="font-poppins text-sm font-medium text-gray-900">{% trans 'Target language' %}</span>
+                    <select class="glossary-language-target glossary-language-select w-full p-3 border border-gray-300 rounded-md" name="target_language" required>
+                        <option value="" disabled selected>{% trans 'Select target language' %}</option>
                         {% for translate_language in translate_languages %}
                         <option value="{{ translate_language.abbreviation|lower }}">
                             {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
@@ -436,43 +471,92 @@
                     </select>
                 </div>
             </div>
-            <div class="glossary-container bg-gray-25 w-full py-5 rounded-md">
+
+            <!-- Options -->
+            <div class="flex flex-col gap-0.5 rounded-lg bg-white">
+                <div class="flex items-center p-2 rounded-md bg-blue-50">
+                    <div class="flex items-center gap-6 flex-1">
+                        <!-- Custom Radio Button -->
+                        <div class="relative w-5 h-5">
+                            <div class="w-5 h-5 rounded-full border-2 border-green-600 bg-green-600 flex items-center justify-center">
+                                <div class="w-2 h-2 rounded-full bg-white"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col justify-center gap-1 flex-1">
+                            <div class="font-poppins text-sm font-medium text-gray-900 leading-6 tracking-[-0.084px]">
+                                {% trans 'Import an existing glossary' %}
+                            </div>
+                            <div class="font-poppins text-xs font-normal text-gray-600 leading-4">
+                                {% trans 'Use a .csv file' %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Upload Section -->
+            <div class="glossary-container bg-gray-50 w-full py-5 rounded-md">
                 <div id="uploadButtons" class="flex flex-col gap-2.5 items-center">
-                    <button type="button" id="uploadButton" class="bg-green-700 text-white py-2.5 rounded font-semibold px-14">
+                    <button type="button" id="uploadButton" class="bg-green-600 hover:bg-green-700 text-white py-2.5 px-6 rounded-full font-poppins font-semibold transition-colors">
                         {% trans 'Upload file' %}
                     </button>
-                    <div id="fileInfo" class="max-w-50.5 hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-100 text-green-400 w-full">
-                        <span id="fileName" class="flex-grow truncate"></span>
+                    <div id="fileInfo" class="max-w-full hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-100 text-green-700 w-full">
+                        <span id="fileName" class="flex-grow truncate font-poppins text-sm"></span>
                         <button type="button" class="remove-file">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <g clip-path="url(#clip0_759_4082)">
-                                    <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z" fill="#176C77"/>
-                                    <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z" fill="white"/>
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_759_4082">
-                                        <rect width="20" height="20" fill="white"/>
-                                    </clipPath>
-                                </defs>
+                            <svg class="w-5 h-5 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
                     </div>
-                    <div class="text-3.5 text-gray-500">{% trans 'File formats: CSV, TXT, XLSX' %} | {% trans 'Max size: 2MB' %}</div>
+                    <a href="{% static 'Gloss_en-de.csv' %}" type="button" id="downloadSample" class="px-6 text-center bg-white text-green-600 border border-green-600 py-2 rounded-full font-poppins font-semibold hover:bg-green-50 transition-colors">
+                        {% trans 'Download sample' %}
+                    </a>
+                    <p class="font-poppins text-xs text-gray-500">{% trans 'Supported Files: .csv, .xlsx max 5mb' %}</p>
                 </div>
             </div>
-            <input type="file" id="fileInput" class="hidden" accept=".csv,.txt,.xlsx"/>
-            <div class="flex justify-center gap-5">
-                <button type="button" id="closeModal" class="border border-green-700 text-green-700 py-2.5 px-6 rounded font-semibold hover:bg-green-50 transition-colors">
-                    {% trans 'Cancel' %}
+
+            <!-- Instructions -->
+            <ul class="list-disc list-inside space-y-1 font-poppins text-sm text-gray-600">
+                <li>{% trans "The first row of the file should start with the language (i.e: French or FR)" %}</li>
+                <li>{% trans "Your file should not include any comments" %}</li>
+                <li>{% trans "Your file should have only 2 columns" %}</li>
+                <li>{% trans "Your file should include only one entry per each source text (no duplicates are allowed)" %}</li>
+                <li>{% trans "Your file must not contain empty lines, empty sources or empty targets" %}</li>
+                <li>{% trans "Entries must not have leading or trailing empty spaces" %}</li>
+                <li>{% trans "Table formatting is not allowed, only plain text" %}</li>
+                <li>{% trans "Commas are not allowed" %}</li>
+            </ul>
+
+            <!-- Buttons -->
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-between items-stretch sm:items-start gap-3 sm:gap-4">
+                <button
+                    type="button"
+                    id="closeModal"
+                    class="flex items-center justify-center px-4 py-2 rounded-full border border-gray-300 font-poppins text-sm font-bold text-gray-900 leading-6 tracking-[-0.084px] hover:bg-gray-50 transition-colors"
+                >
+                    <span class="px-2">{% trans 'Cancel' %}</span>
                 </button>
-                <button type="submit" id="add-glossary" class="bg-green-700 text-white py-2.5 px-6 rounded font-semibold hover:bg-green-800 transition-colors">
-                    {% trans 'Add Glossary' %}
+
+                <button 
+                    type="submit" 
+                    id="continueButton"
+                    class="flex items-center justify-center px-4 py-2 rounded-full bg-green-600 hover:bg-green-700 transition-colors create-glossary"
+                >
+                    <!-- Download Icon SVG -->
+                    <svg class="w-5 h-5 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <span class="font-poppins text-sm font-bold text-white leading-6 tracking-[-0.084px]">
+                        {% trans 'Import' %}
+                    </span>
                 </button>
             </div>
         </form>
+
+        <input type="file" class="hidden glossary-file" accept=".csv, .xlsx">
     </div>
 </div>
-
 <!-- JavaScript from original template -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -497,80 +581,101 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Modal functionality
+    // Modal functionality with Builder.io design
     const modal = document.getElementById('modal');
     const openModalBtn = document.getElementById('openModal');
     const closeModalBtn = document.getElementById('closeModal');
     const closeIcon = document.getElementById('closeIcon');
 
     function openModal() {
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+        modal?.classList.remove('hidden');
     }
 
     function closeModal() {
-        modal.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-        resetForm();
-    }
-
-    function resetForm() {
-        const form = modal.querySelector('form');
-        form.reset();
-        const fileInfo = document.getElementById('fileInfo');
-        const uploadButtons = document.getElementById('uploadButtons');
-        fileInfo.classList.add('hidden');
-        uploadButtons.querySelector('button').style.display = 'block';
+        modal?.classList.add('hidden');
+        resetUploadArea();
     }
 
     openModalBtn?.addEventListener('click', openModal);
     closeModalBtn?.addEventListener('click', closeModal);
     closeIcon?.addEventListener('click', closeModal);
 
-    // File upload functionality
-    const uploadButton = document.getElementById('uploadButton');
-    const fileInput = document.getElementById('fileInput');
-    const fileInfo = document.getElementById('fileInfo');
-    const fileName = document.getElementById('fileName');
-    const removeFileBtn = document.querySelector('.remove-file');
-
-    uploadButton?.addEventListener('click', function() {
-        fileInput.click();
+    // Close modal when clicking outside
+    modal?.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeModal();
+        }
     });
 
-    fileInput?.addEventListener('change', function() {
-        if (this.files.length > 0) {
-            const file = this.files[0];
-            fileName.textContent = file.name;
-            fileInfo.classList.remove('hidden');
-            uploadButton.style.display = 'none';
+    // File upload functionality
+    const uploadButton = document.getElementById('uploadButton');
+    const fileInput = document.querySelector('.glossary-file');
+    const fileInfo = document.getElementById('fileInfo');
+    const removeFileBtn = document.querySelector('.remove-file');
+    const maxFileSize = 5 * 1024 * 1024; // 5MB
+
+    function resetUploadArea() {
+        uploadButton?.classList.remove('hidden');
+        fileInfo?.classList.add('hidden');
+        if (fileInput) fileInput.value = '';
+    }
+
+    function showUploadedFile(fileName) {
+        document.getElementById('fileName').textContent = fileName;
+        fileInfo?.classList.remove('hidden');
+        uploadButton?.classList.add('hidden');
+    }
+
+    uploadButton?.addEventListener('click', function() {
+        fileInput?.click();
+    });
+
+    fileInput?.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size <= maxFileSize) {
+                showUploadedFile(file.name);
+            } else {
+                alert('File size exceeds 5MB limit.');
+                this.value = '';
+            }
         }
     });
 
     removeFileBtn?.addEventListener('click', function() {
-        fileInput.value = '';
-        fileInfo.classList.add('hidden');
-        uploadButton.style.display = 'block';
+        resetUploadArea();
     });
 
     // Form submission
-    const form = modal.querySelector('form');
+    const form = document.getElementById('glossary-form');
     form?.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const formData = new FormData();
-        formData.append('source_language', this.source_language.value);
-        formData.append('target_language', this.target_language.value);
+        const sourceLanguage = this.querySelector('[name="source_language"]').value;
+        const targetLanguage = this.querySelector('[name="target_language"]').value;
         
-        if (fileInput.files.length > 0) {
-            formData.append('file', fileInput.files[0]);
+        if (!sourceLanguage || !targetLanguage) {
+            alert('{% trans "Please select both source and target languages" %}');
+            return;
         }
+        
+        if (!fileInput?.files.length) {
+            alert('{% trans "Please select a file to upload" %}');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('source_language', sourceLanguage);
+        formData.append('target_language', targetLanguage);
+        formData.append('file', fileInput.files[0]);
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
         fetch('{% url "add_glossary" %}', {
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'X-CSRFToken': csrfToken,
             }
         })
         .then(response => response.json())
@@ -578,22 +683,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.error) {
                 alert(data.error);
             } else {
+                alert('{% trans "Glossary added successfully!" %}');
                 closeModal();
                 location.reload();
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while adding the glossary.');
-        });
-    });
-
-    // Edit functionality
-    document.querySelectorAll('.edit-glossary').forEach(button => {
-        button.addEventListener('click', function() {
-            const url = this.dataset.editUrl;
-            // Implement edit functionality
-            console.log('Edit glossary:', url);
+            alert('{% trans "An error occurred while adding the glossary." %}');
         });
     });
 
