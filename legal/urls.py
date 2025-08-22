@@ -5,7 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views import TranslateView, FileExpertRevisionView, ProjectsHistoryView, SingleProjectView, \
      GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView, ProfileDetailsView, \
-     DashboardView, TextTranslate2View, ProfileDetails2View, DisplayMessage
+     DashboardView, TextTranslate2View, ProfileDetails2View, DisplayMessage, ProjectsHistory2View
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
 from domains.views import update_domains_view
@@ -24,6 +24,10 @@ urlpatterns = i18n_patterns(
          name='expert_revision_file'),
     path('project-history/', login_required(ProjectsHistoryView.as_view()),
          name='project_history'),
+    
+    path('project-history-2/', login_required(ProjectsHistory2View.as_view()),
+         name='project_history_2'),
+    
     path('project/', login_required(SingleProjectView.as_view()),
          name='single_project'),
     path('get-templates/', login_required(GetTemplatesView.as_view()),
