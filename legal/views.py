@@ -626,7 +626,162 @@ class DashboardView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-    # Add context variables here if needed
+        user = self.request.user
+        page = self.request.GET.get('page', 1)
+        type_filter = self.request.GET.get('type', '')
+        status_filter = self.request.GET.get('status', '')
+        language_filter = self.request.GET.get('language', '')
+        
+        # Paramètres pour l'API - limiter à 10 projets récents pour le dashboard
+        params = {
+            "page_size": 10,
+            "page": page,
+            "user_custom_mt_token": user.uuid if not user.is_staff else None
+        }
+        headers = {
+            "token": preferences.MainSettings.api_key if user.is_staff else user.group.api_key
+        }
+
+        # Ajouter les filtres au contexte pour maintenir l'état
+        context['current_type_filter'] = type_filter
+        context['current_status_filter'] = status_filter
+        context['current_language_filter'] = language_filter
+
+        # Récupérer le compteur de mots traduits depuis la subscription de l'utilisateur
+        translated_words_count = 0
+        try:
+            user_subscription = user.subscriptions.first()
+            if user_subscription:
+                translated_words_count = user_subscription.translated_words_count
+        except Exception as e:
+            # En cas d'erreur, garder la valeur par défaut
+            translated_words_count = 0
+        
+        context['translated_words_count'] = translated_words_count
+
+        # Récupérer le nombre de glossaires ajoutés par l'utilisateur
+        glossaries_count = 0
+        try:
+            from glossaries.models import Glossary
+            glossaries_count = Glossary.objects.filter(user=user).count()
+        except Exception as e:
+            # En cas d'erreur, garder la valeur par défaut
+            glossaries_count = 0
+        
+        context['user_glossaries_count'] = glossaries_count
+
+        try:
+            # Récupérer les projets depuis l'API
+            response = requests.get(
+                preferences.MainSettings.CLOUDSTORAGE_API_URL, 
+                params=params, 
+                headers=headers
+            ).json()
+            
+            if 'results' in response:
+                for project in response['results']:
+                    # Traitement du nom de fichier
+                    file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
+                    original_filename = unquote(file_name)
+                    project['source_file_name'] = original_filename
+                    
+                    # Conversion de la date
+                    project['created_at'] = datetime.fromisoformat(
+                        project['created_at'].replace('Z', '+00:00'))
+                    
+                    # Utiliser le statut original sans mapping
+                    project['status_mapped'] = project['status']
+                    
+                    # Déterminer le type de document
+                    project['document_type'] = 'text' if project['source_file_name'].lower().endswith('.txt') else 'document'
+                    
+                    # Popup pour expert revision
+                    project['display_popup'] = False if get_price_by_language_pair(
+                        source_language=project['source_language'],
+                        target_language=project['target_language']
+                    ) else True
+                
+                context['projects'] = response
+                
+                # Récupérer le nombre total de traductions pour les statistiques
+                context['total_translations'] = response.get('count', 0)
+                
+                # Collecter dynamiquement les statuts disponibles (statuts originaux)
+                available_statuses = set()
+                available_languages = set()
+                for project in response['results']:
+                    available_statuses.add(project['status'])
+                    # Créer la paire de langues (source → target)
+                    language_pair = f"{project['source_language'].upper()} → {project['target_language'].upper()}"
+                    available_languages.add(language_pair)
+                
+                # Créer la liste des statuts disponibles (triés alphabétiquement)
+                context['available_statuses'] = [
+                    {'value': status, 'label': status}
+                    for status in sorted(available_statuses)
+                ]
+                
+                # Créer la liste des langues de traduction disponibles (triées alphabétiquement)
+                context['available_languages'] = [
+                    {'value': lang_pair, 'label': lang_pair}
+                    for lang_pair in sorted(available_languages)
+                ]
+                
+                # Informations de pagination
+                current_page = int(page)
+                total_pages = (response.get('count', 0) + 9) // 10  # Arrondir vers le haut
+                
+                # Calculer la plage de pages à afficher
+                page_range = []
+                if total_pages <= 5:
+                    page_range = list(range(1, total_pages + 1))
+                else:
+                    if current_page <= 3:
+                        page_range = list(range(1, 6))
+                    elif current_page >= total_pages - 2:
+                        page_range = list(range(total_pages - 4, total_pages + 1))
+                    else:
+                        page_range = list(range(current_page - 2, current_page + 3))
+                
+                context['paginator'] = {
+                    'current_page': current_page,
+                    'total_pages': total_pages,
+                    'has_previous': response.get('previous') is not None,
+                    'has_next': response.get('next') is not None,
+                    'previous_page_number': current_page - 1 if current_page > 1 else None,
+                    'next_page_number': current_page + 1 if response.get('next') else None,
+                    'count': response.get('count', 0),
+                    'start_index': (current_page - 1) * 10 + 1,
+                    'end_index': min(current_page * 10, response.get('count', 0)),
+                    'has_multiple_pages': response.get('count', 0) > 10,
+                    'page_range': page_range
+                }
+            else:
+                context['projects'] = {'results': [], 'count': 0}
+                context['total_translations'] = 0
+                context['paginator'] = {
+                    'current_page': 1,
+                    'total_pages': 1,
+                    'has_previous': False,
+                    'has_next': False,
+                    'has_multiple_pages': False,
+                    'count': 0,
+                    'page_range': [1]
+                }
+        except Exception as e:
+            # En cas d'erreur, retourner des données vides
+            context['projects'] = {'results': [], 'count': 0}
+            context['total_translations'] = 0
+            context['paginator'] = {
+                'current_page': 1,
+                'total_pages': 1,
+                'has_previous': False,
+                'has_next': False,
+                'has_multiple_pages': False,
+                'count': 0,
+                'page_range': [1]
+            }
+        
         return context
 
 
@@ -637,6 +792,33 @@ class TextTranslate2View(TemplateView):
         context = super().get_context_data(**kwargs)
         # Add context variables here if needed
         return context
+
+
+class DocumentTranslate2View(TemplateView):
+    template_name = "document_translate_2.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['languages'] = languages
+        context['translate_languages'] = self.get_languages()
+        context['access_to_default_glossaries'] = self.default_glossary_allowed()
+        context['subscription_types'] = SubscriptionType.objects.all()
+        return context
+
+    def default_glossary_allowed(self):
+        if self.request.user.is_staff:
+            return True
+
+        user_subscription = self.request.user.subscriptions.first()
+        if self.request.user.group:
+            if user_subscription and user_subscription.access_to_official_glossaries:
+                return True
+        return False
+
+    def get_languages(self):
+        if self.request.LANGUAGE_CODE == 'fr':
+            return Language.objects.order_by('french_name').all()
+        return Language.objects.order_by('name').all()
 
 
 class DisplayMessage(TemplateView):

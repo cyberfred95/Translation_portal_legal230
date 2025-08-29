@@ -4,6 +4,34 @@
 
 {% block content %}
 
+<style>
+/* CSS personnalisé pour les onglets */
+.tab-button {
+    color: #374151 !important; /* text-gray-700 */
+    background-color: transparent !important;
+}
+
+.tab-button.active {
+    color: #111827 !important; /* text-gray-900 */
+    background-color: white !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.tab-button:hover {
+    background-color: rgba(255, 255, 255, 0.5) !important;
+    color: #111827 !important;
+}
+
+/* Empêcher le scroll automatique vers les ancres */
+html {
+    scroll-behavior: auto !important;
+}
+
+#text-translate, #document-translate {
+    scroll-margin-top: 0 !important;
+}
+</style>
+
 <div class="mx-5 mb-11.5 mt-5">
     <div class="flex justify-between items-center mt-10">
         <div class="space-y-2.5">
@@ -19,11 +47,11 @@
             </div>
 
             <!-- Main tabs -->
-            <div class="bg-blue-50 rounded-full p-0.5 mb-6 inline-flex">
-                <button type="button" id="text-translate" class="flex items-center justify-center px-3 py-2 text-sm font-medium rounded-full transition-all bg-white text-gray-900 shadow-sm border border-gray-200">
+            <div class="bg-gray-100 rounded-full p-0.5 mb-6 inline-flex">
+                <button type="button" id="text-translate" class="tab-button active flex items-center justify-center px-3 py-2 text-sm font-medium rounded-full transition-all">
                     Text Translation
                 </button>
-                <button type="button" id="document-translate" class="flex items-center justify-center px-3 py-2 text-sm font-medium rounded-full transition-all text-gray-900 hover:bg-white/50">
+                <button type="button" id="document-translate" class="tab-button flex items-center justify-center px-3 py-2 text-sm font-medium rounded-full transition-all">
                     Document Translation
                 </button>
             </div>
@@ -44,14 +72,14 @@
 
 
         <div id="document-translate-content" class="tab-content hidden">
-            {% include 'document_translate.html' %}
+            {% include 'document_translate_2.html' %}
         </div>
 
     </div>
 
 </div>
 <script src="{% static 'js/text-translate.js' %}"></script>
-<script src="{% static 'js/translate.js' %}"></script>
+<!-- <script src="{% static 'js/translate.js' %}"></script> Désactivé pour éviter les conflits -->
 <script>
     let get_domains = "{% url 'get_domains' %}"
     let translate = "{% url 'main_index' %}"
@@ -78,5 +106,67 @@
     var language_code = "{{  request.LANGUAGE_CODE }}"
 
     var access_to_default_glossaries = {{ access_to_default_glossaries|yesno:"true,false" }}
+</script>
+
+<script>
+// Gestion des onglets personnalisée pour translate_2.html
+$(document).ready(function() {
+    console.log('Initialisation des onglets translate_2');
+    
+    // Empêcher le scroll automatique
+    $('html, body').scrollTop(0);
+    
+    function showTab(tabId) {
+        console.log('Affichage de l\'onglet:', tabId);
+        
+        // Masquer tous les contenus d'onglets
+        $('.tab-content').addClass('hidden');
+        
+        // Afficher le contenu de l'onglet sélectionné
+        $(`#${tabId}-content`).removeClass('hidden');
+        
+        // Retirer les classes actives de tous les boutons
+        $('.tab-button').removeClass('active');
+        
+        // Ajouter la classe active au bouton sélectionné
+        $(`#${tabId}`).addClass('active');
+        
+        // Empêcher le scroll
+        return false;
+    }
+    
+    // Déterminer l'onglet initial basé sur l'URL
+    let initialTab = 'text-translate';
+    if (window.location.hash) {
+        const hash = window.location.hash.substring(1);
+        if (hash === 'document-translate') {
+            initialTab = 'document-translate';
+        }
+    }
+    
+    // Afficher l'onglet initial
+    showTab(initialTab);
+    
+    // Event listeners pour les onglets
+    $('#text-translate').off('click').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        showTab('text-translate');
+        return false;
+    });
+    
+    $('#document-translate').off('click').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        showTab('document-translate');
+        return false;
+    });
+    
+    // Empêcher le scroll lors du changement de hash
+    $(window).on('hashchange', function(e) {
+        $('html, body').scrollTop(0);
+        return false;
+    });
+});
 </script>
 {% endblock %}
