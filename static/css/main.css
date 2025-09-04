@@ -38,10 +38,65 @@
     url(../fonts/Montserrat-Bold.woff) format('woff')
 }
 
+@font-face {
+    font-family: Poppins;
+    font-style: normal;
+    font-weight: 400;
+    src: local('Poppins'),
+    url(../fonts/Poppins-Regular.ttf) format('woff')
+}
+
+@font-face {
+    font-family: Poppins;
+    font-style: normal;
+    font-weight: 400;
+    src: local('Poppins'),
+    url(../fonts/Poppins-Regular.ttf) format('woff')
+}
+
+@font-face {
+    font-family: Poppins;
+    font-style: normal;
+    font-weight: 400;
+    src: local('Poppins'),
+    url(../fonts/Poppins-Regular.ttf) format('woff')
+}
+
+@font-face {
+    font-family: Poppins-Semibold;
+    font-style: normal;
+    font-weight: 600;
+    src: local('Poppins'),
+    url(../fonts/Poppins-SemiBold.ttf) format('woff')
+}
+
+@font-face {
+    font-family: Poppins-Italic;
+    font-style: italic;
+    font-weight: 400;
+    src: local('Poppins'),
+    url(../fonts/Poppins-Italic.ttf) format('woff')
+}
+
+@font-face {
+    font-family: Poppins-Bold;
+    font-style: normal;
+    font-weight: 1000;
+    src: local('Poppins'),
+    url(../fonts/Poppins-Bold.ttf) format('woff')
+}
+
 /*********** SELECT STYLES ***********/
 
 .select2-container {
-    width: 200px !important;
+    min-width: 145px !important;
+    font-family: Poppins-Bold, sans-serif;
+    font-size:0.875rem;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+    color:#181932 !important;
+    font-weight:600;
 }
 
 .select2-container--default .select2-selection--single {

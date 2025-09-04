@@ -116,7 +116,7 @@ $(document).ready(function () {
     });
 
 
-    $('#copy').click(function () {
+    $('#copy, .copy').click(function () {
         var translatedText = translatedQuill.getText();
         var translatedHtml = translatedQuill.root.innerHTML;
 
@@ -206,4 +206,37 @@ $(document).ready(function () {
     translatedQuill.on("text-change", resizeTextAreas);
 
     resizeTextAreas();
+});
+
+
+/**
+ * MODAL
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('modal');
+    const closeModalBtn = document.getElementById('closeModal');
+    const closeIcon = document.getElementById('closeIcon');
+    const checkbox = document.querySelector('input[type="checkbox"].peer');
+
+    function closeModal() {
+        modal.classList.add('hidden');
+        checkbox.checked = false;
+    }
+
+    checkbox.addEventListener('change', function() {
+        if (!checkbox.checked) {
+            modal.classList.add('hidden');
+        } else {
+            modal.classList.remove('hidden');
+        }
+    });
+
+    closeModalBtn?.addEventListener('click', closeModal);
+    closeIcon?.addEventListener('click', closeModal);
+
+    modal?.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
 });

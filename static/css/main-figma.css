@@ -95,3 +95,8 @@
   min-width: 220px;
   max-width: 300px;
 }
+#text-translate-content .select2-container--default .select2-selection--single .select2-selection__placeholder {
+  font-family: Poppins, sans-serif !important;
+  border-bottom: 1px solid #181932;
+  padding-bottom: .21rem;
+}
