@@ -1,131 +1,139 @@
 {% load static %}
 {% load i18n %}
 
-<form class="rounded-md p-2.5 w-full h-full flex flex-col items-end">
-    <div class="w-full bg-white p-2.5 rounded-2.5 border border-gray-300 mb-1">
-        <div class="relative pt-1">
-            <div class="overflow-hidden h-1.5 mb-15 text-xs flex rounded bg-green-200">
-
-                <div id="progress-bar"
-                     class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-700 transition-all duration-500 ease-out"
-                     style="width: 0%"></div>
+<!-- Main Content -->
+<div class="flex p-4 px-6 flex-col items-end gap-6 self-stretch rounded-lg bg-white">
+    <!-- Step Indicator -->
+    <div class="flex items-start self-stretch">
+        <!-- Step 1: Document -->
+        <div class="flex flex-col items-start gap-3 flex-1">
+            <!-- Status bar with circle and line -->
+            <div class="flex pr-0.5 items-center gap-0.5 self-stretch">
+                <!-- Circle with number -->
+                <div class="flex w-6 h-6 justify-center items-center rounded-full border-0.5 border-[#166534]">
+                    <span class="flex w-6 h-6 flex-col justify-center shrink-0 text-center font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#166534]">
+                        1
+                    </span>
+                </div>
+                <!-- Connecting line -->
+                <div class="h-0.5 flex-1 bg-black/10"></div>
             </div>
-            <div class="flex justify-between absolute w-full top-0.5">
-                <div id="point-1" class="flex flex-col text-green-500">
-                    <svg class="progress-point w-2.5 h-2.5" viewBox="0 0 10 10" fill="none"
-                         xmlns="http://www.w3.org/2000/svg">
-                        <rect width="10" height="10" rx="5" fill="currentColor"/>
-                        <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
-                    </svg>
-                    <div class="flex flex-col gap-0.25 mt-2">
-                        <span class="text-3.25 text-green-500">{% trans 'Upload the document' %}</span>
-                        <span class="text-2.5 text-gray-400">{% trans 'Documents uploaded' %}</span>
-                    </div>
+            <!-- Content -->
+            <div class="flex pr-5 flex-col items-start gap-4 self-stretch">
+                <div class="flex flex-col items-start gap-1.5 self-stretch">
+                    <h3 class="self-stretch font-poppins text-lg font-semibold leading-6 tracking-[-0.252px] text-[#181932]">
+                        {% trans 'Document' %}
+                    </h3>
                 </div>
-                <div id="point-2" class="flex flex-col">
-                    <svg class="progress-point w-2.5 h-2.5 text-green-250" viewBox="0 0 10 10" fill="none"
+            </div>
+        </div>
 
-                         xmlns="http://www.w3.org/2000/svg">
-                        <rect width="10" height="10" rx="5" fill="currentColor"/>
-                        <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
-                    </svg>
-                    <div class="flex flex-col gap-0.25 mt-2">
-                        <span class="text-3.25 text-green-300">{% trans 'Language combination' %}</span>
-                        <span class="text-2.5 text-gray-400 hidden language-step"><span class="source"></span>-<span
-                                class="target"></span></span>
-                    </div>
+        <!-- Step 2: Languages -->
+        <div class="flex flex-col items-start gap-3 flex-1">
+            <!-- Status bar with circle and line -->
+            <div class="flex pr-0.5 items-center gap-0.5 self-stretch">
+                <!-- Circle with number -->
+                <div class="flex w-6 h-6 justify-center items-center rounded-full border-0.5 border-black/10">
+                        <span class="flex w-6 h-6 flex-col justify-center shrink-0 text-center font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#5A5A78]">
+                            2
+                        </span>
                 </div>
-                <div id="point-3" class="flex flex-col">
-                    <svg class="progress-point w-2.5 h-2.5 text-green-250" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="10" height="10" rx="5" fill="currentColor"/>
-                        <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
-                    </svg>
-                    <div class="flex flex-col gap-0.25 mt-2">
-                        <span class="text-3.25 text-green-300">{% trans 'Domain selection' %}</span>
-                        <span class="w-25 text-2.5 text-gray-400 domain-step truncate"></span>
-                    </div>
+                <!-- Connecting line -->
+                <div class="h-0.5 flex-1 bg-black/10"></div>
+            </div>
+            <!-- Content -->
+            <div class="flex pr-5 flex-col items-start gap-4 self-stretch">
+                <div class="flex flex-col items-start gap-1.5 self-stretch">
+                    <h3 class="self-stretch font-poppins text-lg font-semibold leading-6 tracking-[-0.252px] text-[#181932]">
+                        {% trans 'Languages' %}
+                    </h3>
                 </div>
+            </div>
+        </div>
 
-                <div id="point-4" class="flex flex-col">
-                    <svg class="progress-point w-2.5 h-2.5 text-green-250" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="10" height="10" rx="5" fill="currentColor"/>
-                        <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
-                    </svg>
-                    <div class="flex flex-col gap-0.25 mt-2">
-                        <span class="text-3.25 text-green-300">{% trans 'Terminology' %}</span>
-                        <span class="w-25 text-2.5 text-gray-400 terminology-step truncate"></span>
-                    </div>
+        <!-- Step 3: Field and Lexicon -->
+        <div class="flex flex-col items-start gap-3 flex-1">
+            <!-- Status bar with circle and line -->
+            <div class="flex pr-0.5 items-center gap-0.5 self-stretch">
+                <!-- Circle with number -->
+                <div class="flex w-6 h-6 justify-center items-center rounded-full border-0.5 border-black/10">
+                        <span class="flex w-6 h-6 flex-col justify-center shrink-0 text-center font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#5A5A78]">
+                            3
+                        </span>
                 </div>
-                <div id="point-5" class="flex flex-col">
-                    <svg class="progress-point w-2.5 h-2.5 text-green-250" viewBox="0 0 10 10" fill="none"
+                <!-- Connecting line -->
+                <div class="h-0.5 flex-1 bg-black/10"></div>
+            </div>
+            <!-- Content -->
+            <div class="flex pr-5 flex-col items-start gap-4 self-stretch">
+                <div class="flex flex-col items-start gap-1.5 self-stretch">
+                    <h3 class="self-stretch font-poppins text-lg font-semibold leading-6 tracking-[-0.252px] text-[#181932]">
+                        {% trans 'Field and Lexicon' %}
+                    </h3>
+                </div>
+            </div>
+        </div>
 
-                         xmlns="http://www.w3.org/2000/svg">
-                        <rect width="10" height="10" rx="5" fill="currentColor"/>
-                        <rect x="3.33398" y="3.33301" width="3.33333" height="3.33333" rx="1.66667" fill="white"/>
-                    </svg>
-                    <span class="text-xs mt-2 text-green-300">{% trans 'Review' %}</span>
+        <!-- Step 4: Translation -->
+        <div class="flex flex-col items-start gap-3">
+            <!-- Status bar with circle -->
+            <div class="flex pr-0.5 items-center gap-0.5 self-stretch">
+                <!-- Circle with number -->
+                <div class="flex w-6 h-6 justify-center items-center rounded-full border-0.5 border-black/10">
+                        <span class="flex w-6 h-6 flex-col justify-center shrink-0 text-center font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#5A5A78]">
+                            4
+                        </span>
+                </div>
+            </div>
+            <!-- Content -->
+            <div class="flex pr-5 flex-col items-start gap-4 self-stretch">
+                <div class="flex flex-col items-start gap-1.5 self-stretch">
+                    <h3 class="self-stretch font-poppins text-lg font-semibold leading-6 tracking-[-0.252px] text-[#181932]">
+                        {% trans 'Translation' %}
+                    </h3>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="w-full bg-white p-2.5 rounded-2.5 border border-gray-300 mb-1">
-        <div class="border-line w-full h-full py-7.5 px-5 step-container text-gray-300">
-            <!--  ------------- STEP-1 -------------  -->
 
-
-            {% include 'steps/step_1.html' %}
-
-
-            <!--  ------------- STEP-2 -------------  -->
-
-
-            {% include 'steps/step_2.html' %}
-
-
-            <!--  ------------- STEP-3 -------------  -->
-
-
-            {% include 'steps/step_3.html' %}
-
-
-            <!--  ------------- STEP-4 -------------  -->
-
-
-            {% include 'steps/step_4.html' %}
-
-
-            <!--  ------------- STEP-5 -------------  -->
-
-
-            {% include 'steps/step_5.html' %}
-
-
-        </div>
-        <div class="flex items-center justify-between w-full action-list mt-5">
-            <button type="button"
-                    id="prev-step"
-                    class="text-3.5 flex gap-2.5 items-center px-6.5 py-1 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold upload-document hidden">
-                {% trans 'Previous' %}
-            </button>
-            <div class="flex items-center justify-between gap-10 text-green-400 text-3.5 w-full">
-                <button type="button"
-                        id="restart"
-                        class="hidden text-3.5 flex gap-2.5 items-center px-6.5 py-1 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold upload-document hidden">
-                    {% trans 'New translation' %}
-                </button>
-                <span id="restart-text" class="text-3.5 text-gray-475 font-normal">{% trans 'You can leave the page and see your translation progress on the ‘Project history’ page' %}</span>
-            </div>
-            <button type="button"
-                    id="next-step"
-                    class="text-3.5 flex gap-2.5 items-center px-6.5 py-1 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold upload-document hidden">
-                {% trans 'Following' %}
-            </button>
-        </div>
+    <div class="w-full h-full py-7.5 px-5 step-container">
+        {% include 'steps/step_1.html' %}
+        {% include 'steps/step_2.html' %}
+        {% include 'steps/step_3.html' %}
+        {% include 'steps/step_4.html' %}
     </div>
-</form>
+
+    <div class="flex justify-between w-full">
+        <!-- Prev Button -->
+        <button id="prev-step" disabled class="flex px-2.5 py-2 justify-center items-center rounded-full bg-[#166534] transition-all opacity-50 cursor-not-allowed">
+            <div class="flex px-2 justify-center items-center">
+                <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-white">
+                    {% trans 'Previous' %}
+                </span>
+            </div>
+            <!-- Arrow Right Icon SVG -->
+            <svg class="w-6 h-6 text-white" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+
+        <!-- Next Button -->
+        <button id="next-step" disabled class="flex px-2.5 py-2 justify-center items-center rounded-full bg-[#166534] transition-all opacity-50 cursor-not-allowed">
+            <div class="flex px-2 justify-center items-center">
+                <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-white">
+                    {% trans 'Next' %}
+                </span>
+            </div>
+            <!-- Arrow Right Icon SVG -->
+            <svg class="w-6 h-6 text-white" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    </div>
+</div>
 
 <script src="{% static 'js/document-translate.js' %}"></script>
-<script>
-    var language_code = "{{ request.LANGUAGE_CODE }}"
-</script>
+

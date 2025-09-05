@@ -2,18 +2,19 @@
 .dashboard-cards-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-  margin-top: 2rem;
+  gap: 1.25rem 2rem;
+  margin-top: 0.55rem;
   margin-bottom: 0;
 }
 .dashboard-card {
   background: #fff;
-  padding: 1.5rem 2rem;
+  padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 1px 4px #0001;
   min-width: 220px;
+  min-height: 146px;
   display: flex;
-  align-items: center;
+  align-items: start;
   justify-content: space-between;
 }
 .dashboard-icon {
@@ -21,12 +22,12 @@
   height: 40px;
   border-radius: 50%;
   display: flex;
-  align-items: center;
+  align-items: start;
   justify-content: center;
   margin-left: 1rem;
 }
 .stat-title { color: #5a5a78; font-size: 1rem; }
-.stat-value { color: #181932; font-size: 2rem; font-weight: 600; }
+.stat-value { color: #181932; font-size: 2rem; font-weight: 600; margin-top:1rem; }
 .quick-actions {
   background: #fff;
   padding: 2rem 2rem 2rem 2rem;

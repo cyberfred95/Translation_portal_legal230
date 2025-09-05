@@ -1,4 +1,54 @@
 $(document).ready(function () {
+    var $fileInput = $('#file-input');
+    var $fileUploadZone = $('#file-upload-zone');
+    var $warningAlert = $('#warning-alert');
+    var $fileList = $('#file-list');
+    var $nextButton = $('#next-step');
+    var uploadedFiles = [];
+
+    // File input change handler
+    $fileInput.on('change', function (e) {
+        handleFiles(Array.from(e.target.files));
+        $(this).val(''); // Reset input
+    });
+
+    // Drag and drop handlers
+    $fileUploadZone.on('dragover', function (e) {
+        e.preventDefault();
+        $(this).addClass('bg-black/[0.05]');
+        $(this).removeClass('bg-black/[0.03]');
+    });
+
+    $fileUploadZone.on('dragleave', function (e) {
+        e.preventDefault();
+        $(this).removeClass('bg-black/[0.05]');
+        $(this).addClass('bg-black/[0.03]');
+    });
+
+    $fileUploadZone.on('drop', function (e) {
+        e.preventDefault();
+        $(this).removeClass('bg-black/[0.05]');
+        $(this).addClass('bg-black/[0.03]');
+
+        var files = Array.from(e.originalEvent.dataTransfer.files);
+        handleFiles(files);
+    });
+
+    function getFileType(filename) {
+        var extension = filename.toLowerCase().split('.').pop();
+        if (extension === 'pdf') return 'pdf';
+        if (extension === 'docx') return 'docx';
+        if (extension === 'pptx') return 'pptx';
+        return 'pdf'; // default
+    }
+
+    // Pour bouton suppression dynamique
+    window.removeFile = function (fileId) {
+        uploadedFiles = uploadedFiles.filter(function (file) { return file.id !== fileId; });
+        updateUI();
+    }
+
+
     let sourceLanguage = '';
     let targetLanguage = '';
     let selectedDomain = '';
@@ -56,9 +106,6 @@ $(document).ready(function () {
     }
 
     function showStep(step) {
-        $('.border-line > div').addClass('hidden');
-        $(`.border-line > div:eq(${step})`).removeClass('hidden');
-
         updateProgress(step);
 
         const $actionList = $(".action-list");
@@ -72,11 +119,14 @@ $(document).ready(function () {
                 nextStep.show().text(language_code === 'en' ? "Next" : "Suivant");
                 $actionList.css("justify-content", "flex-end");
             } else {
-                nextStep.hide();
+                // nextStep.hide();
             }
+        } else if (currentStep === 1) {
+            $('.step-1').addClass('hidden');
+            $('.step-2').removeClass('hidden');
         } else if (currentStep === 4) {
             prevStep.hide();
-            nextStep.hide();
+            // nextStep.hide();
             $("#restart").show().text(language_code === 'en' ? "New translation" : "Nouveau document");
             $("#restart-text").show();
 
@@ -120,6 +170,7 @@ $(document).ready(function () {
         if (currentStep === 3) {
             fileTranslate();
         }
+
         currentStep++;
         showStep(currentStep);
     });
@@ -155,9 +206,11 @@ $(document).ready(function () {
 
     const $dropZone = $('.file-upload');
     const $chooseFileButton = $('.choose-file');
-    const $fileList = $('.file-list');
 
-    fileInput.on('change', handleFiles);
+    fileInput.on('change', function(e) {
+        handleFiles(Array.from(e.target.files));
+        e.target.value = ''; // Reset input
+    });
 
     $chooseFileButton.on('click', () => fileInput.click());
 
@@ -179,27 +232,69 @@ $(document).ready(function () {
         handleFiles({target: {files: e.originalEvent.dataTransfer.files}});
     });
 
+    function updateUI() {
+        if ($fileList.length > 0) {
+            $('#warning-alert').removeClass('hidden');
+            $('#file-list').removeClass('hidden');
+            $('#next-step').prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+        } else {
+            $('#warning-alert').addClass('hidden');
+            $('#file-list').addClass('hidden');
+            $('#next-step').prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+        }
+    }
+
+    $nextButton.on('click', function () {
+        if (!$(this).prop('disabled')) {
+            // Handle next step logic here
+            console.log('Proceeding to next step with files:', uploadedFiles);
+            // You can redirect to the next step or trigger the next step logic
+        }
+    });
+
     function handleFiles(e) {
-        const files = Array.from(e.target.files || e.originalEvent.dataTransfer.files).filter(file => {
-            const ext = '.' + file.name.split('.').pop().toLowerCase();
+        // Extraire les fichiers selon le type d'événement (input ou drop)
+        var filesArray = Array.isArray(e) ? e : Array.from(e.target.files || e.originalEvent.dataTransfer.files);
+
+        // Filtrer fichiers selon extension autorisée
+        var filteredFiles = filesArray.filter(function (file) {
+            var ext = '.' + file.name.split('.').pop().toLowerCase();
             return allowedTypes.includes(ext);
         });
 
-        const newFiles = files.filter(file =>
-            !selectedFiles.some(selectedFile =>
-                selectedFile.name === file.name && selectedFile.size === file.size
-            )
-        );
+        // Filtrer les fichiers déjà présents (par nom et taille)
+        var newFiles = filteredFiles.filter(function (file) {
+            return !selectedFiles.some(function (selectedFile) {
+                return selectedFile.name === file.name && selectedFile.size === file.size;
+            });
+        });
 
-        selectedFiles = [...selectedFiles, ...newFiles];
+        // Construire les objets fichiers enrichis
+        var enrichedFiles = $.map(newFiles, function (file, index) {
+            return {
+                id: 'file-' + Date.now() + '-' + index,
+                name: file.name,
+                size: (file.size / 1024 / 1024).toFixed(1) + ' MB',
+                timeAgo: '1 minute ago',
+                type: getFileType(file.name),
+                file: file
+            };
+        });
+
+        // Ajouter les nouveaux fichiers enrichis à la liste sélectionnée
+        selectedFiles = selectedFiles.concat(enrichedFiles);
 
         checkPDF(selectedFiles);
-
         displayFiles(selectedFiles);
+        updateUI();
         toggleFollowingButton();
 
-        e.target.value = '';
+        // Réinitialiser la valeur input si c'est un event input (pas un array)
+        if (!Array.isArray(e)) {
+            e.target.value = '';
+        }
     }
+
 
     const displayFiles = (files) => {
         $fileList.empty();
@@ -209,20 +304,33 @@ $(document).ready(function () {
             file.fileId = fileId;
 
             const $fileItem = $(`
-            <div class="file flex gap-4 items-center px-4 py-3 rounded-md bg-green-100 text-green-400 font-normal" data-file-id="${fileId}">
-
-                <span>${file.name}</span>
-                <button type="button" class="remove-file" data-file-id="${fileId}">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <g clip-path="url(#clip0_759_4082)">
-                            <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z" fill="#176C77"/>
-                            <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z" fill="white"/>
-                        </g>
-                        <defs>
-                            <clipPath id="clip0_759_4082">
-                                <rect width="20" height="20" fill="white"/>
-                            </clipPath>
-                        </defs>
+            <div class="flex items-center gap-8 flex-1">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-10 relative">
+                        <svg class="w-8 h-10 shrink-0 fill-[#BFDBFE] absolute left-0 top-0" width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 36V4C0 1.79086 1.79086 0 4 0H19.9C20.9271 0 21.9149 0.395099 22.6586 1.10345L30.7586 8.81773C31.5513 9.57271 32 10.6196 32 11.7143V36C32 38.2091 30.2091 40 28 40H4C1.79086 40 0 38.2091 0 36Z" fill="#BFDBFE"/>
+                        </svg>
+                        <div class="inline-flex px-1 items-center gap-2 rounded-sm bg-[#3B82F6] absolute -left-1 top-[18px] w-[26px] h-4">
+                            <span class="font-inter text-[9px] font-bold leading-4 tracking-[0.144px] text-white uppercase">
+                                ${file.type}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col justify-center items-start">
+                        <div class="font-poppins text-base font-normal leading-6 tracking-[-0.176px] text-[#181932]">
+                            ${file.name}
+                        </div>
+                        <div class="font-poppins text-sm font-normal leading-6 tracking-[-0.084px] text-[#5A5A78]">
+                            ${file.size} • Downloaded ${file.timeAgo}
+                        </div>
+                    </div>
+                </div>
+                <button onclick="removeFile('${file.id}')" class="w-6 h-6 text-black/80 hover:text-red-600 transition-colors">
+                    <svg class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M10 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M14 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </button>
             </div>
@@ -249,7 +357,7 @@ $(document).ready(function () {
 
             $actionList.css("justify-content", "flex-end");
         } else if (currentStep === 0) {
-            nextStep.hide();
+            // nextStep.hide();
         }
 
         $fileList.toggleClass('hidden', !filesExist);
@@ -297,7 +405,7 @@ $(document).ready(function () {
 
         const formData = new FormData();
         selectedFiles.forEach((file) => {
-            formData.append(`document[]`, file);
+            formData.append(`document[]`, file.file);
         });
 
         $.ajax({
@@ -1210,3 +1318,9 @@ $(document).ready(function () {
     };
 
 });
+
+// Close warning alert
+function closeWarning() {
+    $('#warning-alert').addClass('hidden');
+}
+
