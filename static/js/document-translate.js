@@ -4,6 +4,7 @@ $(document).ready(function () {
     var $warningAlert = $('#warning-alert');
     var $fileList = $('#file-list');
     var $nextButton = $('#next-step');
+    var $blockButtons = $('.block-buttons');
     var uploadedFiles = [];
 
     // File input change handler
@@ -44,7 +45,9 @@ $(document).ready(function () {
 
     // Pour bouton suppression dynamique
     window.removeFile = function (fileId) {
-        uploadedFiles = uploadedFiles.filter(function (file) { return file.id !== fileId; });
+        uploadedFiles = uploadedFiles.filter(function (file) {
+            return file.id !== fileId;
+        });
         updateUI();
     }
 
@@ -112,28 +115,49 @@ $(document).ready(function () {
 
         if (step === 0) {
             prevStep.hide();
+            $blockButtons.removeClass('justify-between').addClass('justify-end');
             $("#restart").hide();
             $("#restart-text").hide();
 
             if (selectedFiles.length > 0) {
-                nextStep.show().text(language_code === 'en' ? "Next" : "Suivant");
+                nextStep.show();
                 $actionList.css("justify-content", "flex-end");
             } else {
-                // nextStep.hide();
+                nextStep.hide();
             }
+
+            $('.step-1').removeClass('hidden').show();
+            $('.step-2').addClass('hidden').hide();
+            $('.step-indicator-2').removeClass('border-0.5 border-[#166534]');
+            $('.step-indicator-3').removeClass('border-0.5 border-[#166534]');
+            $('.step-indicator-4').removeClass('border-0.5 border-[#166534]');
         } else if (currentStep === 1) {
-            $('.step-1').addClass('hidden');
-            $('.step-2').removeClass('hidden');
+            $('.step-1').addClass('hidden').hide();
+            $('.step-2').removeClass('hidden').show();
+            $blockButtons.addClass('justify-between').removeClass('justify-end');
+            prevStep.show();
+            prevStep.css('display', 'flex');
+            prevStep.prop("disabled", false);
+            $('.step-indicator-2').addClass('border-0.5 border-[#166534]');
+            $('.step-indicator-3').removeClass('border-0.5 border-[#166534]');
+            $('.step-indicator-4').removeClass('border-0.5 border-[#166534]');
         } else if (currentStep === 4) {
             prevStep.hide();
-            // nextStep.hide();
+            $blockButtons.removeClass('justify-between').addClass('justify-end');
+
+            nextStep.hide();
             $("#restart").show().text(language_code === 'en' ? "New translation" : "Nouveau document");
             $("#restart-text").show();
 
             $actionList.css("justify-content", "flex-start");
+            $('.step-indicator-2').addClass('border-0.5 border-[#166534]');
+            $('.step-indicator-3').addClass('border-0.5 border-[#166534]');
+            $('.step-indicator-4').addClass('border-0.5 border-[#166534]');
         } else {
             prevStep.show();
-            nextStep.show().text(language_code === 'en' ? "Next" : "Suivant");
+            $blockButtons.removeClass('justify-end').addClass('justify-between');
+
+            nextStep.show();
             $("#restart").hide();
             $("#restart-text").hide();
 
@@ -207,7 +231,7 @@ $(document).ready(function () {
     const $dropZone = $('.file-upload');
     const $chooseFileButton = $('.choose-file');
 
-    fileInput.on('change', function(e) {
+    fileInput.on('change', function (e) {
         handleFiles(Array.from(e.target.files));
         e.target.value = ''; // Reset input
     });
@@ -351,7 +375,9 @@ $(document).ready(function () {
 
         if (filesExist && currentStep === 0) {
             prevStep.hide();
-            nextStep.show().text(language_code === 'en' ? "Next" : "Suivant");
+            $blockButtons.removeClass('justify-between').addClass('justify-end');
+
+            nextStep.show();
             $("#restart").hide();
             $("#restart-text").hide();
 
@@ -568,7 +594,7 @@ $(document).ready(function () {
 
                 targetSelect.hide();
 
-                targetLanguageBlock.prepend(language_code === 'en'?'<div class="error-message text-red-400">One or more files have different language, please fix it.</div>': '<div class="error-message text-red-400">Vous ne pouvez pas importer des documents ayant des langues différentes</div>');
+                targetLanguageBlock.prepend(language_code === 'en' ? '<div class="error-message text-red-400">One or more files have different language, please fix it.</div>' : '<div class="error-message text-red-400">Vous ne pouvez pas importer des documents ayant des langues différentes</div>');
 
                 detectedFiles.removeClass('bg-green-150 text-green-500').addClass('bg-red-150 text-red-400 border border-red-400');
             } else {
@@ -1266,7 +1292,7 @@ $(document).ready(function () {
                 const statusSpan = projectRow.find('td:eq(1) span');
                 statusSpan.addClass('text-yellow-400');
 
-                statusSpan.text(language_code === 'en'?'Request for quote sent': 'Demande de devis envoyée');
+                statusSpan.text(language_code === 'en' ? 'Request for quote sent' : 'Demande de devis envoyée');
                 projectRow.find('.expert-revision').prop('disabled', true).addClass('disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225');
 
                 $modalRevision.addClass('hidden');
