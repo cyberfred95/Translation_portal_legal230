@@ -7,6 +7,45 @@ $(document).ready(function () {
     var $blockButtons = $('.block-buttons');
     var uploadedFiles = [];
 
+    // Filtre toutes les langues visibles selon la recherche
+    $('#search-input').on('input keyup change', function() {
+        var val = $(this).val().toLowerCase();
+        $('.language-item').each(function() {
+            var text = $(this).text().toLowerCase();
+            $(this).toggle(text.indexOf(val) > -1);
+        });
+    });
+
+    // Sélection d'une langue, coloration verte sur tous les blocs concernés
+    // Filtre toutes les langues visibles selon la recherche
+    $('#search-input').on('input keyup change', function() {
+        var val = $(this).val().toLowerCase();
+        $('.language-item').each(function() {
+            var text = $(this).text().toLowerCase();
+            $(this).toggle(text.indexOf(val) > -1);
+        });
+    });
+
+// Sélection d'une langue, coloration verte sur tous les blocs concernés et gestion de l'icône + select2
+    $(document).on('click', '.language-item', function() {
+        // Récupère la valeur de la langue
+        var selectedLang = $(this).data('value');
+
+        // Désélectionne partout la couleur
+        $('.language-item').removeClass('text-green-800 bg-green-100');
+        // Cache toutes les icônes ph-check
+        $('.language-item .ph-check').parent().addClass('hidden').removeClass('visible');
+
+        // Sélectionne la ligne cliquée
+        $(this).addClass('text-green-800 bg-green-100');
+        // Affiche l'icone dans la ligne cliquée
+        $(this).find('.ph-check').parent().removeClass('hidden').addClass('visible');
+
+        // Met à jour le select2 si présent
+        $('.document-target-language').val(selectedLang).trigger('change');
+    });
+
+
     // File input change handler
     $fileInput.on('change', function (e) {
         handleFiles(Array.from(e.target.files));
@@ -478,36 +517,44 @@ $(document).ready(function () {
         $detectiveLanguageList.empty();
 
         files.forEach((file) => {
+            console.log(file);
+            file.type = file.file_name.split('.').pop();
+
             const $fileItem = $(`
-            <div class="flex gap-5 items-center" data-file-id="${file.fileId}">
-                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-100 text-green-400 detected-file font-normal">
-
-                    <span class="text-3.5 w-50 truncate">${file.file_name}</span>
-                    <button type="button" class="remove-detected-file" data-file-id="${file.fileId}">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <g clip-path="url(#clip0_759_4082)">
-                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z" fill="currentColor"/>
-                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z" fill="white"/>
-                            </g>
-                            <defs>
-                                <clipPath id="clip0_759_4082">
-                                    <rect width="20" height="20" fill="white"/>
-                                </clipPath>
-                            </defs>
-                        </svg>
-                    </button>
-                </div>
-                <div class="flex gap-3 items-center">
-                    <svg width="6" height="10" viewBox="0 0 6 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5.71393 4.28962C5.6637 4.23904 5.6081 4.19635 5.55034 4.15922L1.67443 0.283488C1.29615 -0.0944361 0.683075 -0.0946154 0.304613 0.283667C-0.0736695 0.66177 -0.0736695 1.27502 0.304613 1.65348L3.64279 4.9913L0.287753 8.3467C-0.0907092 8.72462 -0.0907092 9.33805 0.287753 9.71651C0.476983 9.90539 0.724687 9.99991 0.972392 9.99991C1.2201 9.99991 1.46834 9.90539 1.65703 9.71615L5.55034 5.82338C5.6081 5.78625 5.66352 5.74374 5.71393 5.69298C5.90764 5.49926 6.00055 5.24492 5.99625 4.9913C6.00073 4.7375 5.90764 4.4828 5.71393 4.28962Z" fill="#9EAAB3"/>
+              <div class="flex items-center gap-8 flex-1" data-file-id="${file.fileId}">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-10 relative">
+                    <svg class="w-8 h-10 shrink-0 fill-[#BFDBFE] absolute left-0 top-0" width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M0 36V4C0 1.79086 1.79086 0 4 0H19.9C20.9271 0 21.9149 0.395099 22.6586 1.10345L30.7586 8.81773C31.5513 9.57271 32 10.6196 32 11.7143V36C32 38.2091 30.2091 40 28 40H4C1.79086 40 0 38.2091 0 36Z" fill="#BFDBFE"/>
                     </svg>
-                    <select class="gray-text-select document-source-language" name="source_language" required data-file-id="${file.fileId}" data-default-value="${file.abbreviation.toLowerCase()}">
-                        ${getLanguageOptions(file.abbreviation)}
-                    </select>
+                    <div class="inline-flex px-1 items-center gap-2 rounded-sm bg-[#3B82F6] absolute -left-1 top-[18px] w-[26px] h-4">
+                      <span class="font-inter text-[9px] font-bold leading-4 tracking-[0.144px] text-white uppercase">
+                        ${file.type}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="flex flex-col justify-center items-start">
+                    <div class="font-poppins text-base font-normal leading-6 tracking-[-0.176px] text-[#181932]">
+                      ${file.file_name}
+                    </div>
+                    <!-- 
+                    @TODO: récupérer les infos dans l'appel ajax pour les afficher 
+                    <div class="font-poppins text-sm font-normal leading-6 tracking-[-0.084px] text-[#5A5A78]">
+                      ${file.size} • Downloaded ${file.timeAgo}
+                    </div> -->
+                  </div>
                 </div>
-            </div>
-        `);
-
+                <!-- @TODO : delete an item
+                 <button onclick="removeFile('${file.id}')" class="w-6 h-6 text-black/80 hover:text-red-600 transition-colors remove-detected-file" data-file-id="${file.fileId}">
+                  <svg class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button> -->
+              </div>
+            `);
             $detectiveLanguageList.append($fileItem);
 
             $fileItem.find('.document-source-language').select2().each(function () {
@@ -575,10 +622,7 @@ $(document).ready(function () {
         $('.document-target-language').select2();
         $('.document-source-language').select2();
 
-        $targetSelect = $(".document-target-language").select2();
-
-        $targetSelect.data('select2').$container.addClass('detect-languages');
-        $targetSelect.data('select2').$dropdown.addClass('detect-languages');
+        $targetSelect = $(".document-target-language");
 
         targetLanguageBlock.find('.error-message').remove();
 
@@ -625,8 +669,8 @@ $(document).ready(function () {
                 .addClass('border-green-700 text-green-700')
                 .prop("disabled", false);
             $('.language-step').removeClass('hidden');
-            $('.source').text(firstValue.toUpperCase());
-            $('.target').text(targetValue.toUpperCase());
+            // $('.source').text(firstValue.toUpperCase());
+            // $('.target').text(targetValue.toUpperCase());
 
         }
     }
@@ -1342,6 +1386,7 @@ $(document).ready(function () {
 
         setInterval(checkDocumentStatus, 10000);
     };
+
 
 });
 
