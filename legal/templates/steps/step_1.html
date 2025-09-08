@@ -1,37 +1,73 @@
 {% load static %}
 {% load i18n %}
-<div class="grid grid-cols-1 divide-y file-upload step-1 hidden">
-    <div class="flex flex-col justify-center items-center">
-        <span class="text-gray-575 text-6 mb-2.5">{% trans 'Drag and drop' %}</span>
-        <span class="text-gray-400 text-3.5">{% trans 'Supported formats' %}</span>
 
-        <svg class="my-7.5 w-10 h-10" width="40" height="40" viewBox="0 0 40 40" fill="none"
-             xmlns="http://www.w3.org/2000/svg">
-            <g clip-path="url(#clip0_759_1541)">
-                <path d="M33.0197 17.6379V37.088C33.0197 38.6963 31.7159 39.9999 30.1077 39.9999H6.18539C4.57711 39.9999 3.27344 38.6962 3.27344 37.088V6.61898C3.27344 5.01031 4.5775 3.70703 6.18539 3.70703H19.0884L33.0197 17.6379Z"
-                      fill="#99B5BB"/>
-                <path d="M9.89242 36.293C8.28414 36.293 6.98047 34.9892 6.98047 33.381V2.91195C6.98039 1.30328 8.28445 0 9.89242 0H22.7954C25.0138 0 36.7266 11.7128 36.7266 13.9309V33.381C36.7266 34.9893 35.4229 36.293 33.8147 36.293H9.89242Z"
-                      fill="#F4F7FA"/>
-                <path d="M36.7274 13.9312V15.163C36.7274 12.5696 34.6245 10.4666 32.0311 10.4666H29.1727C27.5648 10.4666 26.2608 9.16258 26.2608 7.55469V4.69633C26.2608 2.10297 24.1578 0 21.5645 0H22.7962C25.0142 0 27.1421 0.88125 28.7104 2.44961L34.2779 8.01711C35.8461 9.58539 36.7274 11.7132 36.7274 13.9312Z"
-                      fill="#AEC4C9"/>
-                <path d="M18.9545 22.2308V30.7445C18.9545 31.1117 19.2523 31.4095 19.6195 31.4095H24.0878C24.4551 31.4095 24.7528 31.1117 24.7528 30.7445V22.2308H26.6524C27.2448 22.2308 27.5416 21.5146 27.1227 21.0956L22.878 16.851C22.3123 16.2853 21.3951 16.2853 20.8294 16.851L16.5848 21.0956C16.1659 21.5146 16.4626 22.2308 17.055 22.2308H18.9545Z"
-                      fill="#176C77"/>
-                <path d="M16.6709 14.515H27.0346C27.7503 14.515 28.3305 13.9349 28.3305 13.2192V13.1836C28.3305 12.4679 27.7503 11.8877 27.0346 11.8877H16.6709C15.9552 11.8877 15.375 12.4679 15.375 13.1836V13.2192C15.375 13.9348 15.9552 14.515 16.6709 14.515Z"
-                      fill="#176C77"/>
-            </g>
-            <defs>
-                <clipPath id="clip0_759_1541">
-                    <rect width="40" height="40" fill="white"/>
-                </clipPath>
-            </defs>
-        </svg>
-        <div class="text-center max-w-120 mb-5 text-red-400 hidden pdf-document">
-            {% trans 'Important' %}!<br/> {% trans 'PDF file' %}
-        </div>
-        <button type="button"
-                class="flex gap-2.5 items-center px-6.5 py-1 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 font-semibold choose-file">
-            <span class="text-3.5">{% trans 'Choose file' %} (max 30 MB)</span>
-        </button>
+<div class="step-1">
+
+<!-- File Upload Section -->
+<div id="file-upload-zone" class="step-1 flex p-6 px-4 flex-col justify-center items-center gap-6 self-stretch rounded-md bg-black/[0.03] transition-colors">
+    <div class="flex flex-col items-center gap-2 self-stretch">
+        <!-- Upload Icon SVG -->
+        {% include 'svg/icons/import.svg' %}
+
+        <!-- Label -->
+        <p class="self-stretch text-center font-poppins text-sm font-normal leading-6 tracking-[-0.084px] text-[#181932]">
+            {% trans 'Drag and drop your document(s) here' %}
+        </p>
+
+        <!-- Helper text -->
+        <p class="self-stretch text-center font-poppins text-xs font-normal leading-4 text-[#5A5A78]">
+            {% trans 'PDF, Word (.docx), PowerPoint (.pptx), max 30 MB' %}
+        </p>
     </div>
-    <div class="pt-5 mt-5 flex flex-wrap gap-2.5 file-list hidden"></div>
+
+    <!-- Import button -->
+    <label class="flex px-2.5 py-2 justify-center items-center rounded-full border border-black/10 cursor-pointer transition-colors hover:bg-black/5">
+        <!-- Plus Icon SVG -->
+        <svg class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="flex px-2 justify-center items-center">
+                    <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#181932]">
+                        {% trans 'Import a document' %}
+                    </span>
+        </div>
+        <input type="file" multiple accept=".pdf,.docx,.pptx" class="hidden" id="file-input">
+    </label>
+</div>
+
+<!-- Warning Alert (initially hidden) -->
+<div id="warning-alert" class="flex min-w-[280px] p-3 my-6 items-center gap-3 self-stretch rounded-md border-0.5 border-[#FCD34D] bg-[#FFFBEB] hidden">
+    <!-- Warning Icon SVG -->
+    <svg class="w-6 h-6 text-[#F59E0B]" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10.29 3.86L1.82 18C1.64537 18.3024 1.55299 18.6453 1.55201 18.9945C1.55103 19.3437 1.64149 19.6871 1.81442 19.9905C1.98735 20.2939 2.23673 20.5467 2.53771 20.7239C2.83868 20.9011 3.18082 20.9962 3.53 21H20.47C20.8192 20.9962 21.1613 20.9011 21.4623 20.7239C21.7633 20.5467 22.0127 20.2939 22.1856 19.9905C22.3585 19.6871 22.449 19.3437 22.448 18.9945C22.447 18.6453 22.3546 18.3024 22.18 18L13.71 3.86C13.5317 3.56611 13.2807 3.32312 12.9812 3.15448C12.6817 2.98585 12.3438 2.89725 12 2.89725C11.6562 2.89725 11.3183 2.98585 11.0188 3.15448C10.7193 3.32312 10.4683 3.56611 10.29 3.86Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 9V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+
+    <!-- Content -->
+    <div class="flex items-center gap-2 flex-1">
+                <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#181932]">
+                    {% trans 'Attention!' %}
+                </span>
+        <span class="flex-1 font-poppins text-sm font-normal leading-6 tracking-[-0.084px] text-[#181932] line-clamp-1 overflow-hidden text-ellipsis">
+                    {% trans 'The quality of your document affects the translation result. Scanned or poorly readable PDFs do not allow for a quality output.' %}
+                </span>
+    </div>
+
+    <!-- Close Button -->
+    <button class="flex w-6 h-6 p-1 justify-center items-center" onclick="closeWarning()">
+        <!-- X Icon SVG -->
+        <svg class="w-4 h-4 shrink-0 opacity-50" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+</div>
+
+<!-- File List (initially hidden) -->
+<div id="file-list" class="flex items-start gap-16 self-stretch hidden">
+    <!-- Files will be added here dynamically -->
+</div>
+
 </div>

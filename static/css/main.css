@@ -365,6 +365,7 @@ textarea:focus {
     min-height: 320px;
     max-height: 100%;
     overflow: hidden;
+    border:none;
 }
 
 #pre-text,
