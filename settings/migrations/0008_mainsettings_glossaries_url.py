@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='mainsettings',
             name='glossaries_url',
-            field=models.URLField(default='http://3.71.83.247:8000/', max_length=256),
+            field=models.URLField(default='http://16.171.1.82:8000/', max_length=256),
         ),
     ]
