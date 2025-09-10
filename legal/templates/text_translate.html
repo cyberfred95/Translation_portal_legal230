@@ -50,10 +50,10 @@
                         <option value=""></option>
                     </select>
 
-                    <label class="inline-flex items-center cursor-pointer">
-                        <input type="checkbox" value="" class="sr-only peer">
+                    <label class="inline-flex items-center cursor-pointer openGlossary">
+                        <input type="checkbox" value="" name="openGlossary" class="sr-only peer">
                         <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-800 dark:peer-checked:bg-green-800"></div>
-                        <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300" id="openModal">{% trans 'Glossary' %}</span>
+                        <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300 add-glossary-btn">{% trans 'Glossary' %}</span>
                     </label>
 
                 </div>
@@ -117,95 +117,5 @@
         </div>
 
     </form>
-</div>
-
-<!-- Add Glossary Modal with Builder.io Design -->
-<div id="modal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-white rounded-md flex flex-col gap-6 p-6 pb-8 w-3/4 max-h-[90vh] overflow-y-auto sm:p-8 sm:pb-8">
-        <!-- Header -->
-        <div class="flex justify-between items-center">
-            <div class="flex items-center gap-2 pl-4">
-                <!-- FolderPlus Icon SVG -->
-                {% include 'svg/icons/glossary.svg' %}
-                <h1 class="font-poppins text-2xl font-bold text-gray-900 leading-8 tracking-[-0.456px]">
-                    {% trans 'Glossary' %}
-                </h1>
-            </div>
-            <button
-                    type="button"
-                    id="closeIcon"
-                    class="flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                    aria-label="Close modal"
-            >
-                <!-- X Icon SVG -->
-                <svg class="w-6 h-6 text-black/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-        </div>
-
-        <div class="flex items-start">
-            <div class="flex flex-col flex-start pl-4 border-r-0.25 border-gray-50">
-                <p class="mb-4">{% trans 'Select a field:' %}</p>
-                {% include 'blocks/domains.html' %}
-            </div>
-            <div class="flex flex-col items-center w-full pl-8">
-                <p class="w-full text-left mb-4">{% trans 'Select a specialization:' %}</p>
-                <ul class="flex flex-row items-center justify-center w-full mb-8">
-                    <li class="flex items-center">
-                        <div class="flex items-center mr-2 w-54 mr-4 rounded-lg bg-blue-50 pl-4 py-2">
-                            <input id="type-competition" type="radio" value="" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                            <label for="type-competition" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300 flex h-8 items-center">
-                                {% include 'svg/icons/lightning.svg' %}
-                                <span class="font-base ml-4">
-                                {% trans 'Competition' %}
-                            </span>
-                            </label>
-                        </div>
-                    </li>
-                    <li class="flex items-center">
-                        <div class="flex items-center mr-2 w-54 mr-4 rounded-lg pl-4 py-2">
-                            <input id="type-contracts" type="radio" value="" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                            <label for="type-contracts" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300 flex h-8 items-center">
-                                {% include 'svg/icons/contracts.svg' %}
-                                <span class="font-base ml-4">
-                                {% trans 'Contracts' %}
-                            </span>
-                            </label>
-                        </div>
-                    </li>
-                    <li class="flex items-center">
-                        <div class="flex items-center mr-2 w-54 mr-4 rounded-lg pl-4 py-2">
-                            <input id="type-customs" type="radio" value="" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                            <label for="type-customs" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300 flex h-8 items-center">
-                                {% include 'svg/icons/customs.svg' %}
-                                <span class="font-base ml-4">
-                                {% trans 'Customs' %}
-                            </span>
-                            </label>
-                        </div>
-                    </li>
-                </ul>
-                <div class="flex flex-col align-center text-center">
-                    <div class="flex items-center justify-center">
-                        <!--
-                        @TODO : dynamiser les images ISO - 04/09/2025
-                        -->
-                        <img src="{% static 'images/certifications/certified_iso_9001.png' %}" class="px-2 h-14" alt="certified" />
-                        <img src="{% static 'images/certifications/certified_iso_9001.png' %}" class="px-2 h-14" alt="certified" />
-                        <img src="{% static 'images/certifications/certified_iso_27001.png' %}" class="px-2 h-14" alt="certified" />
-                        <img src="{% static 'images/certifications/star_certification.png' %}" class="px-2 h-14" alt="certified" />
-                        <img src="{% static 'images/certifications/certified_aicpa_soc.png' %}" class="px-2 h-14" alt="certified" />
-                        <img src="{% static 'images/certifications/certified_plus.png' %}" class="px-2 h-14" alt="certified" />
-                    </div>
-                    <p class="block font-poppins text-sm font-normal text-gray-600 leading-5 tracking-[-0.084px] mt-8">
-                        {% trans 'Example of free text explaining the specialization and certifications below in several paragraphs.' %}
-                    </p>
-                </div>
-            </div>
-        </div>
-
-
-    </div>
 </div>
 
