@@ -37,8 +37,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '0.0.0.0', 'legal230.portal.custom.mt', '141.145.204.44', 'portail.lexamt.fr', 'portail.lexamt.com',
-                 'portail.lexamt.tech', '89.168.44.123', 'test.portail.lexamt.fr', 'test.portail.lexamt.com', 'test.portail.lexamt.tech']
+ALLOWED_HOSTS = ['localhost', '0.0.0.0', 'legal230.portal.custom.mt', '141.145.204.44', 'portail.lexamt.fr', 'portail.lexamt.com','portail.lexamt.tech', '89.168.44.123', 'test.portail.lexamt.fr', 'test.portail.lexamt.com', 'test.portail.lexamt.tech', 'api.portail.lexamt.fr', 'api.portail.lexamt.com', 'api.portail.lexamt.tech']
 
 # Application definition
 
