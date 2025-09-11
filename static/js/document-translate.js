@@ -8,9 +8,9 @@ $(document).ready(function () {
     var uploadedFiles = [];
 
     // Filtre toutes les langues visibles selon la recherche
-    $('#search-input').on('input keyup change', function() {
+    $('#search-input').on('input keyup change', function () {
         var val = $(this).val().toLowerCase();
-        $('.language-item').each(function() {
+        $('.language-item').each(function () {
             var text = $(this).text().toLowerCase();
             $(this).toggle(text.indexOf(val) > -1);
         });
@@ -18,16 +18,16 @@ $(document).ready(function () {
 
     // Sélection d'une langue, coloration verte sur tous les blocs concernés
     // Filtre toutes les langues visibles selon la recherche
-    $('#search-input').on('input keyup change', function() {
+    $('#search-input').on('input keyup change', function () {
         var val = $(this).val().toLowerCase();
-        $('.language-item').each(function() {
+        $('.language-item').each(function () {
             var text = $(this).text().toLowerCase();
             $(this).toggle(text.indexOf(val) > -1);
         });
     });
 
 // Sélection d'une langue, coloration verte sur tous les blocs concernés et gestion de l'icône + select2
-    $(document).on('click', '.language-item', function() {
+    $(document).on('click', '.language-item', function () {
         // Récupère la valeur de la langue
         var selectedLang = $(this).data('value');
 
@@ -110,46 +110,7 @@ $(document).ready(function () {
 
     let currentStep = 0;
 
-    function updateProgress(step) {
-        let percentage;
-        switch (step) {
-            case 0:
-                percentage = 0;
-                break;
-            case 1:
-                percentage = 26;
-                break;
-            case 2:
-                percentage = 52;
-                break;
-            case 3:
-                percentage = 76;
-                break;
-            case 4:
-                percentage = 100;
-                break;
-            default:
-                percentage = 1;
-        }
-
-        $("#progress-bar").css("width", percentage + "%");
-
-        $(".progress-point").parent().find("svg").removeClass("text-green-700").addClass("text-green-250");
-        $(".progress-point").parent().find(".text-3\\.25, .text-xs").removeClass("text-green-700").addClass("text-green-200");
-
-        $("#point-1").find("svg").removeClass("text-green-250").addClass("text-green-700");
-        $("#point-1").find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-700");
-
-        for (let i = 0; i <= step; i++) {
-            $(`#point-${i + 1}`).find("svg").removeClass("text-green-250").addClass("text-green-700");
-            $(`#point-${i + 1}`).find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-700");
-
-        }
-    }
-
     function showStep(step) {
-        updateProgress(step);
-
         const $actionList = $(".action-list");
 
         if (step === 0) {
@@ -180,8 +141,6 @@ $(document).ready(function () {
             $('.step-indicator-2').addClass('border-0.5 border-[#166534]');
             $('.step-indicator-3').removeClass('border-0.5 border-[#166534]');
             $('.step-indicator-4').removeClass('border-0.5 border-[#166534]');
-<<<<<<< Updated upstream
-=======
         } else if (currentStep === 2) {
             $('.step-2').addClass('hidden');
             $('.step-3').removeClass('hidden').show();
@@ -199,19 +158,13 @@ $(document).ready(function () {
             $('.step-indicator-2').addClass('border-0.5 border-[#166534]');
             $('.step-indicator-3').addClass('border-0.5 border-[#166534]');
             $('.step-indicator-4').addClass('border-0.5 border-[#166534]');
->>>>>>> Stashed changes
         } else if (currentStep === 4) {
-            prevStep.hide();
-            $blockButtons.removeClass('justify-between').addClass('justify-end');
-
-            nextStep.hide();
+            $('.step-4').addClass('hidden');
+            $('.step-5').removeClass('hidden').show();
             $("#restart").show().text(language_code === 'en' ? "New translation" : "Nouveau document");
             $("#restart-text").show();
 
             $actionList.css("justify-content", "flex-start");
-            $('.step-indicator-2').addClass('border-0.5 border-[#166534]');
-            $('.step-indicator-3').addClass('border-0.5 border-[#166534]');
-            $('.step-indicator-4').addClass('border-0.5 border-[#166534]');
         } else {
             prevStep.show();
             $blockButtons.removeClass('justify-end').addClass('justify-between');
@@ -227,44 +180,53 @@ $(document).ready(function () {
         nextStep.toggleClass('hidden', step === 4);
     }
 
-    nextStep.click(function () {
-        if (currentStep === 0 && selectedFiles.length === 0) {
-            return;
-        }
-        if (currentStep === 0) {
-            detectLanguageFiles();
-            checkLanguagesConsistency()
-        }
-        if (currentStep === 1) {
-            targetLanguage = $('.document-target-language').val();
-            getDomainsGroups();
-        }
-        if (currentStep === 2) {
-            if (!defaultDomain && access_to_default_glossaries) {
-                loadDefaultGlossary();
-                $(".add-glossary-btn").addClass('hidden');
-                $(".step-4 .default").addClass('bg-gray-600 text-white');
-            } else {
-                loadMyGlossaries();
-                $(".add-glossary-btn").removeClass('hidden');
-                $(".step-4 .my-glossary").addClass('bg-gray-600 text-white');
-            }
-        }
-        if (currentStep === 3) {
-            fileTranslate();
-        }
+    $(document).on('click', nextStep, function (e) {
+        if ($(e.target).hasClass('nextStep') || $(e.target).children().hasClass('nextStep')) {
 
-        currentStep++;
-        showStep(currentStep);
+            if (currentStep === 0 && selectedFiles.length === 0) {
+                return;
+            }
+            if (currentStep === 0) {
+                detectLanguageFiles();
+                checkLanguagesConsistency()
+            }
+            if (currentStep === 1) {
+                targetLanguage = $('.document-target-language').val();
+                getDomainsGroups();
+            }
+            if (currentStep === 2) {
+                if (!defaultDomain && access_to_default_glossaries) {
+                    loadDefaultGlossary();
+                    $(".add-glossary-btn").addClass('hidden');
+                    $(".step-4 .default").addClass('bg-gray-600 text-white');
+                } else {
+                    loadMyGlossaries();
+                    $(".add-glossary-btn").removeClass('hidden');
+                    $(".step-4 .my-glossary").addClass('bg-gray-600 text-white');
+                }
+            }
+
+            console.log('currentStep : ' + currentStep);
+            if (currentStep === 3) {
+                fileTranslate();
+            }
+
+            currentStep++;
+            showStep(currentStep);
+
+        }
     });
 
-    prevStep.click(function () {
-        if (currentStep > 0) {
-            currentStep--;
-            showStep(currentStep);
-            nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none').addClass('border-green-700 text-green-700').prop("disabled", false);
+    $(document).on('click', prevStep, function (e) {
+        if ($(e.target).hasClass('prevStep')) {
+            console.log('currentStep from prevStep : ' + currentStep)
+            if (currentStep > 0) {
+                currentStep--;
+                showStep(currentStep);
+                nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none').addClass('border-green-700 text-green-700').prop("disabled", false);
 
-            $('.step-container').removeClass('bg-red-100 border-red-200');
+                $('.step-container').removeClass('bg-red-100 border-red-200');
+            }
         }
     });
 
@@ -624,7 +586,9 @@ $(document).ready(function () {
         let firstValue = sourceSelects.first().val();
         let targetValue = $('.document-target-language').val();
 
-        sourceLanguage = firstValue;
+        if (null !== firstValue) {
+            sourceLanguage = firstValue;
+        }
 
         sourceSelects.each(function () {
             const currentValue = $(this).val();
@@ -1109,10 +1073,15 @@ $(document).ready(function () {
     const fileTranslate = () => {
         const formData = new FormData();
         selectedFiles.forEach((file) => {
-            formData.append(`document[]`, file);
+            formData.append(`document[]`, file.file);
         });
 
         formData.append('domain_name', selectedSubDomain);
+        /**
+         * @TODO 11/09/2025 : Le système de sélection du glossaire étant totalement à revoir
+         * en js pour récupérer l'id du glossaire sélectionné dans la popup
+         * je ne l'intègre pas dans les paramètres de l'appel ajax volontairement
+         */
         formData.append('glossary', selectedGlossary);
         formData.append('source_language', sourceLanguage);
         formData.append('target_language', targetLanguage);
