@@ -180,6 +180,26 @@ $(document).ready(function () {
             $('.step-indicator-2').addClass('border-0.5 border-[#166534]');
             $('.step-indicator-3').removeClass('border-0.5 border-[#166534]');
             $('.step-indicator-4').removeClass('border-0.5 border-[#166534]');
+<<<<<<< Updated upstream
+=======
+        } else if (currentStep === 2) {
+            $('.step-2').addClass('hidden');
+            $('.step-3').removeClass('hidden').show();
+            $blockButtons.addClass('justify-between').removeClass('justify-end');
+            prevStep.show();
+            $('.step-indicator-2').addClass('border-0.5 border-[#166534]');
+            $('.step-indicator-3').addClass('border-0.5 border-[#166534]');
+            $('.step-indicator-4').removeClass('border-0.5 border-[#166534]');
+        } else if (currentStep === 3) {
+            $('.step-3').addClass('hidden');
+            $('.step-4').removeClass('hidden').show();
+            $blockButtons.addClass('justify-between').removeClass('justify-end');
+            prevStep.show();
+            $('span', $nextButton).text($('span', $nextButton).data('confirm'));
+            $('.step-indicator-2').addClass('border-0.5 border-[#166534]');
+            $('.step-indicator-3').addClass('border-0.5 border-[#166534]');
+            $('.step-indicator-4').addClass('border-0.5 border-[#166534]');
+>>>>>>> Stashed changes
         } else if (currentStep === 4) {
             prevStep.hide();
             $blockButtons.removeClass('justify-between').addClass('justify-end');

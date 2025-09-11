@@ -5,6 +5,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Legal230</title>
+    <!--
+    @TODO: Pacome
+    - supprimer les CDN
+    - intégrer polices et js directement hébergé sur le serveur
+    -->
     <!-- FONT -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- TAILWIND -->
@@ -15,11 +20,22 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- FORMATTING TEXT -->
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <!-- PHOSPHORE ICONS -->
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+    />
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
+    />
     <!-- STYLES -->
-    <link href="{% static 'css/quill.snow.css' %}" rel="stylesheet">
-    <link href="{% static 'css/main.css' %}" rel="stylesheet">
-    <link href="{% static 'css/main-figma.css' %}"rel="stylesheet">
+    <link href="{% static 'css/main.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/main-figma.css' %}"rel="stylesheet" />
 
     <!-- TAILWINDCSS -->
     <script>
@@ -92,8 +108,8 @@
                             600: '#4b5563',
                             500: '#6b7280',
                             400: '#9ca3af',
-                            300: '#dcfce7',
-                            200: '#e5e7eb',
+                            300: '#b9bfcb',
+                            200: '#dedede',
                             100: '#ecedee',
                             50: '#f3f4f6',
                         },
@@ -106,7 +122,7 @@
                             500: '#22c55e',
                             400: '#4ade80',
                             300: '#86efac',
-                            200: '#bbf7d0',
+                            200: '#dcfce7',
                             100: '#dcfce7',
                             50: '#f0fdf4',
                         },
@@ -194,7 +210,7 @@
     </script>
 </head>
 
-<body class="font-montserrat font-medium">
+<body class="font-poppins font-medium">
 
 <div class="flex min-h-screen overflow-hidden relative">
     <!-- Sidebar -->
