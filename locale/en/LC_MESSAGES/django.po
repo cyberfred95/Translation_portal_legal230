@@ -276,6 +276,9 @@ msgstr "Support"
 
 ########################################## TEXT TRANSLATE ####################################################
 
+msgid "Instantly translate your texts and documents into multiple languages"
+msgstr "Instantly translate your texts and documents into multiple languages"
+
 msgid "Text translate"
 msgstr "Translate text"
 
