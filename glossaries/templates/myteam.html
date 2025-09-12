@@ -312,18 +312,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('search-user');
     const searchForm = searchInput.closest('form');
     let searchTimeout;
-    
+
     if (searchInput && searchForm) {
         searchInput.addEventListener('input', function() {
             // Clear previous timeout
             clearTimeout(searchTimeout);
-            
+
             // Set a new timeout to avoid too many requests
             searchTimeout = setTimeout(() => {
                 searchForm.submit();
             }, 500); // Wait 500ms after user stops typing
         });
-        
+
         // Submit form on Enter key
         searchInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
