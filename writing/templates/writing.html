@@ -1,47 +1,338 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load i18n %}
-{% load static %}
+
+{% block title %}{% trans "Writing Tools" %}{% endblock %}
 
 {% block content %}
+<div class="h-screen bg-gray-50 flex flex-col">
+    <div class="flex-1 flex flex-col px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col h-full">
+            <!-- Header -->
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-gray-900">
+                    {% trans "Writing Tools" %}
+                </h1>
+                <p class="mt-2 text-lg text-gray-600">
+                    {% trans "Improve your text with writing tools." %}
+                </p>
+            </div>
 
-<div class="mx-5 mb-11.5">
-    <div class="flex gap-2.5 items-center mt-5">
-        <button type="button" id="text-translate"
-                class="tab flex gap-2.5 items-center px-4 py-2.5 rounded-md hover:bg-gray-200 hover:text-gray-475 text-gray-300 border border-gray-300 transition-colors duration-300 focus:text-white">
+            <!-- Main Content -->
+            <div class="flex flex-col lg:flex-row gap-4 md:gap-6 flex-1 min-h-0">
+                <!-- Left Column: Writing Actions List (minimal width) -->
+                <div class="w-full lg:w-60 lg:min-w-48 lg:flex-shrink-0">
+                    <div class="bg-white rounded-lg">
+                        <div class="flex flex-col gap-0">
+                            {% for prompt in prompts %}
+                            <div class="flex items-center gap-2 p-2 rounded-md transition-colors hover:bg-gray-50 {% if forloop.first %}rounded-t-lg{% endif %} {% if forloop.last %}rounded-b-lg{% endif %}" data-prompt-row>
+                                <!-- Radio button for selection -->
+                                <input type="radio" name="selected_prompt" value="{{ prompt.id }}" class="w-3 h-3 border border-gray-300 rounded-full bg-white">
 
-            <svg class="w-6.5 h-6.5" width="26" height="26" viewBox="0 0 26 26" fill="none"
-                 xmlns="http://www.w3.org/2000/svg">
-                <g clip-path="url(#clip0_759_1481)">
-                    <path d="M23.1996 10.6064H13.4089C11.8642 10.6064 10.6076 11.8631 10.6076 13.4077V18.7271L8.07092 20.5389C7.87077 20.6818 7.75195 20.9127 7.75195 21.1586C7.75195 21.4048 7.87077 21.6357 8.07092 21.7785L10.6382 23.6122C10.8387 24.9615 12.0049 25.9999 13.4089 25.9999H23.1996C24.7442 25.9999 26.0009 24.7433 26.0009 23.1984V13.4077C26.0009 11.8631 24.7442 10.6064 23.1996 10.6064ZM19.9075 21.3098C19.728 21.3098 19.5893 21.2529 19.5487 21.0977L19.2384 20.0125H17.3698L17.06 21.0977C17.0191 21.2529 16.8805 21.3098 16.701 21.3098C16.4153 21.3098 16.0319 21.1305 16.0319 20.8694C16.0319 20.853 16.04 20.8204 16.0481 20.7877L17.623 15.6556C17.6964 15.4108 17.9983 15.2964 18.3002 15.2964C18.6102 15.2964 18.9121 15.4108 18.9855 15.6556L20.5603 20.7877C20.5685 20.8204 20.5766 20.8448 20.5766 20.8694C20.5766 21.1221 20.1932 21.3098 19.9075 21.3098Z"
-                          fill="currentColor"/>
-                    <path d="M17.5898 19.1805H19.0097L18.2996 16.6758L17.5898 19.1805Z" fill="currentColor"/>
-                    <path d="M9.0833 13.4078C9.0833 12.3851 9.44095 11.4448 10.0366 10.7035C9.1676 10.7035 8.36125 10.4316 7.69653 9.96959C7.03181 10.4318 6.22546 10.7035 5.35623 10.7035C5.11919 10.7035 4.92677 10.5111 4.92677 10.2739C4.92677 10.0366 5.11919 9.84442 5.35623 9.84442C5.96501 9.84442 6.53471 9.67581 7.02249 9.38382C6.43414 8.74886 6.04297 7.92902 5.94835 7.0217H5.35643C5.11919 7.0217 4.92677 6.82948 4.92677 6.59224C4.92677 6.355 5.11919 6.16258 5.35643 6.16258H7.26727V5.11958C7.26727 4.88214 7.45949 4.68993 7.69673 4.68993C7.93398 4.68993 8.12619 4.88214 8.12619 5.11958V6.16258H10.037C10.2743 6.16258 10.4667 6.355 10.4667 6.59224C10.4667 6.82948 10.2743 7.0217 10.037 7.0217H9.44511C9.35049 7.92902 8.95932 8.74886 8.37097 9.38382C8.85855 9.67621 9.42845 9.84442 10.037 9.84442C10.2638 9.84442 10.449 10.0202 10.4651 10.2429C11.2377 9.52406 12.2722 9.0831 13.4082 9.0831H15.3935V7.27283L17.9301 5.46097C18.1301 5.31815 18.2489 5.08725 18.2489 4.84128C18.2489 4.59511 18.1301 4.36421 17.9301 4.22139L15.3629 2.38771C15.1622 1.03844 13.996 0 12.592 0H2.8015C1.25664 0 0 1.25664 0 2.8013V12.5922C0 14.1368 1.25664 15.3935 2.8015 15.3935H9.0833V13.4078Z"
-                          fill="currentColor"/>
-                    <path d="M7.69698 8.84663C8.1671 8.35886 8.48627 7.72548 8.5797 7.02148H6.81445C6.90788 7.72548 7.22725 8.35886 7.69698 8.84663Z"
-                          fill="#currentColor"/>
-                </g>
-                <defs>
-                    <clipPath id="clip0_759_1481">
-                        <rect width="26" height="26" fill="currentColor"/>
-                    </clipPath>
-                </defs>
-            </svg>
-            <span class="text-3.5">{% trans 'Text writing' %}</span>
-        </button>
-    </div>
+                                <!-- Icon placeholder -->
+                                <div class="w-6 h-6 text-gray-500">
+                                    {% if prompt.action_type == 'anonymise' %}
+                                    <!-- Detective/Anonymise Icon -->
+                                    <svg width="24" height="24" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M24 11.7498C24 11.9487 23.921 12.1395 23.7803 12.2801C23.6397 12.4208 23.4489 12.4998 23.25 12.4998H0.75C0.551088 12.4998 0.360322 12.4208 0.21967 12.2801C0.0790176 12.1395 0 11.9487 0 11.7498C0 11.5509 0.0790176 11.3601 0.21967 11.2195C0.360322 11.0788 0.551088 10.9998 0.75 10.9998H3.3675L7.82062 4.86763C7.95557 4.68235 8.13118 4.53046 8.33397 4.42363C8.53676 4.3168 8.76134 4.25786 8.99046 4.25134C9.21958 4.24482 9.44714 4.2909 9.65568 4.38603C9.86422 4.48116 10.0482 4.62282 10.1934 4.80013L11.3981 6.197L11.4169 6.21857C11.4867 6.30626 11.5754 6.37708 11.6763 6.42575C11.7773 6.47443 11.8879 6.49971 12 6.49971C12.1121 6.49971 12.2227 6.47443 12.3237 6.42575C12.4246 6.37708 12.5133 6.30626 12.5831 6.21857L12.6019 6.197L13.8066 4.80013C13.9518 4.62282 14.1358 4.48116 14.3443 4.38603C14.5529 4.2909 14.7804 4.24482 15.0095 4.25134C15.2387 4.25786 15.4632 4.3168 15.666 4.42363C15.8688 4.53046 16.0444 4.68235 16.1794 4.86763L20.6325 10.9998H23.25C23.4489 10.9998 23.6397 11.0788 23.7803 11.2195C23.921 11.3601 24 11.5509 24 11.7498ZM16.875 13.9998C16.0449 14 15.2441 14.306 14.6254 14.8595C14.0068 15.4129 13.6138 16.1749 13.5216 16.9998H10.4784C10.386 16.1757 9.99334 15.4144 9.37539 14.8613C8.75745 14.3082 7.95748 14.0019 7.12815 14.001C6.29882 14.0001 5.49819 14.3046 4.87904 14.8564C4.25989 15.4081 3.86557 16.1685 3.77133 16.9925C3.67709 17.8165 3.88953 18.6463 4.3681 19.3236C4.84667 20.0009 5.55788 20.4783 6.36599 20.6647C7.17411 20.8511 8.02256 20.7334 8.74944 20.3341C9.47632 19.9348 10.0307 19.2818 10.3069 18.4998H13.6931C13.8994 19.0832 14.262 19.5986 14.7414 19.9898C15.2208 20.381 15.7986 20.6328 16.4115 20.7178C17.0243 20.8028 17.6488 20.7177 18.2166 20.4718C18.7843 20.2258 19.2736 19.8285 19.6308 19.3233C19.988 18.8181 20.1995 18.2244 20.2421 17.6071C20.2847 16.9899 20.1568 16.3727 19.8723 15.8233C19.5879 15.2738 19.1578 14.813 18.6292 14.4915C18.1006 14.1699 17.4937 13.9998 16.875 13.9998Z"
+                                              fill="currentColor" fillOpacity="0.8"/>
+                                    </svg>
+                                    {% elif prompt.action_type == 'summarise' %}
+                                    <!-- Search Icon -->
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                    </svg>
+                                    {% elif prompt.action_type == 'detail' %}
+                                    <!-- List Icon -->
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                                    </svg>
+                                    {% elif prompt.action_type == 'explain' %}
+                                    <!-- Edit3 Icon -->
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                    {% elif prompt.action_type == 'shorten' %}
+                                    <!-- ArrowUpDown Icon -->
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                                    </svg>
+                                    {% elif prompt.action_type == 'simple' %}
+                                    <!-- Hand Icon -->
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"/>
+                                    </svg>
+                                    {% elif prompt.action_type == 'professional' %}
+                                    <!-- Briefcase Icon -->
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"/>
+                                    </svg>
+                                    {% elif prompt.action_type == 'casual' %}
+                                    <!-- Users Icon -->
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                                    </svg>
+                                    {% else %}
+                                    <!-- Default Edit Icon -->
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                    {% endif %}
+                                </div>
 
-    <div class="my-5 bg-white">
-        <!--  ------------- TAB-1 -------------  -->
+                                <!-- Text content -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-sm font-medium text-gray-900">
+                                            {{ prompt.name }}
+                                        </span>
+                                        <!--<span class="text-xs text-gray-500 truncate">
+                                            {{ prompt.description }}
+                                        </span>-->
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="p-8 text-center">
+                                <div class="text-gray-400">
+                                    <p class="text-lg font-medium">{% trans 'No writing prompts available' %}</p>
+                                    <p class="text-sm mt-1">{% trans 'There are currently no writing prompts configured.' %}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
 
+                <div class="flex md:flex-row sm:flex-col flex-grow">
+                    <!-- Center Column: Text Input -->
+                    <div class="flex-1 min-w-0">
+                        <div class="bg-white rounded-l-lg h-full">
+                            <div class="p-6 h-full flex flex-col relative">
+                                <!-- Text input area -->
+                                <div class="flex-1 flex flex-col">
+                                    <textarea
+                                            id="input-text"
+                                            class="flex-1 p-3 resize-none"
+                                            placeholder="{% trans 'To translate PDF, Word (.docx), PowerPoint (.pptx) files, drop them directly into our document translation interface....' %}"
+                                            disabled
+                                    ></textarea>
+                                </div>
 
-        <div id="text-translate-content" class="tab-content hidden">
-            {% include 'gpt_text_translate.html' %}
+                                <!-- Action button -->
+                                <div class="flex justify-end mt-4 absolute bottom-6 right-10">
+                                    <button
+                                            id="process-btn"
+                                            class="rounded-full px-6.5 py-2 bg-green-800 opacity-50 hover:opacity-100 text-white transition-colors duration-300 disabled:cursor-not-allowed"
+                                            disabled
+                                    >
+                                        {% trans 'Translate' %}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Results -->
+                    <div class="flex-1 min-w-0 w-full">
+                        <div class="bg-white rounded-r-lg h-full">
+                            <div class="p-6 h-full flex flex-col">
+                                <!-- No results state -->
+                                <div class="flex-1 flex items-center justify-center text-gray-400" id="no-results">
+                                    <div class="text-center">
+                                        <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        <p class="text-sm">{% trans 'Your results will appear here' %}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Results area -->
+                                <div class="hidden flex-1 flex flex-col" id="results-area">
+                                    <div class="flex-1 p-3 bg-gray-50 rounded-md overflow-auto">
+                                        <div id="result-text" class="text-sm text-gray-700 whitespace-pre-wrap"></div>
+                                    </div>
+
+                                    <!-- Copy button -->
+                                    <div class="flex justify-end mt-4">
+                                        <button
+                                                id="copy-btn"
+                                                class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                                        >
+                                            {% trans 'Copy Result' %}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
     </div>
-
 </div>
 
-<script src="{% static 'js/writing.js' %}"></script>
+<!-- JavaScript for interaction -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle prompt selection
+        const promptRows = document.querySelectorAll('[data-prompt-row]');
+        const processBtn = document.getElementById('process-btn');
+        const inputText = document.getElementById('input-text');
+        const resultsArea = document.getElementById('results-area');
+        const noResults = document.getElementById('no-results');
+        const resultText = document.getElementById('result-text');
+        const copyBtn = document.getElementById('copy-btn');
+        const promptMeta = document.getElementById('prompt-meta');
+
+        // Prompt data for easy access
+        const promptData = {
+        {%
+            for prompt in prompts %
+        }
+        '{{ prompt.id }}'
+    :
+        {
+            name: '{{ prompt.name|escapejs }}',
+                description
+        :
+            '{{ prompt.description|escapejs }}',
+                model
+        :
+            '{{ prompt.gpt_model|escapejs }}',
+                temperature
+        :
+            '{{ prompt.temperature }}'
+        }
+        {%
+            if not forloop.last %
+        }
+    ,
+        {%
+            endif %
+        }
+        {%
+            endfor %
+        }
+    }
+        ;
+
+        promptRows.forEach(row => {
+            row.addEventListener('click', function () {
+                // Remove selected state from all rows
+                promptRows.forEach(r => {
+                    r.classList.remove('bg-blue-50');
+                    r.style.backgroundColor = '';
+                });
+
+                // Add selected state to clicked row
+                this.classList.add('bg-blue-50');
+                this.style.backgroundColor = '#eff6ff';
+
+                // Update radio button
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.checked = true;
+
+                    // Show prompt details
+                    const promptId = radio.value;
+                    const prompt = promptData[promptId];
+
+                    if (prompt) {
+                        document.getElementById('selected-prompt-name').textContent = prompt.name;
+                        document.getElementById('selected-prompt-description').textContent = prompt.description;
+                        document.getElementById('selected-prompt-model').textContent = prompt.model;
+                        document.getElementById('selected-prompt-temperature').textContent = prompt.temperature;
+
+                        // Show meta info
+                        promptMeta.style.display = 'flex';
+
+                        // Enable text input
+                        inputText.disabled = false;
+
+                        // Check if we can enable process button
+                        checkProcessButton();
+                    }
+                }
+            });
+        });
+
+        // Check if process button should be enabled
+        function checkProcessButton() {
+            const hasText = inputText.value.trim().length > 0;
+            const hasSelectedPrompt = document.querySelector('input[name="selected_prompt"]:checked');
+
+            processBtn.disabled = !(hasText && hasSelectedPrompt);
+        }
+
+        // Listen for text input changes
+        inputText.addEventListener('input', checkProcessButton);
+
+        // Handle process button click
+        processBtn.addEventListener('click', function () {
+            const selectedPrompt = document.querySelector('input[name="selected_prompt"]:checked');
+            const text = inputText.value.trim();
+
+            if (!selectedPrompt || !text) {
+                alert('{% trans "Please select a prompt and enter some text." %}');
+                return;
+            }
+
+            // Show loading state
+            processBtn.disabled = true;
+            processBtn.textContent = '{% trans "Processing..." %}';
+
+            // Make API call
+            fetch('{% url "process" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    prompt: selectedPrompt.value,
+                    text: text
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.result) {
+                        // Show results
+                        resultText.textContent = Array.isArray(data.result) ? data.result.join('\n') : data.result;
+                        noResults.classList.add('hidden');
+                        resultsArea.classList.remove('hidden');
+                    } else {
+                        alert('{% trans "An error occurred while processing your text." %}');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('{% trans "An error occurred while processing your text." %}');
+                })
+                .finally(() => {
+                    // Reset button state
+                    processBtn.disabled = false;
+                    processBtn.textContent = '{% trans "Process Text" %}';
+                    checkProcessButton();
+                });
+        });
+
+        // Handle copy button click
+        if (copyBtn) {
+            copyBtn.addEventListener('click', function () {
+                navigator.clipboard.writeText(resultText.textContent).then(() => {
+                    // Show feedback
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = '{% trans "Copied!" %}';
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                    }, 1000);
+                });
+            });
+        }
+    });
+</script>
+
+<!-- CSRF Token for AJAX -->
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
 {% endblock %}
