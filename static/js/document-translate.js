@@ -382,6 +382,7 @@ $(document).ready(function () {
         `);
 
             $fileList.append($fileItem);
+            $fileList.append($fileItem);
         });
     };
 
@@ -938,21 +939,28 @@ $(document).ready(function () {
         });
     }
 
-    const $modal = $('#modal');
+    const $modal = $('#modalGlossary');
     const $closeIcon = $('#closeIcon');
     const maxFileSize = 5 * 1024 * 1024; // 5MB
 
-    $('#openModal').on('click', function () {
+    $(document).on('click', '.openGlossary', function(event) {
+        event.preventDefault(); // Empêche clic par défaut si besoin (par ex lien)
         $modal.removeClass('hidden');
         $closeIcon.removeClass('hidden');
+        $('input[name=openGlossary]').prop('checked', 'checked');
     });
 
     $('#closeModal, #closeIcon').on('click', function () {
+        // Réinitialise les styles des boutons comme avant
         $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
         $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-700 text-green-700 border border-green-700');
         $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
+
         $modal.addClass('hidden');
         $closeIcon.addClass('hidden');
+
+        // Désactive la checkbox et le style "peer-checked"
+        $('input[name=openGlossary]').prop('checked', false).trigger('change');
     });
 
     $(window).on('click', function (event) {
@@ -1376,7 +1384,62 @@ $(document).ready(function () {
         setInterval(checkDocumentStatus, 10000);
     };
 
+    function showTab(tabId) {
+        // Masquer tous les contenus de tabs
+        $('#step2-tab-default-content').hide();
+        $('#step2-tab-no-lexicon-content').hide();
+        $('#step2-tab-my-lexicon-content').hide();
 
+        // Afficher le contenu du tab sélectionné
+        $(`#step2-tab-${tabId}-content`).show();
+
+        // Retirer les styles actifs de tous les boutons
+        $('button.tab-button').removeClass('border-b-0.5 border-b-black');
+        $(`#step2-${tabId}`).addClass('border-b-0.5 border-b-black');
+    }
+
+    setTimeout(() => showTab('default'), 1000);
+    $('#step2-default').click(function () {
+        showTab('default');
+    });
+
+    $('#step2-my-lexicon').click(function () {
+        showTab('my-lexicon');
+    });
+
+    $('#step2-no-lexicon').click(function () {
+        showTab('no-lexicon');
+    });
+
+    // Gestion du clic sur les blocs radio
+    $('ul.flex li > div.flex.items-center.mr-2').click(function() {
+        // Décoche et enlève le fond bleu sur tous
+        $('ul.flex li > div.flex.items-center.mr-2').removeClass('bg-blue-50');
+        $('ul.flex li > div.flex.items-center.mr-2 input[type=radio]').prop('checked', false);
+
+        // Coche la radio du bloc cliqué et ajoute fond bleu
+        $(this).addClass('bg-blue-50');
+        $(this).find('input[type=radio]').prop('checked', true);
+    });
+
+    // Fonction pour cliquer automatiquement sur le bouton .domain-button avec data-name
+    function clickDomainButton(domainName) {
+        // Retire classes de sélection sur tous les boutons
+        $('.domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-100 text-gray-475');
+
+        // Cherche le bouton à sélectionner
+        var $btn = $('.domain-button[data-name="' + domainName + '"]');
+        if ($btn.length) {
+            // Déclenche clic sur ce bouton
+            $btn.click();
+
+            // Applique classes sélection sur ce bouton
+            $btn.addClass('selected bg-green-700 text-white').removeClass('bg-gray-100 text-gray-475');
+        }
+    }
+
+    // Exemple d’appel : sélectionner automatiquement le bouton "Corporate"
+    clickDomainButton('Corporate');
 });
 
 // Close warning alert
