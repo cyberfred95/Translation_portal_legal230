@@ -1,17 +1,51 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
-
 {% block content %}
 
-<div class="mx-5 mb-11.5">
-    <div class="flex justify-end items-center my-5">
-        <button
-                type="button" id="openModal" class="flex gap-2.5 items-center px-6.5 py-1 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 text-3.5">
-            + {% trans 'Add glossary' %}
-        </button>
+<div class="px-6 py-6 lg:px-13 lg:py-6">
+    <!-- Header -->
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold leading-8 tracking-[-0.456px] text-foreground mb-2">
+            {% trans 'Glossary' %}
+        </h1>
+        <p class="text-base font-normal leading-6 tracking-[-0.176px] text-muted-foreground max-w-4xl">
+            {% trans 'Find all your personal glossaries' %}
+        </p>
     </div>
-    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md px-5 pt-5 w-full h-full flex flex-col items-end  bg-white">
+    <div class="rounded-md px-5 pt-5 w-full h-full flex flex-col items-end bg-white">
+        <div class="flex w-full items-center my-5">
+            <div class="flex w-full items-center justify-between gap-4 mb-6">
+                <form method="GET" class="relative flex-1 ">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <!-- Search Icon SVG -->
+                        <svg class="h-5 w-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <input
+                            type="text"
+                            name="search"
+                            id="search-user"
+                            value="{{ search_query }}"
+                            placeholder="{% trans 'Search for a user' %}"
+                            class="w-full h-9 pl-10 pr-3 border border-black/10 rounded-md bg-white text-sm font-normal leading-6 tracking-[-0.084px] text-muted-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                    <!-- Preserve current page when searching -->
+                    {% if request.GET.page %}
+                    <input type="hidden" name="page" value="1">
+                    {% endif %}
+                </form>
+                <button
+                        type="button" id="openModal" class="text-white text-sm flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
+                     <div class="mr-2">
+                         {% include 'svg/icons/add_folder.svg' %}
+                     </div>
+                     {% trans 'Add glossary' %}
+                </button>
+            </div>
+
+        </div>
         <table class="border-collapse w-full border-separate border-spacing-y-5">
             <thead>
             <tr class="border-gray-425">
@@ -19,6 +53,7 @@
                     <div class="flex items-center gap-1 w-auto cursor-pointer">
                         {% trans 'File name' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
                     </div>
+
                 </th>
                 <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
                     <div class="flex items-center gap-1 w-auto cursor-pointer">
@@ -33,12 +68,27 @@
                 <th class="border-b text-4 text-gray-600 font-semibold text-right pb-5">{% trans 'Actions' %}</th>
             </tr>
             </thead>
+
             <tbody>
             {% if glossaries %}
             {% for glossary in glossaries %}
             <tr>
-
                 <td class="text-3.25 text-gray-600 flex gap-6 items-center">
+                    <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_759_2669)">
+                            <path d="M12.6666 8.53064C12.298 8.53064 12 8.82935 12 9.19727V14.5306C12 14.8979 11.7013 15.1973 11.3334 15.1973H2C1.63196 15.1973 1.33337 14.8979 1.33337 14.5306V5.19727C1.33337 4.82996 1.63196 4.53064 2 4.53064H7.33337C7.70203 4.53064 8 4.23193 8 3.86401C8 3.49597 7.70203 3.19727 7.33337 3.19727H2C0.897339 3.19727 0 4.0946 0 5.19727V14.5306C0 15.6333 0.897339 16.5306 2 16.5306H11.3334C12.436 16.5306 13.3334 15.6333 13.3334 14.5306V9.19727C13.3334 8.82861 13.0353 8.53064 12.6666 8.53064Z"
+                                  fill="#0F3144"/>
+                            <path d="M6.25075 7.9231C6.20412 7.96973 6.17275 8.02905 6.15944 8.09302L5.68813 10.4504C5.66616 10.5597 5.70082 10.6724 5.77944 10.7517C5.84279 10.8151 5.92812 10.849 6.01552 10.849C6.03676 10.849 6.05886 10.847 6.08083 10.8424L8.43752 10.3711C8.50283 10.3577 8.56215 10.3264 8.60817 10.2797L13.8828 5.005L11.5261 2.64844L6.25075 7.9231Z"
+                                  fill="#0F3144"/>
+                            <path d="M15.5117 1.01877C14.8618 0.368744 13.8044 0.368744 13.155 1.01877L12.2324 1.94138L14.5891 4.29807L15.5117 3.37534C15.8264 3.06137 15.9998 2.64267 15.9998 2.19736C15.9998 1.75204 15.8264 1.33334 15.5117 1.01877Z"
+                                  fill="#0F3144"/>
+                        </g>
+                        <defs>
+                            <clipPath id="clip0_759_2669">
+                                <rect width="16" height="16" fill="white" transform="translate(0 0.5)"/>
+                            </clipPath>
+                        </defs>
+                    </svg>
                     <span class="md:w-60 2xl:w-80 w-max truncate">{{ glossary.name }}</span>
 
                     <button type="button" class="edit-glossary" data-edit-url="{% url 'single_glossary' glossary.id %}">

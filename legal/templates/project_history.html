@@ -4,129 +4,119 @@
 {% load i18n %}
 
 {% block content %}
-
 <div class="mx-5 mb-11.5">
+    <div class="mx-5 mb-11.5 mt-5">
+        <h2 class="text-2xl mb-2">{% trans 'History' %}</h2>
+        <div class="text-base">{% trans 'Find all your translation history' %}</div>
+    </div>
 
-    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md px-5 pt-5 w-full h-full flex flex-col items-end mt-5 bg-white">
-        <table class="border-collapse w-full border-separate border-spacing-y-5">
+    <div class="rounded-md px-5 pt-5 w-full h-full flex flex-col items-end mt-5 bg-white">
 
-            <thead>
-            <tr class="border-gray-425">
+        <div class="flex flex-col items-center justify-start w-full">
+            <div class="w-full flex flex-row bg-blue-50 border-b-0.25 border-gray-100">
+                <div class="h-12 flex flex-row justify-center items-center w-18">
+                </div>
                 {% if request.user.is_staff %}
-                    <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
-                        <div class="flex items-center gap-1 w-auto cursor-pointer">
-                            {% trans 'Username' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
-                        </div>
-                    </th>
+                <div class="text-base px-8 h-12 flex flex-row items-center justify-start w-160">
+                    <i class="ph ph-user mr-1"></i>
+                    {% trans 'User' %}
+                </div>
                 {% endif %}
-                <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
-                    <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        {% trans 'Project' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
-                    </div>
-                </th>
-                <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
-                    <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        {% trans 'Languages' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
-                    </div>
-                </th>
-                <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
-                    <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        {% trans 'Status' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
-                    </div>
-                </th>
-                <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
-                    <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        {% trans 'Revision project history' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
-                    </div>
-                </th>
-                <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
-                    <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        {% trans 'Created' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
-                    </div>
-                </th>
-                <th class="border-b text-4 text-gray-600 font-semibold text-right pb-5">
+                <div class="text-base px-8 h-12 flex flex-row items-center justify-start w-380">
+                    <i class="ph ph-file-text mr-1"></i>
+                    {% trans 'Document' %}
+                </div>
+                <div class="text-base px-8 text-[#5a5a78] h-12 flex flex-row items-center justify-start w-160">
+                    <i class="ph ph-user mr-1"></i>
+                    {% trans 'Languages' %}
+                </div>
+                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center justify-start w-80 pr-8">
+                    <i class="ph ph-certificate mr-1"></i>
+                    {% trans 'Status' %}
+                </div>
+                <div class="text-base pl-8 text-[#5a5a78] h-12 flex flex-row items-center justify-start w-160">
+                    <i class="ph ph-calendar-blank mr-1"></i>
+                    {% trans 'Creation date' %}
+                </div>
+                <div class="text-base px-8 text-[#5a5a78] h-12 flex flex-row flex-grow justify-center items-center w-full">
+                    <i class="ph ph-wrench mr-1"></i>
+                    {% trans 'Actions' %}
 
-                </th>
-            </tr>
-            </thead>
-            <tbody>
+                </div>
+            </div>
 
             {% if projects.results %}
             {% for project in projects.results %}
-            <tr>
+
+            <div class="w-full flex flex-row border-b-0.25 border-gray-100 h-16 justify-center items-center">
+                <div class="h-12 flex flex-row justify-center items-center w-18">
+                    {% include 'svg/icons/file_text_blue.svg' %}
+                </div>
                 {% if request.user.is_staff %}
-                    {% if project.username %}
-                        <td class="text-3.25 text-gray-600">
+                <div class="flex flex-row justify-center items-center w-160">
+                        {% if project.username %}
                             {{ project.username }}
-                        </td>
-                    {% else %}
-                        <td class="text-3.25 text-gray-600">
+                        {% else %}
                             Unknown
-                        </td>
-                    {% endif %}
+                        {% endif %}
+                </div>
                 {% endif %}
-                <td class="text-3.25 text-gray-600 ">
-                    <div class="md:w-30 2xl:w-50 truncate">
-                        {{ project.source_file_name }}
+                <div class="text-sm text-[#5a5a78] h-12 flex flex-row items-center px-8 w-380">
+                    {{ project.source_file_name }}
+                    <!-- @TODO : Ajouter type de fichier &bull; nombre de pages -->
+                </div>
+                <div class="flex justify-start px-8 w-160">
+                    <div class="flex gap-1 text-4 items-center text-gray-500">
+                        <span class="text-3 text-gray-500">{{ project.source_language|upper }}</span>
+                        →
+                        <span class="text-3 text-gray-500">{{ project.target_language|upper }}</span>
                     </div>
-                </td>
-                <td>
-                    <div class="flex gap-1 text-4 items-center text-green-500">
-                        <span class="text-3 text-green-500">{{ project.source_language|upper }}</span>
-                        <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 4C12 3.91051 11.9711 3.837 11.9134 3.77947L8.83337 0.711292C8.77563 0.653764 8.70183 0.625 8.612 0.625C8.52858 0.625 8.4564 0.655362 8.39544 0.716087C8.33448 0.776811 8.304 0.848722 8.304 0.931818V2.77273H0.307999C0.224583 2.77273 0.152396 2.80309 0.0914373 2.86381C0.0304791 2.92454 0 2.99645 0 3.07955V4.92045C0 5.00355 0.0304791 5.07546 0.0914373 5.13619C0.152396 5.19691 0.224583 5.22727 0.307999 5.22727H8.304V7.06818C8.304 7.15767 8.33288 7.23118 8.39063 7.28871C8.44838 7.34624 8.52217 7.375 8.612 7.375C8.689 7.375 8.766 7.34304 8.843 7.27912L11.9134 4.22053C11.9711 4.163 12 4.08949 12 4Z"
-                                  fill="#176C77"/>
+                </div>
+                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center w-80">
+                    {% if project.status == 'Needs attention' or project.status_mapped == 'needs-attention' %}
+                    <div class="inline-flex items-center gap-1 px-1 py-0.5 rounded border text-sm font-medium bg-orange-50 border-orange-200 text-orange-700">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                         </svg>
-                        <span class="text-3 text-green-500">{{ project.target_language|upper }}</span>
+                        <span>{% trans 'Needs attention' %}</span>
                     </div>
-                </td>
-                <td>
-                    <span class="rounded-md py-1.5 px-2.5 text-3.25 status">
-                        {{ project.status }}
-                    </span>
-                </td>
-                <td>
-                    <button
-                            type="button"
-                            data-translated-file="{{ project.translated_file }}"
-                            data-id="{{ project.id }}"
-                            data-display="{{ project.display_popup }}"
-                            class="flex gap-2.5 items-center text-gray-600 border border-gray-600 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision"
-                            {% if not project.status == 'Translated' %}disabled{% endif %}
-                    >
-                    {% trans 'Expert revision project history' %}
-                    <div class="relative group">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                             xmlns="http://www.w3.org/2000/svg">
-                            <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z"
-                                  fill="currentColor"/>
+                    {% elif project.status == 'In progress' or project.status == 'Processing' or project.status_mapped == 'in-progress' %}
+                    <div class="inline-flex items-center gap-1 px-1 py-0.5 rounded border text-sm font-medium bg-blue-50 border-blue-200 text-blue-700">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
-                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 bg-gray-600 text-white text-2.75 rounded-md bottom-30 left-1/2 transform -translate-x-1/2 translate-y-full">
-                            <span class="py-4 px-4.5 text-justify text-wrap block">
-                                {% trans 'Click the button to see options for improving the quality of the translated file.' %}
-                            </span>
-                            <div class="absolute w-3 h-3 bg-gray-600 transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5"></div>
-                        </div>
+                        <span>{% trans 'In progress' %}</span>
                     </div>
-                    </button>
-                </td>
-                <td class="text-3.25 text-gray-600">
+                    {% elif project.status == 'Error' or project.status_mapped == 'error' %}
+                    <div class="inline-flex items-center gap-1 px-1 py-0.5 rounded border text-sm font-medium bg-red-50 border-red-200 text-red-700">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.268 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                        </svg>
+                        <span>{% trans 'Error' %}</span>
+                    </div>
+                    {% else %}
+                    <div class="inline-flex items-center gap-1 px-1 py-0.5 rounded border text-sm font-medium bg-green-50 border-green-200 text-green-700">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>{% if project.status == 'Translated' %}{% trans 'Completed' %}{% else %}{{ project.status }}{% endif %}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="text-base text-[#5a5a78] h-12 flex flex-row justify-start items-center pl-8 w-160">
                     {{ project.created_at|date:"d/m/Y" }}
-                </td>
-                <td>
+                </div>
+                <div class="text-base text-[#5a5a78] h-12 flex flex-row flex-grow justify-center items-center px-8 w-full">
                     <div class="flex gap-5 items-center justify-end">
-                        <div class="relative">
-                            <button type="button" class="download-file"
-                                    data-translated-file="{{ project.translated_file }}"
-                                    {% if project.reviewed_file %}data-reviewed-file="{{ project.reviewed_file }}" {% endif %}>
-                                <svg width="17" height="16" viewBox="0 0 17 16" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M15.7188 7.21875C15.2875 7.21875 14.9375 7.56875 14.9375 8C14.9375 11.55 12.05 14.4375 8.5 14.4375C4.95 14.4375 2.0625 11.55 2.0625 8C2.0625 7.56875 1.7125 7.21875 1.28125 7.21875C0.85 7.21875 0.5 7.56875 0.5 8C0.5 10.1375 1.33125 12.1469 2.84375 13.6562C4.35625 15.1687 6.3625 16 8.5 16C10.6375 16 12.6469 15.1687 14.1562 13.6562C15.6687 12.1438 16.5 10.1375 16.5 8C16.5 7.56875 16.15 7.21875 15.7188 7.21875Z"
-                                          fill="#176C77"></path>
-                                    <path d="M7.42891 10.7375C7.71641 11.025 8.09766 11.1812 8.50078 11.1812C8.90703 11.1812 9.28828 11.0219 9.57266 10.7375L11.5383 8.77187C11.8445 8.46562 11.8445 7.97187 11.5383 7.66562C11.232 7.35937 10.7383 7.35937 10.432 7.66562L9.28203 8.81875V0.78125C9.28203 0.35 8.93203 0 8.50078 0C8.06953 0 7.71953 0.35 7.71953 0.78125V8.81875L6.56641 7.66562C6.26016 7.35937 5.76641 7.35937 5.46016 7.66562C5.15391 7.97187 5.15391 8.46562 5.46016 8.77187L7.42891 10.7375Z"
-                                          fill="#176C77"></path>
-                                </svg>
-                            </button>
+                        <div class="flex">
+                            <div class="download-file cursor-pointer flex items-center justify-center border border-0.25 border-gray-100 rounded-full py-0.5 px-4"
+                                 data-translated-file="{{ project.translated_file }}"
+                                 {% if project.reviewed_file %}data-reviewed-file="{{ project.reviewed_file }}" {% endif %}>
+                                <i class="ph ph-download mr-2"></i>
+                                Télécharger
+                            </div>
+
                             {% if project.reviewed_file and project.translated_file %}
                             <div class="download-tooltip hidden absolute z-10 bg-white rounded-md shadow-lg p-2 mt-2 right-0">
                                 <button type="button"
@@ -141,7 +131,16 @@
                                 </button>
                             </div>
                             {% endif %}
+
+                            <div class="flex items-center justify-center text-base text-green-800 border-b border-green-600 font-poppins p-1 ml-2">
+                                Expert Review
+                                <i class="ph ph-arrow-right ml-2"></i>
+                            </div>
                         </div>
+
+
+                        <!--
+                        @TODO : supprimer bouton de suppression ?
                         <div>
                             <button type="button" class="delete-project" data-project-id="{{ project.id }}">
                                 <div class="relative group">
@@ -175,23 +174,16 @@
                                     </div>
                                 </div>
                             </button>
-                        </div>
+                        </div>-->
                     </div>
-                </td>
-            </tr>
+                </div>
+            </div>
+
             {% endfor %}
-            {% else %}
-            <tr>
-                <td colspan="7" class="text-center py-8 text-gray-425">
-                    <div class="flex flex-col items-center justify-center">
-                        <p class="text-5 text-gray-600 font-semibold">{% trans 'No data available' %}</p>
-                        <p class="text-3.25 text-gray-600 mt-1.25">{% trans 'There are currently no projects to display.' %}</p>
-                    </div>
-                </td>
-            </tr>
             {% endif %}
-            </tbody>
-        </table>
+
+        </div>
+
     </div>
     <div id="modal"
          class="fixed inset-0 bg-gray-500 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
