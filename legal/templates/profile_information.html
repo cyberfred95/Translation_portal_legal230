@@ -1,509 +1,129 @@
-{% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
 
-{% block content %}
-<div class="min-h-screen bg-white font-sans">
-    <div class="max-w-4xl mx-auto px-6 sm:px-13 py-6">
-        <!-- Title -->
-        <h1 class="text-2xl font-semibold text-gray-900 mb-6 tracking-[-0.456px] leading-8">
-            {% trans 'My Account' %}
-        </h1>
+<form name="change-user-data" method="post" class="w-full">
+    {% csrf_token %}
 
-        <!-- Tabs -->
-        <div class="w-full">
-            <!-- Tab Navigation -->
-            <div class="h-11 p-0.5 bg-black/5 rounded-full mb-6 gap-0.5 flex">
-                <button 
-                    id="tab-information"
-                    class="tab-button active rounded-full px-4 py-2 text-sm font-medium bg-white shadow-[0_0_1px_0_rgba(0,0,0,0.24),0_1px_2px_0_rgba(0,0,0,0.20)] text-gray-900 tracking-[-0.084px] leading-6"
-                    data-tab="information">
-                    {% trans 'My Information' %}
-                </button>
-                <button 
-                    id="tab-security"
-                    class="tab-button rounded-full px-4 py-2 text-sm font-normal text-gray-900 tracking-[-0.084px] leading-6"
-                    data-tab="security">
-                    {% trans 'Security' %}
-                </button>
-            </div>
+    <!-- Form Fields -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <!-- First Name -->
+        <div class="space-y-1">
+            <label for="first_name" class="text-sm font-semibold text-gray-900 tracking-[-0.084px] leading-6">
+                {% trans 'First Name' %}
+            </label>
+            <input
+                    type="text"
+                    name="first_name"
+                    id="first_name"
+                    value="{{ request.user.first_name|default:'' }}"
+                    class="h-10 rounded-md border border-black/10 bg-white text-sm font-normal text-gray-900 tracking-[-0.084px] leading-6 focus:outline-none focus:ring-1 focus:ring-gray-900 px-3 w-full"
+            />
+        </div>
 
-            <!-- Tab Content: Information -->
-            <div id="content-information" class="tab-content active">
-                <div class="bg-white rounded-lg border-0 p-6">
-                    <form name="change-user-data" method="post" class="w-full">
-                        {% csrf_token %}
-                        
-                        <!-- Form Fields -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                            <!-- First Name -->
-                            <div class="space-y-1">
-                                <label for="first_name" class="text-sm font-semibold text-gray-900 tracking-[-0.084px] leading-6">
-                                    {% trans 'First Name' %}
-                                </label>
-                                <input
-                                    type="text"
-                                    name="first_name"
-                                    id="first_name"
-                                    value="{{ request.user.first_name|default:'' }}"
-                                    class="h-10 rounded-md border border-black/10 bg-white text-sm font-normal text-gray-900 tracking-[-0.084px] leading-6 focus:outline-none focus:ring-1 focus:ring-gray-900 px-3 w-full"
-                                />
-                            </div>
+        <!-- Last Name -->
+        <div class="space-y-1">
+            <label for="last_name" class="text-sm font-semibold text-gray-900 tracking-[-0.084px] leading-6">
+                {% trans 'Last Name' %}
+            </label>
+            <input
+                    type="text"
+                    name="last_name"
+                    id="last_name"
+                    value="{{ request.user.last_name|default:'' }}"
+                    class="h-10 rounded-md border border-black/10 bg-white text-sm font-normal text-gray-900 tracking-[-0.084px] leading-6 focus:outline-none focus:ring-1 focus:ring-gray-900 px-3 w-full"
+            />
+        </div>
 
-                            <!-- Last Name -->
-                            <div class="space-y-1">
-                                <label for="last_name" class="text-sm font-semibold text-gray-900 tracking-[-0.084px] leading-6">
-                                    {% trans 'Last Name' %}
-                                </label>
-                                <input
-                                    type="text"
-                                    name="last_name"
-                                    id="last_name"
-                                    value="{{ request.user.last_name|default:'' }}"
-                                    class="h-10 rounded-md border border-black/10 bg-white text-sm font-normal text-gray-900 tracking-[-0.084px] leading-6 focus:outline-none focus:ring-1 focus:ring-gray-900 px-3 w-full"
-                                />
-                            </div>
-
-                            <!-- Language -->
-                            <div class="space-y-1">
-                                <label for="language" class="text-sm font-semibold text-gray-900 tracking-[-0.084px] leading-6">
-                                    {% trans 'Language' %}
-                                </label>
-                                <div class="relative">
-                                    <select 
-                                        name="language"
-                                        id="language"
-                                        class="h-10 rounded-md border border-black/10 bg-white text-sm font-normal text-gray-900 tracking-[-0.084px] leading-6 focus:outline-none focus:ring-1 focus:ring-gray-900 px-3 w-full appearance-none pr-10">
-                                        <option value="en-uk" {% if request.LANGUAGE_CODE == 'en' %}selected{% endif %}>
-                                            🇬🇧 English (UK)
-                                        </option>
-                                        <option value="en-us">
-                                            🇺🇸 English (US)
-                                        </option>
-                                        <option value="fr" {% if request.LANGUAGE_CODE == 'fr' %}selected{% endif %}>
-                                            🇫🇷 French
-                                        </option>
-                                        <option value="de">
-                                            🇩🇪 German
-                                        </option>
-                                    </select>
-                                    <!-- Chevron Down Icon -->
-                                    <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Email and Username Section -->
-                        <div class="space-y-4 mb-6">
-                            <!-- Username -->
-                            <div class="space-y-1">
-                                <label for="username" class="text-sm font-semibold text-gray-900 tracking-[-0.084px] leading-6">
-                                    {% trans 'Username' %}
-                                </label>
-                                <input
-                                    type="text"
-                                    name="username"
-                                    id="username"
-                                    value="{{ request.user.username }}"
-                                    class="h-10 rounded-md border border-black/10 bg-white text-sm font-normal text-gray-900 tracking-[-0.084px] leading-6 focus:outline-none focus:ring-1 focus:ring-gray-900 px-3 w-full max-w-md"
-                                />
-                            </div>
-
-                            <!-- Email -->
-                            <div class="space-y-1">
-                                <label for="email" class="text-sm font-semibold text-gray-900 tracking-[-0.084px] leading-6">
-                                    {% trans 'Email' %}
-                                </label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    id="email"
-                                    value="{{ request.user.email }}"
-                                    class="h-10 rounded-md border border-black/10 bg-white text-sm font-normal text-gray-900 tracking-[-0.084px] leading-6 focus:outline-none focus:ring-1 focus:ring-gray-900 px-3 w-full max-w-md"
-                                />
-                            </div>
-                        </div>
-
-                        <!-- Email and Password Section with Manage Button -->
-                        <div class="flex items-center justify-between py-2 max-w-96">
-                            <h3 class="text-sm font-semibold text-gray-900 tracking-[-0.084px] leading-6">
-                                {% trans 'Email address and Password' %}
-                            </h3>
-                            <button 
-                                type="button" 
-                                id="manage-security-btn"
-                                class="h-10 px-2.5 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-full tracking-[-0.084px] leading-6 flex items-center gap-2 transition-colors">
-                                <!-- Wrench Icon SVG exact from Builder.io -->
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                                <span class="px-2">{% trans 'Manage' %}</span>
-                            </button>
-                        </div>
-
-                        <!-- Save Button -->
-                        <div class="mt-6">
-                            <button 
-                                type="submit"
-                                class="bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-md py-2.5 px-6 transition-colors">
-                                {% trans 'Update Information' %}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Tab Content: Security -->
-            <div id="content-security" class="tab-content hidden">
-                <div class="bg-white rounded-lg border-0 p-6">
-                    <!-- Password Change Section -->
-                    <div class="mb-8">
-                        <div class="flex justify-between items-end mb-4">
-                            <div class="flex flex-col items-start gap-1.5">
-                                <span class="text-lg font-semibold text-gray-600">{% trans 'Password' %}</span>
-                                <span class="text-sm text-gray-400">{% trans 'Change your password.' %}</span>
-                            </div>
-                            <button 
-                                id="toggle-password-btn" 
-                                type="button"
-                                class="border border-green-600 text-green-600 rounded-md py-2.5 px-5 transition duration-300 ease-in-out hover:bg-green-600 hover:text-white">
-                                {% trans 'Change Password' %}
-                            </button>
-                        </div>
-
-                        <!-- Password Form (hidden by default) -->
-                        <form id="password-form" class="hidden w-full border border-green-200 rounded-lg mt-4 password-form">
-                            {% csrf_token %}
-                            <div class="flex flex-col gap-5 p-5">
-                                <div>
-                                    <label for="current-password" class="text-sm font-semibold text-gray-600 mb-1.5 block">
-                                        {% trans 'Current password' %}
-                                    </label>
-                                    <div class="relative mt-1">
-                                        <input
-                                            type="password"
-                                            id="current-password"
-                                            name="current_password"
-                                            placeholder="{% trans 'Start typing...' %}"
-                                            required
-                                            class="placeholder:text-gray-400 font-normal text-sm p-3 w-full rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-green-600"
-                                        />
-                                        <span class="absolute inset-y-0 right-3 flex items-center cursor-pointer toggle-visibility"
-                                              data-target="current-password">
-                                            <!-- Eye icons from original -->
-                                            <svg class="eye-icon open hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                            </svg>
-                                            <svg class="eye-icon closed w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
-                                            </svg>
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label for="new-password" class="text-sm font-semibold text-gray-600 mb-1.5 block">
-                                        {% trans 'New password' %}
-                                    </label>
-                                    <div class="relative mt-1">
-                                        <input
-                                            type="password"
-                                            id="new-password"
-                                            name="new_password"
-                                            placeholder="{% trans 'Start typing...' %}"
-                                            required
-                                            class="placeholder:text-gray-400 font-normal text-sm p-3 w-full rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-green-600"
-                                        />
-                                        <span class="absolute inset-y-0 right-3 flex items-center cursor-pointer toggle-visibility"
-                                              data-target="new-password">
-                                            <svg class="eye-icon open hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                            </svg>
-                                            <svg class="eye-icon closed w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
-                                            </svg>
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label for="confirm-password" class="text-sm font-semibold text-gray-600 mb-1.5 block">
-                                        {% trans 'Confirm password' %}
-                                    </label>
-                                    <div class="relative mt-1">
-                                        <input
-                                            type="password"
-                                            id="confirm-password"
-                                            name="confirm_password"
-                                            placeholder="{% trans 'Start typing...' %}"
-                                            required
-                                            class="placeholder:text-gray-400 font-normal text-sm p-3 w-full rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-green-600"
-                                        />
-                                        <span class="absolute inset-y-0 right-3 flex items-center cursor-pointer toggle-visibility"
-                                              data-target="confirm-password">
-                                            <svg class="eye-icon open hidden w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                            </svg>
-                                            <svg class="eye-icon closed w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
-                                            </svg>
-                                        </span>
-                                    </div>
-                                    <div id="confirm-error" class="text-red-500 text-sm mt-1 hidden"></div>
-                                </div>
-
-                                <div>
-                                    <button
-                                        type="submit"
-                                        id="update-password-btn"
-                                        class="bg-green-600 hover:bg-green-700 text-white py-2.5 px-6 rounded-md transition hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                                        disabled>
-                                        {% trans 'Update password' %}
-                                    </button>
-                                </div>
-                                <div id="server-response" class="mt-2 text-sm hidden"></div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Delete Resources Section -->
-                    <div class="flex justify-between items-end mb-6">
-                        <div class="flex flex-col items-start gap-1.5">
-                            <span class="text-sm font-semibold text-gray-600">{% trans 'Delete your resources' %}</span>
-                            <span class="text-xs text-gray-400">{% trans 'Permanently delete your files and glossaries.' %}</span>
-                        </div>
-                        <div class="w-full max-w-48">
-                            <button 
-                                type="button" 
-                                id="modal-delete-resources"
-                                class="w-full border border-green-600 text-green-600 text-sm rounded-md py-2.5 px-5 transition duration-300 ease-in-out hover:bg-green-600 hover:text-white">
-                                {% trans 'Delete resources' %}
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Delete Account Section -->
-                    <div class="flex justify-between items-end">
-                        <div class="flex flex-col items-start gap-1.5">
-                            <span class="text-sm font-semibold text-gray-600">{% trans 'Delete your account' %}</span>
-                            <span class="text-xs text-gray-400">{% trans 'Permanently delete your account and all your portal data.' %}</span>
-                        </div>
-                        <div class="w-full max-w-48">
-                            <button 
-                                type="button" 
-                                id="modal-delete-account"
-                                class="w-full border border-green-600 text-green-600 text-sm rounded-md py-2.5 px-5 transition duration-300 ease-in-out hover:bg-green-600 hover:text-white">
-                                {% trans 'Delete account' %}
-                            </button>
-                        </div>
-                    </div>
+        <!-- Language -->
+        <div class="space-y-1">
+            <label for="language" class="text-sm font-semibold text-gray-900 tracking-[-0.084px] leading-6">
+                {% trans 'Language' %}
+            </label>
+            <div class="relative">
+                <select
+                        name="language"
+                        id="language"
+                        class="h-10 rounded-md border border-black/10 bg-white text-sm font-normal text-gray-900 tracking-[-0.084px] leading-6 focus:outline-none focus:ring-1 focus:ring-gray-900 px-3 w-full appearance-none pr-10">
+                    <option value="en-uk" {% if request.LANGUAGE_CODE == 'en' %}selected{% endif %}>
+                    🇬🇧 English (UK)
+                    </option>
+                    <option value="en-us">
+                        🇺🇸 English (US)
+                    </option>
+                    <option value="fr" {% if request.LANGUAGE_CODE == 'fr' %}selected{% endif %}>
+                    🇫🇷 French
+                    </option>
+                    <option value="de">
+                        🇩🇪 German
+                    </option>
+                </select>
+                <!-- Chevron Down Icon -->
+                <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- JavaScript -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Tab functionality
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabContents = document.querySelectorAll('.tab-content');
-    
-    tabButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const tabName = this.dataset.tab;
-            
-            // Remove active class from all tabs
-            tabButtons.forEach(btn => {
-                btn.classList.remove('active', 'bg-white', 'shadow-[0_0_1px_0_rgba(0,0,0,0.24),0_1px_2px_0_rgba(0,0,0,0.20)]');
-                btn.classList.add('font-normal');
-            });
-            tabContents.forEach(content => {
-                content.classList.remove('active');
-                content.classList.add('hidden');
-            });
-            
-            // Add active class to clicked tab
-            this.classList.add('active', 'bg-white', 'shadow-[0_0_1px_0_rgba(0,0,0,0.24),0_1px_2px_0_rgba(0,0,0,0.20)]');
-            this.classList.remove('font-normal');
-            this.classList.add('font-medium');
-            
-            // Show corresponding content
-            const activeContent = document.getElementById(`content-${tabName}`);
-            if (activeContent) {
-                activeContent.classList.add('active');
-                activeContent.classList.remove('hidden');
-            }
-        });
-    });
-    
-    // Manage button - switch to security tab
-    document.getElementById('manage-security-btn')?.addEventListener('click', function() {
-        document.getElementById('tab-security').click();
-    });
-    
-    // Password visibility toggle logic (from original)
-    document.querySelectorAll('.toggle-visibility').forEach(toggle => {
-        toggle.addEventListener('click', function() {
-            const targetId = this.dataset.target;
-            const input = document.getElementById(targetId);
-            const openIcon = this.querySelector('.eye-icon.open');
-            const closedIcon = this.querySelector('.eye-icon.closed');
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                openIcon.classList.remove('hidden');
-                closedIcon.classList.add('hidden');
-            } else {
-                input.type = 'password';
-                openIcon.classList.add('hidden');
-                closedIcon.classList.remove('hidden');
-            }
-        });
-    });
-    
-    // Password form toggle
-    document.getElementById('toggle-password-btn')?.addEventListener('click', function() {
-        const passwordForm = document.getElementById('password-form');
-        passwordForm.classList.toggle('hidden');
-    });
-    
-    // Password validation logic (from original)
-    const newPasswordInput = document.getElementById('new-password');
-    const confirmPasswordInput = document.getElementById('confirm-password');
-    const updatePasswordBtn = document.getElementById('update-password-btn');
-    const confirmError = document.getElementById('confirm-error');
-    
-    function validatePasswords() {
-        const newPassword = newPasswordInput?.value || '';
-        const confirmPassword = confirmPasswordInput?.value || '';
-        
-        if (newPassword && confirmPassword) {
-            if (newPassword === confirmPassword) {
-                confirmError?.classList.add('hidden');
-                updatePasswordBtn?.removeAttribute('disabled');
-                return true;
-            } else {
-                confirmError?.classList.remove('hidden');
-                confirmError.textContent = "{% trans 'Passwords do not match' %}";
-                updatePasswordBtn?.setAttribute('disabled', 'disabled');
-                return false;
-            }
-        } else {
-            updatePasswordBtn?.setAttribute('disabled', 'disabled');
-            confirmError?.classList.add('hidden');
-            return false;
-        }
-    }
-    
-    newPasswordInput?.addEventListener('input', validatePasswords);
-    confirmPasswordInput?.addEventListener('input', validatePasswords);
-    
-    // Profile form submission
-    document.querySelector('form[name="change-user-data"]')?.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this);
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        formData.append('csrfmiddlewaretoken', csrfToken);
-        
-        fetch(window.location.href, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': csrfToken,
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showMessage(data.message, 'success');
-            } else {
-                showMessage(data.error || 'An error occurred', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage('Network error occurred', 'error');
-        });
-    });
-    
-    // Password form submission
-    document.getElementById('password-form')?.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        if (!validatePasswords()) {
-            return;
-        }
-        
-        const formData = new FormData(this);
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        formData.append('csrfmiddlewaretoken', csrfToken);
-        
-        const serverResponse = document.getElementById('server-response');
-        
-        fetch(window.location.href, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': csrfToken,
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            serverResponse.classList.remove('hidden');
-            if (data.success) {
-                serverResponse.textContent = data.message;
-                serverResponse.className = 'mt-2 text-sm text-green-600';
-                // Reset form
-                this.reset();
-                validatePasswords();
-            } else {
-                serverResponse.textContent = data.error || 'An error occurred';
-                serverResponse.className = 'mt-2 text-sm text-red-600';
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            serverResponse.classList.remove('hidden');
-            serverResponse.textContent = 'Network error occurred';
-            serverResponse.className = 'mt-2 text-sm text-red-600';
-        });
-    });
-    
-    // Helper function to show messages
-    function showMessage(message, type) {
-        // Create or update a message element
-        let messageEl = document.getElementById('profile-message');
-        if (!messageEl) {
-            messageEl = document.createElement('div');
-            messageEl.id = 'profile-message';
-            messageEl.className = 'fixed top-4 right-4 p-4 rounded-md z-50';
-            document.body.appendChild(messageEl);
-        }
-        
-        messageEl.textContent = message;
-        if (type === 'success') {
-            messageEl.className = 'fixed top-4 right-4 p-4 rounded-md z-50 bg-green-100 text-green-800 border border-green-200';
-        } else {
-            messageEl.className = 'fixed top-4 right-4 p-4 rounded-md z-50 bg-red-100 text-red-800 border border-red-200';
-        }
-        
-        // Auto-hide after 3 seconds
-        setTimeout(() => {
-            messageEl.remove();
-        }, 3000);
-    }
-});
-</script>
+    <!-- Email and Username Section -->
+    <div class="space-y-4 mb-6">
+        <!-- Username -->
+        <div class="space-y-1">
+            <label for="username" class="block text-sm font-semibold text-gray-900 tracking-[-0.084px] leading-6">
+                {% trans 'Username' %}
+            </label>
+            <input
+                    type="text"
+                    name="username"
+                    id="username"
+                    value="{{ request.user.username }}"
+                    class="h-10 rounded-md border border-black/10 bg-white text-sm font-normal text-gray-900 tracking-[-0.084px] leading-6 focus:outline-none focus:ring-1 focus:ring-gray-900 px-3 w-full max-w-md"
+            />
+        </div>
 
-{% endblock %}
+        <!-- Email -->
+        <div class="space-y-1">
+            <label for="email" class="block text-sm font-semibold text-gray-900 tracking-[-0.084px] leading-6">
+                {% trans 'Email' %}
+            </label>
+            <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    value="{{ request.user.email }}"
+                    class="h-10 rounded-md border border-black/10 bg-white text-sm font-normal text-gray-900 tracking-[-0.084px] leading-6 focus:outline-none focus:ring-1 focus:ring-gray-900 px-3 w-full max-w-md"
+            />
+        </div>
+    </div>
+
+    <!-- Email and Password Section with Manage Button -->
+    <!--
+    @TODO : Popup manage email & password
+    <div class="flex items-center justify-between py-2 max-w-96">
+        <h3 class="text-sm font-semibold text-gray-900 tracking-[-0.084px] leading-6">
+            {% trans 'Email address and Password' %}
+        </h3>
+        <button
+                type="button"
+                id="manage-security-btn"
+                class="h-10 px-2.5 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-full tracking-[-0.084px] leading-6 flex items-center gap-2 transition-colors">
+            &lt;!&ndash; Wrench Icon SVG exact from Builder.io &ndash;&gt;
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span class="px-2">{% trans 'Manage' %}</span>
+        </button>
+    </div>-->
+
+    <!-- Save Button -->
+    <div class="mt-6 w-full flex justify-end">
+        <button
+                type="submit"
+                class="h-10 px-4 py-2 bg-green-800 hover:bg-green-600 text-white text-sm font-semibold rounded-full tracking-[-0.084px] leading-6 flex items-center gap-2 transition-colors">
+            {% trans 'Update Information' %}
+        </button>
+    </div>
+</form>
