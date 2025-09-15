@@ -3,17 +3,11 @@
 {% load i18n %}
 {% block content %}
 
-<div class="px-6 py-6 lg:px-13 lg:py-6">
-    <!-- Header -->
-    <div class="mb-6">
-        <h1 class="text-2xl font-semibold leading-8 tracking-[-0.456px] text-foreground mb-2">
-            {% trans 'Glossary' %}
-        </h1>
-        <p class="text-base font-normal leading-6 tracking-[-0.176px] text-muted-foreground max-w-4xl">
-            {% trans 'Find all your personal glossaries' %}
-        </p>
-    </div>
-    <div class="rounded-md px-5 pt-5 w-full h-full flex flex-col items-end bg-white">
+<div class="mx-5 mb-11.5 mt-5">
+    <h2 class="text-2xl mb-2">{% trans 'Glossary' %}</h2>
+    <div class="text-base">{% trans 'Find all your personal glossaries' %}</div>
+
+    <div class="rounded-md px-5 pt-5 mt-5 w-full h-full flex flex-col items-end bg-white">
         <div class="flex w-full items-center my-5">
             <div class="flex w-full items-center justify-between gap-4 mb-6">
                 <form method="GET" class="relative flex-1 ">
