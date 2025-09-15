@@ -126,40 +126,41 @@ $(document).ready(function () {
                 nextStep.hide();
             }
 
+            $("div[class^='step-']").addClass('hidden').hide();
             $('.step-1').removeClass('hidden').show();
-            $('.step-2').addClass('hidden').hide();
-            $('.step-indicator-2').removeClass('border-0.5 border-[#166534]');
-            $('.step-indicator-3').removeClass('border-0.5 border-[#166534]');
-            $('.step-indicator-4').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-1').addClass('border-0.5 border-[#166534]');
+            $('.stepindicator-2').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-3').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-4').removeClass('border-0.5 border-[#166534]');
         } else if (currentStep === 1) {
-            $('.step-1').addClass('hidden').hide();
+            $("div[class^='step-']").addClass('hidden').hide();
             $('.step-2').removeClass('hidden').show();
             $blockButtons.addClass('justify-between').removeClass('justify-end');
             prevStep.show();
             prevStep.css('display', 'flex');
             prevStep.prop("disabled", false);
-            $('.step-indicator-2').addClass('border-0.5 border-[#166534]');
-            $('.step-indicator-3').removeClass('border-0.5 border-[#166534]');
-            $('.step-indicator-4').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-2').addClass('border-0.5 border-[#166534]');
+            $('.stepindicator-3').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-4').removeClass('border-0.5 border-[#166534]');
         } else if (currentStep === 2) {
-            $('.step-2').addClass('hidden');
+            $("div[class^='step-']").addClass('hidden').hide();
             $('.step-3').removeClass('hidden').show();
             $blockButtons.addClass('justify-between').removeClass('justify-end');
             prevStep.show();
-            $('.step-indicator-2').addClass('border-0.5 border-[#166534]');
-            $('.step-indicator-3').addClass('border-0.5 border-[#166534]');
-            $('.step-indicator-4').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-2').addClass('border-0.5 border-[#166534]');
+            $('.stepindicator-3').addClass('border-0.5 border-[#166534]');
+            $('.stepindicator-4').removeClass('border-0.5 border-[#166534]');
         } else if (currentStep === 3) {
-            $('.step-3').addClass('hidden');
+            $("div[class^='step-']").addClass('hidden').hide();
             $('.step-4').removeClass('hidden').show();
             $blockButtons.addClass('justify-between').removeClass('justify-end');
             prevStep.show();
             $('span', $nextButton).text($('span', $nextButton).data('confirm'));
-            $('.step-indicator-2').addClass('border-0.5 border-[#166534]');
-            $('.step-indicator-3').addClass('border-0.5 border-[#166534]');
-            $('.step-indicator-4').addClass('border-0.5 border-[#166534]');
+            $('.stepindicator-2').addClass('border-0.5 border-[#166534]');
+            $('.stepindicator-3').addClass('border-0.5 border-[#166534]');
+            $('.stepindicator-4').addClass('border-0.5 border-[#166534]');
         } else if (currentStep === 4) {
-            $('.step-4').addClass('hidden');
+            $("div[class^='step-']").addClass('hidden').hide();
             $('.step-5').removeClass('hidden').show();
             $("#restart").show().text(language_code === 'en' ? "New translation" : "Nouveau document");
             $("#restart-text").show();
