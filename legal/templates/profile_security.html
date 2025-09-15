@@ -1,59 +1,85 @@
-{% extends 'base.html' %}
-
 {% load static %}
 {% load i18n %}
 
-{% block content %}
+<div class="min-h-screen">
+    <!-- Main Container -->
+    <!-- Security Content Card -->
+    <div class="w-full flex flex-col items-start gap-8 pt-4 pb-6 rounded-lg bg-white">
 
-<div class="min-h-screen bg-[#f8fafc]">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Main Container -->
-        <div class="flex flex-col items-start gap-6 py-6 sm:py-12 lg:px-14">
+        <!-- Retention Period -->
+        <div class="w-full flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 sm:gap-6">
+            <div class="flex flex-col justify-center items-start gap-2">
+                <h3 class="text-base font-normal text-[#181932] leading-6 tracking-[-0.176px]">
+                    {% trans 'Retention period' %}
+                </h3>
+                <p class="text-sm font-normal text-[#5A5A78] leading-6 tracking-[-0.084px]">
+                    {% trans 'Defines the number of days after which your history is automatically reset.' %}
+                </p>
+            </div>
+            <div class="flex flex-col items-start gap-1 w-full sm:w-auto sm:min-w-[135px]">
+                <div class="relative w-full sm:w-[135px]">
+                    <select
+                            id="retention-period"
+                            name="retention_period"
+                            class="w-full h-10 pl-2 pr-8 rounded-md border border-black/10 bg-white text-sm font-normal text-[#181932] leading-6 tracking-[-0.084px] appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                        <option value="30">{% trans '30 days' %}</option>
+                        <option value="45" selected>{% trans '45 days' %}</option>
+                        <option value="60">{% trans '60 days' %}</option>
+                        <option value="90">{% trans '90 days' %}</option>
+                    </select>
+                    <svg class="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 text-black/50 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
 
-            <!-- Security Content Card -->
-            <div class="w-full flex flex-col items-start gap-8 p-4 sm:px-6 lg:px-6 pt-4 pb-6 rounded-lg bg-white border border-gray-100 shadow-sm">
-                
-                <!-- Change Password Section -->
-                <div class="w-full flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 sm:gap-6">
-                    <div class="flex flex-col justify-center items-start gap-2">
-                        <h3 class="text-base font-normal text-[#181932] leading-6 tracking-[-0.176px]">
-                            {% trans 'Password' %}
-                        </h3>
-                        <p class="text-sm font-normal text-[#5A5A78] leading-6 tracking-[-0.084px]">
-                            {% trans 'Change your password.' %}
-                        </p>
+        <!-- Password Change Form (Hidden by default) -->
+        <form id="password-form" class="hidden w-full border border-black/10 rounded-lg p-6 bg-[#f8fafc]">
+            {% csrf_token %}
+            <div class="flex flex-col gap-6">
+                <div>
+                    <label for="current-password" class="text-sm font-medium text-[#181932] mb-2 block">
+                        {% trans 'Current password' %}
+                    </label>
+                    <div class="relative">
+                        <input
+                                type="password"
+                                id="current-password"
+                                name="current_password"
+                                placeholder="{% trans 'Start typing...' %}"
+                                required
+                                class="w-full h-10 pl-3 pr-10 rounded-md border border-black/10 bg-white text-sm font-normal text-[#181932] leading-6 tracking-[-0.084px] placeholder:text-[#5A5A78] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <span class="absolute inset-y-0 right-3 flex items-center cursor-pointer toggle-visibility"
+                              data-target="current-password">
+                                    <svg class="eye-icon open hidden w-5 h-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                    <svg class="eye-icon closed w-5 h-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                                    </svg>
+                                </span>
                     </div>
-                    <button id="toggle-password-btn" type="button" 
-                            class="flex items-center justify-center gap-2 px-2.5 py-2 rounded-full border border-black/10 bg-white hover:bg-gray-50 transition-colors duration-200 group">
-                        <svg class="w-6 h-6 text-black/80 group-hover:text-black transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                        </svg>
-                        <span class="px-2 text-sm font-semibold text-[#181932] leading-6 tracking-[-0.084px]">
-                            {% trans 'Change Password' %}
-                        </span>
-                    </button>
                 </div>
 
-                <!-- Password Change Form (Hidden by default) -->
-                <form id="password-form" class="hidden w-full border border-black/10 rounded-lg p-6 bg-[#f8fafc]">
-                    {% csrf_token %}
-                    <div class="flex flex-col gap-6">
-                        <div>
-                            <label for="current-password" class="text-sm font-medium text-[#181932] mb-2 block">
-                                {% trans 'Current password' %}
-                            </label>
-                            <div class="relative">
-                                <input
-                                    type="password"
-                                    id="current-password"
-                                    name="current_password"
-                                    placeholder="{% trans 'Start typing...' %}"
-                                    required
-                                    class="w-full h-10 pl-3 pr-10 rounded-md border border-black/10 bg-white text-sm font-normal text-[#181932] leading-6 tracking-[-0.084px] placeholder:text-[#5A5A78] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                                <span class="absolute inset-y-0 right-3 flex items-center cursor-pointer toggle-visibility"
-                                      data-target="current-password">
+                <div>
+                    <label for="new-password" class="text-sm font-medium text-[#181932] mb-2 block">
+                        {% trans 'New password' %}
+                    </label>
+                    <div class="relative">
+                        <input
+                                type="password"
+                                id="new-password"
+                                name="new_password"
+                                placeholder="{% trans 'Start typing...' %}"
+                                required
+                                class="w-full h-10 pl-3 pr-10 rounded-md border border-black/10 bg-white text-sm font-normal text-[#181932] leading-6 tracking-[-0.084px] placeholder:text-[#5A5A78] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <span class="absolute inset-y-0 right-3 flex items-center cursor-pointer toggle-visibility"
+                              data-target="new-password">
                                     <svg class="eye-icon open hidden w-5 h-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -62,24 +88,24 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
                                     </svg>
                                 </span>
-                            </div>
-                        </div>
+                    </div>
+                </div>
 
-                        <div>
-                            <label for="new-password" class="text-sm font-medium text-[#181932] mb-2 block">
-                                {% trans 'New password' %}
-                            </label>
-                            <div class="relative">
-                                <input
-                                    type="password"
-                                    id="new-password"
-                                    name="new_password"
-                                    placeholder="{% trans 'Start typing...' %}"
-                                    required
-                                    class="w-full h-10 pl-3 pr-10 rounded-md border border-black/10 bg-white text-sm font-normal text-[#181932] leading-6 tracking-[-0.084px] placeholder:text-[#5A5A78] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                                <span class="absolute inset-y-0 right-3 flex items-center cursor-pointer toggle-visibility"
-                                      data-target="new-password">
+                <div>
+                    <label for="confirm-password" class="text-sm font-medium text-[#181932] mb-2 block">
+                        {% trans 'Confirm password' %}
+                    </label>
+                    <div class="relative">
+                        <input
+                                type="password"
+                                id="confirm-password"
+                                name="confirm_password"
+                                placeholder="{% trans 'Start typing...' %}"
+                                required
+                                class="w-full h-10 pl-3 pr-10 rounded-md border border-black/10 bg-white text-sm font-normal text-[#181932] leading-6 tracking-[-0.084px] placeholder:text-[#5A5A78] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <span class="absolute inset-y-0 right-3 flex items-center cursor-pointer toggle-visibility"
+                              data-target="confirm-password">
                                     <svg class="eye-icon open hidden w-5 h-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -88,112 +114,98 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
                                     </svg>
                                 </span>
-                            </div>
-                        </div>
+                    </div>
+                    <div id="confirm-error" class="text-red-500 text-sm mt-1 hidden"></div>
+                </div>
 
-                        <div>
-                            <label for="confirm-password" class="text-sm font-medium text-[#181932] mb-2 block">
-                                {% trans 'Confirm password' %}
-                            </label>
-                            <div class="relative">
-                                <input
-                                    type="password"
-                                    id="confirm-password"
-                                    name="confirm_password"
-                                    placeholder="{% trans 'Start typing...' %}"
-                                    required
-                                    class="w-full h-10 pl-3 pr-10 rounded-md border border-black/10 bg-white text-sm font-normal text-[#181932] leading-6 tracking-[-0.084px] placeholder:text-[#5A5A78] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                                <span class="absolute inset-y-0 right-3 flex items-center cursor-pointer toggle-visibility"
-                                      data-target="confirm-password">
-                                    <svg class="eye-icon open hidden w-5 h-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                    </svg>
-                                    <svg class="eye-icon closed w-5 h-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
-                                    </svg>
-                                </span>
-                            </div>
-                            <div id="confirm-error" class="text-red-500 text-sm mt-1 hidden"></div>
-                        </div>
-
-                        <div class="flex gap-4">
-                            <button
-                                type="submit"
-                                id="update-password-btn"
-                                class="flex items-center justify-center gap-2 px-2.5 py-2 rounded-full bg-[#166534] hover:bg-[#166534]/90 text-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled
-                            >
+                <div class="flex gap-4">
+                    <button
+                            type="submit"
+                            id="update-password-btn"
+                            class="flex items-center justify-center gap-2 px-2.5 py-2 rounded-full bg-[#166534] hover:bg-[#166534]/90 text-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled
+                    >
                                 <span class="px-2 text-sm font-semibold text-white leading-6 tracking-[-0.084px]">
                                     {% trans 'Update password' %}
                                 </span>
-                            </button>
-                            <button
-                                type="button"
-                                id="cancel-password-btn"
-                                class="flex items-center justify-center gap-2 px-2.5 py-2 rounded-full border border-black/10 bg-white hover:bg-gray-50 transition-colors duration-200"
-                            >
+                    </button>
+                    <button
+                            type="button"
+                            id="cancel-password-btn"
+                            class="flex items-center justify-center gap-2 px-2.5 py-2 rounded-full border border-black/10 bg-white hover:bg-gray-50 transition-colors duration-200"
+                    >
                                 <span class="px-2 text-sm font-semibold text-[#181932] leading-6 tracking-[-0.084px]">
                                     {% trans 'Cancel' %}
                                 </span>
-                            </button>
-                        </div>
-                        <div id="server-response" class="mt-2 text-sm hidden"></div>
-                    </div>
-                </form>
-
-                <!-- Retention Period -->
-                <div class="w-full flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 sm:gap-6">
-                    <div class="flex flex-col justify-center items-start gap-2">
-                        <h3 class="text-base font-normal text-[#181932] leading-6 tracking-[-0.176px]">
-                            {% trans 'Retention period' %}
-                        </h3>
-                        <p class="text-sm font-normal text-[#5A5A78] leading-6 tracking-[-0.084px]">
-                            {% trans 'Defines the number of days after which your history is automatically reset.' %}
-                        </p>
-                    </div>
-                    <div class="flex flex-col items-start gap-1 w-full sm:w-auto sm:min-w-[135px]">
-                        <div class="relative w-full sm:w-[135px]">
-                            <select
-                                id="retention-period"
-                                name="retention_period"
-                                class="w-full h-10 pl-2 pr-8 rounded-md border border-black/10 bg-white text-sm font-normal text-[#181932] leading-6 tracking-[-0.084px] appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                <option value="30">{% trans '30 days' %}</option>
-                                <option value="45" selected>{% trans '45 days' %}</option>
-                                <option value="60">{% trans '60 days' %}</option>
-                                <option value="90">{% trans '90 days' %}</option>
-                            </select>
-                            <svg class="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 text-black/50 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Delete Resources -->
-                <div class="w-full flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 sm:gap-6">
-                    <div class="flex flex-col items-start gap-2">
-                        <h3 class="text-base font-normal text-[#181932] leading-6 tracking-[-0.176px]">
-                            {% trans 'Delete resources' %}
-                        </h3>
-                        <p class="text-sm font-normal text-[#5A5A78] leading-6 tracking-[-0.084px]">
-                            {% trans 'Permanently deletes your translations and glossaries.' %}
-                        </p>
-                    </div>
-                    <button id="modal-delete-resources" class="flex items-center justify-center gap-2 px-2.5 py-2 rounded-full border border-black/10 bg-white hover:bg-gray-50 transition-colors duration-200 group">
-                        <svg class="w-6 h-6 text-black/80 group-hover:text-black transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
-                        <span class="px-2 text-sm font-semibold text-[#181932] leading-6 tracking-[-0.084px]">
-                            {% trans 'Delete' %}
-                        </span>
                     </button>
                 </div>
-
+                <div id="server-response" class="mt-2 text-sm hidden"></div>
             </div>
+        </form>
+
+        <!-- Delete Resources -->
+        <div class="w-full flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 sm:gap-6">
+            <div class="flex flex-col items-start gap-2">
+                <h3 class="text-base font-normal text-[#181932] leading-6 tracking-[-0.176px]">
+                    {% trans 'Delete resources' %}
+                </h3>
+                <p class="text-sm font-normal text-[#5A5A78] leading-6 tracking-[-0.084px]">
+                    {% trans 'Permanently deletes your translations and glossaries.' %}
+                </p>
+            </div>
+            <button id="modal-delete-resources" class="flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white hover:bg-gray-50 transition-colors duration-200 group">
+                <svg class="w-6 h-6 text-black/80 group-hover:text-black transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                <span class="px-2 text-sm font-semibold text-[#181932] leading-6 tracking-[-0.084px]">
+                    {% trans 'Delete' %}
+                </span>
+            </button>
         </div>
+
+
+        <!-- Change Password Section -->
+        <div class="w-full flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 sm:gap-6">
+            <div class="flex flex-col justify-center items-start gap-2">
+                <h3 class="text-base font-normal text-[#181932] leading-6 tracking-[-0.176px]">
+                    {% trans 'Password' %}
+                </h3>
+                <p class="text-sm font-normal text-[#5A5A78] leading-6 tracking-[-0.084px]">
+                    {% trans 'Change your password.' %}
+                </p>
+            </div>
+            <button id="toggle-password-btn" type="button"
+                    class="flex items-center justify-center gap-2 px-2.5 py-2 rounded-full border border-black/10 bg-white hover:bg-gray-50 transition-colors duration-200 group">
+                <svg class="w-6 h-6 text-black/80 group-hover:text-black transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                <span class="px-2 text-sm font-semibold text-[#181932] leading-6 tracking-[-0.084px]">
+                    {% trans 'Change Password' %}
+                </span>
+            </button>
+        </div>
+
+        <!-- @TODO : Delete my account functionnality -->
+        <div class="w-full flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 sm:gap-6">
+            <div class="flex flex-col items-start gap-2">
+                <h3 class="text-base font-normal text-[#181932] leading-6 tracking-[-0.176px]">
+                    {% trans 'Delete my account' %}
+                </h3>
+                <p class="text-sm font-normal text-[#5A5A78] leading-6 tracking-[-0.084px]">
+                    {% trans 'Permanently deletes your account and all associated data.' %}
+                </p>
+            </div>
+            <button id="modal-delete-account" class="flex items-center justify-center gap-2 px-4 py-2 bg-red-500 rounded-full border border-black/10 bg-white hover:bg-gray-50 transition-colors duration-200 group">
+                {% include 'svg/icons/trash_white.svg' %}
+                <span class="px-2 text-sm font-semibold text-white leading-6 tracking-[-0.084px]">
+                    {% trans 'Delete' %}
+                </span>
+            </button>
+        </div>
+
+
+
     </div>
 </div>
 
@@ -216,25 +228,25 @@
             <form id="delete-account-form" class="w-full">
                 {% csrf_token %}
                 <input
-                    type="text"
-                    id="delete-confirmation"
-                    name="confirmation"
-                    placeholder="{% trans 'Type DELETE here' %}"
-                    class="w-full h-10 px-3 rounded-md border border-black/10 bg-white text-sm font-normal text-[#181932] placeholder:text-[#5A5A78] focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4"
+                        type="text"
+                        id="delete-confirmation"
+                        name="confirmation"
+                        placeholder="{% trans 'Type DELETE here' %}"
+                        class="w-full h-10 px-3 rounded-md border border-black/10 bg-white text-sm font-normal text-[#181932] placeholder:text-[#5A5A78] focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4"
                 />
                 <div class="flex gap-3 justify-center">
                     <button
-                        type="button"
-                        id="cancel-delete-account"
-                        class="flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white hover:bg-gray-50 transition-colors duration-200"
+                            type="button"
+                            id="cancel-delete-account"
+                            class="flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white hover:bg-gray-50 transition-colors duration-200"
                     >
                         <span class="text-sm font-semibold text-[#181932]">{% trans 'Cancel' %}</span>
                     </button>
                     <button
-                        type="submit"
-                        id="confirm-delete-account"
-                        class="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#EF4444] hover:bg-[#DC2626] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled
+                            type="submit"
+                            id="confirm-delete-account"
+                            class="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#EF4444] hover:bg-[#DC2626] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled
                     >
                         <span class="text-sm font-semibold text-white">{% trans 'Delete Account' %}</span>
                     </button>
@@ -259,16 +271,16 @@
                 {% csrf_token %}
                 <div class="flex gap-3 justify-center">
                     <button
-                        type="button"
-                        id="cancel-delete-resources"
-                        class="flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white hover:bg-gray-50 transition-colors duration-200"
+                            type="button"
+                            id="cancel-delete-resources"
+                            class="flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white hover:bg-gray-50 transition-colors duration-200"
                     >
                         <span class="text-sm font-semibold text-[#181932]">{% trans 'Cancel' %}</span>
                     </button>
                     <button
-                        type="submit"
-                        id="confirm-delete-resources"
-                        class="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#EF4444] hover:bg-[#DC2626] transition-colors duration-200"
+                            type="submit"
+                            id="confirm-delete-resources"
+                            class="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#EF4444] hover:bg-[#DC2626] transition-colors duration-200"
                     >
                         <span class="text-sm font-semibold text-white">{% trans 'Delete Resources' %}</span>
                     </button>
@@ -279,149 +291,147 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Password form toggle
-    const togglePasswordBtn = document.getElementById('toggle-password-btn');
-    const passwordForm = document.getElementById('password-form');
-    const cancelPasswordBtn = document.getElementById('cancel-password-btn');
+    document.addEventListener('DOMContentLoaded', function () {
+        // Password form toggle
+        const togglePasswordBtn = document.getElementById('toggle-password-btn');
+        const passwordForm = document.getElementById('password-form');
+        const cancelPasswordBtn = document.getElementById('cancel-password-btn');
 
-    if (togglePasswordBtn && passwordForm) {
-        togglePasswordBtn.addEventListener('click', function() {
-            passwordForm.classList.toggle('hidden');
-        });
-    }
-
-    if (cancelPasswordBtn && passwordForm) {
-        cancelPasswordBtn.addEventListener('click', function() {
-            passwordForm.classList.add('hidden');
-            passwordForm.reset();
-        });
-    }
-
-    // Password visibility toggles
-    document.querySelectorAll('.toggle-visibility').forEach(function(toggle) {
-        toggle.addEventListener('click', function() {
-            const targetId = this.getAttribute('data-target');
-            const targetInput = document.getElementById(targetId);
-            const openIcon = this.querySelector('.eye-icon.open');
-            const closedIcon = this.querySelector('.eye-icon.closed');
-
-            if (targetInput.type === 'password') {
-                targetInput.type = 'text';
-                openIcon.classList.remove('hidden');
-                closedIcon.classList.add('hidden');
-            } else {
-                targetInput.type = 'password';
-                openIcon.classList.add('hidden');
-                closedIcon.classList.remove('hidden');
-            }
-        });
-    });
-
-    // Password validation
-    const newPasswordInput = document.getElementById('new-password');
-    const confirmPasswordInput = document.getElementById('confirm-password');
-    const updatePasswordBtn = document.getElementById('update-password-btn');
-    const confirmError = document.getElementById('confirm-error');
-
-    function validatePasswords() {
-        const newPassword = newPasswordInput.value;
-        const confirmPassword = confirmPasswordInput.value;
-        
-        if (newPassword && confirmPassword) {
-            if (newPassword === confirmPassword) {
-                confirmError.classList.add('hidden');
-                updatePasswordBtn.disabled = false;
-            } else {
-                confirmError.textContent = "{% trans 'Passwords do not match' %}";
-                confirmError.classList.remove('hidden');
-                updatePasswordBtn.disabled = true;
-            }
-        } else {
-            updatePasswordBtn.disabled = true;
-            confirmError.classList.add('hidden');
-        }
-    }
-
-    if (newPasswordInput && confirmPasswordInput) {
-        newPasswordInput.addEventListener('input', validatePasswords);
-        confirmPasswordInput.addEventListener('input', validatePasswords);
-    }
-
-    // Password form submission
-    const passwordFormElement = document.getElementById('password-form');
-    if (passwordFormElement) {
-        passwordFormElement.addEventListener('submit', function(e) {
-            e.preventDefault();
-            // Add your password update logic here
-            console.log('Password update submitted');
-        });
-    }
-
-    // Retention period change
-    const retentionSelect = document.getElementById('retention-period');
-    if (retentionSelect) {
-        retentionSelect.addEventListener('change', function() {
-            // Add your retention period update logic here
-            console.log('Retention period changed to:', this.value);
-        });
-    }
-
-    // Delete modals
-    const deleteAccountBtn = document.getElementById('modal-delete-account');
-    const deleteAccountModal = document.getElementById('delete-account-modal');
-    const cancelDeleteAccountBtn = document.getElementById('cancel-delete-account');
-    const deleteConfirmationInput = document.getElementById('delete-confirmation');
-    const confirmDeleteAccountBtn = document.getElementById('confirm-delete-account');
-
-    if (deleteAccountBtn && deleteAccountModal) {
-        deleteAccountBtn.addEventListener('click', function() {
-            deleteAccountModal.classList.remove('hidden');
-        });
-    }
-
-    if (cancelDeleteAccountBtn && deleteAccountModal) {
-        cancelDeleteAccountBtn.addEventListener('click', function() {
-            deleteAccountModal.classList.add('hidden');
-            deleteConfirmationInput.value = '';
-            confirmDeleteAccountBtn.disabled = true;
-        });
-    }
-
-    if (deleteConfirmationInput && confirmDeleteAccountBtn) {
-        deleteConfirmationInput.addEventListener('input', function() {
-            confirmDeleteAccountBtn.disabled = this.value !== 'DELETE';
-        });
-    }
-
-    // Delete resources modal
-    const deleteResourcesBtn = document.getElementById('modal-delete-resources');
-    const deleteResourcesModal = document.getElementById('delete-resources-modal');
-    const cancelDeleteResourcesBtn = document.getElementById('cancel-delete-resources');
-
-    if (deleteResourcesBtn && deleteResourcesModal) {
-        deleteResourcesBtn.addEventListener('click', function() {
-            deleteResourcesModal.classList.remove('hidden');
-        });
-    }
-
-    if (cancelDeleteResourcesBtn && deleteResourcesModal) {
-        cancelDeleteResourcesBtn.addEventListener('click', function() {
-            deleteResourcesModal.classList.add('hidden');
-        });
-    }
-
-    // Close modals when clicking outside
-    [deleteAccountModal, deleteResourcesModal].forEach(function(modal) {
-        if (modal) {
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    modal.classList.add('hidden');
-                }
+        if (togglePasswordBtn && passwordForm) {
+            togglePasswordBtn.addEventListener('click', function () {
+                passwordForm.classList.toggle('hidden');
             });
         }
-    });
-});
-</script>
 
-{% endblock %}
+        if (cancelPasswordBtn && passwordForm) {
+            cancelPasswordBtn.addEventListener('click', function () {
+                passwordForm.classList.add('hidden');
+                passwordForm.reset();
+            });
+        }
+
+        // Password visibility toggles
+        document.querySelectorAll('.toggle-visibility').forEach(function (toggle) {
+            toggle.addEventListener('click', function () {
+                const targetId = this.getAttribute('data-target');
+                const targetInput = document.getElementById(targetId);
+                const openIcon = this.querySelector('.eye-icon.open');
+                const closedIcon = this.querySelector('.eye-icon.closed');
+
+                if (targetInput.type === 'password') {
+                    targetInput.type = 'text';
+                    openIcon.classList.remove('hidden');
+                    closedIcon.classList.add('hidden');
+                } else {
+                    targetInput.type = 'password';
+                    openIcon.classList.add('hidden');
+                    closedIcon.classList.remove('hidden');
+                }
+            });
+        });
+
+        // Password validation
+        const newPasswordInput = document.getElementById('new-password');
+        const confirmPasswordInput = document.getElementById('confirm-password');
+        const updatePasswordBtn = document.getElementById('update-password-btn');
+        const confirmError = document.getElementById('confirm-error');
+
+        function validatePasswords() {
+            const newPassword = newPasswordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (newPassword && confirmPassword) {
+                if (newPassword === confirmPassword) {
+                    confirmError.classList.add('hidden');
+                    updatePasswordBtn.disabled = false;
+                } else {
+                    confirmError.textContent = "{% trans 'Passwords do not match' %}";
+                    confirmError.classList.remove('hidden');
+                    updatePasswordBtn.disabled = true;
+                }
+            } else {
+                updatePasswordBtn.disabled = true;
+                confirmError.classList.add('hidden');
+            }
+        }
+
+        if (newPasswordInput && confirmPasswordInput) {
+            newPasswordInput.addEventListener('input', validatePasswords);
+            confirmPasswordInput.addEventListener('input', validatePasswords);
+        }
+
+        // Password form submission
+        const passwordFormElement = document.getElementById('password-form');
+        if (passwordFormElement) {
+            passwordFormElement.addEventListener('submit', function (e) {
+                e.preventDefault();
+                // Add your password update logic here
+                console.log('Password update submitted');
+            });
+        }
+
+        // Retention period change
+        const retentionSelect = document.getElementById('retention-period');
+        if (retentionSelect) {
+            retentionSelect.addEventListener('change', function () {
+                // Add your retention period update logic here
+                console.log('Retention period changed to:', this.value);
+            });
+        }
+
+        // Delete modals
+        const deleteAccountBtn = document.getElementById('modal-delete-account');
+        const deleteAccountModal = document.getElementById('delete-account-modal');
+        const cancelDeleteAccountBtn = document.getElementById('cancel-delete-account');
+        const deleteConfirmationInput = document.getElementById('delete-confirmation');
+        const confirmDeleteAccountBtn = document.getElementById('confirm-delete-account');
+
+        if (deleteAccountBtn && deleteAccountModal) {
+            deleteAccountBtn.addEventListener('click', function () {
+                deleteAccountModal.classList.remove('hidden');
+            });
+        }
+
+        if (cancelDeleteAccountBtn && deleteAccountModal) {
+            cancelDeleteAccountBtn.addEventListener('click', function () {
+                deleteAccountModal.classList.add('hidden');
+                deleteConfirmationInput.value = '';
+                confirmDeleteAccountBtn.disabled = true;
+            });
+        }
+
+        if (deleteConfirmationInput && confirmDeleteAccountBtn) {
+            deleteConfirmationInput.addEventListener('input', function () {
+                confirmDeleteAccountBtn.disabled = this.value !== 'DELETE';
+            });
+        }
+
+        // Delete resources modal
+        const deleteResourcesBtn = document.getElementById('modal-delete-resources');
+        const deleteResourcesModal = document.getElementById('delete-resources-modal');
+        const cancelDeleteResourcesBtn = document.getElementById('cancel-delete-resources');
+
+        if (deleteResourcesBtn && deleteResourcesModal) {
+            deleteResourcesBtn.addEventListener('click', function () {
+                deleteResourcesModal.classList.remove('hidden');
+            });
+        }
+
+        if (cancelDeleteResourcesBtn && deleteResourcesModal) {
+            cancelDeleteResourcesBtn.addEventListener('click', function () {
+                deleteResourcesModal.classList.add('hidden');
+            });
+        }
+
+        // Close modals when clicking outside
+        [deleteAccountModal, deleteResourcesModal].forEach(function (modal) {
+            if (modal) {
+                modal.addEventListener('click', function (e) {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    });
+</script>
