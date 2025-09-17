@@ -1,10 +1,17 @@
 {% load i18n %}
-<div class="flex h-screen w-22 flex-col justify-between items-center bg-green-950 border-r border-black/10 py-6 px-4 flex-shrink-0">
+{% load static %}
+{% url 'dashboard' as dashboard_url %}
+{% url 'main_index' as main_index_url %}
+{% url 'glossaries' as glossaries_url %}
+{% url 'project_history' as project_history_url %}
+{% url 'writing' as writing_url %}
+
+<div class="flex h-screen w-22 flex-col justify-between items-center bg-green-950 border-r border-black/10 pt-1.5 px-4 flex-shrink-0">
     <!-- Top area -->
     <div class="flex flex-col items-center gap-6">
         <!-- Logo -->
         <div class="w-[63px] h-[37px] rounded-md flex items-center justify-center">
-            <a href="/">
+            <a href="{% url 'dashboard' %}">
                 <svg height="37" width="63" id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1920 1080">
                     <path fill="#FFFFFF"
                           d="M242,325v402.5h227.1c18.1,0,32,4.4,41.7,13.2,9.7,8.8,14.5,19.9,14.5,33.2s-4.8,24.6-14.3,33c-9.6,8.4-23.5,12.6-41.9,12.6H198.7c-24.4,0-41.9-5.4-52.6-16.2-10.7-10.8-16-28.3-16-52.4v-425.9c0-22.6,5.1-39.6,15.3-50.9,10.2-11.3,23.6-17,40.2-17s30.5,5.6,40.9,16.8c10.4,11.2,15.6,28.2,15.6,51.1Z"/>
@@ -21,48 +28,25 @@
         <!-- Navigation icons -->
         <div class="flex flex-col items-center gap-2">
             <!-- Home/Dashboard -->
-            <a href="{% url 'dashboard' %}"
-               class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'dashboard' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
-               aria-label="{% trans 'Dashboard' %}">
-                <i class="ph-fill ph-house {% if request.resolver_match.url_name == 'dashboard' %}text-black/80{% else %}text-white{% endif %} text-[24px]"></i>
-            </a>
+            {% include "sidebar/sidebar_item.html" with url_name="dashboard" href=dashboard_url icon_class="ph-fill ph-house" aria_label=_('Dashboard') %}
 
             <!-- Translate -->
-            <a href="{% url 'main_index' %}"
-               class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'main_index' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
-               aria-label="{% trans 'Translation' %}">
-                <i class="ph-fill ph-translate {% if request.resolver_match.url_name == 'main_index' %}text-black/80{% else %}text-white{% endif %} text-[24px]"></i>
-            </a>
+            {% include "sidebar/sidebar_item.html" with url_name="main_index" href=main_index_url icon_class="ph-fill ph-translate" aria_label=_('Translation') %}
 
             <!-- Glossaries/Books -->
-            <a href="{% url 'glossaries' %}"
-               class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'glossaries' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
-               aria-label="{% trans 'Glossaries' %}">
-                <i class="ph-fill ph-books {% if request.resolver_match.url_name == 'glossaries' %}text-black/80{% else %}text-white{% endif %} text-[24px]"></i>
-            </a>
+            {% include "sidebar/sidebar_item.html" with url_name="glossaries" href=glossaries_url icon_class="ph-fill ph-books" aria_label=_('Glossaries') %}
 
             <!-- Archive/Project History -->
-            <a href="{% url 'project_history' %}"
-               class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'project_history' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
-               aria-label="{% trans 'Project history' %}">
-                <i class="ph-fill ph-archive-box {% if request.resolver_match.url_name == 'project_history' %}text-black/80{% else %}text-white{% endif %} text-[24px]"></i>
-            </a>
+            {% include "sidebar/sidebar_item.html" with url_name="project_history" href=project_history_url icon_class="ph-fill ph-archive-box" aria_label=_('Project history') %}
 
             <!-- Edit/Writing -->
-            <a href="{% url 'writing' %}"
-               class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'writing' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
-               aria-label="{% trans 'Writing' %}">
-                <i class="ph-fill ph-pencil-simple-line {% if request.resolver_match.url_name == 'writing' %}text-black/80{% else %}text-white{% endif %} text-[24px]"></i>
-            </a>
+            {% include "sidebar/sidebar_item.html" with url_name="writing" href=writing_url icon_class="ph-fill ph-pencil-simple" aria_label=_('Writing') %}
 
-            
         </div>
     </div>
 
     <!-- Bottom support icon -->
-    <div class="flex p-2 justify-center items-center gap-1.5 rounded-lg hover:bg-white/10 transition-colors">
-        <a href="mailto:{{ preferences.MainSettings.support_email }}" aria-label="{% trans 'Support' %}">
-            <i class="ph-fill ph-headset text-white text-[24px]"></i>
-        </a>
-    </div>
+    {% include "sidebar/sidebar_item.html" with url_name="" href="mailto:"|add:preferences.MainSettings.support_email icon_class="ph-fill ph-headset" aria_label=_('Support') %}
 </div>
+
+

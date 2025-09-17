@@ -1,6 +1,7 @@
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.urls import path, re_path
+from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 from .views import TranslateView, FileExpertRevisionView, ProjectsHistoryView, SingleProjectView, \
@@ -13,7 +14,8 @@ from writing.views import refresh_prompts_view
 from glossaries.views import MyTeamView
 
 urlpatterns = i18n_patterns(
-    path("", login_required(TranslateView.as_view()), name="main_index"),
+    path("", login_required(RedirectView.as_view(pattern_name='dashboard')), name="root_redirect"),
+    path("translate/", login_required(TranslateView.as_view()), name="main_index"),
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
     
