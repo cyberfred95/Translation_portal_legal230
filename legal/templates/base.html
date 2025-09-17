@@ -215,19 +215,19 @@
 
 <body class="font-poppins font-medium">
 
-<div class="flex min-h-screen overflow-hidden relative">
+<div class="flex h-screen overflow-hidden relative">
     <!-- Sidebar -->
     <div class="fixed top-0 left-0 h-screen w-22 scrollbar-hide">
         {% include 'sidebar/sidbar.html' %}
     </div>
 
     <!-- Main content -->
-    <div class="flex-1 flex flex-col overflow-hidden bg-gray-60 ml-22">
+    <div class="flex-1 flex flex-col overflow-hidden bg-gray-60 ml-22 min-h-0">
         <!-- Header -->
         {% include 'header/header.html' %}
 
         <!-- Scrollable content -->
-        <main class="flex-1 overflow-y-auto relative pt-14 bg-gray-50">
+        <main class="flex-1 overflow-y-auto relative mt-14 bg-gray-50 min-h-0" style="height: calc(100vh - 3.5rem);">
             <div id="main-loader" class="absolute inset-0 bg-gray-500 bg-opacity-50 hidden flex items-center justify-center z-50">
                 <div class="bg-white rounded-lg p-8 flex flex-col items-center shadow-lg">
                     <span class="loader mb-4"></span>
