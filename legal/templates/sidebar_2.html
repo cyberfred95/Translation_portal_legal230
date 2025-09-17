@@ -24,79 +24,45 @@
             <a href="{% url 'dashboard' %}"
                class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'dashboard' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
                aria-label="{% trans 'Dashboard' %}">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="{% if request.resolver_match.url_name == 'dashboard' %}text-black/80{% else %}text-white{% endif %}">
-                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                <i class="ph-fill ph-house {% if request.resolver_match.url_name == 'dashboard' %}text-black/80{% else %}text-white{% endif %} text-[24px]"></i>
             </a>
 
             <!-- Translate -->
             <a href="{% url 'main_index' %}"
                class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'main_index' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
                aria-label="{% trans 'Translation' %}">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="{% if request.resolver_match.url_name == 'main_index' %}text-black/80{% else %}text-white{% endif %}">
-                    <path d="m5 8 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="m4 14 6-6 2-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 5h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M7 2h1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="m22 22-5-10-5 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M14 18h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                <i class="ph-fill ph-translate {% if request.resolver_match.url_name == 'main_index' %}text-black/80{% else %}text-white{% endif %} text-[24px]"></i>
             </a>
 
             <!-- Glossaries/Books -->
             <a href="{% url 'glossaries' %}"
                class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'glossaries' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
                aria-label="{% trans 'Glossaries' %}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{% if request.resolver_match.url_name == 'glossaries' %}text-black/80{% else %}text-white{% endif %}">
-                     <path d="M18.2172 16.239L15.1056 1.44525C15.0654 1.25179 14.9873 1.06818 14.8759 0.904986C14.7645 0.741788 14.6219 0.602213 14.4564 0.494277C14.2909 0.386341 14.1057 0.312173 13.9114 0.276033C13.7171 0.239893 13.5176 0.242494 13.3244 0.283685L8.93594 1.22681C8.54776 1.3118 8.20885 1.54662 7.99291 1.8802C7.77696 2.21377 7.70146 2.61911 7.78281 3.00806L10.8944 17.8018C10.9637 18.1393 11.1471 18.4427 11.4138 18.6609C11.6805 18.8791 12.0142 18.9988 12.3588 18.9999C12.4653 18.9998 12.5715 18.9885 12.6756 18.9662L17.0641 18.0231C17.4527 17.9379 17.792 17.7026 18.0079 17.3684C18.2239 17.0343 18.2991 16.6283 18.2172 16.239ZM9.25 2.7015C9.25 2.69587 9.25 2.69306 9.25 2.69306L13.6375 1.75556L13.9497 3.24337L9.56219 4.18744L9.25 2.7015ZM10.1875 7.14337L9.87344 5.65275L14.2628 4.70962L14.5759 6.20025L10.1875 7.14337ZM16.75 16.5568L12.3625 17.4943L12.0503 16.0065L16.4378 15.0624L16.75 16.5484C16.75 16.554 16.75 16.5568 16.75 16.5568ZM6.25 0.999935H1.75C1.35218 0.999935 0.970644 1.15797 0.68934 1.43928C0.408035 1.72058 0.25 2.10211 0.25 2.49994V17.4999C0.25 17.8978 0.408035 18.2793 0.68934 18.5606C0.970644 18.8419 1.35218 18.9999 1.75 18.9999H6.25C6.64782 18.9999 7.02936 18.8419 7.31066 18.5606C7.59196 18.2793 7.75 17.8978 7.75 17.4999V2.49994C7.75 2.10211 7.59196 1.72058 7.31066 1.43928C7.02936 1.15797 6.64782 0.999935 6.25 0.999935ZM1.75 2.49994H6.25V3.99994H1.75V2.49994ZM6.25 17.4999H1.75V15.9999H6.25V17.4999Z" fill="white"/>
-                </svg>
+                <i class="ph-fill ph-books {% if request.resolver_match.url_name == 'glossaries' %}text-black/80{% else %}text-white{% endif %} text-[24px]"></i>
             </a>
 
             <!-- Archive/Project History -->
             <a href="{% url 'project_history' %}"
                class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'project_history' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
                aria-label="{% trans 'Project history' %}">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="{% if request.resolver_match.url_name == 'project_history' %}text-black/80{% else %}text-white{% endif %}">
-                    <rect width="20" height="5" x="2" y="3" rx="1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M10 12v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M14 12v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                <i class="ph-fill ph-archive-box {% if request.resolver_match.url_name == 'project_history' %}text-black/80{% else %}text-white{% endif %} text-[24px]"></i>
             </a>
 
             <!-- Edit/Writing -->
             <a href="{% url 'writing' %}"
                class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'writing' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
                aria-label="{% trans 'Writing' %}">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="{% if request.resolver_match.url_name == 'writing' %}text-black/80{% else %}text-white{% endif %}">
-                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="m15 5 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                <i class="ph-fill ph-pencil-simple-line {% if request.resolver_match.url_name == 'writing' %}text-black/80{% else %}text-white{% endif %} text-[24px]"></i>
             </a>
 
-            <!-- Usage/Align -->
-            <a href="{% url 'usage' %}?date_from={{ request.GET.date_from|default:''|date:'Y-m-d'|default:'' }}{% if not request.GET.date_from %}{% now 'Y-m-01' %}{% endif %}&date_to={{ request.GET.date_to|default:''|date:'Y-m-d'|default:'' }}{% if not request.GET.date_to %}{% now 'Y-m-t' %}{% endif %}"
-               class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if request.resolver_match.url_name == 'usage' %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
-               aria-label="{% trans 'Usage' %}">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="{% if request.resolver_match.url_name == 'usage' %}text-black/80{% else %}text-white{% endif %}">
-                    <rect width="6" height="14" x="2" y="5" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <rect width="6" height="10" x="16" y="9" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M12 2v20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </a>
+            
         </div>
     </div>
 
     <!-- Bottom support icon -->
     <div class="flex p-2 justify-center items-center gap-1.5 rounded-lg hover:bg-white/10 transition-colors">
         <a href="mailto:{{ preferences.MainSettings.support_email }}" aria-label="{% trans 'Support' %}">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-white">
-                <path d="M3 11v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="m19 10-2 2-2-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="m9 10-2 2-2-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <i class="ph-fill ph-headset text-white text-[24px]"></i>
         </a>
     </div>
 </div>
