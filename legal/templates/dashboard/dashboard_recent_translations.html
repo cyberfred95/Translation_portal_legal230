@@ -1,0 +1,144 @@
+{% load i18n %}
+<div class="table-container">
+  <div style="margin-bottom:1rem;">
+    <h2 style="color:#181932;font-size:1.2rem;font-weight:600;">{% trans 'Recent translations' %}</h2>
+  </div>
+  <div class="filters-row">
+    <select class="filter-select" id="statusFilter" onchange="filterTable()">
+      <option value="">{% trans "Statuts" %}</option>
+      {% for status in available_statuses %}
+        <option value="{{ status.value }}">{{ status.label }}</option>
+      {% endfor %}
+    </select>
+    <select class="filter-select" id="languageFilter" onchange="filterTable()">
+      <option value="">{% trans "Translation language" %}</option>
+      {% for language in available_languages %}
+        <option value="{{ language.value }}">{{ language.label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <table class="dashboard-table">
+    <thead>
+      <tr>
+        <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-file-text" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Document' %}</span></th>
+        <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-megaphone" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Language' %}</span></th>
+        <th class="status-col"><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-clock-clockwise" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Status' %}</span></th>
+        <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-calendar-blank" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Creation date' %}</span></th>
+        <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-wrench" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Actions' %}</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if projects.results %}
+        {% for project in projects.results %}
+        <tr data-type="{{ project.document_type }}" data-status="{{ project.status }}" data-language="{{ project.source_language|upper }} → {{ project.target_language|upper }}" data-filename="{{ project.source_file_name|lower }}">
+          <td>
+            <span class="doc-title">{{ project.source_file_name }}</span><br>
+            <span class="doc-subtitle">
+              {% if project.document_type == 'text' %}
+                {% trans 'Text' %} • 1 {% trans 'page' %}
+              {% else %}
+                {% trans 'Document' %} • {{ project.page_count|default:"N/A" }} {% trans 'page' %}{% if project.page_count > 1 %}s{% endif %}
+              {% endif %}
+            </span>
+          </td>
+          <td>{{ project.source_language|upper }} → {{ project.target_language|upper }}</td>
+          <td class="status-col">
+            {% if project.status == 'Translated' %}
+              <span class="status-badge status-completed">
+                <i class="ph ph-check-circle" style="font-size: 16px; color: #16a34a;"></i>
+                {{ project.status }}
+              </span>
+            {% elif project.status == 'Error' %}
+              <span class="status-badge status-error">
+                <i class="ph ph-warning-circle" style="font-size: 16px; color: #dc2626;"></i>
+                {{ project.status }}
+              </span>
+            {% elif 'post-editing' in project.status|lower %}
+              <span class="status-badge status-post-editing">
+                <i class="ph ph-pencil" style="font-size: 16px; color: #3b82f6;"></i>
+                {{ project.status }}
+              </span>
+            {% else %}
+              <span class="status-badge status-default">
+                {{ project.status }}
+              </span>
+            {% endif %}
+          </td>
+          <td>{{ project.created_at|date:"d/m/Y" }}</td>
+          <td class="table-actions">
+            <a href="{% url 'project_history_2' %}" title="View" style="display: inline-block; color: inherit; text-decoration: none;">
+              <i class="ph ph-eye" style="font-size: 16px; color: #374151;"></i>
+            </a>
+            {% if project.translated_file %}
+            <button title="Download" onclick="window.open('{{ project.translated_file }}', '_blank')">
+              <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
+            </button>
+            {% else %}
+            <button title="Download" disabled style="opacity: 0.5; cursor: not-allowed;">
+              <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
+            </button>
+            {% endif %}
+            <button title="Share">
+              <i class="ph ph-share" style="font-size: 16px; color: #374151;"></i>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 2rem; color: #6b7280;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+              <i class="ph ph-file-text" style="font-size: 48px; opacity: 0.5;"></i>
+              <p style="font-weight: 600;">{% trans 'No translations found' %}</p>
+              <p style="font-size: 0.875rem;">{% trans 'Start by translating your first document or text.' %}</p>
+            </div>
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+  
+  <!-- Pagination -->
+  {% if paginator.has_multiple_pages %}
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding: 0 1rem;">
+    <div style="color: #6b7280; font-size: 0.875rem;">
+      Showing {{ paginator.start_index }} to {{ paginator.end_index }} of {{ paginator.count }} results
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      {% if paginator.has_previous %}
+      <a href="?page={{ paginator.previous_page_number }}{% if current_type_filter %}&type={{ current_type_filter }}{% endif %}{% if current_status_filter %}&status={{ current_status_filter }}{% endif %}{% if current_language_filter %}&language={{ current_language_filter }}{% endif %}" style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; color: #374151; text-decoration: none; font-size: 0.875rem; font-weight: 600;">
+        ←
+      </a>
+      {% else %}
+      <button style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; color: #d1d5db; font-size: 0.875rem; font-weight: 600; cursor: not-allowed;" disabled>
+        ←
+      </button>
+      {% endif %}
+
+      <div style="display: flex; gap: 0;">
+        {% for num in paginator.page_range %}
+          {% if num == paginator.current_page %}
+          <button style="padding: 0.5rem 0.75rem; background-color: rgba(0,0,0,0.05); color: #374151; border-radius: 0.375rem; font-size: 0.875rem; border: none;">
+            {{ num }}
+          </button>
+          {% else %}
+          <a href="?page={{ num }}{% if current_type_filter %}&type={{ current_type_filter }}{% endif %}{% if current_status_filter %}&status={{ current_status_filter }}{% endif %}{% if current_language_filter %}&language={{ current_language_filter }}{% endif %}" style="padding: 0.5rem 0.75rem; color: #374151; border-radius: 0.375rem; font-size: 0.875rem; text-decoration: none;">
+            {{ num }}
+          </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      {% if paginator.has_next %}
+      <a href="?page={{ paginator.next_page_number }}{% if current_type_filter %}&type={{ current_type_filter }}{% endif %}{% if current_status_filter %}&status={{ current_status_filter }}{% endif %}{% if current_language_filter %}&language={{ current_language_filter }}{% endif %}" style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; color: #374151; text-decoration: none; font-size: 0.875rem; font-weight: 600;">
+        →
+      </a>
+      {% else %}
+      <button style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; color: #d1d5db; font-size: 0.875rem; font-weight: 600; cursor: not-allowed;" disabled>
+        →
+      </button>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>

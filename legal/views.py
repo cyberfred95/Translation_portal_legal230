@@ -622,7 +622,7 @@ class ProfileDetails2View(TemplateView):
 
 
 class DashboardView(TemplateView):
-    template_name = "dashboard.html"
+    template_name = "dashboard/dashboard.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -647,17 +647,25 @@ class DashboardView(TemplateView):
         context['current_status_filter'] = status_filter
         context['current_language_filter'] = language_filter
 
-        # Récupérer le compteur de mots traduits depuis la subscription de l'utilisateur
+        # Récupérer les compteurs depuis la subscription de l'utilisateur
         translated_words_count = 0
+        translated_symbols_count = 0
+        translated_files_count = 0
         try:
             user_subscription = user.subscriptions.first()
             if user_subscription:
                 translated_words_count = user_subscription.translated_words_count
+                translated_symbols_count = user_subscription.translated_symbols_count
+                translated_files_count = user_subscription.translated_files_count
         except Exception as e:
             # En cas d'erreur, garder la valeur par défaut
             translated_words_count = 0
+            translated_symbols_count = 0
+            translated_files_count = 0
         
         context['translated_words_count'] = translated_words_count
+        context['translated_symbols_count'] = translated_symbols_count
+        context['translated_files_count'] = translated_files_count
 
         # Récupérer le nombre de glossaires ajoutés par l'utilisateur
         glossaries_count = 0
