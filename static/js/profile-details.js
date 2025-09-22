@@ -260,12 +260,12 @@ $(document).ready(function () {
         $(`#${tabId}-content`).show();
 
         // Retirer les styles actifs de tous les boutons
-        $('button.tab').removeClass('bg-white text-gray-900 shadow-sm border border-gray-200');
-        $('button.tab').addClass('text-gray-900 hover:bg-white/50');
+        $('button.tab').removeClass('bg-white text-gray-900 font-bold');
+        $('button.tab').addClass('text-gray-900 hover:text-gray-900 text-gray-300');
 
         // Ajouter les styles actifs au bouton sélectionné
-        $(`#${tabId}`).removeClass('text-gray-900 hover:bg-white/50');
-        $(`#${tabId}`).addClass('bg-white text-gray-900 shadow-sm border border-gray-200');
+        $(`#${tabId}`).removeClass('text-gray-900 hover:text-gray-900 text-gray-300');
+        $(`#${tabId}`).addClass('bg-white text-gray-900 font-bold');
     }
 
     let initialTab = 'profile-information';
