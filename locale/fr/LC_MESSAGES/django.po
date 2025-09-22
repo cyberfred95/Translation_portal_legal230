@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-19 18:03+0300\n"
+"POT-Creation-Date: 2025-09-22 13:35+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,8 +45,6 @@ msgstr ""
 # ########################################
 # ################################################ PROJECT HISTORY #################################################
 #: domains/models.py:17 domains/models.py:89
-#, fuzzy
-#| msgid "Username"
 msgid "name"
 msgstr "Utilisateur"
 
@@ -305,10 +303,6 @@ msgid "Use a .csv file"
 msgstr ""
 
 #: glossaries/templates/glossaries_2.html:538
-#: legal/templates/profile_details.html:118
-#: legal/templates/profile_security.html:137
-#: legal/templates/profile_security.html:241
-#: legal/templates/profile_security.html:276
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -452,11 +446,11 @@ msgid "Name in French"
 msgstr "Français"
 
 # ######################## HEADER ###
-#: legal/settings.py:171
+#: legal/settings.py:172
 msgid "English"
 msgstr "Anglais"
 
-#: legal/settings.py:172
+#: legal/settings.py:173
 msgid "French"
 msgstr "Français"
 
@@ -468,14 +462,11 @@ msgstr ""
 msgid "Invite people by email"
 msgstr "Inviter par e-mail"
 
-#: legal/templates/base.html:295 legal/templates/profile_information.html:89
+#: legal/templates/base.html:295
 msgid "Email"
 msgstr "E-mail"
 
-#: legal/templates/base.html:302 legal/templates/profile_details.html:99
-#: legal/templates/profile_security.html:50
-#: legal/templates/profile_security.html:76
-#: legal/templates/profile_security.html:102
+#: legal/templates/base.html:302
 msgid "Start typing..."
 msgstr "Ecrivez ici"
 
@@ -543,6 +534,35 @@ msgid ""
 "in several paragraphs."
 msgstr ""
 
+#: legal/templates/dashboard/dashboard.html:11
+msgid "Welcome to Lexa"
+msgstr "Bienvenue sur Lexa"
+
+#: legal/templates/dashboard/dashboard.html:12
+msgid ""
+"Lexa is specially designed to translate legal content with unmatched legal "
+"precision"
+msgstr ""
+"Lexa est spécialement conçu pour traduire du contenu juridique avec une "
+"précision juridique inégalée"
+
+# Dashboard card titles
+#: legal/templates/dashboard/dashboard.html:18
+msgid "CHARACTERS TRANSLATED"
+msgstr "CARACTÈRES TRADUITS"
+
+#: legal/templates/dashboard/dashboard.html:19
+msgid "WORDS TRANSLATED"
+msgstr "MOTS TRADUITS"
+
+#: legal/templates/dashboard/dashboard.html:20
+msgid "DOCUMENTS TRANSLATED"
+msgstr "DOCUMENTS TRADUITS"
+
+#: legal/templates/dashboard/dashboard.html:21
+msgid "ADDED GLOSSARIES"
+msgstr "GLOSSAIRES AJOUTÉS"
+
 #: legal/templates/dashboard/dashboard_quick_actions.html:3
 msgid "Quick Actions"
 msgstr "Actions rapides"
@@ -578,7 +598,6 @@ msgid "Document"
 msgstr "Document"
 
 #: legal/templates/dashboard/dashboard_recent_translations.html:24
-#: legal/templates/profile_information.html:40
 #: legal/templates/project_history_2.html:103
 #: legal/templates/steps/step_4.html:14
 #, fuzzy
@@ -615,35 +634,6 @@ msgstr "Aucune traduction trouvée"
 #: legal/templates/dashboard/dashboard_recent_translations.html:93
 msgid "Start by translating your first document or text."
 msgstr "Commencez par traduire votre premier document ou texte."
-
-#: legal/templates/dashboard/dashboard.html:11
-msgid "Welcome to Lexa"
-msgstr "Bienvenue sur Lexa"
-
-#: legal/templates/dashboard/dashboard.html:12
-msgid ""
-"Lexa is specially designed to translate legal content with unmatched legal "
-"precision"
-msgstr ""
-"Lexa est spécialement conçu pour traduire du contenu juridique avec une "
-"précision juridique inégalée"
-
-# Dashboard card titles
-#: legal/templates/dashboard/dashboard.html:18
-msgid "CHARACTERS TRANSLATED"
-msgstr "CARACTÈRES TRADUITS"
-
-#: legal/templates/dashboard/dashboard.html:19
-msgid "WORDS TRANSLATED"
-msgstr "MOTS TRADUITS"
-
-#: legal/templates/dashboard/dashboard.html:20
-msgid "DOCUMENTS TRANSLATED"
-msgstr "DOCUMENTS TRADUITS"
-
-#: legal/templates/dashboard/dashboard.html:21
-msgid "ADDED GLOSSARIES"
-msgstr "GLOSSAIRES AJOUTÉS"
 
 #: legal/templates/document_translate.html:48
 #: legal/templates/document_translate_2.html:48
@@ -706,224 +696,50 @@ msgstr ""
 msgid "Search"
 msgstr "Recherche"
 
-#: legal/templates/profile_details.html:8
-#, fuzzy
-#| msgid "Profile details"
+#: legal/templates/profile_details/profile_details.html:11
+
 msgid "Profile Details"
-msgstr "Profil"
+msgstr "Détail du profil"
 
-#: legal/templates/profile_details.html:9
+#: legal/templates/profile_details/profile_details.html:14
 msgid "Manage your account information and security settings."
-msgstr ""
+msgstr "Gérez les informations de votre compte et les paramètres de sécurité."
 
-# #################
-# delete resources
-#: legal/templates/profile_details.html:61
-#: legal/templates/profile_details.html:124
-#: legal/templates/profile_security.html:149
-#: legal/templates/profile_security.html:262
-msgid "Delete resources"
-msgstr "Supprimer le contenu"
+#: legal/templates/profile_details/profile_details.html:22
+msgid "Information"
+msgstr "Information"
 
-#: legal/templates/profile_details.html:64
-msgid ""
-"Deleting your resources is an irreversible operation. Any data synced to "
-"your account will be deleted and no longer be accessible."
-msgstr ""
-"Supprimer votre contenu est une action irréversible. Toutes les données "
-"liées à votre compte seront également supprimées et ne seront plus "
-"accessible."
+# #############
+#: legal/templates/profile_details/profile_details.html:25
+msgid "Security"
+msgstr "Sécurité"
 
-#: legal/templates/profile_details.html:86
-msgid ""
-"For Security reasons, you'll be asked to sign in again so that we can make "
-"sure the account belongs to you."
-msgstr ""
-"Pour des raisons de sécurité vous devrez vous connecter à nouveau. Ceci nous "
-"permet de vérifier que ce compte vous appartient."
-
-#: legal/templates/profile_details.html:92
-msgid "Enter your password to confirm"
-msgstr "Saisissez votre mot de passe"
-
-#: legal/templates/profile_details.html:137
+#: legal/templates/profile_details/profile_details.html:57
 msgid "Your data has been successfully changed"
 msgstr "Vos données ont été modifiées avec succès."
 
-#: legal/templates/profile_details.html:155
-msgid "Your password has been successfully changed"
-msgstr "Votre mot de passe a été correctement modifié."
-
-#: legal/templates/profile_details.html:160
+#: legal/templates/profile_details/profile_details.html:62
 msgid "Okay"
-msgstr ""
+msgstr "D'accord"
 
-#: legal/templates/profile_information.html:12
-msgid "First Name"
-msgstr ""
-
-# ################################ PROFILE DETAILS #####################################
-# change data
-#: legal/templates/profile_information.html:26
-#, fuzzy
-#| msgid "Name"
-msgid "Last Name"
-msgstr "Nom d’utilisateur"
-
-# ########################################
-# ################################################ PROJECT HISTORY #################################################
-#: legal/templates/profile_information.html:75
-#: legal/templates/project_history_2.html:94
-msgid "Username"
-msgstr "Utilisateur"
-
-#: legal/templates/profile_information.html:106
-msgid "Email address and Password"
-msgstr ""
-
-#: legal/templates/profile_information.html:117
-#, fuzzy
-#| msgid "Manage users"
-msgid "Manage"
-msgstr "Gestion d’équipe"
-
-#: legal/templates/profile_information.html:126
+#: legal/templates/profile_details/profile_information.html:34
 msgid "Update Information"
-msgstr ""
-
-#: legal/templates/profile_security.html:12
-msgid "Retention period"
-msgstr ""
-
-#: legal/templates/profile_security.html:15
-msgid ""
-"Defines the number of days after which your history is automatically reset."
-msgstr ""
-
-#: legal/templates/profile_security.html:25
-msgid "30 days"
-msgstr ""
-
-#: legal/templates/profile_security.html:26
-msgid "45 days"
-msgstr ""
-
-#: legal/templates/profile_security.html:27
-msgid "60 days"
-msgstr ""
-
-#: legal/templates/profile_security.html:28
-msgid "90 days"
-msgstr ""
-
-#: legal/templates/profile_security.html:43
-msgid "Current password"
-msgstr "Mot de passe actuel"
-
-#: legal/templates/profile_security.html:69
-msgid "New password"
-msgstr "Nouveau mot de passe"
-
-#: legal/templates/profile_security.html:95
-msgid "Confirm password"
-msgstr "Confirmer le mot de passe"
-
-#: legal/templates/profile_security.html:128
-msgid "Update password"
-msgstr "Modifier le mot de passe"
-
-#: legal/templates/profile_security.html:152
-#, fuzzy
-#| msgid "Permanently delete your files and glossaries."
-msgid "Permanently deletes your translations and glossaries."
-msgstr "Supprime de manière permanente vos traductions et glossaires."
-
-# #######
-# delete account
-#: legal/templates/profile_security.html:160
-#: legal/templates/profile_security.html:201
-#, fuzzy
-#| msgid "Delete account"
-msgid "Delete"
-msgstr "Supprimer le compte"
+msgstr "Mettre à jour les informations"
 
 # change password
-#: legal/templates/profile_security.html:170
+#: legal/templates/profile_details/profile_security.html:12
 msgid "Password"
 msgstr "Mot de passe"
 
-#: legal/templates/profile_security.html:173
+#: legal/templates/profile_details/profile_security.html:15
 msgid "Change your password."
 msgstr "Modifier le mot de passe"
 
-#: legal/templates/profile_security.html:183
+#: legal/templates/profile_details/profile_security.html:24
 #, fuzzy
 #| msgid "Change your password."
 msgid "Change Password"
 msgstr "Modifier le mot de passe"
-
-# #######
-# delete account
-#: legal/templates/profile_security.html:192
-#, fuzzy
-#| msgid "Delete account"
-msgid "Delete my account"
-msgstr "Supprimer le compte"
-
-#: legal/templates/profile_security.html:195
-#, fuzzy
-#| msgid "Permanently delete your account and all your portal data."
-msgid "Permanently deletes your account and all associated data."
-msgstr ""
-"Supprime de manière permanente votre compte et toutes les données liées."
-
-# #######
-# delete account
-#: legal/templates/profile_security.html:215
-msgid "Delete account"
-msgstr "Supprimer le compte"
-
-#: legal/templates/profile_security.html:218
-msgid ""
-"Deleting your account is an irreversible operation. Any data synced to your "
-"account will be deleted and no longer be accessible."
-msgstr ""
-"Supprimer votre compte est une action irréversible. Toutes les données liées "
-"à votre compte seront également supprimées et ne seront plus accessible."
-
-#: legal/templates/profile_security.html:223
-msgid "Please type \"DELETE\" to confirm:"
-msgstr ""
-
-#: legal/templates/profile_security.html:232
-msgid "Type DELETE here"
-msgstr ""
-
-# #######
-# delete account
-#: legal/templates/profile_security.html:249
-#, fuzzy
-#| msgid "Delete account"
-msgid "Delete Account"
-msgstr "Supprimer le compte"
-
-#: legal/templates/profile_security.html:265
-msgid ""
-"This will permanently delete all your translations and glossaries. This "
-"action cannot be undone."
-msgstr ""
-
-# #################
-# delete resources
-#: legal/templates/profile_security.html:283
-#, fuzzy
-#| msgid "Delete resources"
-msgid "Delete Resources"
-msgstr "Supprimer le contenu"
-
-#: legal/templates/profile_security.html:346
-msgid "Passwords do not match"
-msgstr "Les mots de passe ne correspondent pas"
 
 #: legal/templates/project_history.html:8
 #: legal/templates/project_history_2.html:11
@@ -1016,6 +832,12 @@ msgstr "Choisissez le document."
 #: legal/templates/project_history_2.html:41
 msgid "Type"
 msgstr "Type"
+
+# ########################################
+# ################################################ PROJECT HISTORY #################################################
+#: legal/templates/project_history_2.html:94
+msgid "Username"
+msgstr "Utilisateur"
 
 #: legal/templates/project_history_2.html:162
 msgid "pages"
@@ -1342,6 +1164,100 @@ msgstr ""
 msgid "Copy Result"
 msgstr ""
 
+# #################
+# delete resources
+#~ msgid "Delete resources"
+#~ msgstr "Supprimer le contenu"
+
+#~ msgid ""
+#~ "Deleting your resources is an irreversible operation. Any data synced to "
+#~ "your account will be deleted and no longer be accessible."
+#~ msgstr ""
+#~ "Supprimer votre contenu est une action irréversible. Toutes les données "
+#~ "liées à votre compte seront également supprimées et ne seront plus "
+#~ "accessible."
+
+#~ msgid ""
+#~ "For Security reasons, you'll be asked to sign in again so that we can "
+#~ "make sure the account belongs to you."
+#~ msgstr ""
+#~ "Pour des raisons de sécurité vous devrez vous connecter à nouveau. Ceci "
+#~ "nous permet de vérifier que ce compte vous appartient."
+
+#~ msgid "Enter your password to confirm"
+#~ msgstr "Saisissez votre mot de passe"
+
+#~ msgid "Your password has been successfully changed"
+#~ msgstr "Votre mot de passe a été correctement modifié."
+
+# ################################ PROFILE DETAILS #####################################
+# change data
+msgid "First Name"
+msgstr "Prénom"
+
+msgid "Last Name"
+msgstr "Nom de famille"
+
+#, fuzzy
+#~| msgid "Manage users"
+#~ msgid "Manage"
+#~ msgstr "Gestion d’équipe"
+
+#~ msgid "Current password"
+#~ msgstr "Mot de passe actuel"
+
+#~ msgid "New password"
+#~ msgstr "Nouveau mot de passe"
+
+#~ msgid "Confirm password"
+#~ msgstr "Confirmer le mot de passe"
+
+#~ msgid "Update password"
+#~ msgstr "Modifier le mot de passe"
+
+#, fuzzy
+#~| msgid "Permanently delete your files and glossaries."
+#~ msgid "Permanently deletes your translations and glossaries."
+#~ msgstr "Supprime de manière permanente vos traductions et glossaires."
+
+
+
+#, fuzzy
+#~| msgid "Permanently delete your account and all your portal data."
+#~ msgid "Permanently deletes your account and all associated data."
+#~ msgstr ""
+#~ "Supprime de manière permanente votre compte et toutes les données liées."
+
+# #######
+# delete account
+#~ msgid "Delete account"
+#~ msgstr "Supprimer le compte"
+
+#~ msgid ""
+#~ "Deleting your account is an irreversible operation. Any data synced to "
+#~ "your account will be deleted and no longer be accessible."
+#~ msgstr ""
+#~ "Supprimer votre compte est une action irréversible. Toutes les données "
+#~ "liées à votre compte seront également supprimées et ne seront plus "
+#~ "accessible."
+
+# #######
+# delete account
+#, fuzzy
+#~| msgid "Delete account"
+#~ msgid "Delete Account"
+#~ msgstr "Supprimer le compte"
+
+# #################
+# delete resources
+#, fuzzy
+#~| msgid "Delete resources"
+#~ msgid "Delete Resources"
+#~ msgstr "Supprimer le contenu"
+
+#~ msgid "Passwords do not match"
+#~ msgstr "Les mots de passe ne correspondent pas"
+
 #, fuzzy
 #~| msgid "Add glossary"
 #~ msgid "Add a Glossary"
@@ -1580,10 +1496,6 @@ msgstr ""
 
 #~ msgid "Update Email Address"
 #~ msgstr "Appliquer les changements"
-
-# #############
-#~ msgid "Security"
-#~ msgstr "Sécurité"
 
 #~ msgid "Close"
 #~ msgstr "Fermer"
