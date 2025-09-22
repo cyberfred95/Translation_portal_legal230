@@ -552,75 +552,8 @@ class DetectTextLanguageView(APIView):
 
 
 class ProfileDetailsView(TemplateView):
-    template_name = 'profile_details.html'
+    template_name = 'profile_details/profile_details.html'
     
-class ProfileDetails2View(TemplateView):
-    template_name = 'profile_information.html'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Add user profile data for dynamic rendering
-        if self.request.user.is_authenticated and hasattr(self.request.user, 'first_name'):
-            user = self.request.user
-            context['user'] = user
-            context['user_full_name'] = f"{getattr(user, 'first_name', '')} {getattr(user, 'last_name', '')}".strip()
-        return context
-    
-    def post(self, request, *args, **kwargs):
-        """Handle form submissions for profile updates and password changes"""
-        if not request.user.is_authenticated:
-            return JsonResponse({'error': 'Authentication required'}, status=401)
-        
-        user = request.user
-        
-        # Handle profile information update
-        if 'first_name' in request.POST or 'last_name' in request.POST:
-            user.first_name = request.POST.get('first_name', user.first_name)
-            user.last_name = request.POST.get('last_name', user.last_name)
-            user.username = request.POST.get('username', user.username)
-            user.email = request.POST.get('email', user.email)
-            user.save()
-            
-            return JsonResponse({
-                'success': True,
-                'message': 'Profile updated successfully'
-            })
-        
-        # Handle password change
-        if 'current_password' in request.POST:
-            from django.contrib.auth import authenticate, update_session_auth_hash
-            
-            current_password = request.POST.get('current_password')
-            new_password = request.POST.get('new_password')
-            confirm_password = request.POST.get('confirm_password')
-            
-            # Verify current password
-            if not user.check_password(current_password):
-                return JsonResponse({
-                    'error': 'Current password is incorrect'
-                }, status=400)
-            
-            # Verify new passwords match
-            if new_password != confirm_password:
-                return JsonResponse({
-                    'error': 'New passwords do not match'
-                }, status=400)
-            
-            # Update password
-            user.set_password(new_password)
-            user.save()
-            
-            # Keep user logged in after password change
-            update_session_auth_hash(request, user)
-            
-            return JsonResponse({
-                'success': True,
-                'message': 'Password updated successfully'
-            })
-        
-        return JsonResponse({'error': 'Invalid request'}, status=400)
-
-
 class DashboardView(TemplateView):
     template_name = "dashboard/dashboard.html"
 
