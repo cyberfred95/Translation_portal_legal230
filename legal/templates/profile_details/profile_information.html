@@ -13,7 +13,7 @@
         {% include 'profile_details/profile_information_input.html' with field_id='last_name' field_label='Last Name' field_type='text' field_name='last_name' field_value=request.user.last_name|default:'' %}
 
         <!-- Language -->
-        {% include 'profile_details/profile_information_input.html' with field_id='language' field_label='Language' field_type='select' field_name='language' field_selected_value=request.LANGUAGE_CODE field_options=LANGUAGES %}
+        {% include 'profile_details/profile_information_input.html' with field_id='language' field_label='Language' field_type='select' field_name='language' field_selected_value=request.user.language field_options=LANGUAGES %}
     </div>
 
     <!-- Email and Username Section -->
