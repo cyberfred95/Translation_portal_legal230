@@ -1,0 +1,18 @@
+{% load static %}
+{% load i18n %}
+
+<!-- Success Update User Data Modal -->
+<div id="success-update-user-data"
+     class="fixed inset-0 bg-gray-425 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
+    <div class="relative bg-white rounded-lg shadow-xl max-w-200 w-full mx-4 modal-content">
+        <div class="p-17.5 flex flex-col items-center gap-10">
+            <div class="text-5 font-semibold">{% trans 'Your data has been successfully changed' %}</div>
+            <button
+                    type="button"
+                    id="success-update-btn"
+                    class="flex-1 text-white border border-green-700 bg-green-700 rounded-1.5 py-2.5 px-6.5 text-4 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision">
+                {% trans 'Okay' %}
+            </button>
+        </div>
+    </div>
+</div>
