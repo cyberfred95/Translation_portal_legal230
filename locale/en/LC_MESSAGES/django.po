@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-22 13:35+0300\n"
+"POT-Creation-Date: 2025-09-23 10:18+0200\n"
 "PO-Revision-Date: 2024-07-03 17:56+0300\n"
 "Last-Translator:   <vjxzebra@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -466,7 +466,8 @@ msgstr ""
 msgid "Invite people by email"
 msgstr "Invite people by email"
 
-#: legal/templates/base.html:295
+#: legal/templates/base.html:295 templates/registration/login.html:42
+#: templates/registration/login.html:44
 msgid "Email"
 msgstr "Email"
 
@@ -715,20 +716,21 @@ msgstr "Information"
 msgid "Security"
 msgstr "Security"
 
-#: legal/templates/profile_details/profile_details.html:57
-msgid "Your data has been successfully changed"
-msgstr "Your data has been successfully changed"
-
-#: legal/templates/profile_details/profile_details.html:62
-msgid "Okay"
-msgstr ""
-
 #: legal/templates/profile_details/profile_information.html:34
 msgid "Update Information"
 msgstr ""
 
+#: legal/templates/profile_details/profile_information_modal.html:9
+msgid "Your data has been successfully changed"
+msgstr "Your data has been successfully changed"
+
+#: legal/templates/profile_details/profile_information_modal.html:14
+msgid "Okay"
+msgstr ""
+
 # change password
 #: legal/templates/profile_details/profile_security.html:12
+#: templates/registration/login.html:52 templates/registration/login.html:54
 msgid "Password"
 msgstr "Password"
 
@@ -1061,6 +1063,29 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
+# ########
+#: templates/registration/login.html:26
+msgid "Don't have an account?"
+msgstr ""
+
+#: templates/registration/login.html:29
+msgid "Free trial"
+msgstr ""
+
+#: templates/registration/login.html:37
+msgid "welcome login message"
+msgstr ""
+"Log in to Lexa faster and more securely: we remember your preferred method "
+"(no more email to enter), while keeping the classic access available."
+
+#: templates/registration/login.html:63
+msgid "I forgot my password"
+msgstr ""
+
+#: templates/registration/login.html:66
+msgid "Log in"
+msgstr ""
+
 # #####################
 # ##################### ERRORS #########################
 #: users/views.py:102
@@ -1192,7 +1217,6 @@ msgstr ""
 
 # ################################ PROFILE DETAILS #####################################
 # change account data
-
 #~ msgid "First Name"
 #~ msgstr "First Name"
 
@@ -1210,9 +1234,6 @@ msgstr ""
 #~ msgid "New password"
 #~ msgstr "New password"
 
-#~ msgid "Confirm password"
-#~ msgstr "Confirm password"
-
 #~ msgid "Update password"
 #~ msgstr "Update password"
 
@@ -1225,12 +1246,6 @@ msgstr ""
 #, fuzzy
 #~| msgid "Delete account"
 #~ msgid "Delete"
-#~ msgstr "Delete account"
-
-# ########
-#, fuzzy
-#~| msgid "Delete account"
-#~ msgid "Delete my account"
 #~ msgstr "Delete account"
 
 #, fuzzy

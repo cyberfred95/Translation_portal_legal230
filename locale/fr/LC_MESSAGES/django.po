@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-22 13:35+0300\n"
+"POT-Creation-Date: 2025-09-23 10:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -462,7 +462,8 @@ msgstr ""
 msgid "Invite people by email"
 msgstr "Inviter par e-mail"
 
-#: legal/templates/base.html:295
+#: legal/templates/base.html:295 templates/registration/login.html:42
+#: templates/registration/login.html:44
 msgid "Email"
 msgstr "E-mail"
 
@@ -697,7 +698,6 @@ msgid "Search"
 msgstr "Recherche"
 
 #: legal/templates/profile_details/profile_details.html:11
-
 msgid "Profile Details"
 msgstr "Détail du profil"
 
@@ -714,20 +714,21 @@ msgstr "Information"
 msgid "Security"
 msgstr "Sécurité"
 
-#: legal/templates/profile_details/profile_details.html:57
-msgid "Your data has been successfully changed"
-msgstr "Vos données ont été modifiées avec succès."
-
-#: legal/templates/profile_details/profile_details.html:62
-msgid "Okay"
-msgstr "D'accord"
-
 #: legal/templates/profile_details/profile_information.html:34
 msgid "Update Information"
 msgstr "Mettre à jour les informations"
 
+#: legal/templates/profile_details/profile_information_modal.html:9
+msgid "Your data has been successfully changed"
+msgstr "Vos données ont été modifiées avec succès."
+
+#: legal/templates/profile_details/profile_information_modal.html:14
+msgid "Okay"
+msgstr "D'accord"
+
 # change password
 #: legal/templates/profile_details/profile_security.html:12
+#: templates/registration/login.html:52 templates/registration/login.html:54
 msgid "Password"
 msgstr "Mot de passe"
 
@@ -1060,6 +1061,31 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
+# #######
+# delete account
+#: templates/registration/login.html:26
+msgid "Don't have an account?"
+msgstr "Vous n’avez pas de compte ?"
+
+#: templates/registration/login.html:29
+msgid "Free trial"
+msgstr "Essai gratuit"
+
+#: templates/registration/login.html:37
+msgid "welcome login message"
+msgstr ""
+"Connectez-vous à Lexa plus rapidement et en toute sécurité : nous retenons "
+"votre méthode préférée (plus besoin de saisir votre e-mail), tout en gardant "
+"l’accès classique disponible."
+
+#: templates/registration/login.html:63
+msgid "I forgot my password"
+msgstr "J'ai oublié mon mot de passe"
+
+#: templates/registration/login.html:66
+msgid "Log in"
+msgstr ""
+
 # ################
 # ##################### ERRORS #########################
 #: users/views.py:102
@@ -1192,11 +1218,11 @@ msgstr ""
 
 # ################################ PROFILE DETAILS #####################################
 # change data
-msgid "First Name"
-msgstr "Prénom"
+#~ msgid "First Name"
+#~ msgstr "Prénom"
 
-msgid "Last Name"
-msgstr "Nom de famille"
+#~ msgid "Last Name"
+#~ msgstr "Nom de famille"
 
 #, fuzzy
 #~| msgid "Manage users"
@@ -1209,9 +1235,6 @@ msgstr "Nom de famille"
 #~ msgid "New password"
 #~ msgstr "Nouveau mot de passe"
 
-#~ msgid "Confirm password"
-#~ msgstr "Confirmer le mot de passe"
-
 #~ msgid "Update password"
 #~ msgstr "Modifier le mot de passe"
 
@@ -1220,18 +1243,11 @@ msgstr "Nom de famille"
 #~ msgid "Permanently deletes your translations and glossaries."
 #~ msgstr "Supprime de manière permanente vos traductions et glossaires."
 
-
-
 #, fuzzy
 #~| msgid "Permanently delete your account and all your portal data."
 #~ msgid "Permanently deletes your account and all associated data."
 #~ msgstr ""
 #~ "Supprime de manière permanente votre compte et toutes les données liées."
-
-# #######
-# delete account
-#~ msgid "Delete account"
-#~ msgstr "Supprimer le compte"
 
 #~ msgid ""
 #~ "Deleting your account is an irreversible operation. Any data synced to "
