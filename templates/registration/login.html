@@ -1,25 +1,10 @@
-<!DOCTYPE html>
+{% extends "public_base.html" %}
 {% load i18n %}
 {% load static %}
-<html lang="{{ request.LANGUAGE_CODE }}">
-<head>
-    <meta charset="UTF-8">
-    <title>Legal230</title>
-    <!-- FONTS -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- JQUERY -->
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js"
-            integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-    <!-- STYLES -->
-    <link href="{% static 'css/main.css' %}" rel="stylesheet">
-    <!-- TAILWIND -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- TAILWIND CONFIG (externalized) -->
-    <script src="{% static 'js/tailwind-config.js' %}"></script>
-    <!-- PHOSPHOR ICONS -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-</head>
-<body>
+
+{% block title %}Legal230 - {% trans "Log in" %}{% endblock %}
+
+{% block content %}
 <div class="min-h-screen bg-white flex flex-col items-center p-6 sm:p-12 lg:p-20 relative">
     <div class="absolute top-12 right-20 flex items-center gap-4 z-10">
         <div class="flex-1 text-right text[#181932] font-normal text-base leading-6 tracking-[-0.176px]">
@@ -68,11 +53,10 @@
         </form>
     </div>
 </div>
+{% endblock %}
 
-
+{% block body_end %}
 <script src="{% static 'js/authorization.js' %}"></script>
 <script src="{% static 'js/get-cookie.js' %}"></script>
 <script src="{% static 'js/login.js' %}"></script>
-
-</body>
-</html>
+{% endblock %}
