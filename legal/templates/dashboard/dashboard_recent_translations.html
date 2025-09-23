@@ -20,11 +20,11 @@
   <table class="dashboard-table">
     <thead>
       <tr>
-        <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-file-text" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Document' %}</span></th>
-        <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-megaphone" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Language' %}</span></th>
+        <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-file-text" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Document' %}</span></span></th>
+        <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-megaphone" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Language' %}</span></span></th>
         <th class="status-col"><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-clock-clockwise" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Status' %}</span></th>
         <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-calendar-blank" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Creation date' %}</span></th>
-        <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-wrench" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Actions' %}</span></th>
+        <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-wrench" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Actions' %}</span></span></th>
       </tr>
     </thead>
     <tbody>
@@ -32,43 +32,14 @@
         {% for project in projects.results %}
         <tr data-type="{{ project.document_type }}" data-status="{{ project.status }}" data-language="{{ project.source_language|upper }} → {{ project.target_language|upper }}" data-filename="{{ project.source_file_name|lower }}">
           <td>
-            <span class="doc-title">{{ project.source_file_name }}</span><br>
-            <span class="doc-subtitle">
-              {% if project.document_type == 'text' %}
-                {% trans 'Text' %} • 1 {% trans 'page' %}
-              {% else %}
-                {% trans 'Document' %} • {{ project.page_count|default:"N/A" }} {% trans 'page' %}{% if project.page_count > 1 %}s{% endif %}
-              {% endif %}
-            </span>
+            <span class="doc-title">{{ project.source_file_name }}</span>
           </td>
-          <td>{{ project.source_language|upper }} → {{ project.target_language|upper }}</td>
+          <td><span class="lang-label">{{ project.source_language|upper }} → {{ project.target_language|upper }}</span></td>
           <td class="status-col">
-            {% if project.status == 'Translated' %}
-              <span class="status-badge status-completed">
-                <i class="ph ph-check-circle" style="font-size: 16px; color: #16a34a;"></i>
-                {{ project.status }}
-              </span>
-            {% elif project.status == 'Error' %}
-              <span class="status-badge status-error">
-                <i class="ph ph-warning-circle" style="font-size: 16px; color: #dc2626;"></i>
-                {{ project.status }}
-              </span>
-            {% elif 'post-editing' in project.status|lower %}
-              <span class="status-badge status-post-editing">
-                <i class="ph ph-pencil" style="font-size: 16px; color: #3b82f6;"></i>
-                {{ project.status }}
-              </span>
-            {% else %}
-              <span class="status-badge status-default">
-                {{ project.status }}
-              </span>
-            {% endif %}
+            <span class="status-badge status-default"><span class="status">{{ project.status }}</span></span>
           </td>
           <td>{{ project.created_at|date:"d/m/Y" }}</td>
           <td class="table-actions">
-            <a href="{% url 'project_history_2' %}" title="View" style="display: inline-block; color: inherit; text-decoration: none;">
-              <i class="ph ph-eye" style="font-size: 16px; color: #374151;"></i>
-            </a>
             {% if project.translated_file %}
             <button title="Download" onclick="window.open('{{ project.translated_file }}', '_blank')">
               <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
@@ -78,9 +49,6 @@
               <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
             </button>
             {% endif %}
-            <button title="Share">
-              <i class="ph ph-share" style="font-size: 16px; color: #374151;"></i>
-            </button>
           </td>
         </tr>
         {% endfor %}

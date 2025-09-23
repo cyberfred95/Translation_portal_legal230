@@ -182,4 +182,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeParam || statusParam || languageParam) {
         filterTable();
     }
+
+    // Appliquer l'interprétation des statuts (label, classe, icône)
+    if (typeof applyStatusMapping === 'function') {
+        applyStatusMapping(document);
+    }
 });

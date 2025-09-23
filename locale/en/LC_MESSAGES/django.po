@@ -580,7 +580,7 @@ msgstr "New translation"
 # ########################### STEP 5 ###
 #: legal/templates/dashboard/dashboard_recent_translations.html:4
 msgid "Recent translations"
-msgstr "New translation"
+msgstr ""
 
 #: legal/templates/dashboard/dashboard_recent_translations.html:8
 #, fuzzy
