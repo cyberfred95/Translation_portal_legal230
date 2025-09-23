@@ -565,9 +565,9 @@ class DashboardView(TemplateView):
         status_filter = self.request.GET.get('status', '')
         language_filter = self.request.GET.get('language', '')
         
-        # Paramètres pour l'API - limiter à 10 projets récents pour le dashboard
+        # Paramètres pour l'API - limiter à 5 projets récents pour le dashboard
         params = {
-            "page_size": 10,
+            "page_size": 5,
             "page": page,
             "user_custom_mt_token": user.uuid if not user.is_staff else None
         }
@@ -670,7 +670,7 @@ class DashboardView(TemplateView):
                 
                 # Informations de pagination
                 current_page = int(page)
-                total_pages = (response.get('count', 0) + 9) // 10  # Arrondir vers le haut
+                total_pages = (response.get('count', 0) + 4) // 5  # Arrondir vers le haut
                 
                 # Calculer la plage de pages à afficher
                 page_range = []
@@ -692,9 +692,9 @@ class DashboardView(TemplateView):
                     'previous_page_number': current_page - 1 if current_page > 1 else None,
                     'next_page_number': current_page + 1 if response.get('next') else None,
                     'count': response.get('count', 0),
-                    'start_index': (current_page - 1) * 10 + 1,
-                    'end_index': min(current_page * 10, response.get('count', 0)),
-                    'has_multiple_pages': response.get('count', 0) > 10,
+                    'start_index': (current_page - 1) * 5 + 1,
+                    'end_index': min(current_page * 5, response.get('count', 0)),
+                    'has_multiple_pages': response.get('count', 0) > 5,
                     'page_range': page_range
                 }
             else:
