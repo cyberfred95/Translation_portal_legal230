@@ -21,7 +21,10 @@ $(document).ready(function () {
 
     $(".source-language").select2();
     $(".target-language").select2();
-    $(".domain-select").select2();
+    $(".domain-select").select2({
+        placeholder: $(".domain-select").data('placeholder'),
+        allowClear: true
+    });
 
     $sourceSelect = $(".source-language").select2();
     $targetSelect = $(".target-language").select2();
@@ -47,14 +50,22 @@ $(document).ready(function () {
                     let domainSelect = $('select[name="domain_name"]');
                     if (response.data.length !== 0) {
                         domainSelect.empty();
-                        domainSelect.prop('disabled', false);
+                        // laisser activé pour garder le même style
                         domainSelect.append($('<option></option>').attr('value', '').text('Domain').prop('disabled', true));
 
                         $.each(response.data, function (index, domain) {
                             domainSelect.append($('<option></option>').attr('value', domain).text(domain));
                         });
 
-                        domainSelect.find('option:not(:disabled):first').prop('selected', true);
+                        // Sélectionner automatiquement le premier domaine valide (y compris le générique) et déclencher select2
+                        const firstVal = domainSelect.find('option:not(:disabled):first').val();
+                        if (firstVal) {
+                            domainSelect.val(firstVal).trigger('change.select2');
+                        }
+                        // Revalider le bouton après auto-sélection
+                        if (typeof validateTranslateButton === 'function') {
+                            validateTranslateButton();
+                        }
                     }
                 },
                 error: function (error) {
@@ -66,11 +77,19 @@ $(document).ready(function () {
 
     $('select[name="source_language"]').change(function () {
         sourceLanguage = $(this).val();
+        // Réinitialiser le glossaire (Select2) lorsqu'on change la langue source
+        const domainSelect = $('select[name="domain_name"]');
+        domainSelect.val(null).trigger('change');
+        validateTranslateButton();
         getDomains();
     });
 
     $('select[name="target_language"]').change(function () {
         targetLanguage = $(this).val();
+        // Réinitialiser le glossaire (Select2) lorsqu'on change la langue cible
+        const domainSelect = $('select[name="domain_name"]');
+        domainSelect.val(null).trigger('change');
+        validateTranslateButton();
         getDomains();
     });
 
@@ -118,6 +137,7 @@ $(document).ready(function () {
         sourceQuill.deleteText(0, sourceQuill.getLength());
 
         resizeTextAreas();
+        validateTranslateButton();
     });
 
 
@@ -216,9 +236,18 @@ $(document).ready(function () {
         $('#source-char-count').text(Math.min(count, CHAR_LIMIT));
     }
 
+    function validateTranslateButton() {
+        const hasSource = $('select[name="source_language"]').val();
+        const hasTarget = $('select[name="target_language"]').val();
+        const hasDomain = $('select[name="domain_name"]').val();
+        const disabled = !(hasSource && hasTarget && hasDomain);
+        $("#btn-translate").prop('disabled', disabled);
+    }
+
     sourceQuill.on("text-change", function(delta, oldDelta, source){
         if (source !== 'user') {
             updateCharCount();
+            validateTranslateButton();
             return;
         }
         var count = getSourceCharCount();
@@ -232,11 +261,13 @@ $(document).ready(function () {
         }
         resizeTextAreas();
         updateCharCount();
+        validateTranslateButton();
     });
     translatedQuill.on("text-change", resizeTextAreas);
 
     resizeTextAreas();
     updateCharCount();
+    validateTranslateButton();
 });
 
 
