@@ -183,8 +183,5 @@ document.addEventListener('DOMContentLoaded', function () {
         filterTable();
     }
 
-    // Appliquer l'interprétation des statuts (label, classe, icône)
-    if (typeof applyStatusMapping === 'function') {
-        applyStatusMapping(document);
-    }
+    // Le mapping des status est géré par status-management.js
 });

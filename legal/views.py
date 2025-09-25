@@ -353,62 +353,6 @@ class ProjectsHistoryView(TemplateView):
         return context
 
 
-class ProjectsHistory2View(TemplateView):
-    """Nouvelle vue pour project_history_2.html avec design Builder.io"""
-    template_name = 'project_history_2.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-        page = self.request.GET.get('page')
-        context['languages'] = languages
-        params = {
-            "page_size": PAGINATION_PAGE_SIZE,
-            "page": page,
-            "user_custom_mt_token": user.uuid if not user.is_staff else None
-        }
-        headers = {
-            "token": preferences.MainSettings.api_key if user.is_staff else user.group.api_key}
-
-        if page is not None:
-            params["page"] = int(page)
-
-        response = requests.get(
-            preferences.MainSettings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
-        if 'results' in response:
-            for project in response['results']:
-                file_name = urlparse(project['source_file']).path.lstrip(
-                    '/').split('/')[-1]
-                original_filename = unquote(file_name)
-                project['source_file_name'] = original_filename
-                project['created_at'] = datetime.fromisoformat(
-                    project['created_at'].replace('Z', '+00:00'))
-                project['display_popup'] = False if get_price_by_language_pair(
-                    source_language=project['source_language'],
-                    target_language=project['target_language']
-                ) else True
-                
-                # Mapper les statuts pour correspondre aux badges Builder.io
-                status_mapping = {
-                    'Translated': 'completed',
-                    'Error': 'error',
-                    'In progress': 'in-progress',
-                    'Processing': 'in-progress',
-                    'Needs attention': 'needs-attention'
-                }
-                project['status_mapped'] = status_mapping.get(project['status'], project['status'].lower())
-                
-                if user.is_staff:
-                    try:
-                        project['username'] = User.objects.get(
-                            uuid=project['user_custom_mt_token'])
-                    except User.DoesNotExist:
-                        project['username'] = None
-                    except django.core.exceptions.ValidationError:
-                        project['username'] = None
-            context['projects'] = response
-
-        return context
 
 
 def get_projects_by_ids(request):

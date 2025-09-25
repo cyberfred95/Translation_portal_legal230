@@ -1,0 +1,150 @@
+/* Project History CSS */
+
+/* Styles de base pour le tableau */
+.table-container { 
+  background: #fff; 
+  padding: 2rem; 
+  border-radius: 12px; 
+  margin-top: 2rem; 
+  width: 100%; 
+}
+
+.dashboard-table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  table-layout: fixed; 
+}
+
+.dashboard-table th, .dashboard-table td { 
+  padding: 1rem; 
+  text-align: left; 
+  box-sizing: border-box; 
+  overflow: hidden; 
+}
+
+.dashboard-table th:not(:first-child),
+.dashboard-table td:not(:first-child) { 
+  text-align: center; 
+}
+
+.dashboard-table th:nth-child(1), .dashboard-table td:nth-child(1) { 
+  width: 35%; 
+  white-space: normal; 
+  word-break: break-word; 
+  hyphens: auto; 
+}
+
+.dashboard-table th:nth-child(2), .dashboard-table td:nth-child(2) { 
+  width: 20%; 
+  white-space: normal; 
+  word-break: break-word; 
+  hyphens: auto; 
+}
+
+.dashboard-table th:nth-child(4), .dashboard-table td:nth-child(4) { 
+  width: 200px; 
+}
+
+.dashboard-table th:nth-child(5), .dashboard-table td:nth-child(5) { 
+  width: 150px; 
+}
+
+/* Colonnes étroites: empêcher le retour à la ligne et couper proprement */
+.dashboard-table th:nth-child(2), .dashboard-table td:nth-child(2),
+.dashboard-table th:nth-child(4), .dashboard-table td:nth-child(4),
+.dashboard-table th:nth-child(5), .dashboard-table td:nth-child(5) {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.doc-title { 
+  font-weight: 500; 
+  color: #181932; 
+  display: block; 
+  max-width: 100%; 
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+}
+
+.lang-label { 
+  display: block; 
+  max-width: 100%; 
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+}
+
+.table-actions { 
+  display: flex; 
+  gap: 0.5rem; 
+  justify-content: center; 
+  width: 100%; 
+}
+
+.table-actions button { 
+  background: none; 
+  border: none; 
+  cursor: pointer; 
+}
+
+.dashboard-table th:nth-child(5), .dashboard-table td:nth-child(5) { 
+  text-align: center; 
+}
+
+.dashboard-table th.status-col, .dashboard-table td.status-col {
+  width: 260px;
+  min-width: 220px;
+  max-width: 300px;
+}
+
+/* Empêcher la disparition des colonnes sur les petits écrans pour project_history */
+.project-history-table .dashboard-table thead th:nth-child(3),
+.project-history-table .dashboard-table tbody td:nth-child(3),
+.project-history-table .dashboard-table thead th:nth-child(4),
+.project-history-table .dashboard-table tbody td:nth-child(4) {
+    display: table-cell !important;
+}
+
+/* Status Badges CSS - Centralisé pour toutes les pages */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  font-size: 0.75rem;
+  border-radius: 8px;
+  padding: 0.3rem 1rem;
+  border: 1px solid transparent;
+}
+
+.status-attention { 
+  background: #fffbeb; 
+  color: #d97706; 
+  border-color: #fcd34d; 
+}
+
+.status-progress { 
+  background: #eff6ff; 
+  color: #3b82f6; 
+  border-color: #93c5fd; 
+}
+
+.status-error { 
+  background: #fef2f2; 
+  color: #dc2626; 
+  border-color: #fca5a5; 
+}
+
+.status-completed { 
+  background: #f0fdf4; 
+  color: #16a34a; 
+  border-color: #86efac; 
+}
+
+.status-default { 
+  background: #f3f4f6; 
+  color: #374151; 
+  border-color: #e5e7eb; 
+}
+

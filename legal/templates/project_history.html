@@ -3,185 +3,102 @@
 {% load static %}
 {% load i18n %}
 
+{% block extra_css %}
+<link href="{% static 'css/project-history.css' %}" rel="stylesheet" />
+<link href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css" rel="stylesheet" />
+<link href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/fill/style.css" rel="stylesheet" />
+{% endblock %}
+
 {% block content %}
 <div class="mx-5 mb-11.5 mt-5">
-    <h2 class="text-2xl mb-2">{% trans 'History' %}</h2>
-    <div class="text-base">{% trans 'Find all your translation history' %}</div>
+    <h2 class="text-2xl mb-2 font-poppins font-semibold">{% trans 'History' %}</h2>
+    <div class="text-base font-poppins font-normal">{% trans 'Find all your translation history' %}</div>
 
-        <div class="rounded-md px-5 pt-5 w-full h-full flex flex-col items-end mt-5 bg-white">
-
-        <div class="flex flex-col items-center justify-start w-full">
-            <div class="w-full flex flex-row bg-blue-50 border-b-0.25 border-gray-100">
-                <div class="h-12 flex flex-row justify-center items-center w-18">
-                </div>
-                {% if request.user.is_staff %}
-                <div class="text-base px-8 h-12 flex flex-row items-center justify-start w-160">
-                    <i class="ph ph-user mr-1"></i>
-                    {% trans 'User' %}
-                </div>
-                {% endif %}
-                <div class="text-base px-8 h-12 flex flex-row items-center justify-start w-380">
-                    <i class="ph ph-file-text mr-1"></i>
-                    {% trans 'Document' %}
-                </div>
-                <div class="text-base px-8 text-[#5a5a78] h-12 flex flex-row items-center justify-start w-160">
-                    <i class="ph ph-user mr-1"></i>
-                    {% trans 'Languages' %}
-                </div>
-                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center justify-start w-80 pr-8">
-                    <i class="ph ph-certificate mr-1"></i>
-                    {% trans 'Status' %}
-                </div>
-                <div class="text-base pl-8 text-[#5a5a78] h-12 flex flex-row items-center justify-start w-160">
-                    <i class="ph ph-calendar-blank mr-1"></i>
-                    {% trans 'Creation date' %}
-                </div>
-                <div class="text-base px-8 text-[#5a5a78] h-12 flex flex-row flex-grow justify-center items-center w-full">
-                    <i class="ph ph-wrench mr-1"></i>
-                    {% trans 'Actions' %}
-
-                </div>
-            </div>
-
-            {% if projects.results %}
-            {% for project in projects.results %}
-
-            <div class="w-full flex flex-row border-b-0.25 border-gray-100 h-16 justify-center items-center">
-                <div class="h-12 flex flex-row justify-center items-center w-18">
-                    {% include 'svg/icons/file_text_blue.svg' %}
-                </div>
-                {% if request.user.is_staff %}
-                <div class="flex flex-row justify-center items-center w-160">
-                        {% if project.username %}
-                            {{ project.username }}
-                        {% else %}
-                            Unknown
-                        {% endif %}
-                </div>
-                {% endif %}
-                <div class="text-sm text-[#5a5a78] h-12 flex flex-row items-center px-8 w-380">
-                    {{ project.source_file_name }}
-                    <!-- @TODO : Ajouter type de fichier &bull; nombre de pages -->
-                </div>
-                <div class="flex justify-start px-8 w-160">
-                    <div class="flex gap-1 text-4 items-center text-gray-500">
-                        <span class="text-3 text-gray-500">{{ project.source_language|upper }}</span>
-                        →
-                        <span class="text-3 text-gray-500">{{ project.target_language|upper }}</span>
-                    </div>
-                </div>
-                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center w-80">
-                    {% if project.status == 'Needs attention' or project.status_mapped == 'needs-attention' %}
-                    <div class="inline-flex items-center gap-1 px-1 py-0.5 rounded border text-sm font-medium bg-orange-50 border-orange-200 text-orange-700">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                        </svg>
-                        <span>{% trans 'Needs attention' %}</span>
-                    </div>
-                    {% elif project.status == 'In progress' or project.status == 'Processing' or project.status_mapped == 'in-progress' %}
-                    <div class="inline-flex items-center gap-1 px-1 py-0.5 rounded border text-sm font-medium bg-blue-50 border-blue-200 text-blue-700">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                        </svg>
-                        <span>{% trans 'In progress' %}</span>
-                    </div>
-                    {% elif project.status == 'Error' or project.status_mapped == 'error' %}
-                    <div class="inline-flex items-center gap-1 px-1 py-0.5 rounded border text-sm font-medium bg-red-50 border-red-200 text-red-700">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.268 16.5c-.77.833.192 2.5 1.732 2.5z"/>
-                        </svg>
-                        <span>{% trans 'Error' %}</span>
-                    </div>
-                    {% else %}
-                    <div class="inline-flex items-center gap-1 px-1 py-0.5 rounded border text-sm font-medium bg-green-50 border-green-200 text-green-700">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <span>{% if project.status == 'Translated' %}{% trans 'Completed' %}{% else %}{{ project.status }}{% endif %}</span>
-                    </div>
+    <div class="table-container project-history-table">
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    {% if request.user.is_staff %}
+                    <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-user" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'User' %}</span></span></th>
                     {% endif %}
-                </div>
-                <div class="text-base text-[#5a5a78] h-12 flex flex-row justify-start items-center pl-8 w-160">
-                    {{ project.created_at|date:"d/m/Y" }}
-                </div>
-                <div class="text-base text-[#5a5a78] h-12 flex flex-row flex-grow justify-center items-center px-8 w-full">
-                    <div class="flex gap-5 items-center justify-end">
-                        <div class="flex">
-                            <div class="download-file cursor-pointer flex items-center justify-center border border-0.25 border-gray-100 rounded-full py-0.5 px-4"
-                                 data-translated-file="{{ project.translated_file }}"
-                                 {% if project.reviewed_file %}data-reviewed-file="{{ project.reviewed_file }}" {% endif %}>
-                                <i class="ph ph-download mr-2"></i>
-                                Télécharger
-                            </div>
+                    <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-file-text" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Document' %}</span></span></th>
+                    <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-megaphone" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Languages' %}</span></span></th>
+                    <th class="status-col"><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-clock-clockwise" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Status' %}</span></th>
+                    <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-calendar-blank" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Creation date' %}</span></th>
+                    <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-wrench" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Actions' %}</span></span></th>
+                </tr>
+            </thead>
+            <tbody>
 
-                            {% if project.reviewed_file and project.translated_file %}
-                            <div class="download-tooltip hidden absolute z-10 bg-white rounded-md shadow-lg p-2 mt-2 right-0">
-                                <button type="button"
-                                        class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap"
-                                        data-file-url="{{ project.translated_file }}">
-                                    {% trans 'Translated' %}
-                                </button>
-                                <button type="button"
-                                        class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap"
-                                        data-file-url="{{ project.reviewed_file }}">
-                                    {% trans 'Post-edited' %}
-                                </button>
-                            </div>
-                            {% endif %}
+                {% if projects.results %}
+                    {% for project in projects.results %}
+                    <tr data-type="{{ project.document_type }}" data-status="{{ project.status }}" data-language="{{ project.source_language|upper }} → {{ project.target_language|upper }}" data-filename="{{ project.source_file_name|lower }}">
+                        {% if request.user.is_staff %}
+                        <td>
+                            <span class="doc-title">
+                                {% if project.username %}
+                                    {{ project.username }}
+                                {% else %}
+                                    Unknown
+                                {% endif %}
+                            </span>
+                        </td>
+                        {% endif %}
+                        <td>
+                            <span class="doc-title">{{ project.source_file_name }}</span>
+                        </td>
+                        <td><span class="lang-label">{{ project.source_language|upper }} → {{ project.target_language|upper }}</span></td>
+                        <td class="status-col">
+                            <span class="status-badge status-default"><span class="status">{{ project.status }}</span></span>
+                        </td>
+                        <td>{{ project.created_at|date:"d/m/Y" }}</td>
+                        <td class="table-actions">
+                            <div class="flex gap-5 items-center justify-end">
+                                <div class="flex">
+                                    <div class="download-file cursor-pointer flex items-center justify-center border border-0.25 border-gray-100 rounded-full py-0.5 px-4"
+                                         data-translated-file="{{ project.translated_file }}"
+                                         {% if project.reviewed_file %}data-reviewed-file="{{ project.reviewed_file }}" {% endif %}>
+                                        <i class="ph ph-download mr-2"></i>
+                                        Télécharger
+                                    </div>
 
-                            <div class="flex items-center justify-center text-base text-green-800 border-b border-green-600 font-poppins p-1 ml-2">
-                                Expert Review
-                                <i class="ph ph-arrow-right ml-2"></i>
-                            </div>
-                        </div>
+                                    {% if project.reviewed_file and project.translated_file %}
+                                    <div class="download-tooltip hidden absolute z-10 bg-white rounded-md shadow-lg p-2 mt-2 right-0">
+                                        <button type="button"
+                                                class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap"
+                                                data-file-url="{{ project.translated_file }}">
+                                            {% trans 'Translated' %}
+                                        </button>
+                                        <button type="button"
+                                                class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap"
+                                                data-file-url="{{ project.reviewed_file }}">
+                                            {% trans 'Post-edited' %}
+                                        </button>
+                                    </div>
+                                    {% endif %}
 
-
-                        <!--
-                        @TODO : supprimer bouton de suppression ?
-                        <div>
-                            <button type="button" class="delete-project" data-project-id="{{ project.id }}">
-                                <div class="relative group">
-                                    <svg width="17" height="16" viewBox="0 0 17 16" fill="none"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M14.5007 3.33398H2.50065C2.32384 3.33398 2.15427 3.40422 2.02925 3.52925C1.90422 3.65427 1.83398 3.82384 1.83398 4.00065C1.83398 4.17746 1.90422 4.34703 2.02925 4.47206C2.15427 4.59708 2.32384 4.66732 2.50065 4.66732H3.83398V12.6673C3.83414 13.1977 4.04491 13.7063 4.41995 14.0814C4.79498 14.4564 5.3036 14.6672 5.83398 14.6673H11.1673C11.6977 14.6672 12.2063 14.4564 12.5814 14.0814C12.9564 13.7063 13.1672 13.1977 13.1673 12.6673V4.66732H14.5007C14.6775 4.66732 14.847 4.59708 14.9721 4.47206C15.0971 4.34703 15.1673 4.17746 15.1673 4.00065C15.1673 3.82384 15.0971 3.65427 14.9721 3.52925C14.847 3.40422 14.6775 3.33398 14.5007 3.33398ZM7.83398 10.6673C7.83398 10.8441 7.76375 11.0137 7.63872 11.1387C7.5137 11.2637 7.34413 11.334 7.16732 11.334C6.99051 11.334 6.82094 11.2637 6.69591 11.1387C6.57089 11.0137 6.50065 10.8441 6.50065 10.6673V7.33398C6.50065 7.15717 6.57089 6.9876 6.69591 6.86258C6.82094 6.73756 6.99051 6.66732 7.16732 6.66732C7.34413 6.66732 7.5137 6.73756 7.63872 6.86258C7.76375 6.9876 7.83398 7.15717 7.83398 7.33398V10.6673ZM10.5007 10.6673C10.5007 10.8441 10.4304 11.0137 10.3054 11.1387C10.1804 11.2637 10.0108 11.334 9.83398 11.334C9.65717 11.334 9.4876 11.2637 9.36258 11.1387C9.23756 11.0137 9.16732 10.8441 9.16732 10.6673V7.33398C9.16732 7.15717 9.23756 6.9876 9.36258 6.86258C9.4876 6.73756 9.65717 6.66732 9.83398 6.66732C10.0108 6.66732 10.1804 6.73756 10.3054 6.86258C10.4304 6.9876 10.5007 7.15717 10.5007 7.33398V10.6673Z"
-                                              fill="#176C77"/>
-                                        <path d="M7.16667 2.66732H9.83333C10.0101 2.66732 10.1797 2.59708 10.3047 2.47206C10.4298 2.34703 10.5 2.17746 10.5 2.00065C10.5 1.82384 10.4298 1.65427 10.3047 1.52925C10.1797 1.40422 10.0101 1.33398 9.83333 1.33398H7.16667C6.98986 1.33398 6.82029 1.40422 6.69526 1.52925C6.57024 1.65427 6.5 1.82384 6.5 2.00065C6.5 2.17746 6.57024 2.34703 6.69526 2.47206C6.82029 2.59708 6.98986 2.66732 7.16667 2.66732Z"
-                                              fill="#176C77"/>
-                                    </svg>
-                                    <div class="tooltip invisible opacity-0 transition-opacity duration-300 absolute z-10 w-auto py-2 px-2 bg-white text-black text-2.75 rounded-md bottom-14 left-1/2 transform -translate-x-1/2 translate-y-full shadow-lg">
-                                        <div class="flex items-center gap-1.5">
-                                            <svg class="allow-delete" width="14" height="14" viewBox="0 0 14 14"
-                                                 fill="none"
-                                                 xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M7 14C10.866 14 14 10.866 14 7C14 3.13401 10.866 0 7 0C3.13401 0 0 3.13401 0 7C0 10.866 3.13401 14 7 14Z"
-                                                      fill="#00BBA7"/>
-                                                <path d="M10.4019 4.34429L10.3841 4.32625C10.2923 4.23442 10.1833 4.16159 10.0633 4.11189C9.94333 4.0622 9.81475 4.03662 9.6849 4.03662C9.55505 4.03662 9.42647 4.0622 9.3065 4.11189C9.18654 4.16159 9.07754 4.23442 8.98572 4.32625L5.77174 7.5405L5.01787 6.78664C4.92491 6.69366 4.81454 6.6199 4.69308 6.56958C4.57161 6.51926 4.44142 6.49336 4.30994 6.49336C4.17846 6.49336 4.04827 6.51926 3.9268 6.56958C3.80533 6.6199 3.69497 6.69366 3.60201 6.78664C3.50899 6.8796 3.4352 6.98998 3.38485 7.11148C3.33451 7.23297 3.30859 7.36319 3.30859 7.4947C3.30859 7.62622 3.33451 7.75644 3.38485 7.87793C3.4352 7.99942 3.50899 8.10981 3.60201 8.20277L5.05478 9.65554L5.07256 9.67359C5.16435 9.7654 5.27333 9.83824 5.39327 9.88793C5.51321 9.93762 5.64177 9.96319 5.7716 9.96319C5.90143 9.96319 6.02999 9.93762 6.14993 9.88793C6.26987 9.83824 6.37885 9.7654 6.47064 9.67359L6.47967 9.66457L10.4019 5.74211C10.5872 5.55674 10.6913 5.30533 10.6913 5.0432C10.6913 4.78107 10.5872 4.52967 10.4019 4.34429Z"
-                                                      fill="white"/>
-                                            </svg>
-                                            <svg class="cancel-delete" width="14" height="14" viewBox="0 0 14 14"
-                                                 fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M7 14C10.866 14 14 10.866 14 7C14 3.13401 10.866 0 7 0C3.13401 0 0 3.13401 0 7C0 10.866 3.13401 14 7 14Z"
-                                                      fill="#FD625E"/>
-                                                <path d="M9.53205 10.6914C9.37965 10.6919 9.22867 10.6621 9.08786 10.6038C8.94705 10.5455 8.81921 10.4599 8.71174 10.3518L7.00002 8.64064L5.2883 10.3526C5.07074 10.5702 4.77566 10.6924 4.46799 10.6924C4.16031 10.6924 3.86524 10.5702 3.64768 10.3526C3.43011 10.1351 3.30789 9.84 3.30789 9.53232C3.30789 9.22465 3.43011 8.92957 3.64768 8.71201L5.35939 7.00002L3.6474 5.2883C3.42984 5.07074 3.30762 4.77566 3.30762 4.46799C3.30762 4.16031 3.42984 3.86524 3.6474 3.64768C3.86496 3.43011 4.16004 3.30789 4.46771 3.30789C4.77539 3.30789 5.07047 3.43011 5.28803 3.64768L7.00002 5.35939L8.71174 3.6474C8.81946 3.53968 8.94735 3.45422 9.0881 3.39592C9.22885 3.33762 9.3797 3.30762 9.53205 3.30762C9.6844 3.30762 9.83525 3.33762 9.976 3.39592C10.1167 3.45422 10.2446 3.53968 10.3524 3.6474C10.4601 3.75513 10.5455 3.88301 10.6038 4.02376C10.6621 4.16451 10.6921 4.31537 10.6921 4.46771C10.6921 4.62006 10.6621 4.77091 10.6038 4.91166C10.5455 5.05241 10.4601 5.1803 10.3524 5.28803L8.64064 7.00002L10.3526 8.71174C10.5148 8.87393 10.6253 9.0806 10.6701 9.30558C10.7148 9.53057 10.6918 9.76377 10.604 9.97569C10.5162 10.1876 10.3675 10.3687 10.1767 10.4961C9.98598 10.6235 9.76172 10.6915 9.53232 10.6914H9.53205Z"
-                                                      fill="white"/>
-                                            </svg>
-
-                                        </div>
-                                        <div class="absolute w-3 h-3 bg-white transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5 shadow-lg"></div>
+                                    <div class="flex items-center justify-center text-base text-green-800 border-b border-green-600 font-poppins p-1 ml-2">
+                                        Expert Review
+                                        <i class="ph ph-arrow-right ml-2"></i>
                                     </div>
                                 </div>
-                            </button>
-                        </div>-->
-                    </div>
-                </div>
-            </div>
-
-            {% endfor %}
-            {% endif %}
-
-        </div>
-
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="{% if request.user.is_staff %}6{% else %}5{% endif %}" style="text-align: center; padding: 2rem; color: #6b7280;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                                <i class="ph ph-file-text" style="font-size: 48px; opacity: 0.5;"></i>
+                                <p style="font-weight: 600;">{% trans 'No translations found' %}</p>
+                                <p style="font-size: 0.875rem;">{% trans 'Start by translating your first document or text.' %}</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
     <div id="modal"
          class="fixed inset-0 bg-gray-500 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
@@ -250,14 +167,13 @@
     </div>
 </div>
 
+<script src="{% static 'js/utils/status-utils.js' %}"></script>
 <script src="{% static 'js/project-history.js' %}"></script>
 <script src="{% static 'js/pagination.js' %}"></script>
 
 <script>
     var expert_revision_file_url = "{% url 'expert_revision_file' %}"
     var single_project = "{% url 'single_project' %}"
-</script>
-<script>
     var language_code = "{{ request.LANGUAGE_CODE }}"
 </script>
 

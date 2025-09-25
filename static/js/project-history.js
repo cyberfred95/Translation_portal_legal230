@@ -1,37 +1,6 @@
 $(document).ready(function () {
 
-    $('td').each(function () {
-        var statusElement = $(this).find('.status');
-        var statusText = statusElement.text().trim();
-        switch (statusText) {
-            case 'Being translated':
-                statusElement.text('Processing...');
-                statusElement.addClass('text-green-500');
-                break;
-            case 'Translated':
-                statusElement.text(language_code=== 'en'?'Translated': 'Document traduit');
-                statusElement.addClass('bg-green-100 text-green-400');
-                break;
-            case 'Sent to post-editing, not accepted yet':
-                statusElement.text(language_code=== 'en'?'Request for quote sent': 'Demande de devis envoyée');
-                statusElement.addClass('bg-yellow-100 text-yellow-400');
-                break;
-            case 'Sent to post-editing, accepted':
-                statusElement.text(language_code=== 'en'?'Request for quote accepted': 'Demande de devis acceptée');
-                statusElement.addClass('bg-blue-100 text-blue-400');
-                break;
-            case 'Post-edited file uploaded':
-                statusElement.text(language_code=== 'en'?'Proofread document uploaded': 'Document relu importé');
-                statusElement.addClass('bg-green-50 text-green-300');
-                break;
-            case 'Error':
-                statusElement.text(language_code=== 'en'?'Error': 'Erreur');
-                statusElement.addClass('bg-red-100 text-red-400');
-                break;
-            default:
-                break;
-        }
-    });
+    // L'ancien système de mapping des status a été remplacé par le système centralisé
 
     const $modal = $('#modal');
     const $closeIcon = $('#closeIcon');
@@ -172,5 +141,42 @@ $(document).ready(function () {
             window.location.href = fileUrl;
         }
     });
+
+    // Le mapping des status est géré par le système centralisé en bas du fichier
 });
+
+/**
+ * Status Management - Centralisé pour toutes les pages
+ * Gère l'initialisation et le mapping des badges de status
+ */
+
+// Initialiser le mapping des status pour toutes les pages
+function initializeStatusMapping() {
+    console.log('initializeStatusMapping called');
+    if (typeof applyStatusMapping === 'function') {
+        console.log('Applying status mapping...');
+        applyStatusMapping(document);
+        console.log('Status mapping applied');
+    } else {
+        console.error('applyStatusMapping function not available!');
+    }
+}
+
+// Fonction pour appliquer le mapping des status sur un élément spécifique
+function applyStatusMappingToElement(element) {
+    if (typeof applyStatusMapping === 'function') {
+        applyStatusMapping(element);
+    }
+}
+
+// Auto-initialisation quand le DOM est prêt
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Project History: DOM ready, initializing status mapping...');
+    console.log('applyStatusMapping function available:', typeof applyStatusMapping);
+    initializeStatusMapping();
+});
+
+// Export pour utilisation dans d'autres scripts
+window.initializeStatusMapping = initializeStatusMapping;
+window.applyStatusMappingToElement = applyStatusMappingToElement;
 

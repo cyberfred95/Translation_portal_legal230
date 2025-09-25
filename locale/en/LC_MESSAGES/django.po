@@ -122,7 +122,6 @@ msgstr "Target language"
 #: glossaries/templates/myteam.html:155
 #: legal/templates/dashboard/dashboard_recent_translations.html:26
 #: legal/templates/project_history.html:37
-#: legal/templates/project_history_2.html:120
 msgid "Creation date"
 msgstr "Creation date"
 
@@ -131,7 +130,6 @@ msgstr "Creation date"
 #: glossaries/templates/myteam.html:159
 #: legal/templates/dashboard/dashboard_recent_translations.html:27
 #: legal/templates/project_history.html:41
-#: legal/templates/project_history_2.html:129
 #: legal/templates/steps/step_4.html:22
 msgid "Actions"
 msgstr "Actions"
@@ -257,7 +255,6 @@ msgstr "Target language"
 
 #: glossaries/templates/glossaries_2.html:223
 #: legal/templates/dashboard/dashboard_recent_translations.html:14
-#: legal/templates/project_history_2.html:61
 msgid "Translation language"
 msgstr "Translation language"
 
@@ -593,15 +590,11 @@ msgstr "Status"
 #: legal/templates/document_translate.html:25
 #: legal/templates/document_translate_2.html:25
 #: legal/templates/project_history.html:25
-#: legal/templates/project_history_2.html:42
-#: legal/templates/project_history_2.html:85
-#: legal/templates/project_history_2.html:162
 #: legal/templates/steps/step_4.html:10
 msgid "Document"
 msgstr "Document"
 
 #: legal/templates/dashboard/dashboard_recent_translations.html:24
-#: legal/templates/project_history_2.html:103
 #: legal/templates/steps/step_4.html:14
 #, fuzzy
 #| msgid "Languages"
@@ -610,21 +603,16 @@ msgstr "Languages"
 
 #: legal/templates/dashboard/dashboard_recent_translations.html:25
 #: legal/templates/project_history.html:33
-#: legal/templates/project_history_2.html:50
-#: legal/templates/project_history_2.html:112
 #: legal/templates/steps/step_4.html:18
 msgid "Status"
 msgstr "Status"
 
 #: legal/templates/dashboard/dashboard_recent_translations.html:38
-#: legal/templates/project_history_2.html:43
-#: legal/templates/project_history_2.html:160
 msgid "Text"
 msgstr "Text"
 
 #: legal/templates/dashboard/dashboard_recent_translations.html:38
 #: legal/templates/dashboard/dashboard_recent_translations.html:40
-#: legal/templates/project_history_2.html:160
 msgid "page"
 msgstr ""
 
@@ -659,8 +647,6 @@ msgstr "Translation"
 
 #: legal/templates/document_translate.html:125
 #: legal/templates/project_history.html:101
-#: legal/templates/project_history_2.html:54
-#: legal/templates/project_history_2.html:217
 msgid "Completed"
 msgstr ""
 
@@ -745,34 +731,26 @@ msgid "Change Password"
 msgstr "Change your password."
 
 #: legal/templates/project_history.html:8
-#: legal/templates/project_history_2.html:11
 msgid "History"
 msgstr ""
 
 #: legal/templates/project_history.html:9
-#: legal/templates/project_history_2.html:14
 msgid "Find all your translation history"
 msgstr ""
 
 # ######################################
 # ########################### STEP 5 ###
 #: legal/templates/project_history.html:80
-#: legal/templates/project_history_2.html:51
-#: legal/templates/project_history_2.html:196
 #, fuzzy
 #| msgid "New translation"
 msgid "Needs attention"
 msgstr "New translation"
 
 #: legal/templates/project_history.html:87
-#: legal/templates/project_history_2.html:52
-#: legal/templates/project_history_2.html:203
 msgid "In progress"
 msgstr ""
 
 #: legal/templates/project_history.html:94
-#: legal/templates/project_history_2.html:53
-#: legal/templates/project_history_2.html:210
 msgid "Error"
 msgstr "Error"
 
@@ -787,13 +765,11 @@ msgstr "Proofread"
 # ######################################
 # ########################### STEP 6 ###
 #: legal/templates/project_history.html:199
-#: legal/templates/project_history_2.html:316
 #: legal/templates/steps/step_5.html:29 legal/templates/steps/step_5.html:54
 msgid "Quote for revision"
 msgstr "Request for quote"
 
 #: legal/templates/project_history.html:200
-#: legal/templates/project_history_2.html:318
 #: legal/templates/steps/step_5.html:55
 msgid ""
 "We can not provide an automatic quote for this language pair. Please ask"
@@ -801,7 +777,6 @@ msgstr ""
 "We can not provide an automatic quote for this language pair. Please ask"
 
 #: legal/templates/project_history.html:200
-#: legal/templates/project_history_2.html:320
 #: legal/templates/steps/step_5.html:55
 msgid "to receive a quote in less than 30 minutes."
 msgstr "to receive a quote in less than 30 minutes."
@@ -816,7 +791,6 @@ msgstr ""
 "Quote of the selected service to Legal230"
 
 #: legal/templates/project_history.html:208
-#: legal/templates/project_history_2.html:327
 msgid "Expert revision"
 msgstr "Get a quote"
 
@@ -824,53 +798,43 @@ msgstr "Get a quote"
 msgid "Post-editing by professional editors"
 msgstr ""
 
-#: legal/templates/project_history_2.html:32
 #: legal/templates/steps/step_2.html:78
 #, fuzzy
 #| msgid "Choose the document."
 msgid "Search for text or document..."
 msgstr "Choose the document."
 
-#: legal/templates/project_history_2.html:41
 msgid "Type"
 msgstr ""
 
 # ########################################
 # ################################################ PROJECT HISTORY #################################################
-#: legal/templates/project_history_2.html:94
 msgid "Username"
 msgstr "Username"
 
-#: legal/templates/project_history_2.html:162
 msgid "pages"
 msgstr ""
 
-#: legal/templates/project_history_2.html:175
 msgid "Unknown"
 msgstr ""
 
-#: legal/templates/project_history_2.html:238
 #: legal/templates/steps/step_4.html:50 legal/templates/steps/step_4.html:84
 #: legal/templates/steps/step_4.html:118
 msgid "Download"
 msgstr "Download"
 
-#: legal/templates/project_history_2.html:246
 #, fuzzy
 #| msgid "Expert revision"
 msgid "Expert review"
 msgstr "Get a quote"
 
-#: legal/templates/project_history_2.html:260
 #: stats/templates/usage_history.html:306
 msgid "No data available"
 msgstr "No data available"
 
-#: legal/templates/project_history_2.html:261
 msgid "There are currently no projects to display."
 msgstr "There are currently no projects to display."
 
-#: legal/templates/project_history_2.html:324
 #, fuzzy
 #| msgid ""
 #| "By choosing the options below, you agree that you are sending a request "
