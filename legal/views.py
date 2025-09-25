@@ -552,77 +552,10 @@ class DetectTextLanguageView(APIView):
 
 
 class ProfileDetailsView(TemplateView):
-    template_name = 'profile_details.html'
+    template_name = 'profile_details/profile_details.html'
     
-class ProfileDetails2View(TemplateView):
-    template_name = 'profile_information.html'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Add user profile data for dynamic rendering
-        if self.request.user.is_authenticated and hasattr(self.request.user, 'first_name'):
-            user = self.request.user
-            context['user'] = user
-            context['user_full_name'] = f"{getattr(user, 'first_name', '')} {getattr(user, 'last_name', '')}".strip()
-        return context
-    
-    def post(self, request, *args, **kwargs):
-        """Handle form submissions for profile updates and password changes"""
-        if not request.user.is_authenticated:
-            return JsonResponse({'error': 'Authentication required'}, status=401)
-        
-        user = request.user
-        
-        # Handle profile information update
-        if 'first_name' in request.POST or 'last_name' in request.POST:
-            user.first_name = request.POST.get('first_name', user.first_name)
-            user.last_name = request.POST.get('last_name', user.last_name)
-            user.username = request.POST.get('username', user.username)
-            user.email = request.POST.get('email', user.email)
-            user.save()
-            
-            return JsonResponse({
-                'success': True,
-                'message': 'Profile updated successfully'
-            })
-        
-        # Handle password change
-        if 'current_password' in request.POST:
-            from django.contrib.auth import authenticate, update_session_auth_hash
-            
-            current_password = request.POST.get('current_password')
-            new_password = request.POST.get('new_password')
-            confirm_password = request.POST.get('confirm_password')
-            
-            # Verify current password
-            if not user.check_password(current_password):
-                return JsonResponse({
-                    'error': 'Current password is incorrect'
-                }, status=400)
-            
-            # Verify new passwords match
-            if new_password != confirm_password:
-                return JsonResponse({
-                    'error': 'New passwords do not match'
-                }, status=400)
-            
-            # Update password
-            user.set_password(new_password)
-            user.save()
-            
-            # Keep user logged in after password change
-            update_session_auth_hash(request, user)
-            
-            return JsonResponse({
-                'success': True,
-                'message': 'Password updated successfully'
-            })
-        
-        return JsonResponse({'error': 'Invalid request'}, status=400)
-
-
 class DashboardView(TemplateView):
-    template_name = "dashboard.html"
+    template_name = "dashboard/dashboard.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -632,9 +565,9 @@ class DashboardView(TemplateView):
         status_filter = self.request.GET.get('status', '')
         language_filter = self.request.GET.get('language', '')
         
-        # Paramètres pour l'API - limiter à 10 projets récents pour le dashboard
+        # Paramètres pour l'API - limiter à 5 projets récents pour le dashboard
         params = {
-            "page_size": 10,
+            "page_size": 5,
             "page": page,
             "user_custom_mt_token": user.uuid if not user.is_staff else None
         }
@@ -647,17 +580,25 @@ class DashboardView(TemplateView):
         context['current_status_filter'] = status_filter
         context['current_language_filter'] = language_filter
 
-        # Récupérer le compteur de mots traduits depuis la subscription de l'utilisateur
+        # Récupérer les compteurs depuis la subscription de l'utilisateur
         translated_words_count = 0
+        translated_symbols_count = 0
+        translated_files_count = 0
         try:
             user_subscription = user.subscriptions.first()
             if user_subscription:
                 translated_words_count = user_subscription.translated_words_count
+                translated_symbols_count = user_subscription.translated_symbols_count
+                translated_files_count = user_subscription.translated_files_count
         except Exception as e:
             # En cas d'erreur, garder la valeur par défaut
             translated_words_count = 0
+            translated_symbols_count = 0
+            translated_files_count = 0
         
         context['translated_words_count'] = translated_words_count
+        context['translated_symbols_count'] = translated_symbols_count
+        context['translated_files_count'] = translated_files_count
 
         # Récupérer le nombre de glossaires ajoutés par l'utilisateur
         glossaries_count = 0
@@ -729,7 +670,7 @@ class DashboardView(TemplateView):
                 
                 # Informations de pagination
                 current_page = int(page)
-                total_pages = (response.get('count', 0) + 9) // 10  # Arrondir vers le haut
+                total_pages = (response.get('count', 0) + 4) // 5  # Arrondir vers le haut
                 
                 # Calculer la plage de pages à afficher
                 page_range = []
@@ -751,9 +692,9 @@ class DashboardView(TemplateView):
                     'previous_page_number': current_page - 1 if current_page > 1 else None,
                     'next_page_number': current_page + 1 if response.get('next') else None,
                     'count': response.get('count', 0),
-                    'start_index': (current_page - 1) * 10 + 1,
-                    'end_index': min(current_page * 10, response.get('count', 0)),
-                    'has_multiple_pages': response.get('count', 0) > 10,
+                    'start_index': (current_page - 1) * 5 + 1,
+                    'end_index': min(current_page * 5, response.get('count', 0)),
+                    'has_multiple_pages': response.get('count', 0) > 5,
                     'page_range': page_range
                 }
             else:

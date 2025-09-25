@@ -8,9 +8,9 @@ $(document).ready(function () {
     var uploadedFiles = [];
 
     // Filtre toutes les langues visibles selon la recherche
-    $('#search-input').on('input keyup change', function() {
+    $('#search-input').on('input keyup change', function () {
         var val = $(this).val().toLowerCase();
-        $('.language-item').each(function() {
+        $('.language-item').each(function () {
             var text = $(this).text().toLowerCase();
             $(this).toggle(text.indexOf(val) > -1);
         });
@@ -18,16 +18,16 @@ $(document).ready(function () {
 
     // Sélection d'une langue, coloration verte sur tous les blocs concernés
     // Filtre toutes les langues visibles selon la recherche
-    $('#search-input').on('input keyup change', function() {
+    $('#search-input').on('input keyup change', function () {
         var val = $(this).val().toLowerCase();
-        $('.language-item').each(function() {
+        $('.language-item').each(function () {
             var text = $(this).text().toLowerCase();
             $(this).toggle(text.indexOf(val) > -1);
         });
     });
 
 // Sélection d'une langue, coloration verte sur tous les blocs concernés et gestion de l'icône + select2
-    $(document).on('click', '.language-item', function() {
+    $(document).on('click', '.language-item', function () {
         // Récupère la valeur de la langue
         var selectedLang = $(this).data('value');
 
@@ -110,46 +110,7 @@ $(document).ready(function () {
 
     let currentStep = 0;
 
-    function updateProgress(step) {
-        let percentage;
-        switch (step) {
-            case 0:
-                percentage = 0;
-                break;
-            case 1:
-                percentage = 26;
-                break;
-            case 2:
-                percentage = 52;
-                break;
-            case 3:
-                percentage = 76;
-                break;
-            case 4:
-                percentage = 100;
-                break;
-            default:
-                percentage = 1;
-        }
-
-        $("#progress-bar").css("width", percentage + "%");
-
-        $(".progress-point").parent().find("svg").removeClass("text-green-700").addClass("text-green-250");
-        $(".progress-point").parent().find(".text-3\\.25, .text-xs").removeClass("text-green-700").addClass("text-green-200");
-
-        $("#point-1").find("svg").removeClass("text-green-250").addClass("text-green-700");
-        $("#point-1").find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-700");
-
-        for (let i = 0; i <= step; i++) {
-            $(`#point-${i + 1}`).find("svg").removeClass("text-green-250").addClass("text-green-700");
-            $(`#point-${i + 1}`).find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-700");
-
-        }
-    }
-
     function showStep(step) {
-        updateProgress(step);
-
         const $actionList = $(".action-list");
 
         if (step === 0) {
@@ -165,33 +126,46 @@ $(document).ready(function () {
                 nextStep.hide();
             }
 
+            $("div[class^='step-']").addClass('hidden').hide();
             $('.step-1').removeClass('hidden').show();
-            $('.step-2').addClass('hidden').hide();
-            $('.step-indicator-2').removeClass('border-0.5 border-[#166534]');
-            $('.step-indicator-3').removeClass('border-0.5 border-[#166534]');
-            $('.step-indicator-4').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-1').addClass('border-0.5 border-[#166534]');
+            $('.stepindicator-2').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-3').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-4').removeClass('border-0.5 border-[#166534]');
         } else if (currentStep === 1) {
-            $('.step-1').addClass('hidden').hide();
+            $("div[class^='step-']").addClass('hidden').hide();
             $('.step-2').removeClass('hidden').show();
             $blockButtons.addClass('justify-between').removeClass('justify-end');
             prevStep.show();
             prevStep.css('display', 'flex');
             prevStep.prop("disabled", false);
-            $('.step-indicator-2').addClass('border-0.5 border-[#166534]');
-            $('.step-indicator-3').removeClass('border-0.5 border-[#166534]');
-            $('.step-indicator-4').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-2').addClass('border-0.5 border-[#166534]');
+            $('.stepindicator-3').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-4').removeClass('border-0.5 border-[#166534]');
+        } else if (currentStep === 2) {
+            $("div[class^='step-']").addClass('hidden').hide();
+            $('.step-3').removeClass('hidden').show();
+            $blockButtons.addClass('justify-between').removeClass('justify-end');
+            prevStep.show();
+            $('.stepindicator-2').addClass('border-0.5 border-[#166534]');
+            $('.stepindicator-3').addClass('border-0.5 border-[#166534]');
+            $('.stepindicator-4').removeClass('border-0.5 border-[#166534]');
+        } else if (currentStep === 3) {
+            $("div[class^='step-']").addClass('hidden').hide();
+            $('.step-4').removeClass('hidden').show();
+            $blockButtons.addClass('justify-between').removeClass('justify-end');
+            prevStep.show();
+            $('span', $nextButton).text($('span', $nextButton).data('confirm'));
+            $('.stepindicator-2').addClass('border-0.5 border-[#166534]');
+            $('.stepindicator-3').addClass('border-0.5 border-[#166534]');
+            $('.stepindicator-4').addClass('border-0.5 border-[#166534]');
         } else if (currentStep === 4) {
-            prevStep.hide();
-            $blockButtons.removeClass('justify-between').addClass('justify-end');
-
-            nextStep.hide();
+            $("div[class^='step-']").addClass('hidden').hide();
+            $('.step-5').removeClass('hidden').show();
             $("#restart").show().text(language_code === 'en' ? "New translation" : "Nouveau document");
             $("#restart-text").show();
 
             $actionList.css("justify-content", "flex-start");
-            $('.step-indicator-2').addClass('border-0.5 border-[#166534]');
-            $('.step-indicator-3').addClass('border-0.5 border-[#166534]');
-            $('.step-indicator-4').addClass('border-0.5 border-[#166534]');
         } else {
             prevStep.show();
             $blockButtons.removeClass('justify-end').addClass('justify-between');
@@ -207,44 +181,53 @@ $(document).ready(function () {
         nextStep.toggleClass('hidden', step === 4);
     }
 
-    nextStep.click(function () {
-        if (currentStep === 0 && selectedFiles.length === 0) {
-            return;
-        }
-        if (currentStep === 0) {
-            detectLanguageFiles();
-            checkLanguagesConsistency()
-        }
-        if (currentStep === 1) {
-            targetLanguage = $('.document-target-language').val();
-            getDomainsGroups();
-        }
-        if (currentStep === 2) {
-            if (!defaultDomain && access_to_default_glossaries) {
-                loadDefaultGlossary();
-                $(".add-glossary-btn").addClass('hidden');
-                $(".step-4 .default").addClass('bg-gray-600 text-white');
-            } else {
-                loadMyGlossaries();
-                $(".add-glossary-btn").removeClass('hidden');
-                $(".step-4 .my-glossary").addClass('bg-gray-600 text-white');
-            }
-        }
-        if (currentStep === 3) {
-            fileTranslate();
-        }
+    $(document).on('click', nextStep, function (e) {
+        if ($(e.target).hasClass('nextStep') || $(e.target).children().hasClass('nextStep')) {
 
-        currentStep++;
-        showStep(currentStep);
+            if (currentStep === 0 && selectedFiles.length === 0) {
+                return;
+            }
+            if (currentStep === 0) {
+                detectLanguageFiles();
+                checkLanguagesConsistency()
+            }
+            if (currentStep === 1) {
+                targetLanguage = $('.document-target-language').val();
+                getDomainsGroups();
+            }
+            if (currentStep === 2) {
+                if (!defaultDomain && access_to_default_glossaries) {
+                    loadDefaultGlossary();
+                    $(".add-glossary-btn").addClass('hidden');
+                    $(".step-4 .default").addClass('bg-gray-600 text-white');
+                } else {
+                    loadMyGlossaries();
+                    $(".add-glossary-btn").removeClass('hidden');
+                    $(".step-4 .my-glossary").addClass('bg-gray-600 text-white');
+                }
+            }
+
+            console.log('currentStep : ' + currentStep);
+            if (currentStep === 3) {
+                fileTranslate();
+            }
+
+            currentStep++;
+            showStep(currentStep);
+
+        }
     });
 
-    prevStep.click(function () {
-        if (currentStep > 0) {
-            currentStep--;
-            showStep(currentStep);
-            nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none').addClass('border-green-700 text-green-700').prop("disabled", false);
+    $(document).on('click', prevStep, function (e) {
+        if ($(e.target).hasClass('prevStep')) {
+            console.log('currentStep from prevStep : ' + currentStep)
+            if (currentStep > 0) {
+                currentStep--;
+                showStep(currentStep);
+                nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none').addClass('border-green-700 text-green-700').prop("disabled", false);
 
-            $('.step-container').removeClass('bg-red-100 border-red-200');
+                $('.step-container').removeClass('bg-red-100 border-red-200');
+            }
         }
     });
 
@@ -399,6 +382,7 @@ $(document).ready(function () {
             </div>
         `);
 
+            $fileList.append($fileItem);
             $fileList.append($fileItem);
         });
     };
@@ -604,7 +588,9 @@ $(document).ready(function () {
         let firstValue = sourceSelects.first().val();
         let targetValue = $('.document-target-language').val();
 
-        sourceLanguage = firstValue;
+        if (null !== firstValue) {
+            sourceLanguage = firstValue;
+        }
 
         sourceSelects.each(function () {
             const currentValue = $(this).val();
@@ -954,21 +940,28 @@ $(document).ready(function () {
         });
     }
 
-    const $modal = $('#modal');
+    const $modal = $('#modalGlossary');
     const $closeIcon = $('#closeIcon');
     const maxFileSize = 5 * 1024 * 1024; // 5MB
 
-    $('#openModal').on('click', function () {
+    $(document).on('click', '.openGlossary', function(event) {
+        event.preventDefault(); // Empêche clic par défaut si besoin (par ex lien)
         $modal.removeClass('hidden');
         $closeIcon.removeClass('hidden');
+        $('input[name=openGlossary]').prop('checked', 'checked');
     });
 
     $('#closeModal, #closeIcon').on('click', function () {
+        // Réinitialise les styles des boutons comme avant
         $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
         $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-700 text-green-700 border border-green-700');
         $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
+
         $modal.addClass('hidden');
         $closeIcon.addClass('hidden');
+
+        // Désactive la checkbox et le style "peer-checked"
+        $('input[name=openGlossary]').prop('checked', false).trigger('change');
     });
 
     $(window).on('click', function (event) {
@@ -1089,10 +1082,15 @@ $(document).ready(function () {
     const fileTranslate = () => {
         const formData = new FormData();
         selectedFiles.forEach((file) => {
-            formData.append(`document[]`, file);
+            formData.append(`document[]`, file.file);
         });
 
         formData.append('domain_name', selectedSubDomain);
+        /**
+         * @TODO 11/09/2025 : Le système de sélection du glossaire étant totalement à revoir
+         * en js pour récupérer l'id du glossaire sélectionné dans la popup
+         * je ne l'intègre pas dans les paramètres de l'appel ajax volontairement
+         */
         formData.append('glossary', selectedGlossary);
         formData.append('source_language', sourceLanguage);
         formData.append('target_language', targetLanguage);
@@ -1387,7 +1385,62 @@ $(document).ready(function () {
         setInterval(checkDocumentStatus, 10000);
     };
 
+    function showTab(tabId) {
+        // Masquer tous les contenus de tabs
+        $('#step2-tab-default-content').hide();
+        $('#step2-tab-no-lexicon-content').hide();
+        $('#step2-tab-my-lexicon-content').hide();
 
+        // Afficher le contenu du tab sélectionné
+        $(`#step2-tab-${tabId}-content`).show();
+
+        // Retirer les styles actifs de tous les boutons
+        $('button.tab-button').removeClass('border-b-0.5 border-b-black');
+        $(`#step2-${tabId}`).addClass('border-b-0.5 border-b-black');
+    }
+
+    setTimeout(() => showTab('default'), 1000);
+    $('#step2-default').click(function () {
+        showTab('default');
+    });
+
+    $('#step2-my-lexicon').click(function () {
+        showTab('my-lexicon');
+    });
+
+    $('#step2-no-lexicon').click(function () {
+        showTab('no-lexicon');
+    });
+
+    // Gestion du clic sur les blocs radio
+    $('ul.flex li > div.flex.items-center.mr-2').click(function() {
+        // Décoche et enlève le fond bleu sur tous
+        $('ul.flex li > div.flex.items-center.mr-2').removeClass('bg-blue-50');
+        $('ul.flex li > div.flex.items-center.mr-2 input[type=radio]').prop('checked', false);
+
+        // Coche la radio du bloc cliqué et ajoute fond bleu
+        $(this).addClass('bg-blue-50');
+        $(this).find('input[type=radio]').prop('checked', true);
+    });
+
+    // Fonction pour cliquer automatiquement sur le bouton .domain-button avec data-name
+    function clickDomainButton(domainName) {
+        // Retire classes de sélection sur tous les boutons
+        $('.domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-100 text-gray-475');
+
+        // Cherche le bouton à sélectionner
+        var $btn = $('.domain-button[data-name="' + domainName + '"]');
+        if ($btn.length) {
+            // Déclenche clic sur ce bouton
+            $btn.click();
+
+            // Applique classes sélection sur ce bouton
+            $btn.addClass('selected bg-green-700 text-white').removeClass('bg-gray-100 text-gray-475');
+        }
+    }
+
+    // Exemple d’appel : sélectionner automatiquement le bouton "Corporate"
+    clickDomainButton('Corporate');
 });
 
 // Close warning alert

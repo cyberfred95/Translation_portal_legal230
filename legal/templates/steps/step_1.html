@@ -23,14 +23,11 @@
     <!-- Import button -->
     <label class="flex px-2.5 py-2 justify-center items-center rounded-full border border-black/10 cursor-pointer transition-colors hover:bg-black/5">
         <!-- Plus Icon SVG -->
-        <svg class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        {% include 'svg/icons/plus.svg' %}
         <div class="flex px-2 justify-center items-center">
-                    <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#181932]">
-                        {% trans 'Import a document' %}
-                    </span>
+            <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#181932]">
+                {% trans 'Import a document' %}
+            </span>
         </div>
         <input type="file" multiple accept=".pdf,.docx,.pptx" class="hidden" id="file-input">
     </label>

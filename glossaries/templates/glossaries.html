@@ -1,99 +1,122 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
-
 {% block content %}
 
-<div class="mx-5 mb-11.5">
-    <div class="flex justify-end items-center my-5">
-        <button
-                type="button" id="openModal" class="flex gap-2.5 items-center px-6.5 py-1 rounded-md bg-transparent hover:bg-green-700 text-green-700 hover:text-white border border-green-700 transition-colors duration-300 text-3.5">
-            + {% trans 'Add glossary' %}
-        </button>
-    </div>
-    <div class="shadow-[0_0_15px_rgba(0,0,0,0.1)] rounded-md px-5 pt-5 w-full h-full flex flex-col items-end  bg-white">
-        <table class="border-collapse w-full border-separate border-spacing-y-5">
-            <thead>
-            <tr class="border-gray-425">
-                <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
-                    <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        {% trans 'File name' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+<div class="mx-5 mb-11.5 mt-5">
+    <h2 class="text-2xl mb-2">{% trans 'Glossary' %}</h2>
+    <div class="text-base">{% trans 'Find all your personal glossaries' %}</div>
+
+    <div class="rounded-md px-5 pt-5 mt-5 w-full h-full flex flex-col items-end bg-white">
+        <div class="flex w-full items-center my-5">
+            <div class="flex w-full items-center justify-between gap-4 mb-6">
+                <form method="GET" class="relative flex-1 ">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <!-- Search Icon SVG -->
+                        <svg class="h-5 w-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
                     </div>
-                </th>
-                <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
-                    <div class="flex items-center gap-1 w-auto cursor-pointer">
-                        {% trans 'Languages' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
-                    </div>
-                </th>
-                <th class="border-b text-4 text-gray-600 font-semibold text-left pb-5">
-                    <div class="flex items-center gap-1 w-auto">
-                        {% trans 'Created' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
-                    </div>
-                </th>
-                <th class="border-b text-4 text-gray-600 font-semibold text-right pb-5">{% trans 'Actions' %}</th>
-            </tr>
-            </thead>
-            <tbody>
+                    <input
+                            type="text"
+                            name="search"
+                            id="search-user"
+                            value="{{ search_query }}"
+                            placeholder="{% trans 'Search for a user' %}"
+                            class="w-full h-9 pl-10 pr-3 border border-black/10 rounded-md bg-white text-sm font-normal leading-6 tracking-[-0.084px] text-muted-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                    <!-- Preserve current page when searching -->
+                    {% if request.GET.page %}
+                    <input type="hidden" name="page" value="1">
+                    {% endif %}
+                </form>
+                <button
+                        type="button" id="openModal" class="text-white text-sm flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
+                     <div class="mr-2">
+                         {% include 'svg/icons/add_folder.svg' %}
+                     </div>
+                     {% trans 'Add glossary' %}
+                </button>
+            </div>
+
+        </div>
+
+
+
+
+        <div class="flex flex-col items-center justify-start w-full">
+            <div class="w-full flex flex-row bg-blue-50 border-b-0.25 border-gray-100">
+                <div class="h-12 flex flex-row justify-center items-center w-18">
+                </div>
+                <div class="text-base px-8 h-12 flex flex-row items-center justify-start w-200">
+                    <i class="ph ph-books mr-1"></i>
+                    {% trans 'File name' %}
+                </div>
+                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center justify-start w-200">
+                    <i class="ph ph-megaphone mr-1"></i>
+                    {% trans 'Original languages' %}
+                </div>
+                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center justify-start w-200">
+                    <i class="ph ph-megaphone mr-1"></i>
+                    {% trans 'Traduction languages' %}
+                </div>
+                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center justify-start w-140">
+                    <i class="ph ph-calendar-blank mr-1"></i>
+                    {% trans 'Creation date' %}
+                </div>
+                <div class="text-base text-[#5a5a78] h-12 flex flex-row flex-grow justify-center items-center w-full">
+                    <i class="ph ph-wrench mr-1"></i>
+                    {% trans 'Actions' %}
+                </div>
+            </div>
+
             {% if glossaries %}
             {% for glossary in glossaries %}
-            <tr>
 
-                <td class="text-3.25 text-gray-600 flex gap-6 items-center">
+            <div class="w-full flex flex-row border-b-0.25 border-gray-100 h-16 justify-center items-center">
+                <div class="h-12 flex flex-row justify-center items-center w-18">
+                    {% include 'svg/icons/glossar.svg' %}
+                </div>
+                <div class="text-sm text-[#5a5a78] h-12 flex flex-row items-center pl-8 w-200">
                     <span class="md:w-60 2xl:w-80 w-max truncate">{{ glossary.name }}</span>
-
-                    <button type="button" class="edit-glossary" data-edit-url="{% url 'single_glossary' glossary.id %}">
-                        <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <g clip-path="url(#clip0_759_2669)">
-                                <path d="M12.6666 8.53064C12.298 8.53064 12 8.82935 12 9.19727V14.5306C12 14.8979 11.7013 15.1973 11.3334 15.1973H2C1.63196 15.1973 1.33337 14.8979 1.33337 14.5306V5.19727C1.33337 4.82996 1.63196 4.53064 2 4.53064H7.33337C7.70203 4.53064 8 4.23193 8 3.86401C8 3.49597 7.70203 3.19727 7.33337 3.19727H2C0.897339 3.19727 0 4.0946 0 5.19727V14.5306C0 15.6333 0.897339 16.5306 2 16.5306H11.3334C12.436 16.5306 13.3334 15.6333 13.3334 14.5306V9.19727C13.3334 8.82861 13.0353 8.53064 12.6666 8.53064Z"
-                                      fill="#0F3144"/>
-                                <path d="M6.25075 7.9231C6.20412 7.96973 6.17275 8.02905 6.15944 8.09302L5.68813 10.4504C5.66616 10.5597 5.70082 10.6724 5.77944 10.7517C5.84279 10.8151 5.92812 10.849 6.01552 10.849C6.03676 10.849 6.05886 10.847 6.08083 10.8424L8.43752 10.3711C8.50283 10.3577 8.56215 10.3264 8.60817 10.2797L13.8828 5.005L11.5261 2.64844L6.25075 7.9231Z"
-                                      fill="#0F3144"/>
-                                <path d="M15.5117 1.01877C14.8618 0.368744 13.8044 0.368744 13.155 1.01877L12.2324 1.94138L14.5891 4.29807L15.5117 3.37534C15.8264 3.06137 15.9998 2.64267 15.9998 2.19736C15.9998 1.75204 15.8264 1.33334 15.5117 1.01877Z"
-                                      fill="#0F3144"/>
-                            </g>
-                            <defs>
-                                <clipPath id="clip0_759_2669">
-                                    <rect width="16" height="16" fill="white" transform="translate(0 0.5)"/>
-                                </clipPath>
-                            </defs>
-                        </svg>
-                    </button>
-
-                </td>
-                <td>
-                    <div class="flex gap-1 text-4 items-center text-green-500">
-                        <span class="text-3 text-green-500">{{ glossary.source_language }}</span>
-                        <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 4C12 3.91051 11.9711 3.837 11.9134 3.77947L8.83337 0.711292C8.77563 0.653764 8.70183 0.625 8.612 0.625C8.52858 0.625 8.4564 0.655362 8.39544 0.716087C8.33448 0.776811 8.304 0.848722 8.304 0.931818V2.77273H0.307999C0.224583 2.77273 0.152396 2.80309 0.0914373 2.86381C0.0304791 2.92454 0 2.99645 0 3.07955V4.92045C0 5.00355 0.0304791 5.07546 0.0914373 5.13619C0.152396 5.19691 0.224583 5.22727 0.307999 5.22727H8.304V7.06818C8.304 7.15767 8.33288 7.23118 8.39063 7.28871C8.44838 7.34624 8.52217 7.375 8.612 7.375C8.689 7.375 8.766 7.34304 8.843 7.27912L11.9134 4.22053C11.9711 4.163 12 4.08949 12 4Z"
-                                  fill="#176C77"/>
-                        </svg>
-                        <span class="text-3 text-green-500">{{ glossary.target_language }}</span>
-                    </div>
-
-                </td>
-                <td class="text-3.25 text-gray-600 created-at">
+                </div>
+                <div class="flex justify-start w-200 pr-8">
+                    {% if glossary.source_language|lower == "en" %}
+                    <span class="fi fi-us mr-2"></span>
+                    {% else %}
+                    <span class="fi fi-{{ glossary.source_language|lower }} mr-2"></span>
+                    {% endif %}
+                    {{ glossary.source_language }}
+                </div>
+                <div class="flex justify-start text-base text-[#5a5a78] h-12 flex flex-row items-center w-200">
+                    {% if glossary.target_language|lower == "en" %}
+                    <span class="fi fi-us mr-2"></span>
+                    {% else %}
+                    <span class="fi fi-{{ glossary.target_language|lower }} mr-2"></span>
+                    {% endif %}
+                    {{ glossary.target_language }}
+                </div>
+                <div class="text-base text-[#5a5a78] h-12 flex flex-row justify-start items-center px-8 w-140">
                     {{ glossary.created_at | date:"d/m/Y" }}
-                </td>
-                <td>
-                    <div class="flex gap-5 items-center justify-end">
-                        <button type="button" data-url="{{ glossary.file_url }}">
-                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M15.7188 7.21875C15.2875 7.21875 14.9375 7.56875 14.9375 8C14.9375 11.55 12.05 14.4375 8.5 14.4375C4.95 14.4375 2.0625 11.55 2.0625 8C2.0625 7.56875 1.7125 7.21875 1.28125 7.21875C0.85 7.21875 0.5 7.56875 0.5 8C0.5 10.1375 1.33125 12.1469 2.84375 13.6562C4.35625 15.1687 6.3625 16 8.5 16C10.6375 16 12.6469 15.1687 14.1562 13.6562C15.6687 12.1438 16.5 10.1375 16.5 8C16.5 7.56875 16.15 7.21875 15.7188 7.21875Z"
-                                      fill="#176C77"/>
-                                <path d="M7.42891 10.7375C7.71641 11.025 8.09766 11.1812 8.50078 11.1812C8.90703 11.1812 9.28828 11.0219 9.57266 10.7375L11.5383 8.77187C11.8445 8.46562 11.8445 7.97187 11.5383 7.66562C11.232 7.35937 10.7383 7.35937 10.432 7.66562L9.28203 8.81875V0.78125C9.28203 0.35 8.93203 0 8.50078 0C8.06953 0 7.71953 0.35 7.71953 0.78125V8.81875L6.56641 7.66562C6.26016 7.35937 5.76641 7.35937 5.46016 7.66562C5.15391 7.97187 5.15391 8.46562 5.46016 8.77187L7.42891 10.7375Z"
-                                      fill="#176C77"/>
-                            </svg>
+                </div>
+                <div class="text-base text-[#5a5a78] h-12 flex flex-row flex-grow justify-center items-center px-8 w-full">
+                    <div class="flex justify-center gap-1">
+                        <!-- Mail Write Button -->
+                        <button class="p-1">
+                            <i class="ph ph-pencil-simple text-black/80 text-lg"></i>
                         </button>
+
+                        <!-- Share Button -->
+                        <button type="button" data-url="{{ glossary.file_url }}">
+                            <i class="ph ph-share text-black/80 text-lg"></i>
+                        </button>
+
+                        <!-- Delete Button -->
                         <button type="button" class="delete-project"
                                 data-delete-url="{% url 'single_glossary' glossary.id %}">
                             <div class="relative group">
-                                <svg width="17" height="16" viewBox="0 0 17 16" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M14.5007 3.33398H2.50065C2.32384 3.33398 2.15427 3.40422 2.02925 3.52925C1.90422 3.65427 1.83398 3.82384 1.83398 4.00065C1.83398 4.17746 1.90422 4.34703 2.02925 4.47206C2.15427 4.59708 2.32384 4.66732 2.50065 4.66732H3.83398V12.6673C3.83414 13.1977 4.04491 13.7063 4.41995 14.0814C4.79498 14.4564 5.3036 14.6672 5.83398 14.6673H11.1673C11.6977 14.6672 12.2063 14.4564 12.5814 14.0814C12.9564 13.7063 13.1672 13.1977 13.1673 12.6673V4.66732H14.5007C14.6775 4.66732 14.847 4.59708 14.9721 4.47206C15.0971 4.34703 15.1673 4.17746 15.1673 4.00065C15.1673 3.82384 15.0971 3.65427 14.9721 3.52925C14.847 3.40422 14.6775 3.33398 14.5007 3.33398ZM7.83398 10.6673C7.83398 10.8441 7.76375 11.0137 7.63872 11.1387C7.5137 11.2637 7.34413 11.334 7.16732 11.334C6.99051 11.334 6.82094 11.2637 6.69591 11.1387C6.57089 11.0137 6.50065 10.8441 6.50065 10.6673V7.33398C6.50065 7.15717 6.57089 6.9876 6.69591 6.86258C6.82094 6.73756 6.99051 6.66732 7.16732 6.66732C7.34413 6.66732 7.5137 6.73756 7.63872 6.86258C7.76375 6.9876 7.83398 7.15717 7.83398 7.33398V10.6673ZM10.5007 10.6673C10.5007 10.8441 10.4304 11.0137 10.3054 11.1387C10.1804 11.2637 10.0108 11.334 9.83398 11.334C9.65717 11.334 9.4876 11.2637 9.36258 11.1387C9.23756 11.0137 9.16732 10.8441 9.16732 10.6673V7.33398C9.16732 7.15717 9.23756 6.9876 9.36258 6.86258C9.4876 6.73756 9.65717 6.66732 9.83398 6.66732C10.0108 6.66732 10.1804 6.73756 10.3054 6.86258C10.4304 6.9876 10.5007 7.15717 10.5007 7.33398V10.6673Z"
-                                          fill="#176C77"/>
-                                    <path d="M7.16667 2.66732H9.83333C10.0101 2.66732 10.1797 2.59708 10.3047 2.47206C10.4298 2.34703 10.5 2.17746 10.5 2.00065C10.5 1.82384 10.4298 1.65427 10.3047 1.52925C10.1797 1.40422 10.0101 1.33398 9.83333 1.33398H7.16667C6.98986 1.33398 6.82029 1.40422 6.69526 1.52925C6.57024 1.65427 6.5 1.82384 6.5 2.00065C6.5 2.17746 6.57024 2.34703 6.69526 2.47206C6.82029 2.59708 6.98986 2.66732 7.16667 2.66732Z"
-                                          fill="#176C77"/>
+                                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                 </svg>
                                 <div class="tooltip invisible opacity-0 transition-opacity duration-300 absolute z-10 w-auto py-2 px-2 bg-white text-black text-2.75 rounded-md bottom-14 left-1/2 transform -translate-x-1/2 translate-y-full shadow-lg">
                                     <div class="flex items-center gap-1.5">
@@ -117,37 +140,42 @@
                                 </div>
                             </div>
                         </button>
+
                     </div>
-                </td>
-            </tr>
+                </div>
+            </div>
+
             {% endfor %}
-            {% else %}
-            <tr>
-                <td colspan="7" class="text-center py-8 text-gray-425">
-                    <div class="flex flex-col items-center justify-center">
-                        <p class="text-5 text-gray-600 font-semibold">{% trans 'No data available' %}</p>
-                        <p class="text-3.25 text-gray-600 mt-1.25">{% trans 'There are currently no glossaries to display.' %}</p>
-                    </div>
-                </td>
-            </tr>
             {% endif %}
-            </tbody>
-        </table>
+
+        </div>
+
     </div>
-    <div id="modal"
-         class="fixed inset-0 bg-gray-500 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
-        <div class="relative bg-white rounded-lg shadow-xl max-w-172.5 w-full mx-4">
-            <div class="absolute -top-4.5 -right-4.5 -mr-4 -mt-4 z-10">
-                <button type="button" id="closeIcon" class="p-2 text-gray-500 hover:text-gray-900 focus:outline-none">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M11.7688 10.0003L19.6335 2.13553C20.1222 1.64732 20.1222 0.855171 19.6335 0.36696C19.1449 -0.121669 18.3536 -0.121669 17.865 0.36696L10.0002 8.23171L2.13504 0.36696C1.64641 -0.121669 0.8551 -0.121669 0.366471 0.36696C-0.122157 0.855171 -0.122157 1.64732 0.366471 2.13553L8.23164 10.0003L0.366471 17.865C-0.122157 18.3532 -0.122157 19.1454 0.366471 19.6336C0.610786 19.8775 0.930979 19.9997 1.25076 19.9997C1.57053 19.9997 1.89073 19.8775 2.13504 19.6332L10.0002 11.7684L17.865 19.6332C18.1093 19.8775 18.4295 19.9997 18.7492 19.9997C19.069 19.9997 19.3892 19.8775 19.6335 19.6332C20.1222 19.145 20.1222 18.3528 19.6335 17.8646L11.7688 10.0003Z"
-                              fill="white"/>
+    <div id="modal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-md flex flex-col gap-6 p-6 pb-8 w-3/4 max-h-[90vh] sm:p-8 sm:pb-8">
+            <!-- Header -->
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2 pl-4">
+                    <!-- FolderPlus Icon SVG -->
+                    {% include 'svg/icons/glossary.svg' %}
+                    <h1 class="font-poppins text-2xl font-bold text-gray-900 leading-8 tracking-[-0.456px]">
+                        {% trans 'Add glossary' %}
+                    </h1>
+                </div>
+                <button
+                        type="button"
+                        id="closeIcon"
+                        class="flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                        aria-label="Close modal"
+                >
+                    <!-- X Icon SVG -->
+                    <svg class="w-6 h-6 text-black/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
 
             <form class="p-12.5 flex flex-col items-center gap-7.5">
-                <div class="text-5">{% trans 'Add glossary' %}</div>
                 <div class="flex w-full justify-between">
                     <div class="flex flex-col gap-2.5 ">
                         <span>{% trans 'Source language' %}</span>
@@ -184,11 +212,14 @@
 
                     <div id="uploadButtons" class="flex flex-col gap-2.5 items-center">
                         <button type="button" id="uploadButton"
-                                class="bg-green-700 text-white py-2.5 rounded font-semibold px-14">
+                                class="text-white text-sm flex h-10 px-4 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
+                                <span class="mr-1">
+                                    {% include 'svg/icons/plus.svg' %}
+                                </span>
                             {% trans 'Upload file' %}
                         </button>
                         <div id="fileInfo"
-                             class="max-w-50.5 hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-100 text-green-400 w-full">
+                             class="max-w-50.5 hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-100 text-white w-full">
 
                             <span id="fileName" class="flex-grow truncate"></span>
                             <button type="button" class="remove-file">
@@ -209,7 +240,10 @@
                             </button>
                         </div>
                         <a href="{% static 'Gloss_en-de.csv' %}" type="button" id="downloadSample"
-                           class="px-6.5 text-center bg-white text-green-700 bg-green-700 py-1 rounded border border-green-700 font-semibold">
+                           class="text-green-800 text-sm flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-white border border-gray-200 transition-colors">
+                            <span class="mr-1">
+                                {% include 'svg/icons/download.svg' %}
+                            </span>
                             {% trans 'Download sample' %}
                         </a>
                         <p class="text-3.5 text-gray-400">{% trans 'Supported Files: .csv, .xlsx max 5mb' %}</p>
@@ -225,10 +259,13 @@
                     <li>{% trans "Table formatting is not allowed, only plain text" %}</li>
                     <li>{% trans "Commas are not allowed" %}</li>
                 </ul>
-                <button type="submit" id="continueButton"
-                        class="bg-gray-600 px-6.5 py-1 rounded font-semibold text-4 text-white create-glossary">
-                    {% trans 'Continue' %}
-                </button>
+                <div class="flex justify-end w-full items-center">
+                    <button type="submit" id="continueButton"
+                            class="text-white text-sm flex h-10 px-4 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
+                        {% trans 'Continue' %}
+                        <i class="ph ph-arrow-right ml-2"></i>
+                    </button>
+                </div>
             </form>
 
             <input type="file" class="hidden glossary-file" accept=".csv, .xlsx">
@@ -295,5 +332,8 @@
     let get_domains = "{% url 'get_domains' %}"
     let add_glossary = "{% url 'add_glossary' %}"
 </script>
-
+<link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css"
+/>
 {% endblock %}

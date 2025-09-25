@@ -1,207 +1,62 @@
-<!DOCTYPE html>
+{% extends "public_base.html" %}
 {% load i18n %}
 {% load static %}
-<html lang="{{ request.LANGUAGE_CODE }}">
-<head>
-    <meta charset="UTF-8">
-    <title>Legal230</title>
-    <!-- FONTS -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- JQUERY -->
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js"
-            integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-    <!-- STYLES -->
-    <link href="{% static 'css/main.css' %}" rel="stylesheet">
-    <!-- TAILWIND -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- TAILWINDCSS -->
-    <script>
-        const generateTailwindSizes = () => {
-            const sizes = {};
-            for (let px = 0; px <= 2000; px++) {
-                const tailwindName = (px / 4);
-                const remValue = (px / 16).toFixed(3);
-                sizes[tailwindName] = `${remValue}rem`;
-            }
-            return sizes;
-        }
 
-        tailwind.config = {
-            experimental: {
-                optimizeUniversalDefaults: true
-            },
-            theme: {
-                extend: {
-                    screens: {
-                        'xs': '320px',
-                        'sm': '576px',
-                        'md': '768px',
-                        'lg': '1024px',
-                        'xl': '1280px',
-                        '2xl': '1536px',
-                        '3xl': '1920px',
-                    },
-                    fontFamily: {
-                        'montserrat': ['Montserrat', 'sans-serif'],
-                    },
-                    colors: {
-                        gray: {
-                            25: '#F8F9FA',
-                            50: '#F5F7F7',
-                            60: '#EFEFEF',
-                            75: '#EAF0F6',
-                            100: '#F2F3F5',
-                            125: '#EBEFF0',
-                            150: '#EAECEE',
-                            175: '#EAECED',
-                            200: '#E4E8EA',
-                            225: '#D5DADE',
-                            250: '#D9D9D9',
-                            275: '#CFD5D9',
-                            300: '#CAD1D6',
-                            325: '#CACACA',
-                            350: '#AFB9C1',
-                            375: '#AAB4BD',
-                            400: '#9EAAB3',
-                            425: '#808E9B',
-                            475: '#7A8B98',
-                            480: '#6C767D',
-                            500: '#556A7B',
-                            525: '#566B79',
-                            550: '#2A4459',
-                            575: '#2B4459',
-                            600: '#0F3144',
-                        },
-                        green: {
-                            50: '#E6F8F6',
-                            100: '#E8F0F1',
-                            150: '#E7F0F1',
-                            200: '#DFEAEC',
-                            225: '#C4D6D7',
-                            250: '#B9D3D6',
-                            300: '#00BBA7',
-                            350: '#74A7AD',
-                            400: '#176C77',
-                            450: '#346C77',
-                            500: '#156D77',
-                            700: '#2F9D6F',
-                        },
-                        red: {
-                            100: '#FFEFEF',
-                            150: '#FFF7F7',
-                            200: '#FFE0DF',
-                            400: '#FD625E',
-                        },
-                        yellow: {
-                            100: '#FCF9ED',
-                            400: '#D4A600',
-                        },
-                        blue: {
-                            100: '#E9F4FF',
-                            400: '#1E90FF',
-                        },
-                    },
-                    fontSize: generateTailwindSizes(),
-                    width: generateTailwindSizes(),
-                    maxWidth: generateTailwindSizes(),
-                    height: generateTailwindSizes(),
-                    padding: generateTailwindSizes(),
-                    margin: generateTailwindSizes(),
-                    inset: generateTailwindSizes(),
-                    spacing: generateTailwindSizes(),
-                    borderRadius: generateTailwindSizes(),
-                    borderWidth: generateTailwindSizes(),
-                    divideWidth: generateTailwindSizes(),
-                    gap: generateTailwindSizes(),
-                }
-            }
-        }
-    </script>
-</head>
-<body>
-<div class="min-h-screen bg-white flex flex-col items-center p-6 sm:p-12 lg:p-20">
-    <div class="w-full max-w-4xl flex justify-center items-center gap-4 mb-8 relative z-10">
-        <div class="flex-1 text-right text-[#181932] font-normal text-base leading-6 tracking-[-0.176px]">
-            Don't have an account?
+{% block title %}Legal230 - {% trans "Log in" %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-white flex flex-col items-center p-6 sm:p-12 lg:p-20 relative">
+    <div class="absolute top-12 right-20 flex items-center gap-4 z-10">
+        <div class="flex-1 text-right text[#181932] font-normal text-base leading-6 tracking-[-0.176px]">
+            {% trans "Don't have an account?" %}
         </div>
         <button class="flex items-center justify-center px-[18px] py-2 bg-[#052E16] text-white font-semibold text-sm leading-6 tracking-[-0.084px] rounded-full">
-            Free trial
+            {% trans "Free trial" %}
         </button>
     </div>
-    <div class="w-full max-w-[628px] bg-white border border-black/10 rounded-xl p-6 relative z-10">
+    <div class="w-full max-w-[628px] bg-white border border-black/10 rounded-xl p-6 relative z-10 mt-24">
         <div class="flex justify-center mb-6">
             <img src="https://api.builder.io/api/v1/image/assets/TEMP/f909c0b2c18b94da3dd8013596b75e44f4f75075?width=206" alt="Lexa" class="w-[103px] h-[42px]" />
         </div>
         <p class="text-center text-[#181932] font-normal text-base leading-6 tracking-[-0.176px] mb-6">
-            Log in to Lexa faster and more securely: we remember your preferred method (no more email to enter), while keeping the classic access available.
+            {% trans "welcome login message" %}
         </p>
         <form name="login" action="{% url 'login' %}" method="post" autocomplete="off">
             {% csrf_token %}
-            <div class="mb-6">
-                <label class="block text-[#181932] font-semibold text-sm leading-6 tracking-[-0.084px] mb-1">Email</label>
+            <div class="mb-3">
+                <label class="block text-[#181932] font-semibold text-sm leading-6 tracking-[-0.084px] mb-1">{% trans "Email" %}</label>
                 <div class="relative flex items-center">
-                    <input type="email" id="email" name="email" required placeholder="Email" class="w-full h-10 px-4 pr-12 border border-black/10 rounded-md bg-white text-[#5A5A78] font-normal text-sm leading-6 tracking-[-0.084px] focus:outline-none focus:ring-2 focus:ring-[#052E16] focus:border-transparent" />
+                    <input type="email" id="email" name="email" required placeholder="{% trans 'Email' %}" class="w-full h-10 px-4 pr-12 border border-black/10 rounded-md bg-white text-[#5A5A78] font-normal text-sm leading-6 tracking-[-0.084px] focus:outline-none focus:ring-2 focus:ring-[#052E16] focus:border-transparent" />
                     <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 flex items-center">
-                        <!-- Pencil SVG -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-black/50"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                        <i class="ph ph-pencil-simple text-black/50 text-[24px]"></i>
                     </button>
                 </div>
             </div>
-            <div class="flex items-start gap-3 mb-6">
-                <div class="pt-0.5">
-                    <input type="checkbox" id="remember_me" name="remember_me" class="w-5 h-5 border border-black/20 rounded bg-white flex items-center justify-center" />
-                </div>
-                <label for="remember_me" class="text-[#181932] font-normal text-sm leading-6 tracking-[-0.084px] cursor-pointer">Remember me</label>
-            </div>
+            
             <div class="mb-2">
-                <label class="block text-[#181932] font-semibold text-sm leading-6 tracking-[-0.084px] mb-1">Password</label>
+                <label class="block text-[#181932] font-semibold text-sm leading-6 tracking-[-0.084px] mb-1">{% trans "Password" %}</label>
                 <div class="relative flex items-center">
-                    <input type="password" id="password" name="password" required placeholder="Password" class="w-full h-10 px-4 pr-12 border border-black/10 rounded-md bg-white text-[#5A5A78] font-normal text-sm leading-6 tracking-[-0.084px] focus:outline-none focus:ring-2 focus:ring-[#052E16] focus:border-transparent" />
+                    <input type="password" id="password" name="password" required placeholder="{% trans 'Password' %}" class="w-full h-10 px-4 pr-12 border border-black/10 rounded-md bg-white text-[#5A5A78] font-normal text-sm leading-6 tracking-[-0.084px] focus:outline-none focus:ring-2 focus:ring-[#052E16] focus:border-transparent" />
                     <button type="button" id="toggle-password" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 flex items-center">
-                        <svg id="eye-open" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-black/50"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
-                        <svg id="eye-closed" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-black/50" style="display:none"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-5.05 0-9.27-3.37-10.74-8a10.94 10.94 0 0 1 1.28-2.73"/><path d="M1 1l22 22"/><path d="M9.53 9.53A3.5 3.5 0 0 0 12 15.5c.96 0 1.84-.36 2.53-.97"/><path d="M14.47 14.47A3.5 3.5 0 0 0 12 8.5c-.96 0-1.84.36-2.53.97"/></svg>
+                        <i id="eye-open" class="ph ph-eye text-black/50 text-[24px]"></i>
+                        <i id="eye-closed" class="ph ph-eye-slash text-black/50 text-[24px]" style="display:none"></i>
                     </button>
                 </div>
             </div>
             <div class="text-right mb-6">
                 <a href="{% url 'forgot-password' %}" class="text-[#14532D] font-normal text-sm leading-6 tracking-[-0.084px] underline decoration-[#14532D]/20 flex items-center justify-end gap-2">
-                    I forgot my password
-                    <!-- Arrow SVG -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[#14532D]"><path d="M5 12h10"/><path d="m12 9 3 3-3 3"/></svg>
+                    {% trans "I forgot my password" %}
                 </a>
             </div>
-            <button type="submit" class="w-full bg-[#052E16] text-white font-semibold text-sm leading-6 tracking-[-0.084px] py-[10px] px-[18px] rounded-full mb-6 hover:bg-[#052E16]/90 transition-colors flex items-center justify-center gap-2">Log in 
+            <button type="submit" class="w-full bg-[#052E16] text-white font-semibold text-sm leading-6 tracking-[-0.084px] py-[10px] px-[18px] rounded-full mb-0 hover:bg-[#052E16]/90 transition-colors flex items-center justify-center gap-2">{% trans "Log in" %} 
             </button>
         </form>
     </div>
 </div>
+{% endblock %}
 
-
+{% block body_end %}
 <script src="{% static 'js/authorization.js' %}"></script>
 <script src="{% static 'js/get-cookie.js' %}"></script>
-
-<script>
-// Password visibility toggle
-document.addEventListener('DOMContentLoaded', function() {
-    var passwordInput = document.getElementById('password');
-    var toggleBtn = document.getElementById('toggle-password');
-    var eyeOpen = document.getElementById('eye-open');
-    var eyeClosed = document.getElementById('eye-closed');
-    if (toggleBtn && passwordInput && eyeOpen && eyeClosed) {
-        toggleBtn.addEventListener('click', function() {
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeOpen.style.display = 'none';
-                eyeClosed.style.display = 'inline';
-            } else {
-                passwordInput.type = 'password';
-                eyeOpen.style.display = 'inline';
-                eyeClosed.style.display = 'none';
-            }
-        });
-    }
-});
-</script>
-
-</body>
-</html>
+<script src="{% static 'js/login.js' %}"></script>
+{% endblock %}

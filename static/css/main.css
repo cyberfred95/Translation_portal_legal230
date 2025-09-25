@@ -91,12 +91,12 @@
 .select2-container {
     min-width: 145px !important;
     font-family: Poppins-Bold, sans-serif;
-    font-size:0.875rem;
+    font-size: 0.875rem;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__placeholder {
-    color:#181932 !important;
-    font-weight:600;
+    color: #181932 !important;
+    font-weight: 600;
 }
 
 .select2-container--default .select2-selection--single {
@@ -316,7 +316,7 @@
 }
 
 body {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
 }
@@ -365,7 +365,7 @@ textarea:focus {
     min-height: 320px;
     max-height: 100%;
     overflow: hidden;
-    border:none;
+    border: none;
 }
 
 #pre-text,

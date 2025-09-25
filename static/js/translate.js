@@ -7,9 +7,11 @@ $(document).ready(function () {
     function showTab(tabId) {
         $('.tab-content').hide();
         $(`#${tabId}-content`).show();
-        $('button.tab').removeClass('bg-white text-white text-gray border-gray-600 hover:bg-gray-600 hover:text-white hover:border-gray-600');
+        $('button.tab').removeClass('bg-white text-gray-900 font-bold');
+        $('button.tab').addClass('text-gray-900 hover:text-gray-900 text-gray-300');
         $('#expert-revision').addClass('hidden');
-        $(`#${tabId}`).addClass('bg-white text-white text-gray border-gray-600 hover:bg-gray-600 hover:text-white hover:border-gray-600');
+        $(`#${tabId}`).removeClass('text-gray-900 hover:text-gray-900 text-gray-300');
+        $(`#${tabId}`).addClass('bg-white text-gray-900 font-bold');
     }
 
     function setHash(tab) {
