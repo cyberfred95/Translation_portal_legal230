@@ -76,6 +76,11 @@ $(document).ready(function () {
 
     $('form[name="text-translate"]').on('submit', function (e) {
         e.preventDefault();
+        const CHAR_LIMIT = 2000;
+        const currentCount = sourceQuill.getText().replace(/\n/g, '').length;
+        if (currentCount > CHAR_LIMIT) {
+            return;
+        }
         let htmlContent = sourceQuill.root.innerHTML;
 
         $('#text').val(htmlContent);
@@ -202,10 +207,36 @@ $(document).ready(function () {
         $translatedEditor.css("height", maxHeight + "px");
     }
 
-    sourceQuill.on("text-change", resizeTextAreas);
+    const CHAR_LIMIT = 2000;
+    function getSourceCharCount() {
+        return sourceQuill.getText().replace(/\n/g, '').length;
+    }
+    function updateCharCount() {
+        var count = getSourceCharCount();
+        $('#source-char-count').text(Math.min(count, CHAR_LIMIT));
+    }
+
+    sourceQuill.on("text-change", function(delta, oldDelta, source){
+        if (source !== 'user') {
+            updateCharCount();
+            return;
+        }
+        var count = getSourceCharCount();
+        if (count > CHAR_LIMIT) {
+            var over = count - CHAR_LIMIT;
+            var sel = sourceQuill.getSelection(true);
+            var deleteIndex = sel ? Math.max(0, sel.index - over) : Math.max(0, sourceQuill.getLength() - 1 - over);
+            sourceQuill.deleteText(deleteIndex, over, 'user');
+            updateCharCount();
+            return;
+        }
+        resizeTextAreas();
+        updateCharCount();
+    });
     translatedQuill.on("text-change", resizeTextAreas);
 
     resizeTextAreas();
+    updateCharCount();
 });
 
 
@@ -213,6 +244,27 @@ $(document).ready(function () {
  * MODAL
  */
 document.addEventListener('DOMContentLoaded', function() {
+    // Tronquer proprement le collage au lieu de bloquer complètement
+    const sourceRoot = document.querySelector('#source-text .ql-editor')?.parentElement;
+    if (sourceRoot) {
+        sourceRoot.addEventListener('paste', function (e) {
+            var clipboardData = e.clipboardData || window.clipboardData;
+            if (!clipboardData) return;
+            var text = clipboardData.getData('text');
+            if (typeof text !== 'string') return;
+            var current = (window.sourceQuill || null) ? window.sourceQuill.getText().replace(/\n/g, '').length : getSourceCharCount();
+            var available = 2000 - current;
+            if (available <= 0) {
+                e.preventDefault();
+                return;
+            }
+            var toInsert = text.replace(/\r?\n/g, ' ').slice(0, available);
+            e.preventDefault();
+            var sel = (window.sourceQuill || null) ? window.sourceQuill.getSelection(true) : null;
+            if (!sel) sel = { index: (window.sourceQuill || null) ? window.sourceQuill.getLength() : 0, length: 0 };
+            (window.sourceQuill || null) ? window.sourceQuill.insertText(sel.index, toInsert, 'user') : null;
+        }, true);
+    }
     const modal = document.getElementById('modal');
     const closeModalBtn = document.getElementById('closeModal');
     const closeIcon = document.getElementById('closeIcon');
