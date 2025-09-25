@@ -108,7 +108,7 @@ $(document).ready(function () {
         });
     });
 
-    $("#clear").on("click", function () {
+    $("#clear, #clear-source").on("click", function () {
         translatedQuill.deleteText(0, translatedQuill.getLength());
         sourceQuill.deleteText(0, sourceQuill.getLength());
 

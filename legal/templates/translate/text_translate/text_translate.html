@@ -71,7 +71,9 @@
                          class="focus:border-transparent focus:ring-0 rounded-2.5 bg-white p-5 pr-10 text-gray-600 resize-none w-full placeholder:text-gray-300 overflow-hidden">
                     </div>
 
-                    {% include 'svg/icons/times.svg' %}
+                    <button type="button" id="clear-source" class="absolute top-2 right-2 p-1 rounded shadow-none hover:shadow-none focus:ring-0 focus:outline-none">
+                        <i class="ph ph-x text-2xl text-gray-500 hover:text-gray-700"></i>
+                    </button>
                 </div>
 
                 <div class="flex justify-end px-5 justify-between items-center">
@@ -99,11 +101,11 @@
 
                 <div class="flex justify-end px-5 items-end">
                     <div class="flex justify-end items-end p-3">
-                        {% include 'svg/icons/download.svg' %}
+                        <i class="ph ph-download-simple text-gray-600 hover:text-gray-800"></i>
                     </div>
                     <div class="flex justify-end items-end p-3">
                         <div class="copy relative">
-                            {% include 'svg/icons/copy.svg' %}
+                            <i class="ph ph-copy text-gray-600 hover:text-gray-800"></i>
                             <div id="tooltip"
                                  class="invisible opacity-0 transition-opacity duration-300 absolute z-10 py-2.5 px-4 bg-gray-600 text-white text-2.75 rounded-md -top-12 -right-6 transform">
                                 <span class="text-justify text-wrap block text-3">{% trans 'Copied' %}</span>
@@ -112,7 +114,7 @@
                         </div>
                     </div>
                     <div class="flex justify-end items-end p-3">
-                        {% include 'svg/icons/pencil.svg' %}
+                        <i class="ph ph-pencil-simple text-gray-600 hover:text-gray-800"></i>
                     </div>
                 </div>
 
