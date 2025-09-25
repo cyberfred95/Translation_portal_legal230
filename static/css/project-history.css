@@ -27,22 +27,27 @@
   text-align: center; 
 }
 
+/* Colonnes avec les mêmes largeurs que le dashboard */
 .dashboard-table th:nth-child(1), .dashboard-table td:nth-child(1) { 
-  width: 35%; 
+  width: 40%; 
   white-space: normal; 
   word-break: break-word; 
   hyphens: auto; 
 }
 
 .dashboard-table th:nth-child(2), .dashboard-table td:nth-child(2) { 
-  width: 20%; 
+  width: 15%; 
   white-space: normal; 
   word-break: break-word; 
   hyphens: auto; 
 }
 
+.dashboard-table th:nth-child(3), .dashboard-table td:nth-child(3) { 
+  width: 25%; 
+}
+
 .dashboard-table th:nth-child(4), .dashboard-table td:nth-child(4) { 
-  width: 200px; 
+  width: 15%; 
 }
 
 .dashboard-table th:nth-child(5), .dashboard-table td:nth-child(5) { 
@@ -51,6 +56,7 @@
 
 /* Colonnes étroites: empêcher le retour à la ligne et couper proprement */
 .dashboard-table th:nth-child(2), .dashboard-table td:nth-child(2),
+.dashboard-table th:nth-child(3), .dashboard-table td:nth-child(3),
 .dashboard-table th:nth-child(4), .dashboard-table td:nth-child(4),
 .dashboard-table th:nth-child(5), .dashboard-table td:nth-child(5) {
   white-space: nowrap;
@@ -104,6 +110,24 @@
 .project-history-table .dashboard-table thead th:nth-child(4),
 .project-history-table .dashboard-table tbody td:nth-child(4) {
     display: table-cell !important;
+}
+
+/* Largeurs spécifiques pour project_history uniquement - Spécificité maximale */
+/* Forcer le layout fixe pour project_history */
+div.table-container.project-history-table table.dashboard-table {
+    table-layout: fixed !important;
+}
+
+div.table-container.project-history-table table.dashboard-table th:nth-child(1), 
+div.table-container.project-history-table table.dashboard-table td:nth-child(1) {
+    width: 25% !important;
+    max-width: 25% !important;
+}
+
+div.table-container.project-history-table table.dashboard-table th:nth-child(5), 
+div.table-container.project-history-table table.dashboard-table td:nth-child(5) {
+    width: 30% !important;
+    max-width: 30% !important;
 }
 
 /* Status Badges CSS - Centralisé pour toutes les pages */

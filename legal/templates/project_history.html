@@ -18,9 +18,6 @@
         <table class="dashboard-table">
             <thead>
                 <tr>
-                    {% if request.user.is_staff %}
-                    <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-user" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'User' %}</span></span></th>
-                    {% endif %}
                     <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-file-text" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Document' %}</span></span></th>
                     <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-megaphone" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Languages' %}</span></span></th>
                     <th class="status-col"><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-clock-clockwise" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Status' %}</span></th>
@@ -30,20 +27,9 @@
             </thead>
             <tbody>
 
-                {% if projects.results %}
-                    {% for project in projects.results %}
+            {% if projects.results %}
+            {% for project in projects.results %}
                     <tr data-type="{{ project.document_type }}" data-status="{{ project.status }}" data-language="{{ project.source_language|upper }} → {{ project.target_language|upper }}" data-filename="{{ project.source_file_name|lower }}">
-                        {% if request.user.is_staff %}
-                        <td>
-                            <span class="doc-title">
-                                {% if project.username %}
-                                    {{ project.username }}
-                                {% else %}
-                                    Unknown
-                                {% endif %}
-                            </span>
-                        </td>
-                        {% endif %}
                         <td>
                             <span class="doc-title">{{ project.source_file_name }}</span>
                         </td>
@@ -53,50 +39,38 @@
                         </td>
                         <td>{{ project.created_at|date:"d/m/Y" }}</td>
                         <td class="table-actions">
-                            <div class="flex gap-5 items-center justify-end">
-                                <div class="flex">
-                                    <div class="download-file cursor-pointer flex items-center justify-center border border-0.25 border-gray-100 rounded-full py-0.5 px-4"
-                                         data-translated-file="{{ project.translated_file }}"
-                                         {% if project.reviewed_file %}data-reviewed-file="{{ project.reviewed_file }}" {% endif %}>
-                                        <i class="ph ph-download mr-2"></i>
-                                        Télécharger
-                                    </div>
-
-                                    {% if project.reviewed_file and project.translated_file %}
-                                    <div class="download-tooltip hidden absolute z-10 bg-white rounded-md shadow-lg p-2 mt-2 right-0">
-                                        <button type="button"
-                                                class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap"
-                                                data-file-url="{{ project.translated_file }}">
-                                            {% trans 'Translated' %}
-                                        </button>
-                                        <button type="button"
-                                                class="download-file-option block w-full text-left px-2 py-1 hover:bg-gray-100 whitespace-nowrap"
-                                                data-file-url="{{ project.reviewed_file }}">
-                                            {% trans 'Post-edited' %}
-                                        </button>
-                                    </div>
-                                    {% endif %}
-
-                                    <div class="flex items-center justify-center text-base text-green-800 border-b border-green-600 font-poppins p-1 ml-2">
-                                        Expert Review
-                                        <i class="ph ph-arrow-right ml-2"></i>
-                                    </div>
-                                </div>
-                            </div>
+                            {% if project.translated_file %}
+                            <button title="Download" onclick="window.open('{{ project.translated_file }}', '_blank')">
+                                <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
+                            </button>
+                            {% else %}
+                            <button title="Download" disabled style="opacity: 0.5; cursor: not-allowed;">
+                                <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
+                            </button>
+                            {% endif %}
+                            
+                            <button title="Expert Review" 
+                                    class="expert-revision"
+                                    data-translated-file="{{ project.translated_file }}"
+                                    data-id="{{ project.id }}"
+                                    style="margin-left: 8px; display: flex; align-items: center; gap: 4px; padding: 4px 8px; border: none; background: transparent; color: #16a34a; font-size: 0.75rem; font-weight: 500; text-decoration: underline;">
+                                Expert Review
+                                <i class="ph ph-arrow-right" style="font-size: 16px; color: #16a34a; text-decoration: underline;"></i>
+                            </button>
                         </td>
                     </tr>
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="{% if request.user.is_staff %}6{% else %}5{% endif %}" style="text-align: center; padding: 2rem; color: #6b7280;">
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: #6b7280;">
                             <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
                                 <i class="ph ph-file-text" style="font-size: 48px; opacity: 0.5;"></i>
                                 <p style="font-weight: 600;">{% trans 'No translations found' %}</p>
                                 <p style="font-size: 0.875rem;">{% trans 'Start by translating your first document or text.' %}</p>
-                            </div>
+                                    </div>
                         </td>
                     </tr>
-                {% endif %}
+            {% endif %}
             </tbody>
         </table>
     </div>
