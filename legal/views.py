@@ -176,7 +176,7 @@ def file_translate(request):
 
 
 class TranslateView(TemplateView):
-    template_name = "translate.html"
+    template_name = "translate/translate.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -736,7 +736,7 @@ class TextTranslate2View(TemplateView):
 
 
 class DocumentTranslate2View(TemplateView):
-    template_name = "document_translate_2.html"
+    template_name = "translate/document_translate/document_translate_2.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
