@@ -263,9 +263,24 @@ $(document).ready(function () {
         updateCharCount();
         validateTranslateButton();
     });
-    translatedQuill.on("text-change", resizeTextAreas);
+    translatedQuill.on("text-change", function(){
+        resizeTextAreas();
+        const hasTranslated = translatedQuill.getText().replace(/\n/g, '').length > 0;
+        if (hasTranslated) {
+            $('#btn-copy').removeClass('hidden');
+        } else {
+            $('#btn-copy').addClass('hidden');
+        }
+    });
 
     resizeTextAreas();
+    // init état du bouton copier
+    const hasTranslatedInit = translatedQuill.getText().replace(/\n/g, '').length > 0;
+    if (hasTranslatedInit) {
+        $('#btn-copy').removeClass('hidden');
+    } else {
+        $('#btn-copy').addClass('hidden');
+    }
     updateCharCount();
     validateTranslateButton();
 });
