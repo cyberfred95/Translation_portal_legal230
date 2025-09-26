@@ -35,6 +35,59 @@ $(document).ready(function () {
     $targetSelect.data('select2').$container.addClass('languages');
     $targetSelect.data('select2').$dropdown.addClass('languages');
 
+    // Fonctions pour sauvegarder/restaurer les langues et glossaires dans localStorage
+    function saveLanguageSelection() {
+        const sourceLang = $('select[name="source_language"]').val();
+        const targetLang = $('select[name="target_language"]').val();
+        
+        if (sourceLang) localStorage.setItem('translate_source_language', sourceLang);
+        if (targetLang) localStorage.setItem('translate_target_language', targetLang);
+    }
+
+    function saveGlossarySelection() {
+        const glossary = $('select[name="domain_name"]').val();
+        if (glossary) {
+            const sourceLang = $('select[name="source_language"]').val();
+            const targetLang = $('select[name="target_language"]').val();
+            // Sauvegarder avec la combinaison de langues comme clé
+            if (sourceLang && targetLang) {
+                const langKey = `${sourceLang}_${targetLang}`;
+                localStorage.setItem(`translate_glossary_${langKey}`, glossary);
+            }
+        }
+    }
+
+    function restoreLanguageSelection() {
+        const savedSourceLang = localStorage.getItem('translate_source_language');
+        const savedTargetLang = localStorage.getItem('translate_target_language');
+        
+        if (savedSourceLang) {
+            $('select[name="source_language"]').val(savedSourceLang).trigger('change');
+        }
+        if (savedTargetLang) {
+            $('select[name="target_language"]').val(savedTargetLang).trigger('change');
+        }
+    }
+
+    function getSavedGlossary() {
+        const sourceLang = $('select[name="source_language"]').val();
+        const targetLang = $('select[name="target_language"]').val();
+        if (sourceLang && targetLang) {
+            const langKey = `${sourceLang}_${targetLang}`;
+            return localStorage.getItem(`translate_glossary_${langKey}`);
+        }
+        return null;
+    }
+
+    // Restaurer les langues sauvegardées au chargement
+    restoreLanguageSelection();
+
+    // Event listener pour sauvegarder la sélection du glossaire
+    $('select[name="domain_name"]').on('change', function () {
+        saveGlossarySelection();
+        validateTranslateButton();
+    });
+
     // Spinner pour le chargement des glossaires (placé à gauche du dropdown)
     (function initGlossarySpinner(){
         const domainSelect = $('select.domain-select');
@@ -109,12 +162,22 @@ $(document).ready(function () {
                             domainSelect.append($('<option></option>').attr('value', domain).text(domain));
                         });
 
-                        // Sélectionner automatiquement le premier domaine valide (y compris le générique) et déclencher select2
-                        const firstVal = domainSelect.find('option:not(:disabled):first').val();
-                        if (firstVal) {
-                            domainSelect.val(firstVal).trigger('change.select2');
+                        // Essayer de restaurer le glossaire précédemment utilisé pour cette combinaison de langues
+                        const savedGlossary = getSavedGlossary();
+                        let selectedVal = null;
+                        
+                        if (savedGlossary && domainSelect.find(`option[value="${savedGlossary}"]`).length > 0) {
+                            // Le glossaire sauvegardé existe dans la liste, l'utiliser
+                            selectedVal = savedGlossary;
+                        } else {
+                            // Sinon, sélectionner le premier domaine valide (y compris le générique)
+                            selectedVal = domainSelect.find('option:not(:disabled):first').val();
                         }
-                        // Revalider le bouton après auto-sélection
+                        
+                        if (selectedVal) {
+                            domainSelect.val(selectedVal).trigger('change.select2');
+                        }
+                        // Revalider le bouton après sélection
                         if (typeof validateTranslateButton === 'function') {
                             validateTranslateButton();
                         }
@@ -132,6 +195,8 @@ $(document).ready(function () {
 
     $('select[name="source_language"]').change(function () {
         sourceLanguage = $(this).val();
+        // Sauvegarder la sélection
+        saveLanguageSelection();
         // Réinitialiser le glossaire (Select2) lorsqu'on change la langue source
         const domainSelect = $('select[name="domain_name"]');
         domainSelect.val(null).trigger('change');
@@ -141,6 +206,8 @@ $(document).ready(function () {
 
     $('select[name="target_language"]').change(function () {
         targetLanguage = $(this).val();
+        // Sauvegarder la sélection
+        saveLanguageSelection();
         // Réinitialiser le glossaire (Select2) lorsqu'on change la langue cible
         const domainSelect = $('select[name="domain_name"]');
         domainSelect.val(null).trigger('change');
