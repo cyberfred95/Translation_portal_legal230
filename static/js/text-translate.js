@@ -23,7 +23,7 @@ $(document).ready(function () {
     $(".target-language").select2();
     $(".domain-select").select2({
         placeholder: $(".domain-select").data('placeholder'),
-        allowClear: true
+        allowClear: false
     });
 
     $sourceSelect = $(".source-language").select2();
@@ -35,6 +35,55 @@ $(document).ready(function () {
     $targetSelect.data('select2').$container.addClass('languages');
     $targetSelect.data('select2').$dropdown.addClass('languages');
 
+    // Spinner pour le chargement des glossaires (placé à gauche du dropdown)
+    (function initGlossarySpinner(){
+        const domainSelect = $('select.domain-select');
+        if ($('#glossary-spinner').length === 0 && domainSelect.length) {
+            const spinner = $('<span id="glossary-spinner" class="inline-block w-5 h-5 mr-2 rounded-full border border-gray-300 border-t-green-800 animate-spin hidden"></span>');
+            // Insérer le spinner juste avant le conteneur Select2 (qui se trouve juste après le <select>)
+            const select2Container = domainSelect.next('.select2');
+            if (select2Container.length) {
+                select2Container.before(spinner);
+            } else {
+                // fallback: avant le <select>
+                domainSelect.before(spinner);
+            }
+        }
+    })();
+
+    function enhanceSelect2Arrows() {
+        $('.select2-container .select2-selection').each(function () {
+            // Assurer un contexte de positionnement
+            $(this).css({ position: 'relative' });
+            // Ajouter du padding à droite du texte pour ne pas chevaucher l'icône
+            $(this).find('.select2-selection__rendered').css({ 'padding-right': '2rem' });
+
+            const $arrow = $(this).find('.select2-selection__arrow');
+            // Cacher l'élément flèche par défaut
+            $arrow.find('b').hide();
+
+            // Positionner proprement l'icône
+            $arrow.css({
+                position: 'absolute',
+                right: '8px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '20px',
+                height: '20px',
+                display: 'flex',
+                'align-items': 'center',
+                'justify-content': 'center'
+            });
+
+            // Forcer une seule icône et utiliser la version pleine (fill)
+            $arrow.find('i.ph').remove();
+            $arrow.append('<i class="ph ph-caret-down ph-fill text-gray-500 text-lg"></i>');
+        });
+    }
+
+    // Appliquer les icônes Phosphor aux flèches des dropdowns
+    enhanceSelect2Arrows();
+
     let sourceLanguage, targetLanguage;
 
     const getDomains = () => {
@@ -45,6 +94,9 @@ $(document).ready(function () {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRFToken': getCookie('csrftoken'),
+                },
+                beforeSend: function(){
+                    $('#glossary-spinner').removeClass('hidden');
                 },
                 success: function (response) {
                     let domainSelect = $('select[name="domain_name"]');
@@ -71,6 +123,9 @@ $(document).ready(function () {
                 error: function (error) {
                     errorNotification(error?.status, error?.responseJSON?.detail);
                 },
+                complete: function(){
+                    $('#glossary-spinner').addClass('hidden');
+                }
             });
         }
     }
@@ -221,7 +276,7 @@ $(document).ready(function () {
             $translatedEditor[0]?.scrollHeight || 0
         );
 
-        maxHeight = Math.max(maxHeight, 200);
+        maxHeight = Math.max(maxHeight, 400);
 
         $sourceEditor.css("height", maxHeight + "px");
         $translatedEditor.css("height", maxHeight + "px");
