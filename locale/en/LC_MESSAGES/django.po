@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-25 14:27+0200\n"
+"POT-Creation-Date: 2025-09-29 15:51+0200\n"
 "PO-Revision-Date: 2024-07-03 17:56+0300\n"
 "Last-Translator:   <vjxzebra@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -77,8 +77,6 @@ msgstr ""
 
 #: glossaries/templates/glossaries.html:7
 #: glossaries/templates/glossaries_2.html:25
-#: legal/templates/text_translate.html:59
-#: legal/templates/text_translate.html:134 legal/templates/translate.html:52
 #, fuzzy
 #| msgid "Glossaries"
 msgid "Glossary"
@@ -134,7 +132,7 @@ msgstr "Creation date"
 #: legal/templates/dashboard/dashboard_recent_translations.html:14
 #: legal/templates/project_history.html:41
 #: legal/templates/project_history_2.html:129
-#: legal/templates/steps/step_4.html:22
+#: legal/templates/translate/document_translate/step_4.html:22
 msgid "Actions"
 msgstr "Actions"
 
@@ -224,9 +222,9 @@ msgstr "Prev"
 
 #: glossaries/templates/glossaries.html:319
 #: glossaries/templates/glossaries_2.html:394
-#: legal/templates/document_translate.html:126
-#: legal/templates/document_translate_2.html:174
 #: legal/templates/project_history.html:243
+#: legal/templates/translate/document_translate/document_translate.html:126
+#: legal/templates/translate/document_translate/document_translate_2.html:174
 #: stats/templates/usage_history.html:348
 msgid "Next"
 msgstr "Next"
@@ -283,7 +281,7 @@ msgid "results"
 msgstr ""
 
 #: glossaries/templates/glossaries_2.html:380
-#: legal/templates/document_translate.html:117
+#: legal/templates/translate/document_translate/document_translate.html:117
 msgid "Previous"
 msgstr "Previous"
 
@@ -517,24 +515,20 @@ msgid "Maritime law"
 msgstr ""
 
 #: legal/templates/blocks/specializations.html:11
-#: legal/templates/text_translate.html:164
 msgid "Competition"
 msgstr ""
 
 #: legal/templates/blocks/specializations.html:22
-#: legal/templates/text_translate.html:175
 #, fuzzy
 #| msgid "Characters"
 msgid "Contracts"
 msgstr "Characters"
 
 #: legal/templates/blocks/specializations.html:33
-#: legal/templates/text_translate.html:186
 msgid "Customs"
 msgstr ""
 
 #: legal/templates/blocks/specializations.html:52
-#: legal/templates/text_translate.html:205
 msgid ""
 "Example of free text explaining the specialization and certifications below "
 "in several paragraphs."
@@ -584,19 +578,19 @@ msgid "Recent translations"
 msgstr ""
 
 #: legal/templates/dashboard/dashboard_recent_translations.html:10
-#: legal/templates/document_translate.html:25
-#: legal/templates/document_translate_2.html:25
 #: legal/templates/project_history.html:25
 #: legal/templates/project_history_2.html:42
 #: legal/templates/project_history_2.html:85
 #: legal/templates/project_history_2.html:162
-#: legal/templates/steps/step_4.html:10
+#: legal/templates/translate/document_translate/document_translate.html:25
+#: legal/templates/translate/document_translate/document_translate_2.html:25
+#: legal/templates/translate/document_translate/step_4.html:10
 msgid "Document"
 msgstr "Document"
 
 #: legal/templates/dashboard/dashboard_recent_translations.html:11
 #: legal/templates/project_history_2.html:103
-#: legal/templates/steps/step_4.html:14
+#: legal/templates/translate/document_translate/step_4.html:14
 #, fuzzy
 #| msgid "Languages"
 msgid "Language"
@@ -606,7 +600,7 @@ msgstr "Languages"
 #: legal/templates/project_history.html:33
 #: legal/templates/project_history_2.html:50
 #: legal/templates/project_history_2.html:112
-#: legal/templates/steps/step_4.html:18
+#: legal/templates/translate/document_translate/step_4.html:18
 msgid "Status"
 msgstr "Status"
 
@@ -619,63 +613,6 @@ msgstr "No translations found"
 #: legal/templates/dashboard/dashboard_recent_translations.html:48
 msgid "Start by translating your first document or text."
 msgstr "Start by translating your first document or text."
-
-#: legal/templates/document_translate.html:48
-#: legal/templates/document_translate_2.html:48
-#: legal/templates/project_history.html:29
-msgid "Languages"
-msgstr "Languages"
-
-#: legal/templates/document_translate.html:71
-#: legal/templates/document_translate_2.html:71
-msgid "Field and Lexicon"
-msgstr ""
-
-# ####################################
-# ######################## SIDEBAR ###
-#: legal/templates/document_translate.html:92
-#: legal/templates/document_translate_2.html:92
-#: legal/templates/sidebar/sidbar.html:34 legal/templates/translate.html:8
-msgid "Translation"
-msgstr "Translation"
-
-#: legal/templates/document_translate.html:125
-#: legal/templates/project_history.html:101
-#: legal/templates/project_history_2.html:54
-#: legal/templates/project_history_2.html:217
-msgid "Completed"
-msgstr ""
-
-#: legal/templates/document_translate_2.html:111
-#: legal/templates/steps/step_1.html:14
-msgid "Drag and drop your document(s) here"
-msgstr ""
-
-#: legal/templates/document_translate_2.html:116
-#: legal/templates/steps/step_1.html:19
-msgid "PDF, Word (.docx), PowerPoint (.pptx), max 30 MB"
-msgstr ""
-
-#: legal/templates/document_translate_2.html:129
-#: legal/templates/steps/step_1.html:29
-#, fuzzy
-#| msgid "Important"
-msgid "Import a document"
-msgstr "Important"
-
-#: legal/templates/document_translate_2.html:148
-#: legal/templates/steps/step_1.html:48
-#, fuzzy
-#| msgid "Action"
-msgid "Attention!"
-msgstr "Action"
-
-#: legal/templates/document_translate_2.html:151
-#: legal/templates/steps/step_1.html:51
-msgid ""
-"The quality of your document affects the translation result. Scanned or "
-"poorly readable PDFs do not allow for a quality output."
-msgstr ""
 
 #: legal/templates/header/header.html:18
 msgid "Search"
@@ -736,6 +673,12 @@ msgstr ""
 msgid "Find all your translation history"
 msgstr ""
 
+#: legal/templates/project_history.html:29
+#: legal/templates/translate/document_translate/document_translate.html:48
+#: legal/templates/translate/document_translate/document_translate_2.html:48
+msgid "Languages"
+msgstr "Languages"
+
 # ######################################
 # ########################### STEP 5 ###
 #: legal/templates/project_history.html:80
@@ -758,6 +701,13 @@ msgstr ""
 msgid "Error"
 msgstr "Error"
 
+#: legal/templates/project_history.html:101
+#: legal/templates/project_history_2.html:54
+#: legal/templates/project_history_2.html:217
+#: legal/templates/translate/document_translate/document_translate.html:125
+msgid "Completed"
+msgstr ""
+
 #: legal/templates/project_history.html:123
 msgid "Translated"
 msgstr "Translated"
@@ -770,13 +720,14 @@ msgstr "Proofread"
 # ########################### STEP 6 ###
 #: legal/templates/project_history.html:199
 #: legal/templates/project_history_2.html:316
-#: legal/templates/steps/step_5.html:29 legal/templates/steps/step_5.html:54
+#: legal/templates/translate/document_translate/step_5.html:29
+#: legal/templates/translate/document_translate/step_5.html:54
 msgid "Quote for revision"
 msgstr "Request for quote"
 
 #: legal/templates/project_history.html:200
 #: legal/templates/project_history_2.html:318
-#: legal/templates/steps/step_5.html:55
+#: legal/templates/translate/document_translate/step_5.html:55
 msgid ""
 "We can not provide an automatic quote for this language pair. Please ask"
 msgstr ""
@@ -784,12 +735,12 @@ msgstr ""
 
 #: legal/templates/project_history.html:200
 #: legal/templates/project_history_2.html:320
-#: legal/templates/steps/step_5.html:55
+#: legal/templates/translate/document_translate/step_5.html:55
 msgid "to receive a quote in less than 30 minutes."
 msgstr "to receive a quote in less than 30 minutes."
 
 #: legal/templates/project_history.html:202
-#: legal/templates/steps/step_5.html:30
+#: legal/templates/translate/document_translate/step_5.html:30
 msgid ""
 "By choosing the options below, you agree that you are sending a request for "
 "Quote  of the selected service to Legal230"
@@ -807,7 +758,7 @@ msgid "Post-editing by professional editors"
 msgstr ""
 
 #: legal/templates/project_history_2.html:32
-#: legal/templates/steps/step_2.html:78
+#: legal/templates/translate/document_translate/step_2.html:78
 #, fuzzy
 #| msgid "Choose the document."
 msgid "Search for text or document..."
@@ -841,8 +792,9 @@ msgid "Unknown"
 msgstr ""
 
 #: legal/templates/project_history_2.html:238
-#: legal/templates/steps/step_4.html:50 legal/templates/steps/step_4.html:84
-#: legal/templates/steps/step_4.html:118
+#: legal/templates/translate/document_translate/step_4.html:50
+#: legal/templates/translate/document_translate/step_4.html:84
+#: legal/templates/translate/document_translate/step_4.html:118
 msgid "Download"
 msgstr "Download"
 
@@ -877,6 +829,15 @@ msgstr ""
 msgid "Dashboard"
 msgstr ""
 
+# ####################################
+# ######################## SIDEBAR ###
+#: legal/templates/sidebar/sidbar.html:34
+#: legal/templates/translate/document_translate/document_translate.html:92
+#: legal/templates/translate/document_translate/document_translate_2.html:92
+#: legal/templates/translate/translate.html:8
+msgid "Translation"
+msgstr "Translation"
+
 #: legal/templates/sidebar/sidbar.html:37
 msgid "Glossaries"
 msgstr "Glossaries"
@@ -893,56 +854,99 @@ msgstr "Editing"
 msgid "Support"
 msgstr "Support"
 
-#: legal/templates/steps/step_2.html:15
+#: legal/templates/translate/document_translate/document_translate.html:71
+#: legal/templates/translate/document_translate/document_translate_2.html:71
+msgid "Domain and Glossary"
+msgstr ""
+
+#: legal/templates/translate/document_translate/document_translate_2.html:111
+#: legal/templates/translate/document_translate/step_1.html:14
+msgid "Drag and drop your document(s) here"
+msgstr ""
+
+#: legal/templates/translate/document_translate/document_translate_2.html:116
+#: legal/templates/translate/document_translate/step_1.html:19
+msgid "Supported formats: .txt, .docx, .xlsx, .pptx, .pdf"
+msgstr ""
+
+#: legal/templates/translate/document_translate/document_translate_2.html:129
+#: legal/templates/translate/document_translate/step_1.html:29
+msgid "Import a document"
+msgstr "Import a document (max 30 MB)"
+
+#: legal/templates/translate/document_translate/document_translate_2.html:148
+#: legal/templates/translate/document_translate/step_1.html:48
+#, fuzzy
+#| msgid "Action"
+msgid "Attention!"
+msgstr "Action"
+
+#: legal/templates/translate/document_translate/document_translate_2.html:151
+#: legal/templates/translate/document_translate/step_1.html:51
+msgid ""
+"The quality of your document affects the translation result. Scanned or "
+"poorly readable PDFs do not allow for a quality output."
+msgstr ""
+
+#: legal/templates/translate/document_translate/step_2.html:15
 #, fuzzy
 #| msgid "Detect language"
 msgid "Detected language"
 msgstr "Detect language"
 
-#: legal/templates/steps/step_3.html:6
+#: legal/templates/translate/document_translate/step_3.html:6
 msgid "Select a field"
 msgstr ""
 
-#: legal/templates/steps/step_3.html:12
+#: legal/templates/translate/document_translate/step_3.html:12
 msgid "Select a lexicon"
 msgstr ""
 
-#: legal/templates/steps/step_3.html:22
+#: legal/templates/translate/document_translate/step_3.html:22
 msgid "Default"
 msgstr "Glossaries"
 
-#: legal/templates/steps/step_3.html:28
+#: legal/templates/translate/document_translate/step_3.html:28
 msgid "My lexicon"
 msgstr ""
 
-#: legal/templates/steps/step_3.html:34
+#: legal/templates/translate/document_translate/step_3.html:34
 msgid "No lexicon"
 msgstr ""
 
-#: legal/templates/steps/step_3.html:82
+#: legal/templates/translate/document_translate/step_3.html:82
 msgid "Add a lexicon"
 msgstr ""
 
-#: legal/templates/steps/step_3.html:92
+#: legal/templates/translate/document_translate/step_3.html:92
 msgid "You have chosen to use no lexicon"
 msgstr ""
 
-#: legal/templates/steps/step_4.html:43 legal/templates/steps/step_4.html:77
-#: legal/templates/steps/step_4.html:111
+#: legal/templates/translate/document_translate/step_4.html:43
+#: legal/templates/translate/document_translate/step_4.html:77
+#: legal/templates/translate/document_translate/step_4.html:111
 #, fuzzy
 #| msgid "Download the translated document"
 msgid "Translated document"
 msgstr "Download the translated document"
 
-#: legal/templates/steps/step_5.html:4
+#: legal/templates/translate/document_translate/step_4.html:53
+#: legal/templates/translate/document_translate/step_4.html:87
+#: legal/templates/translate/document_translate/step_4.html:121
+#, fuzzy
+#| msgid "Expert revision"
+msgid "Expert Review"
+msgstr "Get a quote"
+
+#: legal/templates/translate/document_translate/step_5.html:4
 msgid "Review"
 msgstr "Translation"
 
-#: legal/templates/steps/step_5.html:37
+#: legal/templates/translate/document_translate/step_5.html:37
 msgid "Expert revision in popup"
 msgstr "Get a quote"
 
-#: legal/templates/steps/step_5.html:46
+#: legal/templates/translate/document_translate/step_5.html:46
 msgid ""
 "Click the button to see options for improving the quality of the translated "
 "file."
@@ -950,39 +954,32 @@ msgstr ""
 "Click the button to see options for improving the quality of the translated "
 "file."
 
-#: legal/templates/text_translate.html:16
+#: legal/templates/translate/text_translate/text_translate.html:16
 msgid "Detect language"
 msgstr "Detect language"
 
-#: legal/templates/text_translate.html:86 writing/templates/writing.html:138
+#: legal/templates/translate/text_translate/text_translate.html:80
+#: writing/templates/writing.html:138
 msgid "Translate"
 msgstr "Translate"
 
 # ############################################################################################
-#: legal/templates/text_translate.html:109
+#: legal/templates/translate/text_translate/text_translate.html:96
 #: writing/templates/gpt_text_translate.html:55
 msgid "Copied"
 msgstr "Copied"
 
-#: legal/templates/text_translate.html:152 legal/templates/translate.html:70
-msgid "Select a field:"
-msgstr ""
-
-#: legal/templates/text_translate.html:156 legal/templates/translate.html:74
-msgid "Select a specialization:"
-msgstr ""
-
 # ###################################
 # ######################################### TEXT TRANSLATE ####################################################
-#: legal/templates/translate.html:9
+#: legal/templates/translate/translate.html:9
 msgid "Instantly translate your texts and documents into multiple languages"
 msgstr "Instantly translate your texts and documents into multiple languages"
 
-#: legal/templates/translate.html:14
+#: legal/templates/translate/translate.html:14
 msgid "Text translate"
 msgstr "Translate text"
 
-#: legal/templates/translate.html:18
+#: legal/templates/translate/translate.html:18
 msgid "Document translate"
 msgstr "Translate document"
 
