@@ -482,7 +482,8 @@ $(document).ready(function () {
             return;
         }
 
-        startLoading();
+        // Afficher le spinner à côté du dropdown
+        $('#language-detection-spinner').removeClass('hidden');
 
         const formData = new FormData();
         selectedFiles.forEach((file) => {
@@ -523,7 +524,8 @@ $(document).ready(function () {
                 errorNotification(error?.status, error?.responseJSON?.detail);
             },
             complete: function () {
-                stopLoading();
+                // Cacher le spinner
+                $('#language-detection-spinner').addClass('hidden');
             },
         });
     }
@@ -614,24 +616,13 @@ $(document).ready(function () {
         const sourceSelects = $('.document-source-language');
         const targetLanguageBlock = $('.target-language-container');
         const targetSelect = $('.select-block');
-        const detectedFiles = $(".detected-file");
 
-        let isConsistent = true;
         let firstValue = sourceSelects.first().val();
         let targetValue = $('.document-target-language').val();
 
         if (null !== firstValue) {
             sourceLanguage = firstValue;
         }
-
-        sourceSelects.each(function () {
-            const currentValue = $(this).val();
-            if (currentValue !== firstValue) {
-                isConsistent = false;
-                return false;
-            }
-        });
-
 
         // ------------- SELECT -------------
 
@@ -645,51 +636,35 @@ $(document).ready(function () {
         targetLanguageBlock.find('.error-message').remove();
 
         if (currentStep === 1) {
-            if (!isConsistent) {
-                $('.document-source-language').select2().each(function () {
-                    var $select = $(this);
-                    $select.data('select2').$container.addClass('error languages');
-                    $select.data('select2').$dropdown.addClass('error languages');
-                });
+            $('.document-source-language').select2().each(function () {
+                var $select = $(this);
+                $select.data('select2').$container.addClass('languages');
+                $select.data('select2').$dropdown.addClass('languages');
+                $select.data('select2').$container.removeClass('error');
+                $select.data('select2').$dropdown.removeClass('error');
+            });
 
-                $('.step-container').addClass('bg-red-150 text-red-200');
-
-                targetSelect.hide();
-
-                targetLanguageBlock.prepend(language_code === 'en' ? '<div class="error-message text-red-400">One or more files have different language, please fix it.</div>' : '<div class="error-message text-red-400">Vous ne pouvez pas importer des documents ayant des langues différentes</div>');
-
-                detectedFiles.removeClass('bg-green-150 text-green-500').addClass('bg-red-150 text-red-400 border border-red-400');
-            } else {
-                $('.document-source-language').select2().each(function () {
-                    var $select = $(this);
-                    $select.data('select2').$container.addClass('languages');
-                    $select.data('select2').$dropdown.addClass('languages');
-                    $select.data('select2').$container.removeClass('error');
-                    $select.data('select2').$dropdown.removeClass('error');
-                });
-
-
-                $('.step-container').removeClass('bg-red-150 text-red-200');
-
-                targetSelect.show();
-
-                detectedFiles.removeClass('bg-red-150 text-red-400 border border-red-400').addClass('bg-green-150 text-green-500');
-            }
+            $('.step-container').removeClass('bg-red-150 text-red-200');
+            targetSelect.show();
         }
-        let isSameAsTarget = firstValue === targetValue;
+        
+        // Vérifier si les deux langues sont sélectionnées et valides
+        const hasSourceLanguage = firstValue && firstValue !== '';
+        const hasTargetLanguage = targetValue && targetValue !== '';
+        const languagesAreDifferent = firstValue !== targetValue;
+        const canProceed = hasSourceLanguage && hasTargetLanguage && languagesAreDifferent;
 
-        if (!isConsistent || !targetValue || isSameAsTarget) {
+        if (!canProceed) {
+            // Désactiver le bouton Suivant
             nextStep.removeClass('border-green-700 text-white text-green-700')
-                .addClass('border-gray-225 text-gray-225 pointer-events-none')
+                .addClass('border-gray-225 text-gray-225 pointer-events-none opacity-50 cursor-not-allowed')
                 .prop("disabled", true);
         } else {
-            nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
+            // Activer le bouton Suivant
+            nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none opacity-50 cursor-not-allowed')
                 .addClass('border-green-700 text-green-700')
                 .prop("disabled", false);
             $('.language-step').removeClass('hidden');
-            // $('.source').text(firstValue.toUpperCase());
-            // $('.target').text(targetValue.toUpperCase());
-
         }
     }
 

@@ -8,8 +8,8 @@
             <!-- Left side - Language selection -->
             <div class="flex items-center w-full gap-4 sm:gap-8 lg:gap-12 overflow-x-auto">
                 <!-- Detected Language Tab -->
-                <div class="flex items-center w-1/2">
-                    <div class="relative border-b border-gray-100">
+                <div class="flex items-center w-1/2 gap-2">
+                    <div class="relative border-b border-gray-100 flex-1">
                         <div class="flex items-center gap-2 px-0 py-2 text-sm font-medium text-gray-900">
                             <select class="gray-text-select document-source-language" name="source_language" required data-default-value="FR">
                                 <option value="" disabled selected>{% trans 'Detected language' %}</option>
@@ -26,6 +26,10 @@
                             </select>
                         </div>
                         <div class="absolute bottom-0 left-0 right-0 h-px bg-gray-900"></div>
+                    </div>
+                    <!-- Language Detection Spinner -->
+                    <div id="language-detection-spinner" class="hidden">
+                        <i class="ph ph-circle-notch text-[#166534] animate-spin" style="font-size: 24px;"></i>
                     </div>
                 </div>
 
