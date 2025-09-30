@@ -1,102 +1,23 @@
 {% load static %}
 {% load i18n %}
 
-<!-- Main Content -->
+<!-- Document Translation Wizard -->
 <div class="flex p-4 px-6 flex-col items-end gap-6 self-stretch rounded-lg bg-white">
-    <!-- Step Indicator -->
+    
+    <!-- Progress Indicator -->
     <div class="flex items-start self-stretch">
-        <!-- Step 1: Document -->
-        <div class="flex flex-col items-start gap-3 flex-1">
-            <!-- Status bar with circle and line -->
-            <div class="flex pr-0.5 items-center gap-0.5 self-stretch">
-                <!-- Circle with number -->
-                <div class="stepindicator-1 flex w-6 h-6 justify-center items-center rounded-full border-[1.5px] border-[#166534]">
-                    <span class="flex w-6 h-6 flex-col justify-center shrink-0 text-center font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#166534]">
-                        1
-                    </span>
-                </div>
-                <!-- Connecting line -->
-                <div class="h-0.5 flex-1 bg-black/10"></div>
-            </div>
-            <!-- Content -->
-            <div class="flex pr-5 flex-col items-start gap-4 self-stretch">
-                <div class="flex flex-col items-start gap-1.5 self-stretch">
-                    <h3 class="self-stretch font-poppins text-lg font-semibold leading-6 tracking-[-0.252px] text-[#181932]">
-                        {% trans 'Document' %}
-                    </h3>
-                </div>
-            </div>
-        </div>
-
-        <!-- Step 2: Languages -->
-        <div class="flex flex-col items-start gap-3 flex-1">
-            <!-- Status bar with circle and line -->
-            <div class="flex pr-0.5 items-center gap-0.5 self-stretch">
-                <!-- Circle with number -->
-                <div class="stepindicator-2 flex w-6 h-6 justify-center items-center rounded-full border border-gray-300">
-                        <span class="flex w-6 h-6 flex-col justify-center shrink-0 text-center font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#5A5A78]">
-                            2
-                        </span>
-                </div>
-                <!-- Connecting line -->
-                <div class="h-0.5 flex-1 bg-black/10"></div>
-            </div>
-            <!-- Content -->
-            <div class="flex pr-5 flex-col items-start gap-4 self-stretch">
-                <div class="flex flex-col items-start gap-1.5 self-stretch">
-                    <h3 class="self-stretch font-poppins text-lg font-semibold leading-6 tracking-[-0.252px] text-[#181932]">
-                        {% trans 'Languages' %}
-                    </h3>
-                </div>
-            </div>
-        </div>
-
-        <!-- Step 3: Domain and Glossary -->
-        <div class="flex flex-col items-start gap-3 flex-1">
-            <!-- Status bar with circle and line -->
-            <div class="flex pr-0.5 items-center gap-0.5 self-stretch">
-                <!-- Circle with number -->
-                <div class="stepindicator-3 flex w-6 h-6 justify-center items-center rounded-full border border-gray-300">
-                        <span class="flex w-6 h-6 flex-col justify-center shrink-0 text-center font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#5A5A78]">
-                            3
-                        </span>
-                </div>
-                <!-- Connecting line -->
-                <div class="h-0.5 flex-1 bg-black/10"></div>
-            </div>
-            <!-- Content -->
-            <div class="flex pr-5 flex-col items-start gap-4 self-stretch">
-                <div class="flex flex-col items-start gap-1.5 self-stretch">
-                    <h3 class="self-stretch font-poppins text-lg font-semibold leading-6 tracking-[-0.252px] text-[#181932]">
-                        {% trans 'Domain and Glossary' %}
-                    </h3>
-                </div>
-            </div>
-        </div>
-
-        <!-- Step 4: Translation -->
-        <div class="flex flex-col items-start gap-3">
-            <!-- Status bar with circle -->
-            <div class="flex pr-0.5 items-center gap-0.5 self-stretch">
-                <!-- Circle with number -->
-                <div class="stepindicator-4 flex w-6 h-6 justify-center items-center rounded-full border border-gray-300">
-                        <span class="flex w-6 h-6 flex-col justify-center shrink-0 text-center font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#5A5A78]">
-                            4
-                        </span>
-                </div>
-            </div>
-            <!-- Content -->
-            <div class="flex pr-5 flex-col items-start gap-4 self-stretch">
-                <div class="flex flex-col items-start gap-1.5 self-stretch">
-                    <h3 class="self-stretch font-poppins text-lg font-semibold leading-6 tracking-[-0.252px] text-[#181932]">
-                        {% trans 'Translation' %}
-                    </h3>
-                </div>
-            </div>
-        </div>
+        {% trans 'Document' as step1_title %}
+        {% trans 'Languages' as step2_title %}
+        {% trans 'Domain and Glossary' as step3_title %}
+        {% trans 'Translation' as step4_title %}
+        
+        {% include 'translate/document_translate/document_translate_step_indicator.html' with step_number=1 step_title=step1_title is_active=True has_line=True %}
+        {% include 'translate/document_translate/document_translate_step_indicator.html' with step_number=2 step_title=step2_title is_active=False has_line=True %}
+        {% include 'translate/document_translate/document_translate_step_indicator.html' with step_number=3 step_title=step3_title is_active=False has_line=True %}
+        {% include 'translate/document_translate/document_translate_step_indicator.html' with step_number=4 step_title=step4_title is_active=False has_line=False is_last=True %}
     </div>
 
-
+    <!-- Step Content Container -->
     <div class="w-full h-full py-7.5 px-5 step-container">
         {% include 'translate/document_translate/step_1.html' %}
         {% include 'translate/document_translate/step_2.html' %}
@@ -105,10 +26,13 @@
         {% include 'translate/document_translate/step_5.html' %}
     </div>
 
+    <!-- Navigation Buttons -->
     <div class="block-buttons flex justify-between w-full pr-5">
-        <!-- Prev Button -->
-        <button id="prev-step" disabled class="prevStep flex px-2.5 py-2 justify-center items-center rounded-full bg-white transition-all cursor-not-allowed text-gray-900 border border-black opacity-20">
-            <!-- Arrow Left Icon -->
+        <!-- Previous Button -->
+        <button 
+            id="prev-step" 
+            disabled 
+            class="prevStep flex px-2.5 py-2 justify-center items-center rounded-full bg-white transition-all cursor-not-allowed text-gray-900 border border-black opacity-20">
             <i class="ph ph-arrow-left prevStep" style="font-size: 24px;"></i>
             <div class="flex px-2 justify-center items-center prevStep">
                 <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-gray-900 prevStep">
@@ -118,17 +42,18 @@
         </button>
 
         <!-- Next Button -->
-        <button id="next-step" disabled class="nextStep flex px-2.5 py-2 justify-center items-center rounded-full bg-[#166534] transition-all opacity-50 cursor-not-allowed text-white">
+        <button 
+            id="next-step" 
+            disabled 
+            class="nextStep flex px-2.5 py-2 justify-center items-center rounded-full bg-[#166534] transition-all opacity-50 cursor-not-allowed text-white">
             <div class="flex px-2 justify-center items-center nextStep">
                 <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-white nextStep" data-confirm="{% trans 'Completed' %}">
                     {% trans 'Next' %}
                 </span>
             </div>
-            <!-- Arrow Right Icon -->
             <i class="ph ph-arrow-right nextStep" style="font-size: 24px; color: white;"></i>
         </button>
     </div>
 </div>
 
 <script src="{% static 'js/document-translate.js' %}"></script>
-
