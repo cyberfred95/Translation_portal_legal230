@@ -79,6 +79,8 @@ $(document).ready(function () {
         if (extension === 'pdf') return 'pdf';
         if (extension === 'docx') return 'docx';
         if (extension === 'pptx') return 'pptx';
+        if (extension === 'xlsx') return 'xlsx';
+        if (extension === 'txt') return 'txt';
         return 'pdf'; // default
     }
 

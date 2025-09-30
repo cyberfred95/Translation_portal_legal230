@@ -872,7 +872,7 @@ msgstr ""
 #: legal/templates/translate/document_translate/document_translate_2.html:129
 #: legal/templates/translate/document_translate/step_1.html:29
 msgid "Import a document"
-msgstr "Import a document (max 30 MB)"
+msgstr "Import a document (max 50 MB)"
 
 #: legal/templates/translate/document_translate/document_translate_2.html:148
 #: legal/templates/translate/document_translate/step_1.html:48
