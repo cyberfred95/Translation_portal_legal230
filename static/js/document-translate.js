@@ -84,6 +84,17 @@ $(document).ready(function () {
         return 'pdf'; // default
     }
 
+    function getFileColors(type) {
+        const colors = {
+            'pdf': { bg: '#FCA5A5', badge: '#DC2626' },      // Rouge (PDF)
+            'docx': { bg: '#93C5FD', badge: '#2563EB' },     // Bleu (Word)
+            'xlsx': { bg: '#86EFAC', badge: '#16A34A' },     // Vert (Excel)
+            'pptx': { bg: '#FDBA74', badge: '#EA580C' },     // Orange (PowerPoint)
+            'txt': { bg: '#D1D5DB', badge: '#6B7280' }       // Gris (Texte)
+        };
+        return colors[type] || colors['pdf'];
+    }
+
     // Pour bouton suppression dynamique
     window.removeFile = function (fileId) {
         selectedFiles = selectedFiles.filter(function (file) {
@@ -337,10 +348,21 @@ $(document).ready(function () {
 
         // Construire les objets fichiers enrichis
         var enrichedFiles = $.map(newFiles, function (file, index) {
+            // Calculer la taille appropriée (KB ou MB)
+            var fileSize;
+            var sizeInMB = file.size / 1024 / 1024;
+            if (sizeInMB < 0.1) {
+                // Afficher en KB si moins de 0.1 MB
+                fileSize = (file.size / 1024).toFixed(1) + ' KB';
+            } else {
+                // Afficher en MB
+                fileSize = sizeInMB.toFixed(1) + ' MB';
+            }
+            
             return {
                 id: 'file-' + Date.now() + '-' + index,
                 name: file.name,
-                size: (file.size / 1024 / 1024).toFixed(1) + ' MB',
+                size: fileSize,
                 timeAgo: '1 minute ago',
                 type: getFileType(file.name),
                 file: file
@@ -368,30 +390,32 @@ $(document).ready(function () {
 
             const fileId = file.fileId || `file-${Date.now()}-${index}`;
             file.fileId = fileId;
+            
+            const colors = getFileColors(file.type);
 
             const $fileItem = $(`
-            <div class="flex items-center gap-8 flex-1">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-10 relative">
-                        <svg class="w-8 h-10 shrink-0 fill-[#BFDBFE] absolute left-0 top-0" width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0 36V4C0 1.79086 1.79086 0 4 0H19.9C20.9271 0 21.9149 0.395099 22.6586 1.10345L30.7586 8.81773C31.5513 9.57271 32 10.6196 32 11.7143V36C32 38.2091 30.2091 40 28 40H4C1.79086 40 0 38.2091 0 36Z" fill="#BFDBFE"/>
+            <div class="flex items-center justify-between gap-2 p-3 rounded-lg border border-black/10 bg-white w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.667rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.8rem)]" style="min-width: 200px;">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <div class="w-8 h-10 relative flex-shrink-0">
+                        <svg class="w-8 h-10 shrink-0 absolute left-0 top-0" width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 36V4C0 1.79086 1.79086 0 4 0H19.9C20.9271 0 21.9149 0.395099 22.6586 1.10345L30.7586 8.81773C31.5513 9.57271 32 10.6196 32 11.7143V36C32 38.2091 30.2091 40 28 40H4C1.79086 40 0 38.2091 0 36Z" fill="${colors.bg}"/>
                         </svg>
-                        <div class="inline-flex px-1 items-center gap-2 rounded-sm bg-[#3B82F6] absolute -left-1 top-[18px] w-[26px] h-4">
-                            <span class="font-inter text-[9px] font-bold leading-4 tracking-[0.144px] text-white uppercase">
+                        <div class="inline-flex px-1 items-center justify-center rounded-sm absolute -left-1 top-[18px] h-4 min-w-[26px]" style="background-color: ${colors.badge};">
+                            <span class="font-inter text-[9px] font-bold leading-4 tracking-[0.144px] text-white uppercase whitespace-nowrap">
                                 ${file.type}
                             </span>
                         </div>
                     </div>
-                    <div class="flex flex-col justify-center items-start">
-                        <div class="font-poppins text-base font-normal leading-6 tracking-[-0.176px] text-[#181932]">
+                    <div class="flex flex-col justify-center items-start min-w-0 flex-1">
+                        <div class="font-poppins text-base font-normal leading-6 tracking-[-0.176px] text-[#181932] truncate w-full">
                             ${file.name}
                         </div>
                         <div class="font-poppins text-sm font-normal leading-6 tracking-[-0.084px] text-[#5A5A78]">
-                            ${file.size} • Downloaded ${file.timeAgo}
+                            ${file.size}
                         </div>
                     </div>
                 </div>
-                <button onclick="removeFile('${fileId}')" class="w-6 h-6 text-black/80 hover:text-red-600 transition-colors">
+                <button onclick="removeFile('${fileId}')" class="w-6 h-6 text-black/80 hover:text-red-600 transition-colors flex-shrink-0">
                     <i class="ph ph-trash" style="font-size: 24px;"></i>
                 </button>
             </div>
