@@ -152,11 +152,15 @@ $(document).ready(function () {
             $("#restart").hide();
             $("#restart-text").hide();
 
+            // Toujours afficher le bouton suivant
+            nextStep.show().css('display', 'flex');
+            $actionList.css("justify-content", "flex-end");
+            
+            // Activer/désactiver selon les fichiers
             if (selectedFiles.length > 0) {
-                nextStep.show();
-                $actionList.css("justify-content", "flex-end");
+                nextStep.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
             } else {
-                nextStep.hide();
+                nextStep.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
             }
 
             $("div[class^='step-']").addClass('hidden').hide();
@@ -312,7 +316,9 @@ $(document).ready(function () {
     });
 
     function updateUI() {
-        if ($fileList.length > 0) {
+        const hasFiles = selectedFiles.length > 0;
+        
+        if (hasFiles) {
             $('#file-list').removeClass('hidden');
             $('#next-step').prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
         } else {
@@ -434,17 +440,23 @@ $(document).ready(function () {
         const filesExist = selectedFiles.length > 0;
         const $actionList = $(".action-list");
 
-        if (filesExist && currentStep === 0) {
+        if (currentStep === 0) {
             prevStep.hide();
             $blockButtons.removeClass('justify-between').addClass('justify-end');
 
-            nextStep.show();
+            // Toujours afficher le bouton suivant
+            nextStep.show().css('display', 'flex');
             $("#restart").hide();
             $("#restart-text").hide();
 
             $actionList.css("justify-content", "flex-end");
-        } else if (currentStep === 0) {
-            // nextStep.hide();
+            
+            // Activer/désactiver selon les fichiers
+            if (filesExist) {
+                nextStep.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+            } else {
+                nextStep.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+            }
         }
 
         $fileList.toggleClass('hidden', !filesExist);
