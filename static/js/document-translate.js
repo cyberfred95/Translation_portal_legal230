@@ -7,42 +7,62 @@ $(document).ready(function () {
     var $blockButtons = $('.block-buttons');
     var uploadedFiles = [];
 
-    // Filtre toutes les langues visibles selon la recherche
-    $('#search-input').on('input keyup change', function () {
+    // Filtre les langues sources selon la recherche
+    $('#source-search-input').on('input keyup change', function () {
         var val = $(this).val().toLowerCase();
-        $('.language-item').each(function () {
+        $('.source-language-item').each(function () {
             var text = $(this).text().toLowerCase();
             $(this).toggle(text.indexOf(val) > -1);
         });
     });
 
-    // Sélection d'une langue, coloration verte sur tous les blocs concernés
-    // Filtre toutes les langues visibles selon la recherche
-    $('#search-input').on('input keyup change', function () {
+    // Filtre les langues cibles selon la recherche
+    $('#target-search-input').on('input keyup change', function () {
         var val = $(this).val().toLowerCase();
-        $('.language-item').each(function () {
+        $('.target-language-item').each(function () {
             var text = $(this).text().toLowerCase();
             $(this).toggle(text.indexOf(val) > -1);
         });
     });
 
-// Sélection d'une langue, coloration verte sur tous les blocs concernés et gestion de l'icône + select2
-    $(document).on('click', '.language-item', function () {
-        // Récupère la valeur de la langue
+    // Sélection d'une langue source
+    $(document).on('click', '.source-language-item', function () {
         var selectedLang = $(this).data('value');
 
-        // Désélectionne partout la couleur
-        $('.language-item').removeClass('text-green-800 bg-green-100');
-        // Cache toutes les icônes ph-check
-        $('.language-item .ph-check').parent().addClass('hidden').removeClass('visible');
+        // Désélectionne toutes les langues sources
+        $('.source-language-item').removeClass('text-green-800 bg-green-100');
+        $('.source-language-item .ph-check').parent().addClass('hidden').removeClass('visible');
 
         // Sélectionne la ligne cliquée
         $(this).addClass('text-green-800 bg-green-100');
-        // Affiche l'icone dans la ligne cliquée
         $(this).find('.ph-check').parent().removeClass('hidden').addClass('visible');
 
-        // Met à jour le select2 si présent
+        // Met à jour la variable globale et le dropdown source
+        sourceLanguage = selectedLang;
+        $('.document-source-language').val(selectedLang).trigger('change');
+        
+        // Vérifier la cohérence après sélection
+        checkLanguagesConsistency();
+    });
+
+    // Sélection d'une langue cible
+    $(document).on('click', '.target-language-item', function () {
+        var selectedLang = $(this).data('value');
+
+        // Désélectionne toutes les langues cibles
+        $('.target-language-item').removeClass('text-green-800 bg-green-100');
+        $('.target-language-item .ph-check').parent().addClass('hidden').removeClass('visible');
+
+        // Sélectionne la ligne cliquée
+        $(this).addClass('text-green-800 bg-green-100');
+        $(this).find('.ph-check').parent().removeClass('hidden').addClass('visible');
+
+        // Met à jour la variable globale et le dropdown cible
+        targetLanguage = selectedLang;
         $('.document-target-language').val(selectedLang).trigger('change');
+        
+        // Vérifier la cohérence après sélection
+        checkLanguagesConsistency();
     });
 
 
@@ -79,15 +99,48 @@ $(document).ready(function () {
         if (extension === 'pdf') return 'pdf';
         if (extension === 'docx') return 'docx';
         if (extension === 'pptx') return 'pptx';
+        if (extension === 'xlsx') return 'xlsx';
+        if (extension === 'txt') return 'txt';
         return 'pdf'; // default
+    }
+
+    function getFileColors(type) {
+        const colors = {
+            'pdf': { bg: '#FCA5A5', badge: '#DC2626' },      // Rouge (PDF)
+            'docx': { bg: '#93C5FD', badge: '#2563EB' },     // Bleu (Word)
+            'xlsx': { bg: '#86EFAC', badge: '#16A34A' },     // Vert (Excel)
+            'pptx': { bg: '#FDBA74', badge: '#EA580C' },     // Orange (PowerPoint)
+            'txt': { bg: '#D1D5DB', badge: '#6B7280' }       // Gris (Texte)
+        };
+        return colors[type] || colors['pdf'];
     }
 
     // Pour bouton suppression dynamique
     window.removeFile = function (fileId) {
-        uploadedFiles = uploadedFiles.filter(function (file) {
-            return file.id !== fileId;
+        selectedFiles = selectedFiles.filter(function (file) {
+            return file.fileId !== fileId;
         });
-        updateUI();
+        
+        checkPDF(selectedFiles);
+        displayFiles(selectedFiles);
+        
+        // Retirer aussi les éléments du DOM si présents
+        $(`.file[data-file-id="${fileId}"]`).remove();
+        const $detectedFile = $(`.flex.gap-5[data-file-id="${fileId}"]`);
+        if ($detectedFile.length) {
+            $detectedFile.remove();
+        }
+        
+        toggleFollowingButton();
+        
+        if (currentStep === 1) {
+            checkLanguagesConsistency();
+        }
+        
+        if (selectedFiles.length === 0) {
+            currentStep = 0;
+            showStep(currentStep);
+        }
     }
 
 
@@ -119,19 +172,23 @@ $(document).ready(function () {
             $("#restart").hide();
             $("#restart-text").hide();
 
+            // Toujours afficher le bouton suivant
+            nextStep.show().css('display', 'flex');
+            $actionList.css("justify-content", "flex-end");
+            
+            // Activer/désactiver selon les fichiers
             if (selectedFiles.length > 0) {
-                nextStep.show();
-                $actionList.css("justify-content", "flex-end");
+                nextStep.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
             } else {
-                nextStep.hide();
+                nextStep.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
             }
 
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-1').removeClass('hidden').show();
-            $('.stepindicator-1').addClass('border-0.5 border-[#166534]');
-            $('.stepindicator-2').removeClass('border-0.5 border-[#166534]');
-            $('.stepindicator-3').removeClass('border-0.5 border-[#166534]');
-            $('.stepindicator-4').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-2').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
+            $('.stepindicator-3').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
+            $('.stepindicator-4').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
         } else if (currentStep === 1) {
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-2').removeClass('hidden').show();
@@ -139,26 +196,52 @@ $(document).ready(function () {
             prevStep.show();
             prevStep.css('display', 'flex');
             prevStep.prop("disabled", false);
-            $('.stepindicator-2').addClass('border-0.5 border-[#166534]');
-            $('.stepindicator-3').removeClass('border-0.5 border-[#166534]');
-            $('.stepindicator-4').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-2').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-3').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
+            $('.stepindicator-4').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
+            
+            // Réinitialiser les sélections de langues et variables
+            sourceLanguage = '';
+            targetLanguage = '';
+            $('.document-source-language').val('');
+            $('.source-language-item').removeClass('text-green-800 bg-green-100');
+            $('.source-language-item .ph-check').parent().addClass('hidden').removeClass('visible');
+            
+            $('.document-target-language').val('');
+            $('.target-language-item').removeClass('text-green-800 bg-green-100');
+            $('.target-language-item .ph-check').parent().addClass('hidden').removeClass('visible');
+            
+            // Cacher le warning au départ
+            $('#language-warning-alert').addClass('hidden');
+            
+            // Désactiver le bouton Suivant jusqu'à sélection des langues
+            nextStep.addClass('opacity-50 cursor-not-allowed').prop('disabled', true);
+            
+            // Lancer la détection de langue
+            detectLanguageFiles();
+            
+            // Appeler checkLanguagesConsistency pour initialiser l'état
+            checkLanguagesConsistency();
         } else if (currentStep === 2) {
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-3').removeClass('hidden').show();
             $blockButtons.addClass('justify-between').removeClass('justify-end');
             prevStep.show();
-            $('.stepindicator-2').addClass('border-0.5 border-[#166534]');
-            $('.stepindicator-3').addClass('border-0.5 border-[#166534]');
-            $('.stepindicator-4').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-2').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-3').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-4').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
         } else if (currentStep === 3) {
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-4').removeClass('hidden').show();
             $blockButtons.addClass('justify-between').removeClass('justify-end');
             prevStep.show();
             $('span', $nextButton).text($('span', $nextButton).data('confirm'));
-            $('.stepindicator-2').addClass('border-0.5 border-[#166534]');
-            $('.stepindicator-3').addClass('border-0.5 border-[#166534]');
-            $('.stepindicator-4').addClass('border-0.5 border-[#166534]');
+            $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-2').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-3').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-4').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
         } else if (currentStep === 4) {
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-5').removeClass('hidden').show();
@@ -188,12 +271,11 @@ $(document).ready(function () {
                 return;
             }
             if (currentStep === 0) {
-                detectLanguageFiles();
+                // Pas de détection automatique - l'utilisateur choisit manuellement
                 checkLanguagesConsistency()
             }
             if (currentStep === 1) {
                 targetLanguage = $('.document-target-language').val();
-                getDomainsGroups();
             }
             if (currentStep === 2) {
                 if (!defaultDomain && access_to_default_glossaries) {
@@ -279,12 +361,12 @@ $(document).ready(function () {
     });
 
     function updateUI() {
-        if ($fileList.length > 0) {
-            $('#warning-alert').removeClass('hidden');
+        const hasFiles = selectedFiles.length > 0;
+        
+        if (hasFiles) {
             $('#file-list').removeClass('hidden');
             $('#next-step').prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
         } else {
-            $('#warning-alert').addClass('hidden');
             $('#file-list').addClass('hidden');
             $('#next-step').prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
         }
@@ -317,10 +399,21 @@ $(document).ready(function () {
 
         // Construire les objets fichiers enrichis
         var enrichedFiles = $.map(newFiles, function (file, index) {
+            // Calculer la taille appropriée (KB ou MB)
+            var fileSize;
+            var sizeInMB = file.size / 1024 / 1024;
+            if (sizeInMB < 0.1) {
+                // Afficher en KB si moins de 0.1 MB
+                fileSize = (file.size / 1024).toFixed(1) + ' KB';
+            } else {
+                // Afficher en MB
+                fileSize = sizeInMB.toFixed(1) + ' MB';
+            }
+            
             return {
                 id: 'file-' + Date.now() + '-' + index,
                 name: file.name,
-                size: (file.size / 1024 / 1024).toFixed(1) + ' MB',
+                size: fileSize,
                 timeAgo: '1 minute ago',
                 type: getFileType(file.name),
                 file: file
@@ -348,41 +441,37 @@ $(document).ready(function () {
 
             const fileId = file.fileId || `file-${Date.now()}-${index}`;
             file.fileId = fileId;
+            
+            const colors = getFileColors(file.type);
 
             const $fileItem = $(`
-            <div class="flex items-center gap-8 flex-1">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-10 relative">
-                        <svg class="w-8 h-10 shrink-0 fill-[#BFDBFE] absolute left-0 top-0" width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0 36V4C0 1.79086 1.79086 0 4 0H19.9C20.9271 0 21.9149 0.395099 22.6586 1.10345L30.7586 8.81773C31.5513 9.57271 32 10.6196 32 11.7143V36C32 38.2091 30.2091 40 28 40H4C1.79086 40 0 38.2091 0 36Z" fill="#BFDBFE"/>
+            <div class="flex items-center justify-between gap-2 p-3 rounded-lg border border-black/10 bg-white w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.667rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.8rem)]" style="min-width: 200px;">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <div class="w-8 h-10 relative flex-shrink-0">
+                        <svg class="w-8 h-10 shrink-0 absolute left-0 top-0" width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 36V4C0 1.79086 1.79086 0 4 0H19.9C20.9271 0 21.9149 0.395099 22.6586 1.10345L30.7586 8.81773C31.5513 9.57271 32 10.6196 32 11.7143V36C32 38.2091 30.2091 40 28 40H4C1.79086 40 0 38.2091 0 36Z" fill="${colors.bg}"/>
                         </svg>
-                        <div class="inline-flex px-1 items-center gap-2 rounded-sm bg-[#3B82F6] absolute -left-1 top-[18px] w-[26px] h-4">
-                            <span class="font-inter text-[9px] font-bold leading-4 tracking-[0.144px] text-white uppercase">
+                        <div class="inline-flex px-1 items-center justify-center rounded-sm absolute -left-1 top-[18px] h-4 min-w-[26px]" style="background-color: ${colors.badge};">
+                            <span class="font-inter text-[9px] font-bold leading-4 tracking-[0.144px] text-white uppercase whitespace-nowrap">
                                 ${file.type}
                             </span>
                         </div>
                     </div>
-                    <div class="flex flex-col justify-center items-start">
-                        <div class="font-poppins text-base font-normal leading-6 tracking-[-0.176px] text-[#181932]">
+                    <div class="flex flex-col justify-center items-start min-w-0 flex-1">
+                        <div class="font-poppins text-base font-normal leading-6 tracking-[-0.176px] text-[#181932] truncate w-full">
                             ${file.name}
                         </div>
                         <div class="font-poppins text-sm font-normal leading-6 tracking-[-0.084px] text-[#5A5A78]">
-                            ${file.size} • Downloaded ${file.timeAgo}
+                            ${file.size}
                         </div>
                     </div>
                 </div>
-                <button onclick="removeFile('${file.id}')" class="w-6 h-6 text-black/80 hover:text-red-600 transition-colors">
-                    <svg class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M10 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M14 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                <button onclick="removeFile('${fileId}')" class="w-6 h-6 text-black/80 hover:text-red-600 transition-colors flex-shrink-0">
+                    <i class="ph ph-trash" style="font-size: 24px;"></i>
                 </button>
             </div>
         `);
 
-            $fileList.append($fileItem);
             $fileList.append($fileItem);
         });
     };
@@ -396,17 +485,23 @@ $(document).ready(function () {
         const filesExist = selectedFiles.length > 0;
         const $actionList = $(".action-list");
 
-        if (filesExist && currentStep === 0) {
+        if (currentStep === 0) {
             prevStep.hide();
             $blockButtons.removeClass('justify-between').addClass('justify-end');
 
-            nextStep.show();
+            // Toujours afficher le bouton suivant
+            nextStep.show().css('display', 'flex');
             $("#restart").hide();
             $("#restart-text").hide();
 
             $actionList.css("justify-content", "flex-end");
-        } else if (currentStep === 0) {
-            // nextStep.hide();
+            
+            // Activer/désactiver selon les fichiers
+            if (filesExist) {
+                nextStep.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+            } else {
+                nextStep.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+            }
         }
 
         $fileList.toggleClass('hidden', !filesExist);
@@ -415,31 +510,10 @@ $(document).ready(function () {
     function checkPDF(files) {
         const isPdf = files.some(file => file.name.toLowerCase().endsWith('.pdf'));
         $(".pdf-document").toggleClass('hidden', !isPdf);
+        // Afficher le warning uniquement si au moins un PDF est présent
+        $('#warning-alert').toggleClass('hidden', !isPdf);
     }
 
-    function removeFile(fileId) {
-        selectedFiles = selectedFiles.filter(file => file.fileId !== fileId);
-
-        checkPDF(selectedFiles);
-
-        $(`.file[data-file-id="${fileId}"]`).remove();
-
-        const $detectedFile = $(`.flex.gap-5[data-file-id="${fileId}"]`);
-        if ($detectedFile.length) {
-            $detectedFile.remove();
-        }
-
-        toggleFollowingButton();
-
-        if (currentStep === 1) {
-            checkLanguagesConsistency();
-        }
-
-        if (selectedFiles.length === 0) {
-            currentStep = 0;
-            showStep(currentStep);
-        }
-    }
 
 
     // ------------- STEP-2 -------------
@@ -450,7 +524,13 @@ $(document).ready(function () {
             return;
         }
 
-        startLoading();
+        // Si l'utilisateur a déjà sélectionné une langue source, ignorer la détection
+        if (sourceLanguage && sourceLanguage !== '') {
+            return;
+        }
+
+        // Afficher le spinner à côté du dropdown
+        $('#language-detection-spinner').removeClass('hidden');
 
         const formData = new FormData();
         selectedFiles.forEach((file) => {
@@ -468,30 +548,57 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                const isSameLanguages = response.languages.every(i => i?.abbreviation === response.languages[0]?.abbreviation);
-
-                const detectedFiles = response.languages.map(serverFile => {
-                    const matchingFile = selectedFiles.find(f => f.name === serverFile.file_name);
-                    return {
-                        ...serverFile,
-                        fileId: matchingFile ? matchingFile.fileId : `file-${Date.now()}-${serverFile.file_name}`
-                    };
-                });
-
-                displayDetectLanguageFiles(detectedFiles, isSameLanguages);
-
-                if (!isSameLanguages) {
-                    $('.step-container').addClass('bg-red-150 text-red-200');
-                } else {
-                    sourceLanguage = response.languages[0].abbreviation.toLowerCase();
+                // Si l'utilisateur a sélectionné une langue pendant le chargement, ignorer
+                if (sourceLanguage && sourceLanguage !== '') {
+                    return;
                 }
+                
+                // Compter les occurrences de chaque langue
+                const languageCounts = {};
+                response.languages.forEach(lang => {
+                    const abbr = lang.abbreviation.toLowerCase();
+                    languageCounts[abbr] = (languageCounts[abbr] || 0) + 1;
+                });
+                
+                // Trouver la langue la plus fréquente
+                let mostCommonLang = null;
+                let maxCount = 0;
+                for (const [lang, count] of Object.entries(languageCounts)) {
+                    if (count > maxCount) {
+                        maxCount = count;
+                        mostCommonLang = lang;
+                    }
+                }
+                
+                const isSameLanguages = Object.keys(languageCounts).length === 1;
+                
+                if (mostCommonLang) {
+                    // Sélectionner la langue la plus commune
+                    sourceLanguage = mostCommonLang;
+                    $('.document-source-language').val(mostCommonLang).trigger('change');
+                    
+                    // Mettre en surbrillance dans le tableau
+                    const $sourceLangItem = $(`.source-language-item[data-value="${mostCommonLang}"]`);
+                    $sourceLangItem.addClass('text-green-800 bg-green-100');
+                    $sourceLangItem.find('.ph-check').parent().removeClass('hidden').addClass('visible');
+                    
+                    // Afficher le warning si langues différentes
+                    if (!isSameLanguages) {
+                        $('#language-warning-alert').removeClass('hidden');
+                    } else {
+                        $('#language-warning-alert').addClass('hidden');
+                    }
+                }
+                
                 checkLanguagesConsistency();
             },
             error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
+                // En cas d'erreur, ignorer la détection - l'utilisateur sélectionnera manuellement
+                console.log('Language detection failed, user will select manually');
             },
             complete: function () {
-                stopLoading();
+                // Cacher le spinner
+                $('#language-detection-spinner').addClass('hidden');
             },
         });
     }
@@ -582,24 +689,13 @@ $(document).ready(function () {
         const sourceSelects = $('.document-source-language');
         const targetLanguageBlock = $('.target-language-container');
         const targetSelect = $('.select-block');
-        const detectedFiles = $(".detected-file");
 
-        let isConsistent = true;
         let firstValue = sourceSelects.first().val();
         let targetValue = $('.document-target-language').val();
 
         if (null !== firstValue) {
             sourceLanguage = firstValue;
         }
-
-        sourceSelects.each(function () {
-            const currentValue = $(this).val();
-            if (currentValue !== firstValue) {
-                isConsistent = false;
-                return false;
-            }
-        });
-
 
         // ------------- SELECT -------------
 
@@ -613,56 +709,47 @@ $(document).ready(function () {
         targetLanguageBlock.find('.error-message').remove();
 
         if (currentStep === 1) {
-            if (!isConsistent) {
-                $('.document-source-language').select2().each(function () {
-                    var $select = $(this);
-                    $select.data('select2').$container.addClass('error languages');
-                    $select.data('select2').$dropdown.addClass('error languages');
-                });
+            $('.document-source-language').select2().each(function () {
+                var $select = $(this);
+                $select.data('select2').$container.addClass('languages');
+                $select.data('select2').$dropdown.addClass('languages');
+                $select.data('select2').$container.removeClass('error');
+                $select.data('select2').$dropdown.removeClass('error');
+            });
 
-                $('.step-container').addClass('bg-red-150 text-red-200');
-
-                targetSelect.hide();
-
-                targetLanguageBlock.prepend(language_code === 'en' ? '<div class="error-message text-red-400">One or more files have different language, please fix it.</div>' : '<div class="error-message text-red-400">Vous ne pouvez pas importer des documents ayant des langues différentes</div>');
-
-                detectedFiles.removeClass('bg-green-150 text-green-500').addClass('bg-red-150 text-red-400 border border-red-400');
-            } else {
-                $('.document-source-language').select2().each(function () {
-                    var $select = $(this);
-                    $select.data('select2').$container.addClass('languages');
-                    $select.data('select2').$dropdown.addClass('languages');
-                    $select.data('select2').$container.removeClass('error');
-                    $select.data('select2').$dropdown.removeClass('error');
-                });
-
-
-                $('.step-container').removeClass('bg-red-150 text-red-200');
-
-                targetSelect.show();
-
-                detectedFiles.removeClass('bg-red-150 text-red-400 border border-red-400').addClass('bg-green-150 text-green-500');
-            }
+            $('.step-container').removeClass('bg-red-150 text-red-200');
+            targetSelect.show();
         }
-        let isSameAsTarget = firstValue === targetValue;
+        
+        // Vérifier si les deux langues sont sélectionnées et valides
+        const hasSourceLanguage = firstValue && firstValue !== '';
+        const hasTargetLanguage = targetValue && targetValue !== '';
+        const languagesAreDifferent = firstValue !== targetValue;
+        const canProceed = hasSourceLanguage && hasTargetLanguage && languagesAreDifferent;
 
-        if (!isConsistent || !targetValue || isSameAsTarget) {
+        if (!canProceed) {
+            // Désactiver le bouton Suivant
             nextStep.removeClass('border-green-700 text-white text-green-700')
-                .addClass('border-gray-225 text-gray-225 pointer-events-none')
+                .addClass('border-gray-225 text-gray-225 pointer-events-none opacity-50 cursor-not-allowed')
                 .prop("disabled", true);
         } else {
-            nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
+            // Activer le bouton Suivant
+            nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none opacity-50 cursor-not-allowed')
                 .addClass('border-green-700 text-green-700')
                 .prop("disabled", false);
             $('.language-step').removeClass('hidden');
-            // $('.source').text(firstValue.toUpperCase());
-            // $('.target').text(targetValue.toUpperCase());
-
         }
     }
 
 
     $(document).on('change', '.document-source-language, .document-target-language', function () {
+        // Mettre à jour les variables globales
+        if ($(this).hasClass('document-source-language')) {
+            sourceLanguage = $(this).val() || '';
+        }
+        if ($(this).hasClass('document-target-language')) {
+            targetLanguage = $(this).val() || '';
+        }
         checkLanguagesConsistency();
     });
 
@@ -1443,8 +1530,4 @@ $(document).ready(function () {
     clickDomainButton('Corporate');
 });
 
-// Close warning alert
-function closeWarning() {
-    $('#warning-alert').addClass('hidden');
-}
 

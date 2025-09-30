@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+
+<div class="mx-5 mb-11.5 mt-5">
+    <h2 class="text-2xl mb-2 font-poppins font-semibold">{% trans 'Translation' %}</h2>
+    <div class="text-base font-poppins font-normal">{% trans 'Instantly translate your texts and documents into multiple languages' %}</div>
+    <div class="flex justify-between items-center mt-5">
+        <div class="flex gap-2.5 items-center rounded-full bg-gray-100 border-0.5">
+            <button type="button" id="text-translate"
+                    class="tab flex gap-2.5 items-center px-4 py-2.5 rounded-full hover:bg-gray-200 text-gray-900 font-medium font-weight-500 bg-white transition-colors duration-300 font-bold">
+                <span class="text-3.5">{% trans 'Text translate' %}</span>
+            </button>
+            <button type="button"  id="document-translate"
+                    class="tab flex gap-2.5 items-center px-4 py-2.5 rounded-full text-gray-900 hover:text-gray-900 text-gray-300 transition-colors duration-300">
+                <span class="text-3.5">{% trans 'Document translate' %}</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="my-5">
+        <!--  ------------- TAB-1 -------------  -->
+
+
+        <div id="text-translate-content" class="tab-content hidden">
+            {% include 'translate/text_translate/text_translate.html' %}
+        </div>
+
+
+        <!--  ------------- TAB-2 -------------  -->
+
+
+        <div id="document-translate-content" class="tab-content hidden">
+            {% include 'translate/document_translate/document_translate.html' %}
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="translate-config"
+     data-get-domains="{% url 'get_domains' %}"
+     data-translate="{% url 'main_index' %}"
+     data-single-project="{% url 'single_project' %}"
+     data-detect-language="{% url 'detect_language' %}"
+     data-detect-text-language="{% url 'detect_text_language' %}"
+     data-domain-groups="{% url 'domain_groups' %}"
+     data-get-default-glossary="{% url 'get_default_glossary' %}"
+     data-api-list-glossaries="{% url 'api_list_glossaries' %}"
+     data-expert-revision-file-url="{% url 'expert_revision_file' %}"
+     data-add-glossary="{% url 'add_glossary' %}"
+     data-language-code="{{ request.LANGUAGE_CODE }}"
+     data-access-to-default-glossaries="{{ access_to_default_glossaries|yesno:'true,false' }}"
+     data-languages='[
+        {% for language in translate_languages %}{"id":{{ language.id }},"abbreviation":"{{ language.abbreviation }}","name":"{% if request.LANGUAGE_CODE == 'fr' and language.french_name %}{{ language.french_name|escapejs }}{% else %}{{ language.name|escapejs }}{% endif %}"}{% if not forloop.last %},{% endif %}{% endfor %}
+     ]'>
+</div>
+<script src="{% static 'js/text-translate.js' %}"></script>
+<script src="{% static 'js/translate.js' %}"></script>
+{% endblock %}

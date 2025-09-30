@@ -1,0 +1,53 @@
+{% load static %}
+{% load i18n %}
+
+<div class="step-1 -mb-7.5">
+
+    <!-- File Upload Zone -->
+    <div id="file-upload-zone" class="step-1 flex p-6 px-4 flex-col justify-center items-center gap-6 self-stretch rounded-md bg-black/[0.03] transition-colors">
+        
+        <!-- Upload Icon and Text -->
+        <div class="flex flex-col items-center gap-2 self-stretch">
+            <i class="ph-fill ph-export" style="font-size: 48px; color: #166534;"></i>
+            
+            <p class="self-stretch text-center font-poppins text-sm font-normal leading-6 tracking-[-0.084px] text-[#181932]">
+                {% trans 'Drag and drop your document(s) here' %}
+            </p>
+            
+            <p class="self-stretch text-center font-poppins text-xs font-normal leading-4 text-[#5A5A78]">
+                {% trans 'Supported formats: .txt, .docx, .xlsx, .pptx, .pdf' %}
+            </p>
+        </div>
+
+        <!-- Import Button -->
+        <label class="flex px-2.5 py-2 justify-center items-center rounded-full border border-black/10 cursor-pointer transition-colors hover:bg-black/5">
+            <i class="ph ph-plus" style="font-size: 20px; color: #181932;"></i>
+            <div class="flex px-2 justify-center items-center">
+                <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#181932]">
+                    {% trans 'Import a document' %}
+                </span>
+            </div>
+            <input type="file" multiple accept=".txt,.pdf,.docx,.xlsx,.pptx" class="hidden" id="file-input">
+        </label>
+    </div>
+
+    <!-- PDF Warning Alert (visible only when PDF files present) -->
+    <div id="warning-alert" class="flex min-w-[280px] p-3 mt-4 items-center gap-3 self-stretch rounded-md border-0.5 border-[#FCD34D] bg-[#FFFBEB] hidden">
+        <i class="ph-fill ph-warning" style="font-size: 24px; color: #F59E0B;"></i>
+        
+        <div class="flex items-center gap-2 flex-1">
+            <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#181932]">
+                {% trans 'Warning' %}
+            </span>
+            <span class="flex-1 font-poppins text-sm font-normal leading-6 tracking-[-0.084px] text-[#181932] line-clamp-1 overflow-hidden text-ellipsis">
+                {% trans 'PDF Warning document translation' %}
+            </span>
+        </div>
+    </div>
+
+    <!-- Uploaded Files List (populated dynamically by JavaScript) -->
+    <div id="file-list" class="flex flex-wrap items-start gap-4 self-stretch mt-4 hidden">
+        <!-- Files will be added here dynamically via document-translate.js -->
+    </div>
+
+</div>
