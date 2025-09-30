@@ -2,11 +2,14 @@ import json
 import os
 import re
 import time
+import logging
 from datetime import datetime
 from decimal import Decimal
 from io import BytesIO
 from pprint import pprint
 from urllib.parse import urlparse, unquote
+
+logger = logging.getLogger(__name__)
 
 import openpyxl
 from django.conf import settings
@@ -241,46 +244,119 @@ class GetDomainsView(APIView):
     permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def get(self, request):
+        logger.info(f"[DEBUG] GetDomainsView appelée avec params: {request.query_params}")
+        
         if 'source_language' not in self.request.query_params or 'target_language' not in self.request.query_params:
+            logger.error("[DEBUG] Paramètres manquants: source_language ou target_language")
             return Response({"message": "Missing source language or target language"},
                             status=status.HTTP_400_BAD_REQUEST)
-        domains = requests.post(
-            preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/get-domains",
-            data={
-                "source_language": self.request.query_params['source_language'].lower(),
-                "target_language": self.request.query_params['target_language'].lower()
-            },
-            headers={
-                'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
-            }
-        )
-        domain_names = []
-        for domain in domains.json():
-            domain_names.append(domain['domain_name'])
-        domains = Domain.objects.filter(
-            name__in=domain_names).order_by('-featured', 'name')
-        if self.request.query_params.get('domain_group'):
-            if request.LANGUAGE_CODE == 'fr':
-                domains = domains.filter(
-                    domain_group__french_name=self.request.query_params.get('domain_group'))
+        
+        source_lang = self.request.query_params['source_language'].lower()
+        target_lang = self.request.query_params['target_language'].lower()
+        logger.info(f"[DEBUG] Langues: {source_lang} -> {target_lang}")
+        
+        # Vérification de l'utilisateur et de l'API key
+        try:
+            if self.request.user.is_staff:
+                api_key = preferences.MainSettings.api_key
+                logger.info("[DEBUG] Utilisateur staff, utilisation de l'API key principale")
             else:
-                domains = domains.filter(
-                    domain_group__name=self.request.query_params.get('domain_group'))
+                api_key = self.request.user.group.api_key
+                logger.info("[DEBUG] Utilisateur normal, utilisation de l'API key du groupe")
+        except Exception as e:
+            logger.error(f"[DEBUG] Erreur lors de la récupération de l'API key: {e}")
+            return Response({"message": "API key error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        logger.info(f"[DEBUG] API key configurée: {bool(api_key)}")
+        
+        # Appel à l'API externe
+        try:
+            url = preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/get-domains"
+            logger.info(f"[DEBUG] URL API externe: {url}")
+            
+            domains = requests.post(
+                url,
+                data={
+                    "source_language": source_lang,
+                    "target_language": target_lang
+                },
+                headers={
+                    'token': api_key
+                }
+            )
+            logger.info(f"[DEBUG] Réponse API externe: Status {domains.status_code}")
+            
+            if domains.status_code != 200:
+                logger.error(f"[DEBUG] Erreur API externe: {domains.status_code} - {domains.text}")
+                return Response({"message": "External API error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+        except Exception as e:
+            logger.error(f"[DEBUG] Exception lors de l'appel API externe: {e}")
+            return Response({"message": "External API connection error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        # Traitement de la réponse
+        try:
+            domains_data = domains.json()
+            logger.info(f"[DEBUG] Données reçues: {len(domains_data)} domaines")
+        except Exception as e:
+            logger.error(f"[DEBUG] Erreur parsing JSON: {e}")
+            logger.error(f"[DEBUG] Contenu de la réponse: {domains.text[:500]}")
+            return Response({"message": "Invalid JSON response"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        domain_names = []
+        for domain in domains_data:
+            domain_names.append(domain['domain_name'])
+            
+        logger.info(f"[DEBUG] Noms de domaines extraits: {domain_names}")
+        
+        # Requête base de données
+        try:
+            domains = Domain.objects.filter(
+                name__in=domain_names).order_by('-featured', 'name')
+            logger.info(f"[DEBUG] Domaines trouvés en DB: {domains.count()}")
+        except Exception as e:
+            logger.error(f"[DEBUG] Erreur DB: {e}")
+            return Response({"message": "Database error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if self.request.query_params.get('domain_group'):
+            logger.info(f"[DEBUG] Filtrage par domain_group: {self.request.query_params.get('domain_group')}")
+            try:
+                if request.LANGUAGE_CODE == 'fr':
+                    domains = domains.filter(
+                        domain_group__french_name=self.request.query_params.get('domain_group'))
+                else:
+                    domains = domains.filter(
+                        domain_group__name=self.request.query_params.get('domain_group'))
+                logger.info(f"[DEBUG] Domaines après filtrage: {domains.count()}")
+            except Exception as e:
+                logger.error(f"[DEBUG] Erreur lors du filtrage par domain_group: {e}")
 
         if domains.count() == 0 and preferences.DefaultTranslation.enabled:
-            if request.LANGUAGE_CODE == 'fr':
-                default_domain_name = preferences.DefaultTranslation.french_name if preferences.DefaultTranslation.french_name else preferences.DefaultTranslation.name
-                return Response(
-                    {"data": [default_domain_name], "default_domain": True},
-                )
-            else:
-                return Response({"data": [preferences.DefaultTranslation.name], "default_domain": True}, )
-        if request.LANGUAGE_CODE == 'en':
-            domain_names = domains.values_list('name', flat=True)
-        elif request.LANGUAGE_CODE == 'fr':
-            domain_names = [
-                domain.french_name if domain.french_name else domain.name for domain in domains]
-        return Response({"data": domain_names, "default_domain": False}, status=status.HTTP_200_OK)
+            logger.info("[DEBUG] Aucun domaine trouvé, utilisation du domaine par défaut")
+            try:
+                if request.LANGUAGE_CODE == 'fr':
+                    default_domain_name = preferences.DefaultTranslation.french_name if preferences.DefaultTranslation.french_name else preferences.DefaultTranslation.name
+                    return Response(
+                        {"data": [default_domain_name], "default_domain": True},
+                    )
+                else:
+                    return Response({"data": [preferences.DefaultTranslation.name], "default_domain": True}, )
+            except Exception as e:
+                logger.error(f"[DEBUG] Erreur avec le domaine par défaut: {e}")
+                return Response({"message": "Default domain error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+        try:
+            if request.LANGUAGE_CODE == 'en':
+                domain_names = domains.values_list('name', flat=True)
+            elif request.LANGUAGE_CODE == 'fr':
+                domain_names = [
+                    domain.french_name if domain.french_name else domain.name for domain in domains]
+            
+            logger.info(f"[DEBUG] Domaines finaux retournés: {list(domain_names)}")
+            return Response({"data": domain_names, "default_domain": False}, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            logger.error(f"[DEBUG] Erreur lors de la construction de la réponse finale: {e}")
+            return Response({"message": "Response construction error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class FileExpertRevisionView(APIView):

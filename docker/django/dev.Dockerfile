@@ -13,7 +13,7 @@ RUN apt-get update && apt-get -y upgrade && \
         musl-dev \
         libcairo2-dev \
         libpango1.0-dev \
-        libgdk-pixbuf2.0-dev \
+        libgdk-pixbuf-2.0-dev \
         libffi-dev \
         shared-mime-info \
         zlib1g-dev \

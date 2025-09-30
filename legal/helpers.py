@@ -1,5 +1,6 @@
 import os
 import re
+import logging
 from io import BytesIO
 from urllib.parse import urlparse
 
@@ -10,6 +11,8 @@ from preferences import preferences
 import base64
 from domains.models import Domain
 from stats.calculator import StatsProcessor
+
+logger = logging.getLogger(__name__)
 
 
 def get_translate_data(request, for_statistic=False):
@@ -51,10 +54,27 @@ def get_word_count(segment):
 
 
 def get_text_from_file(file: InMemoryUploadedFile, api_key):
+    logger.info(f"[DEBUG] get_text_from_file appelée pour: {file.name}")
     try:
+        logger.info(f"[DEBUG] Appel de StatsProcessor avec api_key: {bool(api_key)}")
         texts = StatsProcessor(api_key).get_texts(file=file)
-    except UnicodeEncodeError:
+        logger.info(f"[DEBUG] Réponse StatsProcessor reçue: {bool(texts)}")
+        
+        if texts and 'texts' in texts:
+            logger.info(f"[DEBUG] Nombre de segments de texte: {len(texts['texts'])}")
+        else:
+            logger.error(f"[DEBUG] Réponse invalide de StatsProcessor: {texts}")
+            
+    except UnicodeEncodeError as e:
+        logger.error(f"[DEBUG] UnicodeEncodeError: {e}")
         raise ValueError({"detail": "Invalid characters in file name"})
+    except Exception as e:
+        logger.error(f"[DEBUG] Exception dans get_text_from_file: {e}")
+        raise
+
+    if not texts or 'texts' not in texts:
+        logger.error("[DEBUG] Pas de données textuelles retournées")
+        return [], []
 
     formated_texts = [
         word
@@ -62,6 +82,7 @@ def get_text_from_file(file: InMemoryUploadedFile, api_key):
         for word in re.sub(r'<[^>]*>', '', text['text']).split()
     ]
     file.seek(0)
+    logger.info(f"[DEBUG] Traitement terminé - mots formatés: {len(formated_texts)}")
     return formated_texts, [text['text'] for text in texts['texts']]
 
 

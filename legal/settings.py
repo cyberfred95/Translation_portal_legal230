@@ -39,7 +39,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '0.0.0.0', 'legal230.portal.custom.mt', '141.145.204.44', 'portail.lexamt.fr', 'portail.lexamt.com',
                  'portail.lexamt.tech', '89.168.44.123', 'test.portail.lexamt.fr', 'test.portail.lexamt.com', 'test.portail.lexamt.tech',
-                 'api.portail.lexamt.fr']
+                 'api.portail.lexamt.fr', 'api.portail.lexamt.com','141.253.120.134']
 
 # Application definition
 
@@ -255,14 +255,38 @@ ROSETTA_SHOW_AT_ADMIN_PANEL = True
 
 FILES_PROCESSING_API_URL = 'https://office.fileprocessing.custom.mt'
 
+# PDF Conversion method: 'custommt' or 'adobe'
+CONVERSION_METHOD = os.environ.get('CONVERSION_METHOD', 'custommt')
+
+# Adobe PDF Services configuration
+ADOBE_CLIENT_ID = os.environ.get('ADOBE_CLIENT_ID')
+ADOBE_CLIENT_SECRET = os.environ.get('ADOBE_CLIENT_SECRET')
+ADOBE_ORGANIZATION_ID = os.environ.get('ADOBE_ORGANIZATION_ID')
+
 
 # Add logging configuration
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/django_debug.log',
+            'formatter': 'verbose',
         },
     },
     'root': {
@@ -272,6 +296,16 @@ LOGGING = {
     'loggers': {
         'glossaries': {
             'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'stats': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'stats.calculator': {
+            'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': False,
         },
