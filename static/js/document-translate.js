@@ -86,10 +86,30 @@ $(document).ready(function () {
 
     // Pour bouton suppression dynamique
     window.removeFile = function (fileId) {
-        uploadedFiles = uploadedFiles.filter(function (file) {
-            return file.id !== fileId;
+        selectedFiles = selectedFiles.filter(function (file) {
+            return file.fileId !== fileId;
         });
-        updateUI();
+        
+        checkPDF(selectedFiles);
+        displayFiles(selectedFiles);
+        
+        // Retirer aussi les éléments du DOM si présents
+        $(`.file[data-file-id="${fileId}"]`).remove();
+        const $detectedFile = $(`.flex.gap-5[data-file-id="${fileId}"]`);
+        if ($detectedFile.length) {
+            $detectedFile.remove();
+        }
+        
+        toggleFollowingButton();
+        
+        if (currentStep === 1) {
+            checkLanguagesConsistency();
+        }
+        
+        if (selectedFiles.length === 0) {
+            currentStep = 0;
+            showStep(currentStep);
+        }
     }
 
 
@@ -282,11 +302,9 @@ $(document).ready(function () {
 
     function updateUI() {
         if ($fileList.length > 0) {
-            $('#warning-alert').removeClass('hidden');
             $('#file-list').removeClass('hidden');
             $('#next-step').prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
         } else {
-            $('#warning-alert').addClass('hidden');
             $('#file-list').addClass('hidden');
             $('#next-step').prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
         }
@@ -373,18 +391,12 @@ $(document).ready(function () {
                         </div>
                     </div>
                 </div>
-                <button onclick="removeFile('${file.id}')" class="w-6 h-6 text-black/80 hover:text-red-600 transition-colors">
-                    <svg class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M10 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M14 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                <button onclick="removeFile('${fileId}')" class="w-6 h-6 text-black/80 hover:text-red-600 transition-colors">
+                    <i class="ph ph-trash" style="font-size: 24px;"></i>
                 </button>
             </div>
         `);
 
-            $fileList.append($fileItem);
             $fileList.append($fileItem);
         });
     };
@@ -417,31 +429,10 @@ $(document).ready(function () {
     function checkPDF(files) {
         const isPdf = files.some(file => file.name.toLowerCase().endsWith('.pdf'));
         $(".pdf-document").toggleClass('hidden', !isPdf);
+        // Afficher le warning uniquement si au moins un PDF est présent
+        $('#warning-alert').toggleClass('hidden', !isPdf);
     }
 
-    function removeFile(fileId) {
-        selectedFiles = selectedFiles.filter(file => file.fileId !== fileId);
-
-        checkPDF(selectedFiles);
-
-        $(`.file[data-file-id="${fileId}"]`).remove();
-
-        const $detectedFile = $(`.flex.gap-5[data-file-id="${fileId}"]`);
-        if ($detectedFile.length) {
-            $detectedFile.remove();
-        }
-
-        toggleFollowingButton();
-
-        if (currentStep === 1) {
-            checkLanguagesConsistency();
-        }
-
-        if (selectedFiles.length === 0) {
-            currentStep = 0;
-            showStep(currentStep);
-        }
-    }
 
 
     // ------------- STEP-2 -------------
@@ -1445,8 +1436,4 @@ $(document).ready(function () {
     clickDomainButton('Corporate');
 });
 
-// Close warning alert
-function closeWarning() {
-    $('#warning-alert').addClass('hidden');
-}
 

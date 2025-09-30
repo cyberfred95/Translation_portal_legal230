@@ -6,8 +6,8 @@
 <!-- File Upload Section -->
 <div id="file-upload-zone" class="step-1 flex p-6 px-4 flex-col justify-center items-center gap-6 self-stretch rounded-md bg-black/[0.03] transition-colors">
     <div class="flex flex-col items-center gap-2 self-stretch">
-        <!-- Upload Icon SVG -->
-        {% include 'svg/icons/import.svg' %}
+        <!-- Upload Icon -->
+        <i class="ph-fill ph-export" style="font-size: 48px; color: #166534;"></i>
 
         <!-- Label -->
         <p class="self-stretch text-center font-poppins text-sm font-normal leading-6 tracking-[-0.084px] text-[#181932]">
@@ -22,8 +22,8 @@
 
     <!-- Import button -->
     <label class="flex px-2.5 py-2 justify-center items-center rounded-full border border-black/10 cursor-pointer transition-colors hover:bg-black/5">
-        <!-- Plus Icon SVG -->
-        {% include 'svg/icons/plus.svg' %}
+        <!-- Plus Icon -->
+        <i class="ph ph-plus" style="font-size: 20px; color: #181932;"></i>
         <div class="flex px-2 justify-center items-center">
             <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#181932]">
                 {% trans 'Import a document' %}
@@ -34,13 +34,9 @@
 </div>
 
 <!-- Warning Alert (initially hidden) -->
-<div id="warning-alert" class="flex min-w-[280px] p-3 my-6 items-center gap-3 self-stretch rounded-md border-0.5 border-[#FCD34D] bg-[#FFFBEB] hidden">
-    <!-- Warning Icon SVG -->
-    <svg class="w-6 h-6 text-[#F59E0B]" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M10.29 3.86L1.82 18C1.64537 18.3024 1.55299 18.6453 1.55201 18.9945C1.55103 19.3437 1.64149 19.6871 1.81442 19.9905C1.98735 20.2939 2.23673 20.5467 2.53771 20.7239C2.83868 20.9011 3.18082 20.9962 3.53 21H20.47C20.8192 20.9962 21.1613 20.9011 21.4623 20.7239C21.7633 20.5467 22.0127 20.2939 22.1856 19.9905C22.3585 19.6871 22.449 19.3437 22.448 18.9945C22.447 18.6453 22.3546 18.3024 22.18 18L13.71 3.86C13.5317 3.56611 13.2807 3.32312 12.9812 3.15448C12.6817 2.98585 12.3438 2.89725 12 2.89725C11.6562 2.89725 11.3183 2.98585 11.0188 3.15448C10.7193 3.32312 10.4683 3.56611 10.29 3.86Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M12 9V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
+<div id="warning-alert" class="flex min-w-[280px] p-3 mt-6 items-center gap-3 self-stretch rounded-md border-0.5 border-[#FCD34D] bg-[#FFFBEB] hidden">
+    <!-- Warning Icon -->
+    <i class="ph-fill ph-warning" style="font-size: 24px; color: #F59E0B;"></i>
 
     <!-- Content -->
     <div class="flex items-center gap-2 flex-1">
@@ -51,19 +47,10 @@
                     {% trans 'The quality of your document affects the translation result. Scanned or poorly readable PDFs do not allow for a quality output.' %}
                 </span>
     </div>
-
-    <!-- Close Button -->
-    <button class="flex w-6 h-6 p-1 justify-center items-center" onclick="closeWarning()">
-        <!-- X Icon SVG -->
-        <svg class="w-4 h-4 shrink-0 opacity-50" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    </button>
 </div>
 
 <!-- File List (initially hidden) -->
-<div id="file-list" class="flex items-start gap-16 self-stretch hidden">
+<div id="file-list" class="flex items-start gap-16 self-stretch mt-6 hidden">
     <!-- Files will be added here dynamically -->
 </div>
 
