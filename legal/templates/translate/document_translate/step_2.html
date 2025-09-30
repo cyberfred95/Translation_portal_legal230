@@ -40,10 +40,6 @@
                         </div>
                         <div class="absolute bottom-0 left-0 right-0 h-px bg-gray-900"></div>
                     </div>
-                    <!-- Language Detection Spinner -->
-                    <div id="language-detection-spinner" class="hidden">
-                        <i class="ph ph-circle-notch text-[#166534] animate-spin" style="font-size: 24px;"></i>
-                    </div>
                 </div>
 
                 <!-- Target Language Dropdown -->
@@ -74,7 +70,14 @@
             
             <!-- Source Language Selection -->
             <div class="flex-1 flex flex-col">
-                <h4 class="font-poppins text-base font-semibold mb-4 text-[#181932]">{% trans 'Source language' %}</h4>
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="font-poppins text-base font-semibold text-[#181932]">{% trans 'Source language' %}</h4>
+                    
+                    <!-- Language Detection Status -->
+                    <div id="language-detection-status" class="hidden">
+                        <span class="font-poppins text-sm font-normal text-[#5A5A78]"></span>
+                    </div>
+                </div>
                 
                 <!-- Search Input -->
                 <div class="relative w-full mb-4">

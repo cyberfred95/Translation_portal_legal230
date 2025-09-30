@@ -41,6 +41,14 @@ $(document).ready(function () {
         sourceLanguage = selectedLang;
         $('.document-source-language').val(selectedLang).trigger('change');
         
+        // Si sélection pendant la détection, marquer comme annulé et afficher message
+        const $status = $('#language-detection-status');
+        if (!$status.hasClass('hidden') && $status.find('span').text().includes(language_code === 'en' ? 'Detecting' : 'Détection')) {
+            detectionCancelled = true;
+            const cancelMessage = language_code === 'en' ? 'Detection cancelled' : 'Détection annulée';
+            showLanguageDetectionStatus(cancelMessage, true, '#F59E0B');
+        }
+        
         // Vérifier la cohérence après sélection
         checkLanguagesConsistency();
     });
@@ -518,7 +526,41 @@ $(document).ready(function () {
 
     // ------------- STEP-2 -------------
 
+    // Fonction pour afficher le statut de détection de langue
+    function showLanguageDetectionStatus(message, autoHide = false, color = '#5A5A78', showSpinner = false) {
+        const $status = $('#language-detection-status');
+        const $span = $status.find('span');
+        
+        // Ajouter spinner si détection en cours
+        if (showSpinner) {
+            $span.html(`<i class="ph ph-circle-notch" style="font-size: 16px; margin-right: 8px; display: inline-block; animation: rotation 1s linear infinite;"></i>${message}`).css('color', color);
+        } else {
+            $span.text(message).css('color', color);
+        }
+        
+        // Afficher avec fondu
+        $status.removeClass('hidden').css('opacity', '1');
+        
+        if (autoHide) {
+            setTimeout(() => {
+                // Disparition en fondu
+                $status.css('transition', 'opacity 0.5s ease-out');
+                $status.css('opacity', '0');
+                
+                // Cacher complètement après l'animation
+                setTimeout(() => {
+                    $status.addClass('hidden');
+                }, 1000);
+            }, 5000);
+        }
+    }
+    
+    function hideLanguageDetectionStatus() {
+        $('#language-detection-status').addClass('hidden');
+    }
 
+    let detectionCancelled = false;
+    
     function detectLanguageFiles() {
         if (selectedFiles.length === 0) {
             return;
@@ -529,8 +571,12 @@ $(document).ready(function () {
             return;
         }
 
-        // Afficher le spinner à côté du dropdown
-        $('#language-detection-spinner').removeClass('hidden');
+        // Réinitialiser le flag d'annulation
+        detectionCancelled = false;
+
+        // Afficher le message de détection en cours avec spinner
+        const detectionMessage = language_code === 'en' ? 'Detecting language...' : 'Détection de la langue en cours...';
+        showLanguageDetectionStatus(detectionMessage, false, '#5A5A78', true);
 
         const formData = new FormData();
         selectedFiles.forEach((file) => {
@@ -548,8 +594,16 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                // Si l'utilisateur a sélectionné une langue pendant le chargement, ignorer
+                // Si détection annulée, ne rien faire
+                if (detectionCancelled) {
+                    return;
+                }
+                
+                // Si l'utilisateur a sélectionné une langue pendant le chargement, marquer comme annulé
                 if (sourceLanguage && sourceLanguage !== '') {
+                    detectionCancelled = true;
+                    const cancelMessage = language_code === 'en' ? 'Detection cancelled' : 'Détection annulée';
+                    showLanguageDetectionStatus(cancelMessage, true, '#F59E0B');
                     return;
                 }
                 
@@ -588,17 +642,26 @@ $(document).ready(function () {
                     } else {
                         $('#language-warning-alert').addClass('hidden');
                     }
+                    
+                    // Afficher message de succès
+                    const successMessage = language_code === 'en' ? 'Language detected' : 'Langue détectée';
+                    showLanguageDetectionStatus(successMessage, true, '#16A34A');
                 }
                 
                 checkLanguagesConsistency();
             },
             error: function (error) {
-                // En cas d'erreur, ignorer la détection - l'utilisateur sélectionnera manuellement
-                console.log('Language detection failed, user will select manually');
+                // Si détection annulée, ne rien faire
+                if (detectionCancelled) {
+                    return;
+                }
+                
+                // En cas d'erreur, afficher un message d'erreur
+                const errorMessage = language_code === 'en' ? 'Language detection error' : 'Erreur lors de détection de langue';
+                showLanguageDetectionStatus(errorMessage, true, '#DC2626');
             },
             complete: function () {
-                // Cacher le spinner
-                $('#language-detection-spinner').addClass('hidden');
+                // Ne rien faire ici, les messages gèrent leur propre disparition
             },
         });
     }
@@ -745,7 +808,17 @@ $(document).ready(function () {
     $(document).on('change', '.document-source-language, .document-target-language', function () {
         // Mettre à jour les variables globales
         if ($(this).hasClass('document-source-language')) {
-            sourceLanguage = $(this).val() || '';
+            const newValue = $(this).val() || '';
+            
+            // Si changement pendant la détection, marquer comme annulé et afficher message
+            const $status = $('#language-detection-status');
+            if (newValue && !$status.hasClass('hidden') && $status.find('span').text().includes(language_code === 'en' ? 'Detecting' : 'Détection')) {
+                detectionCancelled = true;
+                const cancelMessage = language_code === 'en' ? 'Detection cancelled' : 'Détection annulée';
+                showLanguageDetectionStatus(cancelMessage, true, '#F59E0B');
+            }
+            
+            sourceLanguage = newValue;
         }
         if ($(this).hasClass('document-target-language')) {
             targetLanguage = $(this).val() || '';
