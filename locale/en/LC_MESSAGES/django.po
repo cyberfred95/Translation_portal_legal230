@@ -876,10 +876,8 @@ msgstr "Import a document (max 30 MB)"
 
 #: legal/templates/translate/document_translate/document_translate_2.html:148
 #: legal/templates/translate/document_translate/step_1.html:48
-#, fuzzy
-#| msgid "Action"
-msgid "Attention!"
-msgstr "Action"
+msgid "Warning"
+msgstr ""
 
 #: legal/templates/translate/document_translate/document_translate_2.html:151
 #: legal/templates/translate/document_translate/step_1.html:51
