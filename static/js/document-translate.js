@@ -7,42 +7,62 @@ $(document).ready(function () {
     var $blockButtons = $('.block-buttons');
     var uploadedFiles = [];
 
-    // Filtre toutes les langues visibles selon la recherche
-    $('#search-input').on('input keyup change', function () {
+    // Filtre les langues sources selon la recherche
+    $('#source-search-input').on('input keyup change', function () {
         var val = $(this).val().toLowerCase();
-        $('.language-item').each(function () {
+        $('.source-language-item').each(function () {
             var text = $(this).text().toLowerCase();
             $(this).toggle(text.indexOf(val) > -1);
         });
     });
 
-    // Sélection d'une langue, coloration verte sur tous les blocs concernés
-    // Filtre toutes les langues visibles selon la recherche
-    $('#search-input').on('input keyup change', function () {
+    // Filtre les langues cibles selon la recherche
+    $('#target-search-input').on('input keyup change', function () {
         var val = $(this).val().toLowerCase();
-        $('.language-item').each(function () {
+        $('.target-language-item').each(function () {
             var text = $(this).text().toLowerCase();
             $(this).toggle(text.indexOf(val) > -1);
         });
     });
 
-// Sélection d'une langue, coloration verte sur tous les blocs concernés et gestion de l'icône + select2
-    $(document).on('click', '.language-item', function () {
-        // Récupère la valeur de la langue
+    // Sélection d'une langue source
+    $(document).on('click', '.source-language-item', function () {
         var selectedLang = $(this).data('value');
 
-        // Désélectionne partout la couleur
-        $('.language-item').removeClass('text-green-800 bg-green-100');
-        // Cache toutes les icônes ph-check
-        $('.language-item .ph-check').parent().addClass('hidden').removeClass('visible');
+        // Désélectionne toutes les langues sources
+        $('.source-language-item').removeClass('text-green-800 bg-green-100');
+        $('.source-language-item .ph-check').parent().addClass('hidden').removeClass('visible');
 
         // Sélectionne la ligne cliquée
         $(this).addClass('text-green-800 bg-green-100');
-        // Affiche l'icone dans la ligne cliquée
         $(this).find('.ph-check').parent().removeClass('hidden').addClass('visible');
 
-        // Met à jour le select2 si présent
+        // Met à jour la variable globale et le dropdown source
+        sourceLanguage = selectedLang;
+        $('.document-source-language').val(selectedLang).trigger('change');
+        
+        // Vérifier la cohérence après sélection
+        checkLanguagesConsistency();
+    });
+
+    // Sélection d'une langue cible
+    $(document).on('click', '.target-language-item', function () {
+        var selectedLang = $(this).data('value');
+
+        // Désélectionne toutes les langues cibles
+        $('.target-language-item').removeClass('text-green-800 bg-green-100');
+        $('.target-language-item .ph-check').parent().addClass('hidden').removeClass('visible');
+
+        // Sélectionne la ligne cliquée
+        $(this).addClass('text-green-800 bg-green-100');
+        $(this).find('.ph-check').parent().removeClass('hidden').addClass('visible');
+
+        // Met à jour la variable globale et le dropdown cible
+        targetLanguage = selectedLang;
         $('.document-target-language').val(selectedLang).trigger('change');
+        
+        // Vérifier la cohérence après sélection
+        checkLanguagesConsistency();
     });
 
 
@@ -180,6 +200,29 @@ $(document).ready(function () {
             $('.stepindicator-2').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             $('.stepindicator-3').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
             $('.stepindicator-4').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
+            
+            // Réinitialiser les sélections de langues et variables
+            sourceLanguage = '';
+            targetLanguage = '';
+            $('.document-source-language').val('');
+            $('.source-language-item').removeClass('text-green-800 bg-green-100');
+            $('.source-language-item .ph-check').parent().addClass('hidden').removeClass('visible');
+            
+            $('.document-target-language').val('');
+            $('.target-language-item').removeClass('text-green-800 bg-green-100');
+            $('.target-language-item .ph-check').parent().addClass('hidden').removeClass('visible');
+            
+            // Cacher le warning au départ
+            $('#language-warning-alert').addClass('hidden');
+            
+            // Désactiver le bouton Suivant jusqu'à sélection des langues
+            nextStep.addClass('opacity-50 cursor-not-allowed').prop('disabled', true);
+            
+            // Lancer la détection de langue
+            detectLanguageFiles();
+            
+            // Appeler checkLanguagesConsistency pour initialiser l'état
+            checkLanguagesConsistency();
         } else if (currentStep === 2) {
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-3').removeClass('hidden').show();
@@ -228,12 +271,11 @@ $(document).ready(function () {
                 return;
             }
             if (currentStep === 0) {
-                detectLanguageFiles();
+                // Pas de détection automatique - l'utilisateur choisit manuellement
                 checkLanguagesConsistency()
             }
             if (currentStep === 1) {
                 targetLanguage = $('.document-target-language').val();
-                getDomainsGroups();
             }
             if (currentStep === 2) {
                 if (!defaultDomain && access_to_default_glossaries) {
@@ -482,6 +524,11 @@ $(document).ready(function () {
             return;
         }
 
+        // Si l'utilisateur a déjà sélectionné une langue source, ignorer la détection
+        if (sourceLanguage && sourceLanguage !== '') {
+            return;
+        }
+
         // Afficher le spinner à côté du dropdown
         $('#language-detection-spinner').removeClass('hidden');
 
@@ -501,27 +548,53 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                const isSameLanguages = response.languages.every(i => i?.abbreviation === response.languages[0]?.abbreviation);
-
-                const detectedFiles = response.languages.map(serverFile => {
-                    const matchingFile = selectedFiles.find(f => f.name === serverFile.file_name);
-                    return {
-                        ...serverFile,
-                        fileId: matchingFile ? matchingFile.fileId : `file-${Date.now()}-${serverFile.file_name}`
-                    };
-                });
-
-                displayDetectLanguageFiles(detectedFiles, isSameLanguages);
-
-                if (!isSameLanguages) {
-                    $('.step-container').addClass('bg-red-150 text-red-200');
-                } else {
-                    sourceLanguage = response.languages[0].abbreviation.toLowerCase();
+                // Si l'utilisateur a sélectionné une langue pendant le chargement, ignorer
+                if (sourceLanguage && sourceLanguage !== '') {
+                    return;
                 }
+                
+                // Compter les occurrences de chaque langue
+                const languageCounts = {};
+                response.languages.forEach(lang => {
+                    const abbr = lang.abbreviation.toLowerCase();
+                    languageCounts[abbr] = (languageCounts[abbr] || 0) + 1;
+                });
+                
+                // Trouver la langue la plus fréquente
+                let mostCommonLang = null;
+                let maxCount = 0;
+                for (const [lang, count] of Object.entries(languageCounts)) {
+                    if (count > maxCount) {
+                        maxCount = count;
+                        mostCommonLang = lang;
+                    }
+                }
+                
+                const isSameLanguages = Object.keys(languageCounts).length === 1;
+                
+                if (mostCommonLang) {
+                    // Sélectionner la langue la plus commune
+                    sourceLanguage = mostCommonLang;
+                    $('.document-source-language').val(mostCommonLang).trigger('change');
+                    
+                    // Mettre en surbrillance dans le tableau
+                    const $sourceLangItem = $(`.source-language-item[data-value="${mostCommonLang}"]`);
+                    $sourceLangItem.addClass('text-green-800 bg-green-100');
+                    $sourceLangItem.find('.ph-check').parent().removeClass('hidden').addClass('visible');
+                    
+                    // Afficher le warning si langues différentes
+                    if (!isSameLanguages) {
+                        $('#language-warning-alert').removeClass('hidden');
+                    } else {
+                        $('#language-warning-alert').addClass('hidden');
+                    }
+                }
+                
                 checkLanguagesConsistency();
             },
             error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
+                // En cas d'erreur, ignorer la détection - l'utilisateur sélectionnera manuellement
+                console.log('Language detection failed, user will select manually');
             },
             complete: function () {
                 // Cacher le spinner
@@ -670,6 +743,13 @@ $(document).ready(function () {
 
 
     $(document).on('change', '.document-source-language, .document-target-language', function () {
+        // Mettre à jour les variables globales
+        if ($(this).hasClass('document-source-language')) {
+            sourceLanguage = $(this).val() || '';
+        }
+        if ($(this).hasClass('document-target-language')) {
+            targetLanguage = $(this).val() || '';
+        }
         checkLanguagesConsistency();
     });
 
