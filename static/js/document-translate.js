@@ -165,10 +165,10 @@ $(document).ready(function () {
 
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-1').removeClass('hidden').show();
-            $('.stepindicator-1').addClass('border-0.5 border-[#166534]');
-            $('.stepindicator-2').removeClass('border-0.5 border-[#166534]');
-            $('.stepindicator-3').removeClass('border-0.5 border-[#166534]');
-            $('.stepindicator-4').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-2').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
+            $('.stepindicator-3').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
+            $('.stepindicator-4').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
         } else if (currentStep === 1) {
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-2').removeClass('hidden').show();
@@ -176,26 +176,29 @@ $(document).ready(function () {
             prevStep.show();
             prevStep.css('display', 'flex');
             prevStep.prop("disabled", false);
-            $('.stepindicator-2').addClass('border-0.5 border-[#166534]');
-            $('.stepindicator-3').removeClass('border-0.5 border-[#166534]');
-            $('.stepindicator-4').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-2').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-3').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
+            $('.stepindicator-4').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
         } else if (currentStep === 2) {
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-3').removeClass('hidden').show();
             $blockButtons.addClass('justify-between').removeClass('justify-end');
             prevStep.show();
-            $('.stepindicator-2').addClass('border-0.5 border-[#166534]');
-            $('.stepindicator-3').addClass('border-0.5 border-[#166534]');
-            $('.stepindicator-4').removeClass('border-0.5 border-[#166534]');
+            $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-2').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-3').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-4').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
         } else if (currentStep === 3) {
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-4').removeClass('hidden').show();
             $blockButtons.addClass('justify-between').removeClass('justify-end');
             prevStep.show();
             $('span', $nextButton).text($('span', $nextButton).data('confirm'));
-            $('.stepindicator-2').addClass('border-0.5 border-[#166534]');
-            $('.stepindicator-3').addClass('border-0.5 border-[#166534]');
-            $('.stepindicator-4').addClass('border-0.5 border-[#166534]');
+            $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-2').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-3').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-4').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
         } else if (currentStep === 4) {
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-5').removeClass('hidden').show();

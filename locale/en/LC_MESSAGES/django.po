@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-29 15:51+0200\n"
+"POT-Creation-Date: 2025-09-30 12:09+0200\n"
 "PO-Revision-Date: 2024-07-03 17:56+0300\n"
 "Last-Translator:   <vjxzebra@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -223,7 +223,7 @@ msgstr "Prev"
 #: glossaries/templates/glossaries.html:319
 #: glossaries/templates/glossaries_2.html:394
 #: legal/templates/project_history.html:243
-#: legal/templates/translate/document_translate/document_translate.html:126
+#: legal/templates/translate/document_translate/document_translate.html:124
 #: legal/templates/translate/document_translate/document_translate_2.html:174
 #: stats/templates/usage_history.html:348
 msgid "Next"
@@ -281,7 +281,7 @@ msgid "results"
 msgstr ""
 
 #: glossaries/templates/glossaries_2.html:380
-#: legal/templates/translate/document_translate/document_translate.html:117
+#: legal/templates/translate/document_translate/document_translate.html:115
 msgid "Previous"
 msgstr "Previous"
 
@@ -704,7 +704,7 @@ msgstr "Error"
 #: legal/templates/project_history.html:101
 #: legal/templates/project_history_2.html:54
 #: legal/templates/project_history_2.html:217
-#: legal/templates/translate/document_translate/document_translate.html:125
+#: legal/templates/translate/document_translate/document_translate.html:123
 msgid "Completed"
 msgstr ""
 
@@ -875,16 +875,21 @@ msgid "Import a document"
 msgstr "Import a document (max 50 MB)"
 
 #: legal/templates/translate/document_translate/document_translate_2.html:148
-#: legal/templates/translate/document_translate/step_1.html:48
+#: legal/templates/translate/document_translate/step_1.html:44
 msgid "Warning"
 msgstr ""
 
 #: legal/templates/translate/document_translate/document_translate_2.html:151
-#: legal/templates/translate/document_translate/step_1.html:51
 msgid ""
 "The quality of your document affects the translation result. Scanned or "
 "poorly readable PDFs do not allow for a quality output."
 msgstr ""
+
+#: legal/templates/translate/document_translate/step_1.html:47
+msgid "PDF Warning document translation"
+msgstr ""
+"The quality of your document affects the translation result. Scanned or "
+"poorly readable PDFs do not allow for a quality output."
 
 #: legal/templates/translate/document_translate/step_2.html:15
 #, fuzzy
