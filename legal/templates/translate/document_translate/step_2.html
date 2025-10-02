@@ -4,69 +4,9 @@
 
     <div class="bg-white rounded-lg p-4 sm:p-6 w-full">
         
-        <!-- Warning Alert for different languages (initially hidden) -->
-        <div id="language-warning-alert" class="flex min-w-[280px] p-3 mb-4 items-center gap-3 self-stretch rounded-md border-0.5 border-[#FCD34D] bg-[#FFFBEB] hidden">
-            <i class="ph-fill ph-warning" style="font-size: 24px; color: #F59E0B;"></i>
-            <div class="flex items-center gap-2 flex-1">
-                <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#181932]">
-                    {% trans 'Warning' %}
-                </span>
-                <span class="flex-1 font-poppins text-sm font-normal leading-6 tracking-[-0.084px] text-[#181932]">
-                    {% trans 'Your documents contain different languages. The most common language has been selected.' %}
-                </span>
-            </div>
-        </div>
-        
-        <!-- Language selection dropdowns -->
-        <div class="flex flex-col justify-between mb-0 gap-4 sm:gap-0 pt-4">
-            <div class="flex items-center w-full gap-4 sm:gap-8 lg:gap-12 overflow-x-auto">
-                
-                <!-- Source Language Dropdown -->
-                <div class="flex items-center w-1/2 gap-2">
-                    <div class="relative border-b border-gray-100 flex-1">
-                        <div class="flex items-center gap-2 px-0 py-2 text-sm font-medium text-gray-900">
-                            <select class="gray-text-select document-source-language" name="source_language" required>
-                                <option value="" disabled selected>{% trans 'Source language' %}</option>
-                                {% for translate_language in translate_languages %}
-                                <option value="{{ translate_language.abbreviation|lower }}">
-                                    {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                                    {{ translate_language.french_name }}
-                                    {% else %}
-                                    {{ translate_language.name }}
-                                    {% endif %}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="absolute bottom-0 left-0 right-0 h-px bg-gray-900"></div>
-                    </div>
-                </div>
-
-                <!-- Target Language Dropdown -->
-                <div class="flex items-center gap-6 w-1/2">
-                    <div class="relative">
-                        <div class="flex items-center gap-2 px-0 py-2 text-sm font-medium text-gray-900">
-                            <select class="document-target-language" name="target_language" required>
-                                <option value="" disabled selected>{% trans 'Target language' %}</option>
-                                {% for translate_language in translate_languages %}
-                                <option value="{{ translate_language.abbreviation|lower }}">
-                                    {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                                    {{ translate_language.french_name }}
-                                    {% else %}
-                                    {{ translate_language.name }}
-                                    {% endif %}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="absolute bottom-0 left-0 right-0 h-px bg-gray-900"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Language Selection Grid -->
-        <div class="flex flex-col lg:flex-row gap-6 mt-6 relative">
+        <div class="flex flex-col lg:flex-row gap-6 relative">
             
             <!-- Source Language Selection -->
             <div class="flex-1 flex flex-col">
@@ -148,6 +88,19 @@
                 </div>
             </div>
 
+        </div>
+        
+        <!-- Warning Alert for different languages (initially hidden) -->
+        <div id="language-warning-alert" class="flex min-w-[280px] p-3 mt-4 items-center gap-3 self-stretch rounded-md border-0.5 border-[#FCD34D] bg-[#FFFBEB] hidden">
+            <i class="ph-fill ph-warning" style="font-size: 24px; color: #F59E0B;"></i>
+            <div class="flex items-center gap-2 flex-1">
+                <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#181932]">
+                    {% trans 'Warning' %}
+                </span>
+                <span class="flex-1 font-poppins text-sm font-normal leading-6 tracking-[-0.084px] text-[#181932]">
+                    {% trans 'Your documents contain different languages. You can only translate documents that are in the same language.' %}
+                </span>
+            </div>
         </div>
     </div>
 
