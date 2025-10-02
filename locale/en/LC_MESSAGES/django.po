@@ -93,6 +93,11 @@ msgstr ""
 msgid "Search for a user"
 msgstr "No glossary"
 
+#: legal/templates/translate/document_translate/step_2.html:27
+#: legal/templates/translate/document_translate/step_2.html:65
+msgid "Search for a language..."
+msgstr "Search for a language..."
+
 #: glossaries/templates/glossaries.html:38
 #: glossaries/templates/glossaries.html:162
 msgid "Add glossary"
@@ -876,8 +881,13 @@ msgstr "Import a document (max 50 MB)"
 
 #: legal/templates/translate/document_translate/document_translate_2.html:148
 #: legal/templates/translate/document_translate/step_1.html:44
+#: legal/templates/translate/document_translate/step_2.html:98
 msgid "Warning"
-msgstr ""
+msgstr "Warning"
+
+#: legal/templates/translate/document_translate/step_2.html:101
+msgid "Your documents contain different languages. You can only translate documents that are in the same language."
+msgstr "Your documents contain different languages. You can only translate documents that are in the same language."
 
 #: legal/templates/translate/document_translate/document_translate_2.html:151
 msgid ""
