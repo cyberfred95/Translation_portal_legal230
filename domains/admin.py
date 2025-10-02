@@ -10,20 +10,13 @@ class IconMixin:
     class Media:
         css = {
             'all': (
-                'https://unpkg.com/@phosphor-icons/web@2.0.3/src/thin/style.css',
-                'https://unpkg.com/@phosphor-icons/web@2.0.3/src/light/style.css',
                 'https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css',
-                'https://unpkg.com/@phosphor-icons/web@2.0.3/src/bold/style.css',
-                'https://unpkg.com/@phosphor-icons/web@2.0.3/src/fill/style.css',
-                'https://unpkg.com/@phosphor-icons/web@2.0.3/src/duotone/style.css',
             )
         }
 
     def icon_display(self, obj):
         if obj.icon:
-            weight_class = f"ph-{obj.icon_weight}" if hasattr(
-                obj, 'icon_weight') and obj.icon_weight != 'regular' else "ph"
-            return mark_safe(f'<i class="{weight_class} ph-{obj.icon}" style="font-size: 1.5em;"></i>')
+            return mark_safe(f'<i class="ph ph-{obj.icon}" style="font-size: 1.5em;"></i>')
         return "-"
 
     icon_display.short_description = "Icon"
@@ -44,7 +37,7 @@ class DomainAdmin(IconMixin, admin.ModelAdmin):
         "entities_preview",
     )
     fields = ("name", "french_name", "domain_group",
-              "featured", "icon", "icon_weight", "entities")
+              "featured", "icon", "entities")
     list_filter = ("domain_group", "featured")
     search_fields = ("name", "french_name")
     filter_horizontal = ("entities",)
@@ -66,7 +59,7 @@ class DomainAdmin(IconMixin, admin.ModelAdmin):
 @admin.register(DomainGroup)
 class DomainGroupAdmin(IconMixin, admin.ModelAdmin):
     list_display = ("name", "french_name", "icon_display")
-    fields = ("name", "french_name", "icon", "icon_weight")
+    fields = ("name", "french_name", "icon")
     search_fields = ("name", "french_name")
 
 

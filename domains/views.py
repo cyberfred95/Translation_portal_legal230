@@ -8,9 +8,6 @@ from .tasks import update_domains as update_domains
 from rest_framework.generics import ListAPIView
 from subscriptions.permissions import SubscribedPermission
 
-
-# Create your views here.
-
 def update_domains_view(request):
     update_domains()
     return HttpResponseRedirect(reverse('admin:domains_domain_changelist'))
