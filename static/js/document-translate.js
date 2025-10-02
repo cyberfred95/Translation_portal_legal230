@@ -277,6 +277,13 @@ $(document).ready(function () {
     $(document).on('click', nextStep, function (e) {
         if ($(e.target).hasClass('nextStep') || $(e.target).children().hasClass('nextStep')) {
 
+            // Empêcher le clic si le bouton est désactivé
+            if (nextStep.prop('disabled')) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+
             if (currentStep === 0 && selectedFiles.length === 0) {
                 return;
             }
@@ -285,7 +292,16 @@ $(document).ready(function () {
                 checkLanguagesConsistency()
             }
             if (currentStep === 1) {
-                // La variable targetLanguage est déjà mise à jour par les clics
+                // Vérifier que les langues sont bien sélectionnées et différentes
+                const hasSourceLanguage = sourceLanguage && sourceLanguage !== '';
+                const hasTargetLanguage = targetLanguage && targetLanguage !== '';
+                const languagesAreDifferent = sourceLanguage !== targetLanguage;
+                
+                if (!hasSourceLanguage || !hasTargetLanguage || !languagesAreDifferent) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
             }
             if (currentStep === 2) {
                 if (!defaultDomain && access_to_default_glossaries) {
@@ -677,11 +693,11 @@ $(document).ready(function () {
         if (!canProceed) {
             // Désactiver le bouton Suivant
             nextStep.removeClass('border-green-700 text-white text-green-700')
-                .addClass('border-gray-225 text-gray-225 pointer-events-none opacity-50 cursor-not-allowed')
+                .addClass('border-gray-225 text-gray-225 opacity-50 cursor-not-allowed')
                 .prop("disabled", true);
         } else {
             // Activer le bouton Suivant
-            nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none opacity-50 cursor-not-allowed')
+            nextStep.removeClass('border-gray-225 text-gray-225 opacity-50 cursor-not-allowed')
                 .addClass('border-green-700 text-green-700')
                 .prop("disabled", false);
             $('.language-step').removeClass('hidden');
