@@ -797,25 +797,67 @@ $(document).ready(function () {
         subDomainsList.empty();
 
         subDomains.forEach((subDomain, index) => {
-            const button = $('<button>', {
-                type: 'button',
-                class: 'sub-domain-button text-3.5 py-3 px-7.5 bg-gray-100 text-gray-475 hover:bg-green-700 hover:text-white rounded-md focus:text-white focus:bg-green-700 transition duration-300 ease-in-out truncate',
-                text: subDomain,
-                'data-name': subDomain,
-                click: function () {
-                    $('.sub-domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-175 text-gray-375');
-                    $(this).removeClass('bg-gray-175 text-gray-375').addClass('selected bg-green-700 text-white');
-                    selectedSubDomain = $(this).data('name');
+            // Gérer les objets (avec nom et icône) ou les chaînes simples
+            const domainName = typeof subDomain === 'object' ? subDomain.name : subDomain;
+            const domainIcon = typeof subDomain === 'object' && subDomain.icon ? subDomain.icon : null;
+            
+            const radioId = `subdomain-radio-${index}`;
+            const isFirst = index === 0;
+            
+            // Créer l'icône si elle existe
+            const iconHtml = domainIcon 
+                ? `<i class="ph ph-${domainIcon} mx-2" style="font-size: 24px;" aria-hidden="true"></i>` 
+                : '';
+            
+            // Créer l'élément liste (largeur calculée pour 5 colonnes avec gap-2)
+            const listItem = $('<li>', {
+                class: 'flex items-center',
+                style: 'flex: 0 0 calc(20% - 6.4px);'
+            });
+            
+            // Créer le conteneur
+            const container = $('<div>', {
+                class: `flex items-center w-full rounded-lg p-2 cursor-pointer transition-colors hover:bg-blue-50 subdomain-container ${isFirst ? 'bg-blue-50' : ''}`,
+                'data-name': domainName
+            });
+            
+            // Créer le radio button (12x12)
+            const radio = $('<input>', {
+                id: radioId,
+                type: 'radio',
+                name: 'subdomain-radio',
+                value: domainName,
+                class: 'w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500',
+                checked: isFirst,
+                change: function () {
+                    // Désélectionner tous
+                    $('.sub-domain-list .subdomain-container').removeClass('bg-blue-50');
+                    
+                    // Sélectionner celui-ci
+                    $(this).closest('.subdomain-container').addClass('bg-blue-50');
+                    
+                    selectedSubDomain = $(this).val();
                     $('.domain-step').text(selectedSubDomain).removeClass('hidden');
                 }
             });
-
-            if (index === 0) {
-                button.removeClass('bg-gray-175 text-gray-375').addClass('selected bg-green-700 text-white');
-                selectedSubDomain = subDomain;
+            
+            // Créer le label
+            const label = $('<label>', {
+                for: radioId,
+                class: 'ms-2 flex h-8 items-center cursor-pointer',
+                html: iconHtml + `<span class="font-poppins text-sm font-normal leading-6 tracking-[-0.084px]" style="font-size: 14px; line-height: 24px;">${domainName}</span>`
+            });
+            
+            // Assembler les éléments
+            container.append(radio).append(label);
+            listItem.append(container);
+            subDomainsList.append(listItem);
+            
+            // Définir le premier comme sélectionné
+            if (isFirst) {
+                selectedSubDomain = domainName;
+                $('.domain-step').text(selectedSubDomain).removeClass('hidden');
             }
-
-            subDomainsList.append(button);
         });
     }
 
@@ -848,15 +890,21 @@ $(document).ready(function () {
             success: function (response) {
                 defaultDomain = response.default_domain;
                 if (response.default_domain || !access_to_default_glossaries) {
-                    $(".default").addClass('hidden');
-                    $(".my-glossary").addClass('rounded-l-md');
+                    // Cacher le tab "Default" et afficher "My lexicon"
+                    $("#step2-default").addClass('hidden');
+                    $("#step2-my-lexicon").removeClass('pr-4').addClass('pr-4 pl-0');
                     $(".add-glossary-btn").removeClass('hidden');
-                    selectedGlossaryType = 'my-glossary'
+                    selectedGlossaryType = 'my-glossary';
+                    // Basculer vers "My lexicon"
+                    showTab('my-lexicon');
                 } else {
-                    $(".default").removeClass('hidden');
+                    // Afficher le tab "Default"
+                    $("#step2-default").removeClass('hidden');
+                    $("#step2-my-lexicon").removeClass('pl-0').addClass('pl-4');
                     $(".add-glossary-btn").addClass('hidden');
-                    $(".my-glossary").removeClass('rounded-l-md');
-                    selectedGlossaryType = 'default'
+                    selectedGlossaryType = 'default';
+                    // Basculer vers "Default"
+                    showTab('default');
                 }
 
                 if (response.data && response.data.length === 0) {

@@ -271,16 +271,25 @@ class GetDomainsView(APIView):
             if request.LANGUAGE_CODE == 'fr':
                 default_domain_name = preferences.DefaultTranslation.french_name if preferences.DefaultTranslation.french_name else preferences.DefaultTranslation.name
                 return Response(
-                    {"data": [default_domain_name], "default_domain": True},
+                    {"data": [{"name": default_domain_name, "icon": None}], "default_domain": True},
                 )
             else:
-                return Response({"data": [preferences.DefaultTranslation.name], "default_domain": True}, )
-        if request.LANGUAGE_CODE == 'en':
-            domain_names = domains.values_list('name', flat=True)
-        elif request.LANGUAGE_CODE == 'fr':
-            domain_names = [
-                domain.french_name if domain.french_name else domain.name for domain in domains]
-        return Response({"data": domain_names, "default_domain": False}, status=status.HTTP_200_OK)
+                return Response({"data": [{"name": preferences.DefaultTranslation.name, "icon": None}], "default_domain": True}, )
+        
+        # Construire la liste avec nom et icône
+        domain_data = []
+        for domain in domains:
+            if request.LANGUAGE_CODE == 'fr':
+                domain_name = domain.french_name if domain.french_name else domain.name
+            else:
+                domain_name = domain.name
+            
+            domain_data.append({
+                "name": domain_name,
+                "icon": domain.icon
+            })
+        
+        return Response({"data": domain_data, "default_domain": False}, status=status.HTTP_200_OK)
 
 
 class FileExpertRevisionView(APIView):
