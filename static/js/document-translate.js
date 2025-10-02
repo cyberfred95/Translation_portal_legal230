@@ -67,6 +67,9 @@ $(document).ready(function () {
         // Met à jour la variable globale
         targetLanguage = selectedLang;
         
+        // Sauvegarder dans le localStorage
+        localStorage.setItem('document_translate_target_language', selectedLang);
+        
         // Vérifier la cohérence après sélection
         checkLanguagesConsistency();
     });
@@ -214,6 +217,17 @@ $(document).ready(function () {
             $('.source-language-item .ph-check').parent().addClass('hidden').removeClass('visible');
             $('.target-language-item').removeClass('text-green-800 bg-green-100');
             $('.target-language-item .ph-check').parent().addClass('hidden').removeClass('visible');
+            
+            // Charger la langue cible depuis le localStorage si elle existe
+            const savedTargetLanguage = localStorage.getItem('document_translate_target_language');
+            if (savedTargetLanguage) {
+                targetLanguage = savedTargetLanguage;
+                const $savedTargetItem = $(`.target-language-item[data-value="${savedTargetLanguage}"]`);
+                if ($savedTargetItem.length) {
+                    $savedTargetItem.addClass('text-green-800 bg-green-100');
+                    $savedTargetItem.find('.ph-check').parent().removeClass('hidden').addClass('visible');
+                }
+            }
             
             // Cacher le warning au départ
             $('#language-warning-alert').addClass('hidden');
