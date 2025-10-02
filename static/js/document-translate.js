@@ -747,20 +747,8 @@ $(document).ready(function () {
             
             // Créer le conteneur
             const container = $('<div>', {
-                class: `flex items-center w-full rounded-lg p-2 cursor-pointer transition-colors hover:bg-blue-50 ${isFirst ? 'bg-blue-50' : ''}`,
-                'data-name': domain.name,
-                click: function () {
-                    // Désélectionner tous
-                    $('.domains-list li > div').removeClass('bg-blue-50');
-                    $('.domains-list input[type="radio"]').prop('checked', false);
-                    
-                    // Sélectionner celui-ci
-                    $(this).addClass('bg-blue-50');
-                    $(this).find('input[type="radio"]').prop('checked', true);
-                    
-                    selectedDomain = $(this).data('name');
-                    getDomains();
-                }
+                class: `flex items-center w-full rounded-lg p-2 cursor-pointer transition-colors hover:bg-blue-50 domain-container ${isFirst ? 'bg-blue-50' : ''}`,
+                'data-name': domain.name
             });
             
             // Créer le radio button (12x12)
@@ -770,7 +758,17 @@ $(document).ready(function () {
                 name: 'domain-radio',
                 value: domain.name,
                 class: 'w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500',
-                checked: isFirst
+                checked: isFirst,
+                change: function () {
+                    // Désélectionner tous
+                    $('.domains-list .domain-container').removeClass('bg-blue-50');
+                    
+                    // Sélectionner celui-ci
+                    $(this).closest('.domain-container').addClass('bg-blue-50');
+                    
+                    selectedDomain = $(this).val();
+                    getDomains();
+                }
             });
             
             // Créer le label
