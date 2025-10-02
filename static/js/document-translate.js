@@ -242,6 +242,9 @@ $(document).ready(function () {
             $('.stepindicator-2').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             $('.stepindicator-3').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             $('.stepindicator-4').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
+            
+            // Charger automatiquement les groupes de domaines
+            getDomainsGroups();
         } else if (currentStep === 3) {
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-4').removeClass('hidden').show();

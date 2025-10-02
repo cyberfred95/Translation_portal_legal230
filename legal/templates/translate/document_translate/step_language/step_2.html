@@ -1,0 +1,36 @@
+{% load static %}
+{% load i18n %}
+<div class="step-2 hidden flex flex-col justify-between divide-x-0.5 divide-gray-200">
+    <div class="bg-white rounded-lg p-4 sm:p-6 w-full">
+        <!-- Language Selection Grid -->
+        <div class="flex flex-col lg:flex-row gap-6 relative">
+            
+            <!-- Source Language Selection -->
+            {% include 'translate/document_translate/step_language/step_language_picker.html' with title=_('Source language') search_input_id='source-search-input' item_class='source-language-item' show_detection_status=True %}
+
+            <!-- Divider -->
+            <div class="w-full h-px lg:w-px lg:h-auto bg-gray-200"></div>
+
+            <!-- Target Language Selection -->
+            {% include 'translate/document_translate/step_language/step_language_picker.html' with title=_('Target language') search_input_id='target-search-input' item_class='target-language-item' show_detection_status=False %}
+        </div>
+
+        <!-- Warning Alert for different languages (initially hidden) -->
+        <div 
+            id="language-warning-alert" 
+            class="flex min-w-[280px] p-3 mt-4 items-center gap-3 self-stretch rounded-md border-0.5 border-[#FCD34D] bg-[#FFFBEB] hidden"
+            role="alert"
+            aria-live="polite"
+        >
+            <i class="ph-fill ph-warning text-2xl text-[#F59E0B]" aria-hidden="true"></i>
+            <div class="flex items-center gap-2 flex-1">
+                <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#181932]">
+                    {% trans 'Warning' %}
+                </span>
+                <span class="flex-1 font-poppins text-sm font-normal leading-6 tracking-[-0.084px] text-[#181932]">
+                    {% trans 'Your documents contain different languages. You can only translate documents that are in the same language.' %}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

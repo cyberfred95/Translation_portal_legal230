@@ -89,8 +89,8 @@ msgstr ""
 msgid "Search for a user"
 msgstr ""
 
-#: legal/templates/translate/document_translate/step_2.html:27
-#: legal/templates/translate/document_translate/step_2.html:65
+#: legal/templates/translate/document_translate/step_language/step_2.html:27
+#: legal/templates/translate/document_translate/step_language/step_2.html:65
 msgid "Search for a language..."
 msgstr "Rechercher une langue..."
 
@@ -761,7 +761,7 @@ msgid "Post-editing by professional editors"
 msgstr ""
 
 #: legal/templates/project_history_2.html:32
-#: legal/templates/translate/document_translate/step_2.html:78
+#: legal/templates/translate/document_translate/step_language/step_2.html:78
 #, fuzzy
 #| msgid "Choose the document."
 msgid "Search for text or document..."
@@ -863,27 +863,27 @@ msgid "Domain and Glossary"
 msgstr "Domaine et Glossaire"
 
 #: legal/templates/translate/document_translate/document_translate_2.html:111
-#: legal/templates/translate/document_translate/step_1.html:14
+#: legal/templates/translate/document_translate/step_document/step_1.html:14
 msgid "Drag and drop your document(s) here"
 msgstr "Glissez-déposez vos documents ici"
 
 #: legal/templates/translate/document_translate/document_translate_2.html:116
-#: legal/templates/translate/document_translate/step_1.html:19
+#: legal/templates/translate/document_translate/step_document/step_1.html:19
 msgid "Supported formats: .txt, .docx, .xlsx, .pptx, .pdf"
 msgstr "Formats pris en charge: .txt, .docx, .xlsx, .pptx, .pdf"
 
 #: legal/templates/translate/document_translate/document_translate_2.html:129
-#: legal/templates/translate/document_translate/step_1.html:29
+#: legal/templates/translate/document_translate/step_document/step_1.html:29
 msgid "Import a document"
 msgstr "Importer un document (max 50 MB)"
 
 #: legal/templates/translate/document_translate/document_translate_2.html:148
-#: legal/templates/translate/document_translate/step_1.html:44
-#: legal/templates/translate/document_translate/step_2.html:98
+#: legal/templates/translate/document_translate/step_document/step_1.html:44
+#: legal/templates/translate/document_translate/step_language/step_2.html:98
 msgid "Warning"
 msgstr "Attention"
 
-#: legal/templates/translate/document_translate/step_2.html:101
+#: legal/templates/translate/document_translate/step_language/step_2.html:101
 msgid "Your documents contain different languages. You can only translate documents that are in the same language."
 msgstr "Vos documents contiennent différentes langues. Vous ne pouvez traduire que des documents dans la même langue."
 
@@ -893,43 +893,43 @@ msgid ""
 "poorly readable PDFs do not allow for a quality output."
 msgstr ""
 
-#: legal/templates/translate/document_translate/step_1.html:47
+#: legal/templates/translate/document_translate/step_document/step_1.html:47
 msgid "PDF Warning document translation"
 msgstr ""
 "La qualité de votre document influence le résultat de la traduction. Les PDF "
 "scannés ou difficilement lisibles ne permettent pas d’obtenir un rendu de "
 "qualité."
 
-#: legal/templates/translate/document_translate/step_2.html:15
+#: legal/templates/translate/document_translate/step_language/step_2.html:15
 #, fuzzy
 msgid "Detected language"
 msgstr "Language détécté"
 
-#: legal/templates/translate/document_translate/step_3.html:6
+#: legal/templates/translate/document_translate/step_domain/step_3.html:6
 msgid "Select a field"
 msgstr ""
 
-#: legal/templates/translate/document_translate/step_3.html:12
+#: legal/templates/translate/document_translate/step_domain/step_3.html:12
 msgid "Select a lexicon"
 msgstr ""
 
-#: legal/templates/translate/document_translate/step_3.html:22
+#: legal/templates/translate/document_translate/step_domain/step_3.html:22
 msgid "Default"
 msgstr "Par défaut"
 
-#: legal/templates/translate/document_translate/step_3.html:28
+#: legal/templates/translate/document_translate/step_domain/step_3.html:28
 msgid "My lexicon"
 msgstr ""
 
-#: legal/templates/translate/document_translate/step_3.html:34
+#: legal/templates/translate/document_translate/step_domain/step_3.html:34
 msgid "No lexicon"
 msgstr ""
 
-#: legal/templates/translate/document_translate/step_3.html:82
+#: legal/templates/translate/document_translate/step_domain/step_3.html:82
 msgid "Add a lexicon"
 msgstr ""
 
-#: legal/templates/translate/document_translate/step_3.html:92
+#: legal/templates/translate/document_translate/step_domain/step_3.html:92
 msgid "You have chosen to use no lexicon"
 msgstr ""
 

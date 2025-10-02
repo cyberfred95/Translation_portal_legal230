@@ -1,0 +1,47 @@
+{% load i18n %}
+<!-- Language Picker Component -->
+<div class="flex-1 flex flex-col">
+    <div class="flex justify-between items-center mb-4">
+        <h4 class="font-poppins text-base font-semibold text-[#181932]">{{ title }}</h4>
+        
+        {% if show_detection_status %}
+        <!-- Language Detection Status -->
+        <div id="language-detection-status" class="hidden">
+            <span class="font-poppins text-sm font-normal text-[#5A5A78]"></span>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Search Input -->
+    <div class="relative w-full mb-4">
+        <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl" aria-hidden="true"></i>
+        <input
+            type="search"
+            id="{{ search_input_id }}"
+            placeholder="{% trans 'Search for a language...' %}"
+            aria-label="{% trans 'Search for a language...' %}"
+            class="pl-10 h-10 text-sm text-gray-600 placeholder:text-gray-500 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+        />
+    </div>
+
+    <!-- Language Grid -->
+    <div class="flex flex-row w-full flex-wrap max-h-[400px] overflow-y-auto" role="list">
+        {% for translate_language in translate_languages %}
+        <div 
+            class="flex w-1/3 p-2 items-center {{ item_class }} cursor-pointer hover:bg-gray-50 rounded transition-colors" 
+            data-value="{{ translate_language.abbreviation|lower }}"
+            role="listitem"
+            tabindex="0"
+        >
+            <span class="text-sm text-left">
+                {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                {{ translate_language.french_name }}
+                {% else %}
+                {{ translate_language.name }}
+                {% endif %}
+            </span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
