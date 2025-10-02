@@ -31,11 +31,9 @@ $(document).ready(function () {
 
         // Désélectionne toutes les langues sources
         $('.source-language-item').removeClass('text-green-800 bg-green-100');
-        $('.source-language-item .ph-check').parent().addClass('hidden').removeClass('visible');
 
         // Sélectionne la ligne cliquée
         $(this).addClass('text-green-800 bg-green-100');
-        $(this).find('.ph-check').parent().removeClass('hidden').addClass('visible');
 
         // Met à jour la variable globale
         sourceLanguage = selectedLang;
@@ -58,11 +56,9 @@ $(document).ready(function () {
 
         // Désélectionne toutes les langues cibles
         $('.target-language-item').removeClass('text-green-800 bg-green-100');
-        $('.target-language-item .ph-check').parent().addClass('hidden').removeClass('visible');
 
         // Sélectionne la ligne cliquée
         $(this).addClass('text-green-800 bg-green-100');
-        $(this).find('.ph-check').parent().removeClass('hidden').addClass('visible');
 
         // Met à jour la variable globale
         targetLanguage = selectedLang;
@@ -214,9 +210,7 @@ $(document).ready(function () {
             sourceLanguage = '';
             targetLanguage = '';
             $('.source-language-item').removeClass('text-green-800 bg-green-100');
-            $('.source-language-item .ph-check').parent().addClass('hidden').removeClass('visible');
             $('.target-language-item').removeClass('text-green-800 bg-green-100');
-            $('.target-language-item .ph-check').parent().addClass('hidden').removeClass('visible');
             
             // Charger la langue cible depuis le localStorage si elle existe
             const savedTargetLanguage = localStorage.getItem('document_translate_target_language');
@@ -225,7 +219,6 @@ $(document).ready(function () {
                 const $savedTargetItem = $(`.target-language-item[data-value="${savedTargetLanguage}"]`);
                 if ($savedTargetItem.length) {
                     $savedTargetItem.addClass('text-green-800 bg-green-100');
-                    $savedTargetItem.find('.ph-check').parent().removeClass('hidden').addClass('visible');
                 }
             }
             
@@ -642,7 +635,6 @@ $(document).ready(function () {
                     // Mettre en surbrillance dans le tableau
                     const $sourceLangItem = $(`.source-language-item[data-value="${mostCommonLang}"]`);
                     $sourceLangItem.addClass('text-green-800 bg-green-100');
-                    $sourceLangItem.find('.ph-check').parent().removeClass('hidden').addClass('visible');
                     
                     // Afficher le warning si langues différentes
                     if (!isSameLanguages) {
