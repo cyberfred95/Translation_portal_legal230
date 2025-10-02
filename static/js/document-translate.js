@@ -731,27 +731,64 @@ $(document).ready(function () {
         domainsList.empty();
 
         domains.forEach((domain, index) => {
-            const button = $('<button>', {
-                type: 'button',
-                class: 'border border-gray-300 domain-button text-3.5 py-3 px-7.5 bg-gray-100 text-gray-475 hover:bg-green-700 hover:text-white rounded-md focus:text-white focus:bg-green-700 transition duration-300 ease-in-out truncate',
-                text: domain.name,
+            const radioId = `domain-radio-${index}`;
+            const isFirst = index === 0;
+            
+            // Créer l'icône si elle existe
+            const iconHtml = domain.icon 
+                ? `<i class="ph ph-${domain.icon} mx-2" style="font-size: 24px;" aria-hidden="true"></i>` 
+                : '';
+            
+            // Créer l'élément liste (largeur calculée pour 5 colonnes avec gap-2)
+            const listItem = $('<li>', {
+                class: 'flex items-center',
+                style: 'flex: 0 0 calc(20% - 6.4px);'
+            });
+            
+            // Créer le conteneur
+            const container = $('<div>', {
+                class: `flex items-center w-full rounded-lg p-2 cursor-pointer transition-colors hover:bg-blue-50 ${isFirst ? 'bg-blue-50' : ''}`,
                 'data-name': domain.name,
                 click: function () {
-                    $('.domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-100 text-gray-475');
-                    $(this).removeClass('bg-gray-100 text-gray-475').addClass('selected bg-green-700 text-white');
-
+                    // Désélectionner tous
+                    $('.domains-list li > div').removeClass('bg-blue-50');
+                    $('.domains-list input[type="radio"]').prop('checked', false);
+                    
+                    // Sélectionner celui-ci
+                    $(this).addClass('bg-blue-50');
+                    $(this).find('input[type="radio"]').prop('checked', true);
+                    
                     selectedDomain = $(this).data('name');
                     getDomains();
                 }
             });
-
-            if (index === 0) {
-                button.removeClass('bg-gray-100 text-gray-475').addClass('selected bg-green-700 text-white');
-
+            
+            // Créer le radio button (12x12)
+            const radio = $('<input>', {
+                id: radioId,
+                type: 'radio',
+                name: 'domain-radio',
+                value: domain.name,
+                class: 'w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500',
+                checked: isFirst
+            });
+            
+            // Créer le label
+            const label = $('<label>', {
+                for: radioId,
+                class: 'ms-2 flex h-8 items-center cursor-pointer',
+                html: iconHtml + `<span class="font-poppins text-sm font-normal leading-6 tracking-[-0.084px]" style="font-size: 14px; line-height: 24px;">${domain.name}</span>`
+            });
+            
+            // Assembler les éléments
+            container.append(radio).append(label);
+            listItem.append(container);
+            domainsList.append(listItem);
+            
+            // Définir le premier comme sélectionné
+            if (isFirst) {
                 selectedDomain = domain.name;
             }
-
-            domainsList.append(button);
         });
 
         getDomains();
