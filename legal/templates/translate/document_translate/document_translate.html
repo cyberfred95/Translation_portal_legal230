@@ -2,7 +2,7 @@
 {% load i18n %}
 
 <!-- Document Translation Wizard -->
-<div class="flex p-4 px-6 flex-col items-end gap-0 self-stretch rounded-lg bg-white">
+<div class="flex p-4 flex-col items-start gap-0 self-stretch rounded-lg bg-white">
     
     <!-- Progress Indicator -->
     <div class="flex items-start self-stretch">
@@ -18,7 +18,7 @@
     </div>
 
     <!-- Step Content Container -->
-    <div class="w-full h-full py-8 px-5 step-container">
+    <div class="w-full h-full pt-8 px-5 step-container">
         {% include 'translate/document_translate/step_document/step_1.html' %}
         {% include 'translate/document_translate/step_language/step_2.html' %}
         {% include 'translate/document_translate/step_domain/step_3.html' %}
@@ -27,7 +27,7 @@
     </div>
 
     <!-- Navigation Buttons -->
-    <div class="block-buttons flex justify-between w-full pr-5">
+    <div class="block-buttons flex justify-between w-full pr-0 pb-0 pt-8">
         <!-- Previous Button -->
         <button 
             id="prev-step" 
