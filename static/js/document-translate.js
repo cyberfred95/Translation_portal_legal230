@@ -245,6 +245,11 @@ $(document).ready(function () {
             
             // Charger automatiquement les groupes de domaines
             getDomainsGroups();
+            
+            // Charger automatiquement les glossaires My Lexicon si les langues sont définies
+            if (sourceLanguage && targetLanguage) {
+                loadMyGlossaries();
+            }
         } else if (currentStep === 3) {
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-4').removeClass('hidden').show();
@@ -1018,6 +1023,10 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
+                // Afficher dans step_3 (My Lexicon tab)
+                displayMyGlossariesInStep3(response);
+                
+                // Comportement original pour step_4
                 updateGlossaryList(response, false);
                 selectedGlossary = '';
                 $('.terminology-step').text('').removeClass('hidden');
@@ -1029,6 +1038,83 @@ $(document).ready(function () {
                 errorNotification(error?.status, error?.responseJSON?.detail);
             },
         });
+    }
+
+    function displayMyGlossariesInStep3(glossaries) {
+        const container = $('#step2-tab-my-lexicon-content');
+        container.empty();
+        
+        if (!glossaries || glossaries.length === 0) {
+            container.html(`
+                <div class="flex flex-col items-center justify-center py-8">
+                    <i class="ph ph-folder text-6xl text-gray-400 mb-4"></i>
+                    <p class="font-poppins text-sm text-gray-600">${language_code === 'en' ? 'No glossaries found' : 'Aucun glossaire trouvé'}</p>
+                </div>
+            `);
+            return;
+        }
+        
+        // Créer une liste flex comme sub-domain-list
+        const glossaryList = $('<ul>', {
+            class: 'flex flex-row flex-wrap items-start w-full gap-2'
+        });
+        
+        glossaries.forEach((glossary, index) => {
+            const glossaryId = `glossary-radio-${index}`;
+            const isFirst = index === 0;
+            
+            // Créer l'élément liste (largeur calculée pour 4 colonnes avec gap-2)
+            const listItem = $('<li>', {
+                class: 'flex items-center',
+                style: 'flex: 0 0 calc(25% - 6px);'
+            });
+            
+            // Créer le conteneur
+            const container = $('<div>', {
+                class: `flex items-center w-full rounded-lg p-2 cursor-pointer transition-colors hover:bg-blue-50 glossary-container ${isFirst ? 'bg-blue-50' : ''}`,
+                'data-id': glossary.id
+            });
+            
+            // Créer le radio button (12x12)
+            const radio = $('<input>', {
+                id: glossaryId,
+                type: 'radio',
+                name: 'glossary-radio',
+                value: glossary.id,
+                class: 'w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500',
+                checked: isFirst,
+                change: function () {
+                    // Désélectionner tous les glossaires
+                    $('.glossary-container').removeClass('bg-blue-50');
+                    
+                    // Sélectionner celui-ci
+                    $(this).closest('.glossary-container').addClass('bg-blue-50');
+                    
+                    selectedGlossary = $(this).val();
+                }
+            });
+            
+            // Créer l'icône de fichier
+            const iconHtml = `<i class="ph ph-file mx-2" style="font-size: 24px;" aria-hidden="true"></i>`;
+            
+            // Créer le label (même style que sub-domain-list)
+            const label = $('<label>', {
+                for: glossaryId,
+                class: 'ms-2 flex h-8 items-center cursor-pointer',
+                html: iconHtml + `<span class="font-poppins text-sm font-normal leading-6 tracking-[-0.084px]" style="font-size: 14px; line-height: 24px;">${glossary.name}</span>`
+            });
+            
+            // Assembler les éléments (même ordre que sub-domain-list)
+            container.append(radio).append(label);
+            listItem.append(container);
+            glossaryList.append(listItem);
+            
+            if (isFirst) {
+                selectedGlossary = glossary.id;
+            }
+        });
+        
+        container.append(glossaryList);
     }
 
     function updateGlossaryList(glossaries, isDefault) {
@@ -1532,6 +1618,10 @@ $(document).ready(function () {
 
     $('#step2-my-lexicon').click(function () {
         showTab('my-lexicon');
+        // Charger les glossaires de l'utilisateur
+        if (sourceLanguage && targetLanguage && selectedSubDomain) {
+            loadMyGlossaries();
+        }
     });
 
     $('#step2-no-lexicon').click(function () {
