@@ -243,6 +243,19 @@ $(document).ready(function () {
             $('.stepindicator-3').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             $('.stepindicator-4').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
             
+            // Debug: afficher l'état actuel des sélections
+            console.log('=== ÉTAT À L\'ARRIVÉE SUR STEP 3 ===');
+            console.log('selectedSubDomain:', selectedSubDomain);
+            console.log('selectedGlossary:', selectedGlossary);
+            console.log('sourceLanguage:', sourceLanguage);
+            console.log('targetLanguage:', targetLanguage);
+            console.log('=====================================');
+            
+            // Activer le bouton Suivant par défaut sur step 3 (glossaire optionnel)
+            nextStep.removeClass('border-gray-225 text-gray-225 opacity-50 cursor-not-allowed')
+                .addClass('border-green-700 text-green-700')
+                .prop("disabled", false);
+            
             // Charger automatiquement les groupes de domaines
             getDomainsGroups();
             
@@ -781,7 +794,7 @@ $(document).ready(function () {
                     getDomains();
                 }
             });
-            
+
             // Créer le label
             const label = $('<label>', {
                 for: radioId,
@@ -849,9 +862,10 @@ $(document).ready(function () {
                     
                     selectedSubDomain = $(this).val();
                     $('.domain-step').text(selectedSubDomain).removeClass('hidden');
+                    console.log('Sous-domaine sélectionné:', selectedSubDomain);
                 }
             });
-            
+
             // Créer le label
             const label = $('<label>', {
                 for: radioId,
@@ -868,6 +882,7 @@ $(document).ready(function () {
             if (isFirst) {
                 selectedSubDomain = domainName;
                 $('.domain-step').text(selectedSubDomain).removeClass('hidden');
+                console.log('Premier sous-domaine sélectionné automatiquement:', selectedSubDomain);
             }
         });
     }
@@ -1052,9 +1067,8 @@ $(document).ready(function () {
         
         if (!glossaries || glossaries.length === 0) {
             container.html(`
-                <div class="flex flex-col items-center justify-center py-8">
-                    <i class="ph ph-folder text-6xl text-gray-400 mb-4"></i>
-                    <p class="font-poppins text-sm text-gray-600">${language_code === 'en' ? 'No glossaries found' : 'Aucun glossaire trouvé'}</p>
+                <div class="flex flex-col items-center justify-center pt-6 pb-0">
+                    <p class="font-poppins font-normal text-gray-600" style="font-size: 14px; line-height: 24px;">${language_code === 'en' ? 'No glossaries found' : 'Aucun glossaire trouvé'}</p>
                 </div>
             `);
             return;
@@ -1097,6 +1111,12 @@ $(document).ready(function () {
                     $(this).closest('.glossary-container').addClass('bg-blue-50');
                     
                     selectedGlossary = $(this).val();
+                    console.log('Glossaire sélectionné (My glossaries):', selectedGlossary);
+                    
+                    // S'assurer que le bouton Suivant reste actif
+                    nextStep.removeClass('border-gray-225 text-gray-225 opacity-50 cursor-not-allowed')
+                        .addClass('border-green-700 text-green-700')
+                        .prop("disabled", false);
                 }
             });
             
@@ -1117,6 +1137,7 @@ $(document).ready(function () {
             
             if (isFirst) {
                 selectedGlossary = glossary.id;
+                console.log('Premier glossaire sélectionné automatiquement:', selectedGlossary);
             }
         });
         
@@ -1298,6 +1319,14 @@ $(document).ready(function () {
 
 
     const fileTranslate = () => {
+        // Console log pour afficher le domaine et le glossaire sélectionnés
+        console.log('=== INFORMATIONS DE TRADUCTION ===');
+        console.log('Domaine sélectionné:', selectedSubDomain);
+        console.log('Glossaire sélectionné:', selectedGlossary);
+        console.log('Langue source:', sourceLanguage);
+        console.log('Langue cible:', targetLanguage);
+        console.log('================================');
+
         const formData = new FormData();
         selectedFiles.forEach((file) => {
             formData.append(`document[]`, file.file);
@@ -1354,7 +1383,7 @@ $(document).ready(function () {
                     <td>
                         <span class="doc-title">${project.source_file_name}</span>
                         <span class="doc-subtitle">${project.file_size || 'N/A'} &bull; ${project.pages || 'N/A'} pages</span>
-                    </td>
+            </td>
                     <td>
                         <span class="lang-label">${sourceLanguage.toUpperCase()} → ${targetLanguage.toUpperCase()}</span>
                     </td>
@@ -1394,19 +1423,19 @@ $(document).ready(function () {
 
     function getStatusText(status) {
         switch (status) {
-            case 'Being translated':
+                case 'Being translated':
                 return language_code === 'en' ? 'Processing...' : 'En cours...';
-            case 'Translated':
+                case 'Translated':
                 return language_code === 'en' ? 'Translated document' : 'Document traduit';
-            case 'Sent to post-editing, not accepted yet':
+                case 'Sent to post-editing, not accepted yet':
                 return language_code === 'en' ? 'Request for quote sent' : 'Demande de devis envoyée';
-            case 'Sent to post-editing, accepted':
+                case 'Sent to post-editing, accepted':
                 return language_code === 'en' ? 'Request for quote accepted' : 'Demande de devis acceptée';
-            case 'Post-edited file uploaded':
+                case 'Post-edited file uploaded':
                 return language_code === 'en' ? 'Proofread document uploaded' : 'Document relu importé';
-            case 'Error':
+                case 'Error':
                 return language_code === 'en' ? 'Error' : 'Erreur';
-            default:
+                default:
                 return status;
         }
     }
@@ -1605,13 +1634,26 @@ $(document).ready(function () {
         // Afficher le contenu du tab sélectionné
         if (tabId === 'default') {
             $('#step2-tab-default-content').show();
-        } else {
+            // Pas de réinitialisation automatique pour "default"
+        } else if (tabId === 'no-glossary') {
+            $('#step2-tab-no-glossary-content').show();
+            // Pour "No glossary", sélectionner automatiquement "none"
+            selectedGlossary = 'none';
+            $('.terminology-step').text(language_code === 'en' ? 'none' : 'aucun').removeClass('hidden');
+        } else if (tabId === 'my-glossary') {
             $(`#step2-tab-${tabId}-content`).show();
+            // Pas de réinitialisation automatique pour "my-glossary"
+            // Le premier glossaire sera sélectionné automatiquement par displayMyGlossariesInStep3
         }
 
         // Retirer les styles actifs de tous les boutons
         $('button.tab-button').removeClass('border-b-0.5 border-b-black');
         $(`#step2-${tabId}`).addClass('border-b-0.5 border-b-black');
+        
+        // S'assurer que le bouton Suivant reste actif lors du changement de tab
+        nextStep.removeClass('border-gray-225 text-gray-225 opacity-50 cursor-not-allowed')
+            .addClass('border-green-700 text-green-700')
+            .prop("disabled", false);
     }
 
     setTimeout(() => showTab('default'), 1000);
