@@ -246,7 +246,7 @@ $(document).ready(function () {
             // Charger automatiquement les groupes de domaines
             getDomainsGroups();
             
-            // Charger automatiquement les glossaires My Lexicon si les langues sont définies
+            // Charger automatiquement les glossaires My glossaries si les langues sont définies
             if (sourceLanguage && targetLanguage) {
                 loadMyGlossaries();
             }
@@ -895,17 +895,17 @@ $(document).ready(function () {
             success: function (response) {
                 defaultDomain = response.default_domain;
                 if (response.default_domain || !access_to_default_glossaries) {
-                    // Cacher le tab "Default" et afficher "My lexicon"
+                    // Cacher le tab "Standard" et afficher "My glossaries"
                     $("#step2-default").addClass('hidden');
-                    $("#step2-my-lexicon").removeClass('pr-4').addClass('pr-4 pl-0');
+                    $("#step2-my-glossary").removeClass('pr-4').addClass('pr-4 pl-0');
                     $(".add-glossary-btn").removeClass('hidden');
                     selectedGlossaryType = 'my-glossary';
-                    // Basculer vers "My lexicon"
-                    showTab('my-lexicon');
+                    // Basculer vers "My glossaries"
+                    showTab('my-glossary');
                 } else {
-                    // Afficher le tab "Default"
+                    // Afficher le tab "Standard"
                     $("#step2-default").removeClass('hidden');
-                    $("#step2-my-lexicon").removeClass('pl-0').addClass('pl-4');
+                    $("#step2-my-glossary").removeClass('pl-0').addClass('pl-4');
                     $(".add-glossary-btn").addClass('hidden');
                     selectedGlossaryType = 'default';
                     // Basculer vers "Default"
@@ -1023,7 +1023,7 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                // Afficher dans step_3 (My Lexicon tab)
+                // Afficher dans step_3 (My glossaries tab)
                 displayMyGlossariesInStep3(response);
                 
                 // Comportement original pour step_4
@@ -1041,7 +1041,7 @@ $(document).ready(function () {
     }
 
     function displayMyGlossariesInStep3(glossaries) {
-        const container = $('#step2-tab-my-lexicon-content');
+        const container = $('#step2-tab-my-glossary-content');
         container.empty();
         
         if (!glossaries || glossaries.length === 0) {
@@ -1600,11 +1600,15 @@ $(document).ready(function () {
     function showTab(tabId) {
         // Masquer tous les contenus de tabs
         $('#step2-tab-default-content').hide();
-        $('#step2-tab-no-lexicon-content').hide();
-        $('#step2-tab-my-lexicon-content').hide();
+        $('#step2-tab-no-glossary-content').hide();
+        $('#step2-tab-my-glossary-content').hide();
 
         // Afficher le contenu du tab sélectionné
-        $(`#step2-tab-${tabId}-content`).show();
+        if (tabId === 'default') {
+            $('#step2-tab-default-content').show();
+        } else {
+            $(`#step2-tab-${tabId}-content`).show();
+        }
 
         // Retirer les styles actifs de tous les boutons
         $('button.tab-button').removeClass('border-b-0.5 border-b-black');
@@ -1612,20 +1616,21 @@ $(document).ready(function () {
     }
 
     setTimeout(() => showTab('default'), 1000);
+    
     $('#step2-default').click(function () {
         showTab('default');
     });
 
-    $('#step2-my-lexicon').click(function () {
-        showTab('my-lexicon');
+    $('#step2-my-glossary').click(function () {
+        showTab('my-glossary');
         // Charger les glossaires de l'utilisateur
         if (sourceLanguage && targetLanguage && selectedSubDomain) {
             loadMyGlossaries();
         }
     });
 
-    $('#step2-no-lexicon').click(function () {
-        showTab('no-lexicon');
+    $('#step2-no-glossary').click(function () {
+        showTab('no-glossary');
     });
 
     // Gestion du clic sur les blocs radio

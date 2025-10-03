@@ -3,12 +3,12 @@
 
 <div class="step-3 flex flex-col justify-between hidden">
     <div class="w-full">
-        <span class="font-poppins font-normal text-gray-600 mb-3 inline-block" style="font-size: 16px; line-height: 24px;">1. {% trans 'Select a field' %}</span>
+        <span class="font-poppins font-normal text-gray-600 mb-3 inline-block" style="font-size: 16px; line-height: 24px;">1. {% trans 'Select domain' %}</span>
         <ul class="domains-list flex flex-row flex-wrap items-start w-full gap-2"></ul>
     </div>
     <div class="w-full border-b-0.25 border-gray-200" style="margin-top: 32px; margin-bottom: 32px;"></div>
     <div class="flex-1">
-        <span class="font-poppins font-normal text-gray-600 inline-block" style="font-size: 16px; line-height: 24px; margin-bottom: 12px;">2. {% trans 'Select a lexicon' %}</span>
+        <span class="font-poppins font-normal text-gray-600 inline-block" style="font-size: 16px; line-height: 24px; margin-bottom: 12px;">2. {% trans 'Select a glossary' %}</span>
         <!-- Tabs -->
         <div class="w-full">
             <!-- Tab Navigation -->
@@ -17,19 +17,19 @@
                         id="step2-default"
                         class="tab-button active pr-4 pl-0 h-11"
                         data-tab="default">
-                    {% trans 'Default' %}
+                    {% trans 'Standard' %}
                 </button>
                 <button
-                        id="step2-my-lexicon"
+                        id="step2-my-glossary"
                         class="tab-button px-4 h-11"
-                        data-tab="my-lexicon">
-                    {% trans 'My lexicon' %}
+                        data-tab="my-glossary">
+                    {% trans 'My glossaries' %}
                 </button>
                 <button
-                        id="step2-no-lexicon"
+                        id="step2-no-glossary"
                         class="tab-button px-4 h-11"
-                        data-tab="no-lexicon">
-                    {% trans 'No lexicon' %}
+                        data-tab="no-glossary">
+                    {% trans 'No glossary' %}
                 </button>
             </div>
 
@@ -38,14 +38,14 @@
             <div id="step2-tab-default-content" class="tab-content py-2 active">
                 <div class="sub-domain-list flex flex-row flex-wrap items-start w-full gap-2"></div>
             </div>
-            <!-- Tab Content: My Lexicon -->
-            <div id="step2-tab-my-lexicon-content" class="tab-content py-2">
+            <!-- Tab Content: My glossaries -->
+            <div id="step2-tab-my-glossary-content" class="tab-content py-2">
                 <!-- Le contenu sera chargé dynamiquement par JavaScript -->
             </div>
             <!-- Tab Content: Information -->
-            <div id="step2-tab-no-lexicon-content" class="tab-content py-2">
+            <div id="step2-tab-no-glossary-content" class="tab-content py-2">
                 <div class="flex flex-col items-center justify-center">
-                    <p>{% trans 'You have chosen to use no lexicon' %}</p>
+                    <p>{% trans 'You have chosen to use no glossary' %}</p>
                 </div>
             </div>
         </div>

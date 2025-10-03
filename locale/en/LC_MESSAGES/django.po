@@ -908,32 +908,32 @@ msgid "Detected language"
 msgstr "Detect language"
 
 #: legal/templates/translate/document_translate/step_domain/step_3.html:6
-msgid "Select a field"
-msgstr ""
+msgid "Select domain"
+msgstr "Select domain"
 
 #: legal/templates/translate/document_translate/step_domain/step_3.html:12
-msgid "Select a lexicon"
-msgstr ""
+msgid "Select a glossary"
+msgstr "Select a glossary"
 
 #: legal/templates/translate/document_translate/step_domain/step_3.html:22
-msgid "Default"
-msgstr "Glossaries"
+msgid "Standard"
+msgstr "Standard"
 
 #: legal/templates/translate/document_translate/step_domain/step_3.html:28
-msgid "My lexicon"
-msgstr ""
+msgid "My glossaries"
+msgstr "My glossaries"
 
 #: legal/templates/translate/document_translate/step_domain/step_3.html:34
-msgid "No lexicon"
-msgstr ""
+msgid "No glossary"
+msgstr "No glossary"
 
 #: legal/templates/translate/document_translate/step_domain/step_3.html:82
 msgid "Add a lexicon"
 msgstr ""
 
 #: legal/templates/translate/document_translate/step_domain/step_3.html:92
-msgid "You have chosen to use no lexicon"
-msgstr ""
+msgid "You have chosen to use no glossary"
+msgstr "You have chosen to use no glossary"
 
 #: legal/templates/translate/document_translate/step_4.html:43
 #: legal/templates/translate/document_translate/step_4.html:77
