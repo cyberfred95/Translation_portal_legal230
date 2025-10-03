@@ -253,13 +253,16 @@ $(document).ready(function () {
         } else if (currentStep === 3) {
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-4').removeClass('hidden').show();
-            $blockButtons.addClass('justify-between').removeClass('justify-end');
-            prevStep.show();
-            $('span', $nextButton).text($('span', $nextButton).data('confirm'));
+            $blockButtons.removeClass('justify-between').addClass('justify-end');
+            prevStep.hide();
+            $('span', $nextButton).text(language_code === 'en' ? 'Finish' : 'Terminé');
             $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             $('.stepindicator-2').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             $('.stepindicator-3').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             $('.stepindicator-4').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            
+            // Déclencher la requête de traduction à l'arrivée sur step_4
+            fileTranslate();
         } else if (currentStep === 4) {
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-5').removeClass('hidden').show();
@@ -323,10 +326,13 @@ $(document).ready(function () {
                 }
             }
 
-            console.log('currentStep : ' + currentStep);
             if (currentStep === 3) {
-                fileTranslate();
+                // Rediriger vers le dashboard quand on clique sur "Terminé"
+                window.location.href = '/fr/dashboard/';
+                return;
             }
+
+            console.log('currentStep : ' + currentStep);
 
             currentStep++;
             showStep(currentStep);
@@ -1338,114 +1344,90 @@ $(document).ready(function () {
     const $closeRevision = $('#close-revision');
 
     function updateProjectTable(projects) {
-        const tableBody = $('.projects tbody');
-        tableBody.empty();
-
+        const documentsContainer = $('#documents-container');
+        documentsContainer.empty();
 
         projects.forEach(project => {
-            const row = $('<tr></tr>');
-
-            row.append(`
-            <td>
-                <div class="border border-gray-300  border border-gray-300 glossary-item py-3 px-7.5 bg-gray-60 text-gray-600 rounded-md md:w-50 2xl:w-80 truncate text-3.25">
-
-                    ${project.source_file_name}
-                </div>
-            </td>
-        `);
-
-            const statusColumn = $('<td></td>');
-            const statusSpan = $('<span class="border border-gray-300 glossary-item py-3 px-7.5 bg-gray-175 rounded-md text-gray-600 font-medium"></span>');
-
-
-            switch (project.status) {
-                case 'Being translated':
-                    statusSpan.text('Processing...');
-                    statusSpan.addClass('text-green-500');
-                    break;
-                case 'Translated':
-                    statusSpan.text(language_code === 'en' ? 'Translated' : 'Document traduit');
-                    statusSpan.addClass('text-green-400');
-                    break;
-                case 'Sent to post-editing, not accepted yet':
-                    statusSpan.text(language_code === 'en' ? 'Request for quote sent' : 'Demande de devis envoyée');
-                    statusSpan.addClass('text-yellow-400');
-                    break;
-                case 'Sent to post-editing, accepted':
-                    statusSpan.text(language_code === 'en' ? 'Request for quote accepted' : 'Demande de devis acceptée');
-                    statusSpan.addClass('text-blue-400');
-                    break;
-                case 'Post-edited file uploaded':
-                    statusSpan.text(language_code === 'en' ? 'Request for quote accepted' : 'Demande de devis acceptée');
-                    statusSpan.addClass('text-green-300');
-                    break;
-                case 'Error':
-                    statusSpan.text(language_code === 'en' ? 'Error' : 'Erreur');
-                    statusSpan.addClass('text-red-400');
-                    break;
-                default:
-                    statusSpan.text(project.status);
-                    statusSpan.addClass('text-gray-600');
-                    break;
-            }
-            statusColumn.append(statusSpan);
-            row.append(statusColumn);
-
-            const downloadColumn = $('<td></td>');
-            const downloadButton = $(`
-            <button type=button class="bg-gray-600 disabled:bg-gray-225 flex gap-2.5 items-center text-white px-7.5 py-3 rounded-md download-file disabled:pointer-events-none" ${project.status !== 'Translated' ? 'disabled' : ''}>
-                 ${language_code === 'en' ? 'Download' : 'Télécharger'}
-                <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g clip-path="url(#clip0_759_2185)">
-                        <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z" fill="currentColor"/>
-                        <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z" fill="currentColor"/>
-                    </g>
-                    <defs>
-                        <clipPath id="clip0_759_2185">
-                            <rect width="16" height="16" fill="white" transform="translate(0.333984)"/>
-                        </clipPath>
-                    </defs>
-                </svg>
-            </button>
-        `);
-            downloadButton.attr('data-translated-file', project.translated_file);
-            if (project.reviewed_file) {
-                downloadButton.attr('data-reviewed-file', project.reviewed_file);
-            }
-            downloadColumn.append(downloadButton);
-            row.append(downloadColumn);
-
-            const revisionColumn = $('<td class="flex justify-end"></td>');
-            const revisionButton = $(`
-            <button
-                type="button"
-                data-translated-file="${project.translated_file}"
-                data-id="${project.id}"
-                class="text-white flex gap-2.5 items-center bg-green-700 border border-green-700 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none expert-revision"
-                ${project.status !== 'Translated' ? 'disabled' : ''}
-            >
-                ${language_code === 'en' ? "Human revision" : "Relecture expert"}
-                <div class="relative group">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z" fill="currentColor"/>
-                    </svg>
-                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 bg-green-700 text-white text-2.75 rounded-md bottom-30 left-1/2 transform -translate-x-1/2 translate-y-full">
-                        <span class="py-4 px-4.5 text-justify text-wrap block">
-                                              ${language_code === 'en' ? 'Click the button to see options for improving the quality of the translated file.' : "Cliquez sur ce bouton pour afficher les options de relecture disponibles"}
+            // Créer la ligne du document avec le style original de step_4
+            const documentRow = $(`
+                <div class="w-full flex flex-row border-b-0.25 border-gray-100 h-16 justify-center items-center">
+                    <div class="flex flex-row justify-center items-center w-18">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 2V8H20" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 13H8" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 17H8" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M10 9H8" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center w-160">
+                        <div class="flex flex-col p-2">
+                            <div class="w-full flex flex-wrap">${project.source_file_name}</div>
+                            <div class="w-full flex flex-wrap">${project.file_size || 'N/A'} &bull; ${project.pages || 'N/A'} pages</div>
+                        </div>
+                    </div>
+                    <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center w-64">
+                        <div>${sourceLanguage.toUpperCase()} → ${targetLanguage.toUpperCase()}</div>
+                    </div>
+                    <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center w-160">
+                        <span class="status-badge status-completed">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 6L9 17L4 12" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            ${getStatusText(project.status)}
                         </span>
-                        <div class="absolute w-3 h-3 bg-green-700 transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5"></div>
+                    </div>
+                    <div class="text-base text-[#5a5a78] h-12 flex flex-row flex-grow justify-center items-center w-full">
+                        <div class="flex">
+                            <div class="flex items-center justify-center border border-0.25 border-gray-100 rounded-full py-0.5 px-4 download-file" 
+                                 data-translated-file="${project.translated_file}" 
+                                 data-reviewed-file="${project.reviewed_file || ''}"
+                                 style="cursor: ${project.status === 'Translated' ? 'pointer' : 'not-allowed'}; opacity: ${project.status === 'Translated' ? '1' : '0.5'};">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span class="ml-2">${language_code === 'en' ? 'Download' : 'Télécharger'}</span>
+                            </div>
+                            <div class="flex items-center justify-center text-base text-green-800 border-b border-green-600 font-poppins p-1 ml-2 expert-revision" 
+                                 data-translated-file="${project.translated_file}" 
+                                 data-id="${project.id}"
+                                 style="cursor: ${project.status === 'Translated' ? 'pointer' : 'not-allowed'}; opacity: ${project.status === 'Translated' ? '1' : '0.5'};">
+                                ${language_code === 'en' ? 'Expert Review' : 'Relecture expert'}
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="ml-2">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </button>
-        `);
-            revisionColumn.append(revisionButton);
-            row.append(revisionColumn);
+            `);
 
-            tableBody.append(row);
+            documentsContainer.append(documentRow);
         });
 
         initializeDownloadButtons();
         initializeRevisionButtons();
+    }
+
+    function getStatusText(status) {
+        switch (status) {
+            case 'Being translated':
+                return language_code === 'en' ? 'Processing...' : 'En cours...';
+            case 'Translated':
+                return language_code === 'en' ? 'Translated document' : 'Document traduit';
+            case 'Sent to post-editing, not accepted yet':
+                return language_code === 'en' ? 'Request for quote sent' : 'Demande de devis envoyée';
+            case 'Sent to post-editing, accepted':
+                return language_code === 'en' ? 'Request for quote accepted' : 'Demande de devis acceptée';
+            case 'Post-edited file uploaded':
+                return language_code === 'en' ? 'Proofread document uploaded' : 'Document relu importé';
+            case 'Error':
+                return language_code === 'en' ? 'Error' : 'Erreur';
+            default:
+                return status;
+        }
     }
 
 
