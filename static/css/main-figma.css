@@ -75,7 +75,8 @@
 .btn-green { background: #166534; color: #fff; }
 .btn-outline { background: #fff; color: #181932; border: 1px solid #0002; }
 .btn-outline svg { color: #181932; }
-.table-container { background: #fff; padding: 2rem; border-radius: 12px; margin-top: 0; width: 100%; }
+.table-container { background: #fff; padding: 2rem 2rem 0 2rem; border-radius: 12px 12px 0 0; margin-top: 0; width: 100%; }
+.block-buttons { margin-top: 0; }
 .dashboard-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .dashboard-table th, .dashboard-table td { padding: 1rem; text-align: left; box-sizing: border-box; overflow: hidden; }
 .dashboard-table th:not(:first-child),
