@@ -253,8 +253,8 @@ $(document).ready(function () {
         } else if (currentStep === 3) {
             $("div[class^='step-']").addClass('hidden').hide();
             $('.step-4').removeClass('hidden').show();
-            $blockButtons.removeClass('justify-between').addClass('justify-end');
-            prevStep.hide();
+            $blockButtons.addClass('justify-between').removeClass('justify-end');
+            prevStep.show();
             $('span', $nextButton).text(language_code === 'en' ? 'Finish' : 'Terminé');
             $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             $('.stepindicator-2').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
@@ -1348,60 +1348,41 @@ $(document).ready(function () {
         documentsContainer.empty();
 
         projects.forEach(project => {
-            // Créer la ligne du document avec le style original de step_4
+            // Créer la ligne du document avec le style du dashboard
             const documentRow = $(`
-                <div class="w-full flex flex-row border-b-0.25 border-gray-100 h-16 justify-center items-center">
-                    <div class="flex flex-row justify-center items-center w-18">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M14 2V8H20" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M16 13H8" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M16 17H8" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M10 9H8" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center w-160">
-                        <div class="flex flex-col p-2">
-                            <div class="w-full flex flex-wrap">${project.source_file_name}</div>
-                            <div class="w-full flex flex-wrap">${project.file_size || 'N/A'} &bull; ${project.pages || 'N/A'} pages</div>
-                        </div>
-                    </div>
-                    <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center w-64">
-                        <div>${sourceLanguage.toUpperCase()} → ${targetLanguage.toUpperCase()}</div>
-                    </div>
-                    <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center w-160">
-                        <span class="status-badge status-completed">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20 6L9 17L4 12" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                <tr>
+                    <td>
+                        <span class="doc-title">${project.source_file_name}</span>
+                        <span class="doc-subtitle">${project.file_size || 'N/A'} &bull; ${project.pages || 'N/A'} pages</span>
+                    </td>
+                    <td>
+                        <span class="lang-label">${sourceLanguage.toUpperCase()} → ${targetLanguage.toUpperCase()}</span>
+                    </td>
+                    <td class="status-col">
+                        <span class="status-badge ${getStatusClass(project.status)}">
+                            <i class="ph ${getStatusIcon(project.status)}" style="font-size: 16px;"></i>
                             ${getStatusText(project.status)}
                         </span>
-                    </div>
-                    <div class="text-base text-[#5a5a78] h-12 flex flex-row flex-grow justify-center items-center w-full">
-                        <div class="flex">
-                            <div class="flex items-center justify-center border border-0.25 border-gray-100 rounded-full py-0.5 px-4 download-file" 
-                                 data-translated-file="${project.translated_file}" 
-                                 data-reviewed-file="${project.reviewed_file || ''}"
-                                 style="cursor: ${project.status === 'Translated' ? 'pointer' : 'not-allowed'}; opacity: ${project.status === 'Translated' ? '1' : '0.5'};">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                <span class="ml-2">${language_code === 'en' ? 'Download' : 'Télécharger'}</span>
-                            </div>
-                            <div class="flex items-center justify-center text-base text-green-800 border-b border-green-600 font-poppins p-1 ml-2 expert-revision" 
-                                 data-translated-file="${project.translated_file}" 
-                                 data-id="${project.id}"
-                                 style="cursor: ${project.status === 'Translated' ? 'pointer' : 'not-allowed'}; opacity: ${project.status === 'Translated' ? '1' : '0.5'};">
-                                ${language_code === 'en' ? 'Expert Review' : 'Relecture expert'}
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="ml-2">
-                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    </td>
+                    <td class="table-actions">
+                        <button 
+                            class="download-file" 
+                            data-translated-file="${project.translated_file}" 
+                            data-reviewed-file="${project.reviewed_file || ''}"
+                            title="${language_code === 'en' ? 'Download' : 'Télécharger'}"
+                            ${project.status !== 'Translated' ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                            <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
+                        </button>
+                        <button 
+                            class="expert-revision" 
+                            data-translated-file="${project.translated_file}" 
+                            data-id="${project.id}"
+                            title="${language_code === 'en' ? 'Expert Review' : 'Relecture expert'}"
+                            ${project.status !== 'Translated' ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                            <i class="ph ph-user-focus" style="font-size: 16px; color: #16a34a;"></i>
+                        </button>
+                    </td>
+                </tr>
             `);
 
             documentsContainer.append(documentRow);
@@ -1427,6 +1408,42 @@ $(document).ready(function () {
                 return language_code === 'en' ? 'Error' : 'Erreur';
             default:
                 return status;
+        }
+    }
+
+    function getStatusClass(status) {
+        switch (status) {
+            case 'Being translated':
+                return 'status-progress';
+            case 'Translated':
+                return 'status-completed';
+            case 'Sent to post-editing, not accepted yet':
+            case 'Sent to post-editing, accepted':
+                return 'status-attention';
+            case 'Post-edited file uploaded':
+                return 'status-completed';
+            case 'Error':
+                return 'status-error';
+            default:
+                return 'status-default';
+        }
+    }
+
+    function getStatusIcon(status) {
+        switch (status) {
+            case 'Being translated':
+                return 'ph-clock-clockwise';
+            case 'Translated':
+                return 'ph-check-circle';
+            case 'Sent to post-editing, not accepted yet':
+            case 'Sent to post-editing, accepted':
+                return 'ph-hourglass';
+            case 'Post-edited file uploaded':
+                return 'ph-check-circle';
+            case 'Error':
+                return 'ph-warning-circle';
+            default:
+                return 'ph-circle';
         }
     }
 

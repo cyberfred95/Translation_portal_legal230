@@ -75,7 +75,7 @@
 .btn-green { background: #166534; color: #fff; }
 .btn-outline { background: #fff; color: #181932; border: 1px solid #0002; }
 .btn-outline svg { color: #181932; }
-.table-container { background: #fff; padding: 2rem; border-radius: 12px; margin-top: 2rem; width: 100%; }
+.table-container { background: #fff; padding: 2rem; border-radius: 12px; margin-top: 0; width: 100%; }
 .dashboard-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .dashboard-table th, .dashboard-table td { padding: 1rem; text-align: left; box-sizing: border-box; overflow: hidden; }
 .dashboard-table th:not(:first-child),
@@ -99,17 +99,10 @@
 .dashboard-table thead th .th-label { display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dashboard-table td { font-size: 1rem; color: #181932; vertical-align: middle; }
 .dashboard-table td .lang-label { display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dashboard-table th:nth-child(1), .dashboard-table td:nth-child(1) { width: 35%; white-space: normal; word-break: break-word; hyphens: auto; }
-.dashboard-table th:nth-child(2), .dashboard-table td:nth-child(2) { width: 20%; white-space: normal; word-break: break-word; hyphens: auto; }
-.dashboard-table th:nth-child(4), .dashboard-table td:nth-child(4) { width: 200px; }
-.dashboard-table th:nth-child(5), .dashboard-table td:nth-child(5) { width: 150px; }
-/* Colonnes étroites: empêcher le retour à la ligne et couper proprement */
-.dashboard-table th:nth-child(2), .dashboard-table td:nth-child(2),
-.dashboard-table th:nth-child(4), .dashboard-table td:nth-child(4),
-.dashboard-table th:nth-child(5), .dashboard-table td:nth-child(5) {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
+.dashboard-table th:nth-child(1), .dashboard-table td:nth-child(1) { width: 45%; white-space: normal; word-break: break-word; hyphens: auto; }
+.dashboard-table th:nth-child(2), .dashboard-table td:nth-child(2) { width: 20%; white-space: nowrap; text-overflow: ellipsis; }
+.dashboard-table th:nth-child(3), .dashboard-table td:nth-child(3) { width: 25%; white-space: nowrap; text-overflow: ellipsis; }
+.dashboard-table th:nth-child(4), .dashboard-table td:nth-child(4) { width: 10%; white-space: nowrap; text-overflow: ellipsis; }
 .doc-title { font-weight: 500; color: #181932; display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .doc-subtitle { color: #5a5a78; font-size: 0.95rem; }
 .status-badge {
@@ -130,7 +123,7 @@
 .table-actions { display: flex; gap: 0.5rem; justify-content: center; width: 100%; }
 .table-actions button { background: none; border: none; cursor: pointer; }
 /* Centrage explicite de la colonne Actions */
-.dashboard-table th:nth-child(5), .dashboard-table td:nth-child(5) { text-align: center; }
+.dashboard-table th:nth-child(4), .dashboard-table td:nth-child(4) { text-align: center; }
 .filters-row { display: flex; gap: 1rem; margin-bottom: 1rem; }
 .filter-select { padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid #0002; background: #fff; color: #5a5a78; font-size: 1rem; min-width: 179px; }
 @media (max-width: 1000px) {
@@ -138,24 +131,24 @@
   .quick-actions { min-width: unset; width: 100%; flex: 0 0 100%; align-self: stretch; }
   .dashboard-top { flex-direction: column; align-items: stretch; }
   .dashboard-top > * { width: 100%; }
-  /* Masquer Statut (colonne 3) et Date de création (colonne 4) */
+  /* Masquer Language (colonne 2) et Status (colonne 3) */
+  .dashboard-table thead th:nth-child(2),
+  .dashboard-table tbody td:nth-child(2),
   .dashboard-table thead th:nth-child(3),
-  .dashboard-table tbody td:nth-child(3),
-  .dashboard-table thead th:nth-child(4),
-  .dashboard-table tbody td:nth-child(4) {
+  .dashboard-table tbody td:nth-child(3) {
     display: none;
   }
   /* Recentrer et stabiliser la colonne Actions sous 1000px */
-  .dashboard-table th:nth-child(5),
-  .dashboard-table td:nth-child(5) {
+  .dashboard-table th:nth-child(4),
+  .dashboard-table td:nth-child(4) {
     text-align: center;
     width: auto;
   }
-  .dashboard-table td:nth-child(5) .table-actions {
+  .dashboard-table td:nth-child(4) .table-actions {
     width: 100%;
     justify-content: center;
   }
-  .dashboard-table td:nth-child(5) .table-actions button {
+  .dashboard-table td:nth-child(4) .table-actions button {
     margin: 0 auto;
   }
 }
