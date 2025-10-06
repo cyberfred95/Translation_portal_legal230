@@ -1568,6 +1568,8 @@ $(document).ready(function () {
     });
 
     const startStatusCheck = (projectIds) => {
+        let statusCheckInterval;
+        
         const checkDocumentStatus = () => {
             let params = new URLSearchParams();
 
@@ -1591,6 +1593,14 @@ $(document).ready(function () {
                         $('.show-modal-true').removeClass('hidden');
                     }
                     updateProjectTable(response);
+                    
+                    // Vérifier si tous les projets ont un statut différent de "Being translated"
+                    const allProjectsFinished = response.every(project => project.status !== 'Being translated');
+                    
+                    if (allProjectsFinished) {
+                        console.log('Tous les projets sont terminés, arrêt de la boucle de vérification');
+                        clearInterval(statusCheckInterval);
+                    }
                 },
                 error: function (error) {
                     errorNotification(error?.status, error?.responseJSON?.detail);
@@ -1603,7 +1613,7 @@ $(document).ready(function () {
 
         checkDocumentStatus();
 
-        setInterval(checkDocumentStatus, 10000);
+        statusCheckInterval = setInterval(checkDocumentStatus, 10000);
     };
 
     function showTab(tabId) {
