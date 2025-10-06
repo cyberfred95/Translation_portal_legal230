@@ -1551,10 +1551,17 @@ $(document).ready(function () {
             dataType: 'json',
             success: function () {
                 const projectRow = $(`button[data-id="${id}"]`).closest('tr');
-                const statusSpan = projectRow.find('td:eq(1) span');
-                statusSpan.addClass('text-yellow-400');
-
-                statusSpan.text(language_code === 'en' ? 'Request for quote sent' : 'Demande de devis envoyée');
+                
+                // Mettre à jour le badge de statut (colonne 3, index 2)
+                const statusBadge = projectRow.find('td:eq(2) .status-badge');
+                statusBadge.removeClass('status-completed status-progress status-error status-default')
+                    .addClass('status-attention');
+                statusBadge.find('i').removeClass().addClass('ph ph-hourglass');
+                statusBadge.contents().filter(function() {
+                    return this.nodeType === 3; // Text node
+                }).last().replaceWith(language_code === 'en' ? 'Request for quote sent' : 'Demande de devis envoyée');
+                
+                // Désactiver le bouton de révision
                 projectRow.find('.expert-revision').prop('disabled', true).addClass('disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225');
 
                 $modalRevision.addClass('hidden');
