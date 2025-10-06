@@ -911,6 +911,10 @@ msgstr "Detect language"
 msgid "Select domain"
 msgstr "Select domain"
 
+#: legal/templates/translate/document_translate/step_domain/step_3.html:14
+msgid "Select subdomain"
+msgstr "Select subdomain"
+
 #: legal/templates/translate/document_translate/step_domain/step_3.html:12
 msgid "Select a glossary"
 msgstr "Select a glossary"
@@ -1248,9 +1252,6 @@ msgstr ""
 # ####################### STEP 4 ########
 #~ msgid "Terminology"
 #~ msgstr "Glossaries"
-
-#~ msgid "My glossaries"
-#~ msgstr "My glossaries"
 
 #, fuzzy
 #~| msgid "Status"
