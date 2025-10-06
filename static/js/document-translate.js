@@ -1384,12 +1384,11 @@ $(document).ready(function () {
                             <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
                         </button>
                         <button 
-                            class="expert-revision" 
+                            class="expert-revision text-green-600 hover:text-green-700 font-poppins text-sm font-normal underline" 
                             data-translated-file="${project.translated_file}" 
                             data-id="${project.id}"
-                            title="${language_code === 'en' ? 'Expert Review' : 'Relecture expert'}"
-                            ${project.status !== 'Translated' ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
-                            <i class="ph ph-user-focus" style="font-size: 16px; color: #16a34a;"></i>
+                            ${project.status !== 'Translated' ? 'disabled style="opacity: 0.5; cursor: not-allowed; text-decoration: none;"' : ''}>
+                            ${language_code === 'en' ? 'Expert review' : 'Révision d\'un expert'}
                         </button>
                     </td>
                 </tr>

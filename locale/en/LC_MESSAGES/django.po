@@ -807,7 +807,7 @@ msgstr "Download"
 #, fuzzy
 #| msgid "Expert revision"
 msgid "Expert review"
-msgstr "Get a quote"
+msgstr "Expert review"
 
 #: legal/templates/project_history_2.html:260
 #: stats/templates/usage_history.html:306

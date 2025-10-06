@@ -805,7 +805,7 @@ msgstr "Télécharger"
 #, fuzzy
 #| msgid "Expert revision"
 msgid "Expert review"
-msgstr "Recevoir un devis"
+msgstr "Révision d'un expert"
 
 #: legal/templates/project_history_2.html:260
 #: stats/templates/usage_history.html:306
