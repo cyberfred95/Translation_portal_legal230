@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" 
+           xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides" 
+           xsi:type="TaskPaneApp">
+  <Id>f3d3a3e8-faff-4b52-8698-a2e444a25382</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Legal 230</ProviderName>
+  <DefaultLocale>fr-FR</DefaultLocale>
+  <DisplayName DefaultValue="Lexa traducteur juridique" />
+  <Description DefaultValue="Extension de traduction juridique pour Word" />
+  
+  <!-- Localized display names -->
+  <DisplayName>
+    <Override Locale="en-US" Value="Lexa Legal Translator" />
+    <Override Locale="es-ES" Value="Lexa traductor jurídico" />
+    <Override Locale="de-DE" Value="Lexa Rechtsübersetzer" />
+    <Override Locale="it-IT" Value="Lexa traduttore legale" />
+  </DisplayName>
+  
+  <!-- Localized descriptions -->
+  <Description>
+    <Override Locale="en-US" Value="Legal translation extension for Word" />
+    <Override Locale="es-ES" Value="Extensión de traducción jurídica pour Word" />
+    <Override Locale="de-DE" Value="Rechtsübersetzung Erweiterung für Word" />
+    <Override Locale="it-IT" Value="Estensione di traduzione legale per Word" />
+  </Description>
+  
+  <IconUrl DefaultValue="https://api.portail.lexamt.fr/word_add_in/assets/icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="https://api.portail.lexamt.fr/word_add_in/assets/icon-64.png" />
+  <SupportUrl DefaultValue="https://www.lexamt.com/" />
+  <AppDomains>
+    <AppDomain>https://api.portail.lexamt.fr</AppDomain>
+  </AppDomains>
+  <Hosts>
+    <Host Name="Document" />
+  </Hosts>
+  <Requirements>
+    <Sets>
+      <Set Name="WordApi" MinVersion="1.3" />
+    </Sets>
+  </Requirements>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://api.portail.lexamt.fr/word_add_in/src/taskpane/taskpane.html" />
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+  
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Document">
+        <DesktopFormFactor>
+          <GetStarted>
+            <Title resid="GetStarted.Title" />
+            <Description resid="GetStarted.Description" />
+            <LearnMoreUrl resid="GetStarted.LearnMoreUrl" />
+          </GetStarted>
+          <FunctionFile resid="Commands.Url" />
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <OfficeTab id="TabHome">
+              <Group id="CommandsGroup">
+                <Label resid="CommandsGroup.Label" />
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16x16" />
+                  <bt:Image size="32" resid="Icon.32x32" />
+                  <bt:Image size="64" resid="Icon.64x64" />
+                  <bt:Image size="80" resid="Icon.80x80"/>
+                </Icon>
+                <Control xsi:type="Button" id="TaskpaneButton">
+                  <Label resid="TaskpaneButton.Label" />
+                  <Supertip>
+                    <Title resid="TaskpaneButton.Label" />
+                    <Description resid="TaskpaneButton.Tooltip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16x16" />
+                    <bt:Image size="32" resid="Icon.32x32" />
+                    <bt:Image size="64" resid="Icon.64x64" />
+                    <bt:Image size="80" resid="Icon.80x80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>ButtonId1</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url" />
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16x16" DefaultValue="https://api.portail.lexamt.fr/word_add_in/assets/icon-16.png" />
+        <bt:Image id="Icon.32x32" DefaultValue="https://api.portail.lexamt.fr/word_add_in/assets/icon-32.png" />
+        <bt:Image id="Icon.64x64" DefaultValue="https://api.portail.lexamt.fr/word_add_in/assets/icon-64.png" />
+        <bt:Image id="Icon.80x80" DefaultValue="https://api.portail.lexamt.fr/word_add_in/assets/icon-80.png" />
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://go.microsoft.com/fwlink/?LinkId=276812" />
+        <bt:Url id="Commands.Url" DefaultValue="https://api.portail.lexamt.fr/word_add_in/src/commands/commands.html" />
+        <bt:Url id="Taskpane.Url" DefaultValue="https://api.portail.lexamt.fr/word_add_in/src/taskpane/taskpane.html" />
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="GetStarted.Title" DefaultValue="Lexa traduction juridique">
+          <bt:Override Locale="en-US" Value="Lexa Legal Translation" />
+          <bt:Override Locale="es-ES" Value="Lexa traducción jurídica" />
+          <bt:Override Locale="de-DE" Value="Lexa Rechtsübersetzung" />
+          <bt:Override Locale="it-IT" Value="Lexa traduzione legale" />
+        </bt:String>
+        
+        <bt:String id="CommandsGroup.Label" DefaultValue="Traducteur">
+          <bt:Override Locale="en-US" Value="Translator" />
+          <bt:Override Locale="es-ES" Value="Traductor" />
+          <bt:Override Locale="de-DE" Value="Übersetzer" />
+          <bt:Override Locale="it-IT" Value="Traduttore" />
+        </bt:String>
+        
+        <bt:String id="TaskpaneButton.Label" DefaultValue="Lexa" />
+      </bt:ShortStrings>
+      
+      <bt:LongStrings>
+        <bt:String id="GetStarted.Description" DefaultValue="Extension de traduction juridique">
+          <bt:Override Locale="en-US" Value="Legal translation extension" />
+          <bt:Override Locale="es-ES" Value="Extensión de traducción jurídica" />
+          <bt:Override Locale="de-DE" Value="Rechtsübersetzung Erweiterung" />
+          <bt:Override Locale="it-IT" Value="Estensione di traduzione legale" />
+        </bt:String>
+        
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Ouvre le panneau de traduction Lexa">
+          <bt:Override Locale="en-US" Value="Opens Lexa translation panel" />
+          <bt:Override Locale="es-ES" Value="Abre el panel de traducción Lexa" />
+          <bt:Override Locale="de-DE" Value="Öffnet das Lexa-Übersetzungspanel" />
+          <bt:Override Locale="it-IT" Value="Apre il pannello di traduzione Lexa" />
+        </bt:String>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>
+          <bt:Override Locale="de-DE" Value="Rechtsübersetzung Erweiterung" />
+          <bt:Override Locale="it-IT" Value="Estensione di traduzione legale" />
+        </bt:String>
+        
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Ouvre le panneau de traduction Lexa">
+          <bt:Override Locale="en-US" Value="Opens Lexa translation panel" />
+          <bt:Override Locale="es-ES" Value="Abre el panel de traducción Lexa" />
+          <bt:Override Locale="de-DE" Value="Öffnet das Lexa-Übersetzungspanel" />
+          <bt:Override Locale="it-IT" Value="Apre il pannello di traduzione Lexa" />
+        </bt:String>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>
+        
+        <!-- Italian -->
+        <bt:String id="GetStarted.Title">
+          <bt:Override Locale="it-IT" Value="Lexa traduzione legale" />
+        </bt:String>
+        <bt:String id="CommandsGroup.Label">
+          <bt:Override Locale="it-IT" Value="Traduttore" />
+        </bt:String>
+      </bt:ShortStrings>
+      
+      <bt:LongStrings>
+        <bt:String id="GetStarted.Description" DefaultValue="Extension de traduction juridique" />
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Ouvre le panneau de traduction Lexa" />
+        
+        <!-- English -->
+        <bt:String id="GetStarted.Description">
+          <bt:Override Locale="en-US" Value="Legal translation extension" />
+        </bt:String>
+        <bt:String id="TaskpaneButton.Tooltip">
+          <bt:Override Locale="en-US" Value="Opens Lexa translation panel" />
+        </bt:String>
+        
+        <!-- French -->
+        <bt:String id="GetStarted.Description">
+          <bt:Override Locale="fr-FR" Value="Extension de traduction juridique" />
+        </bt:String>
+        <bt:String id="TaskpaneButton.Tooltip">
+          <bt:Override Locale="fr-FR" Value="Ouvre le panneau de traduction Lexa" />
+        </bt:String>
+        
+        <!-- Spanish -->
+        <bt:String id="GetStarted.Description">
+          <bt:Override Locale="es-ES" Value="Extensión de traducción jurídica" />
+        </bt:String>
+        <bt:String id="TaskpaneButton.Tooltip">
+          <bt:Override Locale="es-ES" Value="Abre el panel de traducción Lexa" />
+        </bt:String>
+        
+        <!-- German -->
+        <bt:String id="GetStarted.Description">
+          <bt:Override Locale="de-DE" Value="Rechtsübersetzung Erweiterung" />
+        </bt:String>
+        <bt:String id="TaskpaneButton.Tooltip">
+          <bt:Override Locale="de-DE" Value="Öffnet das Lexa-Übersetzungspanel" />
+        </bt:String>
+        
+        <!-- Italian -->
+        <bt:String id="GetStarted.Description">
+          <bt:Override Locale="it-IT" Value="Estensione di traduzione legale" />
+        </bt:String>
+        <bt:String id="TaskpaneButton.Tooltip">
+          <bt:Override Locale="it-IT" Value="Apre il pannello di traduzione Lexa" />
+        </bt:String>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>

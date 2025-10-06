@@ -26,7 +26,6 @@ export function showSettingsView() {
  * Affiche la vue principale (traduction).
  */
 export function showMainView() {
-  console.log("showMainView appelée");
   const settingsView = document.getElementById("settings-view");
   const settingsBtn = document.getElementById("settings-btn");
   const success = document.getElementById("api-key-success");

@@ -8,8 +8,19 @@ import { handleSelectionChange as wordHandleSelectionChange } from '../office/wo
 import { setSourceLang, setTargetLang, setSelectedDomain } from '../utils/storage.js';
 import { chargerLanguesEtDomaines } from '../index.js';
 
-const TRANSLATION_PLACEHOLDER_TEXT = "Sélectionnez un texte";
-const TRANSLATION_LOADING_TEXT = "Traduction en cours...";
+// Accéder à i18n via window.i18n qui est défini globalement
+// pour éviter les imports circulaires
+const getI18n = () => window.i18n;
+
+const getPlaceholderText = () => {
+  const i18n = getI18n();
+  return i18n ? i18n.t('ui.selectText') : 'Sélectionnez un texte';
+};
+
+const getLoadingText = () => {
+  const i18n = getI18n();
+  return i18n ? i18n.t('ui.translating') : 'Traduction en cours...';
+};
 
 /**
  * Initialise tous les listeners de l'UI.
@@ -23,14 +34,24 @@ export function initializeUIEvents() {
   const replaceBtn = document.getElementById("replace-btn");
   const swapLanguagesBtn = document.getElementById("swap-languages");
 
-  if (settingsBtn) settingsBtn.addEventListener("click", () => {
-    const settingsView = document.getElementById("settings-view");
-    if (settingsView.style.display === "block") {
-      showMainView();
-    } else {
-      showSettingsView();
-    }
-  });
+  if (settingsBtn) {
+    // Supprimer les anciens listeners en clonant le bouton
+    const newSettingsBtn = settingsBtn.cloneNode(true);
+    settingsBtn.parentNode.replaceChild(newSettingsBtn, settingsBtn);
+    
+    // Réattacher le listener sur le nouveau bouton
+    const freshSettingsBtn = document.getElementById("settings-btn");
+    freshSettingsBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const settingsView = document.getElementById("settings-view");
+      if (settingsView && settingsView.style.display === "block") {
+        showMainView();
+      } else {
+        showSettingsView();
+      }
+    });
+  }
+  
   if (saveApiKeyBtn) saveApiKeyBtn.addEventListener("click", onSaveApiKey);
   if (testApiKeyBtn) testApiKeyBtn.addEventListener("click", onTestApiKey);
   if (backToMainBtn) backToMainBtn.addEventListener("click", showMainView);
@@ -42,14 +63,14 @@ export function initializeUIEvents() {
   if (swapLanguagesBtn) swapLanguagesBtn.addEventListener("click", swapLanguages);
 
   // Gestion du changement de sélection Word - vérifier que Office.context est disponible
-  if (Office && Office.context && Office.context.document) {
+  if (typeof Office !== 'undefined' && Office.context && Office.context.document) {
     Office.context.document.addHandlerAsync(Office.EventType.DocumentSelectionChanged, wordHandleSelectionChange, (asyncResult) => {
       if (asyncResult.status === Office.AsyncResultStatus.Failed) {
-        console.error("Impossible d'enregistrer le gestionnaire de changement de sélection.");
+        // Gestion silencieuse des erreurs d'enregistrement du handler
       }
     });
   } else {
-    console.warn("Office.context not available during initialization");
+    // Contexte Office non disponible (mode développement ou hors Word)
   }
 
   // Ajout des listeners pour sauvegarder la sélection de langue
@@ -81,20 +102,21 @@ function onSaveApiKey() {
   const successMessage = document.getElementById("api-key-success");
   const errorMessage = document.getElementById("api-key-error");
   const previousApiKey = getApiKey();
+  const i18n = getI18n();
 
   setApiKey(apiKey);
   errorMessage.style.display = "none";
 
   if (!apiKey) {
     if (previousApiKey) {
-      successMessage.textContent = "API supprimée";
+      successMessage.textContent = i18n ? i18n.t('ui.apiKeyDeleted') : 'API supprimée';
       successMessage.style.display = "block";
     } else {
       successMessage.textContent = "";
       successMessage.style.display = "none";
     }
   } else {
-    successMessage.textContent = "Clé API sauvegardée. Testez ou retournez à l'accueil.";
+    successMessage.textContent = i18n ? i18n.t('ui.apiKeySaved') : 'Clé API sauvegardée. Testez ou retournez à l\'accueil.';
     successMessage.style.display = "block";
     // Ne pas recharger automatiquement les langues et domaines depuis la vue paramètres
     // L'utilisateur peut tester la clé ou retourner à l'accueil où les langues seront chargées
@@ -103,27 +125,28 @@ function onSaveApiKey() {
 
 async function onTestApiKey() {
   const apiKey = getApiKey();
+  const i18n = getI18n();
 
   if (!apiKey) {
-    setTestResult("Veuillez d'abord sauvegarder une clé API.");
+    setTestResult(i18n ? i18n.t('ui.apiKeyPrompt') : 'Veuillez configurer votre clé API dans les paramètres pour utiliser Lexa.');
     document.getElementById("test-result").style.color = "#dc2626";
     return;
   }
 
-  setTestResult("Test en cours...");
+  setTestResult(i18n ? i18n.t('ui.translating') : 'Traduction en cours...');
   document.getElementById("test-result").style.color = "#6b7280";
 
   try {
     const ok = await testApiKey(apiKey);
     if (ok) {
-      setTestResult("Connexion réussie ! L'API est fonctionnelle.");
+      setTestResult(i18n ? i18n.t('ui.apiKeyValid') : 'Clé API valide');
       document.getElementById("test-result").style.color = "#16a34a";
     } else {
-      setTestResult(`Échec de la connexion.`);
+      setTestResult(i18n ? i18n.t('ui.apiKeyInvalid') : 'Clé API invalide');
       document.getElementById("test-result").style.color = "#dc2626";
     }
   } catch (error) {
-    setTestResult(`Erreur réseau: ${error.message}`);
+    setTestResult(`${i18n ? i18n.t('ui.translationError') : 'Erreur lors de la traduction'}: ${error.message}`);
     document.getElementById("test-result").style.color = "#dc2626";
   }
 }
@@ -146,9 +169,10 @@ async function insertTranslationWithoutReplace() {
   const sourceLang = document.getElementById("source-lang").value;
   const targetLang = document.getElementById("target-lang").value;
   const domain = document.getElementById("domain").value;
+  const i18n = getI18n();
 
   if (!apiKey) {
-    showError("Clé API non configurée.");
+    showError(i18n ? i18n.t('ui.apiKeyRequired') : 'Clé API requise');
     showSettingsView();
     return;
   }
@@ -162,7 +186,8 @@ async function insertTranslationWithoutReplace() {
         // Affiche l'animation de chargement dans l'encadré
         const resultBox = document.getElementById("translation-result");
         if (resultBox) {
-          resultBox.innerHTML = `<span class=\"translation-loading\" style=\"font-style:italic; color:#888;\">${TRANSLATION_LOADING_TEXT}<span class=\"dot\">.</span><span class=\"dot\">.</span><span class=\"dot\">.</span></span>`;
+          const loadingText = getLoadingText();
+          resultBox.innerHTML = `<span class="translation-loading" style="font-style:italic; color:#888;">${loadingText}<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span>`;
           resultBox.style.display = "block";
           const replaceBtn = document.getElementById("replace-btn");
           if (replaceBtn) replaceBtn.disabled = true;
@@ -179,27 +204,30 @@ async function insertTranslationWithoutReplace() {
           resultBox.style.display = "block";
           const replaceBtn = document.getElementById("replace-btn");
           // Active le bouton seulement si on a une vraie traduction
+          const placeholderText = getPlaceholderText();
+          const loadingText = getLoadingText();
           const isValid = Array.isArray(translatedText)
-            ? translatedText.some(line => line && line.trim() && line !== TRANSLATION_PLACEHOLDER_TEXT && !line.startsWith(TRANSLATION_LOADING_TEXT))
-            : (translatedText && translatedText.trim() && translatedText !== TRANSLATION_PLACEHOLDER_TEXT && !translatedText.startsWith(TRANSLATION_LOADING_TEXT));
+            ? translatedText.some(line => line && line.trim() && line !== placeholderText && !line.startsWith(loadingText))
+            : (translatedText && translatedText.trim() && translatedText !== placeholderText && !translatedText.startsWith(loadingText));
           if (replaceBtn) replaceBtn.disabled = !isValid;
           updateReplaceBtnState();
         }
       } else {
-        showError("Veuillez sélectionner du texte à traduire.");
+        showError(i18n ? i18n.t('ui.noTextSelected') : 'Aucun texte sélectionné');
       }
     });
   } catch (error) {
-    console.error(error);
-    showError(`Erreur: ${error.message || error.toString()}`);
+    const errorMsg = i18n ? i18n.t('ui.translationError') : 'Erreur lors de la traduction';
+    showError(`${errorMsg}: ${error.message || error.toString()}`);
   }
 }
 
 // Nouvelle fonction : remplace la sélection Word par le texte de l'encadré de traduction
 async function replaceSelectionWithTranslationBox() {
+  const i18n = getI18n();
   const resultBox = document.getElementById("translation-result");
   if (!resultBox || resultBox.style.display === "none" || !resultBox.textContent.trim()) {
-    showError("Aucune traduction à insérer.");
+    showError(i18n ? i18n.t('ui.noTextSelected') : 'Aucun texte sélectionné');
     return;
   }
   // Récupère toutes les lignes (chaque div) ou le texte brut
@@ -208,9 +236,11 @@ async function replaceSelectionWithTranslationBox() {
     lines = [resultBox.textContent];
   }
   // Vérifie qu'il ne s'agit pas du placeholder ou du loading
-  const isValid = lines.some(line => line && line.trim() && line !== TRANSLATION_PLACEHOLDER_TEXT && !line.startsWith(TRANSLATION_LOADING_TEXT));
+  const placeholderText = getPlaceholderText();
+  const loadingText = getLoadingText();
+  const isValid = lines.some(line => line && line.trim() && line !== placeholderText && !line.startsWith(loadingText));
   if (!isValid) {
-    showError("Aucune traduction à insérer.");
+    showError(i18n ? i18n.t('ui.noTextSelected') : 'Aucun texte sélectionné');
     return;
   }
   const textToInsert = lines.join("\n");
@@ -222,14 +252,13 @@ async function replaceSelectionWithTranslationBox() {
       if (range.text.length > 0) {
         range.insertText(textToInsert, Word.InsertLocation.replace);
         await context.sync();
-        // showSuccess("La traduction a été insérée dans le document.");
       } else {
-        showError("Veuillez sélectionner du texte à remplacer.");
+        showError(i18n ? i18n.t('ui.noTextSelected') : 'Aucun texte sélectionné');
       }
     });
   } catch (error) {
-    console.error(error);
-    showError(`Erreur: ${error.message || error.toString()}`);
+    const errorMsg = i18n ? i18n.t('ui.translationError') : 'Erreur lors de la traduction';
+    showError(`${errorMsg}: ${error.message || error.toString()}`);
   }
 }
 
@@ -239,7 +268,9 @@ export function updateReplaceBtnState() {
   if (resultBox) {
     let lines = Array.from(resultBox.querySelectorAll('div')).map(div => div.textContent);
     if (lines.length === 0) lines = [resultBox.textContent];
-    hasValidTranslation = lines.some(line => line && line.trim() && line !== TRANSLATION_PLACEHOLDER_TEXT && !line.startsWith(TRANSLATION_LOADING_TEXT));
+    const placeholderText = getPlaceholderText();
+    const loadingText = getLoadingText();
+    hasValidTranslation = lines.some(line => line && line.trim() && line !== placeholderText && !line.startsWith(loadingText));
   }
   return hasValidTranslation;
 } 
