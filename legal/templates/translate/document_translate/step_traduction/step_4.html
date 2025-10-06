@@ -1,0 +1,26 @@
+{% load static %}
+{% load i18n %}
+<div class="step-4 hidden">
+    <div class="table-container">
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-file-text" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Document' %}</span></span></th>
+                    <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-megaphone" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Language' %}</span></span></th>
+                    <th class="status-col"><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-clock-clockwise" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Status' %}</span></th>
+                    <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-wrench" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Actions' %}</span></span></th>
+                </tr>
+            </thead>
+            <tbody id="documents-container">
+                <!-- LOADER ROW -->
+                <tr id="loader-row" class="hidden">
+                    <td colspan="4" style="text-align: center; padding: 2rem;">
+                        <span class="loader"></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    {% include 'translate/document_translate/step_traduction/step_traduction_modal_review.html' %}
+</div>

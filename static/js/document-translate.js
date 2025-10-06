@@ -1364,8 +1364,7 @@ $(document).ready(function () {
                 <tr>
                     <td>
                         <span class="doc-title">${project.source_file_name}</span>
-                        <span class="doc-subtitle">${project.file_size || 'N/A'} &bull; ${project.pages || 'N/A'} pages</span>
-            </td>
+                    </td>
                     <td>
                         <span class="lang-label">${sourceLanguage.toUpperCase()} → ${targetLanguage.toUpperCase()}</span>
                     </td>
