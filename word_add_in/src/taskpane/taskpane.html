@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Lexa Traducteur juridique</title>
+    <title data-i18n="ui.title">Lexa traducteur juridique</title>
     <link rel="icon" type="image/png" href="../../assets/favicon.png">
     <link rel="stylesheet" type="text/css" href="../ui/styles.css">
     <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
@@ -17,40 +17,54 @@
                 <div class="logo">
                     <img src="../../assets/logo_lexa.svg" alt="Lexa Logo">
                 </div>
-                <button id="settings-btn" class="settings-btn" title="Paramètres">
+                <div class="header-controls">
+                    <!-- Sélecteur de langue avec drapeaux -->
+                    <div class="custom-select" id="language-selector">
+                        <div class="select-button" id="language-select-button" data-i18n-title="ui.selectLanguage" title="Choisir la langue de l'interface">
+                            <img src="../../assets/flags/fr.svg" class="flag-img" id="selected-flag" alt="FR" />
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="options-container" id="language-options">
+                            <!-- Les options seront remplies dynamiquement par JavaScript -->
+                        </div>
+                    </div>
+                    <button id="settings-btn" class="settings-btn" data-i18n-title="ui.settings" title="Paramètres">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                </button>
+                    </button>
+                </div>
             </div>
         </div>
 
         <div id="added-value" class="info-message" style="display: none;">
-            <strong>Lexa add-in for word</strong> est conçue pour les professionnels du droit, ayant besoin d’une traduction de qualité pour leurs documents juridiques.
-            Pour obtenir un abonnement, contactez le support Lexa: <strong>support@lexamt.com </strong>
+            <strong data-i18n="ui.addedValueTitle">Lexa add-in for Word</strong>
+            <span data-i18n="ui.addedValueDescription">est conçue pour les professionnels du droit, ayant besoin d’une traduction de qualité pour leurs documents juridiques.</span>
+            <span data-i18n="ui.addedValueContact">Pour obtenir un abonnement, contactez le support Lexa :</span>
+            <strong>support@lexamt.com</strong>
         </div>
         
         <div id="no-api-message" class="info-message" style="display: none;">
-            Aucune clé <strong>API</strong> n'est encore enregistrée.<br>
-            Cliquez sur l'icône
+            <span data-i18n="ui.noApiMessageLine1Prefix">Aucune clé</span> <strong>API</strong> <span data-i18n="ui.noApiMessageLine1Suffix">n'est encore enregistrée.</span><br>
+            <span data-i18n="ui.noApiMessageLine2">Cliquez sur l'icône</span>
             <span style="vertical-align: middle; display: inline-block;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             </span>
-            en haut à droite pour enregistrer la votre.<br>
+            <span data-i18n="ui.noApiMessageLine3">en haut à droite pour enregistrer la vôtre.</span><br>
         </div>
 
         <div id="api-error-message" class="error-message-global" style="display: none;">
-            <a href="#" id="api-error-refresh" class="refresh-link">Actualiser<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-left: 3px;"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10M1 14l5.36 5.36A9 9 0 0 0 20.49 15"></path></svg></a><br>
-            Une erreur est survenue
+            <a href="#" id="api-error-refresh" class="refresh-link"><span data-i18n="ui.refresh">Actualiser</span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-left: 3px;"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10M1 14l5.36 5.36A9 9 0 0 0 20.49 15"></path></svg></a><br>
+            <span data-i18n="ui.apiError">Une erreur est survenue</span>
             <div id="api-error-detail" style="margin-top: 8px; font-size: 14px; color: #b91c1c; font-weight: 400;"></div>
         </div>
 
         <div id="main-content">
             <div class="form-group language-row">
                 <div class="form-group">
-                    <label for="source-lang">Source</label>
+                    <label for="source-lang" data-i18n="ui.source">Source</label>
                     <select id="source-lang">
                     </select>
                 </div>
-                <button id="swap-languages" class="swap-btn" title="Inverser les langues">
+                <button id="swap-languages" class="swap-btn" data-i18n-title="ui.swapLanguages" title="Inverser les langues">
                     <!-- License: MIT. Made by css.gg: https://github.com/astrit/css.gg/blob/master/LICENSE -->
                     <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M4.99268 12.984C4.44039 12.984 3.99268 13.4318 3.99268 13.984C3.99268 14.3414 4.18016 14.655 4.46214 14.8319L7.14976 17.5195C7.54029 17.91 8.17345 17.91 8.56398 17.5195C8.9545 17.129 8.9545 16.4958 8.56398 16.1053L7.44275 14.984H14.9927C15.545 14.984 15.9927 14.5363 15.9927 13.984C15.9927 13.4318 15.545 12.984 14.9927 12.984L5.04213 12.984C5.033 12.9839 5.02388 12.9839 5.01476 12.984H4.99268Z" fill="black"/>
@@ -58,25 +72,25 @@
                     </svg>
                 </button>
                 <div class="form-group">
-                    <label for="target-lang">Cible</label>
+                    <label for="target-lang" data-i18n="ui.target">Cible</label>
                     <select id="target-lang">
                     </select>
                 </div>
             </div>
             <div class="form-group" style="margin-bottom:0;">
-                <label for="domain">Domaine</label>
+                <label for="domain" data-i18n="ui.domain">Domaine</label>
                 <select id="domain">
                 </select>
             </div>
             <div style="display: flex; gap: 8px; margin-top: 16px;">
-                <button id="translate-btn" class="translate-btn" style="flex:1; background: #0d3951;">Traduire</button>
-                <button id="replace-btn" class="translate-btn" style="flex:1; background: #02a06a;">Remplacer</button>
+                <button id="translate-btn" class="translate-btn" data-i18n="ui.translate" style="flex:1; background: #0d3951;">Traduire</button>
+                <button id="replace-btn" class="translate-btn" data-i18n="ui.replace" style="flex:1; background: #02a06a;">Remplacer</button>
             </div>
-            <div id="translation-result" style="display:block; background:#fff; border:1px solid #d1d5db; border-radius:4px; padding:12px; margin-top:16px; color:#222; font-size:15px;"><span id="translation-placeholder" style="font-style:italic; color:#888;">Sélectionnez un texte</span></div>
+            <div id="translation-result" style="display:block; background:#fff; border:1px solid #d1d5db; border-radius:4px; padding:12px; margin-top:16px; color:#222; font-size:15px;"><span id="translation-placeholder" data-i18n="ui.selectText" style="font-style:italic; color:#888;">Sélectionnez un texte</span></div>
 
             <div id="loading" class="loading">
                 <div class="spinner"></div>
-                <span>Traduction en cours...</span>
+                <span data-i18n="ui.translating">Traduction en cours...</span>
             </div>
             <div id="error-message" class="error" style="display: none;"></div>
             <div id="success-message" class="success" style="display: none;"></div>
@@ -84,12 +98,11 @@
 
         <div id="settings-view" style="display: none;">
             <div class="api-key-section">
-                <!-- <h2 class="title-blue">Clé API Lexa</h2> -->
                 <div class="form-group">
-                    <label for="api-key">Votre clé API</label>
+                    <label for="api-key" data-i18n="ui.apiKeyLabel">Votre clé API</label>
                     <div class="api-key-input-group" style="display: flex; align-items: center; gap: 8px;">
-                        <input type="password" id="api-key" placeholder="Entrez votre clé API" style="flex: 1 1 auto;">
-                        <button id="save-api-key" class="floppy-btn" title="Sauvegarder la clé">
+                        <input type="password" id="api-key" data-i18n-placeholder="ui.apiKeyPlaceholder" placeholder="Entrez votre clé API" style="flex: 1 1 auto;">
+                        <button id="save-api-key" class="floppy-btn" data-i18n-title="ui.save" title="Sauvegarder la clé">
                             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6.83a2 2 0 0 0-.59-1.42l-2.83-2.83A2 2 0 0 0 15.17 2H6z"></path>
                                 <rect x="7" y="11" width="10" height="6" rx="1.2"></rect>
@@ -98,18 +111,17 @@
                         </button>
                     </div>
                 </div>
-                <div id="api-key-success" class="success" style="display: none;">Clé API sauvegardée avec succès.</div>
+                <div id="api-key-success" class="success" style="display: none;" data-i18n="ui.apiKeySaved">Clé API sauvegardée. Testez ou retournez à l'accueil.</div>
                 <div id="api-key-error" class="error" style="display: none;"></div>
             </div>
 
             <div class="test-section">
-                <!-- <h2 class="title-green">Tester la Clé API</h2> -->
-                <button id="test-api-key" class="translate-btn" style="background: #38A06E;">Tester la connexion</button>
+                <button id="test-api-key" class="translate-btn" data-i18n="ui.test" style="background: #38A06E;">Tester</button>
                 <div id="test-result" style="font-size: 14px;"></div>
             </div>
         </div>
     </div>
-    <script type="module" src="../index.js"></script>
+    <script type="module" src="../index.js?v=20251005002"></script>
 </body>
 
 </html> 

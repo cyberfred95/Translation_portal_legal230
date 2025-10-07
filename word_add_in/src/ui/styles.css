@@ -234,14 +234,105 @@ select:focus, input:focus, textarea:focus {
     z-index: 10;
 }
 
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    position: relative;
+    margin-right: 6px;
+    margin-top: 11px;
+}
+
+/* Dropdown personnalisé pour sélecteur de langue avec drapeaux */
+.custom-select {
+    position: relative;
+    width: 50px;
+    display: inline-block;
+}
+
+.select-button {
+    width: 100%;
+    padding: 7px 9px;
+    border: 1px solid #d1d5db;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 6px;
+    transition: border-color 0.2s;
+}
+
+.select-button:hover {
+    border-color: #9ca3af;
+}
+
+.select-button:focus {
+    outline: none;
+    border-color: #0d3951;
+    box-shadow: 0 0 0 2px rgba(13, 57, 81, 0.1);
+}
+
+.flag-img {
+    width: 20px;
+    height: 13px;
+    object-fit: cover;
+}
+
+.dropdown-arrow {
+    font-size: 8px;
+    color: #666;
+    margin-left: 4px;
+}
+
+.options-container {
+    position: absolute;
+    top: calc(100% + 2px); /* Petit espace sous le bouton */
+    right: 15px; /* Décalage de 15px vers la gauche */
+    width: 60px; /* Largeur adaptée pour les drapeaux */
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 10000; /* Z-index très élevé */
+    display: none; /* Caché par défaut */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 4px 0;
+}
+
+.options-container.show {
+    display: block !important;
+}
+
+.option-item {
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s;
+}
+
+.option-item:hover {
+    background-color: #f3f4f6;
+}
+
+.option-item.selected {
+    background-color: #e0f2fe;
+}
+
+.option-item .flag-img {
+    width: 24px;
+    height: 16px;
+}
+
 .settings-btn {
     background: none;
     border: none;
     box-shadow: none;
     outline: none;
     padding: 0;
-    margin-right: 12px;
-    margin-top: 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -323,6 +414,13 @@ input, .floppy-btn {
   max-width: 280px;
   margin-left: auto;
   margin-right: auto;
+}
+
+#settings-view {
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
 }
 
 #replace-btn:disabled {

@@ -6,23 +6,18 @@ import { showSettingsView, showMainView } from './ui/dom.js';
 import { getApiKey, getSourceLang, getTargetLang, getSelectedDomain } from './utils/storage.js';
 import { loadLanguages, loadDomains } from './api/lexamtApi.js';
 import { populateSelect } from './utils/helpers.js';
+import { i18n } from './i18n/i18n.js';
 
 // Office.onReady doit être appelé avant toute interaction avec l'API Office
 if (typeof Office !== 'undefined') {
   Office.onReady((info) => {
-    console.log("Office.onReady called", info); // Debug
     if (info.host === Office.HostType.Word) {
-      console.log("Initializing app for Word"); // Debug
       initializeApp();
-    } else {
-      console.warn("Application not running in Word", info.host);
     }
   });
 } else {
-  console.error("Office object is not available");
   // Fallback pour le développement/test en dehors de Word
   document.addEventListener('DOMContentLoaded', () => {
-    console.log("Fallback initialization for development");
     initializeApp();
   });
 }
@@ -30,7 +25,11 @@ if (typeof Office !== 'undefined') {
 /**
  * Initialise l'application Lexa (UI, listeners, chargement initial)
  */
-function initializeApp() {
+async function initializeApp() {
+  // Initialiser le système i18n et attendre qu'il soit prêt
+  await i18n.init();
+  // Attendre suffisamment pour que initLanguageSelector() se termine (délai de 250ms dans i18n.init)
+  await new Promise(resolve => setTimeout(resolve, 400));
   initializeUIEvents();
   
   // Ajouter le listener pour le lien 'Actualiser' de l'erreur API
@@ -104,9 +103,6 @@ async function chargerLanguesEtDomaines() {
     if (apiErrorMessage) apiErrorMessage.style.display = "none";
     if (apiErrorDetail) apiErrorDetail.textContent = "";
   } catch (error) {
-    console.error(error);
-    // Debug : print complet de l'objet error
-    console.log('DEBUG ERROR OBJ:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
     if (mainContent) mainContent.style.display = "none";
     if (noApiMessage) noApiMessage.style.display = "none";
     if (addedValueMessage) addedValueMessage.style.display = "none";
@@ -114,17 +110,19 @@ async function chargerLanguesEtDomaines() {
     if (apiErrorDetail) {
       let code = error && (error.code || error.status || error.statusCode);
       let detail = error && error.body && error.body.detail;
+      const contactAdminText = i18n ? i18n.t('ui.contactAdmin') : 'Contactez un administrateur';
+      const errorCodeLabel = i18n ? i18n.t('ui.errorCodeLabel') : 'Code erreur :';
       
       if (detail) {
-        apiErrorDetail.innerHTML = `${detail}<br><span style='display:inline-block;margin-top:10px;color:#b91c1c;font-size:13px;'>Contactez un administrateur</span>`;
+        apiErrorDetail.innerHTML = `${detail}<br><span style='display:inline-block;margin-top:10px;color:#b91c1c;font-size:13px;'>${contactAdminText}</span>`;
       } else if (error.bodyText) {
-        apiErrorDetail.innerHTML = `<pre style='white-space:pre-wrap;word-break:break-all;'>${error.bodyText}</pre><span style='display:inline-block;margin-top:10px;color:#b91c1c;font-size:13px;'>Contactez un administrateur</span>`;
+        apiErrorDetail.innerHTML = `<pre style='white-space:pre-wrap;word-break:break-all;'>${error.bodyText}</pre><span style='display:inline-block;margin-top:10px;color:#b91c1c;font-size:13px;'>${contactAdminText}</span>`;
       } else if (error.body) {
-        apiErrorDetail.innerHTML = `<pre style='white-space:pre-wrap;word-break:break-all;'>${JSON.stringify(error.body, null, 2)}</pre><span style='display:inline-block;margin-top:10px;color:#b91c1c;font-size:13px;'>Contactez un administrateur</span>`;
+        apiErrorDetail.innerHTML = `<pre style='white-space:pre-wrap;word-break:break-all;'>${JSON.stringify(error.body, null, 2)}</pre><span style='display:inline-block;margin-top:10px;color:#b91c1c;font-size:13px;'>${contactAdminText}</span>`;
       } else if (code) {
-        apiErrorDetail.innerHTML = `<strong>Code erreur :</strong> ${code}<br><span style='display:inline-block;margin-top:10px;color:#b91c1c;font-size:13px;'>Contactez un administrateur</span>`;
+        apiErrorDetail.innerHTML = `<strong>${errorCodeLabel}</strong> ${code}<br><span style='display:inline-block;margin-top:10px;color:#b91c1c;font-size:13px;'>${contactAdminText}</span>`;
       } else {
-        apiErrorDetail.innerHTML = `<span style='color:#b91c1c;font-size:13px;'>Contactez un administrateur</span>`;
+        apiErrorDetail.innerHTML = `<span style='color:#b91c1c;font-size:13px;'>${contactAdminText}</span>`;
       }
     }
   }
