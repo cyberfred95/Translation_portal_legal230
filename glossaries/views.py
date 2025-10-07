@@ -207,7 +207,7 @@ class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     Team management view for administrators.
     Only group administrators can access this view.
     """
-    template_name = 'myteam.html'
+    template_name = 'my_team/my_team.html'
     
     def test_func(self):
         """Check if user is an admin of any group"""

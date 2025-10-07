@@ -5,10 +5,17 @@
     <i class="ph ph-plus" style="font-size: 24px;"></i>
     {% trans 'New translation' %}
   </a>
-  <a href="{% url 'profile_details' %}" class="dashboard-btn btn-outline">
-    <i class="ph ph-user-plus" style="font-size: 24px; color: #181932;"></i>
-    {% trans 'Add a user' %}
+  {% if is_group_admin %}
+  <a href="{% url 'my_team' %}" class="dashboard-btn btn-outline">
+    <i class="ph ph-users-three" style="font-size: 24px; color: #181932;"></i>
+    {% trans 'Manage my team' %}
   </a>
+  {% else %}
+  <a href="{% url 'profile_details' %}" class="dashboard-btn btn-outline">
+    <i class="ph ph-user-circle" style="font-size: 24px; color: #181932;"></i>
+    {% trans 'My profile' %}
+  </a>
+  {% endif %}
   <a href="{% url 'glossaries' %}" class="dashboard-btn btn-outline">
     <i class="ph ph-folder-plus" style="font-size: 24px; color: #181932;"></i>
     {% trans 'Add a glossary' %}

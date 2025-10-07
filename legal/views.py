@@ -620,6 +620,21 @@ class DashboardView(TemplateView):
         
         context['user_glossaries_count'] = glossaries_count
 
+        # Déterminer si l'utilisateur est admin de groupe
+        try:
+            is_group_admin = False
+            user_group = getattr(user, 'group', None)
+            
+            # L'utilisateur est admin s'il est staff, superuser ou admin de son groupe
+            if user.is_staff or user.is_superuser:
+                is_group_admin = True
+            elif user_group:
+                is_group_admin = user_group.admin.filter(id=user.id).exists()
+            
+            context['is_group_admin'] = is_group_admin
+        except Exception:
+            context['is_group_admin'] = False
+
         try:
             # Récupérer les projets depuis l'API
             response = requests.get(

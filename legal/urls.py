@@ -49,7 +49,7 @@ urlpatterns = i18n_patterns(
     path('detect_text_language/', login_required(DetectTextLanguageView.as_view()),
          name='detect_text_language'),
 
-    path('myteam/', login_required(MyTeamView.as_view()), name='myteam'),
+    path('my-team/', login_required(MyTeamView.as_view()), name='my_team'),
 
     path('statistics/', include('stats.urls')),
     path('glossaries/', include('glossaries.urls')),

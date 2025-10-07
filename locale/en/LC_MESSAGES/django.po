@@ -87,7 +87,7 @@ msgstr "Glossaries"
 msgid "Find all your personal glossaries"
 msgstr ""
 
-#: glossaries/templates/glossaries.html:25 glossaries/templates/myteam.html:120
+#: glossaries/templates/glossaries.html:25 legal/templates/my_team/my_team.html:120
 #, fuzzy
 #| msgid "No glossary"
 msgid "Search for a user"
@@ -124,7 +124,7 @@ msgstr "Target language"
 
 #: glossaries/templates/glossaries.html:65
 #: glossaries/templates/glossaries_2.html:315
-#: glossaries/templates/myteam.html:155
+#: legal/templates/my_team/my_team.html:155
 #: legal/templates/dashboard/dashboard_recent_translations.html:13
 #: legal/templates/project_history.html:37
 #: legal/templates/project_history_2.html:120
@@ -133,7 +133,7 @@ msgstr "Creation date"
 
 #: glossaries/templates/glossaries.html:69
 #: glossaries/templates/glossaries_2.html:340
-#: glossaries/templates/myteam.html:159
+#: legal/templates/my_team/my_team.html:159
 #: legal/templates/dashboard/dashboard_recent_translations.html:14
 #: legal/templates/project_history.html:41
 #: legal/templates/project_history_2.html:129
@@ -344,84 +344,84 @@ msgstr ""
 msgid "Are you sure you want to delete this glossary?"
 msgstr ""
 
-#: glossaries/templates/myteam.html:49
+#: legal/templates/my_team/my_team.html:49
 msgid "My Team"
 msgstr ""
 
-#: glossaries/templates/myteam.html:52
+#: legal/templates/my_team/my_team.html:52
 msgid ""
 "Create, manage, and delete users from your account, learn more about users."
 msgstr ""
 
-#: glossaries/templates/myteam.html:61
+#: legal/templates/my_team/my_team.html:61
 msgid "NUMBER OF USERS"
 msgstr ""
 
-#: glossaries/templates/myteam.html:76
+#: legal/templates/my_team/my_team.html:76
 msgid "NUMBER OF PREMIUM PLANS"
 msgstr ""
 
-#: glossaries/templates/myteam.html:91
+#: legal/templates/my_team/my_team.html:91
 msgid "NUMBER OF ADMINS"
 msgstr ""
 
-#: glossaries/templates/myteam.html:133
+#: legal/templates/my_team/my_team.html:133
 #: legal/templates/dashboard/dashboard_quick_actions.html:10
 msgid "Add a user"
 msgstr ""
 
-#: glossaries/templates/myteam.html:143
+#: legal/templates/my_team/my_team.html:143
 msgid "Utilisateur"
 msgstr ""
 
-#: glossaries/templates/myteam.html:147
+#: legal/templates/my_team/my_team.html:147
 msgid "Plan"
 msgstr ""
 
-#: glossaries/templates/myteam.html:151
+#: legal/templates/my_team/my_team.html:151
 msgid "Role"
 msgstr ""
 
-#: glossaries/templates/myteam.html:193
+#: legal/templates/my_team/my_team.html:193
 msgid "Premium"
 msgstr ""
 
-#: glossaries/templates/myteam.html:201
+#: legal/templates/my_team/my_team.html:201
 msgid "Essential"
 msgstr ""
 
-#: glossaries/templates/myteam.html:211
+#: legal/templates/my_team/my_team.html:211
 msgid "Admin"
 msgstr ""
 
-#: glossaries/templates/myteam.html:217 legal/templates/project_history.html:20
+#: legal/templates/my_team/my_team.html:217 legal/templates/project_history.html:20
 #: stats/templates/usage_history.html:25 stats/templates/usage_history.html:232
 msgid "User"
 msgstr "User"
 
-#: glossaries/templates/myteam.html:255
+#: legal/templates/my_team/my_team.html:255
 msgid "No team members found"
 msgstr ""
 
-#: glossaries/templates/myteam.html:256
+#: legal/templates/my_team/my_team.html:256
 #, fuzzy
 #| msgid "There are currently no statistic to display."
 msgid "There are currently no users in your team."
 msgstr "There are currently no statistics to display."
 
-#: glossaries/templates/myteam.html:351
+#: legal/templates/my_team/my_team.html:351
 msgid "Edit functionality will be implemented here"
 msgstr ""
 
-#: glossaries/templates/myteam.html:359
+#: legal/templates/my_team/my_team.html:359
 msgid "Are you sure you want to delete this user?"
 msgstr ""
 
-#: glossaries/templates/myteam.html:362
+#: legal/templates/my_team/my_team.html:362
 msgid "Delete functionality will be implemented here"
 msgstr ""
 
-#: glossaries/templates/myteam.html:371
+#: legal/templates/my_team/my_team.html:371
 msgid "Add user functionality will be implemented here"
 msgstr ""
 
@@ -575,6 +575,14 @@ msgstr "Quick Actions"
 #: legal/templates/dashboard/dashboard_quick_actions.html:6
 msgid "New translation"
 msgstr "New translation"
+
+#: legal/templates/dashboard/dashboard_quick_actions.html:11
+msgid "Manage my team"
+msgstr "Manage my team"
+
+#: legal/templates/dashboard/dashboard_quick_actions.html:16
+msgid "My profile"
+msgstr "My profile"
 
 # ######################################
 # ########################### STEP 5 ###

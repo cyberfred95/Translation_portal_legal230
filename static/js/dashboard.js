@@ -162,6 +162,7 @@ function clearAllFilters() {
 
 // Initialiser le filtrage au chargement de la page
 document.addEventListener('DOMContentLoaded', function () {
+
     // Conserver la sélection des filtres si la page est rechargée
     const urlParams = new URLSearchParams(window.location.search);
     const typeParam = urlParams.get('type');
