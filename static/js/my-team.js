@@ -23,14 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
-    const addUserBtn = document.getElementById('add-user-btn');
-    if (addUserBtn) {
-        addUserBtn.addEventListener('click', function() {
-            console.log('Add user clicked');
-            alert(gettext('Add user functionality will be implemented here'));
-        });
-    }
 });
 
 

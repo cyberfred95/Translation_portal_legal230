@@ -31,6 +31,7 @@ import django
 from rest_framework.views import APIView
 
 from subscriptions.models import SubscriptionType
+from stripe_webhooks.tasks_handlers.helper.stripe_session import get_stripe_customer_session_url
 from .helpers import get_translate_data, lowercase_file_extension, get_word_count, get_text_from_file, get_project_file, \
     rename_file
 
@@ -991,11 +992,19 @@ class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
             user_group = getattr(self.request.user, 'group', None)
             group_name = user_group.name if user_group else "No Group"
         
+        # Get Stripe portal URL if user has stripe_customer_id
+        stripe_portal_url = None
+        if self.request.user.stripe_customer_id:
+            error_response, portal_url = get_stripe_customer_session_url(self.request.user.stripe_customer_id)
+            if not error_response and portal_url:
+                stripe_portal_url = portal_url
+        
         context.update({
             'team_members': team_members,
             'stats': stats,
             'paginator': paginator_info,
             'group_name': group_name,
+            'stripe_portal_url': stripe_portal_url,
         })
         
         return context
