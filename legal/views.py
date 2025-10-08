@@ -1085,20 +1085,23 @@ class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         # Calculate statistics on the full queryset
         total_users = queryset.count()
         
-        # Count admin users
+        # Count admin users and active plans
         admin_users = 0
-        premium_users = 0
+        active_plans = 0
         
         for user in queryset:
             if self.check_admin_status(user):
                 admin_users += 1
-            if self.check_premium_status(user):
-                premium_users += 1
+            
+            # Count users with exactly one active subscription
+            license_info = self.get_user_license(user)
+            if license_info['status'] == 'active':
+                active_plans += 1
         
         return {
             'total_users': total_users,
             'admin_users': admin_users,
-            'premium_users': premium_users,
+            'active_plans': active_plans,
         }
     
     def get_user_initials(self, user):

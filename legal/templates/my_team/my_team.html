@@ -16,14 +16,12 @@
     <div class="text-base font-poppins font-normal mb-5">{% trans 'Create, manage, and delete users from your account, learn more about users.' %}</div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {% trans 'NUMBER OF USERS' as users_title %}
-        {% trans 'NUMBER OF PREMIUM PLANS' as premium_title %}
-        {% trans 'NUMBER OF ADMINS' as admins_title %}
+        {% trans 'NOMBRE DE PLANS ACTIFS' as active_plans_title %}
         
         {% include 'my_team/my_team_data_card.html' with title=users_title value=stats.total_users icon='user' color='purple' %}
-        {% include 'my_team/my_team_data_card.html' with title=premium_title value=stats.premium_users icon='trophy' color='amber' %}
-        {% include 'my_team/my_team_data_card.html' with title=admins_title value=stats.admin_users icon='briefcase' color='blue' %}
+        {% include 'my_team/my_team_data_card.html' with title=active_plans_title value=stats.active_plans icon='check-circle' color='amber' %}
     </div>
 
     <!-- Main Content -->
