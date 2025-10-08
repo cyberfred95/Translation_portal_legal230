@@ -28,8 +28,9 @@
 
     <!-- Main Content -->
     <div class="bg-white rounded-lg p-6">
-        <!-- Add User Button -->
-        <div class="flex items-center justify-end gap-4 mb-6">
+        <!-- Table Title and Add User Button -->
+        <div class="flex items-center justify-between gap-4 mb-6">
+            <h2 style="color:#181932;font-size:1.2rem;font-weight:600;">{{ group_name }}</h2>
             <button id="add-user-btn" type="button" class="h-8 px-3 bg-green-800 text-white rounded-full flex items-center gap-2 text-sm font-medium hover:bg-green-700 whitespace-nowrap" aria-label="{% trans 'Add a user' %}">
                 <i class="ph ph-user-plus text-[16px]"></i>
                 <span>{% trans 'Add a user' %}</span>

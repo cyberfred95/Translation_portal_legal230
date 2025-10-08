@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
 from domains.views import update_domains_view
 from writing.views import refresh_prompts_view
-from glossaries.views import MyTeamView
+from legal.views import MyTeamView
 
 urlpatterns = i18n_patterns(
     path("", login_required(RedirectView.as_view(pattern_name='dashboard')), name="root_redirect"),

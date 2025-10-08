@@ -13,11 +13,14 @@ from django.conf import settings
 from django.urls import reverse
 from django.shortcuts import render
 from django.contrib.auth.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 from glossaries.helpers import get_glossary_username
 from glossaries.processor import GlossaryProcessor
 from quoting.models import LanguageQuote
 from django.utils.timezone import now
+from subscriptions.models import UserSubscription
+from subscriptions.permissions import is_user_subscription_active
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -935,3 +938,225 @@ def show_alert_dialog(icon_name='EXCLAMATION_POINT', title='', message='',
         button2_text_color=button2_text_color,
         button2_icon_name=button2_icon_name
     )
+
+
+class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    """
+    Team management view for administrators.
+    Only group administrators can access this view.
+    """
+    template_name = 'my_team/my_team.html'
+    
+    def test_func(self):
+        """Check if user is an admin of any group"""
+        print(f"\n=== MY TEAM ACCESS CHECK ===")
+        print(f"User: {self.request.user.username} (ID: {self.request.user.id})")
+        print(f"Is staff: {self.request.user.is_staff}")
+        
+        # Check if user is staff or is admin of their group
+        if self.request.user.is_staff:
+            print(f"Access granted: User is staff")
+            return True
+        
+        # Check if user is admin of their group
+        user_group = getattr(self.request.user, 'group', None)
+        print(f"User group: {user_group}")
+        
+        if user_group:
+            is_admin = user_group.admin.filter(id=self.request.user.id).exists()
+            print(f"Is admin of group '{user_group.name}': {is_admin}")
+            if is_admin:
+                print(f"Access granted: User is admin of their group")
+            else:
+                print(f"Access denied: User is not admin of their group")
+            return is_admin
+        
+        print(f"Access denied: User has no group")
+        print(f"=== END ACCESS CHECK ===\n")
+        return False
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Get team members based on user's group membership
+        team_members, paginator_info = self.get_team_members()
+        
+        # Calculate stats on the full dataset
+        stats = self.get_team_stats()
+        
+        # Get group name
+        if self.request.user.is_staff:
+            group_name = "All Users"
+        else:
+            user_group = getattr(self.request.user, 'group', None)
+            group_name = user_group.name if user_group else "No Group"
+        
+        context.update({
+            'team_members': team_members,
+            'stats': stats,
+            'paginator': paginator_info,
+            'group_name': group_name,
+        })
+        
+        return context
+    
+    def get_team_members(self):
+        """Get all team members sorted by creation date (newest first)"""
+        # Debug: Print current user info
+        print(f"\n=== MY TEAM DEBUG ===")
+        print(f"Current user: {self.request.user.username} (ID: {self.request.user.id})")
+        print(f"Is staff: {self.request.user.is_staff}")
+        print(f"Is superuser: {self.request.user.is_superuser}")
+        
+        # If user is staff, show all users; otherwise show group members
+        if self.request.user.is_staff:
+            print(f"User is staff - showing ALL users")
+            queryset = User.objects.all()
+        else:
+            # Get users from the same group
+            user_group = getattr(self.request.user, 'group', None)
+            print(f"User group attribute: {user_group}")
+            
+            if user_group:
+                print(f"User group found: {user_group.name} (ID: {user_group.id})")
+                queryset = User.objects.filter(group=user_group)
+                print(f"Number of users in this group: {queryset.count()}")
+            else:
+                print(f"No group found for user - showing NO users")
+                queryset = User.objects.none()
+        
+        # Sort by date_joined descending (newest first)
+        queryset = queryset.select_related('group').order_by('-date_joined')
+        
+        # Debug: Print all users that will be displayed
+        print(f"\nUsers to display ({queryset.count()} total):")
+        for user in queryset[:5]:  # Show first 5 users
+            user_group_name = user.group.name if hasattr(user, 'group') and user.group else 'No group'
+            print(f"  - {user.username} ({user.email}) - Group: {user_group_name}")
+        if queryset.count() > 5:
+            print(f"  ... and {queryset.count() - 5} more users")
+        print(f"=== END DEBUG ===\n")
+        
+        # Add computed fields for each member
+        members_with_data = []
+        for user in queryset:
+            member_data = {
+                'id': user.id,
+                'username': user.username,
+                'first_name': user.first_name or 'Unknown',
+                'last_name': user.last_name or 'User',
+                'email': user.email,
+                'initials': self.get_user_initials(user),
+                'is_admin': self.check_admin_status(user),
+                'is_buyer': self.check_buyer_status(user),
+                'is_premium': self.check_premium_status(user),
+                'date_joined': user.date_joined,
+                'license': self.get_user_license(user),
+            }
+            members_with_data.append(member_data)
+        
+        # Return empty paginator info since pagination is removed
+        paginator_info = {
+            'current_page': 1,
+            'total_pages': 1,
+            'has_previous': False,
+            'has_next': False,
+            'previous_page_number': None,
+            'next_page_number': None,
+            'page_range': [1],
+            'has_multiple_pages': False,
+        }
+        
+        return members_with_data, paginator_info
+    
+    def get_team_stats(self):
+        """Calculate team statistics from the full dataset"""
+        # Get the same queryset used for team members, but without pagination
+        if self.request.user.is_staff:
+            queryset = User.objects.all()
+        else:
+            # Get users from the same group
+            user_group = getattr(self.request.user, 'group', None)
+            if user_group:
+                queryset = User.objects.filter(group=user_group)
+            else:
+                queryset = User.objects.none()
+        
+        # Calculate statistics on the full queryset
+        total_users = queryset.count()
+        
+        # Count admin users
+        admin_users = 0
+        premium_users = 0
+        
+        for user in queryset:
+            if self.check_admin_status(user):
+                admin_users += 1
+            if self.check_premium_status(user):
+                premium_users += 1
+        
+        return {
+            'total_users': total_users,
+            'admin_users': admin_users,
+            'premium_users': premium_users,
+        }
+    
+    def get_user_initials(self, user):
+        """Generate user initials from first and last name"""
+        first_initial = user.first_name[0].upper() if user.first_name else 'U'
+        last_initial = user.last_name[0].upper() if user.last_name else 'U'
+        return f"{first_initial}{last_initial}"
+    
+    def check_admin_status(self, user):
+        """Check if user is admin of their group"""
+        if user.is_staff or user.is_superuser:
+            return True
+        
+        user_group = getattr(user, 'group', None)
+        if user_group:
+            return user_group.admin.filter(id=user.id).exists()
+        
+        return False
+    
+    def check_premium_status(self, user):
+        """Check if user has premium subscription"""
+        # This would be replaced with actual subscription logic
+        # For now, we'll consider staff users as premium
+        return user.is_staff or hasattr(user, 'subscription') and getattr(user.subscription, 'is_premium', False)
+    
+    def check_buyer_status(self, user):
+        """Check if user has a Stripe customer ID"""
+        return bool(user.stripe_customer_id)
+    
+    def get_user_license(self, user):
+        """Get user's active license/subscription"""
+        # Get all subscriptions for this user
+        all_subscriptions = UserSubscription.objects.filter(user=user)
+        
+        # Filter active subscriptions
+        active_subscriptions = []
+        current_time = now()
+        
+        for sub in all_subscriptions:
+            # Check if subscription status is active
+            if is_user_subscription_active(sub.status):
+                # Check if subscription is within date range
+                if current_time >= sub.start_date and current_time <= sub.end_date:
+                    active_subscriptions.append(sub)
+        
+        # Return appropriate value based on number of active subscriptions
+        if len(active_subscriptions) == 0:
+            return {
+                'status': 'no_subscription',
+                'name': 'No subscription'
+            }
+        elif len(active_subscriptions) == 1:
+            return {
+                'status': 'active',
+                'name': active_subscriptions[0].subscription.name
+            }
+        else:
+            return {
+                'status': 'error',
+                'name': 'Error: Multiple subscriptions'
+            }
