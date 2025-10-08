@@ -1,0 +1,119 @@
+{% load i18n %}
+
+<!-- Table -->
+<div class="overflow-x-auto" role="table" aria-label="{% trans 'Team members' %}">
+    <div class="flex flex-col items-center justify-start w-full" role="rowgroup">
+        <div class="w-full flex flex-row bg-blue-50 border-b-0.25 border-gray-100" role="row">
+            <div class="h-12 flex flex-row justify-center items-center w-18">
+            </div>
+            <div class="text-base px-8 text-[#5a5a78] h-12 flex flex-row items-center justify-start w-160" role="columnheader">
+                <i class="ph ph-user mr-1"></i>
+                {% trans 'Utilisateur' %}
+            </div>
+            <div class="text-base px-8 text-[#5a5a78] h-12 flex flex-row items-center justify-start w-64" role="columnheader">
+                <i class="ph ph-certificate mr-1"></i>
+                {% trans 'Plan' %}
+            </div>
+            <div class="text-base px-8 text-[#5a5a78] h-12 flex flex-row items-center justify-start w-160" role="columnheader">
+                <i class="ph ph-briefcase mr-1"></i>
+                {% trans 'Role' %}
+            </div>
+            <div class="text-base px-8 text-[#5a5a78] h-12 flex flex-row items-center justify-start w-160" role="columnheader">
+                <i class="ph ph-calendar-blank mr-1"></i>
+                {% trans 'Creation date' %}
+            </div>
+            <div class="text-base px-8 text-[#5a5a78] h-12 flex flex-row flex-grow justify-center items-center w-full" role="columnheader">
+                <i class="ph ph-wrench mr-1"></i>
+                {% trans 'Actions' %}
+            </div>
+        </div>
+
+        {% if team_members %}
+        {% for member in team_members %}
+
+        <!-- @TODO : Dynamiser le tableau -->
+        <div class="w-full flex flex-row border-b-0.25 border-gray-100 h-16 justify-center items-center" role="row">
+            <div class="flex flex-row justify-center items-center w-18">
+                <div class="w-7 h-7 rounded-full border-[0.5px] border-black/10 bg-gray-100 flex items-center justify-center">
+                    <span class="text-muted-foreground text-[10px] font-semibold leading-4 font-inter">
+                        {{ member.initials }}
+                    </span>
+                </div>
+            </div>
+            <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center px-8 w-160" role="cell">
+                <div class="flex flex-col gap-1">
+                    <div class="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground">
+                        {{ member.first_name }} {{ member.last_name }}
+                    </div>
+                    <div class="text-xs font-normal leading-4 text-muted-foreground">
+                        {{ member.email }}
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center px-8" role="cell">
+                <div class="flex items-center gap-1.5">
+                    {% if member.is_premium %}
+                    <i class="ph ph-trophy text-yellow-500 text-[20px]"></i>
+                    <span class="text-foreground text-sm font-normal leading-6 tracking-[-0.084px]">
+                        {% trans 'Premium' %}
+                    </span>
+                    {% else %}
+                    <i class="ph ph-cloud text-blue-500 text-[20px]"></i>
+                    <span class="text-foreground text-sm font-normal leading-6 tracking-[-0.084px]">
+                        {% trans 'Essential' %}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center px-8 w-160" role="cell">
+                <div class="flex justify-center">
+                    {% if member.is_admin %}
+                    <div class="inline-flex items-center px-2 py-0 rounded border-[0.5px] bg-blue-50 border-blue-200 text-blue-600">
+                        <span class="px-1 text-sm font-medium leading-6 tracking-[-0.084px]">
+                            {% trans 'Admin' %}
+                        </span>
+                    </div>
+                    {% else %}
+                    <div class="inline-flex items-center px-2 py-0 rounded border-[0.5px] bg-gray-50 border-gray-200 text-gray-600">
+                        <span class="px-1 text-sm font-medium leading-6 tracking-[-0.084px]">
+                            {% trans 'User' %}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center px-8 w-160" role="cell">
+                <span class="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground">
+                    {{ member.date_joined|date:"d/m/Y" }}
+                </span>
+            </div>
+            <div class="text-base text-[#5a5a78] h-12 flex flex-row flex-grow justify-center items-center px-8 w-full" role="cell">
+                <div class="flex justify-center gap-1">
+                    <!-- Mail Button -->
+                    <button type="button" class="p-1 rounded-lg hover:bg-gray-50 mail-user" data-email="{{ member.email }}" aria-label="{% trans 'Send email' %}">
+                        <i class="ph ph-envelope text-black/80 text-[16px]"></i>
+                    </button>
+                    <!-- Edit Button -->
+                    <button type="button" class="p-1 rounded-lg hover:bg-gray-50 edit-user" data-user-id="{{ member.id }}" aria-label="{% trans 'Edit user' %}">
+                        <i class="ph ph-pencil-simple text-black/80 text-[16px]"></i>
+                    </button>
+                    <!-- Delete Button -->
+                    <button type="button" class="p-1 rounded-lg hover:bg-gray-50 delete-user" data-user-id="{{ member.id }}" aria-label="{% trans 'Delete user' %}">
+                        <i class="ph ph-trash text-red-500 text-[16px]"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {% empty %}
+        <div class="text-center py-8 text-muted-foreground">
+            <div class="flex flex-col items-center justify-center">
+                <p class="text-base font-semibold">{% trans 'No team members found' %}</p>
+                <p class="text-sm mt-1">{% trans 'There are currently no users in your team.' %}</p>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+    </div>
+</div>

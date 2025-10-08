@@ -1,0 +1,32 @@
+.font-poppins {
+    font-family: 'Poppins', sans-serif;
+}
+.font-inter {
+    font-family: 'Inter', sans-serif;
+}
+.bg-stat-users {
+    background-color: #f3f4f6;
+}
+.bg-stat-premium {
+    background-color: #fef3c7;
+}
+.bg-stat-admins {
+    background-color: #dbeafe;
+}
+.bg-table-header {
+    background-color: #f9fafb;
+}
+.text-foreground {
+    color: #111827;
+}
+.text-muted-foreground {
+    color: #6b7280;
+}
+.bg-primary {
+    background-color: #22c55e;
+}
+.text-primary-foreground {
+    color: white;
+}
+
+
