@@ -571,7 +571,7 @@ msgstr "Manage licences and billings"
 #: legal/templates/my_team/my_team_edit_user.html:11
 #: legal/templates/my_team/my_team_users.html:104
 msgid "Edit user"
-msgstr ""
+msgstr "Edit user"
 
 # ########################################
 # ################################################ PROJECT HISTORY #################################################

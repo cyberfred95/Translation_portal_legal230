@@ -567,10 +567,8 @@ msgstr "Gérer les licences et la facturation"
 
 #: legal/templates/my_team/my_team_edit_user.html:11
 #: legal/templates/my_team/my_team_users.html:104
-#, fuzzy
-#| msgid "Add a user"
 msgid "Edit user"
-msgstr "Ajouter un utilisateur"
+msgstr "Modifier l'utilisateur"
 
 # ########################################
 # ################################################ PROJECT HISTORY #################################################
