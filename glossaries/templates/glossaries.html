@@ -5,22 +5,16 @@
 
 <div class="mx-5 mb-11.5 mt-5">
     <h2 class="text-2xl mb-2 font-poppins font-semibold">{% trans 'Glossary' %}</h2>
-    <div class="text-base font-poppins font-normal">{% trans 'Find all your personal glossaries' %}</div>
+    <div class="text-base font-poppins font-normal mb-5">{% trans 'Find all your personal glossaries' %}</div>
 
-    <div class="rounded-md px-5 pt-5 mt-5 w-full h-full flex flex-col items-end bg-white">
-        <div class="flex w-full items-center my-5">
-            <div class="flex w-full items-center justify-end gap-4 mb-6">
-                <button
-                        type="button" id="openModal" class="text-white text-sm flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
-                     <i class="ph ph-folder-plus mr-2" style="font-size: 20px;"></i>
-                     {% trans 'Add glossary' %}
-                </button>
-            </div>
-
+    <div class="rounded-lg p-6 w-full h-full flex flex-col items-end bg-white">
+        <div class="flex w-full items-center justify-end gap-4 mb-6">
+            <button
+                    type="button" id="openModal" class="text-white text-sm flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
+                 <i class="ph ph-folder-plus mr-2" style="font-size: 20px;"></i>
+                 {% trans 'Add glossary' %}
+            </button>
         </div>
-
-
-
 
         <div class="flex flex-col items-center justify-start w-full">
             <div class="w-full flex flex-row bg-blue-50 border-b-0.25 border-gray-100">
@@ -50,17 +44,17 @@
             {% for glossary in glossaries %}
 
             <div class="w-full flex flex-row border-b-0.25 border-gray-100 h-16 justify-center items-center glossary-row">
-                <div class="text-sm text-[#5a5a78] h-12 flex flex-row items-center pl-8 w-200">
-                    <span class="md:w-60 2xl:w-80 w-max truncate">{{ glossary.name }}</span>
+                <div class="text-sm text-[#5a5a78] h-12 flex flex-row items-center pl-8 w-200 overflow-hidden">
+                    <span class="truncate">{{ glossary.name }}</span>
                 </div>
-                <div class="flex justify-start w-200 pr-8">
-                    {{ glossary.source_language }}
+                <div class="flex justify-start w-200 pr-8 overflow-hidden whitespace-nowrap">
+                    <span class="truncate">{{ glossary.source_language }}</span>
                 </div>
-                <div class="flex justify-start text-base text-[#5a5a78] h-12 flex flex-row items-center w-200">
-                    {{ glossary.target_language }}
+                <div class="flex justify-start text-base text-[#5a5a78] h-12 flex-row items-center w-200 overflow-hidden whitespace-nowrap">
+                    <span class="truncate">{{ glossary.target_language }}</span>
                 </div>
-                <div class="text-base text-[#5a5a78] h-12 flex flex-row justify-start items-center px-8 w-140">
-                    {{ glossary.created_at | date:"d/m/Y" }}
+                <div class="text-base text-[#5a5a78] h-12 flex flex-row justify-start items-center px-8 w-140 overflow-hidden whitespace-nowrap">
+                    <span class="truncate">{{ glossary.created_at | date:"d/m/Y" }}</span>
                 </div>
                 <div class="text-base text-[#5a5a78] h-12 flex flex-row flex-grow justify-center items-center px-8 w-full">
                     <div class="flex justify-center gap-1">
