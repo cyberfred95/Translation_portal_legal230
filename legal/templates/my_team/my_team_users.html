@@ -43,7 +43,7 @@
                         {% if member.email %}
                             {{ member.email }}
                         {% else %}
-                            (Compte non attribué)
+                            {% trans '(Unassigned account)' %}
                         {% endif %}
                     </span>
                 </div>
@@ -68,12 +68,12 @@
                     {% elif member.license.status == 'no_subscription' %}
                         <span style="width: 20px; flex-shrink: 0;"></span>
                         <span style="font-family: 'Poppins', sans-serif; font-weight: 400; font-size: 14px; line-height: 24px; color: #9CA3AF; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">
-                            (Inactif)
+                            {% trans '(Inactive)' %}
                         </span>
                     {% elif member.license.status == 'error' %}
                         <i class="ph-fill ph-warning" style="font-size: 20px; color: #DC2626; flex-shrink: 0;"></i>
                         <span style="font-family: 'Poppins', sans-serif; font-weight: 400; font-size: 14px; line-height: 24px; color: #DC2626; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">
-                            Error
+                            {% trans 'Error' %}
                         </span>
                     {% endif %}
                 </div>
@@ -82,26 +82,26 @@
                 <div style="min-width: 0; display: flex; justify-content: center;">
                     {% if member.is_buyer %}
                     <span class="role-badge role-badge-buyer" style="display: inline-flex; align-items: center; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 14px; line-height: 24px; padding: 0 4px; border-radius: 4px; border: 0.5px solid #F59E0B; background: #FFFBEB; color: #D97706; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        Buyer
+                        {% trans 'Buyer' %}
                     </span>
                     {% elif member.is_admin %}
                     <span class="role-badge role-badge-admin" style="display: inline-flex; align-items: center; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 14px; line-height: 24px; padding: 0 4px; border-radius: 4px; border: 0.5px solid #93C5FD; background: #EFF6FF; color: #3B82F6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        Admin
+                        {% trans 'Admin' %}
                     </span>
                     {% else %}
                     <span class="role-badge role-badge-user" style="display: inline-flex; align-items: center; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 14px; line-height: 24px; padding: 0 4px; border-radius: 4px; border: 0.5px solid #14532D; background: #F0FDF4; color: #14532D; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        Utilisateur
+                        {% trans 'User' %}
                     </span>
                     {% endif %}
                 </div>
             </td>
             <td class="py-3 px-4" style="text-align: center;">
-                {% if member.is_admin or member.is_buyer %}
-                <button type="button" disabled title="{% trans 'Cannot edit admin or buyer' %}" style="background: none; border: none; cursor: not-allowed; opacity: 0.5;">
+                {% if member.is_buyer %}
+                <button type="button" disabled title="{% trans 'Cannot edit buyer' %}" style="background: none; border: none; cursor: not-allowed; opacity: 0.5;">
                     <i class="ph ph-pencil-simple" style="font-size: 16px; color: #9CA3AF;"></i>
                 </button>
                 {% else %}
-                <button type="button" class="edit-user" data-user-id="{{ member.id }}" title="{% trans 'Edit user' %}" style="background: none; border: none; cursor: pointer;">
+                <button type="button" class="edit-user" data-user-id="{{ member.id }}" data-username="{{ member.username }}" data-email="{{ member.email }}" data-is-admin="{{ member.is_admin|yesno:'true,false' }}" data-has-active-subscription="{% if member.license.status == 'active' %}true{% else %}false{% endif %}" title="{% trans 'Edit user' %}" style="background: none; border: none; cursor: pointer;">
                     <i class="ph ph-pencil-simple" style="font-size: 16px; color: #374151;"></i>
                 </button>
                 {% endif %}

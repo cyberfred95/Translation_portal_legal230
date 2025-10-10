@@ -18,7 +18,7 @@
         <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {% trans 'NUMBER OF USERS' as users_title %}
-        {% trans 'NOMBRE DE PLANS ACTIFS' as active_plans_title %}
+        {% trans 'NUMBER OF ACTIVE USERS' as active_plans_title %}
         
         {% include 'my_team/my_team_data_card.html' with title=users_title value=stats.total_users icon='user' color='purple' %}
         {% include 'my_team/my_team_data_card.html' with title=active_plans_title value=stats.active_plans icon='check-circle' color='amber' %}
@@ -29,22 +29,27 @@
         <!-- Table Title and Manage Button -->
             <div class="flex items-center justify-between gap-4 mb-6">
             <h2 style="color:#181932;font-size:1.2rem;font-weight:600;">{{ group_name }}</h2>
-            {% if stripe_portal_url %}
-            <a href="{{ stripe_portal_url }}" class="h-8 px-3 bg-green-800 text-white rounded-full flex items-center gap-2 text-sm font-medium hover:bg-green-700 whitespace-nowrap no-underline" aria-label="{% trans 'Manage licences and billings' %}">
-                <i class="ph ph-credit-card text-[16px]"></i>
-                <span>{% trans 'Manage licences and billings' %}</span>
-                </a>
-                {% else %}
-            <button type="button" class="h-8 px-3 bg-gray-400 text-white rounded-full flex items-center gap-2 text-sm font-medium cursor-not-allowed whitespace-nowrap" disabled aria-label="{% trans 'Manage licences and billings' %}">
-                <i class="ph ph-credit-card text-[16px]"></i>
-                <span>{% trans 'Manage licences and billings' %}</span>
-                </button>
+            {% if has_buyer_in_group %}
+                {% if stripe_portal_url %}
+                <a href="{{ stripe_portal_url }}" class="h-8 px-3 bg-green-800 text-white rounded-full flex items-center gap-2 text-sm font-medium hover:bg-green-700 no-underline" style="min-width: 0;" aria-label="{% trans 'Manage licences and billings' %}">
+                    <i class="ph ph-credit-card text-[16px] flex-shrink-0"></i>
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{% trans 'Manage licences and billings' %}</span>
+                    </a>
+                    {% else %}
+                <button type="button" class="h-8 px-3 bg-gray-400 text-white rounded-full flex items-center gap-2 text-sm font-medium cursor-not-allowed" style="min-width: 0;" disabled aria-label="{% trans 'Manage licences and billings' %}">
+                    <i class="ph ph-credit-card text-[16px] flex-shrink-0"></i>
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{% trans 'Manage licences and billings' %}</span>
+                    </button>
+                {% endif %}
             {% endif %}
         </div>
         
         {% include 'my_team/my_team_users.html' %}
     </div>
 </div>
+
+<!-- Edit User Modal -->
+{% include 'my_team/my_team_edit_user.html' %}
 
 <!-- JavaScript -->
 <script src="{% static 'js/my-team.js' %}" defer></script>

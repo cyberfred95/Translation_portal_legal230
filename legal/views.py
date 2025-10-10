@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 import re
@@ -6,7 +7,7 @@ from datetime import datetime
 from decimal import Decimal
 from io import BytesIO
 from pprint import pprint
-from urllib.parse import urlparse, unquote
+from urllib.parse import urlparse, unquote, urlencode
 
 import openpyxl
 from django.conf import settings
@@ -976,6 +977,99 @@ class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         print(f"=== END ACCESS CHECK ===\n")
         return False
     
+    def post(self, request, *args, **kwargs):
+        """Handle user edit form submission"""
+        from django.shortcuts import redirect
+        
+        user_id = request.POST.get('user_id')
+        username = request.POST.get('username')
+        email = request.POST.get('email', '')
+        is_admin = request.POST.get('is_admin') == 'on'
+        
+        try:
+            # Get the user to edit
+            user = User.objects.get(id=user_id)
+            
+            # Check if the current user has permission to edit this user
+            if not request.user.is_staff:
+                # Only allow editing users in the same group
+                if user.group != request.user.group:
+                    return JsonResponse({'error': 'Permission denied'}, status=403)
+                
+                # Don't allow editing buyer users
+                if user.stripe_customer_id:
+                    return JsonResponse({'error': 'Cannot edit buyer users'}, status=403)
+            
+            # Store old email to check if it changed
+            old_email = user.email
+            new_email = email if email else ''
+            
+            # Update user fields
+            user.username = username
+            user.email = new_email
+            user.save()
+            
+            # Update admin status
+            user_group = user.group
+            if user_group:
+                if is_admin:
+                    # Add to admin list
+                    if not user_group.admin.filter(id=user.id).exists():
+                        user_group.admin.add(user)
+                else:
+                    # Remove from admin list
+                    if user_group.admin.filter(id=user.id).exists():
+                        user_group.admin.remove(user)
+            
+            # Send invitation email if email has changed
+            if new_email and old_email != new_email:
+                # Check if user has an active subscription
+                active_subscription = None
+                current_time = now()
+                all_subscriptions = UserSubscription.objects.filter(user=user)
+                
+                for sub in all_subscriptions:
+                    # Check if subscription status is active and within date range
+                    if is_user_subscription_active(sub.status):
+                        if current_time >= sub.start_date and current_time <= sub.end_date:
+                            active_subscription = sub
+                            break
+                
+                # Only send email if user has an active subscription
+                if active_subscription:
+                    params = {
+                        "email": base64.b64encode(new_email.encode('utf-8')),
+                        "group": base64.b64encode(str(user.group.id).encode('utf-8')) if user.group else None,
+                        "subscription_type_id": base64.b64encode(str(active_subscription.subscription.id).encode('utf-8')),
+                    }
+                    
+                    send_email(
+                        new_email,
+                        EmailType.USER_MANAGEMENT_INVITATION,
+                        request.user.language,
+                        {
+                            "lexa_username": user.username,
+                            "lexa_email": new_email,
+                            "url_reset_password": self.get_register_user_absolute_uri(request, params=params),
+                        }
+                    )
+            
+            # Redirect back to my-team page
+            return redirect('my_team')
+            
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    @staticmethod
+    def get_register_user_absolute_uri(request, params: dict = None):
+        """Generate absolute URL for user registration"""
+        url = f"{request.build_absolute_uri(reverse('reset-password'))}"
+        if params:
+            url = f"{url}?{urlencode(params)}"
+        return url
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
@@ -999,12 +1093,24 @@ class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
             if not error_response and portal_url:
                 stripe_portal_url = portal_url
         
+        # Check if there's at least one buyer in the group
+        has_buyer_in_group = False
+        if self.request.user.is_staff:
+            # Check all users for staff
+            has_buyer_in_group = User.objects.filter(stripe_customer_id__isnull=False).exists()
+        else:
+            # Check only users in the same group
+            user_group = getattr(self.request.user, 'group', None)
+            if user_group:
+                has_buyer_in_group = User.objects.filter(group=user_group, stripe_customer_id__isnull=False).exists()
+        
         context.update({
             'team_members': team_members,
             'stats': stats,
             'paginator': paginator_info,
             'group_name': group_name,
             'stripe_portal_url': stripe_portal_url,
+            'has_buyer_in_group': has_buyer_in_group,
         })
         
         return context
