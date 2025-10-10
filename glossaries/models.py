@@ -103,6 +103,7 @@ class Glossary(models.Model):
             "source_language": self.source_language.abbreviation.upper(),
             "target_language": self.target_language.abbreviation.upper(),
             "created_at": self.created_at,
+            "file_url": request.build_absolute_uri(self.file.url) if self.file else None,
         }
 
     @staticmethod

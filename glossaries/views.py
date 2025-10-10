@@ -12,6 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import Group
 from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404
 
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
@@ -37,10 +38,8 @@ class UserGlossariesView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        glossaries_data, pagination_context = self.get_glossaries()
-        context['glossaries'] = glossaries_data
+        context['glossaries'] = self.get_glossaries()
         context['translate_languages'] = self.get_languages()
-        context['paginator'] = pagination_context
         return context
 
     def get_languages(self):
@@ -51,15 +50,11 @@ class UserGlossariesView(TemplateView):
     def get_glossaries(self):
         tmp_glossaries = Glossary.objects.filter(user=self.request.user)
 
-        paginator = TemplateViewPagination()
-        paginated_glossaries = paginator.paginate_queryset(
-            tmp_glossaries, self.request)
-
         formatted_glossaries = [
             glossary.to_json(self.request)
-            for glossary in paginated_glossaries
+            for glossary in tmp_glossaries
         ]
-        return formatted_glossaries, paginator.get_paginated_context()
+        return formatted_glossaries
 
 
 class UserGlossariesView2(TemplateView):
@@ -145,10 +140,15 @@ class AddGlossaryView(APIView):
 
 
 class SingleGlossaryView(RetrieveUpdateDestroyAPIView):
+    permission_classes = (SubscribedPermission, IsAuthenticated)
     serializer_class = GlossarySerializer
 
     def get_object(self):
-        return Glossary.objects.filter(user=self.request.user, id=self.kwargs['pk']).first()
+        return get_object_or_404(
+            Glossary,
+            user=self.request.user,
+            id=self.kwargs['pk']
+        )
 
 
 class GlossariesListAPIView(APIView):

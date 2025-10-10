@@ -78,9 +78,10 @@ $(document).ready(function () {
         $('.glossary-file').val('');
     }
 
-    $('button[data-url]').on('click', function () {
+    $(document).on('click', '.download-glossary', function (e) {
+        e.preventDefault();
         const fileUrl = $(this).data('url');
-        if (fileUrl) {
+        if (fileUrl && fileUrl !== 'None') {
             downloadFile(fileUrl);
         }
     });
@@ -89,12 +90,15 @@ $(document).ready(function () {
         const $link = $('<a>', {
             href: url,
             download: '',
+            target: '_blank',
             style: 'display: none;'
         }).appendTo('body');
 
         $link[0].click();
 
-        $link.remove();
+        setTimeout(function() {
+            $link.remove();
+        }, 100);
     }
 
     $(document).on('click', '.delete-project', function () {
@@ -125,7 +129,9 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken')
             },
             success: function () {
-                $deleteButton.closest('tr').remove();
+                $deleteButton.closest('.glossary-row').fadeOut(300, function() {
+                    $(this).remove();
+                });
             },
             error: function (error) {
                 errorNotification(error?.status, error?.responseJSON?.detail);

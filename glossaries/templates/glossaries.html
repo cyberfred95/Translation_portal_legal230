@@ -4,37 +4,15 @@
 {% block content %}
 
 <div class="mx-5 mb-11.5 mt-5">
-    <h2 class="text-2xl mb-2">{% trans 'Glossary' %}</h2>
-    <div class="text-base">{% trans 'Find all your personal glossaries' %}</div>
+    <h2 class="text-2xl mb-2 font-poppins font-semibold">{% trans 'Glossary' %}</h2>
+    <div class="text-base font-poppins font-normal">{% trans 'Find all your personal glossaries' %}</div>
 
     <div class="rounded-md px-5 pt-5 mt-5 w-full h-full flex flex-col items-end bg-white">
         <div class="flex w-full items-center my-5">
-            <div class="flex w-full items-center justify-between gap-4 mb-6">
-                <form method="GET" class="relative flex-1 ">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <!-- Search Icon SVG -->
-                        <svg class="h-5 w-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </div>
-                    <input
-                            type="text"
-                            name="search"
-                            id="search-user"
-                            value="{{ search_query }}"
-                            placeholder="{% trans 'Search for a user' %}"
-                            class="w-full h-9 pl-10 pr-3 border border-black/10 rounded-md bg-white text-sm font-normal leading-6 tracking-[-0.084px] text-muted-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                    />
-                    <!-- Preserve current page when searching -->
-                    {% if request.GET.page %}
-                    <input type="hidden" name="page" value="1">
-                    {% endif %}
-                </form>
+            <div class="flex w-full items-center justify-end gap-4 mb-6">
                 <button
                         type="button" id="openModal" class="text-white text-sm flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
-                     <div class="mr-2">
-                         {% include 'svg/icons/add_folder.svg' %}
-                     </div>
+                     <i class="ph ph-folder-plus mr-2" style="font-size: 20px;"></i>
                      {% trans 'Add glossary' %}
                 </button>
             </div>
@@ -46,54 +24,39 @@
 
         <div class="flex flex-col items-center justify-start w-full">
             <div class="w-full flex flex-row bg-blue-50 border-b-0.25 border-gray-100">
-                <div class="h-12 flex flex-row justify-center items-center w-18">
+                <div class="text-base px-8 h-12 flex flex-row items-center justify-start w-200 overflow-hidden whitespace-nowrap">
+                    <i class="ph ph-books mr-1 flex-shrink-0"></i>
+                    <span class="truncate">{% trans 'File name' %}</span>
                 </div>
-                <div class="text-base px-8 h-12 flex flex-row items-center justify-start w-200">
-                    <i class="ph ph-books mr-1"></i>
-                    {% trans 'File name' %}
+                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center justify-start w-200 overflow-hidden whitespace-nowrap">
+                    <i class="ph ph-megaphone mr-1 flex-shrink-0"></i>
+                    <span class="truncate">{% trans 'Original languages' %}</span>
                 </div>
-                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center justify-start w-200">
-                    <i class="ph ph-megaphone mr-1"></i>
-                    {% trans 'Original languages' %}
+                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center justify-start w-200 overflow-hidden whitespace-nowrap">
+                    <i class="ph ph-megaphone mr-1 flex-shrink-0"></i>
+                    <span class="truncate">{% trans 'Traduction languages' %}</span>
                 </div>
-                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center justify-start w-200">
-                    <i class="ph ph-megaphone mr-1"></i>
-                    {% trans 'Traduction languages' %}
+                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center justify-start w-140 overflow-hidden whitespace-nowrap">
+                    <i class="ph ph-calendar-blank mr-1 flex-shrink-0"></i>
+                    <span class="truncate">{% trans 'Creation date' %}</span>
                 </div>
-                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center justify-start w-140">
-                    <i class="ph ph-calendar-blank mr-1"></i>
-                    {% trans 'Creation date' %}
-                </div>
-                <div class="text-base text-[#5a5a78] h-12 flex flex-row flex-grow justify-center items-center w-full">
-                    <i class="ph ph-wrench mr-1"></i>
-                    {% trans 'Actions' %}
+                <div class="text-base text-[#5a5a78] h-12 flex flex-row flex-grow justify-center items-center w-full overflow-hidden whitespace-nowrap">
+                    <i class="ph ph-wrench mr-1 flex-shrink-0"></i>
+                    <span class="truncate">{% trans 'Actions' %}</span>
                 </div>
             </div>
 
             {% if glossaries %}
             {% for glossary in glossaries %}
 
-            <div class="w-full flex flex-row border-b-0.25 border-gray-100 h-16 justify-center items-center">
-                <div class="h-12 flex flex-row justify-center items-center w-18">
-                    {% include 'svg/icons/glossar.svg' %}
-                </div>
+            <div class="w-full flex flex-row border-b-0.25 border-gray-100 h-16 justify-center items-center glossary-row">
                 <div class="text-sm text-[#5a5a78] h-12 flex flex-row items-center pl-8 w-200">
                     <span class="md:w-60 2xl:w-80 w-max truncate">{{ glossary.name }}</span>
                 </div>
                 <div class="flex justify-start w-200 pr-8">
-                    {% if glossary.source_language|lower == "en" %}
-                    <span class="fi fi-us mr-2"></span>
-                    {% else %}
-                    <span class="fi fi-{{ glossary.source_language|lower }} mr-2"></span>
-                    {% endif %}
                     {{ glossary.source_language }}
                 </div>
                 <div class="flex justify-start text-base text-[#5a5a78] h-12 flex flex-row items-center w-200">
-                    {% if glossary.target_language|lower == "en" %}
-                    <span class="fi fi-us mr-2"></span>
-                    {% else %}
-                    <span class="fi fi-{{ glossary.target_language|lower }} mr-2"></span>
-                    {% endif %}
                     {{ glossary.target_language }}
                 </div>
                 <div class="text-base text-[#5a5a78] h-12 flex flex-row justify-start items-center px-8 w-140">
@@ -106,35 +69,20 @@
                             <i class="ph ph-pencil-simple text-black/80 text-lg"></i>
                         </button>
 
-                        <!-- Share Button -->
-                        <button type="button" data-url="{{ glossary.file_url }}">
-                            <i class="ph ph-share text-black/80 text-lg"></i>
-                        </button>
+                        <!-- Download Button -->
+                        <a href="{{ glossary.file_url }}" download="{{ glossary.name }}.csv" class="p-1 inline-flex items-center justify-center" title="Télécharger {{ glossary.name }}">
+                            <i class="ph ph-download text-black/80 text-lg"></i>
+                        </a>
 
                         <!-- Delete Button -->
                         <button type="button" class="delete-project"
                                 data-delete-url="{% url 'single_glossary' glossary.id %}">
                             <div class="relative group">
-                                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
+                                <i class="ph ph-trash text-red-500" style="font-size: 16px;"></i>
                                 <div class="tooltip invisible opacity-0 transition-opacity duration-300 absolute z-10 w-auto py-2 px-2 bg-white text-black text-2.75 rounded-md bottom-14 left-1/2 transform -translate-x-1/2 translate-y-full shadow-lg">
                                     <div class="flex items-center gap-1.5">
-                                        <svg class="allow-delete" width="14" height="14" viewBox="0 0 14 14" fill="none"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M7 14C10.866 14 14 10.866 14 7C14 3.13401 10.866 0 7 0C3.13401 0 0 3.13401 0 7C0 10.866 3.13401 14 7 14Z"
-                                                  fill="#00BBA7"/>
-                                            <path d="M10.4019 4.34429L10.3841 4.32625C10.2923 4.23442 10.1833 4.16159 10.0633 4.11189C9.94333 4.0622 9.81475 4.03662 9.6849 4.03662C9.55505 4.03662 9.42647 4.0622 9.3065 4.11189C9.18654 4.16159 9.07754 4.23442 8.98572 4.32625L5.77174 7.5405L5.01787 6.78664C4.92491 6.69366 4.81454 6.6199 4.69308 6.56958C4.57161 6.51926 4.44142 6.49336 4.30994 6.49336C4.17846 6.49336 4.04827 6.51926 3.9268 6.56958C3.80533 6.6199 3.69497 6.69366 3.60201 6.78664C3.50899 6.8796 3.4352 6.98998 3.38485 7.11148C3.33451 7.23297 3.30859 7.36319 3.30859 7.4947C3.30859 7.62622 3.33451 7.75644 3.38485 7.87793C3.4352 7.99942 3.50899 8.10981 3.60201 8.20277L5.05478 9.65554L5.07256 9.67359C5.16435 9.7654 5.27333 9.83824 5.39327 9.88793C5.51321 9.93762 5.64177 9.96319 5.7716 9.96319C5.90143 9.96319 6.02999 9.93762 6.14993 9.88793C6.26987 9.83824 6.37885 9.7654 6.47064 9.67359L6.47967 9.66457L10.4019 5.74211C10.5872 5.55674 10.6913 5.30533 10.6913 5.0432C10.6913 4.78107 10.5872 4.52967 10.4019 4.34429Z"
-                                                  fill="white"/>
-                                        </svg>
-                                        <svg class="cancel-delete" width="14" height="14" viewBox="0 0 14 14"
-                                             fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M7 14C10.866 14 14 10.866 14 7C14 3.13401 10.866 0 7 0C3.13401 0 0 3.13401 0 7C0 10.866 3.13401 14 7 14Z"
-                                                  fill="#FD625E"/>
-                                            <path d="M9.53205 10.6914C9.37965 10.6919 9.22867 10.6621 9.08786 10.6038C8.94705 10.5455 8.81921 10.4599 8.71174 10.3518L7.00002 8.64064L5.2883 10.3526C5.07074 10.5702 4.77566 10.6924 4.46799 10.6924C4.16031 10.6924 3.86524 10.5702 3.64768 10.3526C3.43011 10.1351 3.30789 9.84 3.30789 9.53232C3.30789 9.22465 3.43011 8.92957 3.64768 8.71201L5.35939 7.00002L3.6474 5.2883C3.42984 5.07074 3.30762 4.77566 3.30762 4.46799C3.30762 4.16031 3.42984 3.86524 3.6474 3.64768C3.86496 3.43011 4.16004 3.30789 4.46771 3.30789C4.77539 3.30789 5.07047 3.43011 5.28803 3.64768L7.00002 5.35939L8.71174 3.6474C8.81946 3.53968 8.94735 3.45422 9.0881 3.39592C9.22885 3.33762 9.3797 3.30762 9.53205 3.30762C9.6844 3.30762 9.83525 3.33762 9.976 3.39592C10.1167 3.45422 10.2446 3.53968 10.3524 3.6474C10.4601 3.75513 10.5455 3.88301 10.6038 4.02376C10.6621 4.16451 10.6921 4.31537 10.6921 4.46771C10.6921 4.62006 10.6621 4.77091 10.6038 4.91166C10.5455 5.05241 10.4601 5.1803 10.3524 5.28803L8.64064 7.00002L10.3526 8.71174C10.5148 8.87393 10.6253 9.0806 10.6701 9.30558C10.7148 9.53057 10.6918 9.76377 10.604 9.97569C10.5162 10.1876 10.3675 10.3687 10.1767 10.4961C9.98598 10.6235 9.76172 10.6915 9.53232 10.6914H9.53205Z"
-                                                  fill="white"/>
-                                        </svg>
-
+                                        <i class="ph-fill ph-check-circle allow-delete" style="font-size: 14px; color: #00BBA7;"></i>
+                                        <i class="ph-fill ph-x-circle cancel-delete" style="font-size: 14px; color: #FD625E;"></i>
                                     </div>
                                     <div class="absolute w-3 h-3 bg-white transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5 shadow-lg"></div>
                                 </div>
@@ -156,8 +104,8 @@
             <!-- Header -->
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2 pl-4">
-                    <!-- FolderPlus Icon SVG -->
-                    {% include 'svg/icons/glossary.svg' %}
+                    <!-- Glossary Icon -->
+                    <i class="ph ph-books text-black/80" style="font-size: 24px;"></i>
                     <h1 class="font-poppins text-2xl font-bold text-gray-900 leading-8 tracking-[-0.456px]">
                         {% trans 'Add glossary' %}
                     </h1>
@@ -168,10 +116,8 @@
                         class="flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
                         aria-label="Close modal"
                 >
-                    <!-- X Icon SVG -->
-                    <svg class="w-6 h-6 text-black/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
+                    <!-- X Icon -->
+                    <i class="ph ph-x text-black/80" style="font-size: 24px;"></i>
                 </button>
             </div>
 
@@ -213,9 +159,7 @@
                     <div id="uploadButtons" class="flex flex-col gap-2.5 items-center">
                         <button type="button" id="uploadButton"
                                 class="text-white text-sm flex h-10 px-4 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
-                                <span class="mr-1">
-                                    {% include 'svg/icons/plus.svg' %}
-                                </span>
+                                <i class="ph ph-plus mr-2" style="font-size: 20px;"></i>
                             {% trans 'Upload file' %}
                         </button>
                         <div id="fileInfo"
@@ -223,27 +167,12 @@
 
                             <span id="fileName" class="flex-grow truncate"></span>
                             <button type="button" class="remove-file">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <g clip-path="url(#clip0_759_4082)">
-                                        <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z"
-                                              fill="#176C77"/>
-                                        <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z"
-                                              fill="white"/>
-                                    </g>
-                                    <defs>
-                                        <clipPath id="clip0_759_4082">
-                                            <rect width="20" height="20" fill="white"/>
-                                        </clipPath>
-                                    </defs>
-                                </svg>
+                                <i class="ph ph-x-circle" style="font-size: 20px; color: #176C77;"></i>
                             </button>
                         </div>
                         <a href="{% static 'Gloss_en-de.csv' %}" type="button" id="downloadSample"
                            class="text-green-800 text-sm flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-white border border-gray-200 transition-colors">
-                            <span class="mr-1">
-                                {% include 'svg/icons/download.svg' %}
-                            </span>
+                            <i class="ph ph-download mr-2" style="font-size: 20px;"></i>
                             {% trans 'Download sample' %}
                         </a>
                         <p class="text-3.5 text-gray-400">{% trans 'Supported Files: .csv, .xlsx max 5mb' %}</p>
@@ -259,9 +188,13 @@
                     <li>{% trans "Table formatting is not allowed, only plain text" %}</li>
                     <li>{% trans "Commas are not allowed" %}</li>
                 </ul>
-                <div class="flex justify-end w-full items-center">
+                <div class="flex justify-between w-full items-center">
+                    <button type="button" id="closeModal"
+                            class="text-gray-600 text-sm flex h-10 px-4 py-2 justify-center items-center rounded-full border border-gray-300 hover:bg-gray-50 transition-colors">
+                        {% trans 'Cancel' %}
+                    </button>
                     <button type="submit" id="continueButton"
-                            class="text-white text-sm flex h-10 px-4 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
+                            class="text-white text-sm flex h-10 px-4 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors create-glossary">
                         {% trans 'Continue' %}
                         <i class="ph ph-arrow-right ml-2"></i>
                     </button>
@@ -277,10 +210,7 @@
             <div class="absolute -top-4.5 -right-4.5 -mr-4 -mt-4 z-10">
                 <button type="button" id="close-edit-modal"
                         class="p-2 text-gray-500 hover:text-gray-900 focus:outline-none">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M11.7688 10.0003L19.6335 2.13553C20.1222 1.64732 20.1222 0.855171 19.6335 0.36696C19.1449 -0.121669 18.3536 -0.121669 17.865 0.36696L10.0002 8.23171L2.13504 0.36696C1.64641 -0.121669 0.8551 -0.121669 0.366471 0.36696C-0.122157 0.855171 -0.122157 1.64732 0.366471 2.13553L8.23164 10.0003L0.366471 17.865C-0.122157 18.3532 -0.122157 19.1454 0.366471 19.6336C0.610786 19.8775 0.930979 19.9997 1.25076 19.9997C1.57053 19.9997 1.89073 19.8775 2.13504 19.6332L10.0002 11.7684L17.865 19.6332C18.1093 19.8775 18.4295 19.9997 18.7492 19.9997C19.069 19.9997 19.3892 19.8775 19.6335 19.6332C20.1222 19.145 20.1222 18.3528 19.6335 17.8646L11.7688 10.0003Z"
-                              fill="white"/>
-                    </svg>
+                    <i class="ph ph-x" style="font-size: 20px; color: white;"></i>
                 </button>
             </div>
 
@@ -299,41 +229,11 @@
 
         </div>
     </div>
-
-
-    <div class="pagination flex justify-center items-center py-12.5 w-full gap-18 hidden"
-         data-total-items="{{ paginator.count }}"
-         data-items-per-page="{{ paginator.page_size }}"
-         data-current-page="{{ paginator.current_page }}">
-        <a href="#" id="prev-page" class="flex items-center gap-2.5 text-3.25 text-gray-600">
-            <svg width="6" height="11" viewBox="0 0 6 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M0.286074 4.78962C0.336297 4.73904 0.3919 4.69635 0.449656 4.65922L4.32557 0.783488C4.70385 0.405564 5.31693 0.405385 5.69539 0.783667C6.07367 1.16177 6.07367 1.77502 5.69539 2.15348L2.35721 5.4913L5.71225 8.8467C6.09071 9.22462 6.09071 9.83805 5.71225 10.2165C5.52302 10.4054 5.27531 10.4999 5.02761 10.4999C4.7799 10.4999 4.53166 10.4054 4.34297 10.2162L0.449656 6.32338C0.3919 6.28625 0.336476 6.24374 0.286074 6.19298C0.0923591 5.99926 -0.000552654 5.74492 0.00375223 5.4913C-0.000731945 5.2375 0.0923591 4.9828 0.286074 4.78962Z"
-                      fill="currentColor"/>
-            </svg>
-            {% trans 'Prev' %}
-        </a>
-        <div id="page-numbers" class="flex space-x-3.5 text-3.25 items-end">
-            <!-- Page numbers will be inserted here dynamically -->
-        </div>
-        <a href="#" id="next-page" class="flex items-center gap-2.5 text-3.25 text-gray-600">
-            {% trans 'Next' %}
-            <svg width="6" height="11" viewBox="0 0 6 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M5.71393 4.78962C5.6637 4.73904 5.6081 4.69635 5.55034 4.65922L1.67443 0.783488C1.29615 0.405564 0.683075 0.405385 0.304613 0.783667C-0.0736695 1.16177 -0.0736695 1.77502 0.304613 2.15348L3.64279 5.4913L0.287753 8.8467C-0.0907092 9.22462 -0.0907092 9.83805 0.287753 10.2165C0.476983 10.4054 0.724687 10.4999 0.972392 10.4999C1.2201 10.4999 1.46834 10.4054 1.65703 10.2162L5.55034 6.32338C5.6081 6.28625 5.66352 6.24374 5.71393 6.19298C5.90764 5.99926 6.00055 5.74492 5.99625 5.4913C6.00073 5.2375 5.90764 4.9828 5.71393 4.78962Z"
-                      fill="currentColor"/>
-            </svg>
-
-        </a>
-    </div>
 </div>
 
 <script src="{% static 'js/glossaries.js' %}"></script>
-<script src="{% static 'js/pagination.js' %}"></script>
 <script>
     let get_domains = "{% url 'get_domains' %}"
     let add_glossary = "{% url 'add_glossary' %}"
 </script>
-<link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css"
-/>
 {% endblock %}
