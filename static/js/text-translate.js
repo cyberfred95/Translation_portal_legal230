@@ -79,9 +79,6 @@ $(document).ready(function () {
         return null;
     }
 
-    // Restaurer les langues sauvegardées au chargement
-    restoreLanguageSelection();
-
     // Event listener pour sauvegarder la sélection du glossaire
     $('select[name="domain_name"]').on('change', function () {
         saveGlossarySelection();
@@ -137,7 +134,9 @@ $(document).ready(function () {
     // Appliquer les icônes Phosphor aux flèches des dropdowns
     enhanceSelect2Arrows();
 
-    let sourceLanguage, targetLanguage;
+    // Variables pour stocker les langues sélectionnées
+    let sourceLanguage = $('select[name="source_language"]').val();
+    let targetLanguage = $('select[name="target_language"]').val();
 
     const getDomains = () => {
         if (sourceLanguage && targetLanguage) {
@@ -159,7 +158,10 @@ $(document).ready(function () {
                         domainSelect.append($('<option></option>').attr('value', '').text('Domain').prop('disabled', true));
 
                         $.each(response.data, function (index, domain) {
-                            domainSelect.append($('<option></option>').attr('value', domain).text(domain));
+                            const option = $('<option></option>')
+                                .attr('value', domain.name)
+                                .text(domain.name);
+                            domainSelect.append(option);
                         });
 
                         // Essayer de restaurer le glossaire précédemment utilisé pour cette combinaison de langues
@@ -175,7 +177,7 @@ $(document).ready(function () {
                         }
                         
                         if (selectedVal) {
-                            domainSelect.val(selectedVal).trigger('change.select2');
+                            domainSelect.val(selectedVal).trigger('change');
                         }
                         // Revalider le bouton après sélection
                         if (typeof validateTranslateButton === 'function') {
@@ -214,6 +216,10 @@ $(document).ready(function () {
         validateTranslateButton();
         getDomains();
     });
+
+    // Restaurer les langues sauvegardées au chargement
+    // Note: trigger('change') dans restoreLanguageSelection() appellera getDomains() automatiquement
+    restoreLanguageSelection();
 
     $('form[name="text-translate"]').on('submit', function (e) {
         e.preventDefault();
