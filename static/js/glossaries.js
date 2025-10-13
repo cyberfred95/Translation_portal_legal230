@@ -72,28 +72,6 @@ $(document).ready(function () {
     // Exposer la fonction globalement
     window.resetGlossaryUploadArea = resetUploadArea;
 
-    $(document).on('click', '.download-glossary', function (e) {
-        e.preventDefault();
-        const fileUrl = $(this).data('url');
-        if (fileUrl && fileUrl !== 'None') {
-            downloadFile(fileUrl);
-        }
-    });
-
-    function downloadFile(url) {
-        const $link = $('<a>', {
-            href: url,
-            download: '',
-            target: '_blank',
-            style: 'display: none;'
-        }).appendTo('body');
-
-        $link[0].click();
-
-        setTimeout(function() {
-            $link.remove();
-        }, 100);
-    }
 
     $(document).on('click', '.delete-project', function () {
         $('.tooltip').addClass('opacity-0 invisible').removeClass('opacity-100 visible');
