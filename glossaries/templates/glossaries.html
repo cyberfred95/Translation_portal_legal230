@@ -9,88 +9,111 @@
 
     <div class="rounded-lg p-6 w-full h-full flex flex-col items-end bg-white">
         <div class="flex w-full items-center justify-end gap-4 mb-6">
-            <button
-                    type="button" id="openModal" class="text-white text-sm flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
+                <button
+                        type="button" id="openModal" class="text-white text-sm flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
                  <i class="ph ph-folder-plus mr-2" style="font-size: 20px;"></i>
-                 {% trans 'Add glossary' %}
-            </button>
-        </div>
-
-        <div class="flex flex-col items-center justify-start w-full">
-            <div class="w-full flex flex-row bg-blue-50 border-b-0.25 border-gray-100">
-                <div class="text-base px-8 h-12 flex flex-row items-center justify-start w-200 overflow-hidden whitespace-nowrap">
-                    <i class="ph ph-books mr-1 flex-shrink-0"></i>
-                    <span class="truncate">{% trans 'File name' %}</span>
-                </div>
-                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center justify-start w-200 overflow-hidden whitespace-nowrap">
-                    <i class="ph ph-megaphone mr-1 flex-shrink-0"></i>
-                    <span class="truncate">{% trans 'Original languages' %}</span>
-                </div>
-                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center justify-start w-200 overflow-hidden whitespace-nowrap">
-                    <i class="ph ph-megaphone mr-1 flex-shrink-0"></i>
-                    <span class="truncate">{% trans 'Traduction languages' %}</span>
-                </div>
-                <div class="text-base text-[#5a5a78] h-12 flex flex-row items-center justify-start w-140 overflow-hidden whitespace-nowrap">
-                    <i class="ph ph-calendar-blank mr-1 flex-shrink-0"></i>
-                    <span class="truncate">{% trans 'Creation date' %}</span>
-                </div>
-                <div class="text-base text-[#5a5a78] h-12 flex flex-row flex-grow justify-center items-center w-full overflow-hidden whitespace-nowrap">
-                    <i class="ph ph-wrench mr-1 flex-shrink-0"></i>
-                    <span class="truncate">{% trans 'Actions' %}</span>
-                </div>
+                     {% trans 'Add glossary' %}
+                </button>
             </div>
 
+        <table class="w-full table-fixed">
+            <thead>
+                <tr class="bg-blue-50 border-b border-gray-200">
+                    <th style="width: 40%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 12px 32px;">
+                        <span style="display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; width: 100%;">
+                            <i class="ph ph-books" style="font-size: 20px; color: #6B7280; flex: 0 0 auto;"></i>
+                            <span style="display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% trans 'File name' %}</span>
+                        </span>
+                    </th>
+                    <th style="width: 15%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 12px 16px; text-align: center;">
+                        <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; width: 100%;">
+                            <i class="ph ph-megaphone" style="font-size: 20px; color: #6B7280; flex: 0 0 auto;"></i>
+                            <span style="display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% trans 'Source' %}</span>
+                        </span>
+                    </th>
+                    <th style="width: 15%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 12px 16px; text-align: center;">
+                        <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; width: 100%;">
+                            <i class="ph ph-megaphone" style="font-size: 20px; color: #6B7280; flex: 0 0 auto;"></i>
+                            <span style="display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% trans 'Target' %}</span>
+                        </span>
+                    </th>
+                    <th style="width: 15%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 12px 32px; text-align: center;">
+                        <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; width: 100%;">
+                            <i class="ph ph-calendar-blank" style="font-size: 20px; color: #6B7280; flex: 0 0 auto;"></i>
+                            <span style="display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% trans 'Creation date' %}</span>
+                        </span>
+                    </th>
+                    <th style="width: 15%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 12px 32px; text-align: center;">
+                        <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; width: 100%;">
+                            <i class="ph ph-wrench" style="font-size: 20px; color: #6B7280; flex: 0 0 auto;"></i>
+                            <span style="display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% trans 'Actions' %}</span>
+                        </span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
             {% if glossaries %}
             {% for glossary in glossaries %}
-
-            <div class="w-full flex flex-row border-b-0.25 border-gray-100 h-16 justify-center items-center glossary-row">
-                <div class="text-sm text-[#5a5a78] h-12 flex flex-row items-center pl-8 w-200 overflow-hidden">
-                    <span class="truncate">{{ glossary.name }}</span>
-                </div>
-                <div class="flex justify-start w-200 pr-8 overflow-hidden whitespace-nowrap">
-                    <span class="truncate">{{ glossary.source_language }}</span>
-                </div>
-                <div class="flex justify-start text-base text-[#5a5a78] h-12 flex-row items-center w-200 overflow-hidden whitespace-nowrap">
-                    <span class="truncate">{{ glossary.target_language }}</span>
-                </div>
-                <div class="text-base text-[#5a5a78] h-12 flex flex-row justify-start items-center px-8 w-140 overflow-hidden whitespace-nowrap">
-                    <span class="truncate">{{ glossary.created_at | date:"d/m/Y" }}</span>
-                </div>
-                <div class="text-base text-[#5a5a78] h-12 flex flex-row flex-grow justify-center items-center px-8 w-full">
-                    <div class="flex justify-center gap-1">
-                        <!-- Mail Write Button -->
-                        <button class="p-1">
-                            <i class="ph ph-pencil-simple text-black/80 text-lg"></i>
-                        </button>
-
-                        <!-- Download Button -->
-                        <a href="{{ glossary.file_url }}" download="{{ glossary.name }}.csv" class="p-1 inline-flex items-center justify-center" title="Télécharger {{ glossary.name }}">
-                            <i class="ph ph-download text-black/80 text-lg"></i>
-                        </a>
+                    <tr class="border-b border-gray-100 hover:bg-gray-50 glossary-row">
+                        <td class="py-3 px-8" style="vertical-align: top;">
+                            <span class="text-sm text-[#5a5a78] truncate block">{{ glossary.name }}</span>
+                        </td>
+                        <td class="py-3 px-4" style="vertical-align: middle; text-align: center;">
+                            <span class="text-sm text-[#5a5a78] truncate block">{{ glossary.source_language }}</span>
+                        </td>
+                        <td class="py-3 px-4" style="vertical-align: middle; text-align: center;">
+                            <span class="text-sm text-[#5a5a78] truncate block">{{ glossary.target_language }}</span>
+                        </td>
+                        <td class="py-3 px-8" style="vertical-align: middle; text-align: center;">
+                            <span class="text-sm text-[#5a5a78] truncate block">{{ glossary.created_at | date:"d/m/Y" }}</span>
+                        </td>
+                        <td class="py-3 px-8" style="text-align: center; vertical-align: middle;">
+                            <div class="flex justify-center gap-2">
+                                <!-- Download Button -->
+                                <a href="{{ glossary.file_url }}" download="{{ glossary.name }}.csv" class="p-1 inline-flex items-center justify-center" title="Télécharger {{ glossary.name }}" style="background: none; border: none; cursor: pointer;">
+                                    <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
+                                </a>
 
                         <!-- Delete Button -->
-                        <button type="button" class="delete-project"
-                                data-delete-url="{% url 'single_glossary' glossary.id %}">
+                                <button type="button" class="delete-project p-1"
+                                        data-delete-url="{% url 'single_glossary' glossary.id %}"
+                                        style="background: none; border: none; cursor: pointer;">
                             <div class="relative group">
-                                <i class="ph ph-trash text-red-500" style="font-size: 16px;"></i>
+                                        <i class="ph ph-trash" style="font-size: 16px; color: #DC2626;"></i>
                                 <div class="tooltip invisible opacity-0 transition-opacity duration-300 absolute z-10 w-auto py-2 px-2 bg-white text-black text-2.75 rounded-md bottom-14 left-1/2 transform -translate-x-1/2 translate-y-full shadow-lg">
                                     <div class="flex items-center gap-1.5">
-                                        <i class="ph-fill ph-check-circle allow-delete" style="font-size: 14px; color: #00BBA7;"></i>
-                                        <i class="ph-fill ph-x-circle cancel-delete" style="font-size: 14px; color: #FD625E;"></i>
+                                                <i class="ph-fill ph-check-circle allow-delete" style="font-size: 14px; color: #00BBA7;"></i>
+                                                <i class="ph-fill ph-x-circle cancel-delete" style="font-size: 14px; color: #FD625E;"></i>
                                     </div>
                                     <div class="absolute w-3 h-3 bg-white transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5 shadow-lg"></div>
                                 </div>
                             </div>
                         </button>
-
                     </div>
-                </div>
-            </div>
-
-            {% endfor %}
-            {% endif %}
-
-        </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-8 text-gray-500">
+                            <div class="flex flex-col items-center justify-center">
+                                <p class="text-base font-semibold">{% trans 'No glossaries found' %}</p>
+                                <p class="text-sm mt-1">{% trans 'Create your first glossary to get started.' %}</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center py-8 text-gray-500">
+                        <div class="flex flex-col items-center justify-center">
+                            <p class="text-base font-semibold">{% trans 'No glossaries found' %}</p>
+                            <p class="text-sm mt-1">{% trans 'Create your first glossary to get started.' %}</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
 
     </div>
     <div id="modal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">

@@ -10,12 +10,12 @@ def fill_glossary_ids(apps, schema_editor):
     glossaries = Glossary.objects.all()
 
     for glossary in glossaries:
-        i = 0
+        #i = 0
         try:
-            # glossary.glossary_id = AIGlossaryService().create_glossary(glossary)
-            glossary.glossary_id = i
+            glossary.glossary_id = AIGlossaryService().create_glossary(glossary)
+            #glossary.glossary_id = i
             glossary.save()
-            i += 1
+            #i += 1
         except ValidationError:
             glossary.delete()
 
