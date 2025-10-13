@@ -1,0 +1,196 @@
+{% load static %}
+{% load i18n %}
+
+<div id="modal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-md flex flex-col gap-6 p-6 pb-8 w-full max-h-[90vh] overflow-y-auto sm:p-8 sm:pb-8" style="max-width: 720px;">
+        <!-- Header -->
+        <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2 pl-4">
+                <!-- Glossary Icon -->
+                <i class="ph ph-books text-black/80" style="font-size: 24px;"></i>
+                <h1 class="font-poppins text-2xl font-bold text-gray-900 leading-8 tracking-[-0.456px]">
+                    {% trans 'Add glossary' %}
+                </h1>
+            </div>
+            <button
+                    type="button"
+                    id="closeIcon"
+                    class="flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    aria-label="Close modal"
+            >
+                <!-- X Icon -->
+                <i class="ph ph-x text-black/80" style="font-size: 24px;"></i>
+            </button>
+        </div>
+
+        <form class="flex flex-col items-center gap-7.5">
+            <div class="flex w-full justify-between gap-4">
+                <div class="flex flex-col gap-2.5 flex-1">
+                    <span>{% trans 'Source language' %}</span>
+                    <select class="glossary-language-source glossary-language-select" name="source_language"
+                            required>
+                        <option value="" disabled selected>{% trans 'Source language' %}</option>
+                        {% for translate_language in translate_languages %}
+                        <option value="{{ translate_language.abbreviation|lower }}">
+                            {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                            {{ translate_language.french_name }}
+                            {% else %} {{ translate_language.name }}
+                            {% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex flex-col gap-2.5 flex-1">
+                    <span>{% trans 'Target language' %}</span>
+                    <select class="glossary-language-target glossary-language-select" name="target_language"
+                            required>
+                        <option value="" disabled selected>{% trans 'Source language' %}</option>
+                        {% for translate_language in translate_languages %}
+                        <option value="{{ translate_language.abbreviation|lower }}">
+                            {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                            {{ translate_language.french_name }}
+                            {% else %} {{ translate_language.name }}
+                            {% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="glossary-container bg-gray-25 w-full py-5 rounded-md">
+
+                <div id="uploadButtons" class="flex flex-col gap-2.5 items-center">
+                    <button type="button" id="uploadButton"
+                            class="text-white text-sm flex h-10 px-4 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
+                            <i class="ph ph-plus mr-2" style="font-size: 20px;"></i>
+                        {% trans 'Upload file' %}
+                    </button>
+                    <div id="fileInfo"
+                         class="hidden flex gap-4 items-center justify-between px-4 py-2 rounded-full bg-green-800 text-white h-10">
+
+                        <span id="fileName" class="flex-grow truncate text-sm"></span>
+                        <button type="button" class="remove-file flex items-center justify-center">
+                            <i class="ph ph-x" style="font-size: 16px; color: white;"></i>
+                        </button>
+                    </div>
+                    <a href="{% static 'Gloss_en-de.csv' %}" type="button" id="downloadSample"
+                       class="text-green-800 text-sm flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-white border border-gray-200 transition-colors">
+                        <i class="ph ph-download mr-2" style="font-size: 20px;"></i>
+                        {% trans 'Download sample' %}
+                    </a>
+                    <p class="text-3.5 text-gray-400">{% trans 'Supported Files: .csv, .xlsx max 5mb' %}</p>
+                </div>
+            </div>
+            <ul class="list-disc pl-5">
+                <li>{% trans "The first row of the file should start with the language (i.e: French or FR)" %}</li>
+                <li>{% trans "Your file should not include any comments" %}</li>
+                <li>{% trans "Your file should have only 2 columns" %}</li>
+                <li>{% trans "Your file should include only one entry per each source text (no duplicates are allowed)" %}</li>
+                <li>{% trans "Your file must not contain empty lines, empty sources or empty targets" %}</li>
+                <li>{% trans "Entries must not have leading or trailing empty spaces" %}</li>
+                <li>{% trans "Table formatting is not allowed, only plain text" %}</li>
+                <li>{% trans "Commas are not allowed" %}</li>
+            </ul>
+
+            <!-- Warning Message -->
+            <div id="glossary-warning" class="hidden flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-md">
+                <i class="ph ph-warning-circle text-red-600 flex-shrink-0" style="font-size: 20px; margin-top: 2px;"></i>
+                <p id="glossary-warning-text" class="text-sm text-red-800 font-poppins"></p>
+            </div>
+
+            <div class="flex justify-between w-full items-center">
+                <button type="button" id="closeModal"
+                        class="text-gray-600 text-sm flex h-10 px-4 py-2 justify-center items-center rounded-full border border-gray-300 hover:bg-gray-50 transition-colors">
+                    {% trans 'Cancel' %}
+                </button>
+                <button type="submit" id="continueButton"
+                        class="text-white text-sm flex h-10 px-4 py-2 justify-center items-center rounded-full bg-gray-400 cursor-not-allowed transition-colors create-glossary"
+                        disabled>
+                    {% trans 'Continue' %}
+                    <i class="ph ph-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </form>
+
+        <input type="file" class="hidden glossary-file" accept=".csv, .xlsx">
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    function showWarning(message) {
+        $('#glossary-warning-text').text(message);
+        $('#glossary-warning').removeClass('hidden');
+    }
+    
+    function hideWarning() {
+        $('#glossary-warning').addClass('hidden');
+        $('#glossary-warning-text').text('');
+    }
+    
+    function validateGlossaryForm() {
+        const sourceLanguage = $('.glossary-language-source').val();
+        const targetLanguage = $('.glossary-language-target').val();
+        const hasFile = $('.glossary-file')[0]?.files.length > 0;
+        
+        // Cacher le warning lors de la validation
+        hideWarning();
+        
+        const isValid = sourceLanguage && 
+                       targetLanguage && 
+                       sourceLanguage !== targetLanguage && 
+                       hasFile;
+        
+        const $continueButton = $('#continueButton');
+        
+        if (isValid) {
+            $continueButton.prop('disabled', false)
+                          .removeClass('bg-gray-400 cursor-not-allowed')
+                          .addClass('bg-green-800 hover:bg-green-600 cursor-pointer');
+        } else {
+            $continueButton.prop('disabled', true)
+                          .removeClass('bg-green-800 hover:bg-green-600 cursor-pointer')
+                          .addClass('bg-gray-400 cursor-not-allowed');
+        }
+    }
+    
+    // Vérifier lors du changement de langue source
+    $('.glossary-language-source').on('change', validateGlossaryForm);
+    
+    // Vérifier lors du changement de langue cible
+    $('.glossary-language-target').on('change', validateGlossaryForm);
+    
+    // Vérifier lors de la sélection d'un fichier
+    $('.glossary-file').on('change', validateGlossaryForm);
+    
+    // Vérifier lors de la suppression du fichier
+    $(document).on('click', '.remove-file', function() {
+        setTimeout(validateGlossaryForm, 100);
+    });
+    
+    // Réinitialiser le formulaire quand la modal se ferme
+    $('#closeModal, #closeIcon').on('click', function() {
+        $('.glossary-language-source').val('').trigger('change');
+        $('.glossary-language-target').val('').trigger('change');
+        $('.glossary-file').val('');
+        hideWarning();
+        
+        // Réinitialiser la zone d'upload
+        if (typeof window.resetGlossaryUploadArea === 'function') {
+            window.resetGlossaryUploadArea();
+        }
+        
+        validateGlossaryForm();
+    });
+    
+    // Fermer la modal en cliquant en dehors
+    $(window).on('click', function(event) {
+        if (event.target.id === 'modal') {
+            $('#closeModal').click();
+        }
+    });
+    
+    // Exposer la fonction showWarning globalement pour l'utiliser depuis glossaries.js
+    window.showGlossaryWarning = showWarning;
+    window.hideGlossaryWarning = hideWarning;
+});
+</script>

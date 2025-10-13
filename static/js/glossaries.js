@@ -24,20 +24,12 @@ $(document).ready(function () {
     });
 
     $('#closeModal, #closeIcon').on('click', function () {
-        $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
-        $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-700 text-green-700 border border-green-700');
-        $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
-
         $modal.addClass('hidden');
         $closeIcon.addClass('hidden');
     });
 
     $(window).on('click', function (event) {
         if (event.target == $modal[0]) {
-            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
-            $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-700 text-green-700 border border-green-700');
-            $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
-
             $modal.addClass('hidden');
             $closeIcon.addClass('hidden');
         }
@@ -50,14 +42,12 @@ $(document).ready(function () {
     $('.glossary-file').on('change', function (e) {
         file = e.target.files[0];
         if (file) {
-            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
-            $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-700 text-green-700 border border-green-700');
-            $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
             if (file.size <= maxFileSize) {
                 showUploadedFile(file.name);
             } else {
-                alert('File size exceeds 5MB limit.');
+                window.showGlossaryWarning('File size exceeds 5MB limit.');
                 $(this).val('');
+                file = null;
             }
         }
     });
@@ -76,7 +66,11 @@ $(document).ready(function () {
         $('#uploadButton').removeClass('hidden');
         $('#fileInfo').addClass('hidden');
         $('.glossary-file').val('');
+        file = null;
     }
+    
+    // Exposer la fonction globalement
+    window.resetGlossaryUploadArea = resetUploadArea;
 
     $(document).on('click', '.download-glossary', function (e) {
         e.preventDefault();
@@ -206,12 +200,23 @@ $(document).ready(function () {
     $(document).on('click', '.create-glossary', function (e) {
         e.preventDefault();
 
+        // Cacher les warnings existants
+        window.hideGlossaryWarning();
+
         if (!file) {
-            $('#uploadButton').removeClass('bg-green-700').addClass('bg-transparent border border-red-400 text-red-400');
-            $('#downloadSample').removeClass('bg-green-700 text-green-700 border border-green-700').addClass('bg-transparent border border-gray-200 text-gray-400');
-            $('.glossary-container').removeClass('bg-gray-25').addClass('bg-red-150');
+            window.showGlossaryWarning('Please select a file to upload');
             return;
         }
+
+        const $button = $(this);
+        
+        // Désactiver le bouton et afficher le spinner
+        $button.prop('disabled', true)
+               .addClass('cursor-not-allowed opacity-75');
+        
+        // Créer et insérer le spinner juste avant le texte "Continue"
+        const spinner = '<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="margin-right: 0.5rem;"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+        $button.prepend(spinner);
 
         const formData = new FormData();
 
@@ -233,7 +238,14 @@ $(document).ready(function () {
                 window.location.reload();
             },
             error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
+                // Retirer le spinner et réactiver le bouton en cas d'erreur
+                $button.prop('disabled', false)
+                       .removeClass('cursor-not-allowed opacity-75')
+                       .find('svg.animate-spin').remove();
+                
+                // Afficher le message d'erreur dans le warning
+                const errorMessage = error?.responseJSON?.detail || 'An error occurred while adding the glossary.';
+                window.showGlossaryWarning(errorMessage);
             },
         });
     });
