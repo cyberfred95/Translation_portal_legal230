@@ -111,36 +111,21 @@
     
     {% include 'glossaries_add_glossary.html' %}
     
-    <div id="edit-modal"
-         class="fixed inset-0 bg-gray-500 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
-        <div class="relative bg-white rounded-lg shadow-xl max-w-172.5 w-full mx-4">
-            <div class="absolute -top-4.5 -right-4.5 -mr-4 -mt-4 z-10">
-                <button type="button" id="close-edit-modal"
-                        class="p-2 text-gray-500 hover:text-gray-900 focus:outline-none">
-                    <i class="ph ph-x" style="font-size: 20px; color: white;"></i>
-                </button>
-            </div>
 
-            <form class="p-12.5 flex flex-col items-center gap-7.5">
-                <div class="text-5">Edit Name Glossary</div>
-                <input
-                        type="text"
-                        class="w-full bg-gray-125 px-2.5 py-4 rounded text-black border-none"
-                        placeholder="name"
-                >
-                <button type="submit" id="edit-glossary"
-                        class="bg-gray-600 px-6.5 py-1 rounded font-semibold text-4 text-white">
-                    {% trans 'Continue' %}
-                </button>
-            </form>
-
-        </div>
-    </div>
 </div>
 
 <script src="{% static 'js/glossaries.js' %}"></script>
 <script>
     let get_domains = "{% url 'get_domains' %}"
     let add_glossary = "{% url 'add_glossary' %}"
+    
+    // Messages traduits pour glossaries.js
+    window.glossaryMessages = {
+        fileTooBig: "{% trans 'File size exceeds 5MB limit.' %}",
+        pleaseSelectFile: "{% trans 'Please select a file to upload' %}",
+        errorOccurred: "{% trans 'An error occurred while adding the glossary.' %}",
+        glossaryAddedSuccess: "{% trans 'Glossary added successfully!' %}",
+        sameLanguages: "{% trans 'Source and target languages must be different' %}"
+    }
 </script>
 {% endblock %}

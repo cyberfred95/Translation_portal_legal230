@@ -1207,3 +1207,11 @@ msgstr ""
 #: writing/templates/writing_2.html:177
 msgid "Copy Result"
 msgstr ""
+
+#: glossaries/templates/glossaries.html:148
+msgid "File size exceeds 5MB limit."
+msgstr "La taille du fichier dépasse la limite de 5 Mo."
+
+#: glossaries/templates/glossaries.html:153
+msgid "Source and target languages must be different"
+msgstr "Les langues source et cible doivent être différentes"

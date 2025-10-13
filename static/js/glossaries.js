@@ -45,7 +45,7 @@ $(document).ready(function () {
             if (file.size <= maxFileSize) {
                 showUploadedFile(file.name);
             } else {
-                window.showGlossaryWarning('File size exceeds 5MB limit.');
+                window.showGlossaryWarning(window.glossaryMessages?.fileTooBig || 'File size exceeds 5MB limit.');
                 $(this).val('');
                 file = null;
             }
@@ -182,7 +182,7 @@ $(document).ready(function () {
         window.hideGlossaryWarning();
 
         if (!file) {
-            window.showGlossaryWarning('Please select a file to upload');
+            window.showGlossaryWarning(window.glossaryMessages?.pleaseSelectFile || 'Please select a file to upload');
             return;
         }
 
@@ -222,9 +222,87 @@ $(document).ready(function () {
                        .find('svg.animate-spin').remove();
                 
                 // Afficher le message d'erreur dans le warning
-                const errorMessage = error?.responseJSON?.detail || 'An error occurred while adding the glossary.';
+                const errorMessage = error?.responseJSON?.detail || window.glossaryMessages?.errorOccurred || 'An error occurred while adding the glossary.';
                 window.showGlossaryWarning(errorMessage);
             },
         });
+    });
+
+    // Fonctions de gestion des warnings pour la modal
+    function showWarning(message) {
+        $('#glossary-warning-text').text(message);
+        $('#glossary-warning').removeClass('hidden');
+    }
+    
+    function hideWarning() {
+        $('#glossary-warning').addClass('hidden');
+        $('#glossary-warning-text').text('');
+    }
+    
+    // Exposer les fonctions globalement
+    window.showGlossaryWarning = showWarning;
+    window.hideGlossaryWarning = hideWarning;
+    
+    // Validation du formulaire de la modal
+    function validateGlossaryForm() {
+        const sourceLanguage = $('.glossary-language-source').val();
+        const targetLanguage = $('.glossary-language-target').val();
+        const hasFile = $('.glossary-file')[0]?.files.length > 0;
+        
+        // Cacher le warning lors de la validation
+        hideWarning();
+        
+        const isValid = sourceLanguage && 
+                       targetLanguage && 
+                       sourceLanguage !== targetLanguage && 
+                       hasFile;
+        
+        const $continueButton = $('#continueButton');
+        
+        if (isValid) {
+            $continueButton.prop('disabled', false)
+                          .removeClass('bg-gray-400 cursor-not-allowed')
+                          .addClass('bg-green-800 hover:bg-green-600 cursor-pointer');
+        } else {
+            $continueButton.prop('disabled', true)
+                          .removeClass('bg-green-800 hover:bg-green-600 cursor-pointer')
+                          .addClass('bg-gray-400 cursor-not-allowed');
+        }
+    }
+    
+    // Vérifier lors du changement de langue source
+    $('.glossary-language-source').on('change', validateGlossaryForm);
+    
+    // Vérifier lors du changement de langue cible
+    $('.glossary-language-target').on('change', validateGlossaryForm);
+    
+    // Vérifier lors de la sélection d'un fichier
+    $('.glossary-file').on('change', validateGlossaryForm);
+    
+    // Vérifier lors de la suppression du fichier
+    $(document).on('click', '.remove-file', function() {
+        setTimeout(validateGlossaryForm, 100);
+    });
+    
+    // Réinitialiser le formulaire quand la modal se ferme
+    $('#closeModal, #closeIcon').on('click', function() {
+        $('.glossary-language-source').val('').trigger('change');
+        $('.glossary-language-target').val('').trigger('change');
+        $('.glossary-file').val('');
+        hideWarning();
+        
+        // Réinitialiser la zone d'upload
+        if (typeof window.resetGlossaryUploadArea === 'function') {
+            window.resetGlossaryUploadArea();
+        }
+        
+        validateGlossaryForm();
+    });
+    
+    // Fermer la modal en cliquant en dehors
+    $(window).on('click', function(event) {
+        if (event.target.id === 'modal') {
+            $('#closeModal').click();
+        }
     });
 });
