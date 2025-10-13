@@ -5,48 +5,47 @@
 
 <div class="mx-5 mb-11.5 mt-5">
     <h2 class="text-2xl mb-2 font-poppins font-semibold">{% trans 'Glossary' %}</h2>
-    <div class="text-base font-poppins font-normal mb-5">{% trans 'Find all your personal glossaries' %}</div>
+    <div class="flex items-center justify-between mb-5" style="padding-right: 1.5rem;">
+        <div class="text-base font-poppins font-normal">{% trans 'Find all your personal glossaries' %}</div>
+        <button
+                type="button" id="openModal" class="text-white text-sm flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
+             <i class="ph ph-folder-plus mr-2" style="font-size: 20px;"></i>
+             {% trans 'Add glossary' %}
+        </button>
+    </div>
 
-    <div class="rounded-lg p-6 w-full h-full flex flex-col items-end bg-white">
-        <div class="flex w-full items-center justify-end gap-4 mb-6">
-                <button
-                        type="button" id="openModal" class="text-white text-sm flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
-                 <i class="ph ph-folder-plus mr-2" style="font-size: 20px;"></i>
-                     {% trans 'Add glossary' %}
-                </button>
-            </div>
-
+    <div class="rounded-lg p-6 w-full h-full bg-white">
         <table class="w-full table-fixed">
             <thead>
                 <tr class="bg-blue-50 border-b border-gray-200">
-                    <th style="width: 40%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 12px 32px;">
-                        <span style="display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; width: 100%;">
-                            <i class="ph ph-books" style="font-size: 20px; color: #6B7280; flex: 0 0 auto;"></i>
-                            <span style="display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% trans 'File name' %}</span>
+                    <th style="width: 30%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 1rem 2rem;">
+                        <span style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="ph ph-books" style="font-size: 24px; color: #6B7280; flex: 0 0 auto;"></i>
+                            <span class="th-label">{% trans 'File name' %}</span>
                         </span>
                     </th>
-                    <th style="width: 15%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 12px 16px; text-align: center;">
-                        <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; width: 100%;">
-                            <i class="ph ph-megaphone" style="font-size: 20px; color: #6B7280; flex: 0 0 auto;"></i>
-                            <span style="display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% trans 'Source' %}</span>
+                    <th style="width: 15%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 1rem; text-align: center;">
+                        <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <i class="ph ph-megaphone" style="font-size: 24px; color: #6B7280; flex: 0 0 auto;"></i>
+                            <span class="th-label">{% trans 'Source' %}</span>
                         </span>
                     </th>
-                    <th style="width: 15%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 12px 16px; text-align: center;">
-                        <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; width: 100%;">
-                            <i class="ph ph-megaphone" style="font-size: 20px; color: #6B7280; flex: 0 0 auto;"></i>
-                            <span style="display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% trans 'Target' %}</span>
+                    <th style="width: 15%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 1rem; text-align: center;">
+                        <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <i class="ph ph-megaphone" style="font-size: 24px; color: #6B7280; flex: 0 0 auto;"></i>
+                            <span class="th-label">{% trans 'Target' %}</span>
                         </span>
                     </th>
-                    <th style="width: 15%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 12px 32px; text-align: center;">
-                        <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; width: 100%;">
-                            <i class="ph ph-calendar-blank" style="font-size: 20px; color: #6B7280; flex: 0 0 auto;"></i>
-                            <span style="display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% trans 'Creation date' %}</span>
+                    <th style="width: 25%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 1rem 2rem; text-align: center;">
+                        <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <i class="ph ph-calendar-blank" style="font-size: 24px; color: #6B7280; flex: 0 0 auto;"></i>
+                            <span class="th-label">{% trans 'Creation date' %}</span>
                         </span>
                     </th>
-                    <th style="width: 15%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 12px 32px; text-align: center;">
-                        <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; width: 100%;">
-                            <i class="ph ph-wrench" style="font-size: 20px; color: #6B7280; flex: 0 0 auto;"></i>
-                            <span style="display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% trans 'Actions' %}</span>
+                    <th style="width: 15%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 1rem 2rem; text-align: center;">
+                        <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <i class="ph ph-wrench" style="font-size: 24px; color: #6B7280; flex: 0 0 auto;"></i>
+                            <span class="th-label">{% trans 'Actions' %}</span>
                         </span>
                     </th>
                 </tr>
@@ -55,41 +54,39 @@
             {% if glossaries %}
             {% for glossary in glossaries %}
                     <tr class="border-b border-gray-100 hover:bg-gray-50 glossary-row">
-                        <td class="py-3 px-8" style="vertical-align: top;">
-                            <span class="text-sm text-[#5a5a78] truncate block">{{ glossary.name }}</span>
+                        <td style="padding: 1rem 2rem; vertical-align: middle;">
+                            <span class="doc-title">{{ glossary.name }}</span>
                         </td>
-                        <td class="py-3 px-4" style="vertical-align: middle; text-align: center;">
-                            <span class="text-sm text-[#5a5a78] truncate block">{{ glossary.source_language }}</span>
+                        <td style="padding: 1rem; vertical-align: middle; text-align: center;">
+                            <span class="lang-label" style="display: inline;">{{ glossary.source_language }}</span>
                         </td>
-                        <td class="py-3 px-4" style="vertical-align: middle; text-align: center;">
-                            <span class="text-sm text-[#5a5a78] truncate block">{{ glossary.target_language }}</span>
+                        <td style="padding: 1rem; vertical-align: middle; text-align: center;">
+                            <span class="lang-label" style="display: inline;">{{ glossary.target_language }}</span>
                         </td>
-                        <td class="py-3 px-8" style="vertical-align: middle; text-align: center;">
-                            <span class="text-sm text-[#5a5a78] truncate block">{{ glossary.created_at | date:"d/m/Y" }}</span>
+                        <td style="padding: 1rem 2rem; vertical-align: middle; text-align: center;">
+                            {{ glossary.created_at | date:"d/m/Y" }}
                         </td>
-                        <td class="py-3 px-8" style="text-align: center; vertical-align: middle;">
-                            <div class="flex justify-center gap-2">
+                        <td style="padding: 1rem 2rem; vertical-align: middle; text-align: center;">
+                            <div class="table-actions">
                                 <!-- Download Button -->
-                                <a href="{{ glossary.file_url }}" download="{{ glossary.name }}.csv" class="p-1 inline-flex items-center justify-center" title="Télécharger {{ glossary.name }}" style="background: none; border: none; cursor: pointer;">
+                                <a href="{{ glossary.file_url }}" download="{{ glossary.name }}.csv" title="Télécharger {{ glossary.name }}" style="background: none; border: none; cursor: pointer;">
                                     <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
                                 </a>
 
-                        <!-- Delete Button -->
-                                <button type="button" class="delete-project p-1"
+                                <!-- Delete Button -->
+                                <button type="button" class="delete-project"
                                         data-delete-url="{% url 'single_glossary' glossary.id %}"
-                                        style="background: none; border: none; cursor: pointer;">
-                            <div class="relative group">
-                                        <i class="ph ph-trash" style="font-size: 16px; color: #DC2626;"></i>
-                                <div class="tooltip invisible opacity-0 transition-opacity duration-300 absolute z-10 w-auto py-2 px-2 bg-white text-black text-2.75 rounded-md bottom-14 left-1/2 transform -translate-x-1/2 translate-y-full shadow-lg">
-                                    <div class="flex items-center gap-1.5">
-                                                <i class="ph-fill ph-check-circle allow-delete" style="font-size: 14px; color: #00BBA7;"></i>
-                                                <i class="ph-fill ph-x-circle cancel-delete" style="font-size: 14px; color: #FD625E;"></i>
+                                        style="background: none; border: none; cursor: pointer; position: relative;">
+                                    <i class="ph ph-trash" style="font-size: 16px; color: #DC2626;"></i>
+                                    <div class="tooltip invisible opacity-0 transition-opacity duration-300 absolute z-10 w-auto py-2 px-2 bg-white text-black text-2.75 rounded-md bottom-14 left-1/2 transform -translate-x-1/2 translate-y-full shadow-lg">
+                                        <div class="flex items-center gap-1.5">
+                                            <i class="ph-fill ph-check-circle allow-delete" style="font-size: 14px; color: #00BBA7;"></i>
+                                            <i class="ph-fill ph-x-circle cancel-delete" style="font-size: 14px; color: #FD625E;"></i>
+                                        </div>
+                                        <div class="absolute w-3 h-3 bg-white transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5 shadow-lg"></div>
                                     </div>
-                                    <div class="absolute w-3 h-3 bg-white transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5 shadow-lg"></div>
-                                </div>
+                                </button>
                             </div>
-                        </button>
-                    </div>
                         </td>
                     </tr>
                     {% empty %}
