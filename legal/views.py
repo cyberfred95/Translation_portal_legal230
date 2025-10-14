@@ -1155,6 +1155,13 @@ class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         # Add computed fields for each member
         members_with_data = []
         for user in queryset:
+            # Get user license info
+            license_info = self.get_user_license(user)
+            
+            # Skip users without active license (inactive users)
+            if license_info['status'] == 'no_subscription':
+                continue
+            
             member_data = {
                 'id': user.id,
                 'username': user.username,
@@ -1166,7 +1173,7 @@ class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
                 'is_buyer': self.check_buyer_status(user),
                 'is_premium': self.check_premium_status(user),
                 'date_joined': user.date_joined,
-                'license': self.get_user_license(user),
+                'license': license_info,
             }
             members_with_data.append(member_data)
         
@@ -1197,24 +1204,32 @@ class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
             else:
                 queryset = User.objects.none()
         
-        # Calculate statistics on the full queryset
-        total_users = queryset.count()
-        
         # Count admin users and active plans
+        # Only count users with active licenses
         admin_users = 0
         active_plans = 0
+        total_users_with_license = 0
         
         for user in queryset:
+            # Get user license info
+            license_info = self.get_user_license(user)
+            
+            # Skip users without active license (inactive users)
+            if license_info['status'] == 'no_subscription':
+                continue
+            
+            # Count this user (has a license)
+            total_users_with_license += 1
+            
             if self.check_admin_status(user):
                 admin_users += 1
             
-            # Count users with exactly one active subscription
-            license_info = self.get_user_license(user)
-            if license_info['status'] == 'active':
+            # Count users with email (not "Compte non attribué")
+            if user.email:
                 active_plans += 1
         
         return {
-            'total_users': total_users,
+            'total_users': total_users_with_license,
             'admin_users': admin_users,
             'active_plans': active_plans,
         }

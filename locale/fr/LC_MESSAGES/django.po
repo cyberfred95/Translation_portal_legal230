@@ -71,15 +71,13 @@ msgstr ""
 
 #: glossaries/templates/glossaries.html:7
 #: glossaries/templates/glossaries_2.html:25
-#, fuzzy
-#| msgid "Glossaries"
 msgid "Glossary"
-msgstr "glossaires"
+msgstr "Glossaires"
 
 #: glossaries/templates/glossaries.html:8
 #: glossaries/templates/glossaries_2.html:28
 msgid "Find all your personal glossaries"
-msgstr ""
+msgstr "Retrouvez tous vos glossaires personnels"
 
 #: glossaries/templates/glossaries.html:25
 msgid "Search for a user"
@@ -711,7 +709,7 @@ msgstr ""
 #: legal/templates/project_history.html:9
 #: legal/templates/project_history_2.html:14
 msgid "Find all your translation history"
-msgstr ""
+msgstr "Retrouvez tout votre historique de traduction"
 
 #: legal/templates/project_history.html:29
 #: legal/templates/translate/document_translate/document_translate.html:10
