@@ -1,85 +1,99 @@
 {% load static %}
 {% load i18n %}
 
+<!-- Add Glossary Modal -->
 <div id="modal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
     <div class="bg-white rounded-md flex flex-col gap-6 p-6 pb-8 w-full max-h-[90vh] overflow-y-auto sm:p-8 sm:pb-8" style="max-width: 720px;">
-        <!-- Header -->
+        
+        <!-- Modal Header -->
         <div class="flex justify-between items-center">
             <div class="flex items-center gap-2 pl-4">
-                <!-- Glossary Icon -->
                 <i class="ph ph-books text-black/80" style="font-size: 24px;"></i>
                 <h1 class="font-poppins text-2xl font-bold text-gray-900 leading-8 tracking-[-0.456px]">
                     {% trans 'Add glossary' %}
                 </h1>
             </div>
-            <button
-                    type="button"
+            <button type="button"
                     id="closeIcon"
                     class="flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                    aria-label="Close modal"
-            >
-                <!-- X Icon -->
+                    aria-label="{% trans 'Close' %}">
                 <i class="ph ph-x text-black/80" style="font-size: 24px;"></i>
             </button>
         </div>
 
+        <!-- Form -->
         <form class="flex flex-col items-center gap-7.5">
+            
+            <!-- Language Selection -->
             <div class="flex w-full justify-between gap-4">
                 <div class="flex flex-col gap-2.5 flex-1">
-                    <span>{% trans 'Source language' %}</span>
-                    <select class="glossary-language-source glossary-language-select" name="source_language"
+                    <label for="source_language">{% trans 'Source language' %}</label>
+                    <select id="source_language"
+                            class="glossary-language-source glossary-language-select" 
+                            name="source_language"
                             required>
                         <option value="" disabled selected>{% trans 'Source language' %}</option>
                         {% for translate_language in translate_languages %}
-                        <option value="{{ translate_language.abbreviation|lower }}">
-                            {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                            {{ translate_language.french_name }}
-                            {% else %} {{ translate_language.name }}
-                            {% endif %}
-                        </option>
+                            <option value="{{ translate_language.abbreviation|lower }}">
+                                {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                                    {{ translate_language.french_name }}
+                                {% else %}
+                                    {{ translate_language.name }}
+                                {% endif %}
+                            </option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="flex flex-col gap-2.5 flex-1">
-                    <span>{% trans 'Target language' %}</span>
-                    <select class="glossary-language-target glossary-language-select" name="target_language"
+                    <label for="target_language">{% trans 'Target language' %}</label>
+                    <select id="target_language"
+                            class="glossary-language-target glossary-language-select" 
+                            name="target_language"
                             required>
-                        <option value="" disabled selected>{% trans 'Source language' %}</option>
+                        <option value="" disabled selected>{% trans 'Target language' %}</option>
                         {% for translate_language in translate_languages %}
-                        <option value="{{ translate_language.abbreviation|lower }}">
-                            {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                            {{ translate_language.french_name }}
-                            {% else %} {{ translate_language.name }}
-                            {% endif %}
-                        </option>
+                            <option value="{{ translate_language.abbreviation|lower }}">
+                                {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                                    {{ translate_language.french_name }}
+                                {% else %}
+                                    {{ translate_language.name }}
+                                {% endif %}
+                            </option>
                         {% endfor %}
                     </select>
                 </div>
             </div>
+            
+            <!-- File Upload Section -->
             <div class="glossary-container bg-gray-25 w-full py-5 rounded-md">
-
                 <div id="uploadButtons" class="flex flex-col gap-2.5 items-center">
-                    <button type="button" id="uploadButton"
+                    <button type="button" 
+                            id="uploadButton"
                             class="text-white text-sm flex h-10 px-4 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
-                            <i class="ph ph-plus mr-2" style="font-size: 20px;"></i>
+                        <i class="ph ph-plus mr-2" style="font-size: 20px;"></i>
                         {% trans 'Upload file' %}
                     </button>
+                    
                     <div id="fileInfo"
                          class="hidden flex gap-4 items-center justify-between px-4 py-2 rounded-full bg-green-800 text-white h-10">
-
                         <span id="fileName" class="flex-grow truncate text-sm"></span>
                         <button type="button" class="remove-file flex items-center justify-center">
                             <i class="ph ph-x" style="font-size: 16px; color: white;"></i>
                         </button>
                     </div>
-                    <a href="{% static 'Gloss_en-de.csv' %}" type="button" id="downloadSample"
+                    
+                    <a href="{% static 'Gloss_en-de.csv' %}" 
+                       id="downloadSample"
                        class="text-green-800 text-sm flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-white border border-gray-200 transition-colors">
                         <i class="ph ph-download mr-2" style="font-size: 20px;"></i>
                         {% trans 'Download sample' %}
                     </a>
+                    
                     <p class="text-3.5 text-gray-400">{% trans 'Supported Files: .csv, .xlsx max 5mb' %}</p>
                 </div>
             </div>
+            
+            <!-- Instructions -->
             <ul class="list-disc pl-5">
                 <li>{% trans "The first row of the file should start with the language (i.e: French or FR)" %}</li>
                 <li>{% trans "Your file should not include any comments" %}</li>
@@ -97,20 +111,24 @@
                 <p id="glossary-warning-text" class="text-sm text-red-800 font-poppins"></p>
             </div>
 
+            <!-- Action Buttons -->
             <div class="flex justify-between w-full items-center">
-                <button type="button" id="closeModal"
+                <button type="button" 
+                        id="closeModal"
                         class="text-gray-600 text-sm flex h-10 px-4 py-2 justify-center items-center rounded-full border border-gray-300 hover:bg-gray-50 transition-colors">
                     {% trans 'Cancel' %}
                 </button>
-                <button type="submit" id="continueButton"
+                <button type="submit" 
+                        id="continueButton"
                         class="text-white text-sm flex h-10 px-4 py-2 justify-center items-center rounded-full bg-gray-400 cursor-not-allowed transition-colors create-glossary"
                         disabled>
                     {% trans 'Continue' %}
-                    <i class="ph ph-arrow-right ml-2"></i>
+                    <i class="ph ph-arrow-right ml-2" style="font-size: 16px;"></i>
                 </button>
             </div>
         </form>
 
+        <!-- Hidden File Input -->
         <input type="file" class="hidden glossary-file" accept=".csv, .xlsx">
     </div>
 </div>

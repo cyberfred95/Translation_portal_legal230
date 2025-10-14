@@ -1,50 +1,53 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
+
 {% block content %}
-
 <div class="mx-5 mb-11.5 mt-5">
+    <!-- Page Header -->
     <h2 class="text-2xl mb-2 font-poppins font-semibold">{% trans 'Glossary' %}</h2>
-    <div class="flex items-center justify-between mb-5" style="padding-right: 1.5rem;">
-        <div class="text-base font-poppins font-normal">{% trans 'Find all your personal glossaries' %}</div>
-        <button
-                type="button" id="openModal" class="text-white text-sm flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
-             <i class="ph ph-folder-plus mr-2" style="font-size: 20px;"></i>
-             {% trans 'Add glossary' %}
-        </button>
-    </div>
+    <div class="flex items-center justify-between mb-5 pr-6">
+        <p class="text-base font-poppins font-normal">{% trans 'Find all your personal glossaries' %}</p>
+        <button type="button" 
+                id="openModal" 
+                class="text-white text-sm flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-green-800 hover:bg-green-600 transition-colors">
+            <i class="ph ph-folder-plus mr-2" style="font-size: 20px;"></i>
+                     {% trans 'Add glossary' %}
+                </button>
+            </div>
 
-    <div class="rounded-lg p-6 w-full h-full bg-white">
+    <!-- Glossaries Table -->
+    <div class="rounded-lg p-6 bg-white">
         <table class="w-full table-fixed">
             <thead>
                 <tr class="bg-blue-50 border-b border-gray-200">
-                    <th style="width: 30%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 1rem 2rem;">
+                    <th style="width: 30%; padding: 1rem 2rem;">
                         <span style="display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="ph ph-books" style="font-size: 24px; color: #6B7280; flex: 0 0 auto;"></i>
+                            <i class="ph ph-books" style="font-size: 24px; color: #6B7280;"></i>
                             <span class="th-label">{% trans 'File name' %}</span>
                         </span>
                     </th>
-                    <th style="width: 15%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 1rem; text-align: center;">
+                    <th style="width: 15%; padding: 1rem; text-align: center;">
                         <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                            <i class="ph ph-megaphone" style="font-size: 24px; color: #6B7280; flex: 0 0 auto;"></i>
+                            <i class="ph ph-megaphone" style="font-size: 24px; color: #6B7280;"></i>
                             <span class="th-label">{% trans 'Source' %}</span>
                         </span>
                     </th>
-                    <th style="width: 15%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 1rem; text-align: center;">
+                    <th style="width: 15%; padding: 1rem; text-align: center;">
                         <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                            <i class="ph ph-megaphone" style="font-size: 24px; color: #6B7280; flex: 0 0 auto;"></i>
+                            <i class="ph ph-megaphone" style="font-size: 24px; color: #6B7280;"></i>
                             <span class="th-label">{% trans 'Target' %}</span>
                         </span>
                     </th>
-                    <th style="width: 25%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 1rem 2rem; text-align: center;">
+                    <th style="width: 25%; padding: 1rem 2rem; text-align: center;">
                         <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                            <i class="ph ph-calendar-blank" style="font-size: 24px; color: #6B7280; flex: 0 0 auto;"></i>
+                            <i class="ph ph-calendar-blank" style="font-size: 24px; color: #6B7280;"></i>
                             <span class="th-label">{% trans 'Creation date' %}</span>
                         </span>
                     </th>
-                    <th style="width: 15%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 1rem 2rem; text-align: center;">
+                    <th style="width: 15%; padding: 1rem 2rem; text-align: center;">
                         <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                            <i class="ph ph-wrench" style="font-size: 24px; color: #6B7280; flex: 0 0 auto;"></i>
+                            <i class="ph ph-wrench" style="font-size: 24px; color: #6B7280;"></i>
                             <span class="th-label">{% trans 'Actions' %}</span>
                         </span>
                     </th>
@@ -58,28 +61,28 @@
                             <span class="doc-title">{{ glossary.name }}</span>
                         </td>
                         <td style="padding: 1rem; vertical-align: middle; text-align: center;">
-                            <span class="lang-label" style="display: inline;">{{ glossary.source_language }}</span>
+                            <span class="lang-label">{{ glossary.source_language }}</span>
                         </td>
                         <td style="padding: 1rem; vertical-align: middle; text-align: center;">
-                            <span class="lang-label" style="display: inline;">{{ glossary.target_language }}</span>
+                            <span class="lang-label">{{ glossary.target_language }}</span>
                         </td>
                         <td style="padding: 1rem 2rem; vertical-align: middle; text-align: center;">
-                            {{ glossary.created_at | date:"d/m/Y" }}
+                            {{ glossary.created_at|date:"d/m/Y" }}
                         </td>
                         <td style="padding: 1rem 2rem; vertical-align: middle; text-align: center;">
                             <div class="table-actions">
-                                <!-- Delete Button -->
-                                <button type="button" class="delete-project"
+                                <button type="button" 
+                                        class="delete-project"
                                         data-delete-url="{% url 'single_glossary' glossary.id %}"
                                         style="background: none; border: none; cursor: pointer; position: relative;">
                                     <i class="ph ph-trash" style="font-size: 16px; color: #DC2626;"></i>
-                                    <div class="tooltip invisible opacity-0 transition-opacity duration-300 absolute z-10 w-auto py-2 px-2 bg-white text-black text-2.75 rounded-md bottom-14 left-1/2 transform -translate-x-1/2 translate-y-full shadow-lg">
-                                        <div class="flex items-center gap-1.5">
+                                    <div class="tooltip invisible opacity-0 transition-opacity duration-300 absolute z-10 w-auto py-2 px-2 bg-white text-black rounded-md bottom-14 left-1/2 transform -translate-x-1/2 translate-y-full shadow-lg" style="font-size: 11px;">
+                                    <div class="flex items-center gap-1.5">
                                             <i class="ph-fill ph-check-circle allow-delete" style="font-size: 14px; color: #00BBA7;"></i>
                                             <i class="ph-fill ph-x-circle cancel-delete" style="font-size: 14px; color: #FD625E;"></i>
-                                        </div>
-                                        <div class="absolute w-3 h-3 bg-white transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5 shadow-lg"></div>
                                     </div>
+                                    <div class="absolute w-3 h-3 bg-white transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5 shadow-lg"></div>
+                                </div>
                                 </button>
                             </div>
                         </td>
@@ -87,37 +90,38 @@
                     {% empty %}
                     <tr>
                         <td colspan="5" class="text-center py-8 text-gray-500">
-                            <div class="flex flex-col items-center justify-center">
+                            <div class="flex flex-col items-center justify-center gap-1">
                                 <p class="text-base font-semibold">{% trans 'No glossaries found' %}</p>
-                                <p class="text-sm mt-1">{% trans 'Create your first glossary to get started.' %}</p>
-                            </div>
+                                <p class="text-sm">{% trans 'Create your first glossary to get started.' %}</p>
+                    </div>
                         </td>
                     </tr>
                     {% endfor %}
                 {% else %}
-                <tr>
-                    <td colspan="5" class="text-center py-8 text-gray-500">
-                        <div class="flex flex-col items-center justify-center">
-                            <p class="text-base font-semibold">{% trans 'No glossaries found' %}</p>
-                            <p class="text-sm mt-1">{% trans 'Create your first glossary to get started.' %}</p>
-                        </div>
-                    </td>
-                </tr>
-                {% endif %}
+                    <tr>
+                        <td colspan="5" class="text-center py-8 text-gray-500">
+                            <div class="flex flex-col items-center justify-center gap-1">
+                                <p class="text-base font-semibold">{% trans 'No glossaries found' %}</p>
+                                <p class="text-sm">{% trans 'Create your first glossary to get started.' %}</p>
+                </div>
+                        </td>
+                    </tr>
+            {% endif %}
             </tbody>
         </table>
 
-    </div>
-    
-    {% include 'glossaries_add_glossary.html' %}
-    
+            </div>
 
+    <!-- Add Glossary Modal -->
+    {% include 'glossaries_add_glossary.html' %}
 </div>
 
+<!-- Scripts -->
 <script src="{% static 'js/glossaries.js' %}"></script>
 <script>
-    let get_domains = "{% url 'get_domains' %}"
-    let add_glossary = "{% url 'add_glossary' %}"
+    // URLs pour les requêtes AJAX
+    let get_domains = "{% url 'get_domains' %}";
+    let add_glossary = "{% url 'add_glossary' %}";
     
     // Messages traduits pour glossaries.js
     window.glossaryMessages = {
@@ -126,6 +130,6 @@
         errorOccurred: "{% trans 'An error occurred while adding the glossary.' %}",
         glossaryAddedSuccess: "{% trans 'Glossary added successfully!' %}",
         sameLanguages: "{% trans 'Source and target languages must be different' %}"
-    }
+    };
 </script>
 {% endblock %}
