@@ -101,10 +101,12 @@
 .dashboard-table thead th .th-label { display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dashboard-table td { font-size: 1rem; color: #181932; vertical-align: middle; }
 .dashboard-table td .lang-label { display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dashboard-table th:nth-child(1), .dashboard-table td:nth-child(1) { width: 30%; white-space: normal; word-break: break-word; hyphens: auto; }
-.dashboard-table th:nth-child(2), .dashboard-table td:nth-child(2) { width: 15%; white-space: nowrap; text-overflow: ellipsis; }
-.dashboard-table th:nth-child(3), .dashboard-table td:nth-child(3) { width: 25%; white-space: nowrap; text-overflow: ellipsis; }
-.dashboard-table th:nth-child(4), .dashboard-table td:nth-child(4) { width: 30%; white-space: nowrap; text-overflow: ellipsis; }
+.dashboard-table td .date-label { display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Tailles spécifiques désactivées - toutes les colonnes à 20% */
+/* .dashboard-table th:nth-child(1), .dashboard-table td:nth-child(1) { width: 30%; white-space: normal; word-break: break-word; hyphens: auto; } */
+/* .dashboard-table th:nth-child(2), .dashboard-table td:nth-child(2) { width: 15%; white-space: nowrap; text-overflow: ellipsis; } */
+/* .dashboard-table th:nth-child(3), .dashboard-table td:nth-child(3) { width: 25%; white-space: nowrap; text-overflow: ellipsis; } */
+/* .dashboard-table th:nth-child(4), .dashboard-table td:nth-child(4) { width: 30%; white-space: nowrap; text-overflow: ellipsis; } */
 .doc-title { font-weight: 500; color: #181932; display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .doc-subtitle { color: #5a5a78; font-size: 0.95rem; }
 .status-badge {
@@ -116,6 +118,14 @@
   border-radius: 8px;
   padding: 0.3rem 1rem;
   border: 1px solid transparent;
+  max-width: 100%;
+  overflow: hidden;
+}
+.status-badge .status {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 .status-attention { background: #fffbeb; color: #d97706; border-color: #fcd34d; }
 .status-progress { background: #eff6ff; color: #3b82f6; border-color: #93c5fd; }
@@ -133,26 +143,7 @@
   .quick-actions { min-width: unset; width: 100%; flex: 0 0 100%; align-self: stretch; }
   .dashboard-top { flex-direction: column; align-items: stretch; }
   .dashboard-top > * { width: 100%; }
-  /* Masquer Language (colonne 2) et Status (colonne 3) */
-  .dashboard-table thead th:nth-child(2),
-  .dashboard-table tbody td:nth-child(2),
-  .dashboard-table thead th:nth-child(3),
-  .dashboard-table tbody td:nth-child(3) {
-    display: none;
-  }
-  /* Recentrer et stabiliser la colonne Actions sous 1000px */
-  .dashboard-table th:nth-child(4),
-  .dashboard-table td:nth-child(4) {
-    text-align: center;
-    width: auto;
-  }
-  .dashboard-table td:nth-child(4) .table-actions {
-    width: 100%;
-    justify-content: center;
-  }
-  .dashboard-table td:nth-child(4) .table-actions button {
-    margin: 0 auto;
-  }
+  /* Colonnes toujours visibles */
 }
 .dashboard-top {
   display: flex;
@@ -160,9 +151,21 @@
   align-items: flex-start;
 }
 .dashboard-table th.status-col, .dashboard-table td.status-col {
-  width: 260px;
-  min-width: 220px;
-  max-width: 300px;
+  width: 20%;
+  min-width: unset;
+  max-width: unset;
+}
+/* Toutes les colonnes à 20% */
+.dashboard-table th, .dashboard-table td {
+  width: 20%;
+}
+/* Languages réduite à 10% */
+.dashboard-table th:nth-child(2), .dashboard-table td:nth-child(2) {
+  width: 10%;
+}
+/* Date de création à 15% */
+.dashboard-table th:nth-child(4), .dashboard-table td:nth-child(4) {
+  width: 15%;
 }
 #text-translate-content .select2-container--default .select2-selection--single .select2-selection__placeholder {
   font-family: Poppins, sans-serif !important;

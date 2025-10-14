@@ -23,32 +23,32 @@
                 <tr class="bg-blue-50 border-b border-gray-200">
                     <th style="width: 30%; padding: 1rem 2rem;">
                         <span style="display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="ph ph-books" style="font-size: 24px; color: #6B7280;"></i>
-                            <span class="th-label">{% trans 'File name' %}</span>
+                            <i class="ph ph-books" style="font-size: 24px; color: #6b7280;"></i>
+                            <span class="th-label" style="color:#5a5a78;font-size:1rem;font-weight:500;">{% trans 'File name' %}</span>
                         </span>
                     </th>
                     <th style="width: 15%; padding: 1rem; text-align: center;">
                         <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                            <i class="ph ph-megaphone" style="font-size: 24px; color: #6B7280;"></i>
-                            <span class="th-label">{% trans 'Source' %}</span>
+                            <i class="ph ph-megaphone" style="font-size: 24px; color: #6b7280;"></i>
+                            <span class="th-label" style="color:#5a5a78;font-size:1rem;font-weight:500;">{% trans 'Source' %}</span>
                         </span>
                     </th>
                     <th style="width: 15%; padding: 1rem; text-align: center;">
                         <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                            <i class="ph ph-megaphone" style="font-size: 24px; color: #6B7280;"></i>
-                            <span class="th-label">{% trans 'Target' %}</span>
+                            <i class="ph ph-megaphone" style="font-size: 24px; color: #6b7280;"></i>
+                            <span class="th-label" style="color:#5a5a78;font-size:1rem;font-weight:500;">{% trans 'Target' %}</span>
                         </span>
                     </th>
                     <th style="width: 25%; padding: 1rem 2rem; text-align: center;">
                         <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                            <i class="ph ph-calendar-blank" style="font-size: 24px; color: #6B7280;"></i>
-                            <span class="th-label">{% trans 'Creation date' %}</span>
+                            <i class="ph ph-calendar-blank" style="font-size: 24px; color: #6b7280;"></i>
+                            <span class="th-label" style="color:#5a5a78;font-size:1rem;font-weight:500;">{% trans 'Creation date' %}</span>
                         </span>
                     </th>
                     <th style="width: 15%; padding: 1rem 2rem; text-align: center;">
                         <span style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                            <i class="ph ph-wrench" style="font-size: 24px; color: #6B7280;"></i>
-                            <span class="th-label">{% trans 'Actions' %}</span>
+                            <i class="ph ph-wrench" style="font-size: 24px; color: #6b7280;"></i>
+                            <span class="th-label" style="color:#5a5a78;font-size:1rem;font-weight:500;">{% trans 'Actions' %}</span>
                         </span>
                     </th>
                 </tr>
@@ -58,15 +58,15 @@
             {% for glossary in glossaries %}
                     <tr class="border-b border-gray-100 hover:bg-gray-50 glossary-row">
                         <td style="padding: 1rem 2rem; vertical-align: middle;">
-                            <span class="doc-title">{{ glossary.name }}</span>
+                            <span class="doc-title" style="color:#181932;font-size:1rem;font-weight:500;">{{ glossary.name }}</span>
                         </td>
                         <td style="padding: 1rem; vertical-align: middle; text-align: center;">
-                            <span class="lang-label">{{ glossary.source_language }}</span>
+                            <span class="lang-label" style="color:#181932;font-size:1rem;font-weight:500;">{{ glossary.source_language }}</span>
                         </td>
                         <td style="padding: 1rem; vertical-align: middle; text-align: center;">
-                            <span class="lang-label">{{ glossary.target_language }}</span>
+                            <span class="lang-label" style="color:#181932;font-size:1rem;font-weight:500;">{{ glossary.target_language }}</span>
                         </td>
-                        <td style="padding: 1rem 2rem; vertical-align: middle; text-align: center;">
+                        <td style="padding: 1rem 2rem; vertical-align: middle; text-align: center; color:#181932; font-size:1rem;">
                             {{ glossary.created_at|date:"d/m/Y" }}
                         </td>
                         <td style="padding: 1rem 2rem; vertical-align: middle; text-align: center;">

@@ -322,7 +322,7 @@ class FileExpertRevisionView(APIView):
 
 
 class ProjectsHistoryView(TemplateView):
-    template_name = 'project_history.html'
+    template_name = 'project_history/project_history.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -369,7 +369,7 @@ class ProjectsHistoryView(TemplateView):
 
 class ProjectsHistory2View(TemplateView):
     """Nouvelle vue pour project_history_2.html avec design Builder.io"""
-    template_name = 'project_history_2.html'
+    template_name = 'project_history/project_history_2.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
