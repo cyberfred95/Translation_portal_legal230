@@ -429,4 +429,25 @@ input, .floppy-btn {
     pointer-events: none;
 }
 
+/* Styles pour la boîte de prévisualisation de la traduction */
+#translation-result {
+    /* Permettre le défilement si le contenu est long */
+    max-height: 300px;
+    overflow-y: auto;
+    /* Assurer que le texte est sélectionnable */
+    user-select: text;
+    /* Hauteur minimale pour éviter les sauts visuels */
+    min-height: 40px;
+    /* Aligner le texte à gauche */
+    text-align: left;
+    line-height: 1.5;
+    /* Couleur par défaut pour le texte sans couleur spécifique */
+    color: #222;
+}
+
+/* Les spans avec couleur inline doivent être affichés avec leur couleur */
+#translation-result span[style*="color"] {
+    /* La couleur sera définie par le style inline */
+}
+
 /* ... (reste du CSS identique à l'original) ... */ 
