@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from legal.constants import LANGUAGES
 
 
@@ -11,6 +12,13 @@ class Prompt(models.Model):
     temperature = models.DecimalField(decimal_places=1, max_digits=2, default=0,
                                       validators=[MinValueValidator(0), MaxValueValidator(1)])
     gpt_model = models.CharField(max_length=100)
+    icon = models.CharField(
+        _("icon"),
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Phosphor icon name (https://phosphoricons.com/)"
+    )
 
 
 class PromptTranslation(models.Model):

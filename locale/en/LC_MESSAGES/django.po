@@ -1119,10 +1119,8 @@ msgstr "Process"
 
 #: writing/templates/writing.html:5 writing/templates/writing.html:9
 #: writing/templates/writing_2.html:4 writing/templates/writing_2.html:13
-#, fuzzy
-#| msgid "Writing"
 msgid "Writing Tools"
-msgstr "Editing"
+msgstr ""
 
 #: writing/templates/writing.html:10 writing/templates/writing_2.html:16
 msgid "Improve your text with writing tools."

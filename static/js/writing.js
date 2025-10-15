@@ -1,4 +1,24 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Récupération des data-attributes du root
+    const root = document.getElementById('writing-root');
+    const urlProcess = root?.dataset.urlProcess;
+    const trans = {
+        processing: root?.dataset.transProcessing || 'Processing...',
+        select_a_prompt: root?.dataset.transSelectAPrompt || 'Please select a prompt and enter some text.',
+        error_occured: root?.dataset.transErrorOccured || 'An error occurred while processing your text.',
+        process_text: root?.dataset.transProcessText || 'Apply',
+        copied: root?.dataset.transCopied || 'Copied!'
+    };
+
+    // Prompt data (construit depuis le DOM)
+    // Utilise les radios existants pour reconstruire un mapping minimal id->meta
+    const promptData = {};
+    document.querySelectorAll('input[name="selected_prompt"]').forEach(radio => {
+        const row = radio.closest('[data-prompt-row]');
+        if (!row) return;
+        // On peut enrichir si besoin en lisant des data-attributes sur row
+        promptData[radio.value] = promptData[radio.value] || {};
+    });
     // Handle prompt selection
     const promptRows = document.querySelectorAll('[data-prompt-row]');
     const processBtn = document.getElementById('process-btn');
@@ -61,8 +81,49 @@ document.addEventListener('DOMContentLoaded', function() {
         processBtn.disabled = !(hasText && hasSelectedPrompt);
     }
 
+    const CHAR_LIMIT = 2000;
+    const charCountEl = document.getElementById('char-count');
+
+    function getInputCharCount() {
+        return inputText.value.replace(/\n/g, '').length;
+    }
+
+    function updateCharCount() {
+        const count = Math.min(getInputCharCount(), CHAR_LIMIT);
+        if (charCountEl) {
+            charCountEl.textContent = `${count} / ${CHAR_LIMIT}`;
+        }
+    }
+
+    function resizeInputArea() {
+        // Ajuster dynamiquement la hauteur du textarea, min 400px
+        if (!inputText) return;
+        inputText.style.height = 'auto';
+        const minHeight = 400; // comme text-translate
+        const nextHeight = Math.max(inputText.scrollHeight, minHeight);
+        inputText.style.height = `${nextHeight}px`;
+    }
+
     // Listen for text input changes
-    inputText.addEventListener('input', checkProcessButton);
+    inputText.addEventListener('input', function(e){
+        // Tronquer à la limite de caractères, comme text-translate
+        const current = getInputCharCount();
+        if (current > CHAR_LIMIT) {
+            const over = current - CHAR_LIMIT;
+            const start = inputText.selectionStart || inputText.value.length;
+            // Supprimer l'excédent en partant avant le curseur
+            const deleteIndex = Math.max(0, start - over);
+            inputText.value = inputText.value.slice(0, deleteIndex) + inputText.value.slice(deleteIndex + over);
+        }
+        updateCharCount();
+        resizeInputArea();
+        checkProcessButton();
+    });
+
+    // Initialiser l'affichage du compteur et l'état du bouton
+    updateCharCount();
+    resizeInputArea();
+    checkProcessButton();
 
     // Handle process button click
     processBtn.addEventListener('click', function() {

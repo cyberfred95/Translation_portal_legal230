@@ -9,10 +9,12 @@ class PromptTranslationInline(admin.StackedInline):
     model = PromptTranslation
     extra = len(LANGUAGES)
     max_num = len(LANGUAGES)
+    fields = ("language", "name", "description")
 
 
 class PromptAdmin(admin.ModelAdmin):
-    list_display = ('id', 'gpt_model', 'name_en', 'name_fr')
+    list_display = ('id', 'gpt_model', 'icon', 'name_en', 'name_fr')
+    fields = ('prompt', 'variables', 'temperature', 'gpt_model', 'icon')
     inlines = [PromptTranslationInline]
 
     change_list_template = "admin/writing/Prompt/change_list.html"

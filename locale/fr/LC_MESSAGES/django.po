@@ -1,3 +1,4 @@
+# --- Writing page i18n additions removed (duplicates) ---
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
@@ -1122,14 +1123,12 @@ msgstr "Appliquer"
 
 #: writing/templates/writing.html:5 writing/templates/writing.html:9
 #: writing/templates/writing_2.html:4 writing/templates/writing_2.html:13
-#, fuzzy
-#| msgid "Writing"
 msgid "Writing Tools"
 msgstr "Personnaliser"
 
 #: writing/templates/writing.html:10 writing/templates/writing_2.html:16
 msgid "Improve your text with writing tools."
-msgstr ""
+msgstr "Améliorez votre texte avec nos outils d'écriture."
 
 #: writing/templates/writing.html:101 writing/templates/writing_2.html:96
 #, fuzzy
@@ -1148,10 +1147,12 @@ msgid ""
 "To translate PDF, Word (.docx), PowerPoint (.pptx) files, drop them directly "
 "into our document translation interface...."
 msgstr ""
+"Pour traduire des fichiers PDF, Word (.docx) et PowerPoint (.pptx), déposez-les "
+"directement dans notre interface de traduction de documents…"
 
 #: writing/templates/writing.html:158 writing/templates/writing_2.html:161
 msgid "Your results will appear here"
-msgstr ""
+msgstr "Vos résultats s'afficheront ici"
 
 #: writing/templates/writing.html:204 writing/templates/writing_2.html:277
 #, fuzzy
