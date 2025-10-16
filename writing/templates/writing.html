@@ -28,9 +28,9 @@
                         <!-- Radio button for selection -->
                         <input type="radio" name="selected_prompt" value="{{ prompt.id }}" class="w-3 h-3 border border-gray-300 rounded-full bg-white">
 
-                        <!-- Icon placeholder -->
-                        <div class="w-6 h-6 text-gray-500 flex items-center justify-center">
-                            <i class="ph text-xl {% if prompt.icon %}ph-{{ prompt.icon }}{% else %}ph-note-pencil{% endif %}"></i>
+                        <!-- Icon -->
+                        <div class="flex items-center justify-center text-gray-500">
+                            <i class="ph {% if prompt.icon %}ph-{{ prompt.icon }}{% else %}ph-note-pencil{% endif %} mx-2" style="font-size: 24px;" aria-hidden="true"></i>
                         </div>
 
                         <!-- Text content -->
