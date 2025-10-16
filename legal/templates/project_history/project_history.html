@@ -41,7 +41,7 @@
                             data-translated-file="{{ project.translated_file }}" 
                             data-reviewed-file="{% if project.reviewed_file %}{{ project.reviewed_file }}{% endif %}"
                             title="{% trans 'Download' %}"
-                            {% if project.status != 'Translated' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
+                            {% if not project.translated_file and not project.reviewed_file %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
                             <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
                         </button>
                         <button 

@@ -132,6 +132,12 @@
 .status-error { background: #fef2f2; color: #dc2626; border-color: #fca5a5; }
 .status-completed { background: #f0fdf4; color: #16a34a; border-color: #86efac; }
 .status-default { background: #f3f4f6; color: #374151; border-color: #e5e7eb; }
+
+/* Post-editing (Document relu importé) en bleu clair */
+.status-post-editing { background: #e0f2fe; color: #0284c7; border-color: #7dd3fc; }
+
+/* Attention orange (Demande de devis envoyée) */
+.status-attention-orange { background: #fff7ed; color: #ea580c; border-color: #fdba74; }
 .table-actions { display: flex; flex-direction: row; gap: 1rem; align-items: center; justify-content: center; width: 100% !important; }
 .table-actions button { background: none; border: none; cursor: pointer; white-space: nowrap; }
 /* Centrage explicite de la colonne Actions */
