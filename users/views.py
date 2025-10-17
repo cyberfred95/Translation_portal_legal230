@@ -113,6 +113,17 @@ class SingleAccountView(RetrieveUpdateDestroyAPIView):
         user = request.user
         user.username = request.data['username']
         user.email = request.data['email']
+        user.first_name = request.data.get('first_name', user.first_name)
+        user.last_name = request.data.get('last_name', user.last_name)
+        
+        # Mettre à jour la langue de préférence de l'utilisateur
+        if 'language' in request.data:
+            user.language = request.data['language']
+            # Mettre à jour aussi la langue de session pour l'interface actuelle
+            from django.utils import translation
+            translation.activate(request.data['language'])
+            request.session[translation.LANGUAGE_SESSION_KEY] = request.data['language']
+        
         user.save()
         return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
 

@@ -1,0 +1,16 @@
+<!-- Step Indicator Component -->
+<div class="flex flex-col items-start gap-3 {% if not is_last %}flex-1{% endif %}">
+    <div class="flex pr-0.5 items-center gap-0.5 self-stretch">
+        <div class="stepindicator-{{ step_number }} flex w-6 h-6 justify-center items-center rounded-full {% if is_active %}border-[1.5px] border-[#166534]{% else %}border border-gray-300{% endif %}">
+            <span class="flex w-6 h-6 flex-col justify-center shrink-0 text-center font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] {% if is_active %}text-[#166534]{% else %}text-[#5A5A78]{% endif %}">{{ step_number }}</span>
+        </div>
+        {% if has_line %}
+            <div class="h-0.5 flex-1 bg-black/10"></div>
+        {% endif %}
+    </div>
+    <div class="flex pr-5 flex-col items-start gap-4 self-stretch">
+        <h3 class="self-stretch font-poppins text-lg font-semibold leading-6 tracking-[-0.252px] text-[#181932]">
+            {{ step_title }}
+        </h3>
+    </div>
+</div>

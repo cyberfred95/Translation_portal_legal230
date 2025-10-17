@@ -15,7 +15,7 @@ class MainSettings(Preferences):
     CUSTOM_MT_CONSOLE_URL = models.URLField(max_length=256, default='https://console.custom.mt/')
     CLOUDSTORAGE_API_URL = models.URLField(max_length=256,
                                            default='https://cloudstorage.fileprocessing.custom.mt/translate/legal230/')
-    glossaries_url = models.URLField(max_length=256, default='http://3.71.83.247:8000/')
+    glossaries_url = models.URLField(max_length=256, default='http://16.171.1.82:8000/')
 
 
     class Meta:

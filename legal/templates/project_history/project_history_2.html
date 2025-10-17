@@ -1,0 +1,345 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto px-6 lg:px-12 py-6">
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-2xl mb-2 font-poppins font-semibold">
+                {% trans 'History' %}
+            </h1>
+            <p class="text-base font-poppins font-normal">
+                {% trans 'Find all your translation history' %}
+            </p>
+        </div>
+
+        <!-- Main Content Card -->
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
+            <!-- Search Filters -->
+            <div class="flex flex-col lg:flex-row gap-6 mb-6">
+                <!-- Search Input -->
+                <div class="flex-1 relative">
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" 
+                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"></path>
+                        </svg>
+                        <input
+                            id="search-input"
+                            placeholder="{% trans 'Search for text or document...' %}"
+                            class="pl-10 h-8 text-sm text-gray-600 placeholder:text-gray-500 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                    </div>
+                </div>
+
+                <!-- Type Filter -->
+                <div class="w-full lg:w-44">
+                    <select id="type-filter" class="h-8 text-sm text-gray-600 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">{% trans 'Type' %}</option>
+                        <option value="document">{% trans 'Document' %}</option>
+                        <option value="text">{% trans 'Text' %}</option>
+                    </select>
+                </div>
+
+                <!-- Status Filter -->
+                <div class="w-full lg:w-48">
+                    <select id="status-filter" class="h-8 text-sm text-gray-600 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">{% trans 'Status' %}</option>
+                        <option value="needs-attention">{% trans 'Needs attention' %}</option>
+                        <option value="in-progress">{% trans 'In progress' %}</option>
+                        <option value="error">{% trans 'Error' %}</option>
+                        <option value="completed">{% trans 'Completed' %}</option>
+                    </select>
+                </div>
+
+                <!-- Language Filter -->
+                <div class="w-full lg:w-52">
+                    <select id="language-filter" class="h-8 text-sm text-gray-600 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">{% trans 'Translation language' %}</option>
+                        <option value="fr-en">FR → EN</option>
+                        <option value="fr-de">FR → DE</option>
+                        <option value="en-fr">EN → FR</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Table -->
+            <div class="mt-6">
+                <div class="space-y-2">
+                    <div class="overflow-hidden">
+                        <table class="w-full">
+                            <!-- Header -->
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200">
+                                    <th class="w-14 px-4 py-3 text-center">
+                                        <!-- Empty for icons -->
+                                    </th>
+                                    <th class="px-4 py-3 text-left">
+                                        <div class="flex items-center gap-1 text-sm font-normal text-gray-600">
+                                            <svg class="h-6 w-6 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                            <span>{% trans 'Document' %}</span>
+                                        </div>
+                                    </th>
+                                    {% if request.user.is_staff %}
+                                    <th class="px-3 py-3 text-left w-32">
+                                        <div class="flex items-center gap-1 text-sm font-normal text-gray-600">
+                                            <svg class="h-5 w-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                            </svg>
+                                            <span>{% trans 'Username' %}</span>
+                                        </div>
+                                    </th>
+                                    {% endif %}
+                                    <th class="px-3 py-3 text-center w-32">
+                                        <div class="flex items-center justify-center gap-1 text-sm font-normal text-gray-600">
+                                            <svg class="h-5 w-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                            </svg>
+                                            <span>{% trans 'Language' %}</span>
+                                        </div>
+                                    </th>
+                                    <th class="px-3 py-3 text-left w-52">
+                                        <div class="flex items-center justify-start gap-1 text-sm font-normal text-gray-600">
+                                            <svg class="h-5 w-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                            <span>{% trans 'Status' %}</span>
+                                        </div>
+                                    </th>
+                                    <th class="px-3 py-3 text-center w-32">
+                                        <div class="flex items-center justify-center gap-1 text-sm font-normal text-gray-600">
+                                            <svg class="h-5 w-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4v6m4-6v6m-8-6a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v8z"/>
+                                            </svg>
+                                            <span>{% trans 'Creation date' %}</span>
+                                        </div>
+                                    </th>
+                                    <th class="px-3 py-3 text-center w-72">
+                                        <div class="flex items-center justify-center gap-1 text-sm font-normal text-gray-600">
+                                            <svg class="h-5 w-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                            <span>{% trans 'Actions' %}</span>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            
+                            <!-- Body -->
+                            <tbody id="projects-table-body">
+                                {% if projects.results %}
+                                {% for project in projects.results %}
+                                <tr class="border-b border-gray-200 project-row" 
+                                    data-document="{{ project.source_file_name|lower }}"
+                                    data-type="{% if project.source_file_name|slice:'-4:' == '.txt' %}text{% else %}document{% endif %}"
+                                    data-status="{{ project.status_mapped|default:project.status|lower }}"
+                                    data-language="{{ project.source_language|lower }}-{{ project.target_language|lower }}">
+                                    <!-- Icon -->
+                                    <td class="px-4 py-4 text-center">
+                                        <!-- Document Icon SVG exact from Builder.io -->
+                                        <svg width="20" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5">
+                                            <path d="M17.1922 6.43281L12.8172 2.05781C12.7591 1.99979 12.6902 1.95378 12.6143 1.92241C12.5384 1.89105 12.4571 1.87494 12.375 1.875H4.875C4.54348 1.875 4.22554 2.0067 3.99112 2.24112C3.7567 2.47554 3.625 2.79348 3.625 3.125V16.875C3.625 17.2065 3.7567 17.5245 3.99112 17.7589C4.22554 17.9933 4.54348 18.125 4.875 18.125H16.125C16.4565 18.125 16.7745 17.9933 17.0089 17.7589C17.2433 17.5245 17.375 17.2065 17.375 16.875V6.875C17.3751 6.7929 17.359 6.71159 17.3276 6.63572C17.2962 6.55985 17.2502 6.4909 17.1922 6.43281ZM13 13.75H8C7.83424 13.75 7.67527 13.6842 7.55806 13.5669C7.44085 13.4497 7.375 13.2908 7.375 13.125C7.375 12.9592 7.44085 12.8003 7.55806 12.6831C7.67527 12.5658 7.83424 12.5 8 12.5H13C13.1658 12.5 13.3247 12.5658 13.4419 12.6831C13.5592 12.8003 13.625 12.9592 13.625 13.125C13.625 13.2908 13.5592 13.4497 13.4419 13.5669C13.3247 13.6842 13.1658 13.75 13 13.75ZM13 11.25H8C7.83424 11.25 7.67527 11.1842 7.55806 11.0669C7.44085 10.9497 7.375 10.7908 7.375 10.625C7.375 10.4592 7.44085 10.3003 7.55806 10.1831C7.67527 10.0658 7.83424 10 8 10H13C13.1658 10 13.3247 10.0658 13.4419 10.1831C13.5592 10.3003 13.625 10.4592 13.625 10.625C13.625 10.7908 13.5592 10.9497 13.4419 11.0669C13.3247 11.1842 13.1658 11.25 13 11.25ZM12.375 6.875V3.4375L15.8125 6.875H12.375Z" fill="#3B82F6"/>
+                                        </svg>
+                                    </td>
+                                    
+                                    <!-- Document -->
+                                    <td class="px-4 py-3">
+                                        <div class="space-y-1">
+                                            <div class="text-sm font-normal text-gray-900">
+                                                {{ project.source_file_name }}
+                                            </div>
+                                            <div class="text-xs text-gray-600">
+                                                {% if project.source_file_name|slice:'-4:' == '.txt' %}
+                                                    {% trans 'Text' %} • 1 {% trans 'page' %}
+                                                {% else %}
+                                                    {% trans 'Document' %} • {% trans 'pages' %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    
+                                    <!-- Username (staff only) -->
+                                    {% if request.user.is_staff %}
+                                    <td class="px-3 py-3 text-center">
+                                        <span class="text-sm font-normal text-gray-900">
+                                            {% if project.username %}
+                                                {{ project.username }}
+                                            {% else %}
+                                                {% trans 'Unknown' %}
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    {% endif %}
+                                    
+                                    <!-- Language -->
+                                    <td class="px-3 py-3 text-center">
+                                        <span class="text-sm font-normal text-gray-900">
+                                            {{ project.source_language|upper }} → {{ project.target_language|upper }}
+                                        </span>
+                                    </td>
+                                    
+                                    <!-- Status -->
+                                    <td class="px-3 py-3 text-left">
+                                        {% if project.status == 'Needs attention' or project.status_mapped == 'needs-attention' %}
+                                            <div class="inline-flex items-center gap-1 px-1 py-0.5 rounded border text-sm font-medium bg-orange-50 border-orange-200 text-orange-700">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                </svg>
+                                                <span>{% trans 'Needs attention' %}</span>
+                                            </div>
+                                        {% elif project.status == 'In progress' or project.status == 'Processing' or project.status_mapped == 'in-progress' %}
+                                            <div class="inline-flex items-center gap-1 px-1 py-0.5 rounded border text-sm font-medium bg-blue-50 border-blue-200 text-blue-700">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                                </svg>
+                                                <span>{% trans 'In progress' %}</span>
+                                            </div>
+                                        {% elif project.status == 'Error' or project.status_mapped == 'error' %}
+                                            <div class="inline-flex items-center gap-1 px-1 py-0.5 rounded border text-sm font-medium bg-red-50 border-red-200 text-red-700">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.268 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                                                </svg>
+                                                <span>{% trans 'Error' %}</span>
+                                            </div>
+                                        {% else %}
+                                            <div class="inline-flex items-center gap-1 px-1 py-0.5 rounded border text-sm font-medium bg-green-50 border-green-200 text-green-700">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                                <span>{% if project.status == 'Translated' %}{% trans 'Completed' %}{% else %}{{ project.status }}{% endif %}</span>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Creation Date -->
+                                    <td class="px-3 py-3 text-center">
+                                        <span class="text-sm font-normal text-gray-900">
+                                            {{ project.created_at|date:"d/m/Y" }}
+                                        </span>
+                                    </td>
+                                    
+                                    <!-- Actions -->
+                                    <td class="px-3 py-3">
+                                        <div class="flex items-center justify-center gap-4">
+                                            <button class="h-6 px-2 rounded-full border border-gray-300 text-xs font-semibold text-gray-900 hover:bg-gray-50 download-file"
+                                                    data-translated-file="{{ project.translated_file }}"
+                                                    {% if project.reviewed_file %}data-reviewed-file="{{ project.reviewed_file }}"{% endif %}>
+                                                <svg class="h-4 w-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                </svg>
+                                                {% trans 'Download' %}
+                                            </button>
+                                            <button class="group flex items-center gap-1 text-sm text-green-600 hover:text-green-500 expert-revision"
+                                                    data-translated-file="{{ project.translated_file }}"
+                                                    data-id="{{ project.id }}"
+                                                    data-display="{{ project.display_popup }}"
+                                                    {% if not project.status == 'Translated' %}disabled{% endif %}>
+                                                <span class="border-b border-green-600/20 group-hover:border-green-500/40">
+                                                    {% trans 'Expert review' %}
+                                                </span>
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="{% if request.user.is_staff %}7{% else %}6{% endif %}" class="text-center py-8 text-gray-500">
+                                        <div class="flex flex-col items-center justify-center">
+                                            <p class="text-lg text-gray-600 font-semibold">{% trans 'No data available' %}</p>
+                                            <p class="text-sm text-gray-600 mt-1">{% trans 'There are currently no projects to display.' %}</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="flex items-center justify-between pt-2" id="pagination-container">
+                        <button id="prev-page"
+                                class="flex items-center px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                                disabled>
+                            ←
+                        </button>
+                        
+                        <div class="flex items-center space-x-0" id="page-numbers">
+                            <button class="px-3 py-2 text-sm bg-black/5 rounded-md text-gray-900">
+                                1
+                            </button>
+                            <button class="px-3 py-2 text-sm text-gray-900 hover:bg-black/5 rounded-md">
+                                2
+                            </button>
+                            <button class="px-3 py-2 text-sm text-gray-900 hover:bg-black/5 rounded-md">
+                                ...
+                            </button>
+                            <button class="px-3 py-2 text-sm text-gray-900 hover:bg-black/5 rounded-md">
+                                10
+                            </button>
+                        </div>
+                        
+                        <button id="next-page"
+                                class="flex items-center px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50">
+                            →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal (réutilisé de l'ancienne version) -->
+<div id="modal" class="fixed inset-0 bg-gray-500 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
+    <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
+        <div class="absolute -top-4 -right-4 z-10">
+            <button type="button" id="closeIcon" class="p-2 text-gray-500 hover:text-gray-900 focus:outline-none">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.7688 10.0003L19.6335 2.13553C20.1222 1.64732 20.1222 0.855171 19.6335 0.36696C19.1449 -0.121669 18.3536 -0.121669 17.865 0.36696L10.0002 8.23171L2.13504 0.36696C1.64641 -0.121669 0.8551 -0.121669 0.366471 0.36696C-0.122157 0.855171 -0.122157 1.64732 0.366471 2.13553L8.23164 10.0003L0.366471 17.865C-0.122157 18.3532 -0.122157 19.1454 0.366471 19.6336C0.610786 19.8775 0.930979 19.9997 1.25076 19.9997C1.57053 19.9997 1.89073 19.8775 2.13504 19.6332L10.0002 11.7684L17.865 19.6332C18.1093 19.8775 18.4295 19.9997 18.7492 19.9997C19.069 19.9997 19.3892 19.8775 19.6335 19.6332C20.1222 19.145 20.1222 18.3528 19.6335 17.8646L11.7688 10.0003Z" fill="white"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-12 flex flex-col items-center gap-8">
+            <div class="text-xl font-semibold">{% trans 'Quote for revision' %}</div>
+            <span class="quote-display hidden text-center text-sm text-gray-600">
+                {% trans 'We can not provide an automatic quote for this language pair. Please ask' %} 
+                <a href="mailto:contact@lexamt.com">contact@lexamt.com</a> 
+                {% trans 'to receive a quote in less than 30 minutes.' %}
+            </span>
+            <div class="quote-hide hidden flex flex-col items-center gap-8">
+                <span class="text-center text-sm">
+                    {% trans 'By choosing the options below, you agree that you are sending a request for Quote of the selected service to Legal230' %}
+                </span>
+                <button type="button" class="flex gap-2 items-center text-gray-600 border border-gray-600 rounded-md px-3 py-2 text-sm expert-revision">
+                    {% trans 'Expert revision' %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts JavaScript -->
+<script src="{% static 'js/project-history-2.js' %}"></script>
+
+<script>
+// Variables Django injectées dans le contexte global
+var expert_revision_file_url = "{% url 'expert_revision_file' %}";
+var single_project = "{% url 'single_project' %}";
+var language_code = "{{ request.LANGUAGE_CODE }}";
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,63 @@
+.font-poppins {
+    font-family: 'Poppins', sans-serif;
+}
+.font-inter {
+    font-family: 'Inter', sans-serif;
+}
+.bg-stat-users {
+    background-color: #f3f4f6;
+}
+.bg-stat-premium {
+    background-color: #fef3c7;
+}
+.bg-stat-admins {
+    background-color: #dbeafe;
+}
+.bg-table-header {
+    background-color: #f9fafb;
+}
+.text-foreground {
+    color: #111827;
+}
+.text-muted-foreground {
+    color: #6b7280;
+}
+.bg-primary {
+    background-color: #22c55e;
+}
+.text-primary-foreground {
+    color: white;
+}
+
+/* Role Tags */
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 24px;
+    padding: 0 4px;
+    border-radius: 4px;
+    border: 0.5px solid;
+}
+
+.role-badge-user {
+    background: #F0FDF4 !important;
+    border-color: #14532D !important;
+    color: #14532D !important;
+}
+
+.role-badge-admin {
+    background: #EFF6FF !important;
+    border-color: #93C5FD !important;
+    color: #3B82F6 !important;
+}
+
+.role-badge-buyer {
+    background: #FFFBEB !important;
+    border-color: #F59E0B !important;
+    color: #D97706 !important;
+}
+
+

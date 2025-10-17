@@ -1,0 +1,725 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block extra_head %}
+<!-- Poppins font for Builder.io modal design -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+.font-poppins {
+    font-family: 'Poppins', sans-serif;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Main Content -->
+    <main class="flex flex-col items-center flex-1">
+        <div class="w-full max-w-[1345px]">
+            <!-- Page Header -->
+            <div class="flex px-6 md:px-13 py-6 flex-col items-start gap-6 self-stretch">
+                <!-- Title and subtitle -->
+                <div class="flex flex-col items-start gap-2">
+                    <h1 class="text-gray-800 font-sans text-2xl font-semibold leading-8 tracking-[-0.456px]">
+                        {% trans 'Glossary' %}
+                    </h1>
+                    <p class="w-full max-w-[1241px] text-gray-600 font-sans text-base font-normal leading-6 tracking-[-0.176px]">
+                        {% trans 'Find all your personal glossaries' %}
+                    </p>
+                </div>
+
+                <!-- Search and Add button section -->
+                <div class="flex p-6 flex-col items-start gap-6 self-stretch rounded-lg bg-white">
+                    <div class="flex items-center gap-6 self-stretch">
+                        <!-- Search input -->
+                        <div class="flex flex-col items-start gap-1 flex-1">
+                            <div class="flex h-8 items-center self-stretch rounded-md border border-black/10 bg-white">
+                                <div class="flex px-1.5 py-1.5 justify-center items-center gap-2 self-stretch">
+                                    <!-- Search Icon SVG -->
+                                    <svg class="w-5 h-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                    </svg>
+                                </div>
+                                <input
+                                    type="text"
+                                    id="search-glossary"
+                                    placeholder="{% trans 'Search for a glossary' %}"
+                                    class="h-6 flex-1 overflow-hidden text-gray-600 text-ellipsis whitespace-nowrap font-sans text-sm font-normal leading-6 tracking-[-0.084px] bg-transparent border-none outline-none"
+                                />
+                                <div class="flex w-px px-2 items-start gap-2 self-stretch"></div>
+                            </div>
+                        </div>
+
+                        <!-- Add glossary button -->
+                        <button id="openModal" class="flex h-10 px-2.5 py-2 justify-center items-center rounded-full bg-green-600 hover:bg-green-800 transition-colors">
+                            <!-- FolderPlus Icon SVG -->
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-5l-2-2H5a2 2 0 00-2 2z"/>
+                            </svg>
+                            <div class="flex px-2 justify-center items-center">
+                                <span class="text-white text-center font-sans text-sm font-semibold leading-6 tracking-[-0.084px]">
+                                    {% trans 'Add a glossary' %}
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Table Container -->
+            <div class="px-6 md:px-13 pb-6">
+                <div class="flex p-6 flex-col items-start gap-6 self-stretch rounded-lg bg-white">
+                    <!-- Data Table -->
+                    <div class="flex flex-col items-start gap-2 self-stretch">
+                        <!-- Table - Responsive wrapper -->
+                        <div class="w-full overflow-x-auto">
+                            <div class="flex items-start min-w-full">
+                                <!-- Column 1 - Icon -->
+                                <div class="flex w-14 flex-col items-start">
+                                    <!-- Header -->
+                                    <div class="flex h-12 p-4 justify-center items-center gap-2 self-stretch border-b border-black/10 bg-blue-50">
+                                    </div>
+                                    <!-- Cells -->
+                                    {% for glossary in glossaries %}
+                                    <div class="flex h-[70px] px-3.5 py-3.5 justify-center items-center gap-1.5 self-stretch border-b border-black/10" data-glossary-row>
+                                        <!-- BookOpen Icon SVG -->
+                                        <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                        </svg>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Column 2 - Glossary Name -->
+                                <div class="flex w-[334px] flex-col items-start">
+                                    <!-- Header -->
+                                    <div class="flex h-12 px-4 py-2 items-center gap-1 self-stretch border-b border-black/10 bg-blue-50">
+                                        <!-- BookOpen Icon SVG -->
+                                        <svg class="w-6 h-6 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                        </svg>
+                                        <span class="text-gray-600 font-sans text-sm font-normal leading-6 tracking-[-0.084px]">
+                                            {% trans 'Glossary name' %}
+                                        </span>
+                                    </div>
+                                    <!-- Cells -->
+                                    {% for glossary in glossaries %}
+                                    <div class="flex h-[70px] px-4 py-3.5 items-center gap-2 self-stretch border-b border-black/10" data-glossary-row>
+                                        <div class="flex flex-col justify-center items-start gap-1 flex-1">
+                                            <div class="self-stretch overflow-hidden text-gray-800 text-ellipsis font-sans text-sm font-normal leading-6 tracking-[-0.084px] line-clamp-1" data-glossary-name>
+                                                {{ glossary.name }}
+                                            </div>
+                                            <div class="self-stretch overflow-hidden text-gray-600 text-ellipsis font-sans text-xs font-normal leading-4 line-clamp-1">
+                                                CSV • 3.5 MB
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Column 3 - Original Language -->
+                                <div class="flex flex-col items-end flex-1 min-w-[180px]">
+                                    <!-- Header -->
+                                    <div class="flex h-12 px-3 py-2 items-center gap-1 self-stretch border-b border-black/10 bg-blue-50">
+                                        <!-- Megaphone Icon SVG -->
+                                        <svg class="w-5 h-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                                        </svg>
+                                        <span class="text-gray-600 font-sans text-sm font-normal leading-6 tracking-[-0.084px]">
+                                            {% trans 'Original language' %}
+                                        </span>
+                                    </div>
+                                    <!-- Cells -->
+                                    {% for glossary in glossaries %}
+                                    <div class="flex h-[70px] px-3.5 py-3.5 justify-center items-center gap-1.5 self-stretch border-b border-black/10" data-glossary-row>
+                                        <div class="flex w-5 h-5 px-0.5 py-1 justify-center items-center">
+                                            <!-- Flag Component -->
+                                            {% if glossary.source_language == 'FR' %}
+                                                <!-- France Flag SVG -->
+                                                <svg class="w-5 h-5" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <g clipPath="url(#clip0_france)">
+                                                        <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="white"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M0.833984 0.333252H6.66732V13.6666H0.833984V0.333252Z" fill="#1A47B8"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M13.334 0.333252H19.1673V13.6666H13.334V0.333252Z" fill="#F93939"/>
+                                                    </g>
+                                                    <rect x="1.08398" y="0.583252" width="17.8333" height="12.8333" rx="1.75" stroke="black" strokeOpacity="0.1" strokeWidth="0.5"/>
+                                                    <defs>
+                                                        <clipPath id="clip0_france">
+                                                            <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="white"/>
+                                                        </clipPath>
+                                                    </defs>
+                                                </svg>
+                                            {% elif glossary.source_language == 'EN' %}
+                                                <!-- UK Flag SVG -->
+                                                <svg class="w-5 h-5" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <g clipPath="url(#clip0_uk)">
+                                                        <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="#1A47B8"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M2.78428 0.333252H0.833984V2.55547L17.2064 13.6666L19.1673 13.6666V11.4444L2.78428 0.333252Z" fill="white"/>
+                                                        <path d="M1.48447 0.333252L19.1673 12.3647V13.6666H18.5321L0.833984 1.62264V0.333252H1.48447Z" fill="#F93939"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M17.4213 0.333252H19.1673V2.55547C19.1673 2.55547 7.82667 9.95819 2.58002 13.6666H0.833984V11.4444L17.4213 0.333252Z" fill="white"/>
+                                                        <path d="M19.1673 0.333252H18.5752L0.833984 12.3751V13.6666H1.48447L19.1673 1.63238V0.333252Z" fill="#F93939"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M7.50127 0.333252H12.5153V4.44598H19.1673V9.55115H12.5153V13.6666H7.50127V9.55115H0.833984V4.44598H7.50127V0.333252Z" fill="white"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M8.55328 0.333252H11.448V5.46146H19.1673V8.53838H11.448V13.6666H8.55328V8.53838H0.833984V5.46146H8.55328V0.333252Z" fill="#F93939"/>
+                                                    </g>
+                                                    <rect x="1.08398" y="0.583252" width="17.8333" height="12.8333" rx="1.75" stroke="black" strokeOpacity="0.1" strokeWidth="0.5"/>
+                                                    <defs>
+                                                        <clipPath id="clip0_uk">
+                                                            <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="white"/>
+                                                        </clipPath>
+                                                    </defs>
+                                                </svg>
+                                            {% elif glossary.source_language == 'IT' %}
+                                                <!-- Italy Flag SVG -->
+                                                <svg class="w-5 h-5" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <g clipPath="url(#clip0_italy)">
+                                                        <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="white"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M0.833984 0.333252H6.66732V13.6666H0.833984V0.333252Z" fill="#249F58"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M13.334 0.333252H19.1673V13.6666H13.334V0.333252Z" fill="#F93939"/>
+                                                    </g>
+                                                    <rect x="1.08398" y="0.583252" width="17.8333" height="12.8333" rx="1.75" stroke="black" strokeOpacity="0.1" strokeWidth="0.5"/>
+                                                    <defs>
+                                                        <clipPath id="clip0_italy">
+                                                            <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="white"/>
+                                                        </clipPath>
+                                                    </defs>
+                                                </svg>
+                                            {% elif glossary.source_language == 'DE' %}
+                                                <!-- Germany Flag SVG -->
+                                                <svg class="w-5 h-5" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <g clipPath="url(#clip0_germany)">
+                                                        <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="#F93939"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M0.333984 9.5H19.5007V13.6667H0.333984V9.5Z" fill="#FFDA2C"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M0.333984 0.333252H19.5007V4.49992H0.333984V0.333252Z" fill="#151515"/>
+                                                    </g>
+                                                    <rect x="1.08398" y="0.583252" width="17.8333" height="12.8333" rx="1.75" stroke="black" strokeOpacity="0.1" strokeWidth="0.5"/>
+                                                    <defs>
+                                                        <clipPath id="clip0_germany">
+                                                            <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="white"/>
+                                                        </clipPath>
+                                                    </defs>
+                                                </svg>
+                                            {% else %}
+                                                🌐
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex-1 text-gray-800 font-sans text-sm font-normal leading-6 tracking-[-0.084px]" data-source-language>
+                                            {{ glossary.source_language }}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Column 4 - Translation Language -->
+                                <div class="flex flex-col items-end flex-1 min-w-[180px]">
+                                    <!-- Header -->
+                                    <div class="flex h-12 px-3 py-2 items-center gap-1 self-stretch border-b border-black/10 bg-blue-50">
+                                        <!-- Megaphone Icon SVG -->
+                                        <svg class="w-5 h-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                                        </svg>
+                                        <span class="text-gray-600 font-sans text-sm font-normal leading-6 tracking-[-0.084px]">
+                                            {% trans 'Translation language' %}
+                                        </span>
+                                    </div>
+                                    <!-- Cells -->
+                                    {% for glossary in glossaries %}
+                                    <div class="flex h-[70px] px-3.5 py-3.5 justify-center items-center gap-1.5 self-stretch border-b border-black/10" data-glossary-row>
+                                        <div class="flex w-5 h-5 px-0.5 py-1 justify-center items-center">
+                                            <!-- Flag Component -->
+                                            {% if glossary.target_language == 'FR' %}
+                                                <!-- France Flag SVG -->
+                                                <svg class="w-5 h-5" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <g clipPath="url(#clip1_france)">
+                                                        <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="white"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M0.833984 0.333252H6.66732V13.6666H0.833984V0.333252Z" fill="#1A47B8"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M13.334 0.333252H19.1673V13.6666H13.334V0.333252Z" fill="#F93939"/>
+                                                    </g>
+                                                    <rect x="1.08398" y="0.583252" width="17.8333" height="12.8333" rx="1.75" stroke="black" strokeOpacity="0.1" strokeWidth="0.5"/>
+                                                    <defs>
+                                                        <clipPath id="clip1_france">
+                                                            <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="white"/>
+                                                        </clipPath>
+                                                    </defs>
+                                                </svg>
+                                            {% elif glossary.target_language == 'EN' %}
+                                                <!-- UK Flag SVG -->
+                                                <svg class="w-5 h-5" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <g clipPath="url(#clip1_uk)">
+                                                        <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="#1A47B8"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M2.78428 0.333252H0.833984V2.55547L17.2064 13.6666L19.1673 13.6666V11.4444L2.78428 0.333252Z" fill="white"/>
+                                                        <path d="M1.48447 0.333252L19.1673 12.3647V13.6666H18.5321L0.833984 1.62264V0.333252H1.48447Z" fill="#F93939"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M17.4213 0.333252H19.1673V2.55547C19.1673 2.55547 7.82667 9.95819 2.58002 13.6666H0.833984V11.4444L17.4213 0.333252Z" fill="white"/>
+                                                        <path d="M19.1673 0.333252H18.5752L0.833984 12.3751V13.6666H1.48447L19.1673 1.63238V0.333252Z" fill="#F93939"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M7.50127 0.333252H12.5153V4.44598H19.1673V9.55115H12.5153V13.6666H7.50127V9.55115H0.833984V4.44598H7.50127V0.333252Z" fill="white"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M8.55328 0.333252H11.448V5.46146H19.1673V8.53838H11.448V13.6666H8.55328V8.53838H0.833984V5.46146H8.55328V0.333252Z" fill="#F93939"/>
+                                                    </g>
+                                                    <rect x="1.08398" y="0.583252" width="17.8333" height="12.8333" rx="1.75" stroke="black" strokeOpacity="0.1" strokeWidth="0.5"/>
+                                                    <defs>
+                                                        <clipPath id="clip1_uk">
+                                                            <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="white"/>
+                                                        </clipPath>
+                                                    </defs>
+                                                </svg>
+                                            {% elif glossary.target_language == 'IT' %}
+                                                <!-- Italy Flag SVG -->
+                                                <svg class="w-5 h-5" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <g clipPath="url(#clip1_italy)">
+                                                        <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="white"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M0.833984 0.333252H6.66732V13.6666H0.833984V0.333252Z" fill="#249F58"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M13.334 0.333252H19.1673V13.6666H13.334V0.333252Z" fill="#F93939"/>
+                                                    </g>
+                                                    <rect x="1.08398" y="0.583252" width="17.8333" height="12.8333" rx="1.75" stroke="black" strokeOpacity="0.1" strokeWidth="0.5"/>
+                                                    <defs>
+                                                        <clipPath id="clip1_italy">
+                                                            <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="white"/>
+                                                        </clipPath>
+                                                    </defs>
+                                                </svg>
+                                            {% elif glossary.target_language == 'DE' %}
+                                                <!-- Germany Flag SVG -->
+                                                <svg class="w-5 h-5" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <g clipPath="url(#clip1_germany)">
+                                                        <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="#F93939"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M0.333984 9.5H19.5007V13.6667H0.333984V9.5Z" fill="#FFDA2C"/>
+                                                        <path fillRule="evenodd" clipRule="evenodd" d="M0.333984 0.333252H19.5007V4.49992H0.333984V0.333252Z" fill="#151515"/>
+                                                    </g>
+                                                    <rect x="1.08398" y="0.583252" width="17.8333" height="12.8333" rx="1.75" stroke="black" strokeOpacity="0.1" strokeWidth="0.5"/>
+                                                    <defs>
+                                                        <clipPath id="clip1_germany">
+                                                            <rect x="0.833984" y="0.333252" width="18.3333" height="13.3333" rx="2" fill="white"/>
+                                                        </clipPath>
+                                                    </defs>
+                                                </svg>
+                                            {% else %}
+                                                🌐
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex-1 text-gray-800 font-sans text-sm font-normal leading-6 tracking-[-0.084px]" data-target-language>
+                                            {{ glossary.target_language }}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Column 5 - Creation Date -->
+                                <div class="flex flex-col items-end flex-1 min-w-[120px]">
+                                    <!-- Header -->
+                                    <div class="flex h-12 px-3 py-2 items-center gap-1 self-stretch border-b border-black/10 bg-blue-50">
+                                        <!-- Calendar Icon SVG -->
+                                        <svg class="w-5 h-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        <span class="text-gray-600 font-sans text-sm font-normal leading-6 tracking-[-0.084px]">
+                                            {% trans 'Creation date' %}
+                                        </span>
+                                    </div>
+                                    <!-- Cells -->
+                                    {% for glossary in glossaries %}
+                                    <div class="flex h-[70px] p-3 items-center gap-2 self-stretch border-b border-black/10" data-glossary-row>
+                                        <div class="flex flex-col justify-center items-start flex-1">
+                                            <div class="self-stretch overflow-hidden text-gray-800 text-ellipsis font-sans text-sm font-normal leading-6 tracking-[-0.084px] line-clamp-1">
+                                                {{ glossary.created_at|date:"d/m/Y" }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Column 6 - Actions -->
+                                <div class="flex flex-col items-end flex-1 min-w-[120px]">
+                                    <!-- Header -->
+                                    <div class="flex h-12 px-3 py-2 justify-center items-center gap-1 self-stretch border-b border-black/10 bg-blue-50">
+                                        <!-- Wrench Icon SVG -->
+                                        <svg class="w-5 h-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                        <span class="text-gray-600 font-sans text-sm font-normal leading-6 tracking-[-0.084px]">
+                                            {% trans 'Actions' %}
+                                        </span>
+                                    </div>
+                                    <!-- Cells -->
+                                    {% for glossary in glossaries %}
+                                    <div class="flex h-[70px] p-3 justify-center items-center gap-2 self-stretch border-b border-black/10" data-glossary-row>
+                                        <button class="edit-glossary flex p-1 justify-center items-center gap-1.5 rounded-lg hover:bg-gray-100 transition-colors" data-edit-url="{% url 'single_glossary' glossary.id %}">
+                                            <!-- Edit Icon SVG -->
+                                            <svg class="w-4 h-4 text-black/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                        </button>
+                                        <button class="flex p-1 justify-center items-center gap-1.5 rounded-lg hover:bg-gray-100 transition-colors" data-url="{{ glossary.file_url }}">
+                                            <!-- Share Icon SVG -->
+                                            <svg class="w-4 h-4 text-black/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
+                                            </svg>
+                                        </button>
+                                        <button class="delete-project flex p-1 justify-center items-center gap-1.5 rounded-lg hover:bg-red-50 transition-colors" data-delete-url="{% url 'single_glossary' glossary.id %}">
+                                            <!-- Trash Icon SVG -->
+                                            <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if paginator %}
+                    <div class="flex justify-between items-center w-full">
+                        <div class="text-sm text-gray-600">
+                            {% trans 'Showing' %} {{ paginator.start_index }} {% trans 'to' %} {{ paginator.end_index }} {% trans 'of' %} {{ paginator.count }} {% trans 'results' %}
+                        </div>
+                        <div class="flex items-center gap-2">
+                            {% if paginator.has_previous %}
+                                <a href="?page={{ paginator.previous_page_number }}" class="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+                                    {% trans 'Previous' %}
+                                </a>
+                            {% endif %}
+                            
+                            {% for num in paginator.page_range %}
+                                {% if num == paginator.number %}
+                                    <span class="px-3 py-2 text-sm bg-green-600 text-white rounded-md">{{ num }}</span>
+                                {% else %}
+                                    <a href="?page={{ num }}" class="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">{{ num }}</a>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if paginator.has_next %}
+                                <a href="?page={{ paginator.next_page_number }}" class="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50">
+                                    {% trans 'Next' %}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Add Glossary Modal with Builder.io Design -->
+<div id="modal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-md flex flex-col gap-6 p-6 pb-8 max-w-lg w-full max-h-[90vh] overflow-y-auto sm:p-8 sm:pb-8">
+        {% csrf_token %}
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <!-- FolderPlus Icon SVG -->
+                <svg class="w-6 h-6 text-black/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-5l-2-2H5a2 2 0 00-2 2z"/>
+                </svg>
+                <h1 class="font-poppins text-2xl font-bold text-gray-900 leading-8 tracking-[-0.456px]">
+                    {% trans 'Add a glossary' %}
+                </h1>
+            </div>
+            <button 
+                type="button"
+                id="closeIcon"
+                class="flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                aria-label="Close modal"
+            >
+                <!-- X Icon SVG -->
+                <svg class="w-6 h-6 text-black/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Subtitle -->
+        <p class="font-poppins text-sm font-normal text-gray-600 leading-5 tracking-[-0.084px]">
+            {% trans 'Step 1 of 2: How would you like to add a glossary to your collection?' %}
+        </p>
+
+        <!-- Form -->
+        <form id="glossary-form" class="flex flex-col gap-6">
+            <!-- Language Selection -->
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-2.5">
+                    <span class="font-poppins text-sm font-medium text-gray-900">{% trans 'Source language' %}</span>
+                    <select class="glossary-language-source glossary-language-select w-full p-3 border border-gray-300 rounded-md" name="source_language" required>
+                        <option value="" disabled selected>{% trans 'Select source language' %}</option>
+                        {% for translate_language in translate_languages %}
+                        <option value="{{ translate_language.abbreviation|lower }}">
+                            {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                            {{ translate_language.french_name }}
+                            {% else %} {{ translate_language.name }}
+                            {% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex flex-col gap-2.5">
+                    <span class="font-poppins text-sm font-medium text-gray-900">{% trans 'Target language' %}</span>
+                    <select class="glossary-language-target glossary-language-select w-full p-3 border border-gray-300 rounded-md" name="target_language" required>
+                        <option value="" disabled selected>{% trans 'Select target language' %}</option>
+                        {% for translate_language in translate_languages %}
+                        <option value="{{ translate_language.abbreviation|lower }}">
+                            {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                            {{ translate_language.french_name }}
+                            {% else %} {{ translate_language.name }}
+                            {% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Options -->
+            <div class="flex flex-col gap-0.5 rounded-lg bg-white">
+                <div class="flex items-center p-2 rounded-md bg-blue-50">
+                    <div class="flex items-center gap-6 flex-1">
+                        <!-- Custom Radio Button -->
+                        <div class="relative w-5 h-5">
+                            <div class="w-5 h-5 rounded-full border-2 border-green-600 bg-green-600 flex items-center justify-center">
+                                <div class="w-2 h-2 rounded-full bg-white"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col justify-center gap-1 flex-1">
+                            <div class="font-poppins text-sm font-medium text-gray-900 leading-6 tracking-[-0.084px]">
+                                {% trans 'Import an existing glossary' %}
+                            </div>
+                            <div class="font-poppins text-xs font-normal text-gray-600 leading-4">
+                                {% trans 'Use a .csv file' %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Upload Section -->
+            <div class="glossary-container bg-gray-50 w-full py-5 rounded-md">
+                <div id="uploadButtons" class="flex flex-col gap-2.5 items-center">
+                    <button type="button" id="uploadButton" class="bg-green-600 hover:bg-green-700 text-white py-2.5 px-6 rounded-full font-poppins font-semibold transition-colors">
+                        {% trans 'Upload file' %}
+                    </button>
+                    <div id="fileInfo" class="max-w-full hidden flex gap-4 items-center justify-between px-4 py-3 rounded-md bg-green-100 text-green-700 w-full">
+                        <span id="fileName" class="flex-grow truncate font-poppins text-sm"></span>
+                        <button type="button" class="remove-file">
+                            <svg class="w-5 h-5 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <a href="{% static 'Gloss_en-de.csv' %}" type="button" id="downloadSample" class="px-6 text-center bg-white text-green-600 border border-green-600 py-2 rounded-full font-poppins font-semibold hover:bg-green-50 transition-colors">
+                        {% trans 'Download sample' %}
+                    </a>
+                    <p class="font-poppins text-xs text-gray-500">{% trans 'Supported Files: .csv, .xlsx max 5mb' %}</p>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <ul class="list-disc list-inside space-y-1 font-poppins text-sm text-gray-600">
+                <li>{% trans "The first row of the file should start with the language (i.e: French or FR)" %}</li>
+                <li>{% trans "Your file should not include any comments" %}</li>
+                <li>{% trans "Your file should have only 2 columns" %}</li>
+                <li>{% trans "Your file should include only one entry per each source text (no duplicates are allowed)" %}</li>
+                <li>{% trans "Your file must not contain empty lines, empty sources or empty targets" %}</li>
+                <li>{% trans "Entries must not have leading or trailing empty spaces" %}</li>
+                <li>{% trans "Table formatting is not allowed, only plain text" %}</li>
+                <li>{% trans "Commas are not allowed" %}</li>
+            </ul>
+
+            <!-- Buttons -->
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-between items-stretch sm:items-start gap-3 sm:gap-4">
+                <button
+                    type="button"
+                    id="closeModal"
+                    class="flex items-center justify-center px-4 py-2 rounded-full border border-gray-300 font-poppins text-sm font-bold text-gray-900 leading-6 tracking-[-0.084px] hover:bg-gray-50 transition-colors"
+                >
+                    <span class="px-2">{% trans 'Cancel' %}</span>
+                </button>
+
+                <button 
+                    type="submit" 
+                    id="continueButton"
+                    class="flex items-center justify-center px-4 py-2 rounded-full bg-green-600 hover:bg-green-700 transition-colors create-glossary"
+                >
+                    <!-- Download Icon SVG -->
+                    <svg class="w-5 h-5 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <span class="font-poppins text-sm font-bold text-white leading-6 tracking-[-0.084px]">
+                        {% trans 'Import' %}
+                    </span>
+                </button>
+            </div>
+        </form>
+
+        <input type="file" class="hidden glossary-file" accept=".csv, .xlsx">
+    </div>
+</div>
+<!-- JavaScript from original template -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('search-glossary');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('[data-glossary-row]');
+            
+            rows.forEach(row => {
+                const name = row.querySelector('[data-glossary-name]')?.textContent.toLowerCase() || '';
+                const sourceLanguage = row.querySelector('[data-source-language]')?.textContent.toLowerCase() || '';
+                const targetLanguage = row.querySelector('[data-target-language]')?.textContent.toLowerCase() || '';
+                
+                if (name.includes(searchTerm) || sourceLanguage.includes(searchTerm) || targetLanguage.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Modal functionality with Builder.io design
+    const modal = document.getElementById('modal');
+    const openModalBtn = document.getElementById('openModal');
+    const closeModalBtn = document.getElementById('closeModal');
+    const closeIcon = document.getElementById('closeIcon');
+
+    function openModal() {
+        modal?.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        modal?.classList.add('hidden');
+        resetUploadArea();
+    }
+
+    openModalBtn?.addEventListener('click', openModal);
+    closeModalBtn?.addEventListener('click', closeModal);
+    closeIcon?.addEventListener('click', closeModal);
+
+    // Close modal when clicking outside
+    modal?.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    // File upload functionality
+    const uploadButton = document.getElementById('uploadButton');
+    const fileInput = document.querySelector('.glossary-file');
+    const fileInfo = document.getElementById('fileInfo');
+    const removeFileBtn = document.querySelector('.remove-file');
+    const maxFileSize = 5 * 1024 * 1024; // 5MB
+
+    function resetUploadArea() {
+        uploadButton?.classList.remove('hidden');
+        fileInfo?.classList.add('hidden');
+        if (fileInput) fileInput.value = '';
+    }
+
+    function showUploadedFile(fileName) {
+        document.getElementById('fileName').textContent = fileName;
+        fileInfo?.classList.remove('hidden');
+        uploadButton?.classList.add('hidden');
+    }
+
+    uploadButton?.addEventListener('click', function() {
+        fileInput?.click();
+    });
+
+    fileInput?.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size <= maxFileSize) {
+                showUploadedFile(file.name);
+            } else {
+                alert('File size exceeds 5MB limit.');
+                this.value = '';
+            }
+        }
+    });
+
+    removeFileBtn?.addEventListener('click', function() {
+        resetUploadArea();
+    });
+
+    // Form submission
+    const form = document.getElementById('glossary-form');
+    form?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const sourceLanguage = this.querySelector('[name="source_language"]').value;
+        const targetLanguage = this.querySelector('[name="target_language"]').value;
+        
+        if (!sourceLanguage || !targetLanguage) {
+            alert('{% trans "Please select both source and target languages" %}');
+            return;
+        }
+        
+        if (!fileInput?.files.length) {
+            alert('{% trans "Please select a file to upload" %}');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('source_language', sourceLanguage);
+        formData.append('target_language', targetLanguage);
+        formData.append('file', fileInput.files[0]);
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+        fetch('{% url "add_glossary" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken,
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                alert('{% trans "Glossary added successfully!" %}');
+                closeModal();
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('{% trans "An error occurred while adding the glossary." %}');
+        });
+    });
+
+    // Delete functionality
+    document.querySelectorAll('.delete-project').forEach(button => {
+        button.addEventListener('click', function() {
+            const url = this.dataset.deleteUrl;
+            if (confirm('{% trans "Are you sure you want to delete this glossary?" %}')) {
+                fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Error deleting glossary');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the glossary.');
+                });
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

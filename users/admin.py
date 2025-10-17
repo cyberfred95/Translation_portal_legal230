@@ -19,7 +19,7 @@ class UserDisplayMixin:
             error_response, session_url = get_stripe_customer_session_url(
                 obj.stripe_customer_id)
             if error_response:
-                return format_html('<span style="color: red;">{error_response}</span>')
+                return format_html('<span style="color: red;">Error</span>')
             return format_html(
                 '<a href="{}" target="_blank" style="background-color: #635bff; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;">Stripe</a>',
                 session_url
@@ -71,7 +71,7 @@ class CustomUserAdmin(UserDisplayMixin, UserAdmin):
 
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('email', 'uuid', 'language')}),
+        ('Personal info', {'fields': ('email', 'uuid', 'stripe_customer_id', 'language')}),
         ('Permissions', {
             'fields': ('is_active', 'is_staff', 'is_superuser', 'group'),
         }),

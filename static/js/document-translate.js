@@ -1,11 +1,161 @@
 $(document).ready(function () {
+    var $fileInput = $('#file-input');
+    var $fileUploadZone = $('#file-upload-zone');
+    var $warningAlert = $('#warning-alert');
+    var $fileList = $('#file-list');
+    var $nextButton = $('#next-step');
+    var $blockButtons = $('.block-buttons');
+    var uploadedFiles = [];
+
+    // Filtre les langues sources selon la recherche
+    $('#source-search-input').on('input keyup change', function () {
+        var val = $(this).val().toLowerCase();
+        $('.source-language-item').each(function () {
+            var text = $(this).text().toLowerCase();
+            $(this).toggle(text.indexOf(val) > -1);
+        });
+    });
+
+    // Filtre les langues cibles selon la recherche
+    $('#target-search-input').on('input keyup change', function () {
+        var val = $(this).val().toLowerCase();
+        $('.target-language-item').each(function () {
+            var text = $(this).text().toLowerCase();
+            $(this).toggle(text.indexOf(val) > -1);
+        });
+    });
+
+    // Sélection d'une langue source
+    $(document).on('click', '.source-language-item', function () {
+        var selectedLang = $(this).data('value');
+
+        // Désélectionne toutes les langues sources
+        $('.source-language-item').removeClass('text-green-800 bg-green-100');
+
+        // Sélectionne la ligne cliquée
+        $(this).addClass('text-green-800 bg-green-100');
+
+        // Met à jour la variable globale
+        sourceLanguage = selectedLang;
+        
+        // Si sélection pendant la détection, marquer comme annulé et afficher message
+        const $status = $('#language-detection-status');
+        if (!$status.hasClass('hidden') && $status.find('span').text().includes(language_code === 'en' ? 'Detecting' : 'Détection')) {
+            detectionCancelled = true;
+            const cancelMessage = language_code === 'en' ? 'Detection cancelled' : 'Détection annulée';
+            showLanguageDetectionStatus(cancelMessage, true, '#F59E0B');
+        }
+        
+        // Vérifier la cohérence après sélection
+        checkLanguagesConsistency();
+    });
+
+    // Sélection d'une langue cible
+    $(document).on('click', '.target-language-item', function () {
+        var selectedLang = $(this).data('value');
+
+        // Désélectionne toutes les langues cibles
+        $('.target-language-item').removeClass('text-green-800 bg-green-100');
+
+        // Sélectionne la ligne cliquée
+        $(this).addClass('text-green-800 bg-green-100');
+
+        // Met à jour la variable globale
+        targetLanguage = selectedLang;
+        
+        // Sauvegarder dans le localStorage
+        localStorage.setItem('document_translate_target_language', selectedLang);
+        
+        // Vérifier la cohérence après sélection
+        checkLanguagesConsistency();
+    });
+
+
+    // File input change handler
+    $fileInput.on('change', function (e) {
+        handleFiles(Array.from(e.target.files));
+        $(this).val(''); // Reset input
+    });
+
+    // Drag and drop handlers
+    $fileUploadZone.on('dragover', function (e) {
+        e.preventDefault();
+        $(this).addClass('bg-black/[0.05]');
+        $(this).removeClass('bg-black/[0.03]');
+    });
+
+    $fileUploadZone.on('dragleave', function (e) {
+        e.preventDefault();
+        $(this).removeClass('bg-black/[0.05]');
+        $(this).addClass('bg-black/[0.03]');
+    });
+
+    $fileUploadZone.on('drop', function (e) {
+        e.preventDefault();
+        $(this).removeClass('bg-black/[0.05]');
+        $(this).addClass('bg-black/[0.03]');
+
+        var files = Array.from(e.originalEvent.dataTransfer.files);
+        handleFiles(files);
+    });
+
+    function getFileType(filename) {
+        var extension = filename.toLowerCase().split('.').pop();
+        if (extension === 'pdf') return 'pdf';
+        if (extension === 'docx') return 'docx';
+        if (extension === 'pptx') return 'pptx';
+        if (extension === 'xlsx') return 'xlsx';
+        if (extension === 'txt') return 'txt';
+        return 'pdf'; // default
+    }
+
+    function getFileColors(type) {
+        const colors = {
+            'pdf': { bg: '#FCA5A5', badge: '#DC2626' },      // Rouge (PDF)
+            'docx': { bg: '#93C5FD', badge: '#2563EB' },     // Bleu (Word)
+            'xlsx': { bg: '#86EFAC', badge: '#16A34A' },     // Vert (Excel)
+            'pptx': { bg: '#FDBA74', badge: '#EA580C' },     // Orange (PowerPoint)
+            'txt': { bg: '#D1D5DB', badge: '#6B7280' }       // Gris (Texte)
+        };
+        return colors[type] || colors['pdf'];
+    }
+
+    // Pour bouton suppression dynamique
+    window.removeFile = function (fileId) {
+        selectedFiles = selectedFiles.filter(function (file) {
+            return file.fileId !== fileId;
+        });
+        
+        checkPDF(selectedFiles);
+        displayFiles(selectedFiles);
+        
+        // Retirer aussi les éléments du DOM si présents
+        $(`.file[data-file-id="${fileId}"]`).remove();
+        const $detectedFile = $(`.flex.gap-5[data-file-id="${fileId}"]`);
+        if ($detectedFile.length) {
+            $detectedFile.remove();
+        }
+        
+        toggleFollowingButton();
+        
+        if (currentStep === 1) {
+            checkLanguagesConsistency();
+        }
+        
+        if (selectedFiles.length === 0) {
+            currentStep = 0;
+            showStep(currentStep);
+        }
+    }
+
+
     let sourceLanguage = '';
     let targetLanguage = '';
     let selectedDomain = '';
     let selectedSubDomain = '';
     let defaultDomain = false;
     let selectedGlossaryType = 'default';
-    let selectedGlossary = '';
+    let selectedGlossary = 'none';
     let glossaryFile = '';
     let selectedFiles = [];
 
@@ -18,72 +168,119 @@ $(document).ready(function () {
 
     let currentStep = 0;
 
-    function updateProgress(step) {
-        let percentage;
-        switch (step) {
-            case 0:
-                percentage = 0;
-                break;
-            case 1:
-                percentage = 26;
-                break;
-            case 2:
-                percentage = 52;
-                break;
-            case 3:
-                percentage = 76;
-                break;
-            case 4:
-                percentage = 100;
-                break;
-            default:
-                percentage = 1;
-        }
-
-        $("#progress-bar").css("width", percentage + "%");
-
-        $(".progress-point").parent().find("svg").removeClass("text-green-700").addClass("text-green-250");
-        $(".progress-point").parent().find(".text-3\\.25, .text-xs").removeClass("text-green-700").addClass("text-green-200");
-
-        $("#point-1").find("svg").removeClass("text-green-250").addClass("text-green-700");
-        $("#point-1").find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-700");
-
-        for (let i = 0; i <= step; i++) {
-            $(`#point-${i + 1}`).find("svg").removeClass("text-green-250").addClass("text-green-700");
-            $(`#point-${i + 1}`).find(".text-3\\.25, .text-xs").removeClass("text-green-200").addClass("text-green-700");
-
-        }
-    }
-
     function showStep(step) {
-        $('.border-line > div').addClass('hidden');
-        $(`.border-line > div:eq(${step})`).removeClass('hidden');
-
-        updateProgress(step);
-
         const $actionList = $(".action-list");
 
         if (step === 0) {
             prevStep.hide();
+            $blockButtons.removeClass('justify-between').addClass('justify-end');
             $("#restart").hide();
             $("#restart-text").hide();
 
+            // Toujours afficher le bouton suivant
+            nextStep.show().css('display', 'flex');
+            $actionList.css("justify-content", "flex-end");
+            
+            // Activer/désactiver selon les fichiers
             if (selectedFiles.length > 0) {
-                nextStep.show().text(language_code === 'en' ? "Next" : "Suivant");
-                $actionList.css("justify-content", "flex-end");
+                nextStep.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
             } else {
-                nextStep.hide();
+                nextStep.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
             }
+
+            $("div[class^='step-']").addClass('hidden').hide();
+            $('.step-1').removeClass('hidden').show();
+            $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-2').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
+            $('.stepindicator-3').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
+            $('.stepindicator-4').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
+        } else if (currentStep === 1) {
+            $("div[class^='step-']").addClass('hidden').hide();
+            $('.step-2').removeClass('hidden').show();
+            $blockButtons.addClass('justify-between').removeClass('justify-end');
+            prevStep.show();
+            prevStep.css('display', 'flex');
+            prevStep.prop("disabled", false);
+            $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-2').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-3').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
+            $('.stepindicator-4').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
+            
+            // Réinitialiser les sélections de langues et variables
+            sourceLanguage = '';
+            targetLanguage = '';
+            $('.source-language-item').removeClass('text-green-800 bg-green-100');
+            $('.target-language-item').removeClass('text-green-800 bg-green-100');
+            
+            // Charger la langue cible depuis le localStorage si elle existe
+            const savedTargetLanguage = localStorage.getItem('document_translate_target_language');
+            if (savedTargetLanguage) {
+                targetLanguage = savedTargetLanguage;
+                const $savedTargetItem = $(`.target-language-item[data-value="${savedTargetLanguage}"]`);
+                if ($savedTargetItem.length) {
+                    $savedTargetItem.addClass('text-green-800 bg-green-100');
+                }
+            }
+            
+            // Cacher le warning au départ
+            $('#language-warning-alert').addClass('hidden');
+            
+            // Désactiver le bouton Suivant jusqu'à sélection des langues
+            nextStep.addClass('opacity-50 cursor-not-allowed').prop('disabled', true);
+            
+            // Lancer la détection de langue
+            detectLanguageFiles();
+            
+            // Appeler checkLanguagesConsistency pour initialiser l'état
+            checkLanguagesConsistency();
+        } else if (currentStep === 2) {
+            $("div[class^='step-']").addClass('hidden').hide();
+            $('.step-3').removeClass('hidden').show();
+            $blockButtons.addClass('justify-between').removeClass('justify-end');
+            prevStep.show();
+            $('span', $nextButton).text(language_code === 'en' ? 'Next' : 'Suivant');
+            $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-2').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-3').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-4').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
+            
+            // Activer le bouton Suivant par défaut sur step 3 (glossaire optionnel)
+            nextStep.removeClass('border-gray-225 text-gray-225 opacity-50 cursor-not-allowed')
+                .addClass('border-green-700 text-green-700')
+                .prop("disabled", false);
+            
+            // Charger automatiquement les groupes de domaines
+            getDomainsGroups();
+            
+            // Charger automatiquement les glossaires My glossaries si les langues sont définies
+            if (sourceLanguage && targetLanguage) {
+                loadMyGlossaries();
+            }
+        } else if (currentStep === 3) {
+            $("div[class^='step-']").addClass('hidden').hide();
+            $('.step-4').removeClass('hidden').show();
+            $blockButtons.addClass('justify-between').removeClass('justify-end');
+            prevStep.show();
+            $('span', $nextButton).text(language_code === 'en' ? 'Finish' : 'Terminé');
+            $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-2').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-3').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            $('.stepindicator-4').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
+            
+            // Déclencher la requête de traduction à l'arrivée sur step_4
+            fileTranslate();
         } else if (currentStep === 4) {
-            prevStep.hide();
-            nextStep.hide();
+            $("div[class^='step-']").addClass('hidden').hide();
+            $('.step-5').removeClass('hidden').show();
             $("#restart").show().text(language_code === 'en' ? "New translation" : "Nouveau document");
             $("#restart-text").show();
 
             $actionList.css("justify-content", "flex-start");
         } else {
             prevStep.show();
-            nextStep.show().text(language_code === 'en' ? "Next" : "Suivant");
+            $blockButtons.removeClass('justify-end').addClass('justify-between');
+
+            nextStep.show();
             $("#restart").hide();
             $("#restart-text").hide();
 
@@ -94,43 +291,71 @@ $(document).ready(function () {
         nextStep.toggleClass('hidden', step === 4);
     }
 
-    nextStep.click(function () {
-        if (currentStep === 0 && selectedFiles.length === 0) {
-            return;
-        }
-        if (currentStep === 0) {
-            detectLanguageFiles();
-            checkLanguagesConsistency()
-        }
-        if (currentStep === 1) {
-            targetLanguage = $('.document-target-language').val();
-            getDomainsGroups();
-        }
-        if (currentStep === 2) {
-            if (!defaultDomain && access_to_default_glossaries) {
-                loadDefaultGlossary();
-                $(".add-glossary-btn").addClass('hidden');
-                $(".step-4 .default").addClass('bg-gray-600 text-white');
-            } else {
-                loadMyGlossaries();
-                $(".add-glossary-btn").removeClass('hidden');
-                $(".step-4 .my-glossary").addClass('bg-gray-600 text-white');
+    $(document).on('click', nextStep, function (e) {
+        if ($(e.target).hasClass('nextStep') || $(e.target).children().hasClass('nextStep')) {
+
+            // Empêcher le clic si le bouton est désactivé
+            if (nextStep.prop('disabled')) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
             }
+
+            if (currentStep === 0 && selectedFiles.length === 0) {
+                return;
+            }
+            if (currentStep === 0) {
+                // Pas de détection automatique - l'utilisateur choisit manuellement
+                checkLanguagesConsistency()
+            }
+            if (currentStep === 1) {
+                // Vérifier que les langues sont bien sélectionnées et différentes
+                const hasSourceLanguage = sourceLanguage && sourceLanguage !== '';
+                const hasTargetLanguage = targetLanguage && targetLanguage !== '';
+                const languagesAreDifferent = sourceLanguage !== targetLanguage;
+                
+                if (!hasSourceLanguage || !hasTargetLanguage || !languagesAreDifferent) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }
+            if (currentStep === 2) {
+                if (!defaultDomain && access_to_default_glossaries) {
+                    loadDefaultGlossary();
+                    $(".add-glossary-btn").addClass('hidden');
+                    $(".step-4 .default").addClass('bg-gray-600 text-white');
+                } else {
+                    loadMyGlossaries();
+                    $(".add-glossary-btn").removeClass('hidden');
+                    $(".step-4 .my-glossary").addClass('bg-gray-600 text-white');
+                }
+            }
+
+            if (currentStep === 3) {
+                // Rediriger vers le dashboard quand on clique sur "Terminé"
+                window.location.href = '/fr/dashboard/';
+                return;
+            }
+
+            console.log('currentStep : ' + currentStep);
+
+            currentStep++;
+            showStep(currentStep);
+
         }
-        if (currentStep === 3) {
-            fileTranslate();
-        }
-        currentStep++;
-        showStep(currentStep);
     });
 
-    prevStep.click(function () {
-        if (currentStep > 0) {
-            currentStep--;
-            showStep(currentStep);
-            nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none').addClass('border-green-700 text-green-700').prop("disabled", false);
+    $(document).on('click', prevStep, function (e) {
+        if ($(e.target).hasClass('prevStep')) {
+            console.log('currentStep from prevStep : ' + currentStep)
+            if (currentStep > 0) {
+                currentStep--;
+                showStep(currentStep);
+                nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none').addClass('border-green-700 text-green-700').prop("disabled", false);
 
-            $('.step-container').removeClass('bg-red-100 border-red-200');
+                $('.step-container').removeClass('bg-red-100 border-red-200');
+            }
         }
     });
 
@@ -155,9 +380,11 @@ $(document).ready(function () {
 
     const $dropZone = $('.file-upload');
     const $chooseFileButton = $('.choose-file');
-    const $fileList = $('.file-list');
 
-    fileInput.on('change', handleFiles);
+    fileInput.on('change', function (e) {
+        handleFiles(Array.from(e.target.files));
+        e.target.value = ''; // Reset input
+    });
 
     $chooseFileButton.on('click', () => fileInput.click());
 
@@ -179,27 +406,80 @@ $(document).ready(function () {
         handleFiles({target: {files: e.originalEvent.dataTransfer.files}});
     });
 
+    function updateUI() {
+        const hasFiles = selectedFiles.length > 0;
+        
+        if (hasFiles) {
+            $('#file-list').removeClass('hidden');
+            $('#next-step').prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+        } else {
+            $('#file-list').addClass('hidden');
+            $('#next-step').prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+        }
+    }
+
+    $nextButton.on('click', function () {
+        if (!$(this).prop('disabled')) {
+            // Handle next step logic here
+            console.log('Proceeding to next step with files:', uploadedFiles);
+            // You can redirect to the next step or trigger the next step logic
+        }
+    });
+
     function handleFiles(e) {
-        const files = Array.from(e.target.files || e.originalEvent.dataTransfer.files).filter(file => {
-            const ext = '.' + file.name.split('.').pop().toLowerCase();
+        // Extraire les fichiers selon le type d'événement (input ou drop)
+        var filesArray = Array.isArray(e) ? e : Array.from(e.target.files || e.originalEvent.dataTransfer.files);
+
+        // Filtrer fichiers selon extension autorisée
+        var filteredFiles = filesArray.filter(function (file) {
+            var ext = '.' + file.name.split('.').pop().toLowerCase();
             return allowedTypes.includes(ext);
         });
 
-        const newFiles = files.filter(file =>
-            !selectedFiles.some(selectedFile =>
-                selectedFile.name === file.name && selectedFile.size === file.size
-            )
-        );
+        // Filtrer les fichiers déjà présents (par nom et taille)
+        var newFiles = filteredFiles.filter(function (file) {
+            return !selectedFiles.some(function (selectedFile) {
+                return selectedFile.name === file.name && selectedFile.size === file.size;
+            });
+        });
 
-        selectedFiles = [...selectedFiles, ...newFiles];
+        // Construire les objets fichiers enrichis
+        var enrichedFiles = $.map(newFiles, function (file, index) {
+            // Calculer la taille appropriée (KB ou MB)
+            var fileSize;
+            var sizeInMB = file.size / 1024 / 1024;
+            if (sizeInMB < 0.1) {
+                // Afficher en KB si moins de 0.1 MB
+                fileSize = (file.size / 1024).toFixed(1) + ' KB';
+            } else {
+                // Afficher en MB
+                fileSize = sizeInMB.toFixed(1) + ' MB';
+            }
+            
+            return {
+                id: 'file-' + Date.now() + '-' + index,
+                name: file.name,
+                size: fileSize,
+                timeAgo: '1 minute ago',
+                type: getFileType(file.name),
+                file: file
+            };
+        });
+
+        // Ajouter les nouveaux fichiers enrichis à la liste sélectionnée
+        selectedFiles = selectedFiles.concat(enrichedFiles);
 
         checkPDF(selectedFiles);
-
         displayFiles(selectedFiles);
+        updateUI();
         toggleFollowingButton();
 
-        e.target.value = '';
+        // Réinitialiser la valeur input si c'est un event input (pas un array)
+        if (!Array.isArray(e)) {
+            e.target.value = '';
+        }
     }
+
 
     const displayFiles = (files) => {
         $fileList.empty();
@@ -207,23 +487,33 @@ $(document).ready(function () {
 
             const fileId = file.fileId || `file-${Date.now()}-${index}`;
             file.fileId = fileId;
+            
+            const colors = getFileColors(file.type);
 
             const $fileItem = $(`
-            <div class="file flex gap-4 items-center px-4 py-3 rounded-md bg-green-100 text-green-400 font-normal" data-file-id="${fileId}">
-
-                <span>${file.name}</span>
-                <button type="button" class="remove-file" data-file-id="${fileId}">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <g clip-path="url(#clip0_759_4082)">
-                            <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z" fill="#176C77"/>
-                            <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z" fill="white"/>
-                        </g>
-                        <defs>
-                            <clipPath id="clip0_759_4082">
-                                <rect width="20" height="20" fill="white"/>
-                            </clipPath>
-                        </defs>
-                    </svg>
+            <div class="flex items-center justify-between gap-2 p-3 rounded-lg border border-black/10 bg-white w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.667rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.8rem)]" style="min-width: 200px;">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <div class="w-8 h-10 relative flex-shrink-0">
+                        <svg class="w-8 h-10 shrink-0 absolute left-0 top-0" width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 36V4C0 1.79086 1.79086 0 4 0H19.9C20.9271 0 21.9149 0.395099 22.6586 1.10345L30.7586 8.81773C31.5513 9.57271 32 10.6196 32 11.7143V36C32 38.2091 30.2091 40 28 40H4C1.79086 40 0 38.2091 0 36Z" fill="${colors.bg}"/>
+                        </svg>
+                        <div class="inline-flex px-1 items-center justify-center rounded-sm absolute -left-1 top-[18px] h-4 min-w-[26px]" style="background-color: ${colors.badge};">
+                            <span class="font-inter text-[9px] font-bold leading-4 tracking-[0.144px] text-white uppercase whitespace-nowrap">
+                                ${file.type}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col justify-center items-start min-w-0 flex-1">
+                        <div class="font-poppins text-base font-normal leading-6 tracking-[-0.176px] text-[#181932] truncate w-full">
+                            ${file.name}
+                        </div>
+                        <div class="font-poppins text-sm font-normal leading-6 tracking-[-0.084px] text-[#5A5A78]">
+                            ${file.size}
+                        </div>
+                    </div>
+                </div>
+                <button onclick="removeFile('${fileId}')" class="w-6 h-6 text-black/80 hover:text-red-600 transition-colors flex-shrink-0">
+                    <i class="ph ph-trash" style="font-size: 24px;"></i>
                 </button>
             </div>
         `);
@@ -241,15 +531,23 @@ $(document).ready(function () {
         const filesExist = selectedFiles.length > 0;
         const $actionList = $(".action-list");
 
-        if (filesExist && currentStep === 0) {
+        if (currentStep === 0) {
             prevStep.hide();
-            nextStep.show().text(language_code === 'en' ? "Next" : "Suivant");
+            $blockButtons.removeClass('justify-between').addClass('justify-end');
+
+            // Toujours afficher le bouton suivant
+            nextStep.show().css('display', 'flex');
             $("#restart").hide();
             $("#restart-text").hide();
 
             $actionList.css("justify-content", "flex-end");
-        } else if (currentStep === 0) {
-            nextStep.hide();
+            
+            // Activer/désactiver selon les fichiers
+            if (filesExist) {
+                nextStep.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+            } else {
+                nextStep.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+            }
         }
 
         $fileList.toggleClass('hidden', !filesExist);
@@ -258,46 +556,69 @@ $(document).ready(function () {
     function checkPDF(files) {
         const isPdf = files.some(file => file.name.toLowerCase().endsWith('.pdf'));
         $(".pdf-document").toggleClass('hidden', !isPdf);
+        // Afficher le warning uniquement si au moins un PDF est présent
+        $('#warning-alert').toggleClass('hidden', !isPdf);
     }
 
-    function removeFile(fileId) {
-        selectedFiles = selectedFiles.filter(file => file.fileId !== fileId);
-
-        checkPDF(selectedFiles);
-
-        $(`.file[data-file-id="${fileId}"]`).remove();
-
-        const $detectedFile = $(`.flex.gap-5[data-file-id="${fileId}"]`);
-        if ($detectedFile.length) {
-            $detectedFile.remove();
-        }
-
-        toggleFollowingButton();
-
-        if (currentStep === 1) {
-            checkLanguagesConsistency();
-        }
-
-        if (selectedFiles.length === 0) {
-            currentStep = 0;
-            showStep(currentStep);
-        }
-    }
 
 
     // ------------- STEP-2 -------------
 
+    // Fonction pour afficher le statut de détection de langue
+    function showLanguageDetectionStatus(message, autoHide = false, color = '#5A5A78', showSpinner = false) {
+        const $status = $('#language-detection-status');
+        const $span = $status.find('span');
+        
+        // Ajouter spinner si détection en cours
+        if (showSpinner) {
+            $span.html(`<i class="ph ph-circle-notch" style="font-size: 16px; margin-right: 8px; display: inline-block; animation: rotation 1s linear infinite;"></i>${message}`).css('color', color);
+        } else {
+            $span.text(message).css('color', color);
+        }
+        
+        // Afficher avec fondu
+        $status.removeClass('hidden').css('opacity', '1');
+        
+        if (autoHide) {
+            setTimeout(() => {
+                // Disparition en fondu
+                $status.css('transition', 'opacity 0.5s ease-out');
+                $status.css('opacity', '0');
+                
+                // Cacher complètement après l'animation
+                setTimeout(() => {
+                    $status.addClass('hidden');
+                }, 1000);
+            }, 5000);
+        }
+    }
+    
+    function hideLanguageDetectionStatus() {
+        $('#language-detection-status').addClass('hidden');
+    }
 
+    let detectionCancelled = false;
+    
     function detectLanguageFiles() {
         if (selectedFiles.length === 0) {
             return;
         }
 
-        startLoading();
+        // Si l'utilisateur a déjà sélectionné une langue source, ignorer la détection
+        if (sourceLanguage && sourceLanguage !== '') {
+            return;
+        }
+
+        // Réinitialiser le flag d'annulation
+        detectionCancelled = false;
+
+        // Afficher le message de détection en cours avec spinner
+        const detectionMessage = language_code === 'en' ? 'Detecting language...' : 'Détection de la langue en cours...';
+        showLanguageDetectionStatus(detectionMessage, false, '#5A5A78', true);
 
         const formData = new FormData();
         selectedFiles.forEach((file) => {
-            formData.append(`document[]`, file);
+            formData.append(`document[]`, file.file);
         });
 
         $.ajax({
@@ -311,196 +632,99 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                const isSameLanguages = response.languages.every(i => i?.abbreviation === response.languages[0]?.abbreviation);
-
-                const detectedFiles = response.languages.map(serverFile => {
-                    const matchingFile = selectedFiles.find(f => f.name === serverFile.file_name);
-                    return {
-                        ...serverFile,
-                        fileId: matchingFile ? matchingFile.fileId : `file-${Date.now()}-${serverFile.file_name}`
-                    };
-                });
-
-                displayDetectLanguageFiles(detectedFiles, isSameLanguages);
-
-                if (!isSameLanguages) {
-                    $('.step-container').addClass('bg-red-150 text-red-200');
-                } else {
-                    sourceLanguage = response.languages[0].abbreviation.toLowerCase();
+                // Si détection annulée, ne rien faire
+                if (detectionCancelled) {
+                    return;
                 }
+                
+                // Si l'utilisateur a sélectionné une langue pendant le chargement, marquer comme annulé
+                if (sourceLanguage && sourceLanguage !== '') {
+                    detectionCancelled = true;
+                    const cancelMessage = language_code === 'en' ? 'Detection cancelled' : 'Détection annulée';
+                    showLanguageDetectionStatus(cancelMessage, true, '#F59E0B');
+                    return;
+                }
+                
+                // Compter les occurrences de chaque langue
+                const languageCounts = {};
+                response.languages.forEach(lang => {
+                    const abbr = lang.abbreviation.toLowerCase();
+                    languageCounts[abbr] = (languageCounts[abbr] || 0) + 1;
+                });
+                
+                // Trouver la langue la plus fréquente
+                let mostCommonLang = null;
+                let maxCount = 0;
+                for (const [lang, count] of Object.entries(languageCounts)) {
+                    if (count > maxCount) {
+                        maxCount = count;
+                        mostCommonLang = lang;
+                    }
+                }
+                
+                const isSameLanguages = Object.keys(languageCounts).length === 1;
+                
+                if (mostCommonLang) {
+                    // Sélectionner la langue la plus commune
+                    sourceLanguage = mostCommonLang;
+                    
+                    // Mettre en surbrillance dans le tableau
+                    const $sourceLangItem = $(`.source-language-item[data-value="${mostCommonLang}"]`);
+                    $sourceLangItem.addClass('text-green-800 bg-green-100');
+                    
+                    // Afficher le warning si langues différentes
+                    if (!isSameLanguages) {
+                        $('#language-warning-alert').removeClass('hidden');
+                    } else {
+                        $('#language-warning-alert').addClass('hidden');
+                    }
+                    
+                    // Afficher message de succès
+                    const successMessage = language_code === 'en' ? 'Language detected' : 'Langue détectée';
+                    showLanguageDetectionStatus(successMessage, true, '#16A34A');
+                }
+                
                 checkLanguagesConsistency();
             },
             error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
+                // Si détection annulée, ne rien faire
+                if (detectionCancelled) {
+                    return;
+                }
+                
+                // En cas d'erreur, afficher un message d'erreur
+                const errorMessage = language_code === 'en' ? 'Language detection error' : 'Erreur lors de détection de langue';
+                showLanguageDetectionStatus(errorMessage, true, '#DC2626');
             },
             complete: function () {
-                stopLoading();
+                // Ne rien faire ici, les messages gèrent leur propre disparition
             },
         });
     }
 
-    function displayDetectLanguageFiles(files) {
-        const $detectiveLanguageList = $('.detective-language-list');
-        $detectiveLanguageList.empty();
-
-        files.forEach((file) => {
-            const $fileItem = $(`
-            <div class="flex gap-5 items-center" data-file-id="${file.fileId}">
-                <div class="flex gap-4 items-center px-4 py-3 rounded-md bg-green-100 text-green-400 detected-file font-normal">
-
-                    <span class="text-3.5 w-50 truncate">${file.file_name}</span>
-                    <button type="button" class="remove-detected-file" data-file-id="${file.fileId}">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <g clip-path="url(#clip0_759_4082)">
-                                <path d="M10 20C15.5229 20 20 15.5229 20 10C20 4.47716 15.5229 0 10 0C4.47716 0 0 4.47716 0 10C0 15.5229 4.47716 20 10 20Z" fill="currentColor"/>
-                                <path d="M14.5625 14.5625C14.1875 14.9375 13.5625 14.9375 13.1875 14.5625L9.99998 11.375L6.81249 14.5625C6.43751 14.9375 5.81247 14.9375 5.43749 14.5625C5.0625 14.1875 5.0625 13.5625 5.43749 13.1875L8.62498 9.99998L5.43749 6.81249C5.0625 6.43751 5.0625 5.81247 5.43749 5.43749C5.81247 5.0625 6.43751 5.0625 6.81249 5.43749L9.99998 8.62498L13.1875 5.43749C13.5625 5.0625 14.1875 5.0625 14.5625 5.43749C14.9375 5.81247 14.9375 6.43751 14.5625 6.81249L11.375 9.99998L14.5625 13.1875C14.9375 13.5625 14.9375 14.1874 14.5625 14.5625Z" fill="white"/>
-                            </g>
-                            <defs>
-                                <clipPath id="clip0_759_4082">
-                                    <rect width="20" height="20" fill="white"/>
-                                </clipPath>
-                            </defs>
-                        </svg>
-                    </button>
-                </div>
-                <div class="flex gap-3 items-center">
-                    <svg width="6" height="10" viewBox="0 0 6 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5.71393 4.28962C5.6637 4.23904 5.6081 4.19635 5.55034 4.15922L1.67443 0.283488C1.29615 -0.0944361 0.683075 -0.0946154 0.304613 0.283667C-0.0736695 0.66177 -0.0736695 1.27502 0.304613 1.65348L3.64279 4.9913L0.287753 8.3467C-0.0907092 8.72462 -0.0907092 9.33805 0.287753 9.71651C0.476983 9.90539 0.724687 9.99991 0.972392 9.99991C1.2201 9.99991 1.46834 9.90539 1.65703 9.71615L5.55034 5.82338C5.6081 5.78625 5.66352 5.74374 5.71393 5.69298C5.90764 5.49926 6.00055 5.24492 5.99625 4.9913C6.00073 4.7375 5.90764 4.4828 5.71393 4.28962Z" fill="#9EAAB3"/>
-                    </svg>
-                    <select class="gray-text-select document-source-language" name="source_language" required data-file-id="${file.fileId}" data-default-value="${file.abbreviation.toLowerCase()}">
-                        ${getLanguageOptions(file.abbreviation)}
-                    </select>
-                </div>
-            </div>
-        `);
-
-            $detectiveLanguageList.append($fileItem);
-
-            $fileItem.find('.document-source-language').select2().each(function () {
-                var $select = $(this);
-                var defaultValue = $select.data('default-value');
-
-                $select.next('.select2-container').addClass('gray-text-select');
-
-                if (defaultValue) {
-                    $select.val(defaultValue).trigger('change');
-                }
-
-                function updateDetectedText() {
-                    var $selectedOption = $select.find('option:selected');
-                    var text = $selectedOption.text().replace(' (detected)', '');
-
-                    $select.find('option').each(function () {
-                        $(this).text($(this).text().replace(' (detected)', ''));
-                    });
-
-                    if (defaultValue && $selectedOption.val() === defaultValue) {
-                        var newText = text + ' <span class="detected-text font-normal">(detected)</span>';
-
-                        $selectedOption.text(text + (language_code === 'en' ? ' (detected)' : ' (détecté)'));
-                        $select.next('.select2-container').find('.select2-selection__rendered').html(newText);
-                    } else {
-                        $select.next('.select2-container').find('.select2-selection__rendered').text(text);
-                    }
-                }
-
-                updateDetectedText();
-
-                $select.on('select2:select', function (e) {
-                    updateDetectedText();
-                });
-            });
-        });
-    }
 
     function checkLanguagesConsistency() {
-        const sourceSelects = $('.document-source-language');
-        const targetLanguageBlock = $('.target-language-container');
-        const targetSelect = $('.select-block');
-        const detectedFiles = $(".detected-file");
+        // Vérifier si les deux langues sont sélectionnées et valides
+        const hasSourceLanguage = sourceLanguage && sourceLanguage !== '';
+        const hasTargetLanguage = targetLanguage && targetLanguage !== '';
+        const languagesAreDifferent = sourceLanguage !== targetLanguage;
+        const canProceed = hasSourceLanguage && hasTargetLanguage && languagesAreDifferent;
 
-        let isConsistent = true;
-        let firstValue = sourceSelects.first().val();
-        let targetValue = $('.document-target-language').val();
-
-        sourceLanguage = firstValue;
-
-        sourceSelects.each(function () {
-            const currentValue = $(this).val();
-            if (currentValue !== firstValue) {
-                isConsistent = false;
-                return false;
-            }
-        });
-
-
-        // ------------- SELECT -------------
-
-        $('.document-target-language').attr("data-placeholder", language_code === 'en' ? "Target language" : "Langue cible");
-
-        $('.document-target-language').select2();
-        $('.document-source-language').select2();
-
-        $targetSelect = $(".document-target-language").select2();
-
-        $targetSelect.data('select2').$container.addClass('detect-languages');
-        $targetSelect.data('select2').$dropdown.addClass('detect-languages');
-
-        targetLanguageBlock.find('.error-message').remove();
-
-        if (currentStep === 1) {
-            if (!isConsistent) {
-                $('.document-source-language').select2().each(function () {
-                    var $select = $(this);
-                    $select.data('select2').$container.addClass('error languages');
-                    $select.data('select2').$dropdown.addClass('error languages');
-                });
-
-                $('.step-container').addClass('bg-red-150 text-red-200');
-
-                targetSelect.hide();
-
-                targetLanguageBlock.prepend(language_code === 'en'?'<div class="error-message text-red-400">One or more files have different language, please fix it.</div>': '<div class="error-message text-red-400">Vous ne pouvez pas importer des documents ayant des langues différentes</div>');
-
-                detectedFiles.removeClass('bg-green-150 text-green-500').addClass('bg-red-150 text-red-400 border border-red-400');
-            } else {
-                $('.document-source-language').select2().each(function () {
-                    var $select = $(this);
-                    $select.data('select2').$container.addClass('languages');
-                    $select.data('select2').$dropdown.addClass('languages');
-                    $select.data('select2').$container.removeClass('error');
-                    $select.data('select2').$dropdown.removeClass('error');
-                });
-
-
-                $('.step-container').removeClass('bg-red-150 text-red-200');
-
-                targetSelect.show();
-
-                detectedFiles.removeClass('bg-red-150 text-red-400 border border-red-400').addClass('bg-green-150 text-green-500');
-            }
-        }
-        let isSameAsTarget = firstValue === targetValue;
-
-        if (!isConsistent || !targetValue || isSameAsTarget) {
+        if (!canProceed) {
+            // Désactiver le bouton Suivant
             nextStep.removeClass('border-green-700 text-white text-green-700')
-                .addClass('border-gray-225 text-gray-225 pointer-events-none')
+                .addClass('border-gray-225 text-gray-225 opacity-50 cursor-not-allowed')
                 .prop("disabled", true);
         } else {
-            nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
+            // Activer le bouton Suivant
+            nextStep.removeClass('border-gray-225 text-gray-225 opacity-50 cursor-not-allowed')
                 .addClass('border-green-700 text-green-700')
                 .prop("disabled", false);
             $('.language-step').removeClass('hidden');
-            $('.source').text(firstValue.toUpperCase());
-            $('.target').text(targetValue.toUpperCase());
-
         }
     }
 
 
-    $(document).on('change', '.document-source-language, .document-target-language', function () {
-        checkLanguagesConsistency();
-    });
 
     $(document).on('click', '.remove-detected-file', function () {
         const fileId = $(this).data('file-id');
@@ -517,34 +741,93 @@ $(document).ready(function () {
 
 
     // ------------- STEP-3 -------------
-
+    
+    // Fonction utilitaire pour créer un élément de sélection (radio + label + icône)
+    function createSelectionItem(config) {
+        const {
+            radioId,
+            radioName,
+            value,
+            isChecked,
+            icon,
+            label,
+            containerClass = '',
+            containerStyle = '',
+            onChange
+        } = config;
+        
+        // Créer l'élément liste
+        const listItem = $('<li>', {
+            class: 'flex items-center',
+            style: containerStyle
+        });
+        
+        // Créer le conteneur
+        const container = $('<div>', {
+            class: `flex items-center w-full rounded-lg p-2 cursor-pointer transition-colors hover:bg-blue-50 ${containerClass} ${isChecked ? 'bg-blue-50' : ''}`,
+            'data-value': value
+        });
+        
+        // Créer le radio button (12x12)
+        const radio = $('<input>', {
+            id: radioId,
+            type: 'radio',
+            name: radioName,
+            value: value,
+            class: 'w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500',
+            checked: isChecked
+        });
+        
+        if (onChange) {
+            radio.on('change', onChange);
+        }
+        
+        // Créer l'icône
+        const iconHtml = icon ? `<i class="ph ph-${icon} mx-2" style="font-size: 24px;" aria-hidden="true"></i>` : '';
+        
+        // Créer le label
+        const labelElement = $('<label>', {
+            for: radioId,
+            class: 'ms-2 flex h-8 items-center cursor-pointer',
+            html: iconHtml + `<span class="font-poppins text-sm font-normal leading-6 tracking-[-0.084px]" style="font-size: 14px; line-height: 24px;">${label}</span>`
+        });
+        
+        // Assembler les éléments
+        container.append(radio).append(labelElement);
+        listItem.append(container);
+        
+        return { listItem, container, radio };
+    }
 
     function updateDomainsList(domains) {
         const domainsList = $('.domains-list');
         domainsList.empty();
 
         domains.forEach((domain, index) => {
-            const button = $('<button>', {
-                type: 'button',
-                class: 'border border-gray-300 domain-button text-3.5 py-3 px-7.5 bg-gray-100 text-gray-475 hover:bg-green-700 hover:text-white rounded-md focus:text-white focus:bg-green-700 transition duration-300 ease-in-out truncate',
-                text: domain.name,
-                'data-name': domain.name,
-                click: function () {
-                    $('.domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-100 text-gray-475');
-                    $(this).removeClass('bg-gray-100 text-gray-475').addClass('selected bg-green-700 text-white');
-
-                    selectedDomain = $(this).data('name');
+            const isFirst = index === 0;
+            
+            const { listItem } = createSelectionItem({
+                radioId: `domain-radio-${index}`,
+                radioName: 'domain-radio',
+                value: domain.name,
+                isChecked: isFirst,
+                icon: domain.icon,
+                label: domain.name,
+                containerClass: 'domain-container',
+                containerStyle: 'flex: 0 0 calc(20% - 6.4px);',
+                onChange: function () {
+                    $('.domains-list .domain-container').removeClass('bg-blue-50');
+                    $(this).closest('.domain-container').addClass('bg-blue-50');
+                    selectedDomain = $(this).val();
                     getDomains();
                 }
             });
-
-            if (index === 0) {
-                button.removeClass('bg-gray-100 text-gray-475').addClass('selected bg-green-700 text-white');
-
+            
+            domainsList.append(listItem);
+            
+            if (isFirst) {
                 selectedDomain = domain.name;
             }
-
-            domainsList.append(button);
         });
 
         getDomains();
@@ -555,25 +838,35 @@ $(document).ready(function () {
         subDomainsList.empty();
 
         subDomains.forEach((subDomain, index) => {
-            const button = $('<button>', {
-                type: 'button',
-                class: 'sub-domain-button text-3.5 py-3 px-7.5 bg-gray-100 text-gray-475 hover:bg-green-700 hover:text-white rounded-md focus:text-white focus:bg-green-700 transition duration-300 ease-in-out truncate',
-                text: subDomain,
-                'data-name': subDomain,
-                click: function () {
-                    $('.sub-domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-175 text-gray-375');
-                    $(this).removeClass('bg-gray-175 text-gray-375').addClass('selected bg-green-700 text-white');
-                    selectedSubDomain = $(this).data('name');
+            const domainName = typeof subDomain === 'object' ? subDomain.name : subDomain;
+            const domainIcon = typeof subDomain === 'object' && subDomain.icon ? subDomain.icon : null;
+            const isFirst = index === 0;
+            
+            const { listItem } = createSelectionItem({
+                radioId: `subdomain-radio-${index}`,
+                radioName: 'subdomain-radio',
+                value: domainName,
+                isChecked: isFirst,
+                icon: domainIcon,
+                label: domainName,
+                containerClass: 'subdomain-container',
+                containerStyle: 'flex: 0 0 calc(20% - 6.4px);',
+                onChange: function () {
+                    $('.sub-domain-list .subdomain-container').removeClass('bg-blue-50');
+                    $(this).closest('.subdomain-container').addClass('bg-blue-50');
+                    selectedSubDomain = $(this).val();
                     $('.domain-step').text(selectedSubDomain).removeClass('hidden');
+                    loadDefaultGlossary();
                 }
             });
-
-            if (index === 0) {
-                button.removeClass('bg-gray-175 text-gray-375').addClass('selected bg-green-700 text-white');
-                selectedSubDomain = subDomain;
+            
+            subDomainsList.append(listItem);
+            
+            if (isFirst) {
+                selectedSubDomain = domainName;
+                $('.domain-step').text(selectedSubDomain).removeClass('hidden');
+                loadDefaultGlossary();
             }
-
-            subDomainsList.append(button);
         });
     }
 
@@ -605,32 +898,36 @@ $(document).ready(function () {
             },
             success: function (response) {
                 defaultDomain = response.default_domain;
-                if (response.default_domain || !access_to_default_glossaries) {
-                    $(".default").addClass('hidden');
-                    $(".my-glossary").addClass('rounded-l-md');
-                    $(".add-glossary-btn").removeClass('hidden');
-                    selectedGlossaryType = 'my-glossary'
+                
+                // Si default_domain === true : masquer la section sous-domaine et utiliser "Generic domain"
+                if (response.default_domain) {
+                    $('#subdomain-section').hide();
+                    $('#glossary-section-number').text('2. ' + (language_code === 'en' ? 'Select a glossary' : 'Sélectionner un glossaire'));
+                    selectedSubDomain = 'Generic domain';
+                    
+                    // Charger le glossaire par défaut pour Generic domain
+                    loadDefaultGlossary();
                 } else {
-                    $(".default").removeClass('hidden');
-                    $(".add-glossary-btn").addClass('hidden');
-                    $(".my-glossary").removeClass('rounded-l-md');
-                    selectedGlossaryType = 'default'
+                    // Sinon, afficher la section sous-domaine
+                    $('#subdomain-section').show();
+                    $('#glossary-section-number').text('3. ' + (language_code === 'en' ? 'Select a glossary' : 'Sélectionner un glossaire'));
+                    
+                    if (response.data && response.data.length > 0) {
+                        // Mettre à jour la liste des sous-domaines
+                        updateSubDomainsList(response.data);
+                    } else {
+                        $('.sub-domain-list').empty();
+                        selectedSubDomain = '';
+                    }
                 }
-
-                if (response.data && response.data.length === 0) {
-                    nextStep.removeClass('border-green-700 text-white text-green-700')
-
-                        .addClass('border-gray-225 text-gray-225 pointer-events-none')
-                        .prop("disabled", true);
-                    $('.domain-step').text(language_code === 'en' ? 'None' : 'Aucun').removeClass('hidden');
-                } else {
+                
+                // Note: L'affichage du tab "Standard" sera géré par loadDefaultGlossary()
+                // en fonction du résultat de l'API default_glossary
+                
+                // Activer le bouton Suivant
                     nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
                         .addClass('border-green-700 text-green-700')
                         .prop("disabled", false);
-                    $('.domain-step').text(response.data[0]).removeClass('hidden');
-                }
-
-                updateSubDomainsList(response.data);
             },
             error: function (error) {
                 errorNotification(error?.status, error?.responseJSON?.detail);
@@ -696,18 +993,39 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                updateGlossaryList([response], true);
-                selectedGlossary = response?.id;
-                $('.terminology-step').text('default').removeClass('hidden');
-                nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
-                    .addClass('border-green-700 text-green-700')
-                    .prop("disabled", false);
+                // Si la réponse est un objet vide {}, cacher le tab Standard
+                if (!response || Object.keys(response).length === 0) {
+                    $("#step2-default").addClass('hidden');
+                    $("#step2-my-glossary").removeClass('pr-4').addClass('pr-4 pl-0');
+                    $(".add-glossary-btn").removeClass('hidden');
+                    selectedGlossaryType = 'my-glossary';
+                    
+                    // Attendre un court instant que loadMyGlossaries() se termine avant de basculer
+                    setTimeout(function() {
+                        showTab('my-glossary');
+                    }, 300);
+                } else {
+                    // Afficher le tab Standard et afficher le glossaire
+                    $("#step2-default").removeClass('hidden');
+                    $("#step2-my-glossary").removeClass('pl-0').addClass('pl-4');
+                    $(".add-glossary-btn").addClass('hidden');
+                    selectedGlossaryType = 'default';
+                    displayDefaultGlossaryInStep3(response);
+                    // Basculer vers "Standard"
+                    showTab('default');
+                }
             },
             error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
-                nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
-                    .addClass('border-green-700 text-green-700')
-                    .prop("disabled", false);
+                // En cas d'erreur, cacher le tab Standard et basculer vers My glossaries
+                $("#step2-default").addClass('hidden');
+                $("#step2-my-glossary").removeClass('pr-4').addClass('pr-4 pl-0');
+                $(".add-glossary-btn").removeClass('hidden');
+                selectedGlossaryType = 'my-glossary';
+                
+                // Attendre un court instant que loadMyGlossaries() se termine avant de basculer
+                setTimeout(function() {
+                    showTab('my-glossary');
+                }, 300);
             }
         });
     }
@@ -728,17 +1046,84 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                updateGlossaryList(response, false);
-                selectedGlossary = '';
-                $('.terminology-step').text('').removeClass('hidden');
-                nextStep.removeClass('border-green-700 text-white text-green-700')
-                    .addClass('border-gray-225 text-gray-225 pointer-events-none')
-                    .prop("disabled", true);
+                // Afficher dans step_3 (My glossaries tab)
+                displayMyGlossariesInStep3(response);
+                
+                // Note: Le bouton Suivant reste actif car le glossaire est optionnel
+                // Il sera géré par showTab() si nécessaire
             },
             error: function (error) {
                 errorNotification(error?.status, error?.responseJSON?.detail);
             },
         });
+    }
+
+    function displayDefaultGlossaryInStep3(glossary) {
+        const container = $('.glossary-list');
+        container.empty();
+        
+        const { listItem, container: glossaryContainer } = createSelectionItem({
+            radioId: 'default-glossary-radio',
+            radioName: 'default-glossary-radio',
+            value: glossary.id,
+            isChecked: true,
+            icon: 'file',
+            label: glossary.name,
+            containerClass: '',
+            containerStyle: 'flex: 0 0 100%;'
+        });
+        
+        // Ajouter un ID unique pour la restauration lors du changement de tab
+        glossaryContainer.attr('id', 'default-glossary-container');
+        
+        container.append(listItem);
+        selectedGlossary = glossary.id;
+    }
+
+    function displayMyGlossariesInStep3(glossaries) {
+        const container = $('#step2-tab-my-glossary-content');
+        container.empty();
+        
+        if (!glossaries || glossaries.length === 0) {
+            container.html(`
+                <div class="flex flex-col items-center justify-center pt-6 pb-0">
+                    <p class="font-poppins font-normal text-gray-600" style="font-size: 14px; line-height: 24px;">${language_code === 'en' ? 'No glossaries found' : 'Aucun glossaire trouvé'}</p>
+                </div>
+            `);
+            return;
+        }
+        
+        const glossaryList = $('<ul>', {
+            class: 'flex flex-row flex-wrap items-start w-full gap-2'
+        });
+        
+        glossaries.forEach((glossary, index) => {
+            const isFirst = index === 0;
+            
+            const { listItem } = createSelectionItem({
+                radioId: `glossary-radio-${index}`,
+                radioName: 'glossary-radio',
+                value: glossary.id,
+                isChecked: isFirst,
+                icon: 'file',
+                label: glossary.name,
+                containerClass: 'glossary-container',
+                containerStyle: 'flex: 0 0 calc(25% - 6px);',
+                onChange: function () {
+                    $('.glossary-container').removeClass('bg-blue-50');
+                    $(this).closest('.glossary-container').addClass('bg-blue-50');
+                    selectedGlossary = $(this).val();
+                }
+            });
+            
+            glossaryList.append(listItem);
+            
+            if (isFirst) {
+                selectedGlossary = glossary.id;
+            }
+        });
+        
+        container.append(glossaryList);
     }
 
     function updateGlossaryList(glossaries, isDefault) {
@@ -752,7 +1137,7 @@ $(document).ready(function () {
             $item.click(function () {
                 if (selectedGlossary === glossary.id) {
                     $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-175 text-gray-375');
-                    selectedGlossary = '';
+                    selectedGlossary = 'none';
                     $('.terminology-step').text('').removeClass('hidden');
                     if (selectedGlossaryType === 'my-glossary') {
                         nextStep.removeClass('border-green-700 text-white text-green-700')
@@ -776,21 +1161,28 @@ $(document).ready(function () {
         });
     }
 
-    const $modal = $('#modal');
+    const $modal = $('#modalGlossary');
     const $closeIcon = $('#closeIcon');
     const maxFileSize = 5 * 1024 * 1024; // 5MB
 
-    $('#openModal').on('click', function () {
+    $(document).on('click', '.openGlossary', function(event) {
+        event.preventDefault(); // Empêche clic par défaut si besoin (par ex lien)
         $modal.removeClass('hidden');
         $closeIcon.removeClass('hidden');
+        $('input[name=openGlossary]').prop('checked', 'checked');
     });
 
     $('#closeModal, #closeIcon').on('click', function () {
+        // Réinitialise les styles des boutons comme avant
         $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
         $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-700 text-green-700 border border-green-700');
         $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
+
         $modal.addClass('hidden');
         $closeIcon.addClass('hidden');
+
+        // Désactive la checkbox et le style "peer-checked"
+        $('input[name=openGlossary]').prop('checked', false).trigger('change');
     });
 
     $(window).on('click', function (event) {
@@ -880,7 +1272,7 @@ $(document).ready(function () {
                 $item.click(function () {
                     if (selectedGlossary === response.id) {
                         $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-175 text-gray-375');
-                        selectedGlossary = '';
+                        selectedGlossary = 'none';
                         $('.terminology-step').text('').removeClass('hidden');
                         nextStep.removeClass('border-green-700 text-green-700 ')
                             .addClass('border-gray-225 text-gray-225 pointer-events-none')
@@ -909,12 +1301,25 @@ $(document).ready(function () {
 
 
     const fileTranslate = () => {
+        // Console log pour afficher le domaine et le glossaire sélectionnés
+        console.log('=== INFORMATIONS DE TRADUCTION ===');
+        console.log('Domaine sélectionné:', selectedSubDomain);
+        console.log('Glossaire sélectionné:', selectedGlossary);
+        console.log('Langue source:', sourceLanguage);
+        console.log('Langue cible:', targetLanguage);
+        console.log('================================');
+
         const formData = new FormData();
         selectedFiles.forEach((file) => {
-            formData.append(`document[]`, file);
+            formData.append(`document[]`, file.file);
         });
 
         formData.append('domain_name', selectedSubDomain);
+        /**
+         * @TODO 11/09/2025 : Le système de sélection du glossaire étant totalement à revoir
+         * en js pour récupérer l'id du glossaire sélectionné dans la popup
+         * je ne l'intègre pas dans les paramètres de l'appel ajax volontairement
+         */
         formData.append('glossary', selectedGlossary);
         formData.append('source_language', sourceLanguage);
         formData.append('target_language', targetLanguage);
@@ -950,114 +1355,105 @@ $(document).ready(function () {
     const $closeRevision = $('#close-revision');
 
     function updateProjectTable(projects) {
-        const tableBody = $('.projects tbody');
-        tableBody.empty();
-
+        const documentsContainer = $('#documents-container');
+        documentsContainer.empty();
 
         projects.forEach(project => {
-            const row = $('<tr></tr>');
-
-            row.append(`
-            <td>
-                <div class="border border-gray-300  border border-gray-300 glossary-item py-3 px-7.5 bg-gray-60 text-gray-600 rounded-md md:w-50 2xl:w-80 truncate text-3.25">
-
-                    ${project.source_file_name}
-                </div>
-            </td>
-        `);
-
-            const statusColumn = $('<td></td>');
-            const statusSpan = $('<span class="border border-gray-300 glossary-item py-3 px-7.5 bg-gray-175 rounded-md text-gray-600 font-medium"></span>');
-
-
-            switch (project.status) {
-                case 'Being translated':
-                    statusSpan.text('Processing...');
-                    statusSpan.addClass('text-green-500');
-                    break;
-                case 'Translated':
-                    statusSpan.text(language_code === 'en' ? 'Translated' : 'Document traduit');
-                    statusSpan.addClass('text-green-400');
-                    break;
-                case 'Sent to post-editing, not accepted yet':
-                    statusSpan.text(language_code === 'en' ? 'Request for quote sent' : 'Demande de devis envoyée');
-                    statusSpan.addClass('text-yellow-400');
-                    break;
-                case 'Sent to post-editing, accepted':
-                    statusSpan.text(language_code === 'en' ? 'Request for quote accepted' : 'Demande de devis acceptée');
-                    statusSpan.addClass('text-blue-400');
-                    break;
-                case 'Post-edited file uploaded':
-                    statusSpan.text(language_code === 'en' ? 'Request for quote accepted' : 'Demande de devis acceptée');
-                    statusSpan.addClass('text-green-300');
-                    break;
-                case 'Error':
-                    statusSpan.text(language_code === 'en' ? 'Error' : 'Erreur');
-                    statusSpan.addClass('text-red-400');
-                    break;
-                default:
-                    statusSpan.text(project.status);
-                    statusSpan.addClass('text-gray-600');
-                    break;
-            }
-            statusColumn.append(statusSpan);
-            row.append(statusColumn);
-
-            const downloadColumn = $('<td></td>');
-            const downloadButton = $(`
-            <button type=button class="bg-gray-600 disabled:bg-gray-225 flex gap-2.5 items-center text-white px-7.5 py-3 rounded-md download-file disabled:pointer-events-none" ${project.status !== 'Translated' ? 'disabled' : ''}>
-                 ${language_code === 'en' ? 'Download' : 'Télécharger'}
-                <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g clip-path="url(#clip0_759_2185)">
-                        <path d="M15.5527 7.21875C15.1215 7.21875 14.7715 7.56875 14.7715 8C14.7715 11.55 11.884 14.4375 8.33398 14.4375C4.78398 14.4375 1.89648 11.55 1.89648 8C1.89648 7.56875 1.54648 7.21875 1.11523 7.21875C0.683984 7.21875 0.333984 7.56875 0.333984 8C0.333984 10.1375 1.16523 12.1469 2.67773 13.6562C4.19023 15.1687 6.19648 16 8.33398 16C10.4715 16 12.4809 15.1687 13.9902 13.6562C15.5027 12.1438 16.334 10.1375 16.334 8C16.334 7.56875 15.984 7.21875 15.5527 7.21875Z" fill="currentColor"/>
-                        <path d="M7.26289 10.7375C7.55039 11.025 7.93164 11.1812 8.33477 11.1812C8.74102 11.1812 9.12227 11.0219 9.40664 10.7375L11.3723 8.77187C11.6785 8.46562 11.6785 7.97187 11.3723 7.66562C11.066 7.35937 10.5723 7.35937 10.266 7.66562L9.11602 8.81875V0.78125C9.11602 0.35 8.76602 0 8.33477 0C7.90352 0 7.55352 0.35 7.55352 0.78125V8.81875L6.40039 7.66562C6.09414 7.35937 5.60039 7.35937 5.29414 7.66562C4.98789 7.97187 4.98789 8.46562 5.29414 8.77187L7.26289 10.7375Z" fill="currentColor"/>
-                    </g>
-                    <defs>
-                        <clipPath id="clip0_759_2185">
-                            <rect width="16" height="16" fill="white" transform="translate(0.333984)"/>
-                        </clipPath>
-                    </defs>
-                </svg>
-            </button>
-        `);
-            downloadButton.attr('data-translated-file', project.translated_file);
-            if (project.reviewed_file) {
-                downloadButton.attr('data-reviewed-file', project.reviewed_file);
-            }
-            downloadColumn.append(downloadButton);
-            row.append(downloadColumn);
-
-            const revisionColumn = $('<td class="flex justify-end"></td>');
-            const revisionButton = $(`
-            <button
-                type="button"
-                data-translated-file="${project.translated_file}"
-                data-id="${project.id}"
-                class="text-white flex gap-2.5 items-center bg-green-700 border border-green-700 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none expert-revision"
-                ${project.status !== 'Translated' ? 'disabled' : ''}
-            >
-                ${language_code === 'en' ? "Human revision" : "Relecture expert"}
-                <div class="relative group">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10 0C4.47301 0 0 4.4725 0 10C0 15.5269 4.4725 20 10 20C15.527 20 20 15.5275 20 10C20 4.47309 15.5275 0 10 0ZM11.0269 13.9696C11.0269 14.2855 10.5662 14.6014 10.0002 14.6014C9.40785 14.6014 8.98668 14.2855 8.98668 13.9696V8.95445C8.98668 8.5859 9.40789 8.33574 10.0002 8.33574C10.5662 8.33574 11.0269 8.5859 11.0269 8.95445V13.9696ZM10.0002 7.12484C9.39473 7.12484 8.9209 6.6773 8.9209 6.17707C8.9209 5.67687 9.39477 5.2425 10.0002 5.2425C10.5926 5.2425 11.0665 5.67687 11.0665 6.17707C11.0665 6.6773 10.5925 7.12484 10.0002 7.12484Z" fill="currentColor"/>
-                    </svg>
-                    <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 bg-green-700 text-white text-2.75 rounded-md bottom-30 left-1/2 transform -translate-x-1/2 translate-y-full">
-                        <span class="py-4 px-4.5 text-justify text-wrap block">
-                                              ${language_code === 'en' ? 'Click the button to see options for improving the quality of the translated file.' : "Cliquez sur ce bouton pour afficher les options de relecture disponibles"}
+            // Créer la ligne du document avec le style du dashboard
+            const documentRow = $(`
+                <tr>
+                    <td>
+                        <span class="doc-title">${project.source_file_name}</span>
+                    </td>
+                    <td>
+                        <span class="lang-label">${sourceLanguage.toUpperCase()} → ${targetLanguage.toUpperCase()}</span>
+                    </td>
+                    <td class="status-col">
+                        <span class="status-badge ${getStatusClass(project.status)}">
+                            <i class="ph ${getStatusIcon(project.status)}" style="font-size: 16px;"></i>
+                            ${getStatusText(project.status)}
                         </span>
-                        <div class="absolute w-3 h-3 bg-green-700 transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5"></div>
-                    </div>
-                </div>
-            </button>
-        `);
-            revisionColumn.append(revisionButton);
-            row.append(revisionColumn);
+                    </td>
+                    <td class="table-actions">
+                        <button 
+                            class="download-file" 
+                            data-translated-file="${project.translated_file}" 
+                            data-reviewed-file="${project.reviewed_file || ''}"
+                            title="${language_code === 'en' ? 'Download' : 'Télécharger'}"
+                            ${project.status !== 'Translated' ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                            <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
+                        </button>
+                        <button 
+                            class="expert-revision text-green-600 hover:text-green-700 font-poppins text-sm font-normal underline" 
+                            data-translated-file="${project.translated_file}" 
+                            data-id="${project.id}"
+                            ${project.status !== 'Translated' ? 'disabled style="opacity: 0.5; cursor: not-allowed; text-decoration: none;"' : ''}>
+                            ${language_code === 'en' ? 'Expert review' : 'Révision d\'un expert'}
+                        </button>
+                    </td>
+                </tr>
+            `);
 
-            tableBody.append(row);
+            documentsContainer.append(documentRow);
         });
 
         initializeDownloadButtons();
         initializeRevisionButtons();
+    }
+
+    function getStatusText(status) {
+        switch (status) {
+                case 'Being translated':
+                return language_code === 'en' ? 'Processing...' : 'En cours...';
+                case 'Translated':
+                return language_code === 'en' ? 'Translated document' : 'Document traduit';
+                case 'Sent to post-editing, not accepted yet':
+                return language_code === 'en' ? 'Request for quote sent' : 'Demande de devis envoyée';
+                case 'Sent to post-editing, accepted':
+                return language_code === 'en' ? 'Request for quote accepted' : 'Demande de devis acceptée';
+                case 'Post-edited file uploaded':
+                return language_code === 'en' ? 'Proofread document uploaded' : 'Document relu importé';
+                case 'Error':
+                return language_code === 'en' ? 'Error' : 'Erreur';
+                default:
+                return status;
+        }
+    }
+
+    function getStatusClass(status) {
+        switch (status) {
+            case 'Being translated':
+                return 'status-progress';
+            case 'Translated':
+                return 'status-completed';
+            case 'Sent to post-editing, not accepted yet':
+            case 'Sent to post-editing, accepted':
+                return 'status-attention';
+            case 'Post-edited file uploaded':
+                return 'status-completed';
+            case 'Error':
+                return 'status-error';
+            default:
+                return 'status-default';
+        }
+    }
+
+    function getStatusIcon(status) {
+        switch (status) {
+            case 'Being translated':
+                return 'ph-clock-clockwise';
+            case 'Translated':
+                return 'ph-check-circle';
+            case 'Sent to post-editing, not accepted yet':
+            case 'Sent to post-editing, accepted':
+                return 'ph-hourglass';
+            case 'Post-edited file uploaded':
+                return 'ph-check-circle';
+            case 'Error':
+                return 'ph-warning-circle';
+            default:
+                return 'ph-circle';
+        }
     }
 
 
@@ -1155,10 +1551,17 @@ $(document).ready(function () {
             dataType: 'json',
             success: function () {
                 const projectRow = $(`button[data-id="${id}"]`).closest('tr');
-                const statusSpan = projectRow.find('td:eq(1) span');
-                statusSpan.addClass('text-yellow-400');
-
-                statusSpan.text(language_code === 'en'?'Request for quote sent': 'Demande de devis envoyée');
+                
+                // Mettre à jour le badge de statut (colonne 3, index 2)
+                const statusBadge = projectRow.find('td:eq(2) .status-badge');
+                statusBadge.removeClass('status-completed status-progress status-error status-default')
+                    .addClass('status-attention');
+                statusBadge.find('i').removeClass().addClass('ph ph-hourglass');
+                statusBadge.contents().filter(function() {
+                    return this.nodeType === 3; // Text node
+                }).last().replaceWith(language_code === 'en' ? 'Request for quote sent' : 'Demande de devis envoyée');
+                
+                // Désactiver le bouton de révision
                 projectRow.find('.expert-revision').prop('disabled', true).addClass('disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225');
 
                 $modalRevision.addClass('hidden');
@@ -1171,6 +1574,8 @@ $(document).ready(function () {
     });
 
     const startStatusCheck = (projectIds) => {
+        let statusCheckInterval;
+        
         const checkDocumentStatus = () => {
             let params = new URLSearchParams();
 
@@ -1194,6 +1599,14 @@ $(document).ready(function () {
                         $('.show-modal-true').removeClass('hidden');
                     }
                     updateProjectTable(response);
+                    
+                    // Vérifier si tous les projets ont un statut différent de "Being translated"
+                    const allProjectsFinished = response.every(project => project.status !== 'Being translated');
+                    
+                    if (allProjectsFinished) {
+                        console.log('Tous les projets sont terminés, arrêt de la boucle de vérification');
+                        clearInterval(statusCheckInterval);
+                    }
                 },
                 error: function (error) {
                     errorNotification(error?.status, error?.responseJSON?.detail);
@@ -1206,7 +1619,110 @@ $(document).ready(function () {
 
         checkDocumentStatus();
 
-        setInterval(checkDocumentStatus, 10000);
+        statusCheckInterval = setInterval(checkDocumentStatus, 10000);
     };
 
+    function showTab(tabId) {
+        // Masquer tous les contenus de tabs
+        $('#step2-tab-default-content').hide();
+        $('#step2-tab-no-glossary-content').hide();
+        $('#step2-tab-my-glossary-content').hide();
+
+        // Réinitialiser toutes les sélections visuelles
+        $('.subdomain-container').removeClass('bg-blue-50');
+        // Ne pas réinitialiser le glossaire par défaut dans le tab Standard
+        $('#step2-tab-my-glossary-content .glossary-container').removeClass('bg-blue-50');
+        $('input[type="radio"][name="sub_domain"]').prop('checked', false);
+        $('input[type="radio"][name="glossary-radio"]').prop('checked', false);
+
+        // Afficher le contenu du tab sélectionné et sélectionner automatiquement le premier élément
+        if (tabId === 'default') {
+            $('#step2-tab-default-content').show();
+            // Restaurer le glossaire par défaut s'il existe
+            const defaultGlossaryContainer = $('#default-glossary-container');
+            if (defaultGlossaryContainer.length) {
+                const defaultGlossaryRadio = defaultGlossaryContainer.find('input[type="radio"]');
+                defaultGlossaryRadio.prop('checked', true);
+                defaultGlossaryContainer.addClass('bg-blue-50');
+                selectedGlossary = defaultGlossaryRadio.val();
+            } else {
+                selectedGlossary = 'none';
+            }
+        } else if (tabId === 'no-glossary') {
+            $('#step2-tab-no-glossary-content').show();
+            // Pour "No glossary", sélectionner automatiquement "none"
+            selectedGlossary = 'none';
+            $('.terminology-step').text(language_code === 'en' ? 'none' : 'aucun').removeClass('hidden');
+        } else if (tabId === 'my-glossary') {
+        $(`#step2-tab-${tabId}-content`).show();
+            
+            // Sélectionner automatiquement le premier glossaire My glossaries s'il existe
+            const firstGlossary = $('#step2-tab-my-glossary-content .glossary-container').first();
+            if (firstGlossary.length) {
+                firstGlossary.addClass('bg-blue-50');
+                const firstRadio = firstGlossary.find('input[type="radio"]');
+                firstRadio.prop('checked', true);
+                selectedGlossary = firstRadio.val();
+            } else {
+                selectedGlossary = 'none';
+            }
+        }
+
+        // Retirer les styles actifs de tous les boutons
+        $('button.tab-button').removeClass('border-b-0.5 border-b-black');
+        $(`#step2-${tabId}`).addClass('border-b-0.5 border-b-black');
+        
+        // S'assurer que le bouton Suivant reste actif lors du changement de tab
+        nextStep.removeClass('border-gray-225 text-gray-225 opacity-50 cursor-not-allowed')
+            .addClass('border-green-700 text-green-700')
+            .prop("disabled", false);
+    }
+
+    $('#step2-default').click(function () {
+        showTab('default');
+    });
+
+    $('#step2-my-glossary').click(function () {
+        showTab('my-glossary');
+        // Charger les glossaires de l'utilisateur
+        if (sourceLanguage && targetLanguage && selectedSubDomain) {
+            loadMyGlossaries();
+        }
+    });
+
+    $('#step2-no-glossary').click(function () {
+        showTab('no-glossary');
+    });
+
+    // Gestion du clic sur les blocs radio
+    $('ul.flex li > div.flex.items-center.mr-2').click(function() {
+        // Décoche et enlève le fond bleu sur tous
+        $('ul.flex li > div.flex.items-center.mr-2').removeClass('bg-blue-50');
+        $('ul.flex li > div.flex.items-center.mr-2 input[type=radio]').prop('checked', false);
+
+        // Coche la radio du bloc cliqué et ajoute fond bleu
+        $(this).addClass('bg-blue-50');
+        $(this).find('input[type=radio]').prop('checked', true);
+    });
+
+    // Fonction pour cliquer automatiquement sur le bouton .domain-button avec data-name
+    function clickDomainButton(domainName) {
+        // Retire classes de sélection sur tous les boutons
+        $('.domain-button').removeClass('selected bg-green-700 text-white').addClass('bg-gray-100 text-gray-475');
+
+        // Cherche le bouton à sélectionner
+        var $btn = $('.domain-button[data-name="' + domainName + '"]');
+        if ($btn.length) {
+            // Déclenche clic sur ce bouton
+            $btn.click();
+
+            // Applique classes sélection sur ce bouton
+            $btn.addClass('selected bg-green-700 text-white').removeClass('bg-gray-100 text-gray-475');
+        }
+    }
+
+    // Exemple d’appel : sélectionner automatiquement le bouton "Corporate"
+    clickDomainButton('Corporate');
 });
+
+

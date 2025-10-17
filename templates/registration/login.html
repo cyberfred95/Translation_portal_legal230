@@ -1,168 +1,62 @@
-<!DOCTYPE html>
+{% extends "public_base.html" %}
 {% load i18n %}
 {% load static %}
-<html lang="{{ request.LANGUAGE_CODE }}">
-<head>
-    <meta charset="UTF-8">
-    <title>Legal230</title>
-    <!-- FONTS -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- JQUERY -->
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js"
-            integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-    <!-- STYLES -->
-    <link href="{% static 'css/main.css' %}" rel="stylesheet">
-    <!-- TAILWIND -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- TAILWINDCSS -->
-    <script>
-        const generateTailwindSizes = () => {
-            const sizes = {};
-            for (let px = 0; px <= 2000; px++) {
-                const tailwindName = (px / 4);
-                const remValue = (px / 16).toFixed(3);
-                sizes[tailwindName] = `${remValue}rem`;
-            }
-            return sizes;
-        }
 
-        tailwind.config = {
-            experimental: {
-                optimizeUniversalDefaults: true
-            },
-            theme: {
-                extend: {
-                    screens: {
-                        'xs': '320px',
-                        'sm': '576px',
-                        'md': '768px',
-                        'lg': '1024px',
-                        'xl': '1280px',
-                        '2xl': '1536px',
-                        '3xl': '1920px',
-                    },
-                    fontFamily: {
-                        'montserrat': ['Montserrat', 'sans-serif'],
-                    },
-                    colors: {
-                        gray: {
-                            25: '#F8F9FA',
-                            50: '#F5F7F7',
-                            60: '#EFEFEF',
-                            75: '#EAF0F6',
-                            100: '#F2F3F5',
-                            125: '#EBEFF0',
-                            150: '#EAECEE',
-                            175: '#EAECED',
-                            200: '#E4E8EA',
-                            225: '#D5DADE',
-                            250: '#D9D9D9',
-                            275: '#CFD5D9',
-                            300: '#CAD1D6',
-                            325: '#CACACA',
-                            350: '#AFB9C1',
-                            375: '#AAB4BD',
-                            400: '#9EAAB3',
-                            425: '#808E9B',
-                            475: '#7A8B98',
-                            480: '#6C767D',
-                            500: '#556A7B',
-                            525: '#566B79',
-                            550: '#2A4459',
-                            575: '#2B4459',
-                            600: '#0F3144',
-                        },
-                        green: {
-                            50: '#E6F8F6',
-                            100: '#E8F0F1',
-                            150: '#E7F0F1',
-                            200: '#DFEAEC',
-                            225: '#C4D6D7',
-                            250: '#B9D3D6',
-                            300: '#00BBA7',
-                            350: '#74A7AD',
-                            400: '#176C77',
-                            450: '#346C77',
-                            500: '#156D77',
-                            700: '#2F9D6F',
-                        },
-                        red: {
-                            100: '#FFEFEF',
-                            150: '#FFF7F7',
-                            200: '#FFE0DF',
-                            400: '#FD625E',
-                        },
-                        yellow: {
-                            100: '#FCF9ED',
-                            400: '#D4A600',
-                        },
-                        blue: {
-                            100: '#E9F4FF',
-                            400: '#1E90FF',
-                        },
-                    },
-                    fontSize: generateTailwindSizes(),
-                    width: generateTailwindSizes(),
-                    maxWidth: generateTailwindSizes(),
-                    height: generateTailwindSizes(),
-                    padding: generateTailwindSizes(),
-                    margin: generateTailwindSizes(),
-                    inset: generateTailwindSizes(),
-                    spacing: generateTailwindSizes(),
-                    borderRadius: generateTailwindSizes(),
-                    borderWidth: generateTailwindSizes(),
-                    divideWidth: generateTailwindSizes(),
-                    gap: generateTailwindSizes(),
-                }
-            }
-        }
-    </script>
-</head>
-<body>
-<div class="flex items-center justify-center min-h-screen bg-gray-100">
-    <form name="login" action="{% url 'login' %}" method="post" autocomplete="off" class="flex flex-col bg-white shadow-lg py-17.5 px-32.5 rounded-5">
-        <h2 class="text-6 font-bold mb-10 text-center">SIGN IN</h2>
-        {% csrf_token %}
-        <div>
-        <input
-                type="email"
-                placeholder="Email"
-                id="email"
-                name="email"
-                required
-                class="min-w-100 mb-2.5 bg-gray-75 px-3.5 text-3.5 py-3.5 border rounded-2.5 focus:outline-none focus:ring focus:ring-none">
+{% block title %}Legal230 - {% trans "Log in" %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-white flex flex-col items-center p-6 sm:p-12 lg:p-20 relative">
+    <div class="absolute top-12 right-20 flex items-center gap-4 z-10">
+        <div class="flex-1 text-right text[#181932] font-normal text-base leading-6 tracking-[-0.176px]">
+            {% trans "Don't have an account?" %}
         </div>
-        <div class="relative mt-1">
-            <input
-                    type="password"
-                    placeholder="Password"
-                    id="password"
-                    name="password"
-                    required
-                    class="min-w-100 font-normal border text-3.5 px-3.5 p-3.5 w-full rounded-2.5 bg-gray-75"
-            />
-            <span class="absolute inset-y-0 right-3 flex items-center cursor-pointer toggle-visibility" data-target="password">
-                <svg class="eye-icon open hidden" width="17" height="11" viewBox="0 0 17 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8.5 10.8125C2.93874 10.8125 0.181555 5.96431 0.0669375 5.75805C-0.0223125 5.59748 -0.0223125 5.40238 0.0669375 5.24181C0.181555 5.03569 2.93874 0.1875 8.5 0.1875C14.0613 0.1875 16.8184 5.03569 16.9331 5.24195C17.0223 5.40252 17.0223 5.59762 16.9331 5.75819C16.8184 5.96431 14.0613 10.8125 8.5 10.8125ZM1.1564 5.4992C1.78832 6.45691 4.26939 9.75 8.5 9.75C12.744 9.75 15.2141 6.45957 15.8436 5.5008C15.2117 4.54309 12.7306 1.25 8.5 1.25C4.25598 1.25 1.78593 4.54043 1.1564 5.4992ZM8.5 8.6875C6.74236 8.6875 5.3125 7.25764 5.3125 5.5C5.3125 3.74236 6.74236 2.3125 8.5 2.3125C10.2576 2.3125 11.6875 3.74236 11.6875 5.5C11.6875 7.25764 10.2576 8.6875 8.5 8.6875ZM8.5 3.375C7.32833 3.375 6.375 4.32833 6.375 5.5C6.375 6.67167 7.32833 7.625 8.5 7.625C9.67167 7.625 10.625 6.67167 10.625 5.5C10.625 4.32833 9.67167 3.375 8.5 3.375Z" fill="black"/>
-                </svg>
-                <svg class="eye-icon closed" width="17" height="13" viewBox="0 0 17 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M10.6105 6.64321L11.5761 5.67766C11.6463 5.94049 11.6875 6.21528 11.6875 6.50003C11.6875 8.25767 10.2576 9.68753 8.5 9.68753C8.21525 9.68753 7.94046 9.64636 7.67762 9.5761L8.64317 8.61056C9.6989 8.53857 10.5385 7.69893 10.6105 6.64321ZM16.9331 6.24198C16.8677 6.12444 15.941 4.50054 14.1294 3.12434L13.3563 3.89744C14.6772 4.8687 15.5142 6.00145 15.8437 6.50083C15.2141 7.4596 12.744 10.75 8.5 10.75C7.86356 10.75 7.27175 10.6686 6.71487 10.5387L5.84189 11.4117C6.64448 11.6578 7.52662 11.8125 8.5 11.8125C14.0613 11.8125 16.8184 6.96435 16.9331 6.75809C17.0223 6.59752 17.0223 6.40255 16.9331 6.24198ZM14.7193 1.03188L3.03184 12.7194C2.92812 12.8231 2.79212 12.875 2.65625 12.875C2.52038 12.875 2.38438 12.8231 2.28066 12.7194C2.07307 12.5118 2.07307 12.1756 2.28066 11.9682L3.76763 10.4812C1.36372 9.02998 0.142242 6.89369 0.0669375 6.75809C-0.0223125 6.59752 -0.0223125 6.40242 0.0669375 6.24185C0.181555 6.03572 2.93874 1.18753 8.5 1.18753C9.93796 1.18753 11.1835 1.51558 12.2482 2.00061L13.9682 0.280689C14.1757 0.0731035 14.5119 0.0731035 14.7193 0.280689C14.9268 0.488275 14.9269 0.824424 14.7193 1.03188ZM4.55985 9.68899L5.90484 8.344C5.53337 7.82285 5.3125 7.18734 5.3125 6.50003C5.3125 4.74239 6.74236 3.31253 8.5 3.31253C9.1873 3.31253 9.82281 3.5334 10.344 3.90474L11.4316 2.81714C10.5723 2.47303 9.59584 2.25003 8.5 2.25003C4.25598 2.25003 1.78593 5.54046 1.1564 6.49924C1.55616 7.10513 2.70526 8.63885 4.55985 9.68899ZM6.67609 7.57263L9.57259 4.67612C9.25663 4.48952 8.89286 4.37503 8.5 4.37503C7.32833 4.37503 6.375 5.32836 6.375 6.50003C6.375 6.89289 6.48948 7.25667 6.67609 7.57263Z" fill="black"/>
-                </svg>
-            </span>
-        </div>
-        <p class="error-message text-red-400 text-3 mt-2.5 hidden"></p>
-        <a class="my-5 text-3.5 text-green-700 font-medium" href="{% url 'forgot-password' %}">Forgot password?</a>
-        <button
-                type="submit"
-                class="font-semibold bg-green-700 py-2 text-4 text-white rounded-7 hover:bg-gray-600 duration-300 ease-in-out">
-            Sign In
+        <button class="flex items-center justify-center px-[18px] py-2 bg-[#052E16] text-white font-semibold text-sm leading-6 tracking-[-0.084px] rounded-full">
+            {% trans "Free trial" %}
         </button>
-    </form>
+    </div>
+    <div class="w-full max-w-[628px] bg-white border border-black/10 rounded-xl p-6 relative z-10 mt-24">
+        <div class="flex justify-center mb-6">
+            <img src="https://api.builder.io/api/v1/image/assets/TEMP/f909c0b2c18b94da3dd8013596b75e44f4f75075?width=206" alt="Lexa" class="w-[103px] h-[42px]" />
+        </div>
+        <p class="text-center text-[#181932] font-normal text-base leading-6 tracking-[-0.176px] mb-6">
+            {% trans "welcome login message" %}
+        </p>
+        <form name="login" action="{% url 'login' %}" method="post" autocomplete="off">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="block text-[#181932] font-semibold text-sm leading-6 tracking-[-0.084px] mb-1">{% trans "Email" %}</label>
+                <div class="relative flex items-center">
+                    <input type="email" id="email" name="email" required placeholder="{% trans 'Email' %}" class="w-full h-10 px-4 pr-12 border border-black/10 rounded-md bg-white text-[#5A5A78] font-normal text-sm leading-6 tracking-[-0.084px] focus:outline-none focus:ring-2 focus:ring-[#052E16] focus:border-transparent" />
+                    <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 flex items-center">
+                        <i class="ph ph-pencil-simple text-black/50 text-[24px]"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mb-2">
+                <label class="block text-[#181932] font-semibold text-sm leading-6 tracking-[-0.084px] mb-1">{% trans "Password" %}</label>
+                <div class="relative flex items-center">
+                    <input type="password" id="password" name="password" required placeholder="{% trans 'Password' %}" class="w-full h-10 px-4 pr-12 border border-black/10 rounded-md bg-white text-[#5A5A78] font-normal text-sm leading-6 tracking-[-0.084px] focus:outline-none focus:ring-2 focus:ring-[#052E16] focus:border-transparent" />
+                    <button type="button" id="toggle-password" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 flex items-center">
+                        <i id="eye-open" class="ph ph-eye text-black/50 text-[24px]"></i>
+                        <i id="eye-closed" class="ph ph-eye-slash text-black/50 text-[24px]" style="display:none"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="text-right mb-6">
+                <a href="{% url 'forgot-password' %}" class="text-[#14532D] font-normal text-sm leading-6 tracking-[-0.084px] underline decoration-[#14532D]/20 flex items-center justify-end gap-2">
+                    {% trans "I forgot my password" %}
+                </a>
+            </div>
+            <button type="submit" class="w-full bg-[#052E16] text-white font-semibold text-sm leading-6 tracking-[-0.084px] py-[10px] px-[18px] rounded-full mb-0 hover:bg-[#052E16]/90 transition-colors flex items-center justify-center gap-2">{% trans "Log in" %} 
+            </button>
+        </form>
+    </div>
 </div>
+{% endblock %}
 
-
+{% block body_end %}
 <script src="{% static 'js/authorization.js' %}"></script>
 <script src="{% static 'js/get-cookie.js' %}"></script>
-
-</body>
-</html>
+<script src="{% static 'js/login.js' %}"></script>
+{% endblock %}

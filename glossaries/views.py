@@ -9,6 +9,10 @@ from django.db.models.functions import Lower
 from django.core.paginator import Paginator
 from django.views.generic import TemplateView
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import Group
+from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404
 
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
@@ -20,6 +24,7 @@ from rest_framework import serializers
 from domains.models import Domain
 from languages.models import Language
 from subscriptions.permissions import SubscribedPermission
+from users.models import User
 from .models import Glossary
 from .processor import GlossaryProcessor
 from .serializers import GlossarySerializer
@@ -30,6 +35,30 @@ from .paginators import APIViewPagination, TemplateViewPagination
 
 class UserGlossariesView(TemplateView):
     template_name = 'glossaries.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['glossaries'] = self.get_glossaries()
+        context['translate_languages'] = self.get_languages()
+        return context
+
+    def get_languages(self):
+        if self.request.LANGUAGE_CODE == 'fr':
+            return Language.objects.order_by('french_name').all()
+        return Language.objects.order_by('name').all()
+
+    def get_glossaries(self):
+        tmp_glossaries = Glossary.objects.filter(user=self.request.user)
+
+        formatted_glossaries = [
+            glossary.to_json(self.request)
+            for glossary in tmp_glossaries
+        ]
+        return formatted_glossaries
+
+
+class UserGlossariesView2(TemplateView):
+    template_name = 'glossaries_2.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -111,10 +140,15 @@ class AddGlossaryView(APIView):
 
 
 class SingleGlossaryView(RetrieveUpdateDestroyAPIView):
+    permission_classes = (SubscribedPermission, IsAuthenticated)
     serializer_class = GlossarySerializer
 
     def get_object(self):
-        return Glossary.objects.filter(user=self.request.user, id=self.kwargs['pk']).first()
+        return get_object_or_404(
+            Glossary,
+            user=self.request.user,
+            id=self.kwargs['pk']
+        )
 
 
 class GlossariesListAPIView(APIView):

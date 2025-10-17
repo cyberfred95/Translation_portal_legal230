@@ -1,0 +1,64 @@
+{% load static %}
+{% load  i18n %}
+
+<div class="step-3 flex flex-col justify-start hidden">
+    <!-- 1. Sélectionner un domaine -->
+    <div class="w-full">
+        <span class="font-poppins font-normal text-gray-600 mb-3 inline-block" style="font-size: 16px; line-height: 24px;">1. {% trans 'Select domain' %}</span>
+        <ul class="domains-list flex flex-row flex-wrap items-start w-full gap-2"></ul>
+    </div>
+    
+    <!-- 2. Sélectionner un sous-domaine (si default_domain = false) -->
+    <div id="subdomain-section" class="w-full hidden" style="margin-top: 32px;">
+        <div class="w-full">
+            <span class="font-poppins font-normal text-gray-600 mb-3 inline-block" style="font-size: 16px; line-height: 24px;">2. {% trans 'Select subdomain' %}</span>
+            <div class="sub-domain-list flex flex-row flex-wrap items-start w-full gap-2"></div>
+        </div>
+    </div>
+    
+    <div class="w-full border-b-0.25 border-gray-200" style="margin-top: 32px; margin-bottom: 32px;"></div>
+    
+    <!-- 3. Sélectionner un glossaire -->
+    <div class="flex-1">
+        <span id="glossary-section-number" class="font-poppins font-normal text-gray-600 inline-block" style="font-size: 16px; line-height: 24px; margin-bottom: 12px;">3. {% trans 'Select a glossary' %}</span>
+        <!-- Tabs -->
+        <div class="w-full">
+            <!-- Tab Navigation -->
+            <div class="h-11 p-0.5 flex border-b-0.25 border-b-gray-200">
+                <button
+                        id="step2-default"
+                        class="tab-button active pr-4 pl-0 h-11"
+                        data-tab="default">
+                    {% trans 'Standard' %}
+                </button>
+                <button
+                        id="step2-my-glossary"
+                        class="tab-button px-4 h-11"
+                        data-tab="my-glossary">
+                    {% trans 'My glossaries' %}
+                </button>
+                <button
+                        id="step2-no-glossary"
+                        class="tab-button px-4 h-11"
+                        data-tab="no-glossary">
+                    {% trans 'No glossary' %}
+                </button>
+            </div>
+
+            <!-- Tab Content: Information -->
+            <div id="step2-tab-default-content" class="tab-content py-2 active">
+                <div class="glossary-list flex flex-row flex-wrap items-start w-full gap-2"></div>
+            </div>
+            <!-- Tab Content: My glossaries -->
+            <div id="step2-tab-my-glossary-content" class="tab-content py-2">
+                <!-- Le contenu sera chargé dynamiquement par JavaScript -->
+            </div>
+            <!-- Tab Content: Information -->
+            <div id="step2-tab-no-glossary-content" class="tab-content py-2">
+                <div class="flex flex-col items-center justify-center pt-6 pb-0">
+                    <p class="font-poppins font-normal text-gray-600" style="font-size: 14px; line-height: 24px;">{% trans 'You have chosen to use no glossary' %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

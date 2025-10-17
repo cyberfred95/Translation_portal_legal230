@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 from .models import Prompt, PromptTranslation, Prompt
 from legal.constants import LANGUAGES, EN, FR
 
@@ -9,13 +10,30 @@ class PromptTranslationInline(admin.StackedInline):
     model = PromptTranslation
     extra = len(LANGUAGES)
     max_num = len(LANGUAGES)
+    fields = ("language", "name", "description")
 
 
 class PromptAdmin(admin.ModelAdmin):
-    list_display = ('id', 'gpt_model', 'name_en', 'name_fr')
+    class Media:
+        css = {
+            'all': (
+                'https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css',
+            )
+        }
+
+    list_display = ('id', 'gpt_model', 'name_en', 'name_fr', 'icon_display')
+    fields = ('prompt', 'variables', 'temperature', 'gpt_model', 'icon')
     inlines = [PromptTranslationInline]
 
     change_list_template = "admin/writing/Prompt/change_list.html"
+
+    @staticmethod
+    def icon_display(obj: Prompt):
+        if getattr(obj, 'icon', None):
+            return mark_safe(f'<i class="ph ph-{obj.icon}" style="font-size: 1.5em;"></i>')
+        return "-"
+
+    icon_display.short_description = "Icon"
 
     @staticmethod
     def name_en(obj: Prompt) -> str:

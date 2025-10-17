@@ -1,0 +1,12 @@
+{
+    "type": "sftp",
+    "host": "test.portail.lexamt.fr",
+    "username": "websource",
+    "password": "",
+    "remotePath": "/home/ubuntu/legal230-latest/",
+    "sshKeyFile": "~/.ssh/id_rsa",
+    "port": 22,
+    "remotePath": "",
+    "uploadOnSave": true,
+    "uploadConfigFile": false
+}

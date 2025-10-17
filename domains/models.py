@@ -17,13 +17,6 @@ class DomainGroup(models.Model):
     name = models.CharField(_("name"), max_length=255)
     french_name = models.CharField(
         _("french_name"), max_length=255, blank=True, null=True)
-    icon_weight = models.CharField(
-        _("icon_weight"),
-        max_length=10,
-        choices=ICON_WEIGHT_CHOICES,
-        default='regular',
-        help_text="Phosphor icon weight"
-    )
     icon = models.CharField(
         _("icon"),
         max_length=100,
@@ -42,13 +35,6 @@ class Domain(models.Model):
     domain_group = models.ForeignKey(DomainGroup, on_delete=models.SET_NULL, blank=True, null=True,
                                      related_name='domains')
     featured = models.BooleanField(default=False)
-    icon_weight = models.CharField(
-        _("icon_weight"),
-        max_length=10,
-        choices=ICON_WEIGHT_CHOICES,
-        default='regular',
-        help_text="Phosphor icon weight"
-    )
     icon = models.CharField(
         _("icon"),
         max_length=100,

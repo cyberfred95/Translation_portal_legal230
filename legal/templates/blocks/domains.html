@@ -1,0 +1,103 @@
+{% load i18n %}
+
+<ul class="{% if disposition == 'row' %}flex flex-row flex-wrap items-start w-full{% else %}flex flex-col items-start w-full{% endif %}">
+    <li class="flex items-center">
+        <div class="flex items-center mr-2 w-54 mr-4 rounded-lg pl-4 py-2 bg-blue-50">
+            <input id="default-radio-1" type="radio" value="" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+            <label for="default-radio-1" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300 flex h-8 items-center">
+                {% include 'svg/icons/business.svg' %}
+                <span class="font-base ml-4 bold">
+                    {% trans 'Business' %}
+                </span>
+            </label>
+        </div>
+    </li>
+    <li class="flex items-center">
+        <div class="flex items-center mr-2 w-52 mr-4 rounded-lg pl-4 py-2">
+            <input id="default-radio-2" type="radio" value="" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+            <label for="default-radio-2" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300 flex h-8 items-center">
+                {% include 'svg/icons/corporate.svg' %}
+                <span class="font-base ml-4">
+                                    {% trans 'Corporate' %}
+                                </span>
+            </label>
+        </div>
+    </li>
+    <li>
+        <div class="flex items-center mr-2 w-52 mr-4 rounded-lg pl-4 py-2 bg-blue-50">
+            <input id="default-radio-3" type="radio" value="" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+            <label for="default-radio-3" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300 flex h-8 items-center">
+                {% include 'svg/icons/miscellaneous.svg' %}
+                <span class="font-base ml-4">
+                                    {% trans 'Miscellaneous' %}
+                                </span>
+            </label>
+        </div>
+    </li>
+    <li>
+        <div class="flex items-center mr-2 w-52 mr-4 rounded-lg pl-4 py-2">
+            <input id="default-radio-4" type="radio" value="" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+            <label for="default-radio-4" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300 flex h-8 items-center">
+                {% include 'svg/icons/real_estate_law.svg' %}
+                <span class="font-base ml-4">
+                                    {% trans 'Real Estate Law' %}
+                                </span>
+            </label>
+        </div>
+    </li>
+    <li>
+        <div class="flex items-center mr-2 w-52 mr-4 rounded-lg pl-4 py-2">
+            <input id="default-radio-5" type="radio" value="" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+            <label for="default-radio-5" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300 flex h-8 items-center">
+                {% include 'svg/icons/maritime_law.svg' %}
+                <span class="font-base ml-4">
+                                    {% trans 'Maritime law' %}
+                                </span>
+            </label>
+        </div>
+    </li>
+    <li>
+        <div class="flex items-center mr-2 w-52 mr-4 rounded-lg pl-4 py-2">
+            <input id="default-radio-6" type="radio" value="" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+            <label for="default-radio-6" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300 flex h-8 items-center">
+                {% include 'svg/icons/criminal_law.svg' %}
+                <span class="font-base ml-4">
+                            {% trans 'Business' %}
+                            </span>
+            </label>
+        </div>
+    </li>
+    <li>
+        <div class="flex items-center mr-2 w-52 mr-4 rounded-lg pl-4 py-2">
+            <input id="default-radio-7" type="radio" value="" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+            <label for="default-radio-7" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300 flex h-8 items-center">
+                {% include 'svg/icons/public_law.svg' %}
+                <span class="font-base ml-4">
+                            {% trans 'Business' %}
+                            </span>
+            </label>
+        </div>
+    </li>
+    <li>
+        <div class="flex items-center mr-2 w-52 mr-4 rounded-lg pl-4 py-2">
+            <input id="default-radio-8" type="radio" value="" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+            <label for="default-radio-8" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300 flex h-8 items-center">
+                {% include 'svg/icons/labour_law.svg' %}
+                <span class="font-base ml-4">
+                            {% trans 'Business' %}
+                            </span>
+            </label>
+        </div>
+    </li>
+    <li>
+        <div class="flex items-center mr-2 w-52 mr-4 rounded-lg pl-4 py-2">
+            <input id="default-radio-9" type="radio" value="" name="default-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+            <label for="default-radio-9" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300 flex h-8 items-center">
+                {% include 'svg/icons/finance.svg' %}
+                <span class="font-base ml-4">
+                            {% trans 'Business' %}
+                            </span>
+            </label>
+        </div>
+    </li>
+</ul>

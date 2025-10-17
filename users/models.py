@@ -90,7 +90,7 @@ class UserGroup(models.Model):
                 self.api_key = str(uuid.uuid4())
             
             # Save again with the API key
-            super().save(update_fields=['api_key'])
+            super().save()
         else:
             # Normal save if API key already exists
             super().save(*args, **kwargs)

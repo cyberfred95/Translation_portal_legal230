@@ -1,3 +1,22 @@
+// Bootstrap config à partir du DOM et exposition globale (compat historique)
+(function () {
+  var el = document.getElementById('translate-config');
+  if (!el) return;
+  window.get_domains = el.dataset.getDomains;
+  window.translate = el.dataset.translate;
+  window.single_project = el.dataset.singleProject;
+  window.detect_language = el.dataset.detectLanguage;
+  window.detect_text_language = el.dataset.detectTextLanguage;
+  window.domain_groups = el.dataset.domainGroups;
+  window.get_default_glossary = el.dataset.getDefaultGlossary;
+  window.api_list_glossaries = el.dataset.apiListGlossaries;
+  window.expert_revision_file_url = el.dataset.expertRevisionFileUrl;
+  window.add_glossary = el.dataset.addGlossary;
+  window.language_code = el.dataset.languageCode;
+  try { window.languages = JSON.parse(el.dataset.languages || '[]'); } catch (e) { window.languages = []; }
+  window.access_to_default_glossaries = (el.dataset.accessToDefaultGlossaries === 'true');
+})();
+
 $(document).ready(function () {
 
 
@@ -7,9 +26,11 @@ $(document).ready(function () {
     function showTab(tabId) {
         $('.tab-content').hide();
         $(`#${tabId}-content`).show();
-        $('button.tab').removeClass('bg-gray-600 text-white border-gray-600 hover:bg-gray-600 hover:text-white hover:border-gray-600');
+        $('button.tab').removeClass('bg-white text-gray-900 font-bold');
+        $('button.tab').addClass('text-gray-900 hover:text-gray-900 text-gray-300');
         $('#expert-revision').addClass('hidden');
-        $(`#${tabId}`).addClass('bg-gray-600 text-white border-gray-600 hover:bg-gray-600 hover:text-white hover:border-gray-600');
+        $(`#${tabId}`).removeClass('text-gray-900 hover:text-gray-900 text-gray-300');
+        $(`#${tabId}`).addClass('bg-white text-gray-900 font-bold');
     }
 
     function setHash(tab) {

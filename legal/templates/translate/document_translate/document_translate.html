@@ -1,0 +1,59 @@
+{% load static %}
+{% load i18n %}
+
+<!-- Document Translation Wizard -->
+<div class="flex p-4 flex-col items-start gap-0 self-stretch rounded-lg bg-white">
+    
+    <!-- Progress Indicator -->
+    <div class="flex items-start self-stretch">
+        {% trans 'Document' as step1_title %}
+        {% trans 'Languages' as step2_title %}
+        {% trans 'Domain and Glossary' as step3_title %}
+        {% trans 'Translation' as step4_title %}
+        
+        {% include 'translate/document_translate/document_translate_step_indicator.html' with step_number=1 step_title=step1_title is_active=True has_line=True %}
+        {% include 'translate/document_translate/document_translate_step_indicator.html' with step_number=2 step_title=step2_title is_active=False has_line=True %}
+        {% include 'translate/document_translate/document_translate_step_indicator.html' with step_number=3 step_title=step3_title is_active=False has_line=True %}
+        {% include 'translate/document_translate/document_translate_step_indicator.html' with step_number=4 step_title=step4_title is_active=False has_line=False is_last=True %}
+    </div>
+
+    <!-- Step Content Container -->
+    <div class="w-full h-full pt-8 px-5 step-container">
+        {% include 'translate/document_translate/step_document/step_1.html' %}
+        {% include 'translate/document_translate/step_language/step_2.html' %}
+        {% include 'translate/document_translate/step_domain/step_3.html' %}
+        {% include 'translate/document_translate/step_traduction/step_4.html' %}
+        {% include 'translate/document_translate/step_5.html' %}
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="block-buttons flex justify-between w-full pr-0 pb-0 pt-8">
+        <!-- Previous Button -->
+        <button 
+            id="prev-step" 
+            disabled 
+            class="prevStep flex px-2.5 py-2 justify-center items-center rounded-full bg-white transition-all border border-black/10 hover:bg-black/5">
+            <i class="ph ph-arrow-left prevStep" style="font-size: 24px;"></i>
+            <div class="flex px-2 justify-center items-center prevStep">
+                <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-[#181932] prevStep">
+                    {% trans 'Previous' %}
+                </span>
+            </div>
+        </button>
+
+        <!-- Next Button -->
+        <button 
+            id="next-step" 
+            disabled 
+            class="nextStep flex px-2.5 py-2 justify-center items-center rounded-full bg-[#166534] transition-all opacity-50 cursor-not-allowed text-white">
+            <div class="flex px-2 justify-center items-center nextStep">
+                <span class="font-poppins text-sm font-semibold leading-6 tracking-[-0.084px] text-white nextStep" data-confirm="{% trans 'Completed' %}">
+                    {% trans 'Next' %}
+                </span>
+            </div>
+            <i class="ph ph-arrow-right nextStep" style="font-size: 24px; color: white;"></i>
+        </button>
+    </div>
+</div>
+
+<script src="{% static 'js/document-translate.js' %}"></script>
