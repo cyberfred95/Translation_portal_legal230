@@ -161,6 +161,9 @@ class GlossaryAdmin(admin.ModelAdmin):
             opts=self.model._meta,
             app_label=self.model._meta.app_label,
             app_list=self.admin_site.get_app_list(request),
+            has_permission=True,
+            is_nav_sidebar_enabled=True,
+            available_apps=self.admin_site.get_app_list(request),
         )
 
         if request.method == 'POST':
@@ -246,12 +249,11 @@ class GlossaryAdmin(admin.ModelAdmin):
                         logger.info(
                             "Files stored in session, rendering success page")
 
-                        context = {
+                        context.update({
                             'csv_filename': csv_file.name,
                             'zip_filename': zip_file.name,
                             'ready_to_process': True,
-                            'opts': self.model._meta,
-                        }
+                        })
                         return render(request, 'admin/glossaries/batch_upload.html', context)
                 else:
                     logger.error(f"Form validation errors: {form.errors}")
@@ -268,10 +270,9 @@ class GlossaryAdmin(admin.ModelAdmin):
             logger.info("GET request for batch upload form")
             form = BatchUploadForm()
 
-        context = {
+        context.update({
             'form': form,
-            'opts': self.model._meta,
-        }
+        })
         return render(request, 'admin/glossaries/batch_upload.html', context)
 
     @method_decorator(csrf_exempt)
