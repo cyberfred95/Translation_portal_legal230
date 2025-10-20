@@ -294,7 +294,7 @@ class Glossary(models.Model):
                                 logger.info(
                                     f"All available files in working directory: {all_files}")
 
-                            error_msg = f"Row {row_num}: File not found: {original_file_path} (searched for: {filename_only})"
+                            error_msg = f"Row {row_num} (Fichier: {original_file_path}) - Fichier non trouvé dans le ZIP (recherché: {filename_only})"
                             logger.warning(error_msg)
                             results['errors'].append(error_msg)
                             continue
@@ -348,7 +348,7 @@ class Glossary(models.Model):
                             all_languages = Language.objects.all().values('id', 'name', 'abbreviation')
                             logger.info(
                                 f"Available languages: {list(all_languages)}")
-                            error_msg = f"Row {row_num}: Source language '{source_lang_code}' not found"
+                            error_msg = f"Row {row_num} (Fichier: {row['file']}) - Langue source '{source_lang_code}' non trouvée"
                             logger.error(error_msg)
                             results['errors'].append(error_msg)
                             continue
@@ -388,7 +388,7 @@ class Glossary(models.Model):
                             all_languages = Language.objects.all().values('id', 'name', 'abbreviation')
                             logger.info(
                                 f"Available languages: {list(all_languages)}")
-                            error_msg = f"Row {row_num}: Target language '{target_lang_code}' not found"
+                            error_msg = f"Row {row_num} (Fichier: {row['file']}) - Langue cible '{target_lang_code}' non trouvée"
                             logger.error(error_msg)
                             results['errors'].append(error_msg)
                             continue
@@ -431,6 +431,7 @@ class Glossary(models.Model):
                             django_file = ContentFile(
                                 file_content, name=file_name)
 
+                            # Create glossary instance but don't save yet
                             glossary = Glossary(
                                 domain=domain,
                                 source_language=source_language,
@@ -438,14 +439,59 @@ class Glossary(models.Model):
                                 file=django_file,
                                 name=os.path.splitext(file_name)[0]
                             )
+
+                            # First, save to get an ID (needed for file upload)
+                            # Set flag to skip signal processing
+                            glossary._skip_signal = True
                             glossary.save()
-                            results['created'] += 1
-                            logger.info(
-                                f"Successfully created glossary: {glossary.name}")
-                            logger.info(f"File saved to: {glossary.file.url}")
+
+                            # Try to create on external API
+                            try:
+                                ai_service = AIGlossaryService()
+                                glossary.glossary_id = ai_service.create_glossary(glossary)
+
+                                # Update glossary with the glossary_id
+                                glossary._skip_signal = True
+                                glossary.save(update_fields=['glossary_id'])
+
+                                # Now process the file (update API and clean up)
+                                if glossary.glossary_id and glossary.file:
+                                    try:
+                                        ai_service.update_glossary(glossary)
+                                        logger.info(f"Glossary updated on external service: {glossary.name}")
+                                    except Exception as update_error:
+                                        logger.warning(f"Failed to update glossary on service: {update_error}")
+
+                                    # Clean up the file
+                                    glossary.file.delete(save=False)
+                                    glossary.file = None
+                                    glossary._skip_signal = True
+                                    glossary.save(update_fields=['file'])
+
+                                results['created'] += 1
+                                logger.info(f"Successfully created glossary: {glossary.name}")
+
+                            except Exception as api_error:
+                                # API failed, delete the glossary from Django
+                                logger.error(f"API failed for row {row_num}, rolling back: {str(api_error)}")
+                                glossary.delete()
+                                raise Exception(f"L'API de glossaire a échoué - {str(api_error)}")
 
                     except Exception as e:
-                        error_msg = f"Row {row_num}: {str(e)}"
+                        # Extract more meaningful error messages
+                        error_detail = str(e)
+
+                        # Get the filename being processed
+                        filename_info = f"Fichier: {row.get('file', 'inconnu')}"
+
+                        # Check if it's a JSON error from the API
+                        if 'glossary_id' in error_detail and 'Input should be a valid string' in error_detail:
+                            error_msg = f"Row {row_num} ({filename_info}) - L'API de glossaire a échoué - vérifiez que le service de glossaire est accessible et que le fichier est valide"
+                        elif "The 'file' attribute has no file associated with it" in error_detail:
+                            error_msg = f"Row {row_num} ({filename_info}) - Le fichier du glossaire n'a pas pu être traité correctement"
+                        else:
+                            error_msg = f"Row {row_num} ({filename_info}) - {error_detail}"
+
                         logger.error(error_msg, exc_info=True)
                         results['errors'].append(error_msg)
 

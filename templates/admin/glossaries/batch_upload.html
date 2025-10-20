@@ -268,29 +268,63 @@ document.getElementById('start-batch').addEventListener('click', function() {
         setTimeout(() => {
             progressSection.style.display = 'none';
             resultsSection.style.display = 'block';
-            
+
             const resultsInfo = document.getElementById('results-info');
-            
+
             if (data.success) {
-                resultsInfo.innerHTML = `
-                    <div style="background: #dfd; border: 1px solid #4f4; padding: 10px; margin: 10px 0; border-radius: 4px;">
-                        <h4>✅ Traitement terminé avec succès!</h4>
-                        <p><strong>Glossaires créés:</strong> ${data.created}</p>
-                        <p><strong>Lignes traitées:</strong> ${data.total_rows}</p>
-                    </div>
-                `;
-                
-                if (data.errors.length > 0) {
-                    resultsInfo.innerHTML += `
+                const hasErrors = data.errors && data.errors.length > 0;
+                const allFailed = data.created === 0 && hasErrors;
+
+                // Déterminer le statut global
+                if (allFailed) {
+                    // Tous les glossaires ont échoué
+                    resultsInfo.innerHTML = `
+                        <div style="background: #fdd; border: 1px solid #f44; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                            <h4>❌ Échec du traitement!</h4>
+                            <p><strong>Lignes traitées:</strong> ${data.total_rows}</p>
+                            <p><strong>Glossaires créés:</strong> 0</p>
+                        </div>
+                    `;
+                } else if (hasErrors) {
+                    // Succès partiel
+                    resultsInfo.innerHTML = `
                         <div style="background: #ffd; border: 1px solid #ff4; padding: 10px; margin: 10px 0; border-radius: 4px;">
-                            <h4>⚠️ Erreurs rencontrées:</h4>
-                            <ul style="margin: 0; padding-left: 20px;">
-                                ${data.errors.map(error => `<li>${error}</li>`).join('')}
-                            </ul>
+                            <h4>⚠️ Traitement terminé avec des erreurs</h4>
+                            <p><strong>Glossaires créés:</strong> ${data.created} / ${data.total_rows}</p>
+                            <p><strong>Lignes traitées:</strong> ${data.total_rows}</p>
+                        </div>
+                    `;
+                } else {
+                    // Succès complet
+                    resultsInfo.innerHTML = `
+                        <div style="background: #dfd; border: 1px solid #4f4; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                            <h4>✅ Traitement terminé avec succès!</h4>
+                            <p><strong>Glossaires créés:</strong> ${data.created}</p>
+                            <p><strong>Lignes traitées:</strong> ${data.total_rows}</p>
                         </div>
                     `;
                 }
-                
+
+                if (hasErrors) {
+                    resultsInfo.innerHTML += `
+                        <div style="background: #fdd; border: 1px solid #f44; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                            <h4>❌ Erreurs rencontrées (${data.errors.length}):</h4>
+                            <ul style="margin: 0; padding-left: 20px;">
+                                ${data.errors.map(error => `<li>${error}</li>`).join('')}
+                            </ul>
+                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd;">
+                                <p style="margin: 5px 0;"><strong>Solutions possibles:</strong></p>
+                                <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
+                                    <li>Vérifiez que tous les fichiers listés dans le CSV sont présents dans le ZIP</li>
+                                    <li>Vérifiez que les codes de langue sont corrects (EN, FR, etc.)</li>
+                                    <li>Vérifiez que le service de glossaire externe est accessible</li>
+                                    <li>Vérifiez que les fichiers sont au format CSV ou XLSX</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                }
+
                 resultsInfo.innerHTML += `
                     <div style="margin-top: 15px;">
                         <a href="{% url 'admin:glossaries_glossary_changelist' %}" class="button default">Voir les glossaires</a>

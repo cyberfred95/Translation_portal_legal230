@@ -13,25 +13,72 @@ from .services import AIGlossaryService
 
 @receiver(post_save, sender=Glossary)
 def create_glossary_on_service(sender, instance: Glossary, created, **kwargs):
+    import logging
+    logger = logging.getLogger(__name__)
+
+    # Prevent recursive signal calls
+    if getattr(instance, '_skip_signal', False):
+        return
+
     ai_glossary_service = AIGlossaryService()
 
     if created:
-        instance.glossary_id = ai_glossary_service.create_glossary(instance)
-        instance.save()
+        try:
+            instance.glossary_id = ai_glossary_service.create_glossary(instance)
+            # Set flag to prevent recursive call, then save
+            instance._skip_signal = True
+            instance.save(update_fields=['glossary_id'])
+        except Exception as e:
+            logger.error(f"Failed to create glossary_id for {instance.name}: {str(e)}", exc_info=True)
+            # Continue without glossary_id - the glossary is still created in Django
 
-    if instance.file:
-        if instance.glossary_id:
-            ai_glossary_service.update_glossary(instance)
+    # Only process file if it exists and has a valid path
+    if instance.file and hasattr(instance.file, 'name') and instance.file.name:
+        try:
+            # Check if file actually exists on disk
+            if hasattr(instance.file, 'path'):
+                file_exists = os.path.exists(instance.file.path)
+            else:
+                file_exists = False
 
-        instance.name = os.path.splitext(os.path.basename(instance.file.name))[0]
+            if file_exists:
+                try:
+                    if instance.glossary_id:
+                        ai_glossary_service.update_glossary(instance)
+                except Exception as e:
+                    logger.error(f"Failed to update glossary on service for {instance.name}: {str(e)}", exc_info=True)
 
-        instance.file.delete(save=False)
-        instance.file = None
+                instance.name = os.path.splitext(os.path.basename(instance.file.name))[0]
 
-        if instance._state.adding is False:
-            instance.save()
+                try:
+                    instance.file.delete(save=False)
+                except Exception as e:
+                    logger.warning(f"Failed to delete file for {instance.name}: {str(e)}")
+
+                instance.file = None
+
+                if instance._state.adding is False:
+                    # Set flag to prevent recursive call
+                    instance._skip_signal = True
+                    instance.save()
+            else:
+                logger.warning(f"File does not exist on disk for glossary {instance.name}, skipping file processing")
+        except Exception as e:
+            logger.error(f"Error processing file for glossary {instance.name}: {str(e)}", exc_info=True)
 
 
 @receiver(pre_delete, sender=Glossary)
 def delete_glossary_from_service(sender, instance: Glossary, **kwargs):
-    AIGlossaryService().delete_glossary(instance)
+    import logging
+    logger = logging.getLogger(__name__)
+
+    # Only call API if glossary_id exists
+    if instance.glossary_id:
+        try:
+            AIGlossaryService().delete_glossary(instance)
+            logger.info(f"Glossary deleted from external service: {instance.name} (ID: {instance.glossary_id})")
+        except Exception as e:
+            logger.error(f"Failed to delete glossary from external service: {instance.name} - {str(e)}", exc_info=True)
+            # Don't raise - allow Django deletion to proceed even if API fails
+    else:
+        logger.info(f"Skipping external API delete for glossary {instance.name} - no glossary_id")
