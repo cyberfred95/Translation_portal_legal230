@@ -101,7 +101,7 @@ class Glossary(models.Model):
         }
 
     @staticmethod
-    def glossaries_batch(csv_file_path, zip_file_path=None, base_directory=None):
+    def glossaries_batch(csv_file_path, zip_file_path=None, base_directory=None, progress_callback=None):
         """
         Batch load glossaries from a CSV file.
 
@@ -109,6 +109,7 @@ class Glossary(models.Model):
             csv_file_path: Path to the CSV file containing glossary information
             zip_file_path: Path to the ZIP file containing glossary files (optional)
             base_directory: Base directory where glossary files are located (optional, ignored if zip_file_path is provided)
+            progress_callback: Optional callback function called with progress updates (callable)
 
         Returns:
             dict: Summary of the batch operation with success/error counts
@@ -121,6 +122,15 @@ class Glossary(models.Model):
             'errors': [],
             'total_rows': 0
         }
+
+        # Helper function to send progress updates
+        def send_progress(message, row_num=None):
+            if progress_callback:
+                progress_callback(message, row_num, results['created'], results['total_rows'])
+            logger.info(message)
+
+        # Send initial message
+        send_progress("Démarrage du traitement des glossaires...")
 
         # Verify CSV file exists
         if not os.path.exists(csv_file_path):
@@ -190,7 +200,7 @@ class Glossary(models.Model):
                 logger.info(f"Using base directory: {base_directory}")
 
             logger.info("Reading CSV file")
-            with open(csv_file_path, 'r', encoding='utf-8') as csvfile:
+            with open(csv_file_path, 'r', encoding='utf-8-sig') as csvfile:
                 # Read the first few lines to debug
                 csvfile.seek(0)
                 first_lines = [csvfile.readline().strip() for _ in range(5)]
@@ -212,10 +222,31 @@ class Glossary(models.Model):
                     results['errors'].append(error_msg)
                     return results
 
+                # Count total rows first
+                csvfile.seek(0)
+                total_csv_rows = sum(1 for _ in csv.DictReader(csvfile))
+                logger.info(f"Total rows in CSV: {total_csv_rows}")
+
+                # Update results with total from the start
+                results['expected_total'] = total_csv_rows
+
+                # Send initial progress with total
+                if progress_callback:
+                    progress_callback(f"Préparation: {total_csv_rows} glossaires à traiter", 0, 0, total_csv_rows)
+
+                # Reset to start of file for actual processing
+                csvfile.seek(0)
+                reader = csv.DictReader(csvfile)
+
                 # Start at 2 to account for header
                 for row_num, row in enumerate(reader, start=2):
                     results['total_rows'] += 1
                     logger.info(f"Processing row {row_num}: {row}")
+
+                    # Send progress update every 100 rows
+                    if results['total_rows'] % 100 == 0:
+                        if progress_callback:
+                            progress_callback(f"Traitement du glossaire ligne {results['total_rows']}", results['total_rows'], results['created'], total_csv_rows)
 
                     try:
                         # Get file path and normalize it (convert Windows paths to Unix)
@@ -438,6 +469,22 @@ class Glossary(models.Model):
                                 logger.info(f"Successfully created glossary: {glossary.name}")
                                 results['created'] += 1
 
+                    except ValidationError as e:
+                        # Handle Django validation errors (from glossary file validation)
+                        filename_info = f"Fichier: {row.get('file', 'inconnu')}"
+
+                        # Extract validation error messages
+                        if hasattr(e, 'messages'):
+                            validation_messages = ', '.join(e.messages)
+                        elif hasattr(e, 'message'):
+                            validation_messages = e.message
+                        else:
+                            validation_messages = str(e)
+
+                        error_msg = f"Row {row_num} ({filename_info}) - Erreur de validation: {validation_messages}"
+                        logger.error(error_msg, exc_info=True)
+                        results['errors'].append(error_msg)
+
                     except Exception as e:
                         # Extract more meaningful error messages
                         error_detail = str(e)
@@ -445,8 +492,18 @@ class Glossary(models.Model):
                         # Get the filename being processed
                         filename_info = f"Fichier: {row.get('file', 'inconnu')}"
 
+                        # Check if it's a validation error embedded in the exception message
+                        if "ValidationError" in error_detail or "Source column is blank" in error_detail or "Target column is blank" in error_detail:
+                            # Extract the validation error message
+                            import re
+                            match = re.search(r"\['([^']+)'\]", error_detail)
+                            if match:
+                                validation_msg = match.group(1)
+                                error_msg = f"Row {row_num} ({filename_info}) - Erreur de validation: {validation_msg}"
+                            else:
+                                error_msg = f"Row {row_num} ({filename_info}) - Erreur de validation: {error_detail}"
                         # Check if it's a JSON error from the API
-                        if 'glossary_id' in error_detail and 'Input should be a valid string' in error_detail:
+                        elif 'glossary_id' in error_detail and 'Input should be a valid string' in error_detail:
                             error_msg = f"Row {row_num} ({filename_info}) - L'API de glossaire a échoué - vérifiez que le service de glossaire est accessible et que le fichier est valide"
                         elif "The 'file' attribute has no file associated with it" in error_detail:
                             error_msg = f"Row {row_num} ({filename_info}) - Le fichier du glossaire n'a pas pu être traité correctement"
@@ -456,10 +513,21 @@ class Glossary(models.Model):
                         logger.error(error_msg, exc_info=True)
                         results['errors'].append(error_msg)
 
+                # Send final progress message with total
+                total_expected = results.get('expected_total', results['total_rows'])
+                if progress_callback:
+                    progress_callback(
+                        f"Traitement terminé: {results['created']} glossaires créés sur {results['total_rows']} lignes traitées",
+                        results['total_rows'],
+                        results['created'],
+                        total_expected
+                    )
+
         except Exception as e:
             error_msg = f"Error processing files: {str(e)}"
             logger.error(error_msg, exc_info=True)
             results['errors'].append(error_msg)
+            send_progress(f"Erreur lors du traitement: {str(e)}")
         finally:
             # Clean up temporary directory
             if temp_dir and os.path.exists(temp_dir):

@@ -1,6 +1,8 @@
 import os
 import tempfile
 import logging
+import uuid
+import threading
 from django.contrib import admin
 from django.shortcuts import render, redirect
 from django.urls import path
@@ -9,6 +11,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django import forms
+from django.core.cache import cache
 from .models import Glossary
 from .forms import GlossaryAdminForm
 from languages.models import Language
@@ -28,27 +31,6 @@ class BatchUploadForm(forms.Form):
         help_text="ZIP file containing all glossary files listed in the CSV",
         widget=forms.FileInput(attrs={'accept': '.zip'})
     )
-
-    def clean_csv_file(self):
-        csv_file = self.cleaned_data.get('csv_file')
-        if csv_file:
-            if csv_file.size == 0:
-                raise forms.ValidationError(
-                    "The CSV file is empty. Please select a valid file.")
-            if not csv_file.name.lower().endswith('.csv'):
-                raise forms.ValidationError(
-                    "The file must be in CSV format.")
-        return csv_file
-
-    def clean_zip_file(self):
-        zip_file = self.cleaned_data.get('zip_file')
-        if zip_file:
-            if zip_file.size == 0:
-                raise forms.ValidationError(
-                    "The ZIP file is empty. Please select a valid file.")
-            if not zip_file.name.lower().endswith('.zip'):
-                raise forms.ValidationError(
-                    "The file must be in ZIP format.")
 
     def clean_csv_file(self):
         csv_file = self.cleaned_data.get('csv_file')
@@ -151,6 +133,8 @@ class GlossaryAdmin(admin.ModelAdmin):
                  name='glossary_batch_upload'),
             path('process-batch/', self.admin_site.admin_view(self.process_batch_view),
                  name='glossary_process_batch'),
+            path('batch-progress/', self.admin_site.admin_view(self.batch_progress_view),
+                 name='glossary_batch_progress'),
         ]
         return custom_urls + urls
 
@@ -242,17 +226,25 @@ class GlossaryAdmin(admin.ModelAdmin):
                             request, "The ZIP file could not be saved properly.")
                         form = BatchUploadForm()
                     else:
+                        # Generate a unique batch ID for this upload
+                        batch_id = str(uuid.uuid4())
+
                         # Store paths in session for processing
                         request.session['batch_csv_path'] = temp_csv.name
                         request.session['batch_zip_path'] = temp_zip.name
+                        request.session['batch_id'] = batch_id
+
+                        # Clear any previous batch progress in cache
+                        cache.delete(f'batch_progress_{batch_id}')
 
                         logger.info(
-                            "Files stored in session, rendering success page")
+                            f"Files stored in session with batch_id: {batch_id}, rendering success page")
 
                         context.update({
                             'csv_filename': csv_file.name,
                             'zip_filename': zip_file.name,
                             'ready_to_process': True,
+                            'batch_id': batch_id,
                         })
                         return render(request, 'admin/glossaries/batch_upload.html', context)
                 else:
@@ -275,65 +267,168 @@ class GlossaryAdmin(admin.ModelAdmin):
         })
         return render(request, 'admin/glossaries/batch_upload.html', context)
 
-    @method_decorator(csrf_exempt)
+    def batch_progress_view(self, request):
+        """Return current batch processing progress"""
+        try:
+            batch_id = request.GET.get('batch_id')
+            if not batch_id:
+                logger.error("No batch_id provided")
+                return JsonResponse({'error': 'No batch_id provided'}, status=400)
+
+            # Support DELETE method to clear progress
+            if request.method == 'DELETE':
+                cache.delete(f'batch_progress_{batch_id}')
+                logger.info(f"Batch progress cleared from cache for batch_id: {batch_id}")
+                return JsonResponse({'status': 'cleared'}, status=200)
+
+            # Get progress from cache
+            cache_key = f'batch_progress_{batch_id}'
+            progress_data = cache.get(cache_key, {})
+
+            if not progress_data:
+                logger.debug(f"No progress data found in cache for batch_id: {batch_id}")
+                progress_data = {'status': 'waiting', 'message': 'En attente de démarrage...'}
+
+            return JsonResponse(progress_data, status=200)
+        except Exception as e:
+            logger.error(f"Error in batch_progress_view: {str(e)}", exc_info=True)
+            return JsonResponse({'error': str(e)}, status=500)
+
     def process_batch_view(self, request):
+        """Process batch glossary upload in background thread - returns immediately"""
         logger.info(f"Process batch view accessed. Method: {request.method}")
 
-        if request.method == 'POST':
-            try:
-                csv_path = request.session.get('batch_csv_path')
-                zip_path = request.session.get('batch_zip_path')
+        # Wrap entire method in try/except to ensure we always return JSON
+        try:
+            if request.method != 'POST':
+                logger.error("Invalid method for process_batch_view")
+                return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-                logger.info(
-                    f"Session paths - CSV: {csv_path}, ZIP: {zip_path}")
+            csv_path = request.session.get('batch_csv_path')
+            zip_path = request.session.get('batch_zip_path')
+            batch_id = request.session.get('batch_id')
 
-                if not csv_path or not zip_path:
-                    logger.error("Files not found in session")
-                    return JsonResponse({'error': 'Files not found. Please try again.'})
+            logger.info(
+                f"Session paths - CSV: {csv_path}, ZIP: {zip_path}, batch_id: {batch_id}")
 
-                # Verify files exist
-                if not os.path.exists(csv_path):
-                    logger.error(f"CSV file not found: {csv_path}")
-                    return JsonResponse({'error': f'CSV file not found: {csv_path}'})
+            if not csv_path or not zip_path or not batch_id:
+                logger.error("Files or batch_id not found in session")
+                return JsonResponse({'error': 'Files not found. Please try again.'}, status=400)
 
-                if not os.path.exists(zip_path):
-                    logger.error(f"ZIP file not found: {zip_path}")
-                    return JsonResponse({'error': f'ZIP file not found: {zip_path}'})
+            # Verify files exist
+            if not os.path.exists(csv_path):
+                logger.error(f"CSV file not found: {csv_path}")
+                return JsonResponse({'error': f'CSV file not found: {csv_path}'}, status=404)
 
-                logger.info("Starting batch processing")
-                results = Glossary.glossaries_batch(csv_path, zip_path)
-                logger.info(f"Batch processing completed: {results}")
+            if not os.path.exists(zip_path):
+                logger.error(f"ZIP file not found: {zip_path}")
+                return JsonResponse({'error': f'ZIP file not found: {zip_path}'}, status=404)
 
-                # Clean up temporary files
+            # Initialize progress tracking in cache (timeout: 2 hours)
+            cache_key = f'batch_progress_{batch_id}'
+            cache.set(cache_key, {
+                'status': 'processing',
+                'current_row': 0,
+                'total_rows': 0,
+                'created': 0,
+                'message': 'Démarrage du traitement...'
+            }, timeout=7200)
+
+            # Store results in cache (will be set by the thread)
+            results_cache_key = f'batch_results_{batch_id}'
+
+            # Define the background processing function
+            def process_in_background():
                 try:
-                    if os.path.exists(csv_path):
-                        os.unlink(csv_path)
-                        logger.info(f"Cleaned up CSV file: {csv_path}")
-                    if os.path.exists(zip_path):
-                        os.unlink(zip_path)
-                        logger.info(f"Cleaned up ZIP file: {zip_path}")
-                except Exception as cleanup_error:
-                    logger.warning(f"Error cleaning up files: {cleanup_error}")
+                    logger.info(f"[Thread {batch_id}] Starting background batch processing")
 
-                # Clear session
-                request.session.pop('batch_csv_path', None)
-                request.session.pop('batch_zip_path', None)
-                logger.info("Session cleared")
+                    # Define progress callback
+                    def progress_callback(message, row_num, created, total_rows):
+                        progress_data = {
+                            'status': 'processing',
+                            'current_row': row_num or total_rows,
+                            'total_rows': total_rows,
+                            'created': created,
+                            'message': message
+                        }
+                        cache.set(cache_key, progress_data, timeout=7200)
+                        logger.info(f"[Thread {batch_id}] Progress: {message} (row: {row_num}, created: {created}, total: {total_rows})")
 
-                return JsonResponse({
-                    'success': True,
-                    'created': results['created'],
-                    'total_rows': results['total_rows'],
-                    'errors': results['errors']
-                })
+                    # Execute the batch processing
+                    results = Glossary.glossaries_batch(csv_path, zip_path, progress_callback=progress_callback)
+                    logger.info(f"[Thread {batch_id}] Batch processing completed: {results}")
 
-            except Exception as e:
-                logger.error(
-                    f"Error in process_batch_view: {str(e)}", exc_info=True)
-                return JsonResponse({'error': f'Processing error: {str(e)}'})
+                    # Store results in cache
+                    cache.set(results_cache_key, results, timeout=7200)
 
-        logger.error("Invalid method for process_batch_view")
-        return JsonResponse({'error': 'Method not allowed'})
+                    # Update progress to complete
+                    cache.set(cache_key, {
+                        'status': 'completed',
+                        'current_row': results['total_rows'],
+                        'total_rows': results['total_rows'],
+                        'created': results['created'],
+                        'message': 'Traitement terminé',
+                        'errors': results.get('errors', [])
+                    }, timeout=7200)
+
+                    # Clean up temporary files
+                    try:
+                        if os.path.exists(csv_path):
+                            os.unlink(csv_path)
+                            logger.info(f"[Thread {batch_id}] Cleaned up CSV file: {csv_path}")
+                        if os.path.exists(zip_path):
+                            os.unlink(zip_path)
+                            logger.info(f"[Thread {batch_id}] Cleaned up ZIP file: {zip_path}")
+                    except Exception as cleanup_error:
+                        logger.warning(f"[Thread {batch_id}] Error cleaning up files: {cleanup_error}")
+
+                except Exception as e:
+                    # Update progress to error in cache
+                    logger.error(f"[Thread {batch_id}] Error in background processing: {str(e)}", exc_info=True)
+                    cache.set(cache_key, {
+                        'status': 'error',
+                        'message': f'Erreur: {str(e)}'
+                    }, timeout=7200)
+
+                    # Store error results
+                    cache.set(results_cache_key, {
+                        'success': False,
+                        'error': str(e),
+                        'created': 0,
+                        'total_rows': 0,
+                        'errors': [str(e)]
+                    }, timeout=7200)
+
+            # Start the background thread
+            thread = threading.Thread(target=process_in_background, daemon=True)
+            thread.start()
+            logger.info(f"Background thread started for batch_id: {batch_id}")
+
+            # Return immediately - the thread will continue processing
+            return JsonResponse({
+                'success': True,
+                'message': 'Traitement lancé en arrière-plan',
+                'batch_id': batch_id,
+                'status': 'started'
+            }, status=202)  # 202 Accepted
+
+        except Exception as e:
+            # Update progress to error in cache
+            batch_id = request.session.get('batch_id')
+            if batch_id:
+                cache_key = f'batch_progress_{batch_id}'
+                cache.set(cache_key, {
+                    'status': 'error',
+                    'message': f'Erreur: {str(e)}'
+                }, timeout=7200)
+
+            # Catch ANY exception and return as JSON
+            logger.error(
+                f"Error in process_batch_view: {str(e)}", exc_info=True)
+            return JsonResponse({
+                'error': f'Processing error: {str(e)}',
+                'success': False
+            }, status=500)
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}

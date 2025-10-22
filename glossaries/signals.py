@@ -2,6 +2,7 @@ import os
 
 import requests
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 from preferences import preferences
@@ -28,9 +29,18 @@ def create_glossary_on_service(sender, instance: Glossary, created, **kwargs):
             # Set flag to prevent recursive call, then save
             instance._skip_signal = True
             instance.save(update_fields=['glossary_id'])
+        except ValidationError as e:
+            # Re-raise ValidationError so it can be caught by the batch processor
+            logger.error(f"Failed to create glossary_id for {instance.name}: {str(e)}", exc_info=True)
+            # Delete the instance since validation failed
+            instance.delete()
+            raise
         except Exception as e:
             logger.error(f"Failed to create glossary_id for {instance.name}: {str(e)}", exc_info=True)
-            # Continue without glossary_id - the glossary is still created in Django
+            # Delete the instance since creation failed
+            instance.delete()
+            # Re-raise the exception so it can be caught by the batch processor
+            raise
 
     # Only process file if it exists and has a valid path
     if instance.file and hasattr(instance.file, 'name') and instance.file.name:
@@ -45,8 +55,13 @@ def create_glossary_on_service(sender, instance: Glossary, created, **kwargs):
                 try:
                     if instance.glossary_id:
                         ai_glossary_service.update_glossary(instance)
+                except ValidationError as e:
+                    # Re-raise ValidationError for update failures
+                    logger.error(f"Failed to update glossary on service for {instance.name}: {str(e)}", exc_info=True)
+                    raise
                 except Exception as e:
                     logger.error(f"Failed to update glossary on service for {instance.name}: {str(e)}", exc_info=True)
+                    raise
 
                 instance.name = os.path.splitext(os.path.basename(instance.file.name))[0]
 
@@ -65,6 +80,7 @@ def create_glossary_on_service(sender, instance: Glossary, created, **kwargs):
                 logger.warning(f"File does not exist on disk for glossary {instance.name}, skipping file processing")
         except Exception as e:
             logger.error(f"Error processing file for glossary {instance.name}: {str(e)}", exc_info=True)
+            raise
 
 
 @receiver(pre_delete, sender=Glossary)
