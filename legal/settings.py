@@ -269,14 +269,20 @@ FILES_PROCESSING_API_URL = 'https://office.fileprocessing.custom.mt'
 GLOSSARY_SYSTEM = os.environ.get("GLOSSARY_SYSTEM")
 GLOSSARY_API_KEY = os.environ.get("GLOSSARY_API_KEY")
 
+# Statistics Service Configuration
+STATS_API_URL = os.environ.get('STATS_API_URL')
+STATS_API_KEY = os.environ.get('STATS_API_KEY')
+
 # Stripe Configuration
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY')
 STRIPE_PORTAL_RETURN_URL = "https://portail.lexamt.fr/fr/profile-details/"
 
 # Active Trail Configuration
-ACTIVE_TRAIL_SENDING_PROFILE_ID = int(os.environ.get('ACTIVE_TRAIL_SENDING_PROFILE_ID', 0))
-ACTIVE_TRAIL_USER_PROFILE_FROMNAME = os.environ.get('ACTIVE_TRAIL_USER_PROFILE_FROMNAME')
+ACTIVE_TRAIL_SENDING_PROFILE_ID = int(
+    os.environ.get('ACTIVE_TRAIL_SENDING_PROFILE_ID', 0))
+ACTIVE_TRAIL_USER_PROFILE_FROMNAME = os.environ.get(
+    'ACTIVE_TRAIL_USER_PROFILE_FROMNAME')
 ACTIVE_TRAIL_SEND_EMAIL_REQUEST_URL = 'https://webapi.mymarketing.co.il/api/OperationalMessage/Message'
 ACTIVE_TRAIL_API_KEY = os.environ.get('ACTIVE_TRAIL_API_KEY')
 

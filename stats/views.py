@@ -6,6 +6,7 @@ import requests
 from preferences import preferences
 from legal.views import PAGINATION_PAGE_SIZE
 from users.models import User, UserGroup
+from django.conf import settings
 
 
 # Create your views here.
@@ -36,9 +37,9 @@ class UsageView(TemplateView):
 
             responses = []
             response = requests.get(
-                preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params,
+                settings.STATS_API_URL + "statistics_list/" + additional_url_params,
                 headers={
-                    'token': preferences.StatisticSettings.API_KEY,
+                    'token': settings.STATS_API_KEY,
                     'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
                 },
                 json={
@@ -50,10 +51,10 @@ class UsageView(TemplateView):
                 for page in range(1, int(response.json().get('num_pages'))):
                     responses.append(
                         requests.get(
-                            preferences.StatisticSettings.URL + "statistics_list/" +
+                            settings.STATS_API_URL + "statistics_list/" +
                             additional_url_params + f"&page={page}",
                             headers={
-                                'token': preferences.StatisticSettings.API_KEY,
+                                'token': settings.STATS_API_KEY,
                                 'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
                             },
                             json={
@@ -151,9 +152,9 @@ class UsageView(TemplateView):
         files = self.request.GET.getlist('file_name', [])
         additional_url_params = self.set_additional_url_params()
         response = requests.get(
-            preferences.StatisticSettings.URL + "statistics_list/" + additional_url_params,
+            settings.STATS_API_URL + "statistics_list/" + additional_url_params,
             headers={
-                'token': preferences.StatisticSettings.API_KEY,
+                'token': settings.STATS_API_KEY,
                 'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
             },
             json={

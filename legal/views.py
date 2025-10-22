@@ -139,7 +139,7 @@ def file_translate(request):
                 data=data,
                 headers={
                     "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key,
-                    "X-API-Key": preferences.StatisticSettings.API_KEY
+                    "X-API-Key": settings.STATS_API_KEY
                 },
                 files={
                     'source_file': file
