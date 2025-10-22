@@ -64,7 +64,6 @@ INSTALLED_APPS = [
     'django_filters',
     'rosetta',
     'django_cleanup.apps.CleanupConfig',
-    'settings.apps.SettingsConfig',
     'preferences',
     'users.apps.UsersConfig',
     'languages.apps.LanguagesConfig',
@@ -265,9 +264,22 @@ ROSETTA_SHOW_AT_ADMIN_PANEL = True
 # Files Processing API
 FILES_PROCESSING_API_URL = 'https://office.fileprocessing.custom.mt'
 
+# Custom MT Console Configuration
+CUSTOM_MT_CONSOLE_URL = os.environ.get('CUSTOM_MT_CONSOLE_URL')
+
+# Cloud Storage API Configuration
+CLOUDSTORAGE_API_URL = os.environ.get('CLOUDSTORAGE_API_URL')
+CLOUDSTORAGE_API_KEY = os.environ.get('CLOUDSTORAGE_API_KEY')
+
+# Email Configuration
+SENDER_EMAIL = os.environ.get('SENDER_EMAIL')
+QUOTE_CC_EMAIL = os.environ.get('QUOTE_CC_EMAIL')
+SUPPORT_EMAIL = os.environ.get('SUPPORT_EMAIL')
+
 # Glossary Configuration
 GLOSSARY_SYSTEM = os.environ.get("GLOSSARY_SYSTEM")
 GLOSSARY_API_KEY = os.environ.get("GLOSSARY_API_KEY")
+GLOSSARY_API_URL = os.environ.get("GLOSSARY_API_URL")
 
 # Statistics Service Configuration
 STATS_API_URL = os.environ.get('STATS_API_URL')

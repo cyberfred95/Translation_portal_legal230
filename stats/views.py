@@ -1,6 +1,19 @@
 import json
 from datetime import datetime, date, timedelta
 from django.views.generic import TemplateView
+from django.conf import settings
+
+
+class BaseTemplateView(TemplateView):
+    """
+    Base TemplateView that adds environment variables to context
+    """
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['SUPPORT_EMAIL'] = settings.SUPPORT_EMAIL
+        context['SENDER_EMAIL'] = settings.SENDER_EMAIL
+        context['QUOTE_CC_EMAIL'] = settings.QUOTE_CC_EMAIL
+        return context
 
 import requests
 from preferences import preferences
@@ -12,7 +25,7 @@ from django.conf import settings
 # Create your views here.
 
 
-class UsageView(TemplateView):
+class UsageView(BaseTemplateView):
     template_name = 'usage_history.html'
 
     def get_context_data(self, **kwargs):
@@ -40,7 +53,7 @@ class UsageView(TemplateView):
                 settings.STATS_API_URL + "statistics_list/" + additional_url_params,
                 headers={
                     'token': settings.STATS_API_KEY,
-                    'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
+                    'X-API-Key': settings.CLOUDSTORAGE_API_KEY if self.request.user.is_staff else self.request.user.group.api_key
                 },
                 json={
                     "uuid": self.get_users(),
@@ -55,7 +68,7 @@ class UsageView(TemplateView):
                             additional_url_params + f"&page={page}",
                             headers={
                                 'token': settings.STATS_API_KEY,
-                                'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
+                                'X-API-Key': settings.CLOUDSTORAGE_API_KEY if self.request.user.is_staff else self.request.user.group.api_key
                             },
                             json={
                                 "uuid": self.get_users(),
@@ -155,7 +168,7 @@ class UsageView(TemplateView):
             settings.STATS_API_URL + "statistics_list/" + additional_url_params,
             headers={
                 'token': settings.STATS_API_KEY,
-                'X-API-Key': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
+                'X-API-Key': settings.CLOUDSTORAGE_API_KEY if self.request.user.is_staff else self.request.user.group.api_key
             },
             json={
                 "uuid": self.get_users(),

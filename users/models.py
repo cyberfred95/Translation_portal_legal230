@@ -39,11 +39,11 @@ class UserGroup(models.Model):
         """
         try:
             main_settings = get_main_settings()
-            if not main_settings or not main_settings.CUSTOM_MT_CONSOLE_URL:
+            if not main_settings:
                 return None
             
             # Build the API endpoint URL
-            url = main_settings.CUSTOM_MT_CONSOLE_URL.rstrip('/') + "/cabinet_api/create_api_key/"
+            url = settings.CUSTOM_MT_CONSOLE_URL.rstrip('/') + "/cabinet_api/create_api_key/"
             
             # Prepare request data (following the pattern from text_translation)
             data = {

@@ -150,9 +150,7 @@ TEST_MAIN_SETTINGS = {
     'support_email': 'support@legal230test.com',
     'api_key': 'test-main-api-key-123456',
     'algorithm': 'template',  # MainSettings.AlgorithmChoices.template
-    'CUSTOM_MT_CONSOLE_URL': 'https://console.custom.mt/',
     'CLOUDSTORAGE_API_URL': 'https://cloudstorage.fileprocessing.custom.mt/translate/legal230/',
-    'glossaries_url': 'https://glossaries-api.legal230test.com/api/v1/'
 }
 
 

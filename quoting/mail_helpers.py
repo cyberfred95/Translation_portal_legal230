@@ -2,6 +2,7 @@ import base64
 import os.path
 from datetime import datetime
 
+from django.conf import settings
 from django.template.loader import render_to_string
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -59,7 +60,7 @@ def send_quote_email(user_id: int, request, context_variables: dict, template_na
         full_url = save_quote_document(pdf_bytes, filename, request)
         
         # Send email to each recipient
-        for email in [user.email, preferences.MainSettings.quote_cc_email]:
+        for email in [user.email, settings.QUOTE_CC_EMAIL]:
             send_email(
                 email,
                 EmailType.USER_MANAGEMENT_QUOTE,

@@ -1,4 +1,5 @@
 from celery import shared_task
+from django.conf import settings
 from preferences import preferences
 import requests
 from .models import Prompt, PromptTranslation
@@ -11,9 +12,9 @@ from stats.calculator import StatsProcessor
 def refresh_prompts():
     existing_prompts = Prompt.objects.all()
     prompts = requests.post(
-        preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "gpt_playground/api/get-prompts-list",
+        settings.CUSTOM_MT_CONSOLE_URL + "gpt_playground/api/get-prompts-list",
         headers={
-            'token': preferences.MainSettings.api_key
+            'token': settings.CLOUDSTORAGE_API_KEY
         }
     )
 

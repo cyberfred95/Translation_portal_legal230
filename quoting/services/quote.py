@@ -2,6 +2,7 @@ import math
 import os
 from typing import Optional
 from urllib.parse import urlencode
+from django.conf import settings
 from preferences import preferences
 from legal.helpers import get_project_file, get_text_from_file
 from quoting.helpers import get_price_by_language_pair
@@ -17,7 +18,7 @@ class FormQuoteService:
 
     @staticmethod
     def get_expert_revision_url(project_id, context_variables: dict) -> str:
-        base_url = f"{preferences.MainSettings.CLOUDSTORAGE_API_URL}post_editing/{project_id}/accept/"
+        base_url = f"{settings.CLOUDSTORAGE_API_URL}post_editing/{project_id}/accept/"
         return f"{base_url}?{urlencode(context_variables)}"
 
     @staticmethod
@@ -30,9 +31,9 @@ class FormQuoteService:
     def send_quote_to_user(self, request):
         project_id = request.data.get('project_id')
 
-        response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+        response = requests.get(settings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                                 headers={
-                                    "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+                                    "token": settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key})
 
         project = response.json()
         quote_price = get_price_by_language_pair(source_language=project['source_language'],
@@ -42,7 +43,7 @@ class FormQuoteService:
         file_name, extension = os.path.splitext(file.name)
         if quote_price:
             context_variables = {
-                "email": preferences.MainSettings.sender_email,
+                "email": settings.SENDER_EMAIL,
                 "username": request.user.username,
                 "user_email": request.user.email,
                 "company": request.user.group.name if request.user.group else "Administrator",
@@ -55,7 +56,7 @@ class FormQuoteService:
                 'working_days': self.get_working_days(words_count, quote_price=quote_price),
                 'total_price': words_count * quote_price.price,
                 'created_at': now(),
-                'seller_email': preferences.MainSettings.sender_email,
+                'seller_email': settings.SENDER_EMAIL,
                 'quote_number': request.user.group.generate_quoting_number() if request.user.group else f"{now().strftime('%Y/%m')}/0"
 
             }

@@ -8,6 +8,19 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.functions import Lower
 from django.core.paginator import Paginator
 from django.views.generic import TemplateView
+from django.conf import settings
+
+
+class BaseTemplateView(TemplateView):
+    """
+    Base TemplateView that adds environment variables to context
+    """
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['SUPPORT_EMAIL'] = settings.SUPPORT_EMAIL
+        context['SENDER_EMAIL'] = settings.SENDER_EMAIL
+        context['QUOTE_CC_EMAIL'] = settings.QUOTE_CC_EMAIL
+        return context
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import Group
@@ -33,7 +46,7 @@ from .paginators import APIViewPagination, TemplateViewPagination
 
 # Create your views here.
 
-class UserGlossariesView(TemplateView):
+class UserGlossariesView(BaseTemplateView):
     template_name = 'glossaries.html'
 
     def get_context_data(self, **kwargs):
@@ -57,7 +70,7 @@ class UserGlossariesView(TemplateView):
         return formatted_glossaries
 
 
-class UserGlossariesView2(TemplateView):
+class UserGlossariesView2(BaseTemplateView):
     template_name = 'glossaries_2.html'
 
     def get_context_data(self, **kwargs):

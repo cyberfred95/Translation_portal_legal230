@@ -61,7 +61,7 @@ class StatsProcessor:
 
     def get_template_name(self, source_language, target_language, domain_name):
         response = requests.post(
-            preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/get_template_by_language_pair_and_domain",
+            settings.CUSTOM_MT_CONSOLE_URL + "translation/get_template_by_language_pair_and_domain",
             headers={
                 "token": self._api_key
             },

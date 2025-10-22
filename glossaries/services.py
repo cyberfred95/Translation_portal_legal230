@@ -19,7 +19,7 @@ class AIGlossaryService:
     def create_glossary(self, glossary):
         prepared_glossary: dict = GlossaryProcessor().form_glossary_object(glossary.file)
         response = requests.post(
-            preferences.MainSettings.glossaries_url + "create_glossary",
+            settings.GLOSSARY_API_URL + "create_glossary",
             headers=self._prepare_headers(),
             json={
                 "system": settings.GLOSSARY_SYSTEM,
@@ -41,7 +41,7 @@ class AIGlossaryService:
     def update_glossary(self, glossary):
         prepared_glossary: dict = GlossaryProcessor().form_glossary_object(glossary.file)
         response = requests.post(
-            preferences.MainSettings.glossaries_url + "update_glossary",
+            settings.GLOSSARY_API_URL + "update_glossary",
             headers=self._prepare_headers(),
             json={
                 "system": settings.GLOSSARY_SYSTEM,
@@ -62,7 +62,7 @@ class AIGlossaryService:
 
     def delete_glossary(self, glossary):
         response = requests.post(
-            preferences.MainSettings.glossaries_url + 'delete_glossary',
+            settings.GLOSSARY_API_URL + 'delete_glossary',
             headers=self._prepare_headers(),
             json={
                 "system": settings.GLOSSARY_SYSTEM,
