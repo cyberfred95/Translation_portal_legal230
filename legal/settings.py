@@ -5,11 +5,14 @@ from pathlib import Path
 from celery.schedules import crontab
 from django.utils.translation import gettext_lazy as _
 
+# ============================================================================
+# Base paths & environment loading
+# ============================================================================
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Charger manuellement les variables d'environnement depuis le fichier .env
 
+# Manually load environment variables from the .env file
 
 def load_env_file():
     env_file = os.path.join(BASE_DIR, '.env')
@@ -29,20 +32,23 @@ def load_env_file():
 
 load_env_file()
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
-# SECURITY WARNING: don't run with debug turned on in production!
+# ============================================================================
+# Security / core
+# ============================================================================
 DEBUG = True
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 ALLOWED_HOSTS = ['localhost', '0.0.0.0', 'legal230.portal.custom.mt', '141.145.204.44', 'portail.lexamt.fr', 'portail.lexamt.com',
                 'portail.lexamt.tech', '89.168.44.123', 'test.portail.lexamt.fr', 'test.portail.lexamt.com', 'test.portail.lexamt.tech',
                 'api.portail.lexamt.fr', 'api.portail.lexamt.com', 'api.portail.lexamt.tech', 'portail.lexamt.fr', 'portail.lexamt.com', 'portail.lexamt.tech']
 
-# Application definition
+# Proxy / headers
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# ============================================================================
+# Django apps, middleware, URLs, templates
+# ============================================================================
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -54,7 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.sites',
     'allauth',
-    'compressor',
+    # 'compressor',  # archived: not used
     'django_filters',
     'rosetta',
     'django_cleanup.apps.CleanupConfig',
@@ -75,7 +81,7 @@ INSTALLED_APPS = [
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'compressor.finders.CompressorFinder',
+    # 'compressor.finders.CompressorFinder',  # archived: not used
 )
 
 MIDDLEWARE = [
@@ -89,8 +95,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-ROOT_URLCONF = 'legal.urls'
 
 TEMPLATES = [
     {
@@ -111,16 +115,57 @@ TEMPLATES = [
     },
 ]
 
+ROOT_URLCONF = 'legal.urls'
 WSGI_APPLICATION = 'legal.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+# ============================================================================
+# Authentication / accounts
+# ============================================================================
+ACCOUNT_ADAPTER = 'core.account_adapter.NoNewUsersAccountAdapter'
+SITE_ID = 1
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 
+LOGIN_URL = '/users/login/'
+LOGOUT_REDIRECT_URL = "/users/login/"
+LOGIN_REDIRECT_URL = '/'
+
+# ============================================================================
+# Internationalization / localization
+# ============================================================================
+LANGUAGE_CODE = 'en'
+LANGUAGES = (
+    ('en', _('English')),
+    ('fr', _('French')),
+)
+TIME_ZONE = 'Etc/GMT-3'
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
+
+LOCALE_PATHS = [ BASE_DIR / 'locale/', ]
+
+# ============================================================================
+# Static & media files
+# ============================================================================
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [ os.path.join(BASE_DIR, "static") ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_collected')
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+# Compression (archived: not used)
+# COMPRESS_ENABLED = True
+# COMPRESS_OFFLINE = False
+
+# ============================================================================
+# Database
+# ============================================================================
 # Detect if we are in test mode
 TESTING = 'test' in sys.argv
 
 if TESTING:
-    # SQLite configuration for tests (faster and no dependencies)
+    # SQLite configuration used only for tests (fast, no external deps)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -141,89 +186,30 @@ else:
     }
 
 # Password validation
-# https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    { 'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
+    { 'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
+    { 'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
+    { 'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
-ACCOUNT_ADAPTER = 'core.account_adapter.NoNewUsersAccountAdapter'
+# ============================================================================
+# Caching
+# ============================================================================
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
 
-SITE_ID = 1
+# ============================================================================
+# Celery / Redis
+# ============================================================================
+# (REDIS_HOST/REDIS_PORT were not directly used)
+# REDIS_HOST = os.environ.get("REDIS_HOST", "redis")
+# REDIS_PORT = os.environ.get("REDIS_PORT", "6379")
 
-ACCOUNT_EMAIL_VERIFICATION = 'none'
-
-# Internationalization
-# https://docs.djangoproject.com/en/3.1/topics/i18n/
-
-LANGUAGE_CODE = 'en'
-LANGUAGES = (
-    ('en', _('English')),
-    ('fr', _('French')),
-)
-
-TIME_ZONE = 'Etc/GMT-3'
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
-
-LOCALE_PATHS = [
-    BASE_DIR / 'locale/',
-]
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static")
-]
-STATIC_ROOT = os.path.join(BASE_DIR, 'static_collected')
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-
-COMPRESS_ENABLED = True
-COMPRESS_OFFLINE = False
-
-LOGIN_URL = '/users/login/'
-LOGOUT_REDIRECT_URL = "/users/login/"
-LOGIN_REDIRECT_URL = '/'
-
-DEV_MODE = True
-
-# Указываем в часах
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
-# Host for sending e-mail.
-EMAIL_HOST = ''
-
-# Port for sending e-mail.
-EMAIL_PORT = 465
-
-# Optional SMTP authentication information for EMAIL_HOST.
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_USE_TLS = True
-
-REDIS_HOST = os.environ.get("REDIS_HOST", "redis")
-REDIS_PORT = os.environ.get("REDIS_PORT", "6379")
-
-# Celery
 CELERY_BROKER_URL = os.environ.get("CELERY_REDIS", "redis://redis:6379")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_REDIS", "redis://redis:6379")
 CELERY_ACCEPT_CONTENT = ["application/json"]
@@ -246,17 +232,9 @@ CELERY_BEAT_SCHEDULE = {
     }
 }
 
-OPENAI_GPT_API_KEY = os.environ.get('OPENAI_GPT_API_KEY')
-SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
-
-AUTH_USER_MODEL = 'users.User'
-
-ROSETTA_SHOW_AT_ADMIN_PANEL = True
-
-FILES_PROCESSING_API_URL = 'https://office.fileprocessing.custom.mt'
-
-
-# Add logging configuration
+# ============================================================================
+# Logging
+# ============================================================================
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -278,16 +256,16 @@ LOGGING = {
     },
 }
 
-USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# ============================================================================
+# Application-specific settings
+# ============================================================================
+AUTH_USER_MODEL = 'users.User'
+ROSETTA_SHOW_AT_ADMIN_PANEL = True
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
-    }
-}
+# Files Processing API
+FILES_PROCESSING_API_URL = 'https://office.fileprocessing.custom.mt'
 
+# Glossary Configuration
 GLOSSARY_SYSTEM = os.environ.get("GLOSSARY_SYSTEM")
 GLOSSARY_API_KEY = os.environ.get("GLOSSARY_API_KEY")
 
@@ -297,10 +275,8 @@ STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY')
 STRIPE_PORTAL_RETURN_URL = "https://portail.lexamt.fr/fr/profile-details/"
 
 # Active Trail Configuration
-ACTIVE_TRAIL_SENDING_PROFILE_ID = int(
-    os.environ.get('ACTIVE_TRAIL_SENDING_PROFILE_ID', 0))
-ACTIVE_TRAIL_USER_PROFILE_FROMNAME = os.environ.get(
-    'ACTIVE_TRAIL_USER_PROFILE_FROMNAME')
+ACTIVE_TRAIL_SENDING_PROFILE_ID = int(os.environ.get('ACTIVE_TRAIL_SENDING_PROFILE_ID', 0))
+ACTIVE_TRAIL_USER_PROFILE_FROMNAME = os.environ.get('ACTIVE_TRAIL_USER_PROFILE_FROMNAME')
 ACTIVE_TRAIL_SEND_EMAIL_REQUEST_URL = 'https://webapi.mymarketing.co.il/api/OperationalMessage/Message'
 ACTIVE_TRAIL_API_KEY = os.environ.get('ACTIVE_TRAIL_API_KEY')
 
