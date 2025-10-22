@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 class BatchUploadForm(forms.Form):
     csv_file = forms.FileField(
         label="CSV Description File",
-        help_text="CSV file containing the structure: file,source_language,target_language,domain. Existing glossaries will be replaced.",
+        help_text="CSV file containing the structure: file,source_language,target_language,domain. Existing glossaries will be updated.",
         widget=forms.FileInput(attrs={'accept': '.csv'})
     )
     zip_file = forms.FileField(

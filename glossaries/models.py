@@ -3,19 +3,14 @@ import csv
 import zipfile
 import tempfile
 import logging
-from django.core.files import File
 from django.core.files.base import ContentFile
 from django.db import models
 
-from glossaries.helpers import get_glossary_username
-from glossaries.processor import GlossaryProcessor
-from glossaries.services import AIGlossaryService
 from languages.models import Language
 from users.models import User, UserGroup
 from django.core.validators import FileExtensionValidator
 from domains.models import Domain
 from django.core.exceptions import ValidationError
-from preferences import preferences
 
 logger = logging.getLogger(__name__)
 
@@ -402,26 +397,6 @@ class Glossary(models.Model):
                             group__isnull=True
                         ).first()
 
-                        if existing_glossary:
-                            logger.info(
-                                f"Row {row_num}: Replacing existing glossary for {source_lang_code}-{target_lang_code} in {domain_name}")
-                            # Delete the existing glossary file and record
-                            if existing_glossary.file:
-                                try:
-                                    existing_glossary.file.delete(save=False)
-                                    logger.info(
-                                        f"Deleted existing file for glossary: {existing_glossary.name}")
-                                except Exception as file_delete_error:
-                                    logger.warning(
-                                        f"Could not delete existing file: {file_delete_error}")
-
-                            existing_glossary.delete()
-                            logger.info(
-                                f"Deleted existing glossary record: {existing_glossary.name}")
-
-                        # Create glossary
-                        logger.info(f"Creating glossary for row {row_num}")
-
                         # Read file content and create ContentFile to avoid path issues
                         file_name = os.path.basename(found_file_path)
 
@@ -431,51 +406,37 @@ class Glossary(models.Model):
                             django_file = ContentFile(
                                 file_content, name=file_name)
 
-                            # Create glossary instance but don't save yet
-                            glossary = Glossary(
-                                domain=domain,
-                                source_language=source_language,
-                                target_language=target_language,
-                                file=django_file,
-                                name=os.path.splitext(file_name)[0]
-                            )
+                            if existing_glossary:
+                                # Update existing glossary
+                                logger.info(
+                                    f"Row {row_num}: Updating existing glossary for {source_lang_code}-{target_lang_code} in {domain_name}")
 
-                            # First, save to get an ID (needed for file upload)
-                            # Set flag to skip signal processing
-                            glossary._skip_signal = True
-                            glossary.save()
+                                # Update the file and name
+                                existing_glossary.file = django_file
+                                existing_glossary.name = os.path.splitext(file_name)[0]
 
-                            # Try to create on external API
-                            try:
-                                ai_service = AIGlossaryService()
-                                glossary.glossary_id = ai_service.create_glossary(glossary)
+                                # Save and let the post_save signal handle API update
+                                existing_glossary.save()
 
-                                # Update glossary with the glossary_id
-                                glossary._skip_signal = True
-                                glossary.save(update_fields=['glossary_id'])
-
-                                # Now process the file (update API and clean up)
-                                if glossary.glossary_id and glossary.file:
-                                    try:
-                                        ai_service.update_glossary(glossary)
-                                        logger.info(f"Glossary updated on external service: {glossary.name}")
-                                    except Exception as update_error:
-                                        logger.warning(f"Failed to update glossary on service: {update_error}")
-
-                                    # Clean up the file
-                                    glossary.file.delete(save=False)
-                                    glossary.file = None
-                                    glossary._skip_signal = True
-                                    glossary.save(update_fields=['file'])
-
+                                logger.info(f"Successfully updated glossary: {existing_glossary.name}")
                                 results['created'] += 1
-                                logger.info(f"Successfully created glossary: {glossary.name}")
+                            else:
+                                # Create new glossary
+                                logger.info(f"Row {row_num}: Creating new glossary for {source_lang_code}-{target_lang_code} in {domain_name}")
 
-                            except Exception as api_error:
-                                # API failed, delete the glossary from Django
-                                logger.error(f"API failed for row {row_num}, rolling back: {str(api_error)}")
-                                glossary.delete()
-                                raise Exception(f"L'API de glossaire a échoué - {str(api_error)}")
+                                glossary = Glossary(
+                                    domain=domain,
+                                    source_language=source_language,
+                                    target_language=target_language,
+                                    file=django_file,
+                                    name=os.path.splitext(file_name)[0]
+                                )
+
+                                # Save and let the post_save signal handle API creation and update
+                                glossary.save()
+
+                                logger.info(f"Successfully created glossary: {glossary.name}")
+                                results['created'] += 1
 
                     except Exception as e:
                         # Extract more meaningful error messages
