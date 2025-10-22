@@ -3,6 +3,7 @@ Tests for UserGroup model functionality.
 """
 
 from django.test import TestCase
+from unittest.mock import patch
 
 from users.models import UserGroup
 from tests.mock import mock_api_key_generation, mock_api_key_generation_failure, mock_no_settings
@@ -27,8 +28,10 @@ from .settings import (
 class UserGroupAPIKeyTestCase(TestCase):
     """Test case for UserGroup API key auto-generation."""
 
+    @patch('django.conf.settings.CLOUDSTORAGE_API_KEY', API_MAIN_TOKEN)
+    @patch('django.conf.settings.CUSTOM_MT_CONSOLE_URL', 'https://console.custom.mt/')
     @mock_api_key_generation(GENERATED_API_KEY)
-    def test_api_key_auto_generation_success(self, mock_post, mock_get_settings):
+    def test_api_key_auto_generation_success(self, mock_post):
         """Test that API key is auto-generated when UserGroup is saved without one."""
         
         # Create UserGroup without api_key
@@ -52,7 +55,7 @@ class UserGroupAPIKeyTestCase(TestCase):
         )
 
     @mock_api_key_generation_failure()
-    def test_api_key_auto_generation_failure_fallback(self, mock_post, mock_get_settings):
+    def test_api_key_auto_generation_failure_fallback(self, mock_post):
         """Test that UUID fallback is used when API call fails."""
         
         # Create UserGroup without api_key
@@ -78,7 +81,7 @@ class UserGroupAPIKeyTestCase(TestCase):
         self.assertEqual(group.api_key, EXISTING_API_KEY)
 
     @mock_no_settings()
-    def test_api_key_generation_no_settings(self, mock_get_settings):
+    def test_api_key_generation_no_settings(self):
         """Test fallback to UUID when main settings are not available."""
         
         # Create UserGroup without api_key

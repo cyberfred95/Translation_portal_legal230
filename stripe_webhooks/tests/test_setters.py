@@ -215,7 +215,7 @@ class SetUserGroupTestCase(TestCase):
     """Test case for set_userGroup functions."""
 
     @mock_api_key_generation('generated-api-key-12345')
-    def test_create_userGroup_success(self, mock_post, mock_get_settings):
+    def test_create_userGroup_success(self, mock_post):
         """Test successful user group creation with automatic API key generation."""
         
         error, group = create_userGroup(TEST_GROUP_NAME)
@@ -238,7 +238,7 @@ class SetUserGroupTestCase(TestCase):
         self.assertEqual(error.code, 500)  # exception code
 
     @mock_api_key_generation()
-    def test_create_userGroup_if_not_exists_new_group(self, mock_post, mock_get_settings):
+    def test_create_userGroup_if_not_exists_new_group(self, mock_post):
         """Test creating user group when it doesn't exist."""
         
         error, group, is_found = create_userGroup_if_not_exists(
