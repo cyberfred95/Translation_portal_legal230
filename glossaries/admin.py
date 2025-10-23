@@ -1,4 +1,5 @@
 import os
+import csv
 import tempfile
 import logging
 import uuid
@@ -157,6 +158,12 @@ class GlossaryAdmin(admin.ModelAdmin):
                  name='glossary_check_consistency_progress'),
             path('process-consistency-check/', self.admin_site.admin_view(self.process_consistency_check_view),
                  name='glossary_process_consistency_check'),
+            path('compare-csv/', self.admin_site.admin_view(self.compare_csv_view),
+                 name='glossary_compare_csv'),
+            path('process-csv-comparison/', self.admin_site.admin_view(self.process_csv_comparison_view),
+                 name='glossary_process_csv_comparison'),
+            path('csv-comparison-progress/', self.admin_site.admin_view(self.csv_comparison_progress_view),
+                 name='glossary_csv_comparison_progress'),
         ]
         return custom_urls + urls
 
@@ -661,8 +668,16 @@ class GlossaryAdmin(admin.ModelAdmin):
                                     "API-KEY": settings.GLOSSARY_API_KEY
                                 }
 
+                                # Log first request for debugging
+                                import logging
+                                logger = logging.getLogger(__name__)
+                                if glossary.id == glossaries_list[0].id:
+                                    logger.info(f"API Request - URL: {url}")
+                                    logger.info(f"API Request - Payload: {payload}")
+                                    logger.info(f"API Request - Has API-KEY: {bool(settings.GLOSSARY_API_KEY)}")
+
                                 api_start = time.time()
-                                response = requests.post(url, headers=headers, json=payload, timeout=3)
+                                response = requests.post(url, headers=headers, json=payload, timeout=60)
                                 api_duration = time.time() - api_start
 
                                 total_duration = time.time() - start_time
@@ -679,7 +694,7 @@ class GlossaryAdmin(admin.ModelAdmin):
                             except requests.exceptions.Timeout:
                                 total_duration = time.time() - start_time
                                 glossary_info['total_time'] = f"{total_duration:.3f}s"
-                                glossary_info['error'] = "Timeout (3s)"
+                                glossary_info['error'] = "Timeout (60s)"
                                 return ('error', glossary_info)
                             except Exception as e:
                                 total_duration = time.time() - start_time
@@ -687,12 +702,12 @@ class GlossaryAdmin(admin.ModelAdmin):
                                 glossary_info['error'] = str(e)
                                 return ('error', glossary_info)
 
-                        # Process glossaries concurrently with 30 workers
+                        # Process glossaries concurrently with 20 workers
                         glossaries_list = list(glossaries)
                         completed = 0
                         api_times = []
 
-                        with ThreadPoolExecutor(max_workers=30) as executor:
+                        with ThreadPoolExecutor(max_workers=20) as executor:
                             future_to_glossary = {executor.submit(check_single_glossary, g): g for g in glossaries_list}
 
                             for future in as_completed(future_to_glossary):
@@ -777,6 +792,277 @@ class GlossaryAdmin(admin.ModelAdmin):
                 'error': f'Processing error: {str(e)}',
                 'success': False
             }, status=500)
+
+    def compare_csv_view(self, request):
+        """View for uploading CSV file to compare with local database"""
+        logger.info(f"Compare CSV view accessed. Method: {request.method}")
+
+        context = dict(
+            self.admin_site.each_context(request),
+            opts=self.model._meta,
+            app_label=self.model._meta.app_label,
+            has_permission=True,
+        )
+
+        if request.method == 'POST':
+            csv_file = request.FILES.get('csv_file')
+            if not csv_file:
+                context['error'] = 'Aucun fichier CSV fourni'
+                return render(request, 'admin/glossaries/compare_csv.html', context)
+
+            # Save CSV temporarily
+            import tempfile
+            import uuid
+
+            comparison_id = str(uuid.uuid4())
+            temp_dir = tempfile.gettempdir()
+            csv_path = os.path.join(temp_dir, f'compare_{comparison_id}.csv')
+
+            try:
+                with open(csv_path, 'wb+') as destination:
+                    for chunk in csv_file.chunks():
+                        destination.write(chunk)
+                logger.info(f"CSV file saved to: {csv_path}")
+
+                # Store path in session
+                request.session['comparison_csv_path'] = csv_path
+                request.session['comparison_id'] = comparison_id
+
+                # Redirect to processing
+                context['csv_uploaded'] = True
+                context['comparison_id'] = comparison_id
+                return render(request, 'admin/glossaries/compare_csv.html', context)
+
+            except Exception as e:
+                logger.error(f"Error saving CSV file: {str(e)}", exc_info=True)
+                context['error'] = f'Erreur lors de la sauvegarde du fichier: {str(e)}'
+                return render(request, 'admin/glossaries/compare_csv.html', context)
+
+        return render(request, 'admin/glossaries/compare_csv.html', context)
+
+    def process_csv_comparison_view(self, request):
+        """Process CSV comparison in background thread"""
+        logger.info(f"Process CSV comparison view accessed. Method: {request.method}")
+
+        try:
+            if request.method != 'POST':
+                return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+            csv_path = request.session.get('comparison_csv_path')
+            comparison_id = request.session.get('comparison_id')
+
+            if not csv_path or not comparison_id:
+                return JsonResponse({'error': 'CSV file not found in session'}, status=400)
+
+            if not os.path.exists(csv_path):
+                return JsonResponse({'error': f'CSV file not found: {csv_path}'}, status=404)
+
+            # Initialize progress tracking
+            cache_key = f'csv_comparison_progress_{comparison_id}'
+            cache.set(cache_key, {
+                'status': 'processing',
+                'message': 'Démarrage de la comparaison...'
+            }, timeout=7200)
+
+            # Background processing function
+            def process_in_background():
+                try:
+                    logger.info(f"[Thread {comparison_id}] Starting CSV comparison")
+
+                    # Parse CSV
+                    csv_glossaries = self._parse_csv_for_comparison(csv_path)
+
+                    # Get local glossaries
+                    local_glossaries = self._get_local_glossaries_for_comparison()
+
+                    # Compare
+                    results = self._compare_local_csv(local_glossaries, csv_glossaries)
+
+                    # Store results in cache
+                    results_cache_key = f'csv_comparison_results_{comparison_id}'
+                    cache.set(results_cache_key, results, timeout=7200)
+
+                    # Update progress to complete
+                    cache.set(cache_key, {
+                        'status': 'completed',
+                        'message': 'Comparaison terminée'
+                    }, timeout=7200)
+
+                    # Clean up temporary file
+                    try:
+                        if os.path.exists(csv_path):
+                            os.remove(csv_path)
+                            logger.info(f"Cleaned up temp CSV: {csv_path}")
+                    except Exception as e:
+                        logger.error(f"Error cleaning up temp file: {e}")
+
+                except Exception as e:
+                    logger.error(f"Error in background comparison: {str(e)}", exc_info=True)
+                    cache.set(cache_key, {
+                        'status': 'error',
+                        'message': f'Erreur: {str(e)}'
+                    }, timeout=7200)
+
+            # Start background thread
+            thread = threading.Thread(target=process_in_background, daemon=True)
+            thread.start()
+            logger.info(f"Background comparison thread started for comparison_id: {comparison_id}")
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Comparaison lancée en arrière-plan',
+                'comparison_id': comparison_id,
+                'status': 'started'
+            }, status=202)
+
+        except Exception as e:
+            logger.error(f"Error in process_csv_comparison_view: {str(e)}", exc_info=True)
+            return JsonResponse({
+                'error': f'Processing error: {str(e)}',
+                'success': False
+            }, status=500)
+
+    def csv_comparison_progress_view(self, request):
+        """Check progress of CSV comparison"""
+        comparison_id = request.GET.get('comparison_id')
+        if not comparison_id:
+            return JsonResponse({'error': 'comparison_id required'}, status=400)
+
+        cache_key = f'csv_comparison_progress_{comparison_id}'
+        progress_data = cache.get(cache_key)
+
+        if not progress_data:
+            return JsonResponse({'error': 'Comparison not found'}, status=404)
+
+        if progress_data.get('status') == 'completed':
+            # Get results
+            results_cache_key = f'csv_comparison_results_{comparison_id}'
+            results = cache.get(results_cache_key)
+
+            if results:
+                # Render results page
+                context = dict(
+                    self.admin_site.each_context(request),
+                    opts=self.model._meta,
+                    results=results,
+                )
+                html = render(request, 'admin/glossaries/compare_csv_results.html', context).content.decode('utf-8')
+                return JsonResponse({
+                    'status': 'completed',
+                    'html': html
+                })
+
+        return JsonResponse(progress_data)
+
+    def _parse_csv_for_comparison(self, csv_file):
+        """Parse CSV file for comparison"""
+        glossaries = []
+        with open(csv_file, 'r', encoding='utf-8-sig') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row_num, row in enumerate(reader, start=2):
+                filename = row['file']
+                name = os.path.splitext(os.path.basename(filename))[0]
+
+                glossaries.append({
+                    'name': name,
+                    'file': filename,
+                    'source': row['source_language'].upper(),
+                    'target': row['target_language'].upper(),
+                    'domain': row['domain'],
+                    'user': row.get('user', ''),
+                    'group': row.get('group', ''),
+                    'row': row_num
+                })
+        return glossaries
+
+    def _get_local_glossaries_for_comparison(self):
+        """Get local glossaries for comparison"""
+        glossaries = []
+        for glossary in Glossary.objects.all():
+            if glossary.file:
+                name = os.path.splitext(os.path.basename(glossary.file.name))[0]
+            else:
+                name = glossary.name
+
+            owner_type = 'admin'
+            owner_value = ''
+            if glossary.user:
+                owner_type = 'user'
+                owner_value = glossary.user.username
+            elif glossary.group:
+                owner_type = 'group'
+                owner_value = glossary.group.name
+
+            glossaries.append({
+                'id': glossary.id,
+                'name': name,
+                'source': glossary.source_language.abbreviation.upper(),
+                'target': glossary.target_language.abbreviation.upper(),
+                'domain': glossary.domain.name if glossary.domain else '',
+                'owner_type': owner_type,
+                'owner_value': owner_value,
+                'glossary_id': glossary.glossary_id or ''
+            })
+        return glossaries
+
+    def _compare_local_csv(self, local_glossaries, csv_glossaries):
+        """Compare local and CSV glossaries"""
+        def make_key(g, from_csv=False):
+            # The key is based on how batch upload identifies glossaries:
+            # domain, source_language, target_language, and owner (user/group/admin)
+            # NOTE: The file name is NOT part of the key because batch upload
+            # identifies existing glossaries by lang+domain+owner, not by filename
+            if from_csv:
+                owner = g['user'] if g['user'] else (g['group'] if g['group'] else '')
+                return (g['source'], g['target'], g['domain'], owner)
+            else:
+                return (g['source'], g['target'], g['domain'], g['owner_value'])
+
+        # Detect duplicates in CSV
+        csv_keys_count = {}
+        csv_duplicates = []
+        for g in csv_glossaries:
+            key = make_key(g, True)
+            if key in csv_keys_count:
+                csv_keys_count[key].append(g)
+            else:
+                csv_keys_count[key] = [g]
+
+        # Find duplicates (keys with more than one entry)
+        for key, entries in csv_keys_count.items():
+            if len(entries) > 1:
+                csv_duplicates.append({
+                    'key': key,
+                    'entries': entries,
+                    'count': len(entries)
+                })
+
+        local_dict = {make_key(g): g for g in local_glossaries}
+        csv_dict = {make_key(g, True): g for g in csv_glossaries}
+
+        only_in_local = []
+        only_in_csv = []
+        in_both = []
+
+        for key in local_dict:
+            if key in csv_dict:
+                in_both.append((local_dict[key], csv_dict[key]))
+            else:
+                only_in_local.append(local_dict[key])
+
+        for key in csv_dict:
+            if key not in local_dict:
+                only_in_csv.append(csv_dict[key])
+
+        return {
+            'total_local': len(local_glossaries),
+            'total_csv': len(csv_glossaries),
+            'unique_csv': len(csv_dict),
+            'csv_duplicates': csv_duplicates,
+            'in_both': in_both,
+            'only_in_local': only_in_local,
+            'only_in_csv': only_in_csv
+        }
 
     def changelist_view(self, request, extra_context=None):
         from django.conf import settings

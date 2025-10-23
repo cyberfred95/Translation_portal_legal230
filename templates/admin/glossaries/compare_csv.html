@@ -1,0 +1,242 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block title %}Comparer avec CSV | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrahead %}
+<style>
+    .upload-form {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+    .upload-form h2 {
+        margin-top: 0;
+    }
+    .form-group {
+        margin: 15px 0;
+    }
+    .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .btn-primary {
+        background: #0073aa;
+        color: white;
+    }
+    .btn-primary:hover {
+        background: #005a87;
+    }
+    .info-box {
+        background: #e8f4f8;
+        border-left: 4px solid #0073aa;
+        padding: 15px;
+        margin: 15px 0;
+    }
+    .error-box {
+        background: #fdd;
+        border-left: 4px solid #f44;
+        padding: 15px;
+        margin: 15px 0;
+        color: #c00;
+    }
+    .progress-container {
+        margin: 20px 0;
+        padding: 20px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    .progress-container.hidden {
+        display: none;
+    }
+    .progress-bar {
+        width: 100%;
+        height: 30px;
+        background: #f0f0f0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 10px 0;
+    }
+    .progress-fill {
+        height: 100%;
+        background: #0073aa;
+        transition: width 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+    }
+    #results-container {
+        margin: 20px 0;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label='glossaries' %}">Glossaries</a>
+    &rsaquo; <a href="{% url 'admin:glossaries_glossary_changelist' %}">Glossaires</a>
+    &rsaquo; Comparer avec CSV
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>Comparer la base locale avec un fichier CSV</h1>
+
+<div class="info-box">
+    <h3>Format du fichier CSV</h3>
+    <p>Le fichier CSV doit contenir les colonnes suivantes (dans l'ordre) :</p>
+    <ul>
+        <li><strong>file</strong> : Nom du fichier de glossaire (ex: ACCOUNTING_EN_FR.xlsx)</li>
+        <li><strong>source_language</strong> : Langue source (code à 2 lettres, ex: EN)</li>
+        <li><strong>target_language</strong> : Langue cible (code à 2 lettres, ex: FR)</li>
+        <li><strong>domain</strong> : Domaine du glossaire (ex: Accounting)</li>
+        <li><strong>user</strong> : (Optionnel) Username si le glossaire appartient à un utilisateur</li>
+        <li><strong>group</strong> : (Optionnel) Nom du groupe si le glossaire appartient à un groupe</li>
+    </ul>
+    <p><strong>Note:</strong> C'est le même format que le fichier CSV utilisé pour le batch upload.</p>
+</div>
+
+{% if error %}
+<div class="error-box">
+    <strong>Erreur:</strong> {{ error }}
+</div>
+{% endif %}
+
+{% if not csv_uploaded %}
+<div class="upload-form">
+    <h2>Charger le fichier CSV</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="csv_file">Sélectionnez le fichier CSV :</label>
+            <input type="file" id="csv_file" name="csv_file" accept=".csv" required>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Charger et Comparer</button>
+            <a href="{% url 'admin:glossaries_glossary_changelist' %}" class="btn" style="margin-left: 10px; background: #ddd;">Annuler</a>
+        </div>
+    </form>
+</div>
+{% else %}
+<div class="info-box" id="processing-info" style="background: #fff8dc; border-left-color: #f90;">
+    <h3>⏳ Traitement en cours...</h3>
+    <p>Le fichier CSV a été chargé avec succès. La comparaison est en cours d'exécution.</p>
+    <p>Veuillez patienter, les résultats s'afficheront automatiquement ci-dessous.</p>
+</div>
+
+<div class="progress-container" id="progress-container">
+    <h3>Comparaison en cours...</h3>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width: 0%;">
+            <span id="progress-text">0%</span>
+        </div>
+    </div>
+    <p id="progress-message">Initialisation...</p>
+</div>
+
+<div id="results-container"></div>
+
+<script>
+    const comparisonId = '{{ comparison_id }}';
+
+    // Get CSRF token from cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    // Show progress container
+    document.getElementById('progress-container').style.display = 'block';
+
+    // Start processing
+    fetch('{% url "admin:glossary_process_csv_comparison" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        }
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error('HTTP error ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        if (data.success) {
+            // Start polling for progress
+            checkProgress();
+        } else {
+            document.getElementById('progress-message').innerHTML = '<span style="color: red;">Erreur: ' + (data.error || 'Erreur inconnue') + '</span>';
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        document.getElementById('progress-message').innerHTML = '<span style="color: red;">Erreur de connexion: ' + error.message + '</span>';
+    });
+
+    function checkProgress() {
+        fetch('{% url "admin:glossary_csv_comparison_progress" %}?comparison_id=' + comparisonId)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'completed') {
+                    document.getElementById('progress-fill').style.width = '100%';
+                    document.getElementById('progress-text').textContent = '100%';
+                    document.getElementById('progress-message').textContent = 'Comparaison terminée !';
+
+                    // Hide processing info and progress container
+                    document.getElementById('processing-info').style.display = 'none';
+                    document.getElementById('progress-container').style.display = 'none';
+
+                    // Display results
+                    if (data.html) {
+                        document.getElementById('results-container').innerHTML = data.html;
+                    }
+                } else if (data.status === 'error') {
+                    document.getElementById('progress-message').innerHTML = '<span style="color: red;">' + data.message + '</span>';
+                } else {
+                    // Still processing
+                    document.getElementById('progress-message').textContent = data.message || 'En cours...';
+                    document.getElementById('progress-fill').style.width = '50%';
+                    document.getElementById('progress-text').textContent = '50%';
+
+                    // Check again in 500ms
+                    setTimeout(checkProgress, 500);
+                }
+            })
+            .catch(error => {
+                console.error('Error checking progress:', error);
+                setTimeout(checkProgress, 1000);
+            });
+    }
+</script>
+{% endif %}
+
+{% endblock %}
