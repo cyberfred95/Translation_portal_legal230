@@ -151,6 +151,12 @@ class GlossaryAdmin(admin.ModelAdmin):
                  name='glossary_process_batch'),
             path('batch-progress/', self.admin_site.admin_view(self.batch_progress_view),
                  name='glossary_batch_progress'),
+            path('check-consistency/', self.admin_site.admin_view(self.check_consistency_view),
+                 name='glossary_check_consistency'),
+            path('check-consistency-progress/', self.admin_site.admin_view(self.check_consistency_progress_view),
+                 name='glossary_check_consistency_progress'),
+            path('process-consistency-check/', self.admin_site.admin_view(self.process_consistency_check_view),
+                 name='glossary_process_consistency_check'),
         ]
         return custom_urls + urls
 
@@ -442,6 +448,331 @@ class GlossaryAdmin(admin.ModelAdmin):
             # Catch ANY exception and return as JSON
             logger.error(
                 f"Error in process_batch_view: {str(e)}", exc_info=True)
+            return JsonResponse({
+                'error': f'Processing error: {str(e)}',
+                'success': False
+            }, status=500)
+
+    def check_consistency_view(self, request):
+        """View to check glossary consistency with remote API"""
+        from django.conf import settings
+        from preferences import preferences
+
+        context = dict(
+            self.admin_site.each_context(request),
+            opts=self.model._meta,
+            app_label=self.model._meta.app_label,
+            has_permission=True,
+        )
+
+        if request.method == 'GET':
+            # Check if we need to display results
+            show_results = request.GET.get('show_results')
+            if show_results:
+                results_cache_key = f'check_results_{show_results}'
+                results = cache.get(results_cache_key)
+                if results:
+                    context.update({'results': results})
+                    return render(request, 'admin/glossaries/check_consistency_results.html', context)
+
+            # Display the check options page
+            context.update({
+                'glossary_system': settings.GLOSSARY_SYSTEM,
+                'glossary_api_key': '***' if settings.GLOSSARY_API_KEY else 'NOT SET',
+                'glossaries_url': preferences.MainSettings.glossaries_url,
+                'total_glossaries': Glossary.objects.count(),
+                'with_id': Glossary.objects.exclude(glossary_id__isnull=True).exclude(glossary_id='').count(),
+                'without_id': Glossary.objects.filter(glossary_id__isnull=True).count() +
+                             Glossary.objects.filter(glossary_id='').count(),
+            })
+            return render(request, 'admin/glossaries/check_consistency.html', context)
+
+        elif request.method == 'POST':
+            # Store options in session and prepare for async processing
+            verbose = request.POST.get('verbose') == 'on'
+            id_null_only = request.POST.get('id_null_only') == 'on'
+
+            # Generate a unique check ID
+            check_id = str(uuid.uuid4())
+
+            # Store options in session
+            request.session['check_verbose'] = verbose
+            request.session['check_id_null_only'] = id_null_only
+            request.session['check_id'] = check_id
+
+            # Clear any previous check progress in cache
+            cache.delete(f'check_progress_{check_id}')
+
+            context.update({
+                'glossary_system': settings.GLOSSARY_SYSTEM,
+                'verbose': verbose,
+                'id_null_only': id_null_only,
+                'check_id': check_id,
+                'ready_to_process': True,
+            })
+            return render(request, 'admin/glossaries/check_consistency.html', context)
+
+    def check_consistency_progress_view(self, request):
+        """Return current consistency check progress"""
+        try:
+            check_id = request.GET.get('check_id')
+            if not check_id:
+                return JsonResponse({'error': 'No check_id provided'}, status=400)
+
+            # Support DELETE method to clear progress
+            if request.method == 'DELETE':
+                cache.delete(f'check_progress_{check_id}')
+                return JsonResponse({'status': 'cleared'}, status=200)
+
+            # Get progress from cache
+            cache_key = f'check_progress_{check_id}'
+            progress_data = cache.get(cache_key, {})
+
+            if not progress_data:
+                progress_data = {'status': 'waiting', 'message': 'En attente de démarrage...'}
+
+            return JsonResponse(progress_data, status=200)
+        except Exception as e:
+            logger.error(f"Error in check_consistency_progress_view: {str(e)}", exc_info=True)
+            return JsonResponse({'error': str(e)}, status=500)
+
+    def process_consistency_check_view(self, request):
+        """Process consistency check in background thread"""
+        try:
+            if request.method != 'POST':
+                return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+            from django.conf import settings
+            from preferences import preferences
+            from glossaries.helpers import get_glossary_username
+            import requests
+
+            verbose = request.session.get('check_verbose', False)
+            id_null_only = request.session.get('check_id_null_only', False)
+            check_id = request.session.get('check_id')
+
+            if not check_id:
+                return JsonResponse({'error': 'Check ID not found in session'}, status=400)
+
+            # Initialize progress tracking in cache
+            cache_key = f'check_progress_{check_id}'
+            cache.set(cache_key, {
+                'status': 'processing',
+                'current': 0,
+                'total': 0,
+                'message': 'Démarrage de la vérification...'
+            }, timeout=7200)
+
+            # Define the background processing function
+            def process_in_background():
+                try:
+                    results = {
+                        'verbose': verbose,
+                        'id_null_only': id_null_only,
+                        'glossary_system': settings.GLOSSARY_SYSTEM,
+                        'total_glossaries': Glossary.objects.count(),
+                    }
+
+                    if id_null_only:
+                        # Only show glossaries without ID
+                        glossaries_without_id = Glossary.objects.filter(
+                            glossary_id__isnull=True
+                        ) | Glossary.objects.filter(glossary_id='')
+
+                        results['without_id_count'] = glossaries_without_id.count()
+                        results['without_id_list'] = []
+
+                        cache.set(cache_key, {
+                            'status': 'processing',
+                            'current': 0,
+                            'total': results['without_id_count'],
+                            'message': 'Lecture des glossaires sans ID...'
+                        }, timeout=7200)
+
+                        for glossary in glossaries_without_id:
+                            owner = 'Admin/Default'
+                            if glossary.user:
+                                owner = f'User: {glossary.user.username}'
+                            elif glossary.group:
+                                owner = f'Group: {glossary.group.name}'
+
+                            results['without_id_list'].append({
+                                'id': glossary.id,
+                                'name': glossary.name,
+                                'source': glossary.source_language.abbreviation,
+                                'target': glossary.target_language.abbreviation,
+                                'domain': glossary.domain.name if glossary.domain else 'No domain',
+                                'owner': owner,
+                            })
+                    else:
+                        # Check glossaries with ID against remote API
+                        glossaries = Glossary.objects.exclude(glossary_id__isnull=True).exclude(glossary_id='')
+
+                        stats = {
+                            'total': glossaries.count(),
+                            'found': 0,
+                            'not_found': 0,
+                            'errors': 0,
+                        }
+
+                        found_list = []
+                        not_found_list = []
+                        error_list = []
+
+                        cache.set(cache_key, {
+                            'status': 'processing',
+                            'current': 0,
+                            'total': stats['total'],
+                            'message': 'Vérification en cours...'
+                        }, timeout=7200)
+
+                        # Use concurrent execution for faster processing
+                        from concurrent.futures import ThreadPoolExecutor, as_completed
+                        import time
+
+                        def check_single_glossary(glossary):
+                            """Check a single glossary against remote API"""
+                            start_time = time.time()
+
+                            owner = 'Admin/Default'
+                            if glossary.user:
+                                owner = f'User: {glossary.user.username}'
+                            elif glossary.group:
+                                owner = f'Group: {glossary.group.name}'
+
+                            glossary_info = {
+                                'id': glossary.id,
+                                'name': glossary.name,
+                                'source': glossary.source_language.abbreviation,
+                                'target': glossary.target_language.abbreviation,
+                                'domain': glossary.domain.name if glossary.domain else 'No domain',
+                                'owner': owner,
+                                'glossary_id': glossary.glossary_id,
+                            }
+
+                            try:
+                                url = preferences.MainSettings.glossaries_url + 'get_glossary'
+                                payload = {
+                                    "system": settings.GLOSSARY_SYSTEM,
+                                    "username": get_glossary_username(glossary),
+                                    "glossary_id": glossary.glossary_id,
+                                }
+                                headers = {
+                                    "API-KEY": settings.GLOSSARY_API_KEY
+                                }
+
+                                api_start = time.time()
+                                response = requests.post(url, headers=headers, json=payload, timeout=3)
+                                api_duration = time.time() - api_start
+
+                                total_duration = time.time() - start_time
+                                glossary_info['api_time'] = f"{api_duration:.3f}s"
+                                glossary_info['total_time'] = f"{total_duration:.3f}s"
+
+                                if response.status_code == 200:
+                                    return ('found', glossary_info)
+                                elif response.status_code == 404:
+                                    return ('not_found', glossary_info)
+                                else:
+                                    glossary_info['error'] = f"HTTP {response.status_code}"
+                                    return ('error', glossary_info)
+                            except requests.exceptions.Timeout:
+                                total_duration = time.time() - start_time
+                                glossary_info['total_time'] = f"{total_duration:.3f}s"
+                                glossary_info['error'] = "Timeout (3s)"
+                                return ('error', glossary_info)
+                            except Exception as e:
+                                total_duration = time.time() - start_time
+                                glossary_info['total_time'] = f"{total_duration:.3f}s"
+                                glossary_info['error'] = str(e)
+                                return ('error', glossary_info)
+
+                        # Process glossaries concurrently with 30 workers
+                        glossaries_list = list(glossaries)
+                        completed = 0
+                        api_times = []
+
+                        with ThreadPoolExecutor(max_workers=30) as executor:
+                            future_to_glossary = {executor.submit(check_single_glossary, g): g for g in glossaries_list}
+
+                            for future in as_completed(future_to_glossary):
+                                completed += 1
+                                result_type, glossary_info = future.result()
+
+                                # Track API response times
+                                if 'api_time' in glossary_info:
+                                    try:
+                                        api_times.append(float(glossary_info['api_time'].replace('s', '')))
+                                    except:
+                                        pass
+
+                                if result_type == 'found':
+                                    stats['found'] += 1
+                                    if verbose:
+                                        found_list.append(glossary_info)
+                                elif result_type == 'not_found':
+                                    stats['not_found'] += 1
+                                    not_found_list.append(glossary_info)
+                                else:  # error
+                                    stats['errors'] += 1
+                                    error_list.append(glossary_info)
+
+                                # Update progress every 10 glossaries
+                                if completed % 10 == 0 or completed == stats['total']:
+                                    cache.set(cache_key, {
+                                        'status': 'processing',
+                                        'current': completed,
+                                        'total': stats['total'],
+                                        'found': stats['found'],
+                                        'not_found': stats['not_found'],
+                                        'errors': stats['errors'],
+                                        'message': f'Vérification {completed}/{stats["total"]}...'
+                                    }, timeout=7200)
+
+                        # Calculate timing statistics
+                        if api_times:
+                            stats['avg_api_time'] = f"{sum(api_times) / len(api_times):.3f}s"
+                            stats['min_api_time'] = f"{min(api_times):.3f}s"
+                            stats['max_api_time'] = f"{max(api_times):.3f}s"
+
+                        results['stats'] = stats
+                        results['found_list'] = found_list
+                        results['not_found_list'] = not_found_list
+                        results['error_list'] = error_list
+
+                    # Store results in cache
+                    results_cache_key = f'check_results_{check_id}'
+                    cache.set(results_cache_key, results, timeout=7200)
+
+                    # Update progress to complete
+                    cache.set(cache_key, {
+                        'status': 'completed',
+                        'message': 'Vérification terminée',
+                        'results': results
+                    }, timeout=7200)
+
+                except Exception as e:
+                    logger.error(f"Error in background check: {str(e)}", exc_info=True)
+                    cache.set(cache_key, {
+                        'status': 'error',
+                        'message': f'Erreur: {str(e)}'
+                    }, timeout=7200)
+
+            # Start the background thread
+            thread = threading.Thread(target=process_in_background, daemon=True)
+            thread.start()
+            logger.info(f"Background check thread started for check_id: {check_id}")
+
+            # Return immediately
+            return JsonResponse({
+                'success': True,
+                'message': 'Vérification lancée en arrière-plan',
+                'check_id': check_id,
+                'status': 'started'
+            }, status=202)
+
+        except Exception as e:
+            logger.error(f"Error in process_consistency_check_view: {str(e)}", exc_info=True)
             return JsonResponse({
                 'error': f'Processing error: {str(e)}',
                 'success': False

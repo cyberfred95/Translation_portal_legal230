@@ -1,0 +1,211 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block title %}Résultats de la vérification | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrahead %}
+<style>
+    .result-box {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 15px;
+        margin: 15px 0;
+    }
+    .success-box {
+        background: #dfd;
+        border-left: 4px solid #4f4;
+    }
+    .warning-box {
+        background: #ffd;
+        border-left: 4px solid #ff4;
+    }
+    .error-box {
+        background: #fdd;
+        border-left: 4px solid #f44;
+    }
+    .info-box {
+        background: #e8f4f8;
+        border-left: 4px solid #0073aa;
+    }
+    .glossary-list {
+        max-height: 400px;
+        overflow-y: auto;
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin: 10px 0;
+    }
+    .glossary-item {
+        padding: 8px;
+        margin: 5px 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+    }
+    .glossary-item strong {
+        color: #0073aa;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label='glossaries' %}">Glossaries</a>
+    &rsaquo; <a href="{% url 'admin:glossaries_glossary_changelist' %}">Glossaires</a>
+    &rsaquo; <a href="{% url 'admin:glossary_check_consistency' %}">Vérification de cohérence</a>
+    &rsaquo; Résultats
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>Résultats de la vérification</h1>
+
+<div class="info-box" style="margin: 20px 0;">
+    <h3 style="margin-top: 0;">Configuration</h3>
+    <p><strong>GLOSSARY_SYSTEM:</strong> <code>{{ results.glossary_system }}</code></p>
+    <p><strong>Total glossaires:</strong> {{ results.total_glossaries }}</p>
+    <p><strong>Mode:</strong>
+        {% if results.id_null_only %}
+            <span style="color: #0073aa;">Affichage des glossaires sans ID uniquement</span>
+        {% else %}
+            <span style="color: #0073aa;">Vérification avec l'API distante</span>
+            {% if results.verbose %}(mode verbeux){% endif %}
+        {% endif %}
+    </p>
+</div>
+
+{% if results.id_null_only %}
+    {# Mode ID NULL ONLY #}
+    {% if results.without_id_count == 0 %}
+        <div class="result-box success-box">
+            <h3>✅ Tous les glossaires ont un remote ID!</h3>
+            <p>Aucun glossaire sans remote ID trouvé. Tous les glossaires sont synchronisés avec l'API distante.</p>
+        </div>
+    {% else %}
+        <div class="result-box warning-box">
+            <h3>⚠️ {{ results.without_id_count }} glossaire(s) sans remote ID</h3>
+            <p>Ces glossaires n'ont pas encore été uploadés sur l'API distante.</p>
+        </div>
+
+        <div class="glossary-list">
+            {% for glossary in results.without_id_list %}
+                <div class="glossary-item">
+                    <strong>Local ID {{ glossary.id }}:</strong> {{ glossary.name }}<br>
+                    <span style="color: #666;">
+                        {{ glossary.source }} → {{ glossary.target }} |
+                        Domain: {{ glossary.domain }} |
+                        Owner: {{ glossary.owner }}
+                    </span>
+                    <span style="color: red; font-weight: bold;">[NO REMOTE ID]</span>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div style="margin-top: 15px; padding: 10px; background: #ffd; border: 1px solid #ff4; border-radius: 4px;">
+            <p><strong>Recommandations:</strong></p>
+            <ul style="margin: 5px 0; padding-left: 20px;">
+                <li>Ces glossaires ne sont pas encore disponibles sur l'API distante</li>
+                <li>Rechargez-les via le batch upload pour créer leur remote ID</li>
+                <li>Ou supprimez-les s'ils ne sont plus nécessaires</li>
+            </ul>
+        </div>
+    {% endif %}
+{% else %}
+    {# Mode vérification API #}
+    <div class="result-box info-box">
+        <h3>📊 Résumé de la vérification</h3>
+        <p><strong>Total vérifié:</strong> {{ results.stats.total }}</p>
+        <p style="color: green;"><strong>✓ Trouvés sur l'API:</strong> {{ results.stats.found }}</p>
+        <p style="color: red;"><strong>✗ Non trouvés:</strong> {{ results.stats.not_found }}</p>
+        <p style="color: orange;"><strong>⚠ Erreurs:</strong> {{ results.stats.errors }}</p>
+        {% if results.stats.avg_api_time %}
+        <hr style="margin: 15px 0; border-top: 1px solid #ccc;">
+        <h4 style="margin-top: 10px;">⏱️ Temps de réponse de l'API</h4>
+        <p><strong>Temps moyen:</strong> <code>{{ results.stats.avg_api_time }}</code></p>
+        <p><strong>Temps minimum:</strong> <code>{{ results.stats.min_api_time }}</code></p>
+        <p><strong>Temps maximum:</strong> <code>{{ results.stats.max_api_time }}</code></p>
+        {% endif %}
+    </div>
+
+    {% if results.verbose and results.found_list %}
+        <div class="result-box success-box">
+            <h3>✅ Glossaires trouvés sur l'API ({{ results.stats.found }})</h3>
+            <div class="glossary-list">
+                {% for glossary in results.found_list %}
+                    <div class="glossary-item">
+                        <strong>Local ID {{ glossary.id }}:</strong> {{ glossary.name }}<br>
+                        <span style="color: #666;">
+                            {{ glossary.source }} → {{ glossary.target }} |
+                            Domain: {{ glossary.domain }} |
+                            Owner: {{ glossary.owner }}
+                        </span><br>
+                        <span style="color: green;">Remote ID: {{ glossary.glossary_id }}</span>
+                        {% if glossary.api_time %}<br><span style="color: #888; font-size: 0.9em;">Temps API: {{ glossary.api_time }}</span>{% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    {% if results.not_found_list %}
+        <div class="result-box error-box">
+            <h3>❌ Glossaires NON trouvés sur l'API ({{ results.stats.not_found }})</h3>
+            <p>Ces glossaires ont un remote ID mais n'existent plus sur l'API distante.</p>
+            <div class="glossary-list">
+                {% for glossary in results.not_found_list %}
+                    <div class="glossary-item">
+                        <strong>Local ID {{ glossary.id }}:</strong> {{ glossary.name }}<br>
+                        <span style="color: #666;">
+                            {{ glossary.source }} → {{ glossary.target }} |
+                            Domain: {{ glossary.domain }} |
+                            Owner: {{ glossary.owner }}
+                        </span><br>
+                        <span style="color: red;">Remote ID: {{ glossary.glossary_id }} [NOT FOUND]</span>
+                        {% if glossary.api_time %}<br><span style="color: #888; font-size: 0.9em;">Temps API: {{ glossary.api_time }}</span>{% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div style="margin-top: 15px; padding: 10px; background: #fdd; border: 1px solid #f44; border-radius: 4px;">
+                <p><strong>Recommandations:</strong></p>
+                <ul style="margin: 5px 0; padding-left: 20px;">
+                    <li>Ces glossaires ont été supprimés de l'API distante</li>
+                    <li>Re-uploadez-les pour les recréer sur l'API</li>
+                    <li>Ou supprimez-les de la base locale s'ils ne sont plus nécessaires</li>
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if results.error_list %}
+        <div class="result-box error-box">
+            <h3>⚠️ Erreurs lors de la vérification ({{ results.stats.errors }})</h3>
+            <div class="glossary-list">
+                {% for glossary in results.error_list %}
+                    <div class="glossary-item">
+                        <strong>Local ID {{ glossary.id }}:</strong> {{ glossary.name }}<br>
+                        <span style="color: #666;">
+                            {{ glossary.source }} → {{ glossary.target }} |
+                            Domain: {{ glossary.domain }} |
+                            Owner: {{ glossary.owner }}
+                        </span><br>
+                        <span style="color: red;">Remote ID: {{ glossary.glossary_id }}</span><br>
+                        <span style="color: orange;"><strong>Erreur:</strong> {{ glossary.error }}</span>
+                        {% if glossary.total_time %}<br><span style="color: #888; font-size: 0.9em;">Temps écoulé: {{ glossary.total_time }}</span>{% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
+
+<div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #ddd;">
+    <a href="{% url 'admin:glossary_check_consistency' %}" class="button">
+        Nouvelle vérification
+    </a>
+    <a href="{% url 'admin:glossaries_glossary_changelist' %}" class="button default" style="margin-left: 10px;">
+        Retour aux glossaires
+    </a>
+</div>
+
+{% endblock %}

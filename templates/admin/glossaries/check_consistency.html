@@ -1,0 +1,208 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block title %}Vérification de cohérence des glossaires | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label='glossaries' %}">Glossaries</a>
+    &rsaquo; <a href="{% url 'admin:glossaries_glossary_changelist' %}">Glossaires</a>
+    &rsaquo; Vérification de cohérence
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>Vérification de cohérence des glossaires</h1>
+
+<div style="background: #e8f4f8; border-left: 4px solid #0073aa; padding: 15px; margin: 20px 0;">
+    <h3 style="margin-top: 0;">Configuration</h3>
+    <p><strong>GLOSSARY_SYSTEM:</strong> <code>{{ glossary_system }}</code></p>
+    <p><strong>GLOSSARY_API_KEY:</strong> <code>{{ glossary_api_key }}</code></p>
+    <p><strong>URL de l'API:</strong> <code>{{ glossaries_url }}</code></p>
+</div>
+
+<div style="background: #f9f9f9; border: 1px solid #ddd; padding: 15px; margin: 20px 0; border-radius: 4px;">
+    <h3 style="margin-top: 0;">Statistiques</h3>
+    <p><strong>Total de glossaires:</strong> {{ total_glossaries }}</p>
+    <p><strong>Avec remote ID:</strong> <span style="color: green;">{{ with_id }}</span></p>
+    <p><strong>Sans remote ID:</strong> <span style="color: red;">{{ without_id }}</span></p>
+</div>
+
+{% if not ready_to_process %}
+<form method="post" style="background: white; border: 1px solid #ddd; padding: 20px; border-radius: 4px;" id="check-form">
+    {% csrf_token %}
+
+    <h3>Options de vérification</h3>
+
+    <div style="margin: 15px 0;">
+        <label style="display: block; margin-bottom: 10px;">
+            <input type="checkbox" name="id_null_only" id="id_null_only">
+            <strong>Afficher uniquement les glossaires sans remote ID</strong>
+            <p style="margin: 5px 0 0 25px; color: #666; font-size: 13px;">
+                Mode rapide sans appel à l'API. Affiche seulement les glossaires qui n'ont pas été uploadés sur l'API distante.
+            </p>
+        </label>
+    </div>
+
+    <div style="margin: 15px 0;">
+        <label style="display: block; margin-bottom: 10px;">
+            <input type="checkbox" name="verbose" id="verbose">
+            <strong>Mode verbeux</strong>
+            <p style="margin: 5px 0 0 25px; color: #666; font-size: 13px;">
+                Affiche tous les glossaires vérifiés (pas seulement les problèmes).
+            </p>
+        </label>
+    </div>
+
+    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd;">
+        <button type="submit" class="button default" style="padding: 10px 20px; font-size: 14px;">
+            Préparer la vérification
+        </button>
+        <a href="{% url 'admin:glossaries_glossary_changelist' %}" class="button" style="margin-left: 10px;">
+            Annuler
+        </a>
+    </div>
+</form>
+
+<script>
+// Disable verbose when id_null_only is checked
+document.getElementById('id_null_only').addEventListener('change', function() {
+    const verboseCheckbox = document.getElementById('verbose');
+    if (this.checked) {
+        verboseCheckbox.checked = false;
+        verboseCheckbox.disabled = true;
+    } else {
+        verboseCheckbox.disabled = false;
+    }
+});
+</script>
+{% else %}
+{# Ready to process - show start button and progress tracking #}
+<div style="background: white; border: 1px solid #ddd; padding: 20px; border-radius: 4px;">
+    <h3>Options sélectionnées</h3>
+    <p><strong>Mode ID Null Only:</strong> {{ id_null_only|yesno:"Oui,Non" }}</p>
+    <p><strong>Mode verbeux:</strong> {{ verbose|yesno:"Oui,Non" }}</p>
+    <input type="hidden" id="check-id" value="{{ check_id }}" />
+
+    <div id="progress-section" style="display: none; margin-top: 20px;">
+        <h3>Avancement de la vérification</h3>
+        <div id="progress-info">
+            <p id="progress-message">Vérification en cours...</p>
+            <p id="progress-stats" style="font-weight: bold; color: #007cba;"></p>
+        </div>
+    </div>
+
+    <div id="results-section" style="display: none; margin-top: 20px;">
+        <h3>Résultats</h3>
+        <div id="results-info"></div>
+    </div>
+
+    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd;">
+        <button type="button" id="start-check" class="button default" style="padding: 10px 20px; font-size: 14px;">
+            Démarrer la vérification
+        </button>
+        <a href="{% url 'admin:glossary_check_consistency' %}" class="button" style="margin-left: 10px;">
+            Annuler
+        </a>
+    </div>
+</div>
+
+<script>
+document.getElementById('start-check').addEventListener('click', function() {
+    const button = this;
+    const progressSection = document.getElementById('progress-section');
+    const resultsSection = document.getElementById('results-section');
+    const progressMessage = document.getElementById('progress-message');
+    const progressStats = document.getElementById('progress-stats');
+    const checkId = document.getElementById('check-id').value;
+
+    button.disabled = true;
+    button.textContent = 'Vérification en cours...';
+    progressSection.style.display = 'block';
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    let progressInterval = null;
+
+    function startProgressPolling() {
+        progressInterval = setInterval(function() {
+            fetch('{% url "admin:glossary_check_consistency_progress" %}?check_id=' + checkId)
+            .then(response => response.json())
+            .then(progressData => {
+                if (progressData.message) {
+                    progressMessage.textContent = progressData.message;
+                }
+
+                if (progressData.total > 0) {
+                    let statsText = `Vérifié: ${progressData.current || 0} / ${progressData.total}`;
+                    if (progressData.found !== undefined) {
+                        statsText += ` | Trouvés: ${progressData.found} | Non trouvés: ${progressData.not_found} | Erreurs: ${progressData.errors}`;
+                    }
+                    progressStats.textContent = statsText;
+                }
+
+                if (progressData.status === 'completed') {
+                    clearInterval(progressInterval);
+                    progressSection.style.display = 'none';
+                    window.location.href = '{% url "admin:glossary_check_consistency" %}?show_results=' + checkId;
+                } else if (progressData.status === 'error') {
+                    clearInterval(progressInterval);
+                    alert('Erreur: ' + progressData.message);
+                    button.disabled = false;
+                    button.textContent = 'Démarrer la vérification';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching progress:', error);
+            });
+        }, 500);
+    }
+
+    // Start the check process
+    fetch('{% url "admin:glossary_process_consistency_check" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'started') {
+            console.log('Background check started successfully');
+        } else if (data.error) {
+            alert('Erreur au démarrage: ' + data.error);
+            button.disabled = false;
+            button.textContent = 'Démarrer la vérification';
+        }
+    })
+    .catch(error => {
+        console.error('Error starting check:', error);
+        alert('Erreur de communication: ' + error.message);
+        button.disabled = false;
+        button.textContent = 'Démarrer la vérification';
+    });
+
+    setTimeout(function() {
+        startProgressPolling();
+    }, 1000);
+});
+</script>
+{% endif %}
+
+{% endblock %}
