@@ -288,20 +288,25 @@ document.getElementById('start-batch').addEventListener('click', function() {
             const hasErrors = data.errors && data.errors.length > 0;
             const allFailed = data.created === 0 && hasErrors;
 
+            // Calculate totals
+            const totalProcessed = (data.created || 0) + (data.updated || 0);
+
             // Déterminer le statut global
             if (allFailed) {
                 resultsInfo.innerHTML = `
                     <div style="background: #fdd; border: 1px solid #f44; padding: 10px; margin: 10px 0; border-radius: 4px;">
                         <h4>❌ Échec du traitement!</h4>
                         <p><strong>Lignes traitées:</strong> ${data.total_rows}</p>
-                        <p><strong>Glossaires créés:</strong> 0</p>
+                        <p><strong>Glossaires traités:</strong> 0</p>
                     </div>
                 `;
             } else if (hasErrors) {
                 resultsInfo.innerHTML = `
                     <div style="background: #ffd; border: 1px solid #ff4; padding: 10px; margin: 10px 0; border-radius: 4px;">
                         <h4>⚠️ Traitement terminé avec des erreurs</h4>
-                        <p><strong>Glossaires créés:</strong> ${data.created} / ${data.total_rows}</p>
+                        <p><strong>Glossaires créés:</strong> ${data.created || 0}</p>
+                        <p><strong>Glossaires mis à jour:</strong> ${data.updated || 0}</p>
+                        <p><strong>Total traité:</strong> ${totalProcessed} / ${data.total_rows}</p>
                         <p><strong>Lignes traitées:</strong> ${data.total_rows}</p>
                     </div>
                 `;
@@ -309,7 +314,9 @@ document.getElementById('start-batch').addEventListener('click', function() {
                 resultsInfo.innerHTML = `
                     <div style="background: #dfd; border: 1px solid #4f4; padding: 10px; margin: 10px 0; border-radius: 4px;">
                         <h4>✅ Traitement terminé avec succès!</h4>
-                        <p><strong>Glossaires créés:</strong> ${data.created}</p>
+                        <p><strong>Glossaires créés:</strong> ${data.created || 0}</p>
+                        <p><strong>Glossaires mis à jour:</strong> ${data.updated || 0}</p>
+                        <p><strong>Total traité:</strong> ${totalProcessed}</p>
                         <p><strong>Lignes traitées:</strong> ${data.total_rows}</p>
                     </div>
                 `;

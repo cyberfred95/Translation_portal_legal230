@@ -119,6 +119,7 @@ class Glossary(models.Model):
 
         results = {
             'created': 0,
+            'updated': 0,
             'errors': [],
             'total_rows': 0
         }
@@ -450,7 +451,7 @@ class Glossary(models.Model):
                                 existing_glossary.save()
 
                                 logger.info(f"Successfully updated glossary: {existing_glossary.name}")
-                                results['created'] += 1
+                                results['updated'] += 1
                             else:
                                 # Create new glossary
                                 logger.info(f"Row {row_num}: Creating new glossary for {source_lang_code}-{target_lang_code} in {domain_name}")
@@ -515,11 +516,21 @@ class Glossary(models.Model):
 
                 # Send final progress message with total
                 total_expected = results.get('expected_total', results['total_rows'])
+                total_processed = results['created'] + results['updated']
+                message_parts = []
+                if results['created'] > 0:
+                    message_parts.append(f"{results['created']} créés")
+                if results['updated'] > 0:
+                    message_parts.append(f"{results['updated']} mis à jour")
+
+                summary = ", ".join(message_parts) if message_parts else "aucun traité"
+                final_message = f"Traitement terminé: {summary} sur {results['total_rows']} lignes"
+
                 if progress_callback:
                     progress_callback(
-                        f"Traitement terminé: {results['created']} glossaires créés sur {results['total_rows']} lignes traitées",
+                        final_message,
                         results['total_rows'],
-                        results['created'],
+                        total_processed,
                         total_expected
                     )
 

@@ -54,13 +54,21 @@ def create_glossary_on_service(sender, instance: Glossary, created, **kwargs):
             if file_exists:
                 try:
                     if instance.glossary_id:
+                        # Glossary already has a remote ID, update it
+                        logger.info(f"Updating glossary on remote API for {instance.name} (glossary_id: {instance.glossary_id})")
                         ai_glossary_service.update_glossary(instance)
+                    else:
+                        # Glossary exists locally but has no remote ID, create it on API
+                        logger.info(f"Creating glossary on remote API for existing local glossary {instance.name} (local ID: {instance.id})")
+                        instance.glossary_id = ai_glossary_service.create_glossary(instance)
+                        logger.info(f"Successfully created remote glossary_id: {instance.glossary_id} for {instance.name}")
+                        # Will be saved after file cleanup below
                 except ValidationError as e:
-                    # Re-raise ValidationError for update failures
-                    logger.error(f"Failed to update glossary on service for {instance.name}: {str(e)}", exc_info=True)
+                    # Re-raise ValidationError for update/create failures
+                    logger.error(f"Failed to update/create glossary on service for {instance.name}: {str(e)}", exc_info=True)
                     raise
                 except Exception as e:
-                    logger.error(f"Failed to update glossary on service for {instance.name}: {str(e)}", exc_info=True)
+                    logger.error(f"Failed to update/create glossary on service for {instance.name}: {str(e)}", exc_info=True)
                     raise
 
                 instance.name = os.path.splitext(os.path.basename(instance.file.name))[0]
@@ -75,6 +83,7 @@ def create_glossary_on_service(sender, instance: Glossary, created, **kwargs):
                 if instance._state.adding is False:
                     # Set flag to prevent recursive call
                     instance._skip_signal = True
+                    # Save with glossary_id if it was just created
                     instance.save()
             else:
                 logger.warning(f"File does not exist on disk for glossary {instance.name}, skipping file processing")

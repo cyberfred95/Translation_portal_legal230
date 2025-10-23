@@ -367,6 +367,7 @@ class GlossaryAdmin(admin.ModelAdmin):
                         'current_row': results['total_rows'],
                         'total_rows': results['total_rows'],
                         'created': results['created'],
+                        'updated': results['updated'],
                         'message': 'Traitement terminé',
                         'errors': results.get('errors', [])
                     }, timeout=7200)
