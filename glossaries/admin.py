@@ -121,10 +121,26 @@ class UserFilter(admin.SimpleListFilter):
 @admin.register(Glossary)
 class GlossaryAdmin(admin.ModelAdmin):
     list_display = ['name', 'user', 'source_language',
-                    'target_language', 'domain',  'created_at']
+                    'target_language', 'domain', 'has_remote_id', 'created_at']
     list_filter = [DomainFilter, SourceLanguageFilter,
                    TargetLanguageFilter, UserFilter, 'created_at']
     search_fields = ['name', 'domain__name']
+
+    def has_remote_id(self, obj):
+        """Display whether glossary has a remote glossary_id"""
+        from django.utils.html import format_html
+
+        if obj.glossary_id:
+            return format_html(
+                '<span style="color: green; font-weight: bold;">✓ True</span>'
+            )
+        else:
+            return format_html(
+                '<span style="color: red; font-weight: bold;">✗ False</span>'
+            )
+
+    has_remote_id.short_description = 'Remote ID'
+    has_remote_id.admin_order_field = 'glossary_id'
 
     def get_urls(self):
         urls = super().get_urls()
@@ -432,6 +448,8 @@ class GlossaryAdmin(admin.ModelAdmin):
             }, status=500)
 
     def changelist_view(self, request, extra_context=None):
+        from django.conf import settings
         extra_context = extra_context or {}
         extra_context['show_batch_upload'] = True
+        extra_context['glossary_system'] = settings.GLOSSARY_SYSTEM
         return super().changelist_view(request, extra_context)
