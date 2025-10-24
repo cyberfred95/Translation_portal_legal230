@@ -39,7 +39,7 @@ confusable_homoglyphs ==3.2.0
 Django ==3.1
 Faker ==8.1.1
 hLepor ==0.0.4
-django-allauth ==0.45.0
+django-allauth==0.54.0
 django-environ ==0.4.5
 django-libsass ==0.9
 django-compressor ==2.4.1

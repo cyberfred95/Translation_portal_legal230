@@ -37,7 +37,8 @@ RUN chown -R django:django /home/django/
 USER django:django
 
 
-RUN pip install --user -r ./requirements.txt \
+RUN pip install --upgrade setuptools wheel \
+    && pip install --user -r ./requirements.txt \
     && mkdir ~/app \
     && PATH=$PATH:~/home/django/.local/bin
 
