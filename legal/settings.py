@@ -35,7 +35,7 @@ load_env_file()
 # ============================================================================
 # Security / core
 # ============================================================================
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes', 'on')
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # ALLOWED_HOSTS from environment variable

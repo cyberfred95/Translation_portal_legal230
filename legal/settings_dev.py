@@ -10,9 +10,3 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-
-DEBUG = True
-
-DEV_MODE = True
-
-STATISTIC_EMAIL = 'vjxzebra@gmail.com'
