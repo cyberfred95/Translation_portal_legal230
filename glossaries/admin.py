@@ -122,7 +122,7 @@ class UserFilter(admin.SimpleListFilter):
 @admin.register(Glossary)
 class GlossaryAdmin(admin.ModelAdmin):
     list_display = ['name', 'user', 'source_language',
-                    'target_language', 'domain', 'has_remote_id', 'created_at']
+                    'target_language', 'domain', 'has_remote_id', 'last_update_at']
     list_filter = [DomainFilter, SourceLanguageFilter,
                    TargetLanguageFilter, UserFilter, 'created_at']
     search_fields = ['name', 'domain__name']
@@ -142,6 +142,13 @@ class GlossaryAdmin(admin.ModelAdmin):
 
     has_remote_id.short_description = 'Remote ID'
     has_remote_id.admin_order_field = 'glossary_id'
+
+    def last_update_at(self, obj):
+        """Display the last update time (created_at field)"""
+        return obj.created_at
+
+    last_update_at.short_description = 'Last Update At'
+    last_update_at.admin_order_field = 'created_at'
 
     def get_urls(self):
         urls = super().get_urls()

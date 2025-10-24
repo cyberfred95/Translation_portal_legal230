@@ -31,7 +31,7 @@ class Glossary(models.Model):
         on_delete=models.CASCADE,
         related_name='target_language_glossaries'
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now=True)  # Updated on each save to track last modification
     domain = models.ForeignKey(
         Domain, on_delete=models.SET_NULL, blank=True, null=True, related_name='glossaries')
 
