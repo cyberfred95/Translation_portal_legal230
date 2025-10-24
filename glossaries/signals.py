@@ -55,13 +55,10 @@ def create_glossary_on_service(sender, instance: Glossary, created, **kwargs):
                 try:
                     if instance.glossary_id:
                         # Glossary already has a remote ID, update it
-                        logger.info(f"Updating glossary on remote API for {instance.name} (glossary_id: {instance.glossary_id})")
                         ai_glossary_service.update_glossary(instance)
                     else:
                         # Glossary exists locally but has no remote ID, create it on API
-                        logger.info(f"Creating glossary on remote API for existing local glossary {instance.name} (local ID: {instance.id})")
                         instance.glossary_id = ai_glossary_service.create_glossary(instance)
-                        logger.info(f"Successfully created remote glossary_id: {instance.glossary_id} for {instance.name}")
                         # Will be saved after file cleanup below
                 except ValidationError as e:
                     # Re-raise ValidationError for update/create failures
@@ -101,9 +98,6 @@ def delete_glossary_from_service(sender, instance: Glossary, **kwargs):
     if instance.glossary_id:
         try:
             AIGlossaryService().delete_glossary(instance)
-            logger.info(f"Glossary deleted from external service: {instance.name} (ID: {instance.glossary_id})")
         except Exception as e:
             logger.error(f"Failed to delete glossary from external service: {instance.name} - {str(e)}", exc_info=True)
             # Don't raise - allow Django deletion to proceed even if API fails
-    else:
-        logger.info(f"Skipping external API delete for glossary {instance.name} - no glossary_id")

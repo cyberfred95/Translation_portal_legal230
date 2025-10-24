@@ -114,9 +114,6 @@ class Glossary(models.Model):
         Returns:
             dict: Summary of the batch operation with success/error counts
         """
-        logger.info(
-            f"Starting batch processing - CSV: {csv_file_path}, ZIP: {zip_file_path}")
-
         results = {
             'created': 0,
             'updated': 0,
@@ -128,10 +125,9 @@ class Glossary(models.Model):
         def send_progress(message, row_num=None):
             if progress_callback:
                 progress_callback(message, row_num, results['created'], results['total_rows'])
-            logger.info(message)
 
         # Send initial message
-        send_progress("Démarrage du traitement des glossaires...")
+        send_progress("Starting glossary processing...")
 
         # Verify CSV file exists
         if not os.path.exists(csv_file_path):
@@ -151,18 +147,14 @@ class Glossary(models.Model):
         try:
             # Extract ZIP file if provided
             if zip_file_path:
-                logger.info("Extracting ZIP file")
                 temp_dir = tempfile.mkdtemp()
-                logger.info(f"Created temp directory: {temp_dir}")
 
                 try:
                     with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
                         # List contents of ZIP file
                         zip_contents = zip_ref.namelist()
-                        logger.info(f"ZIP file contents: {zip_contents}")
 
                         zip_ref.extractall(temp_dir)
-                        logger.info(f"ZIP extracted to: {temp_dir}")
 
                         # Verify extraction was successful
                         if not os.path.exists(temp_dir):
@@ -179,9 +171,6 @@ class Glossary(models.Model):
                                 relative_path = os.path.relpath(
                                     full_path, temp_dir)
                                 extracted_files.append(relative_path)
-                                logger.info(f"Extracted file: {full_path}")
-
-                        logger.info(f"All extracted files: {extracted_files}")
 
                         if not extracted_files:
                             error_msg = "No files were extracted from ZIP"
@@ -198,15 +187,8 @@ class Glossary(models.Model):
                 working_directory = temp_dir
             else:
                 working_directory = base_directory
-                logger.info(f"Using base directory: {base_directory}")
 
-            logger.info("Reading CSV file")
             with open(csv_file_path, 'r', encoding='utf-8-sig') as csvfile:
-                # Read the first few lines to debug
-                csvfile.seek(0)
-                first_lines = [csvfile.readline().strip() for _ in range(5)]
-                logger.info(f"First 5 lines of CSV: {first_lines}")
-
                 csvfile.seek(0)
                 reader = csv.DictReader(csvfile)
 
@@ -215,7 +197,6 @@ class Glossary(models.Model):
                     'file', 'source_language', 'target_language', 'domain'}
                 actual_columns = set(
                     reader.fieldnames) if reader.fieldnames else set()
-                logger.info(f"CSV columns: {actual_columns}")
 
                 if not expected_columns.issubset(actual_columns):
                     error_msg = f"Invalid CSV structure. Expected columns: {expected_columns}, Found: {actual_columns}"
@@ -226,14 +207,13 @@ class Glossary(models.Model):
                 # Count total rows first
                 csvfile.seek(0)
                 total_csv_rows = sum(1 for _ in csv.DictReader(csvfile))
-                logger.info(f"Total rows in CSV: {total_csv_rows}")
 
                 # Update results with total from the start
                 results['expected_total'] = total_csv_rows
 
                 # Send initial progress with total
                 if progress_callback:
-                    progress_callback(f"Préparation: {total_csv_rows} glossaires à traiter", 0, 0, total_csv_rows)
+                    progress_callback(f"Preparation: {total_csv_rows} glossaries to process", 0, 0, total_csv_rows)
 
                 # Reset to start of file for actual processing
                 csvfile.seek(0)
@@ -242,12 +222,11 @@ class Glossary(models.Model):
                 # Start at 2 to account for header
                 for row_num, row in enumerate(reader, start=2):
                     results['total_rows'] += 1
-                    logger.info(f"Processing row {row_num}: {row}")
 
                     # Send progress update every 100 rows
                     if results['total_rows'] % 100 == 0:
                         if progress_callback:
-                            progress_callback(f"Traitement du glossaire ligne {results['total_rows']}", results['total_rows'], results['created'], total_csv_rows)
+                            progress_callback(f"Processing glossary row {results['total_rows']}", results['total_rows'], results['created'], total_csv_rows)
 
                     try:
                         # Get file path and normalize it (convert Windows paths to Unix)
@@ -256,11 +235,9 @@ class Glossary(models.Model):
 
                         # Convert Windows backslashes to forward slashes
                         file_path = file_path.replace('\\', '/')
-                        logger.info(f"Normalized file path: {file_path}")
 
                         # Extract just the filename for searching
                         filename_only = os.path.basename(file_path)
-                        logger.info(f"Filename only: {filename_only}")
 
                         found_file_path = None
 
@@ -268,34 +245,22 @@ class Glossary(models.Model):
                             # First, try the direct path
                             direct_path = os.path.join(
                                 working_directory, file_path)
-                            logger.info(f"Trying direct path: {direct_path}")
 
                             if os.path.exists(direct_path):
                                 found_file_path = direct_path
-                                logger.info(
-                                    f"Found at direct path: {found_file_path}")
                             else:
                                 # Try just the filename in the root of working directory
                                 root_path = os.path.join(
                                     working_directory, filename_only)
-                                logger.info(f"Trying root path: {root_path}")
 
                                 if os.path.exists(root_path):
                                     found_file_path = root_path
-                                    logger.info(
-                                        f"Found at root path: {found_file_path}")
                                 else:
                                     # Search recursively for the file
-                                    logger.info(
-                                        f"Searching recursively for: {filename_only}")
                                     for root, dirs, files in os.walk(working_directory):
-                                        logger.info(
-                                            f"Checking directory: {root}, files: {files}")
                                         if filename_only in files:
                                             found_file_path = os.path.join(
                                                 root, filename_only)
-                                            logger.info(
-                                                f"Found file recursively: {found_file_path}")
                                             break
 
                                         # Also try case-insensitive search
@@ -303,38 +268,21 @@ class Glossary(models.Model):
                                             if file.lower() == filename_only.lower():
                                                 found_file_path = os.path.join(
                                                     root, file)
-                                                logger.info(
-                                                    f"Found file with case-insensitive match: {found_file_path}")
                                                 break
                                         if found_file_path:
                                             break
 
                         # Verify file exists
                         if not found_file_path or not os.path.exists(found_file_path):
-                            # List all files in working directory for debugging
-                            if working_directory and os.path.exists(working_directory):
-                                all_files = []
-                                for root, dirs, files in os.walk(working_directory):
-                                    for file in files:
-                                        all_files.append(
-                                            os.path.join(root, file))
-                                logger.info(
-                                    f"All available files in working directory: {all_files}")
-
-                            error_msg = f"Row {row_num} (Fichier: {original_file_path}) - Fichier non trouvé dans le ZIP (recherché: {filename_only})"
+                            error_msg = f"Row {row_num} (File: {original_file_path}) - File not found in ZIP (searched for: {filename_only})"
                             logger.warning(error_msg)
                             results['errors'].append(error_msg)
                             continue
-
-                        logger.info(
-                            f"File found successfully: {found_file_path}")
 
                         # Get or create domain
                         domain_name = row['domain'].strip()
                         domain, created = Domain.objects.get_or_create(
                             name=domain_name)
-                        logger.info(
-                            f"Domain: {domain_name} ({'created' if created else 'existing'})")
 
                         # Get languages
                         source_lang_code = row['source_language'].strip()
@@ -346,14 +294,10 @@ class Glossary(models.Model):
                             try:
                                 source_language = Language.objects.get(
                                     abbreviation=source_lang_code)
-                                logger.info(
-                                    f"Source language found by abbreviation: {source_language}")
                             except Language.DoesNotExist:
                                 try:
                                     source_language = Language.objects.get(
                                         name=source_lang_code)
-                                    logger.info(
-                                        f"Source language found by name: {source_language}")
                                 except Language.DoesNotExist:
                                     # Try case-insensitive search
                                     source_language = Language.objects.filter(
@@ -363,19 +307,12 @@ class Glossary(models.Model):
                                         source_language = Language.objects.filter(
                                             name__iexact=source_lang_code
                                         ).first()
-                                    if source_language:
-                                        logger.info(
-                                            f"Source language found by case-insensitive search: {source_language}")
 
                             if not source_language:
                                 raise Language.DoesNotExist()
 
                         except Language.DoesNotExist:
-                            # List all available languages for debugging
-                            all_languages = Language.objects.all().values('id', 'name', 'abbreviation')
-                            logger.info(
-                                f"Available languages: {list(all_languages)}")
-                            error_msg = f"Row {row_num} (Fichier: {row['file']}) - Langue source '{source_lang_code}' non trouvée"
+                            error_msg = f"Row {row_num} (File: {row['file']}) - Source language '{source_lang_code}' not found"
                             logger.error(error_msg)
                             results['errors'].append(error_msg)
                             continue
@@ -386,14 +323,10 @@ class Glossary(models.Model):
                             try:
                                 target_language = Language.objects.get(
                                     abbreviation=target_lang_code)
-                                logger.info(
-                                    f"Target language found by abbreviation: {target_language}")
                             except Language.DoesNotExist:
                                 try:
                                     target_language = Language.objects.get(
                                         name=target_lang_code)
-                                    logger.info(
-                                        f"Target language found by name: {target_language}")
                                 except Language.DoesNotExist:
                                     # Try case-insensitive search
                                     target_language = Language.objects.filter(
@@ -403,19 +336,12 @@ class Glossary(models.Model):
                                         target_language = Language.objects.filter(
                                             name__iexact=target_lang_code
                                         ).first()
-                                    if target_language:
-                                        logger.info(
-                                            f"Target language found by case-insensitive search: {target_language}")
 
                             if not target_language:
                                 raise Language.DoesNotExist()
 
                         except Language.DoesNotExist:
-                            # List all available languages for debugging
-                            all_languages = Language.objects.all().values('id', 'name', 'abbreviation')
-                            logger.info(
-                                f"Available languages: {list(all_languages)}")
-                            error_msg = f"Row {row_num} (Fichier: {row['file']}) - Langue cible '{target_lang_code}' non trouvée"
+                            error_msg = f"Row {row_num} (File: {row['file']}) - Target language '{target_lang_code}' not found"
                             logger.error(error_msg)
                             results['errors'].append(error_msg)
                             continue
@@ -440,9 +366,6 @@ class Glossary(models.Model):
 
                             if existing_glossary:
                                 # Update existing glossary
-                                logger.info(
-                                    f"Row {row_num}: Updating existing glossary for {source_lang_code}-{target_lang_code} in {domain_name}")
-
                                 # Update the file and name
                                 existing_glossary.file = django_file
                                 existing_glossary.name = os.path.splitext(file_name)[0]
@@ -450,12 +373,9 @@ class Glossary(models.Model):
                                 # Save and let the post_save signal handle API update
                                 existing_glossary.save()
 
-                                logger.info(f"Successfully updated glossary: {existing_glossary.name}")
                                 results['updated'] += 1
                             else:
                                 # Create new glossary
-                                logger.info(f"Row {row_num}: Creating new glossary for {source_lang_code}-{target_lang_code} in {domain_name}")
-
                                 glossary = Glossary(
                                     domain=domain,
                                     source_language=source_language,
@@ -467,12 +387,11 @@ class Glossary(models.Model):
                                 # Save and let the post_save signal handle API creation and update
                                 glossary.save()
 
-                                logger.info(f"Successfully created glossary: {glossary.name}")
                                 results['created'] += 1
 
                     except ValidationError as e:
                         # Handle Django validation errors (from glossary file validation)
-                        filename_info = f"Fichier: {row.get('file', 'inconnu')}"
+                        filename_info = f"File: {row.get('file', 'unknown')}"
 
                         # Extract validation error messages
                         if hasattr(e, 'messages'):
@@ -482,7 +401,7 @@ class Glossary(models.Model):
                         else:
                             validation_messages = str(e)
 
-                        error_msg = f"Row {row_num} ({filename_info}) - Erreur de validation: {validation_messages}"
+                        error_msg = f"Row {row_num} ({filename_info}) - Validation error: {validation_messages}"
                         logger.error(error_msg, exc_info=True)
                         results['errors'].append(error_msg)
 
@@ -491,7 +410,7 @@ class Glossary(models.Model):
                         error_detail = str(e)
 
                         # Get the filename being processed
-                        filename_info = f"Fichier: {row.get('file', 'inconnu')}"
+                        filename_info = f"File: {row.get('file', 'unknown')}"
 
                         # Check if it's a validation error embedded in the exception message
                         if "ValidationError" in error_detail or "Source column is blank" in error_detail or "Target column is blank" in error_detail:
@@ -500,14 +419,14 @@ class Glossary(models.Model):
                             match = re.search(r"\['([^']+)'\]", error_detail)
                             if match:
                                 validation_msg = match.group(1)
-                                error_msg = f"Row {row_num} ({filename_info}) - Erreur de validation: {validation_msg}"
+                                error_msg = f"Row {row_num} ({filename_info}) - Validation error: {validation_msg}"
                             else:
-                                error_msg = f"Row {row_num} ({filename_info}) - Erreur de validation: {error_detail}"
+                                error_msg = f"Row {row_num} ({filename_info}) - Validation error: {error_detail}"
                         # Check if it's a JSON error from the API
                         elif 'glossary_id' in error_detail and 'Input should be a valid string' in error_detail:
-                            error_msg = f"Row {row_num} ({filename_info}) - L'API de glossaire a échoué - vérifiez que le service de glossaire est accessible et que le fichier est valide"
+                            error_msg = f"Row {row_num} ({filename_info}) - Glossary API failed - check that the glossary service is accessible and the file is valid"
                         elif "The 'file' attribute has no file associated with it" in error_detail:
-                            error_msg = f"Row {row_num} ({filename_info}) - Le fichier du glossaire n'a pas pu être traité correctement"
+                            error_msg = f"Row {row_num} ({filename_info}) - The glossary file could not be processed correctly"
                         else:
                             error_msg = f"Row {row_num} ({filename_info}) - {error_detail}"
 
@@ -519,12 +438,12 @@ class Glossary(models.Model):
                 total_processed = results['created'] + results['updated']
                 message_parts = []
                 if results['created'] > 0:
-                    message_parts.append(f"{results['created']} créés")
+                    message_parts.append(f"{results['created']} created")
                 if results['updated'] > 0:
-                    message_parts.append(f"{results['updated']} mis à jour")
+                    message_parts.append(f"{results['updated']} updated")
 
-                summary = ", ".join(message_parts) if message_parts else "aucun traité"
-                final_message = f"Traitement terminé: {summary} sur {results['total_rows']} lignes"
+                summary = ", ".join(message_parts) if message_parts else "none processed"
+                final_message = f"Processing complete: {summary} out of {results['total_rows']} rows"
 
                 if progress_callback:
                     progress_callback(
@@ -538,19 +457,15 @@ class Glossary(models.Model):
             error_msg = f"Error processing files: {str(e)}"
             logger.error(error_msg, exc_info=True)
             results['errors'].append(error_msg)
-            send_progress(f"Erreur lors du traitement: {str(e)}")
+            send_progress(f"Error during processing: {str(e)}")
         finally:
             # Clean up temporary directory
             if temp_dir and os.path.exists(temp_dir):
-                logger.info(f"Cleaning up temporary directory: {temp_dir}")
                 try:
                     import shutil
                     shutil.rmtree(temp_dir)
-                    logger.info(
-                        f"Successfully cleaned up temporary directory: {temp_dir}")
                 except Exception as cleanup_error:
                     logger.error(
                         f"Error cleaning up temporary directory: {cleanup_error}")
 
-        logger.info(f"Batch processing completed: {results}")
         return results

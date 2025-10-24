@@ -34,21 +34,7 @@ class AIGlossaryService:
             }
         }
 
-        # Log the payload (without the full values to keep logs readable)
-        payload_summary = {
-            "system": payload["system"],
-            "username": payload["username"],
-            "glossary": {
-                "name": payload["glossary"]["name"],
-                "description": payload["glossary"]["description"],
-                "languages": payload["glossary"]["languages"],
-                "values_count": len(payload["glossary"]["values"]) if isinstance(payload["glossary"]["values"], (list, dict)) else "unknown"
-            }
-        }
-        logger.info(f"🔵 API CREATE_GLOSSARY - Request payload: {payload_summary}")
-
         url = preferences.MainSettings.glossaries_url + "create_glossary"
-        logger.info(f"🔵 API CREATE_GLOSSARY - URL: {url}")
 
         try:
             response = requests.post(
@@ -58,24 +44,21 @@ class AIGlossaryService:
                 timeout=60  # 60 second timeout
             )
         except requests.exceptions.Timeout:
-            error_msg = "L'API de glossaire n'a pas répondu dans le délai imparti (timeout de 60 secondes)"
+            error_msg = "The glossary API did not respond within the timeout period (60 seconds)"
             logger.error(f"❌ {error_msg}")
             raise Exception(error_msg)
         except requests.exceptions.ConnectionError as e:
-            error_msg = f"Impossible de se connecter à l'API de glossaire à l'adresse {url}: {str(e)}"
+            error_msg = f"Unable to connect to the glossary API at {url}: {str(e)}"
             logger.error(f"❌ {error_msg}")
             raise Exception(error_msg)
         except requests.exceptions.RequestException as e:
-            error_msg = f"Erreur lors de la requête à l'API de glossaire: {str(e)}"
+            error_msg = f"Error while requesting the glossary API: {str(e)}"
             logger.error(f"❌ {error_msg}")
             raise Exception(error_msg)
 
-        logger.info(f"🔵 API CREATE_GLOSSARY - Status code: {response.status_code}")
-        logger.info(f"🔵 API CREATE_GLOSSARY - Response: {response.text[:500]}")  # First 500 chars
-
         if response.status_code // 100 != 2:
             logger.error(f"❌ API CREATE_GLOSSARY FAILED - Full response: {response.text}")
-            error_msg = f"L'API de glossaire a retourné une erreur (HTTP {response.status_code})"
+            error_msg = f"The glossary API returned an error (HTTP {response.status_code})"
             try:
                 error_data = response.json()
                 if isinstance(error_data, dict) and 'error' in error_data:
@@ -91,12 +74,11 @@ class AIGlossaryService:
         else:
             try:
                 glossary_id = response.json().get("glossary_id")
-                logger.info(f"✅ API CREATE_GLOSSARY SUCCESS - glossary_id: {glossary_id}")
                 return glossary_id
             except Exception as e:
                 logger.error(f"❌ Failed to parse response JSON: {e}")
                 logger.error(f"Response text: {response.text}")
-                raise Exception(f"L'API a répondu mais le format de réponse est invalide: {str(e)}")
+                raise Exception(f"The API responded but the response format is invalid: {str(e)}")
 
     def update_glossary(self, glossary):
         import logging
@@ -117,22 +99,7 @@ class AIGlossaryService:
             }
         }
 
-        # Log the payload (without the full values to keep logs readable)
-        payload_summary = {
-            "system": payload["system"],
-            "username": payload["username"],
-            "glossary_id": payload["glossary_id"],
-            "glossary": {
-                "name": payload["glossary"]["name"],
-                "description": payload["glossary"]["description"],
-                "languages": payload["glossary"]["languages"],
-                "values_count": len(payload["glossary"]["values"]) if isinstance(payload["glossary"]["values"], (list, dict)) else "unknown"
-            }
-        }
-        logger.info(f"🔵 API UPDATE_GLOSSARY - Request payload: {payload_summary}")
-
         url = preferences.MainSettings.glossaries_url + "update_glossary"
-        logger.info(f"🔵 API UPDATE_GLOSSARY - URL: {url}")
 
         try:
             response = requests.post(
@@ -142,24 +109,21 @@ class AIGlossaryService:
                 timeout=60  # 60 second timeout
             )
         except requests.exceptions.Timeout:
-            error_msg = "L'API de mise à jour n'a pas répondu dans le délai imparti (timeout de 60 secondes)"
+            error_msg = "The update API did not respond within the timeout period (60 seconds)"
             logger.error(f"❌ {error_msg}")
             raise Exception(error_msg)
         except requests.exceptions.ConnectionError as e:
-            error_msg = f"Impossible de se connecter à l'API de glossaire à l'adresse {url}: {str(e)}"
+            error_msg = f"Unable to connect to the glossary API at {url}: {str(e)}"
             logger.error(f"❌ {error_msg}")
             raise Exception(error_msg)
         except requests.exceptions.RequestException as e:
-            error_msg = f"Erreur lors de la requête à l'API de glossaire: {str(e)}"
+            error_msg = f"Error while requesting the glossary API: {str(e)}"
             logger.error(f"❌ {error_msg}")
             raise Exception(error_msg)
 
-        logger.info(f"🔵 API UPDATE_GLOSSARY - Status code: {response.status_code}")
-        logger.info(f"🔵 API UPDATE_GLOSSARY - Response: {response.text[:500]}")  # First 500 chars
-
         if response.status_code // 100 != 2:
             logger.error(f"❌ API UPDATE_GLOSSARY FAILED - Full response: {response.text}")
-            error_msg = f"L'API de mise à jour de glossaire a retourné une erreur (HTTP {response.status_code})"
+            error_msg = f"The glossary update API returned an error (HTTP {response.status_code})"
             try:
                 error_data = response.json()
                 if isinstance(error_data, dict) and 'error' in error_data:
@@ -172,8 +136,6 @@ class AIGlossaryService:
                 # Not JSON, just include first 200 chars of response
                 error_msg += f": {response.text[:200]}"
             raise Exception(error_msg)
-        else:
-            logger.info(f"✅ API UPDATE_GLOSSARY SUCCESS")
 
     def delete_glossary(self, glossary):
         import logging
@@ -185,10 +147,7 @@ class AIGlossaryService:
             "glossary_id": glossary.glossary_id,
         }
 
-        logger.info(f"🔵 API DELETE_GLOSSARY - Request payload: {payload}")
-
         url = preferences.MainSettings.glossaries_url + 'delete_glossary'
-        logger.info(f"🔵 API DELETE_GLOSSARY - URL: {url}")
 
         response = requests.post(
             url,
@@ -196,11 +155,6 @@ class AIGlossaryService:
             json=payload
         )
 
-        logger.info(f"🔵 API DELETE_GLOSSARY - Status code: {response.status_code}")
-        logger.info(f"🔵 API DELETE_GLOSSARY - Response: {response.text[:500]}")
-
         if response.status_code // 100 != 2:
             logger.error(f"❌ API DELETE_GLOSSARY FAILED - Full response: {response.text}")
             raise Exception(response.text)
-        else:
-            logger.info(f"✅ API DELETE_GLOSSARY SUCCESS")

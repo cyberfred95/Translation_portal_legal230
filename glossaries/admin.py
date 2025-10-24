@@ -168,7 +168,6 @@ class GlossaryAdmin(admin.ModelAdmin):
         return custom_urls + urls
 
     def batch_upload_view(self, request):
-        logger.info(f"Batch upload view accessed. Method: {request.method}")
         context = dict(
             self.admin_site.each_context(request),
             opts=self.model._meta,
@@ -181,37 +180,18 @@ class GlossaryAdmin(admin.ModelAdmin):
 
         if request.method == 'POST':
             try:
-                logger.info("Processing POST request for batch upload")
-                logger.info(f"POST data: {request.POST}")
-                logger.info(f"FILES data: {list(request.FILES.keys())}")
-
-                # Log file details if present
-                if 'csv_file' in request.FILES:
-                    csv_file = request.FILES['csv_file']
-                    logger.info(
-                        f"CSV file received: name={csv_file.name}, size={csv_file.size}, content_type={csv_file.content_type}")
-                else:
+                if 'csv_file' not in request.FILES:
                     logger.error("CSV file not found in request.FILES")
 
-                if 'zip_file' in request.FILES:
-                    zip_file = request.FILES['zip_file']
-                    logger.info(
-                        f"ZIP file received: name={zip_file.name}, size={zip_file.size}, content_type={zip_file.content_type}")
-                else:
+                if 'zip_file' not in request.FILES:
                     logger.error("ZIP file not found in request.FILES")
 
                 form = BatchUploadForm(request.POST, request.FILES)
 
                 if form.is_valid():
-                    logger.info("Form is valid, processing files")
                     # Store files temporarily
                     csv_file = form.cleaned_data['csv_file']
                     zip_file = form.cleaned_data['zip_file']
-
-                    logger.info(
-                        f"Cleaned CSV file: {csv_file.name}, size: {csv_file.size}")
-                    logger.info(
-                        f"Cleaned ZIP file: {zip_file.name}, size: {zip_file.size}")
 
                     # Save files temporarily
                     temp_csv = tempfile.NamedTemporaryFile(
@@ -231,14 +211,9 @@ class GlossaryAdmin(admin.ModelAdmin):
                         temp_zip.write(chunk)
                     temp_zip.close()
 
-                    logger.info(
-                        f"Temporary files created: CSV={temp_csv.name}, ZIP={temp_zip.name}")
-
                     # Verify files were written correctly
                     csv_size = os.path.getsize(temp_csv.name)
                     zip_size = os.path.getsize(temp_zip.name)
-                    logger.info(
-                        f"Temporary file sizes: CSV={csv_size}, ZIP={zip_size}")
 
                     if csv_size == 0:
                         logger.error("CSV file was written with 0 bytes")
@@ -266,9 +241,6 @@ class GlossaryAdmin(admin.ModelAdmin):
                         # Clear any previous batch progress in cache
                         cache.delete(f'batch_progress_{batch_id}')
 
-                        logger.info(
-                            f"Files stored in session with batch_id: {batch_id}, rendering success page")
-
                         context.update({
                             'csv_filename': csv_file.name,
                             'zip_filename': zip_file.name,
@@ -288,7 +260,6 @@ class GlossaryAdmin(admin.ModelAdmin):
                     request, f"Error during file loading: {str(e)}")
                 form = BatchUploadForm()
         else:
-            logger.info("GET request for batch upload form")
             form = BatchUploadForm()
 
         context.update({
@@ -307,7 +278,6 @@ class GlossaryAdmin(admin.ModelAdmin):
             # Support DELETE method to clear progress
             if request.method == 'DELETE':
                 cache.delete(f'batch_progress_{batch_id}')
-                logger.info(f"Batch progress cleared from cache for batch_id: {batch_id}")
                 return JsonResponse({'status': 'cleared'}, status=200)
 
             # Get progress from cache
@@ -315,7 +285,6 @@ class GlossaryAdmin(admin.ModelAdmin):
             progress_data = cache.get(cache_key, {})
 
             if not progress_data:
-                logger.debug(f"No progress data found in cache for batch_id: {batch_id}")
                 progress_data = {'status': 'waiting', 'message': 'En attente de démarrage...'}
 
             return JsonResponse(progress_data, status=200)
@@ -325,8 +294,6 @@ class GlossaryAdmin(admin.ModelAdmin):
 
     def process_batch_view(self, request):
         """Process batch glossary upload in background thread - returns immediately"""
-        logger.info(f"Process batch view accessed. Method: {request.method}")
-
         # Wrap entire method in try/except to ensure we always return JSON
         try:
             if request.method != 'POST':
@@ -336,9 +303,6 @@ class GlossaryAdmin(admin.ModelAdmin):
             csv_path = request.session.get('batch_csv_path')
             zip_path = request.session.get('batch_zip_path')
             batch_id = request.session.get('batch_id')
-
-            logger.info(
-                f"Session paths - CSV: {csv_path}, ZIP: {zip_path}, batch_id: {batch_id}")
 
             if not csv_path or not zip_path or not batch_id:
                 logger.error("Files or batch_id not found in session")
@@ -369,8 +333,6 @@ class GlossaryAdmin(admin.ModelAdmin):
             # Define the background processing function
             def process_in_background():
                 try:
-                    logger.info(f"[Thread {batch_id}] Starting background batch processing")
-
                     # Define progress callback
                     def progress_callback(message, row_num, created, total_rows):
                         progress_data = {
@@ -381,11 +343,9 @@ class GlossaryAdmin(admin.ModelAdmin):
                             'message': message
                         }
                         cache.set(cache_key, progress_data, timeout=7200)
-                        logger.info(f"[Thread {batch_id}] Progress: {message} (row: {row_num}, created: {created}, total: {total_rows})")
 
                     # Execute the batch processing
                     results = Glossary.glossaries_batch(csv_path, zip_path, progress_callback=progress_callback)
-                    logger.info(f"[Thread {batch_id}] Batch processing completed: {results}")
 
                     # Store results in cache
                     cache.set(results_cache_key, results, timeout=7200)
@@ -405,10 +365,8 @@ class GlossaryAdmin(admin.ModelAdmin):
                     try:
                         if os.path.exists(csv_path):
                             os.unlink(csv_path)
-                            logger.info(f"[Thread {batch_id}] Cleaned up CSV file: {csv_path}")
                         if os.path.exists(zip_path):
                             os.unlink(zip_path)
-                            logger.info(f"[Thread {batch_id}] Cleaned up ZIP file: {zip_path}")
                     except Exception as cleanup_error:
                         logger.warning(f"[Thread {batch_id}] Error cleaning up files: {cleanup_error}")
 
@@ -432,7 +390,6 @@ class GlossaryAdmin(admin.ModelAdmin):
             # Start the background thread
             thread = threading.Thread(target=process_in_background, daemon=True)
             thread.start()
-            logger.info(f"Background thread started for batch_id: {batch_id}")
 
             # Return immediately - the thread will continue processing
             return JsonResponse({
@@ -639,8 +596,6 @@ class GlossaryAdmin(admin.ModelAdmin):
 
                         def check_single_glossary(glossary):
                             """Check a single glossary against remote API"""
-                            start_time = time.time()
-
                             owner = 'Admin/Default'
                             if glossary.user:
                                 owner = f'User: {glossary.user.username}'
@@ -668,21 +623,7 @@ class GlossaryAdmin(admin.ModelAdmin):
                                     "API-KEY": settings.GLOSSARY_API_KEY
                                 }
 
-                                # Log first request for debugging
-                                import logging
-                                logger = logging.getLogger(__name__)
-                                if glossary.id == glossaries_list[0].id:
-                                    logger.info(f"API Request - URL: {url}")
-                                    logger.info(f"API Request - Payload: {payload}")
-                                    logger.info(f"API Request - Has API-KEY: {bool(settings.GLOSSARY_API_KEY)}")
-
-                                api_start = time.time()
                                 response = requests.post(url, headers=headers, json=payload, timeout=60)
-                                api_duration = time.time() - api_start
-
-                                total_duration = time.time() - start_time
-                                glossary_info['api_time'] = f"{api_duration:.3f}s"
-                                glossary_info['total_time'] = f"{total_duration:.3f}s"
 
                                 if response.status_code == 200:
                                     return ('found', glossary_info)
@@ -692,34 +633,22 @@ class GlossaryAdmin(admin.ModelAdmin):
                                     glossary_info['error'] = f"HTTP {response.status_code}"
                                     return ('error', glossary_info)
                             except requests.exceptions.Timeout:
-                                total_duration = time.time() - start_time
-                                glossary_info['total_time'] = f"{total_duration:.3f}s"
                                 glossary_info['error'] = "Timeout (60s)"
                                 return ('error', glossary_info)
                             except Exception as e:
-                                total_duration = time.time() - start_time
-                                glossary_info['total_time'] = f"{total_duration:.3f}s"
                                 glossary_info['error'] = str(e)
                                 return ('error', glossary_info)
 
-                        # Process glossaries concurrently with 20 workers
+                        # Process glossaries concurrently with 5 workers to avoid overwhelming the API
                         glossaries_list = list(glossaries)
                         completed = 0
-                        api_times = []
 
-                        with ThreadPoolExecutor(max_workers=20) as executor:
+                        with ThreadPoolExecutor(max_workers=5) as executor:
                             future_to_glossary = {executor.submit(check_single_glossary, g): g for g in glossaries_list}
 
                             for future in as_completed(future_to_glossary):
                                 completed += 1
                                 result_type, glossary_info = future.result()
-
-                                # Track API response times
-                                if 'api_time' in glossary_info:
-                                    try:
-                                        api_times.append(float(glossary_info['api_time'].replace('s', '')))
-                                    except:
-                                        pass
 
                                 if result_type == 'found':
                                     stats['found'] += 1
@@ -728,7 +657,7 @@ class GlossaryAdmin(admin.ModelAdmin):
                                 elif result_type == 'not_found':
                                     stats['not_found'] += 1
                                     not_found_list.append(glossary_info)
-                                else:  # error
+                                else:
                                     stats['errors'] += 1
                                     error_list.append(glossary_info)
 
@@ -743,12 +672,6 @@ class GlossaryAdmin(admin.ModelAdmin):
                                         'errors': stats['errors'],
                                         'message': f'Vérification {completed}/{stats["total"]}...'
                                     }, timeout=7200)
-
-                        # Calculate timing statistics
-                        if api_times:
-                            stats['avg_api_time'] = f"{sum(api_times) / len(api_times):.3f}s"
-                            stats['min_api_time'] = f"{min(api_times):.3f}s"
-                            stats['max_api_time'] = f"{max(api_times):.3f}s"
 
                         results['stats'] = stats
                         results['found_list'] = found_list
@@ -776,7 +699,6 @@ class GlossaryAdmin(admin.ModelAdmin):
             # Start the background thread
             thread = threading.Thread(target=process_in_background, daemon=True)
             thread.start()
-            logger.info(f"Background check thread started for check_id: {check_id}")
 
             # Return immediately
             return JsonResponse({
@@ -795,8 +717,6 @@ class GlossaryAdmin(admin.ModelAdmin):
 
     def compare_csv_view(self, request):
         """View for uploading CSV file to compare with local database"""
-        logger.info(f"Compare CSV view accessed. Method: {request.method}")
-
         context = dict(
             self.admin_site.each_context(request),
             opts=self.model._meta,
@@ -822,7 +742,6 @@ class GlossaryAdmin(admin.ModelAdmin):
                 with open(csv_path, 'wb+') as destination:
                     for chunk in csv_file.chunks():
                         destination.write(chunk)
-                logger.info(f"CSV file saved to: {csv_path}")
 
                 # Store path in session
                 request.session['comparison_csv_path'] = csv_path
@@ -842,8 +761,6 @@ class GlossaryAdmin(admin.ModelAdmin):
 
     def process_csv_comparison_view(self, request):
         """Process CSV comparison in background thread"""
-        logger.info(f"Process CSV comparison view accessed. Method: {request.method}")
-
         try:
             if request.method != 'POST':
                 return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -867,8 +784,6 @@ class GlossaryAdmin(admin.ModelAdmin):
             # Background processing function
             def process_in_background():
                 try:
-                    logger.info(f"[Thread {comparison_id}] Starting CSV comparison")
-
                     # Parse CSV
                     csv_glossaries = self._parse_csv_for_comparison(csv_path)
 
@@ -892,7 +807,6 @@ class GlossaryAdmin(admin.ModelAdmin):
                     try:
                         if os.path.exists(csv_path):
                             os.remove(csv_path)
-                            logger.info(f"Cleaned up temp CSV: {csv_path}")
                     except Exception as e:
                         logger.error(f"Error cleaning up temp file: {e}")
 
@@ -906,7 +820,6 @@ class GlossaryAdmin(admin.ModelAdmin):
             # Start background thread
             thread = threading.Thread(target=process_in_background, daemon=True)
             thread.start()
-            logger.info(f"Background comparison thread started for comparison_id: {comparison_id}")
 
             return JsonResponse({
                 'success': True,
