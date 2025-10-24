@@ -38,9 +38,18 @@ load_env_file()
 DEBUG = True
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-ALLOWED_HOSTS = ['localhost', '0.0.0.0', 'legal230.portal.custom.mt', '141.145.204.44', 'portail.lexamt.fr', 'portail.lexamt.com',
-                'portail.lexamt.tech', '89.168.44.123', 'test.portail.lexamt.fr', 'test.portail.lexamt.com', 'test.portail.lexamt.tech',
-                'api.portail.lexamt.fr', 'api.portail.lexamt.com', 'api.portail.lexamt.tech', 'portail.lexamt.fr', 'portail.lexamt.com', 'portail.lexamt.tech']
+# ALLOWED_HOSTS from environment variable
+ALLOWED_HOSTS_STR = os.environ.get('ALLOWED_HOSTS')
+
+if ALLOWED_HOSTS_STR:
+    # Parse format: [host1, host2, host3] or host1,host2,host3
+    if ALLOWED_HOSTS_STR.startswith('[') and ALLOWED_HOSTS_STR.endswith(']'):
+        # Remove brackets and parse
+        hosts_str = ALLOWED_HOSTS_STR[1:-1]
+        ALLOWED_HOSTS = [host.strip().strip("'\"") for host in hosts_str.split(',') if host.strip()]
+    else:
+        # Fallback to comma-separated format
+        ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',') if host.strip()]
 
 # Proxy / headers
 USE_X_FORWARDED_HOST = True
