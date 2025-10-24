@@ -22,6 +22,7 @@ from .settings import (
     API_HEADERS_CONTENT_TYPE,
     API_TOKEN_KEY,
     API_MAIN_TOKEN,
+    CUSTOM_MT_CONSOLE_URL,
 )
 
 
@@ -29,7 +30,7 @@ class UserGroupAPIKeyTestCase(TestCase):
     """Test case for UserGroup API key auto-generation."""
 
     @patch('django.conf.settings.CLOUDSTORAGE_API_KEY', API_MAIN_TOKEN)
-    @patch('django.conf.settings.CUSTOM_MT_CONSOLE_URL', 'https://console.custom.mt/')
+    @patch('django.conf.settings.CUSTOM_MT_CONSOLE_URL', CUSTOM_MT_CONSOLE_URL)
     @mock_api_key_generation(GENERATED_API_KEY)
     def test_api_key_auto_generation_success(self, mock_post):
         """Test that API key is auto-generated when UserGroup is saved without one."""

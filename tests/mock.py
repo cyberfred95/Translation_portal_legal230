@@ -12,8 +12,11 @@ from functools import wraps
 # Common mock configurations
 def _create_mock_settings():
     """Create a mock settings object with standard configuration."""
+    import os
     mock_settings = Mock()
-    mock_settings.CUSTOM_MT_CONSOLE_URL = 'https://console.custom.mt/'
+    mock_settings.CUSTOM_MT_CONSOLE_URL = os.environ.get('CUSTOM_MT_CONSOLE_URL')
+    if not mock_settings.CUSTOM_MT_CONSOLE_URL:
+        raise ValueError("CUSTOM_MT_CONSOLE_URL environment variable is required for tests")
     mock_settings.api_key = 'main-api-key-123'
     return mock_settings
 

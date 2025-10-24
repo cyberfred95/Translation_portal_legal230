@@ -186,4 +186,5 @@ CONVERTER_EXPECTED_PAIRS = [
 ]
 
 # Stripe Session URLs
-TEST_STRIPE_SESSION_URL = 'https://billing.stripe.com/p/session/test_session_123'
+import os
+TEST_STRIPE_SESSION_URL = os.environ.get('STRIPE_SESSION_URL')

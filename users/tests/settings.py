@@ -34,7 +34,15 @@ EXPECTED_API_TIMEOUT = 30
 EXPECTED_LABEL_ID = '1'  # Group ID used in API call
 
 # API Endpoints
-API_CREATE_KEY_ENDPOINT = 'https://console.custom.mt/cabinet_api/create_api_key/'
+import os
+from django.conf import settings
+
+# Use environment variable only
+CUSTOM_MT_CONSOLE_URL = os.environ.get('CUSTOM_MT_CONSOLE_URL')
+if CUSTOM_MT_CONSOLE_URL:
+    API_CREATE_KEY_ENDPOINT = f"{CUSTOM_MT_CONSOLE_URL.rstrip('/')}/cabinet_api/create_api_key/"
+else:
+    API_CREATE_KEY_ENDPOINT = None
 
 # Headers
 API_HEADERS_CONTENT_TYPE = 'application/json'
