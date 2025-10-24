@@ -229,40 +229,40 @@
                     {% if request.user.is_staff or is_group_admin %}
                     <th class="text-4 text-gray-600 font-semibold text-left border-b pb-5 user-row">
                         <div class="flex items-center gap-1 w-auto cursor-pointer">
-                            {% trans 'User' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                            {% trans 'User' %} <i class="ph ph-caret-down text-gray-600"></i>
                         </div>
                     </th>
                     {% if request.user.is_staff %}
                     <th class="text-4 text-gray-600 font-semibold text-left border-b pb-5">
                         <div class="flex items-center gap-1 w-auto cursor-pointer">
-                            {% trans 'Group' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                            {% trans 'Group' %} <i class="ph ph-caret-down text-gray-600"></i>
                         </div>
                     </th>
                     {% endif %}
                     {% endif %}
                     <th class="text-4 text-gray-600 font-semibold text-left border-b pb-5">
                         <div class="flex items-center gap-1 w-auto cursor-pointer">
-                            {% trans 'File name' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                            {% trans 'File name' %} <i class="ph ph-caret-down text-gray-600"></i>
                         </div>
                     </th>
                     <th class="text-4 text-gray-600 font-semibold text-left border-b pb-5">
                         <div class="flex items-center gap-1 w-auto cursor-pointer">
-                            {% trans 'Words' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                            {% trans 'Words' %} <i class="ph ph-caret-down text-gray-600"></i>
                         </div>
                     </th>
                     <th class="text-4 text-gray-600 font-semibold text-left border-b pb-5">
                         <div class="flex items-center gap-1 w-auto cursor-pointer">
-                            {% trans 'Tokens' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                            {% trans 'Tokens' %} <i class="ph ph-caret-down text-gray-600"></i>
                         </div>
                     </th>
                     <th class="text-4 text-gray-600 font-semibold text-left border-b pb-5">
                         <div class="flex items-center gap-1 w-auto cursor-pointer">
-                            {% trans 'Out tokens' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                            {% trans 'Out tokens' %} <i class="ph ph-caret-down text-gray-600"></i>
                         </div>
                     </th>
                     <th class="text-4 text-gray-600 font-semibold text-left w-1 border-b pb-5">
                         <div class="flex items-center gap-1 w-auto cursor-pointer">
-                            {% trans 'Date' %} <img src="{% static 'images/ico-arrow.svg' %}" alt="arrow">
+                            {% trans 'Date' %} <i class="ph ph-caret-down text-gray-600"></i>
                         </div>
                     </th>
                 </tr>
