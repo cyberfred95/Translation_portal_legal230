@@ -54,65 +54,6 @@ class WritingView(BaseTemplateView):
         return PromptSerializer(prompts, many=True, context={'request': self.request}).data
 
 
-class Writing2View(BaseTemplateView):
-    template_name = 'writing_2.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['prompts'] = self.get_prompts_with_translations()
-        return context
-
-    def get_prompts_with_translations(self):
-        """Get prompts with their translations for the current language"""
-        from django.utils.translation import get_language
-        language_code = get_language() or 'en'
-        
-        prompts = Prompt.objects.prefetch_related('translations').all()
-        
-        prompts_data = []
-        for prompt in prompts:
-            # Get translation for current language or fallback to English
-            translation = prompt.translations.filter(language=language_code).first()
-            if not translation:
-                translation = prompt.translations.filter(language='en').first()
-            
-            if translation:
-                prompt_data = {
-                    'id': prompt.id,
-                    'name': translation.name,
-                    'description': translation.description,
-                    'gpt_model': prompt.gpt_model,
-                    'temperature': prompt.temperature,
-                    'prompt': prompt.prompt,
-                    'variables': prompt.variables,
-                    # Infer action type from name (can be improved with a dedicated field)
-                    'action_type': self.infer_action_type(translation.name.lower())
-                }
-                prompts_data.append(prompt_data)
-        
-        return prompts_data
-    
-    def infer_action_type(self, name):
-        """Infer action type from prompt name for icon selection"""
-        name = name.lower()
-        if 'anonym' in name:
-            return 'anonymise'
-        elif 'summar' in name or 'résumé' in name:
-            return 'summarise'
-        elif 'detail' in name or 'détail' in name:
-            return 'detail'
-        elif 'explain' in name or 'expliqu' in name:
-            return 'explain'
-        elif 'shorten' in name or 'raccour' in name:
-            return 'shorten'
-        elif 'simple' in name:
-            return 'simple'
-        elif 'professional' in name or 'professionnel' in name:
-            return 'professional'
-        elif 'casual' in name or 'décontract' in name:
-            return 'casual'
-        else:
-            return 'default'
 
 
 class WritingProcessAPIView(APIView):

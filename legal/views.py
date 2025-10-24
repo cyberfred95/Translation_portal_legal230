@@ -379,62 +379,6 @@ class ProjectsHistoryView(BaseTemplateView):
         return context
 
 
-class ProjectsHistory2View(BaseTemplateView):
-    """Nouvelle vue pour project_history_2.html avec design Builder.io"""
-    template_name = 'project_history/project_history_2.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-        page = self.request.GET.get('page')
-        context['languages'] = languages
-        params = {
-            "page_size": PAGINATION_PAGE_SIZE,
-            "page": page,
-            "user_custom_mt_token": user.uuid if not user.is_staff else None
-        }
-        headers = {
-            "token": settings.CLOUDSTORAGE_API_KEY if user.is_staff else user.group.api_key}
-
-        if page is not None:
-            params["page"] = int(page)
-
-        response = requests.get(
-            settings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
-        if 'results' in response:
-            for project in response['results']:
-                file_name = urlparse(project['source_file']).path.lstrip(
-                    '/').split('/')[-1]
-                original_filename = unquote(file_name)
-                project['source_file_name'] = original_filename
-                project['created_at'] = datetime.fromisoformat(
-                    project['created_at'].replace('Z', '+00:00'))
-                project['display_popup'] = False if get_price_by_language_pair(
-                    source_language=project['source_language'],
-                    target_language=project['target_language']
-                ) else True
-                
-                # Mapper les statuts pour correspondre aux badges Builder.io
-                status_mapping = {
-                    'Translated': 'completed',
-                    'Error': 'error',
-                    'In progress': 'in-progress',
-                    'Processing': 'in-progress',
-                    'Needs attention': 'needs-attention'
-                }
-                project['status_mapped'] = status_mapping.get(project['status'], project['status'].lower())
-                
-                if user.is_staff:
-                    try:
-                        project['username'] = User.objects.get(
-                            uuid=project['user_custom_mt_token'])
-                    except User.DoesNotExist:
-                        project['username'] = None
-                    except django.core.exceptions.ValidationError:
-                        project['username'] = None
-            context['projects'] = response
-
-        return context
 
 
 def get_projects_by_ids(request):
@@ -767,40 +711,6 @@ class DashboardView(BaseTemplateView):
         return context
 
 
-class TextTranslate2View(BaseTemplateView):
-    template_name = "translate_2.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Add context variables here if needed
-        return context
-
-
-class DocumentTranslate2View(BaseTemplateView):
-    template_name = "translate/document_translate/document_translate_2.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['languages'] = languages
-        context['translate_languages'] = self.get_languages()
-        context['access_to_default_glossaries'] = self.default_glossary_allowed()
-        context['subscription_types'] = SubscriptionType.objects.all()
-        return context
-
-    def default_glossary_allowed(self):
-        if self.request.user.is_staff:
-            return True
-
-        user_subscription = self.request.user.subscriptions.first()
-        if self.request.user.group:
-            if user_subscription and user_subscription.access_to_official_glossaries:
-                return True
-        return False
-
-    def get_languages(self):
-        if self.request.LANGUAGE_CODE == 'fr':
-            return Language.objects.order_by('french_name').all()
-        return Language.objects.order_by('name').all()
 
 
 class DisplayMessage(BaseTemplateView):
