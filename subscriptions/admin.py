@@ -311,5 +311,5 @@ class SubscriptionTypeAdmin(admin.ModelAdmin):
         """Display count of UserSubscription for this SubscriptionType"""
         count = UserSubscription.objects.filter(subscription=obj).count()
         return count
-    user_subscription_count.short_description = 'ABONNÉS'
+    user_subscription_count.short_description = 'SUBSCRIBERS'
     user_subscription_count.admin_order_field = 'user_subscription_count'

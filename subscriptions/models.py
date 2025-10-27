@@ -20,20 +20,20 @@ class SubscriptionType(models.Model):
 
     max_symbols_count = models.IntegerField(
         default=-1, 
-        help_text="Nombre maximum de symboles. Utilisez -1 pour illimité (∞)."
+        help_text="Maximum number of symbols. Use -1 for unlimited (∞)."
     )
     max_words_count = models.IntegerField(
         default=-1, 
-        help_text="Nombre maximum de mots. Utilisez -1 pour illimité (∞)."
+        help_text="Maximum number of words. Use -1 for unlimited (∞)."
     )
     max_files_count = models.IntegerField(
         default=-1, 
-        help_text="Nombre maximum de fichiers. Utilisez -1 pour illimité (∞)."
+        help_text="Maximum number of files. Use -1 for unlimited (∞)."
     )
     custom_glossaries_count = models.IntegerField(
         default=-1, 
         verbose_name="Custom Glossaries Count",
-        help_text="Nombre maximum de glossaires personnalisés. Utilisez -1 pour illimité (∞)."
+        help_text="Maximum number of custom glossaries. Use -1 for unlimited (∞)."
     )
 
     product_type = models.CharField(
