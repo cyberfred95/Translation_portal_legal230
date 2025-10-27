@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import reverse, path
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.http import JsonResponse
@@ -213,10 +214,102 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
     user_type.short_description = "Type"
 
 
+class UserSubscriptionInline(admin.TabularInline):
+    """Inline display of UserSubscriptions for a SubscriptionType."""
+    model = UserSubscription
+    fields = ('clickable_user', 'clickable_status', 'start_date', 'end_date', 'stripe_subscription_id')
+    readonly_fields = ('clickable_user', 'clickable_status', 'start_date', 'end_date', 'stripe_subscription_id')
+    extra = 0
+    can_delete = False
+    can_add = False
+    ordering = ('-start_date',)
+
+    def clickable_user(self, obj):
+        """Create a clickable link to the User admin page"""
+        return create_clickable_link(obj, 'users', 'user', 'user')
+    clickable_user.short_description = 'User'
+    clickable_user.admin_order_field = 'user__username'
+
+    def clickable_status(self, obj):
+        """Create a clickable link to the UserSubscription admin page"""
+        return create_clickable_link(obj, 'subscriptions', 'usersubscription', display_field='status')
+    clickable_status.short_description = 'Status'
+    clickable_status.admin_order_field = 'status'
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(SubscriptionType)
 class SubscriptionTypeAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'price', 'max_symbols_count',
-        'max_words_count', 'max_files_count', 'custom_glossaries_count', 'id'
+        'name', 'stripe', 'product_type', 'user_subscription_count', 'formatted_price', 'symbols', 'word', 'files', 'glossaries'
     )
     search_fields = ('name',)
+    inlines = [UserSubscriptionInline]
+
+    def stripe(self, obj):
+        """Display Stripe logo if Stripe Product ID exists"""
+        if obj.stripe_product_id:
+            return mark_safe(f'<i class="ph ph-stripe-logo" style="color: #635bff; font-size: 1.5em;" title="{obj.stripe_product_id}"></i>')
+        return "-"
+    stripe.short_description = 'STRIPE'
+    stripe.admin_order_field = 'stripe_product_id'
+
+    def product_type(self, obj):
+        """Display the product type choice"""
+        return obj.get_product_type_display()
+    product_type.short_description = 'TYPE'
+    product_type.admin_order_field = 'product_type'
+
+    class Media:
+        css = {
+            'all': (
+                'https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css',
+            )
+        }
+
+    def formatted_price(self, obj):
+        """Display price with custom formatting and 2 decimal places"""
+        return f"{obj.price:,.2f}".replace(",", " ") + " €"
+    formatted_price.short_description = 'PRICE'
+    formatted_price.admin_order_field = 'price'
+
+    def symbols(self, obj):
+        """Display max_symbols_count with custom column name and formatting"""
+        if obj.max_symbols_count == -1:
+            return "∞"
+        return f"{obj.max_symbols_count:,}".replace(",", " ")
+    symbols.short_description = 'SYMBOLS'
+    symbols.admin_order_field = 'max_symbols_count'
+
+    def word(self, obj):
+        """Display max_words_count with custom column name and formatting"""
+        if obj.max_words_count == -1:
+            return "∞"
+        return f"{obj.max_words_count:,}".replace(",", " ")
+    word.short_description = 'WORD'
+    word.admin_order_field = 'max_words_count'
+
+    def files(self, obj):
+        """Display max_files_count with custom column name and formatting"""
+        if obj.max_files_count == -1:
+            return "∞"
+        return f"{obj.max_files_count:,}".replace(",", " ")
+    files.short_description = 'FILES'
+    files.admin_order_field = 'max_files_count'
+
+    def glossaries(self, obj):
+        """Display custom_glossaries_count with custom column name and formatting"""
+        if obj.custom_glossaries_count == -1:
+            return "∞"
+        return f"{obj.custom_glossaries_count:,}".replace(",", " ")
+    glossaries.short_description = 'GLOSSARIES'
+    glossaries.admin_order_field = 'custom_glossaries_count'
+
+    def user_subscription_count(self, obj):
+        """Display count of UserSubscription for this SubscriptionType"""
+        count = UserSubscription.objects.filter(subscription=obj).count()
+        return count
+    user_subscription_count.short_description = 'ABONNÉS'
+    user_subscription_count.admin_order_field = 'user_subscription_count'

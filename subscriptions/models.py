@@ -7,26 +7,37 @@ from django.db import models
 from users.models import UserGroup, User
 
 
-# Create your models here.
-
 class SubscriptionType(models.Model):
-    class PriceTypeChoices(models.TextChoices):
-        PUMP = 'PER_USER_PER_MONTH', 'Per-user per month (PUMP)'
-        AU = 'AS_USE', 'As use (AU)',
+    class ProductChoices(models.TextChoices):
+        LEXA = 'LEXA', 'Portail lexa'
+        WORD_ADD_IN = 'WORD_ADD_IN', 'Microsoft word add-in'
+        API = 'API', 'Application Programming Interface'
 
     name = models.CharField(max_length=255)
 
     stripe_product_id = models.CharField(
         max_length=32, unique=True, verbose_name="Stripe Product ID", null=True, blank=True)
 
-    max_symbols_count = models.IntegerField(default=-1)
-    max_words_count = models.IntegerField(default=0)
-    max_files_count = models.IntegerField(default=0)
+    max_symbols_count = models.IntegerField(
+        default=-1, 
+        help_text="Nombre maximum de symboles. Utilisez -1 pour illimité (∞)."
+    )
+    max_words_count = models.IntegerField(
+        default=-1, 
+        help_text="Nombre maximum de mots. Utilisez -1 pour illimité (∞)."
+    )
+    max_files_count = models.IntegerField(
+        default=-1, 
+        help_text="Nombre maximum de fichiers. Utilisez -1 pour illimité (∞)."
+    )
     custom_glossaries_count = models.IntegerField(
-        default=0, verbose_name="Custom Glossaries Count")
+        default=-1, 
+        verbose_name="Custom Glossaries Count",
+        help_text="Nombre maximum de glossaires personnalisés. Utilisez -1 pour illimité (∞)."
+    )
 
-    price_type = models.CharField(
-        max_length=255, choices=PriceTypeChoices.choices)
+    product_type = models.CharField(
+        max_length=255, choices=ProductChoices.choices, verbose_name="Product Type", default=ProductChoices.LEXA)
     price = models.DecimalField(max_digits=7, decimal_places=2)
 
     access_to_writing = models.BooleanField(

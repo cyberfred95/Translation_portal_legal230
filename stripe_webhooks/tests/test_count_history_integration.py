@@ -59,7 +59,7 @@ class CountHistoryIntegrationTestCase(TestCase):
             max_words_count=500,
             max_files_count=10,
             custom_glossaries_count=5,
-            price_type=SubscriptionType.PriceTypeChoices.PUMP,
+            product_type=SubscriptionType.ProductChoices.LEXA,
             price=TEST_SUBSCRIPTION_PRICE,
             access_to_writing=True,
             access_to_official_glossaries=True,

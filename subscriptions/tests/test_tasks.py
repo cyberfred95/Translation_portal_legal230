@@ -75,7 +75,7 @@ class ProcessDailySubscriptionRenewalsTestCase(TestCase):
         # Create a subscription type
         self.subscription_type = SubscriptionType.objects.create(
             name=TEST_SUBSCRIPTION_NAME,
-            price_type=SubscriptionType.PriceTypeChoices.PUMP,
+            product_type=SubscriptionType.ProductChoices.LEXA,
             price=TEST_SUBSCRIPTION_PRICE,
             max_symbols_count=TEST_MAX_SYMBOLS_COUNT,
             max_words_count=TEST_MAX_WORDS_COUNT,

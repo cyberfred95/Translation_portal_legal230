@@ -94,7 +94,7 @@ class GetDataTestCase(TestCase):
         # Create test subscription type
         self.subscription_type = SubscriptionType.objects.create(
             name=TEST_SUBSCRIPTION_NAME,
-            price_type=SubscriptionType.PriceTypeChoices.AU,
+            product_type=SubscriptionType.ProductChoices.WORD_ADD_IN,
             price=TEST_SUBSCRIPTION_PRICE,
             stripe_product_id=TEST_STRIPE_PRODUCT_ID
         )

@@ -88,7 +88,7 @@ class LanguageAPITestCase(TestCase):
         # Create subscription type
         self.subscription_type = SubscriptionType.objects.create(
             name=TEST_SUBSCRIPTION_NAME,
-            price_type=SubscriptionType.PriceTypeChoices.AU,
+            product_type=SubscriptionType.ProductChoices.WORD_ADD_IN,
             price=SUBSCRIPTION_PRICE
         )
 

@@ -100,7 +100,7 @@ class APIIntegrationTestCase(TransactionTestCase):
         # Create subscription type
         self.subscription_type = SubscriptionType.objects.create(
             name=INTEGRATION_SUBSCRIPTION_NAME,
-            price_type=SubscriptionType.PriceTypeChoices.AU,
+            product_type=SubscriptionType.ProductChoices.WORD_ADD_IN,
             price=SUBSCRIPTION_PRICE
         )
 
@@ -302,7 +302,7 @@ class APIPerformanceTestCase(TestCase):
 
         self.subscription_type = SubscriptionType.objects.create(
             name=PERF_SUBSCRIPTION_NAME,
-            price_type=SubscriptionType.PriceTypeChoices.AU,
+            product_type=SubscriptionType.ProductChoices.WORD_ADD_IN,
             price=SUBSCRIPTION_PRICE
         )
 
