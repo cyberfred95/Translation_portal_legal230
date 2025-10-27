@@ -23,7 +23,7 @@ def fill_glossary_ids(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ('glossaries', '0005_auto_20250407_1231'),
-        ('settings', '0008_mainsettings_glossaries_url')
+        #('settings', '0008_mainsettings_glossaries_url')
     ]
 
     operations = [

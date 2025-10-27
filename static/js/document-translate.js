@@ -1315,11 +1315,6 @@ $(document).ready(function () {
         });
 
         formData.append('domain_name', selectedSubDomain);
-        /**
-         * @TODO 11/09/2025 : Le système de sélection du glossaire étant totalement à revoir
-         * en js pour récupérer l'id du glossaire sélectionné dans la popup
-         * je ne l'intègre pas dans les paramètres de l'appel ajax volontairement
-         */
         formData.append('glossary', selectedGlossary);
         formData.append('source_language', sourceLanguage);
         formData.append('target_language', targetLanguage);

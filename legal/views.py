@@ -31,6 +31,18 @@ from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
 import django
 from rest_framework.views import APIView
 
+
+class BaseTemplateView(TemplateView):
+    """
+    Base TemplateView that adds environment variables to context
+    """
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['SUPPORT_EMAIL'] = settings.SUPPORT_EMAIL
+        context['SENDER_EMAIL'] = settings.SENDER_EMAIL
+        context['QUOTE_CC_EMAIL'] = settings.QUOTE_CC_EMAIL
+        return context
+
 from subscriptions.models import SubscriptionType
 from stripe_webhooks.tasks_handlers.helper.stripe_session import get_stripe_customer_session_url
 from .helpers import get_translate_data, lowercase_file_extension, get_word_count, get_text_from_file, get_project_file, \
@@ -69,8 +81,8 @@ def text_translation(request):
     words_count = get_word_count(text)
     symbols_count = len(text)
     if translation_allowed(request=request, words_count=words_count, symbols_count=symbols_count):
-        api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
-        response = requests.post(preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
+        api_key = settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key
+        response = requests.post(settings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
             "text": [text],
             **get_translate_data(request)
         }, headers={
@@ -107,7 +119,7 @@ def form_glossary_object(request) -> Optional[dict]:
 
 def file_translate(request):
     files = request.FILES.getlist('document[]', [])
-    api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+    api_key = settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key
     cache_data = cache.get(f"{request.user.uuid}")
 
     if cache_data:
@@ -135,11 +147,11 @@ def file_translate(request):
         for file in files:
             file = lowercase_file_extension(file)
             response = requests.post(
-                preferences.MainSettings.CLOUDSTORAGE_API_URL,
+                settings.CLOUDSTORAGE_API_URL,
                 data=data,
                 headers={
-                    "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key,
-                    "X-API-Key": preferences.StatisticSettings.API_KEY
+                    "token": settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key,
+                    "X-API-Key": settings.STATS_API_KEY
                 },
                 files={
                     'source_file': file
@@ -153,12 +165,12 @@ def file_translate(request):
         time.sleep(0.1)
         for project in projects:
             project_id = project.get('id')
-            res = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+            res = requests.get(settings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                                headers={
-                                   "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+                                   "token": settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key})
             
             send_email(
-                preferences.MainSettings.quote_cc_email,
+                settings.QUOTE_CC_EMAIL,
                 EmailType.USER_ADM_TR_FILE,
                 'fr',
                 {
@@ -180,7 +192,7 @@ def file_translate(request):
     return JsonResponse({"detail": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class TranslateView(TemplateView):
+class TranslateView(BaseTemplateView):
     template_name = "translate/translate.html"
 
     def get_context_data(self, **kwargs):
@@ -226,13 +238,13 @@ class GetTemplatesView(APIView):
             return Response({"detail": "Missing source language or target language"},
                             status=status.HTTP_400_BAD_REQUEST)
         templates = requests.post(
-            url=preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/get-templates",
+            url=settings.CUSTOM_MT_CONSOLE_URL + "translation/get-templates",
             data={
                 "source_language": self.request.query_params['source_language'].lower(),
                 "target_language": self.request.query_params['target_language'].lower()
             },
             headers={
-                'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
+                'token': settings.CLOUDSTORAGE_API_KEY if self.request.user.is_staff else self.request.user.group.api_key
             }
         )
         template_names = []
@@ -250,13 +262,13 @@ class GetDomainsView(APIView):
             return Response({"message": "Missing source language or target language"},
                             status=status.HTTP_400_BAD_REQUEST)
         domains = requests.post(
-            preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/get-domains",
+            settings.CUSTOM_MT_CONSOLE_URL + "translation/get-domains",
             data={
                 "source_language": self.request.query_params['source_language'].lower(),
                 "target_language": self.request.query_params['target_language'].lower()
             },
             headers={
-                'token': preferences.MainSettings.api_key if self.request.user.is_staff else self.request.user.group.api_key
+                'token': settings.CLOUDSTORAGE_API_KEY if self.request.user.is_staff else self.request.user.group.api_key
             }
         )
         domain_names = []
@@ -321,7 +333,7 @@ class FileExpertRevisionView(APIView):
         return Response({"detail": "Sent to post editing"}, status=status.HTTP_200_OK)
 
 
-class ProjectsHistoryView(TemplateView):
+class ProjectsHistoryView(BaseTemplateView):
     template_name = 'project_history/project_history.html'
 
     def get_context_data(self, **kwargs):
@@ -335,13 +347,13 @@ class ProjectsHistoryView(TemplateView):
             "user_custom_mt_token": user.uuid if not user.is_staff else None
         }
         headers = {
-            "token": preferences.MainSettings.api_key if user.is_staff else user.group.api_key}
+            "token": settings.CLOUDSTORAGE_API_KEY if user.is_staff else user.group.api_key}
 
         if page is not None:
             params["page"] = int(page)
 
         response = requests.get(
-            preferences.MainSettings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
+            settings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
         if 'results' in response:
             for project in response['results']:
                 file_name = urlparse(project['source_file']).path.lstrip(
@@ -367,71 +379,15 @@ class ProjectsHistoryView(TemplateView):
         return context
 
 
-class ProjectsHistory2View(TemplateView):
-    """Nouvelle vue pour project_history_2.html avec design Builder.io"""
-    template_name = 'project_history/project_history_2.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-        page = self.request.GET.get('page')
-        context['languages'] = languages
-        params = {
-            "page_size": PAGINATION_PAGE_SIZE,
-            "page": page,
-            "user_custom_mt_token": user.uuid if not user.is_staff else None
-        }
-        headers = {
-            "token": preferences.MainSettings.api_key if user.is_staff else user.group.api_key}
-
-        if page is not None:
-            params["page"] = int(page)
-
-        response = requests.get(
-            preferences.MainSettings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
-        if 'results' in response:
-            for project in response['results']:
-                file_name = urlparse(project['source_file']).path.lstrip(
-                    '/').split('/')[-1]
-                original_filename = unquote(file_name)
-                project['source_file_name'] = original_filename
-                project['created_at'] = datetime.fromisoformat(
-                    project['created_at'].replace('Z', '+00:00'))
-                project['display_popup'] = False if get_price_by_language_pair(
-                    source_language=project['source_language'],
-                    target_language=project['target_language']
-                ) else True
-                
-                # Mapper les statuts pour correspondre aux badges Builder.io
-                status_mapping = {
-                    'Translated': 'completed',
-                    'Error': 'error',
-                    'In progress': 'in-progress',
-                    'Processing': 'in-progress',
-                    'Needs attention': 'needs-attention'
-                }
-                project['status_mapped'] = status_mapping.get(project['status'], project['status'].lower())
-                
-                if user.is_staff:
-                    try:
-                        project['username'] = User.objects.get(
-                            uuid=project['user_custom_mt_token'])
-                    except User.DoesNotExist:
-                        project['username'] = None
-                    except django.core.exceptions.ValidationError:
-                        project['username'] = None
-            context['projects'] = response
-
-        return context
 
 
 def get_projects_by_ids(request):
     project_ids = request.query_params.getlist('project_id[]', [])
     responses = []
     for project_id in project_ids:
-        response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+        response = requests.get(settings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                                 headers={
-                                    "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+                                    "token": settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key})
         res = response.json()
         file_name = urlparse(response.json()['source_file']).path.lstrip(
             '/').split('/')[-1]
@@ -454,9 +410,9 @@ class SingleProjectView(APIView):
     def delete(self, request):
         project_id = self.request.data.get('project_id')
 
-        response = requests.delete(preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+        response = requests.delete(settings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                                    headers={
-                                       "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key})
+                                       "token": settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key})
 
         return Response({"detail": "Sucessfully deleted"}, status=status.HTTP_204_NO_CONTENT)
 
@@ -473,7 +429,7 @@ class LanguageDetectView(APIView):
         for file in files:
             file = lowercase_file_extension(file)
 
-            api_key = preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+            api_key = settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key
             text_for_detection, words_count, symbols_count = self.get_text_for_detection(
                 api_key=api_key,
                 file=file,
@@ -565,10 +521,10 @@ class DetectTextLanguageView(APIView):
         return text_for_detection
 
 
-class ProfileDetailsView(TemplateView):
+class ProfileDetailsView(BaseTemplateView):
     template_name = 'profile_details/profile_details.html'
     
-class DashboardView(TemplateView):
+class DashboardView(BaseTemplateView):
     template_name = "dashboard/dashboard.html"
 
     def get_context_data(self, **kwargs):
@@ -586,7 +542,7 @@ class DashboardView(TemplateView):
             "user_custom_mt_token": user.uuid if not user.is_staff else None
         }
         headers = {
-            "token": preferences.MainSettings.api_key if user.is_staff else user.group.api_key
+            "token": settings.CLOUDSTORAGE_API_KEY if user.is_staff else user.group.api_key
         }
 
         # Ajouter les filtres au contexte pour maintenir l'état
@@ -643,7 +599,7 @@ class DashboardView(TemplateView):
         try:
             # Récupérer les projets depuis l'API
             response = requests.get(
-                preferences.MainSettings.CLOUDSTORAGE_API_URL, 
+                settings.CLOUDSTORAGE_API_URL, 
                 params=params, 
                 headers=headers
             ).json()
@@ -755,43 +711,9 @@ class DashboardView(TemplateView):
         return context
 
 
-class TextTranslate2View(TemplateView):
-    template_name = "translate_2.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Add context variables here if needed
-        return context
 
 
-class DocumentTranslate2View(TemplateView):
-    template_name = "translate/document_translate/document_translate_2.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['languages'] = languages
-        context['translate_languages'] = self.get_languages()
-        context['access_to_default_glossaries'] = self.default_glossary_allowed()
-        context['subscription_types'] = SubscriptionType.objects.all()
-        return context
-
-    def default_glossary_allowed(self):
-        if self.request.user.is_staff:
-            return True
-
-        user_subscription = self.request.user.subscriptions.first()
-        if self.request.user.group:
-            if user_subscription and user_subscription.access_to_official_glossaries:
-                return True
-        return False
-
-    def get_languages(self):
-        if self.request.LANGUAGE_CODE == 'fr':
-            return Language.objects.order_by('french_name').all()
-        return Language.objects.order_by('name').all()
-
-
-class DisplayMessage(TemplateView):
+class DisplayMessage(BaseTemplateView):
     template_name = "alert.html"
     
     # SVG Icons dictionary
@@ -942,7 +864,7 @@ def show_alert_dialog(icon_name='EXCLAMATION_POINT', title='', message='',
     )
 
 
-class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, BaseTemplateView):
     """
     Team management view for administrators.
     Only group administrators can access this view.

@@ -143,26 +143,6 @@ TEST_GLOSSARY_ID = 1
 TEST_DOMAIN_ID = 1
 MAX_GLOSSARY_ID_FOR_TEST = 99999
 
-# MainSettings Test Constants
-TEST_MAIN_SETTINGS = {
-    'sender_email': 'sender@legal230test.com',
-    'quote_cc_email': 'quotes@legal230test.com',
-    'support_email': 'support@legal230test.com',
-    'api_key': 'test-main-api-key-123456',
-    'algorithm': 'template',  # MainSettings.AlgorithmChoices.template
-    'CUSTOM_MT_CONSOLE_URL': 'https://console.custom.mt/',
-    'CLOUDSTORAGE_API_URL': 'https://cloudstorage.fileprocessing.custom.mt/translate/legal230/',
-    'glossaries_url': 'https://glossaries-api.legal230test.com/api/v1/'
-}
-
-
-def create_test_main_settings():
-    """
-    Create a MainSettings instance with realistic test values.
-    This should be used in test setUp methods to ensure consistent test data.
-    """
-    from settings.models import MainSettings
-    return MainSettings.objects.create(**TEST_MAIN_SETTINGS)
 
 
 def setup_glossary_service_patches(test_case):

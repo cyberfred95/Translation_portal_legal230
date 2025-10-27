@@ -104,15 +104,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-
-    // Delete user functionality - to be implemented
-    // document.querySelectorAll('.delete-user').forEach(button => {
-    //     button.addEventListener('click', function() {
-    //         const userId = this.dataset.userId;
-    //         // TODO: Implement delete functionality with translated messages
-    //         console.log('Delete user:', userId);
-    //     });
-    // });
 });
 
 

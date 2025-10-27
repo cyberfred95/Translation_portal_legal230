@@ -12,8 +12,11 @@ from functools import wraps
 # Common mock configurations
 def _create_mock_settings():
     """Create a mock settings object with standard configuration."""
+    import os
     mock_settings = Mock()
-    mock_settings.CUSTOM_MT_CONSOLE_URL = 'https://console.custom.mt/'
+    mock_settings.CUSTOM_MT_CONSOLE_URL = os.environ.get('CUSTOM_MT_CONSOLE_URL')
+    if not mock_settings.CUSTOM_MT_CONSOLE_URL:
+        raise ValueError("CUSTOM_MT_CONSOLE_URL environment variable is required for tests")
     mock_settings.api_key = 'main-api-key-123'
     return mock_settings
 
@@ -45,15 +48,13 @@ def mock_api_key_generation(api_key='test-api-key-mock'):
     """
     def decorator(test_func):
         @wraps(test_func)
-        @patch('users.models.get_main_settings')
         @patch('users.models.requests.post')
-        def wrapper(self, mock_post, mock_get_settings, *args, **kwargs):
+        def wrapper(self, mock_post, *args, **kwargs):
             # Use shared configuration functions
-            mock_get_settings.return_value = _create_mock_settings()
             mock_post.return_value = _create_mock_api_response(api_key, success=True)
             
             # Pass mocks to the test function
-            return test_func(self, mock_post, mock_get_settings, *args, **kwargs)
+            return test_func(self, mock_post, *args, **kwargs)
         return wrapper
     return decorator
 
@@ -68,16 +69,14 @@ def mock_api_key_generation_silent(api_key='test-api-key-silent'):
     """
     def decorator(test_func):
         @wraps(test_func)
-        @patch('users.models.get_main_settings')
         @patch('users.models.requests.post')
         @patch('builtins.print')  # Suppress print statements
-        def wrapper(self, mock_print, mock_post, mock_get_settings, *args, **kwargs):
+        def wrapper(self, mock_print, mock_post, *args, **kwargs):
             # Use shared configuration functions
-            mock_get_settings.return_value = _create_mock_settings()
             mock_post.return_value = _create_mock_api_response(api_key, success=True)
             
             # Pass mocks to the test function
-            return test_func(self, mock_post, mock_get_settings, *args, **kwargs)
+            return test_func(self, mock_post, *args, **kwargs)
         return wrapper
     return decorator
 
@@ -89,16 +88,14 @@ def mock_api_key_generation_failure():
     """
     def decorator(test_func):
         @wraps(test_func)
-        @patch('users.models.get_main_settings')
         @patch('users.models.requests.post')
         @patch('builtins.print')  # Suppress print statements
-        def wrapper(self, mock_print, mock_post, mock_get_settings, *args, **kwargs):
+        def wrapper(self, mock_print, mock_post, *args, **kwargs):
             # Use shared configuration functions
-            mock_get_settings.return_value = _create_mock_settings()
             mock_post.return_value = _create_mock_api_response('', success=False)
             
             # Pass mocks to the test function
-            return test_func(self, mock_post, mock_get_settings, *args, **kwargs)
+            return test_func(self, mock_post, *args, **kwargs)
         return wrapper
     return decorator
 
@@ -110,12 +107,10 @@ def mock_no_settings():
     """
     def decorator(test_func):
         @wraps(test_func)
-        @patch('users.models.get_main_settings')
         @patch('builtins.print')  # Suppress print statements
-        def wrapper(self, mock_print, mock_get_settings, *args, **kwargs):
-            mock_get_settings.return_value = None
+        def wrapper(self, mock_print, *args, **kwargs):
             # Pass mock to the test function
-            return test_func(self, mock_get_settings, *args, **kwargs)
+            return test_func(self, *args, **kwargs)
         return wrapper
     return decorator
 
@@ -157,23 +152,20 @@ def suppress_api_calls(test_class):
             original_setUp(self)
         
         # Start the patches
-        self._api_patcher_settings = patch('users.models.get_main_settings')
         self._api_patcher_requests = patch('users.models.requests.post')
         self._api_patcher_print = patch('builtins.print')
         
         # Start all patches
-        self._api_mock_get_settings = self._api_patcher_settings.start()
         self._api_mock_post = self._api_patcher_requests.start()
         self._api_mock_print = self._api_patcher_print.start()
         
         # Use common mock setup functions
-        self._api_mock_get_settings.return_value = _create_mock_settings()
         self._api_mock_post.return_value = _create_mock_api_response('test-mocked-api-key')
     
     def new_tearDown(self):
         """Enhanced tearDown with patch cleanup."""
         # Stop patches first
-        for patcher_name in ['_api_patcher_settings', '_api_patcher_requests', '_api_patcher_print']:
+        for patcher_name in ['_api_patcher_requests', '_api_patcher_print']:
             if hasattr(self, patcher_name):
                 getattr(self, patcher_name).stop()
         

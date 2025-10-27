@@ -61,7 +61,7 @@ class StatsProcessor:
 
     def get_template_name(self, source_language, target_language, domain_name):
         response = requests.post(
-            preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + "translation/get_template_by_language_pair_and_domain",
+            settings.CUSTOM_MT_CONSOLE_URL + "translation/get_template_by_language_pair_and_domain",
             headers={
                 "token": self._api_key
             },
@@ -84,9 +84,9 @@ class StatsProcessor:
                      ):
         template_name = self.get_template_name(source_language, target_language, domain_name)
         response = requests.post(
-            preferences.StatisticSettings.URL + "add_statistic/",
+            settings.STATS_API_URL + "add_statistic/",
             headers={
-                'token': preferences.StatisticSettings.API_KEY,
+                'token': settings.STATS_API_KEY,
                 'X-API-KEY': self._api_key,
             },
             data={
@@ -108,9 +108,9 @@ class StatsProcessor:
                              file_name='Text writing',
                              gpt_model='gpt-3.5-turbo-0613'):
         response = requests.post(
-            preferences.StatisticSettings.URL + "add_writing_statistic/",
+            settings.STATS_API_URL + "add_writing_statistic/",
             headers={
-                'token': preferences.StatisticSettings.API_KEY,
+                'token': settings.STATS_API_KEY,
                 'X-API-KEY': self._api_key,
             },
             data={

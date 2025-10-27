@@ -1,4 +1,5 @@
 import requests
+from django.conf import settings
 from preferences import preferences
 from celery import shared_task
 from .models import Domain
@@ -8,8 +9,8 @@ from .models import Domain
 def update_domains():
     existing_domains = Domain.objects.all()
     domains = requests.get(
-        preferences.MainSettings.CUSTOM_MT_CONSOLE_URL + 'translation/get-domamins-list',
-        headers={'token': preferences.MainSettings.api_key}
+        settings.CUSTOM_MT_CONSOLE_URL + 'translation/get-domamins-list',
+        headers={'token': settings.CLOUDSTORAGE_API_KEY}
     )
     existing_domain_names = existing_domains.values_list('name', flat=True)
 

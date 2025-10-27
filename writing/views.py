@@ -1,9 +1,23 @@
 import json
 
+from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
+from django.conf import settings
+
+
+class BaseTemplateView(TemplateView):
+    """
+    Base TemplateView that adds environment variables to context
+    """
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['SUPPORT_EMAIL'] = settings.SUPPORT_EMAIL
+        context['SENDER_EMAIL'] = settings.SENDER_EMAIL
+        context['QUOTE_CC_EMAIL'] = settings.QUOTE_CC_EMAIL
+        return context
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
@@ -27,7 +41,7 @@ def refresh_prompts_view(request):
     return HttpResponseRedirect(reverse('admin:writing_prompt_changelist'))
 
 
-class WritingView(TemplateView):
+class WritingView(BaseTemplateView):
     template_name = 'writing.html'
 
     def get_context_data(self, **kwargs):
@@ -40,65 +54,6 @@ class WritingView(TemplateView):
         return PromptSerializer(prompts, many=True, context={'request': self.request}).data
 
 
-class Writing2View(TemplateView):
-    template_name = 'writing_2.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['prompts'] = self.get_prompts_with_translations()
-        return context
-
-    def get_prompts_with_translations(self):
-        """Get prompts with their translations for the current language"""
-        from django.utils.translation import get_language
-        language_code = get_language() or 'en'
-        
-        prompts = Prompt.objects.prefetch_related('translations').all()
-        
-        prompts_data = []
-        for prompt in prompts:
-            # Get translation for current language or fallback to English
-            translation = prompt.translations.filter(language=language_code).first()
-            if not translation:
-                translation = prompt.translations.filter(language='en').first()
-            
-            if translation:
-                prompt_data = {
-                    'id': prompt.id,
-                    'name': translation.name,
-                    'description': translation.description,
-                    'gpt_model': prompt.gpt_model,
-                    'temperature': prompt.temperature,
-                    'prompt': prompt.prompt,
-                    'variables': prompt.variables,
-                    # Infer action type from name (can be improved with a dedicated field)
-                    'action_type': self.infer_action_type(translation.name.lower())
-                }
-                prompts_data.append(prompt_data)
-        
-        return prompts_data
-    
-    def infer_action_type(self, name):
-        """Infer action type from prompt name for icon selection"""
-        name = name.lower()
-        if 'anonym' in name:
-            return 'anonymise'
-        elif 'summar' in name or 'résumé' in name:
-            return 'summarise'
-        elif 'detail' in name or 'détail' in name:
-            return 'detail'
-        elif 'explain' in name or 'expliqu' in name:
-            return 'explain'
-        elif 'shorten' in name or 'raccour' in name:
-            return 'shorten'
-        elif 'simple' in name:
-            return 'simple'
-        elif 'professional' in name or 'professionnel' in name:
-            return 'professional'
-        elif 'casual' in name or 'décontract' in name:
-            return 'casual'
-        else:
-            return 'default'
 
 
 class WritingProcessAPIView(APIView):
@@ -122,10 +77,10 @@ class WritingProcessAPIView(APIView):
             "variables": prompt.variables,
         }
         response = requests.post(
-            url=preferences.MainSettings.CUSTOM_MT_CONSOLE_URL +
+            url=settings.CUSTOM_MT_CONSOLE_URL +
             'gpt-processing/foreign_gpt_process/',
             headers={
-                'token': preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+                'token': settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key
             },
             json=data
         )
@@ -133,7 +88,7 @@ class WritingProcessAPIView(APIView):
         if not result:
             result = []
         send_statistic_request(
-            api_key=preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key,
+            api_key=settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key,
             texts=result,
             gpt_model=prompt.gpt_model,
             user_uuid=request.user.uuid,

@@ -190,7 +190,7 @@ class SimpleSettersTestCase(TestCase):
         self.assertTrue(user.username.startswith('lexa'))
 
     @mock_api_key_generation
-    def test_create_userGroup_success(self, mock_requests_post, mock_get_main_settings):
+    def test_create_userGroup_success(self, mock_requests_post):
         """Test successful user group creation."""
         from stripe_webhooks.tasks_handlers.setter.set_userGroup import create_userGroup
 

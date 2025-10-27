@@ -10,7 +10,6 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.timezone import now
 from django.conf import settings
 
-from legal.helpers import get_main_settings
 
 logger = logging.getLogger(__name__)
 
@@ -38,12 +37,12 @@ class UserGroup(models.Model):
         Returns the generated API key or None if creation fails.
         """
         try:
-            main_settings = get_main_settings()
-            if not main_settings or not main_settings.CUSTOM_MT_CONSOLE_URL:
+            # Check if required settings are configured
+            if not settings.CUSTOM_MT_CONSOLE_URL or not settings.CLOUDSTORAGE_API_KEY:
                 return None
             
             # Build the API endpoint URL
-            url = main_settings.CUSTOM_MT_CONSOLE_URL.rstrip('/') + "/cabinet_api/create_api_key/"
+            url = settings.CUSTOM_MT_CONSOLE_URL.rstrip('/') + "/cabinet_api/create_api_key/"
             
             # Prepare request data (following the pattern from text_translation)
             data = {
@@ -52,7 +51,7 @@ class UserGroup(models.Model):
             
             # Prepare headers with authorization token
             headers = {
-                "token": main_settings.api_key,
+                "token": settings.CLOUDSTORAGE_API_KEY,
                 "Content-Type": "application/json"
             }
             

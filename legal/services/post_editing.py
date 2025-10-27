@@ -1,4 +1,5 @@
 from typing import Optional
+from django.conf import settings
 from preferences import preferences
 from django.utils.timezone import now
 import requests
@@ -36,18 +37,18 @@ class FileExpertRevisionService:
 
     def send_to_post_editing(self, request, project_id):
         project = requests.get(
-            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+            settings.CLOUDSTORAGE_API_URL + f"{project_id}/",
             headers={
-                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key
+                "token": settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key
             }
 
         ).json()
         response = requests.post(
-            preferences.MainSettings.CLOUDSTORAGE_API_URL + f"post_editing/{project_id}/",
+            settings.CLOUDSTORAGE_API_URL + f"post_editing/{project_id}/",
             headers={
-                "token": preferences.MainSettings.api_key if request.user.is_staff else request.user.group.api_key},
+                "token": settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key},
             data={
-                "email": preferences.MainSettings.sender_email,
+                "email": settings.SENDER_EMAIL,
                 "username": request.user.username,
                 "user_email": request.user.email,
                 "company": request.user.group.name if request.user.group else "Administrator",

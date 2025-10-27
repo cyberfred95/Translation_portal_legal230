@@ -55,7 +55,6 @@ from .settings import (
     TEST_PASSWORD,
     TEST_SUBSCRIPTION_NAME,
     TEST_USERNAME,
-    create_test_main_settings,
     get_auth_headers,
     setup_glossary_service_patches,
     teardown_glossary_service_patches,
@@ -73,13 +72,10 @@ class GlossaryAPITestCase(TestCase):
 
     def setUp(self):
         """Set up test data for glossary API tests."""
-        # Set up patches and main settings using helper functions
+        # Set up patches using helper functions
         setup_glossary_service_patches(self)
         
         self.factory = RequestFactory()
-
-        # Create MainSettings for the test
-        self.main_settings = create_test_main_settings()
 
         # Create test languages
         self.english = Language.objects.create(

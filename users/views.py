@@ -11,6 +11,19 @@ from django.shortcuts import redirect
 from django.templatetags.static import static
 from django.urls import reverse
 from django.views.generic import TemplateView
+from django.conf import settings
+
+
+class BaseTemplateView(TemplateView):
+    """
+    Base TemplateView that adds environment variables to context
+    """
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['SUPPORT_EMAIL'] = settings.SUPPORT_EMAIL
+        context['SENDER_EMAIL'] = settings.SENDER_EMAIL
+        context['QUOTE_CC_EMAIL'] = settings.QUOTE_CC_EMAIL
+        return context
 from django.utils.translation import gettext_lazy as _
 
 from preferences import preferences
@@ -65,22 +78,22 @@ class DeleteAllDataView(APIView):
             "page_size": PAGINATION_PAGE_SIZE,
             "user_custom_mt_token": user.uuid if not user.is_staff else None
         }
-        headers = {"token": preferences.MainSettings.api_key if user.is_staff else user.group.api_key}
+        headers = {"token": settings.CLOUDSTORAGE_API_KEY if user.is_staff else user.group.api_key}
 
-        response = requests.get(preferences.MainSettings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
+        response = requests.get(settings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
         num_pages = response.get('num_pages')
         page = 1
         while page < num_pages:
             params['page'] = page
             response = requests.get(
-                preferences.MainSettings.CLOUDSTORAGE_API_URL,
+                settings.CLOUDSTORAGE_API_URL,
                 params=params,
                 headers=headers,
             ).json()
             if 'results' in response:
                 for project in response['results']:
                     requests.delete(
-                        preferences.MainSettings.CLOUDSTORAGE_API_URL + f"{project['id']}/",
+                        settings.CLOUDSTORAGE_API_URL + f"{project['id']}/",
                         headers=headers,
                     )
 
@@ -187,7 +200,7 @@ class InviteUserAPIView(APIView):
         return url
 
 
-class RegisterUserView(TemplateView):
+class RegisterUserView(BaseTemplateView):
     template_name = 'registration/register.html'
 
     def get_context_data(self, **kwargs):
@@ -224,7 +237,7 @@ class RegisterUserView(TemplateView):
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LoginView(TemplateView):
+class LoginView(BaseTemplateView):
     template_name = 'registration/login.html'
 
     def post(self, request, *args, **kwargs):
@@ -236,7 +249,7 @@ class LoginView(TemplateView):
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ForgotPasswordView(TemplateView):
+class ForgotPasswordView(BaseTemplateView):
     template_name = 'registration/forgot_password.html'
 
     def post(self, request, *args, **kwargs):
@@ -270,7 +283,7 @@ class ForgotPasswordView(TemplateView):
         return url
 
 
-class ResetPasswordView(TemplateView):
+class ResetPasswordView(BaseTemplateView):
     template_name = 'registration/reset_password.html'
 
     def get_context_data(self, **kwargs):
