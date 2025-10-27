@@ -49,19 +49,6 @@
         border: 1px solid #ddd;
         border-radius: 4px;
     }
-    #progress-bar {
-        background: #007cba;
-        height: 100%;
-        transition: width 0.3s;
-    }
-    .progress-container {
-        background: #f0f0f0;
-        border: 1px solid #ccc;
-        height: 20px;
-        margin: 10px 0;
-        border-radius: 4px;
-        overflow: hidden;
-    }
     .module {
         background: white;
         border: 1px solid #ddd;
@@ -217,13 +204,14 @@ document.getElementById('batch-upload-form').addEventListener('submit', function
     <div class="aligned">
         <p><strong>Fichier CSV:</strong> {{ csv_filename }}</p>
         <p><strong>Fichier ZIP:</strong> {{ zip_filename }}</p>
-        
+        <input type="hidden" id="batch-id" value="{{ batch_id }}" />
+
         <div id="progress-section" style="display: none;">
             <h3>Avancement du traitement</h3>
             <div id="progress-info">
-                <p>Traitement en cours...</p>
-                <div class="progress-container">
-                    <div id="progress-bar" style="width: 0%;"></div>
+                <p id="progress-message">Traitement en cours...</p>
+                <p id="progress-stats" style="font-weight: bold; color: #007cba;"></p>
+                <div id="progress-messages" style="max-height: 300px; overflow-y: auto; background: #f9f9f9; border: 1px solid #ddd; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px;">
                 </div>
             </div>
         </div>
@@ -246,84 +234,287 @@ document.getElementById('start-batch').addEventListener('click', function() {
     const button = this;
     const progressSection = document.getElementById('progress-section');
     const resultsSection = document.getElementById('results-section');
-    const progressBar = document.getElementById('progress-bar');
-    
+    const progressMessage = document.getElementById('progress-message');
+    const progressStats = document.getElementById('progress-stats');
+    const progressMessages = document.getElementById('progress-messages');
+    const batchId = document.getElementById('batch-id').value;
+
     button.disabled = true;
     button.textContent = 'Traitement en cours...';
     progressSection.style.display = 'block';
-    progressBar.style.width = '30%';
-    
-    fetch('{% url "admin:glossary_process_batch" %}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
+
+    // Reset progress display
+    progressMessage.textContent = 'Démarrage du traitement...';
+    progressStats.textContent = '';
+    progressMessages.innerHTML = '';
+
+    // Get CSRF token from cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
         }
-    })
-    .then(response => {
-        progressBar.style.width = '70%';
-        return response.json();
-    })
-    .then(data => {
-        progressBar.style.width = '100%';
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    // Track the last message and data to avoid flickering
+    let lastMessage = '';
+    let lastProgressData = null;
+    let progressInterval = null;
+
+    // Function to show final results
+    function showFinalResults(data) {
+        // Clear progress from cache
+        fetch('{% url "admin:glossary_batch_progress" %}?batch_id=' + batchId, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': csrftoken,
+            }
+        }).catch(err => console.log('Error clearing progress:', err));
+
         setTimeout(() => {
             progressSection.style.display = 'none';
             resultsSection.style.display = 'block';
-            
+
             const resultsInfo = document.getElementById('results-info');
-            
-            if (data.success) {
+            const hasErrors = data.errors && data.errors.length > 0;
+            const allFailed = data.created === 0 && hasErrors;
+
+            // Calculate totals
+            const totalProcessed = (data.created || 0) + (data.updated || 0);
+
+            // Déterminer le statut global
+            if (allFailed) {
                 resultsInfo.innerHTML = `
-                    <div style="background: #dfd; border: 1px solid #4f4; padding: 10px; margin: 10px 0; border-radius: 4px;">
-                        <h4>✅ Traitement terminé avec succès!</h4>
-                        <p><strong>Glossaires créés:</strong> ${data.created}</p>
+                    <div style="background: #fdd; border: 1px solid #f44; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                        <h4>❌ Échec du traitement!</h4>
                         <p><strong>Lignes traitées:</strong> ${data.total_rows}</p>
+                        <p><strong>Glossaires traités avec succès:</strong> 0</p>
+                        <p><strong>Glossaires en erreur:</strong> ${data.errors ? data.errors.length : 0}</p>
                     </div>
                 `;
-                
-                if (data.errors.length > 0) {
-                    resultsInfo.innerHTML += `
-                        <div style="background: #ffd; border: 1px solid #ff4; padding: 10px; margin: 10px 0; border-radius: 4px;">
-                            <h4>⚠️ Erreurs rencontrées:</h4>
-                            <ul style="margin: 0; padding-left: 20px;">
-                                ${data.errors.map(error => `<li>${error}</li>`).join('')}
-                            </ul>
-                        </div>
-                    `;
-                }
-                
-                resultsInfo.innerHTML += `
-                    <div style="margin-top: 15px;">
-                        <a href="{% url 'admin:glossaries_glossary_changelist' %}" class="button default">Voir les glossaires</a>
-                        <a href="{% url 'admin:glossary_batch_upload' %}" class="button">Nouveau chargement</a>
+            } else if (hasErrors) {
+                resultsInfo.innerHTML = `
+                    <div style="background: #ffd; border: 1px solid #ff4; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                        <h4>⚠️ Traitement terminé avec des erreurs</h4>
+                        <p><strong>Lignes traitées:</strong> ${data.total_rows}</p>
+                        <p><strong>Glossaires créés:</strong> ${data.created || 0}</p>
+                        <p><strong>Glossaires mis à jour:</strong> ${data.updated || 0}</p>
+                        <p><strong>Glossaires traités avec succès:</strong> ${totalProcessed}</p>
+                        <p><strong>Glossaires en erreur:</strong> ${data.errors ? data.errors.length : 0}</p>
                     </div>
                 `;
             } else {
                 resultsInfo.innerHTML = `
-                    <div style="background: #fdd; border: 1px solid #f44; padding: 10px; margin: 10px 0; border-radius: 4px;">
-                        <h4>❌ Erreur:</h4>
-                        <p>${data.error}</p>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <a href="{% url 'admin:glossary_batch_upload' %}" class="button cancel-link">Recommencer</a>
+                    <div style="background: #dfd; border: 1px solid #4f4; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                        <h4>✅ Traitement terminé avec succès!</h4>
+                        <p><strong>Glossaires créés:</strong> ${data.created || 0}</p>
+                        <p><strong>Glossaires mis à jour:</strong> ${data.updated || 0}</p>
+                        <p><strong>Total traité:</strong> ${totalProcessed}</p>
+                        <p><strong>Lignes traitées:</strong> ${data.total_rows}</p>
                     </div>
                 `;
             }
+
+            if (hasErrors) {
+                resultsInfo.innerHTML += `
+                    <div style="background: #fdd; border: 1px solid #f44; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                        <h4>❌ Erreurs rencontrées (${data.errors.length}):</h4>
+                        <ul style="margin: 0; padding-left: 20px;">
+                            ${data.errors.map(error => `<li>${error}</li>`).join('')}
+                        </ul>
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd;">
+                            <p style="margin: 5px 0;"><strong>Solutions possibles:</strong></p>
+                            <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
+                                <li>Vérifiez que tous les fichiers listés dans le CSV sont présents dans le ZIP</li>
+                                <li>Vérifiez que les codes de langue sont corrects (EN, FR, etc.)</li>
+                                <li>Vérifiez que le service de glossaire externe est accessible</li>
+                                <li>Vérifiez que les fichiers sont au format CSV ou XLSX</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+
+            resultsInfo.innerHTML += `
+                <div style="margin-top: 15px;">
+                    <a href="{% url 'admin:glossaries_glossary_changelist' %}" class="button default">Voir les glossaires</a>
+                    <a href="{% url 'admin:glossary_batch_upload' %}" class="button">Nouveau chargement</a>
+                </div>
+            `;
         }, 500);
-    })
-    .catch(error => {
+    }
+
+    // Function to show error
+    function showError(errorMessage) {
         progressSection.style.display = 'none';
         resultsSection.style.display = 'block';
-        
+
+        document.getElementById('results-info').innerHTML = `
+            <div style="background: #fdd; border: 1px solid #f44; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                <h4>❌ Erreur:</h4>
+                <p>${errorMessage}</p>
+            </div>
+            <div style="margin-top: 15px;">
+                <a href="{% url 'admin:glossary_batch_upload' %}" class="button cancel-link">Recommencer</a>
+            </div>
+        `;
+    }
+
+    // Function to start polling for progress updates
+    function startProgressPolling() {
+        progressInterval = setInterval(function() {
+            fetch('{% url "admin:glossary_batch_progress" %}?batch_id=' + batchId, {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                }
+            })
+            .then(response => {
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Response is not JSON');
+                }
+                return response.json();
+            })
+            .then(progressData => {
+                // Merge with last data to avoid losing information
+                if (lastProgressData) {
+                    // Keep the higher total_rows (once we know it, we keep it)
+                    if (!progressData.total_rows && lastProgressData.total_rows) {
+                        progressData.total_rows = lastProgressData.total_rows;
+                    }
+                    // Keep the last good message if current is empty or default
+                    if (!progressData.message || progressData.message === 'En attente de démarrage...') {
+                        if (lastProgressData.message && lastProgressData.message !== 'En attente de démarrage...') {
+                            progressData.message = lastProgressData.message;
+                        }
+                    }
+                    // Keep progress values
+                    if (!progressData.current_row && lastProgressData.current_row) {
+                        progressData.current_row = lastProgressData.current_row;
+                    }
+                    if (!progressData.created && lastProgressData.created) {
+                        progressData.created = lastProgressData.created;
+                    }
+                }
+
+                // Update display only if we have meaningful data
+                if (progressData.message && progressData.message !== 'En attente de démarrage...') {
+                    progressMessage.textContent = progressData.message;
+                }
+
+                // Update stats - always use the highest total_rows we've seen
+                if (progressData.total_rows > 0 || (lastProgressData && lastProgressData.total_rows > 0)) {
+                    const totalRows = Math.max(progressData.total_rows || 0, lastProgressData?.total_rows || 0);
+                    progressStats.textContent = `Traité: ${progressData.current_row || 0} / ${totalRows} | Créés: ${progressData.created || 0}`;
+                }
+
+                // Add message to log (only for milestone messages and if it's a new message)
+                if (progressData.message && progressData.message.includes('ligne') && progressData.message !== lastMessage) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.textContent = `[${new Date().toLocaleTimeString()}] ${progressData.message}`;
+                    messageDiv.style.marginBottom = '5px';
+                    progressMessages.appendChild(messageDiv);
+
+                    // Auto-scroll to bottom
+                    progressMessages.scrollTop = progressMessages.scrollHeight;
+
+                    // Update last message
+                    lastMessage = progressData.message;
+                }
+
+                // Store this data for next iteration
+                lastProgressData = progressData;
+
+                // Stop polling and show results if completed or error
+                if (progressData.status === 'completed') {
+                    clearInterval(progressInterval);
+                    showFinalResults(progressData);
+                } else if (progressData.status === 'error') {
+                    clearInterval(progressInterval);
+                    showError(progressData.message || 'Erreur inconnue');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching progress:', error);
+            });
+        }, 500); // Poll every 500ms
+    }
+
+    // Start the batch process (it will run in background thread)
+    fetch('{% url "admin:glossary_process_batch" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+        }
+    })
+    .then(response => {
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            console.error('Response is not JSON, content-type:', contentType);
+            throw new Error('Server returned HTML instead of JSON - check server logs');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // The process has started in background
+        if (data.status === 'started') {
+            console.log('Background processing started successfully');
+            // Polling will continue until status is 'completed' or 'error'
+        } else if (data.error) {
+            // Immediate error (before thread started)
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+            progressSection.style.display = 'none';
+            resultsSection.style.display = 'block';
+
+            document.getElementById('results-info').innerHTML = `
+                <div style="background: #fdd; border: 1px solid #f44; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                    <h4>❌ Erreur au démarrage:</h4>
+                    <p>${data.error}</p>
+                </div>
+                <div style="margin-top: 15px;">
+                    <a href="{% url 'admin:glossary_batch_upload' %}" class="button cancel-link">Recommencer</a>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        if (progressInterval) {
+            clearInterval(progressInterval);
+        }
+        progressSection.style.display = 'none';
+        resultsSection.style.display = 'block';
+
         document.getElementById('results-info').innerHTML = `
             <div style="background: #fdd; border: 1px solid #f44; padding: 10px; margin: 10px 0; border-radius: 4px;">
                 <h4>❌ Erreur de communication:</h4>
-                <p>${error.message}</p>
+                <p><strong>Message:</strong> ${error.message}</p>
+                <p style="margin-top: 10px;"><strong>Note:</strong> Si le message indique que la réponse n'est pas JSON, cela signifie que Django a renvoyé une page d'erreur HTML. Vérifiez les logs du serveur pour plus de détails.</p>
             </div>
             <div style="margin-top: 15px;">
                 <a href="{% url 'admin:glossary_batch_upload' %}" class="button cancel-link">Recommencer</a>
             </div>
         `;
     });
+
+    // Start polling after a short delay to ensure the process has started
+    setTimeout(function() {
+        startProgressPolling();
+    }, 1000); // Wait 1 second before starting to poll
 });
 </script>
 {% endif %}

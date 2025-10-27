@@ -1,0 +1,196 @@
+{% load i18n admin_urls static %}
+
+<style>
+    .result-box {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 15px;
+        margin: 15px 0;
+    }
+    .success-box {
+        background: #dfd;
+        border-left: 4px solid #4f4;
+    }
+    .warning-box {
+        background: #ffd;
+        border-left: 4px solid #ff4;
+    }
+    .info-box {
+        background: #e8f4f8;
+        border-left: 4px solid #0073aa;
+    }
+    .glossary-list {
+        max-height: 400px;
+        overflow-y: auto;
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin: 10px 0;
+    }
+    .glossary-item {
+        padding: 8px;
+        margin: 5px 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+    }
+    .glossary-item strong {
+        color: #0073aa;
+    }
+</style>
+
+<h1>Résultats de la comparaison</h1>
+
+<div class="result-box info-box">
+    <h3>📊 Statistiques</h3>
+    <p><strong>Total dans la base locale:</strong> {{ results.total_local }}</p>
+    <p><strong>Total lignes dans le CSV:</strong> {{ results.total_csv }}</p>
+    <p><strong>Glossaires uniques dans le CSV:</strong> {{ results.unique_csv }}</p>
+    {% if results.csv_duplicates %}
+    <p style="color: red;"><strong>⚠️ Doublons dans le CSV:</strong> {{ results.csv_duplicates|length }} clés en double ({{ results.total_csv|add:"-"|add:results.unique_csv }} lignes en trop)</p>
+    {% endif %}
+    <hr style="margin: 15px 0; border: none; border-top: 1px solid #ccc;">
+    <p style="color: green;"><strong>✓ Présents dans les deux:</strong> {{ results.in_both|length }}</p>
+    <p style="color: orange;"><strong>⚠ Uniquement dans la base locale:</strong> {{ results.only_in_local|length }}</p>
+    <p style="color: orange;"><strong>⚠ Uniquement dans le CSV:</strong> {{ results.only_in_csv|length }}</p>
+</div>
+
+{% if results.csv_duplicates %}
+<div class="result-box error-box">
+    <h3>⚠️ Doublons détectés dans le CSV ({{ results.csv_duplicates|length }})</h3>
+    <p>Ces entrées du CSV ont les mêmes langues, domaine et propriétaire. Lors du batch upload, seule la dernière ligne sera conservée.</p>
+    <div class="glossary-list">
+        {% for dup in results.csv_duplicates %}
+            <div class="glossary-item" style="border-left: 3px solid #f44;">
+                <strong>Clé: {{ dup.key.0 }} → {{ dup.key.1 }} | {{ dup.key.2 }} | Owner: {% if dup.key.3 %}{{ dup.key.3 }}{% else %}Admin{% endif %}</strong><br>
+                <span style="color: red;">{{ dup.count }} occurrences dans le CSV:</span>
+                <ul style="margin: 5px 0; padding-left: 20px;">
+                {% for entry in dup.entries %}
+                    <li>Ligne {{ entry.row }}: {{ entry.file }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+    <div style="margin-top: 15px; padding: 10px; background: #fdd; border: 1px solid #f44; border-radius: 4px;">
+        <p><strong>⚠️ Important:</strong></p>
+        <ul style="margin: 5px 0; padding-left: 20px;">
+            <li>Ces lignes sont considérées comme le même glossaire car elles ont les mêmes langues, domaine et propriétaire</li>
+            <li>Le nom du fichier n'est PAS utilisé pour identifier un glossaire unique</li>
+            <li>Lors du batch upload, ces doublons seront écrasés successivement</li>
+            <li>Nettoyez votre CSV pour supprimer les doublons</li>
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+{% if results.in_both %}
+<div class="result-box success-box">
+    <h3>✅ Présents dans les deux ({{ results.in_both|length }})</h3>
+    <p>Ces glossaires sont synchronisés entre la base locale et le CSV.</p>
+    <div class="glossary-list">
+        {% for local_g, csv_g in results.in_both %}
+            <div class="glossary-item">
+                <strong>Local ID {{ local_g.id }}:</strong> {{ local_g.name }}<br>
+                <span style="color: #666;">
+                    {{ local_g.source }} → {{ local_g.target }} |
+                    Domain: {{ local_g.domain }} |
+                    Owner:
+                    {% if local_g.owner_type == 'user' %}
+                        User: {{ local_g.owner_value }}
+                    {% elif local_g.owner_type == 'group' %}
+                        Group: {{ local_g.owner_value }}
+                    {% else %}
+                        Admin/Default
+                    {% endif %}
+                </span><br>
+                <span style="color: #999; font-size: 0.9em;">CSV row {{ csv_g.row }}: {{ csv_g.file }}</span>
+                {% if local_g.glossary_id %}
+                <br><span style="color: green; font-size: 0.9em;">Remote ID: {{ local_g.glossary_id }}</span>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if results.only_in_local %}
+<div class="result-box warning-box">
+    <h3>⚠️ Uniquement dans la base locale ({{ results.only_in_local|length }})</h3>
+    <p>Ces glossaires existent localement mais ne sont pas dans le CSV.</p>
+    <div class="glossary-list">
+        {% for g in results.only_in_local %}
+            <div class="glossary-item">
+                <strong>Local ID {{ g.id }}:</strong> {{ g.name }}<br>
+                <span style="color: #666;">
+                    {{ g.source }} → {{ g.target }} |
+                    Domain: {{ g.domain }} |
+                    Owner:
+                    {% if g.owner_type == 'user' %}
+                        User: {{ g.owner_value }}
+                    {% elif g.owner_type == 'group' %}
+                        Group: {{ g.owner_value }}
+                    {% else %}
+                        Admin/Default
+                    {% endif %}
+                </span>
+                {% if g.glossary_id %}
+                <br><span style="color: green; font-size: 0.9em;">Remote ID: {{ g.glossary_id }}</span>
+                {% else %}
+                <br><span style="color: red; font-size: 0.9em;">[NO REMOTE ID]</span>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    <div style="margin-top: 15px; padding: 10px; background: #ffd; border: 1px solid #ff4; border-radius: 4px;">
+        <p><strong>Recommandations:</strong></p>
+        <ul style="margin: 5px 0; padding-left: 20px;">
+            <li>Ajoutez ces glossaires au CSV si vous voulez les inclure dans votre référence</li>
+            <li>Ou supprimez-les de la base locale s'ils ne sont plus nécessaires</li>
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+{% if results.only_in_csv %}
+<div class="result-box warning-box">
+    <h3>⚠️ Uniquement dans le CSV ({{ results.only_in_csv|length }})</h3>
+    <p>Ces glossaires sont dans le CSV mais n'existent pas dans la base locale.</p>
+    <div class="glossary-list">
+        {% for g in results.only_in_csv %}
+            <div class="glossary-item">
+                <strong>CSV row {{ g.row }}:</strong> {{ g.file }}<br>
+                <span style="color: #666;">
+                    {{ g.source }} → {{ g.target }} |
+                    Domain: {{ g.domain }} |
+                    Owner:
+                    {% if g.user %}
+                        User: {{ g.user }}
+                    {% elif g.group %}
+                        Group: {{ g.group }}
+                    {% else %}
+                        Admin/Default
+                    {% endif %}
+                </span><br>
+                <span style="color: #999; font-size: 0.9em;">Name: {{ g.name }}</span>
+            </div>
+        {% endfor %}
+    </div>
+    <div style="margin-top: 15px; padding: 10px; background: #ffd; border: 1px solid #ff4; border-radius: 4px;">
+        <p><strong>Recommandations:</strong></p>
+        <ul style="margin: 5px 0; padding-left: 20px;">
+            <li>Chargez ces glossaires via le batch upload pour les ajouter à la base locale</li>
+            <li>Vérifiez que vous avez les fichiers de glossaires correspondants dans votre ZIP</li>
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+<div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #ddd;">
+    <a href="{% url 'admin:glossary_compare_csv' %}" class="button">
+        Nouvelle comparaison
+    </a>
+    <a href="{% url 'admin:glossaries_glossary_changelist' %}" class="button default" style="margin-left: 10px;">
+        Retour aux glossaires
+    </a>
+</div>
