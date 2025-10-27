@@ -83,7 +83,7 @@ def get_api_user(request):
 
     try:
         api_products = SubscriptionType.objects.filter(
-            price_type=SubscriptionType.PriceTypeChoices.AU
+            product_type=SubscriptionType.ProductChoices.WORD_ADD_IN
         )
     except SubscriptionType.DoesNotExist:
         return None, API_PRODUCT_NOT_FOUND

@@ -104,7 +104,7 @@ class StripeWebhooksIntegrationTestCase(TransactionTestCase):
         # Step 2: Create subscription type
         subscription_type = SubscriptionType.objects.create(
             name=f"Workflow Test Subscription {timestamp}",
-            price_type=SubscriptionType.PriceTypeChoices.AU,
+            product_type=SubscriptionType.ProductChoices.WORD_ADD_IN,
             price=TEST_SUBSCRIPTION_PRICE,
             stripe_product_id=unique_product_id
         )
@@ -225,7 +225,7 @@ class StripeWebhooksIntegrationTestCase(TransactionTestCase):
 
         subscription_type = SubscriptionType.objects.create(
             name="Multiple Test Subscription",
-            price_type=SubscriptionType.PriceTypeChoices.AU,
+            product_type=SubscriptionType.ProductChoices.WORD_ADD_IN,
             price=TEST_SUBSCRIPTION_PRICE,
             stripe_product_id=unique_product_id
         )
@@ -373,7 +373,7 @@ class StripeWebhooksIntegrationTestCase(TransactionTestCase):
         # Create subscription type
         subscription_type = SubscriptionType.objects.create(
             name=TEST_SUBSCRIPTION_NAME,
-            price_type=SubscriptionType.PriceTypeChoices.AU,
+            product_type=SubscriptionType.ProductChoices.WORD_ADD_IN,
             price=TEST_SUBSCRIPTION_PRICE,
             stripe_product_id=TEST_STRIPE_PRODUCT_ID
         )

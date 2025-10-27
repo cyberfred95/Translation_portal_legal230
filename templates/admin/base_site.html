@@ -2,6 +2,30 @@
 
 {% block title %}Portal administration{% endblock %}
 
+{% block extrahead %}
+{{ block.super }}
+<style>
+    /* Style pour les colonnes numériques dans l'admin */
+    .field-symbols, .field-word, .field-files, .field-glossaries, .field-formatted_price, .field-user_subscription_count {
+        text-align: right !important;
+    }
+    
+    /* Style pour les en-têtes des colonnes numériques */
+    th.column-symbols, th.column-word, th.column-files, th.column-glossaries, th.column-formatted_price, th.column-user_subscription_count {
+        text-align: right !important;
+    }
+    
+    /* Style pour la colonne Stripe */
+    .field-stripe {
+        text-align: center !important;
+    }
+    
+    th.column-stripe {
+        text-align: center !important;
+    }
+</style>
+{% endblock %}
+
 {% block branding %}
 <h1 id="site-name"><a href="{% url 'admin:index' %}">Portal administration</a></h1>
 {% endblock %}
