@@ -36,6 +36,7 @@ import requests
 from glossaries.models import Glossary
 from subscriptions.models import SubscriptionType, UserSubscription
 from subscriptions.permissions import SubscribedPermission
+from subscriptions.utils import get_user_api_key
 from .models import UserGroup, User
 from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer, RegisterUserSerializer, \
     LoginSerializer, ForgotPasswordSerializer, ResetPasswordSerializer
@@ -78,7 +79,15 @@ class DeleteAllDataView(APIView):
             "page_size": PAGINATION_PAGE_SIZE,
             "user_custom_mt_token": user.uuid if not user.is_staff else None
         }
-        headers = {"token": settings.CLOUDSTORAGE_API_KEY if user.is_staff else user.group.api_key}
+        
+        # Resolve API key based on user subscription
+        try:
+            user_api_key = get_user_api_key(user)
+        except ValueError:
+            print("no subscription")
+            return  # Exit early if no subscription found
+            
+        headers = {"token": user_api_key}
 
         response = requests.get(settings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
         num_pages = response.get('num_pages')

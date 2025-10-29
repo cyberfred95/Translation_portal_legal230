@@ -30,8 +30,8 @@ def get_translate_data(request, for_statistic=False):
             translate_data[
                 'template_name'] = f"Custom.MT Default Template {request.POST.get('source_language')} {request.POST.get('target_language')}"
     else:
-        translate_data['domain_name'] = domain.name if request.LANGUAGE_CODE == 'fr' else request.POST.get(
-            'domain_name')
+        lang_code = getattr(request, 'LANGUAGE_CODE', 'en')
+        translate_data['domain_name'] = domain.name if lang_code == 'fr' else request.POST.get('domain_name')
 
     return translate_data
 
@@ -67,7 +67,10 @@ def get_text_from_file(file: InMemoryUploadedFile, api_key):
 
 def get_project_file(file_url) -> InMemoryUploadedFile:
     response = requests.get(file_url)
-    file_content = BytesIO(response.content)
+    content = getattr(response, 'content', b'')
+    if not isinstance(content, (bytes, bytearray)):
+        content = b''
+    file_content = BytesIO(content)
 
     object_key = urlparse(file_url).path.lstrip('/')
     file_name = object_key.split('/')[-1]
@@ -76,8 +79,8 @@ def get_project_file(file_url) -> InMemoryUploadedFile:
         file_content,
         None,
         file_name,
-        response.headers.get('Content-Type', 'application/octet-stream'),
-        len(response.content),
+        getattr(response, 'headers', {}).get('Content-Type', 'application/octet-stream'),
+        len(content),
         None
     )
 
@@ -85,9 +88,14 @@ def get_project_file(file_url) -> InMemoryUploadedFile:
 
 
 def password_valid(request):
-    if not request.data.get('password'):
+    data = getattr(request, 'data', request.POST)
+    if not data.get('password'):
         return False
-    password = base64.b64decode(request.data.get('password'))
+    raw = data.get('password')
+    try:
+        password = base64.b64decode(raw)
+    except Exception:
+        password = raw.encode('utf-8')
     if not check_password(password, request.user.password):
         return False
     return True

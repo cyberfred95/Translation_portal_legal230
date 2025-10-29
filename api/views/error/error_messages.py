@@ -78,7 +78,6 @@ API_KEY_REQUIRED_AFTER_BEARER = "API key is required after Bearer"
 API_KEY_TOO_LONG = f"API key too long. Maximum {MAX_API_KEY_LENGTH} characters"
 
 # API user authentication error messages
-INVALID_API_KEY_NO_GROUP = "Invalid API key, no group found for this API Key"
 API_PRODUCT_NOT_FOUND = "Cannot find any API Product, please contact support"
 API_PRODUCT_ERROR = "Error retrieving API Product, please contact support: {error}"
 NO_ACTIVE_SUBSCRIPTION = "No user found with an active subscription for this API Key"

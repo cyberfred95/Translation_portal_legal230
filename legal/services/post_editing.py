@@ -6,6 +6,7 @@ import requests
 from legal.helpers import get_project_file, get_text_from_file
 from quoting.models import LanguageQuote
 from users.models import UserGroup
+from subscriptions.utils import get_user_api_key
 
 
 class FileExpertRevisionService:
@@ -36,17 +37,24 @@ class FileExpertRevisionService:
         return
 
     def send_to_post_editing(self, request, project_id):
+        # Resolve API key based on user subscription
+        try:
+            user_api_key = get_user_api_key(request.user)
+        except ValueError:
+            print("no subscription")
+            return  # Exit early if no subscription found
+        
         project = requests.get(
             settings.CLOUDSTORAGE_API_URL + f"{project_id}/",
             headers={
-                "token": settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key
+                "token": user_api_key
             }
 
         ).json()
         response = requests.post(
             settings.CLOUDSTORAGE_API_URL + f"post_editing/{project_id}/",
             headers={
-                "token": settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key},
+                "token": user_api_key},
             data={
                 "email": settings.SENDER_EMAIL,
                 "username": request.user.username,

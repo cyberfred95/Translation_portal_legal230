@@ -48,7 +48,7 @@ def mock_api_key_generation(api_key='test-api-key-mock'):
     """
     def decorator(test_func):
         @wraps(test_func)
-        @patch('users.models.requests.post')
+        @patch('subscriptions.models.requests.post')
         def wrapper(self, mock_post, *args, **kwargs):
             # Use shared configuration functions
             mock_post.return_value = _create_mock_api_response(api_key, success=True)
@@ -69,7 +69,7 @@ def mock_api_key_generation_silent(api_key='test-api-key-silent'):
     """
     def decorator(test_func):
         @wraps(test_func)
-        @patch('users.models.requests.post')
+        @patch('subscriptions.models.requests.post')
         @patch('builtins.print')  # Suppress print statements
         def wrapper(self, mock_print, mock_post, *args, **kwargs):
             # Use shared configuration functions
@@ -88,7 +88,7 @@ def mock_api_key_generation_failure():
     """
     def decorator(test_func):
         @wraps(test_func)
-        @patch('users.models.requests.post')
+        @patch('subscriptions.models.requests.post')
         @patch('builtins.print')  # Suppress print statements
         def wrapper(self, mock_print, mock_post, *args, **kwargs):
             # Use shared configuration functions
@@ -115,20 +115,45 @@ def mock_no_settings():
     return decorator
 
 
-def create_test_user_group(name='Test Group', api_key='test-static-key'):
+def create_test_user_group(name='Test Group'):
     """
-    Helper function to create a UserGroup with a static API key for testing.
-    This avoids triggering the automatic API key generation.
+    Helper function to create a UserGroup for testing.
+    Note: API keys are now stored in UserSubscription, not UserGroup.
     
     Args:
         name: The name of the group
-        api_key: The static API key to assign
         
     Returns:
         UserGroup: The created group
     """
     from users.models import UserGroup
-    return UserGroup.objects.create(name=name, api_key=api_key)
+    return UserGroup.objects.create(name=name)
+
+
+def create_test_user_subscription(user, subscription_type, api_key='test-api-key'):
+    """
+    Helper function to create a UserSubscription with an API key for testing.
+    
+    Args:
+        user: The user instance
+        subscription_type: The subscription type instance
+        api_key: The API key to assign
+        
+    Returns:
+        UserSubscription: The created subscription
+    """
+    from subscriptions.models import UserSubscription
+    from django.utils.timezone import now
+    from datetime import timedelta
+    
+    return UserSubscription.objects.create(
+        user=user,
+        subscription=subscription_type,
+        status=UserSubscription.UserSubscriptionChoices.ACTIVE,
+        api_key=api_key,
+        start_date=now(),
+        end_date=now() + timedelta(days=30)
+    )
 
 
 def suppress_api_calls(test_class):
@@ -152,7 +177,7 @@ def suppress_api_calls(test_class):
             original_setUp(self)
         
         # Start the patches
-        self._api_patcher_requests = patch('users.models.requests.post')
+        self._api_patcher_requests = patch('subscriptions.models.requests.post')
         self._api_patcher_print = patch('builtins.print')
         
         # Start all patches

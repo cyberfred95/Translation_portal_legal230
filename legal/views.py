@@ -22,6 +22,7 @@ from quoting.models import LanguageQuote
 from django.utils.timezone import now
 from subscriptions.models import UserSubscription
 from subscriptions.permissions import is_user_subscription_active
+from subscriptions.utils import get_user_api_key
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -81,7 +82,10 @@ def text_translation(request):
     words_count = get_word_count(text)
     symbols_count = len(text)
     if translation_allowed(request=request, words_count=words_count, symbols_count=symbols_count):
-        api_key = settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key
+        try:
+            api_key = get_user_api_key(request.user)
+        except ValueError:
+            return JsonResponse({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
         response = requests.post(settings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
             "text": [text],
             **get_translate_data(request)
@@ -119,7 +123,10 @@ def form_glossary_object(request) -> Optional[dict]:
 
 def file_translate(request):
     files = request.FILES.getlist('document[]', [])
-    api_key = settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key
+    try:
+        api_key = get_user_api_key(request.user)
+    except ValueError:
+        return JsonResponse({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
     cache_data = cache.get(f"{request.user.uuid}")
 
     if cache_data:
@@ -150,7 +157,7 @@ def file_translate(request):
                 settings.CLOUDSTORAGE_API_URL,
                 data=data,
                 headers={
-                    "token": settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key,
+                    "token": api_key,
                     "X-API-Key": settings.STATS_API_KEY
                 },
                 files={
@@ -167,7 +174,7 @@ def file_translate(request):
             project_id = project.get('id')
             res = requests.get(settings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                                headers={
-                                   "token": settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key})
+                                   "token": api_key})
             
             send_email(
                 settings.QUOTE_CC_EMAIL,
@@ -237,6 +244,10 @@ class GetTemplatesView(APIView):
         if 'source_language' not in self.request.query_params or 'target_language' not in self.request.query_params:
             return Response({"detail": "Missing source language or target language"},
                             status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user_api_key = get_user_api_key(self.request.user)
+        except ValueError:
+            return Response({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
         templates = requests.post(
             url=settings.CUSTOM_MT_CONSOLE_URL + "translation/get-templates",
             data={
@@ -244,7 +255,7 @@ class GetTemplatesView(APIView):
                 "target_language": self.request.query_params['target_language'].lower()
             },
             headers={
-                'token': settings.CLOUDSTORAGE_API_KEY if self.request.user.is_staff else self.request.user.group.api_key
+                'token': user_api_key
             }
         )
         template_names = []
@@ -261,6 +272,10 @@ class GetDomainsView(APIView):
         if 'source_language' not in self.request.query_params or 'target_language' not in self.request.query_params:
             return Response({"message": "Missing source language or target language"},
                             status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user_api_key = get_user_api_key(self.request.user)
+        except ValueError:
+            return Response({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
         domains = requests.post(
             settings.CUSTOM_MT_CONSOLE_URL + "translation/get-domains",
             data={
@@ -268,7 +283,7 @@ class GetDomainsView(APIView):
                 "target_language": self.request.query_params['target_language'].lower()
             },
             headers={
-                'token': settings.CLOUDSTORAGE_API_KEY if self.request.user.is_staff else self.request.user.group.api_key
+                'token': user_api_key
             }
         )
         domain_names = []
@@ -346,8 +361,14 @@ class ProjectsHistoryView(BaseTemplateView):
             "page": page,
             "user_custom_mt_token": user.uuid if not user.is_staff else None
         }
+        try:
+            user_api_key = get_user_api_key(user)
+        except ValueError:
+            # En cas d'absence de subscription, on ne peut pas afficher les projets
+            context['projects'] = []
+            return context
         headers = {
-            "token": settings.CLOUDSTORAGE_API_KEY if user.is_staff else user.group.api_key}
+            "token": user_api_key}
 
         if page is not None:
             params["page"] = int(page)
@@ -384,10 +405,14 @@ class ProjectsHistoryView(BaseTemplateView):
 def get_projects_by_ids(request):
     project_ids = request.query_params.getlist('project_id[]', [])
     responses = []
+    try:
+        user_api_key = get_user_api_key(request.user)
+    except ValueError:
+        return Response({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
     for project_id in project_ids:
         response = requests.get(settings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                                 headers={
-                                    "token": settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key})
+                                    "token": user_api_key})
         res = response.json()
         file_name = urlparse(response.json()['source_file']).path.lstrip(
             '/').split('/')[-1]
@@ -410,9 +435,13 @@ class SingleProjectView(APIView):
     def delete(self, request):
         project_id = self.request.data.get('project_id')
 
+        try:
+            user_api_key = get_user_api_key(request.user)
+        except ValueError:
+            return Response({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
         response = requests.delete(settings.CLOUDSTORAGE_API_URL + f"{project_id}/",
                                    headers={
-                                       "token": settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key})
+                                       "token": user_api_key})
 
         return Response({"detail": "Sucessfully deleted"}, status=status.HTTP_204_NO_CONTENT)
 
@@ -429,7 +458,10 @@ class LanguageDetectView(APIView):
         for file in files:
             file = lowercase_file_extension(file)
 
-            api_key = settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key
+            try:
+                api_key = get_user_api_key(request.user)
+            except ValueError:
+                return JsonResponse({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
             text_for_detection, words_count, symbols_count = self.get_text_for_detection(
                 api_key=api_key,
                 file=file,
@@ -541,8 +573,14 @@ class DashboardView(BaseTemplateView):
             "page": page,
             "user_custom_mt_token": user.uuid if not user.is_staff else None
         }
+        try:
+            user_api_key = get_user_api_key(user)
+        except ValueError:
+            # En cas d'absence de subscription, on ne peut pas afficher les projets
+            context['projects'] = []
+            return context
         headers = {
-            "token": settings.CLOUDSTORAGE_API_KEY if user.is_staff else user.group.api_key
+            "token": user_api_key
         }
 
         # Ajouter les filtres au contexte pour maintenir l'état

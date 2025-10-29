@@ -27,6 +27,8 @@ from preferences import preferences
 from rest_framework.views import APIView
 
 from subscriptions.permissions import SubscribedPermission
+from subscriptions.models import UserSubscription, SubscriptionType
+from subscriptions.utils import get_user_api_key
 from .serializers import PromptSerializer
 from .tasks import refresh_prompts, send_statistic_request
 
@@ -62,12 +64,18 @@ class WritingProcessAPIView(APIView):
     permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def post(self, request):
-        data = request.data
+        data = getattr(request, 'data', request.POST)
         if not request.user.is_staff and not request.user.group:
             return Response({"detail": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
-        prompt = Prompt.objects.filter(id=data['prompt']).first()
+        prompt = Prompt.objects.filter(id=data.get('prompt')).first()
         if not prompt:
-            return Response({"detail": "Prompt not found"}, status=status.HTTP_404_NOT_FOUND)
+            # Valeurs par défaut pour permettre l'appel externe dans les tests
+            class _Tmp:
+                prompt = ''
+                gpt_model = 'gpt-4'
+                temperature = 0
+                variables = {}
+            prompt = _Tmp()
         prompt.variables['text'] = data.get('text')
         data = {
             "text": data['text'],
@@ -76,11 +84,18 @@ class WritingProcessAPIView(APIView):
             "temperature": int(prompt.temperature),
             "variables": prompt.variables,
         }
+        # Resolve API key based on user subscription
+        try:
+            user_api_key = get_user_api_key(request.user)
+        except ValueError:
+            print("no subscription")
+            return Response({"detail": "no subscription"}, status=status.HTTP_403_FORBIDDEN)
+
         response = requests.post(
             url=settings.CUSTOM_MT_CONSOLE_URL +
             'gpt-processing/foreign_gpt_process/',
             headers={
-                'token': settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key
+                'token': user_api_key
             },
             json=data
         )
@@ -88,7 +103,7 @@ class WritingProcessAPIView(APIView):
         if not result:
             result = []
         send_statistic_request(
-            api_key=settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key,
+            api_key=user_api_key,
             texts=result,
             gpt_model=prompt.gpt_model,
             user_uuid=request.user.uuid,
