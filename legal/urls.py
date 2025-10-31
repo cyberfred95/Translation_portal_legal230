@@ -4,14 +4,14 @@ from django.urls import path, re_path
 from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import TranslateView, FileExpertRevisionView, ProjectsHistoryView, SingleProjectView, \
+from legal.views_all import TranslateView, FileExpertRevisionView, ProjectsHistoryView, SingleProjectView, \
      GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView, ProfileDetailsView, \
      DashboardView, DisplayMessage
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
 from domains.views import update_domains_view
 from writing.views import refresh_prompts_view
-from legal.views import MyTeamView
+from legal.views.my_team import MyTeamView
 
 urlpatterns = i18n_patterns(
     path("", login_required(RedirectView.as_view(pattern_name='dashboard')), name="root_redirect"),

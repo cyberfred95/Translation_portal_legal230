@@ -13,7 +13,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
 # Local imports
-from legal.views import text_translation, file_translate, get_projects_by_ids
+from legal.views_all import text_translation, file_translate, get_projects_by_ids
 from ..utils import get_user_and_data
 from ..settings import (
     MAX_TEXT_LENGTH,

@@ -24,7 +24,7 @@ from writing.views import WritingProcessAPIView
 from users.views import DeleteAllDataView
 from stats.views import UsageView
 from quoting.services.quote import FormQuoteService
-from legal.views import text_translation, file_translate
+from legal.views_all import text_translation, file_translate
 
 
 class APIMigrationTestCase(TestCase):

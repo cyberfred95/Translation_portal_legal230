@@ -17,7 +17,7 @@ class BaseTemplateView(TemplateView):
 
 import requests
 from preferences import preferences
-from legal.views import PAGINATION_PAGE_SIZE
+from legal.views_all import PAGINATION_PAGE_SIZE
 from users.models import User, UserGroup
 from django.conf import settings
 from subscriptions.utils import get_user_api_key
