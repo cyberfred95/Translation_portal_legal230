@@ -19,7 +19,6 @@ from .views.error.error_messages import (
     AUTHORIZATION_HEADER_FORMAT,
     API_KEY_REQUIRED_AFTER_BEARER,
     API_KEY_TOO_LONG,
-    INVALID_API_KEY_NO_GROUP,
     API_PRODUCT_NOT_FOUND,
     API_PRODUCT_ERROR,
     NO_ACTIVE_SUBSCRIPTION,
@@ -59,13 +58,13 @@ def extract_and_validate_api_key(auth_header):
 
 def get_api_user(request):
     """
-    Get user and group from API key authentication.
+    Get user from API key authentication.
 
     Args:
         request: Django HttpRequest object
 
     Returns:
-        tuple: ((user, group), error_message) where error_message is None on success
+        tuple: (user, error_message) where error_message is None on success
     """
     auth_header = request.headers.get('Authorization')
 
@@ -74,32 +73,25 @@ def get_api_user(request):
     if error:
         return None, error
 
-    # Find group by API key (temporary waiting for custom.mt: API key should be unique)
-    group = UserGroup.objects.filter(api_key=api_key).first()
-    if not group:
-        return None, INVALID_API_KEY_NO_GROUP
-
-    users = User.objects.filter(group=group)
-
-    try:
-        api_products = SubscriptionType.objects.filter(
-            product_type=SubscriptionType.ProductChoices.WORD_ADD_IN
-        )
-    except SubscriptionType.DoesNotExist:
-        return None, API_PRODUCT_NOT_FOUND
-    except Exception as error:
-        return None, API_PRODUCT_ERROR.format(error=error)
-
-    user_subscriptions = UserSubscription.objects.filter(
-        user__in=users, subscription__in=api_products
-    )
-
+    # Find user subscriptions by API key
+    user_subscriptions = UserSubscription.objects.filter(api_key=api_key)
+    
     if not user_subscriptions.exists():
         return None, NO_ACTIVE_SUBSCRIPTION
     if user_subscriptions.count() > 1:
         return None, MULTIPLE_ACTIVE_SUBSCRIPTIONS
 
-    return (user_subscriptions[0].user, group), None
+    user_subscription = user_subscriptions.first()
+    
+    # Check if the subscription product type is supported for API auth
+    if user_subscription.subscription.product_type not in [
+        SubscriptionType.ProductChoices.WORD_ADD_IN,
+        SubscriptionType.ProductChoices.API,
+        SubscriptionType.ProductChoices.LEXA,
+    ]:
+        return None, API_PRODUCT_NOT_FOUND
+
+    return user_subscription.user, None
 
 
 def get_request_data(request, from_query=False):
@@ -149,7 +141,7 @@ def get_user_and_data(request, with_data=True, from_query=False):
     Returns:
         tuple: (user, data, error_dict) where error_dict is None on success
     """
-    user_group, error = get_api_user(request)
+    user, error = get_api_user(request)
     if error:
         return None, None, error_message(error)
 
@@ -159,7 +151,7 @@ def get_user_and_data(request, with_data=True, from_query=False):
         if error:
             return None, None, error_message(error)
 
-    return user_group[0], data, None
+    return user, data, None
 
 
 def detect_glossary_file_type(file_content):

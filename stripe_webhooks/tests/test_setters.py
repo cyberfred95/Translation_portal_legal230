@@ -214,17 +214,15 @@ class SetUserTestCase(TestCase):
 class SetUserGroupTestCase(TestCase):
     """Test case for set_userGroup functions."""
 
-    @mock_api_key_generation('generated-api-key-12345')
-    def test_create_userGroup_success(self, mock_post):
-        """Test successful user group creation with automatic API key generation."""
+    def test_create_userGroup_success(self):
+        """Test successful user group creation."""
         
         error, group = create_userGroup(TEST_GROUP_NAME)
 
         self.assertIsNone(error)
         self.assertIsNotNone(group)
         self.assertEqual(group.name, TEST_GROUP_NAME)
-        # Verify API key was auto-generated
-        self.assertEqual(group.api_key, 'generated-api-key-12345')
+        # Plus de génération d'API key au niveau du groupe
 
     @patch('stripe_webhooks.tasks_handlers.setter.set_userGroup.UserGroup.objects.create')
     def test_create_userGroup_exception_handling(self, mock_create):

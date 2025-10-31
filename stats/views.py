@@ -20,6 +20,7 @@ from preferences import preferences
 from legal.views import PAGINATION_PAGE_SIZE
 from users.models import User, UserGroup
 from django.conf import settings
+from subscriptions.utils import get_user_api_key
 
 
 # Create your views here.
@@ -49,11 +50,16 @@ class UsageView(BaseTemplateView):
                 exclude_page_param=True)
 
             responses = []
+            try:
+                user_api_key = get_user_api_key(self.request.user)
+            except ValueError:
+                # En cas d'absence de subscription, retourner des réponses vides
+                return []
             response = requests.get(
                 settings.STATS_API_URL + "statistics_list/" + additional_url_params,
                 headers={
                     'token': settings.STATS_API_KEY,
-                    'X-API-Key': settings.CLOUDSTORAGE_API_KEY if self.request.user.is_staff else self.request.user.group.api_key
+                    'X-API-Key': user_api_key
                 },
                 json={
                     "uuid": self.get_users(),
@@ -68,7 +74,7 @@ class UsageView(BaseTemplateView):
                             additional_url_params + f"&page={page}",
                             headers={
                                 'token': settings.STATS_API_KEY,
-                                'X-API-Key': settings.CLOUDSTORAGE_API_KEY if self.request.user.is_staff else self.request.user.group.api_key
+                                'X-API-Key': user_api_key
                             },
                             json={
                                 "uuid": self.get_users(),
@@ -164,11 +170,16 @@ class UsageView(BaseTemplateView):
     def get_stats(self) -> dict:
         files = self.request.GET.getlist('file_name', [])
         additional_url_params = self.set_additional_url_params()
+        try:
+            user_api_key = get_user_api_key(self.request.user)
+        except ValueError:
+            # En cas d'absence de subscription, retourner des stats vides
+            return {'results': [], 'total_count': {'chars': 0, 'tokens': 0, 'words': 0}}
         response = requests.get(
             settings.STATS_API_URL + "statistics_list/" + additional_url_params,
             headers={
                 'token': settings.STATS_API_KEY,
-                'X-API-Key': settings.CLOUDSTORAGE_API_KEY if self.request.user.is_staff else self.request.user.group.api_key
+                'X-API-Key': user_api_key
             },
             json={
                 "uuid": self.get_users(),

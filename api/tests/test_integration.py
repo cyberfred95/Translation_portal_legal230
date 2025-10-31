@@ -82,10 +82,9 @@ class APIIntegrationTestCase(TransactionTestCase):
             domain_group=self.domain_group
         )
 
-        # Create group with API key
+        # Create group
         self.group = create_test_user_group(
-            name=INTEGRATION_GROUP_NAME,
-            api_key=INTEGRATION_API_KEY
+            name=INTEGRATION_GROUP_NAME
         )
 
         # Create test user
@@ -104,11 +103,12 @@ class APIIntegrationTestCase(TransactionTestCase):
             price=SUBSCRIPTION_PRICE
         )
 
-        # Create user subscription
+        # Create user subscription with API key
         self.user_subscription = UserSubscription.objects.create(
             user=self.user,
             subscription=self.subscription_type,
             status=UserSubscription.UserSubscriptionChoices.ACTIVE,
+            api_key=INTEGRATION_API_KEY,
             start_date=timezone.now(),
             end_date=timezone.now() + timedelta(days=30)
         )
@@ -288,8 +288,7 @@ class APIPerformanceTestCase(TestCase):
 
         # Minimal setup for performance tests
         self.group = create_test_user_group(
-            name=PERF_GROUP_NAME,
-            api_key=PERF_API_KEY
+            name=PERF_GROUP_NAME
         )
 
         self.user = User.objects.create_user(
@@ -310,6 +309,7 @@ class APIPerformanceTestCase(TestCase):
             user=self.user,
             subscription=self.subscription_type,
             status=UserSubscription.UserSubscriptionChoices.ACTIVE,
+            api_key=PERF_API_KEY,
             start_date=timezone.now(),
             end_date=timezone.now() + timedelta(days=30)
         )

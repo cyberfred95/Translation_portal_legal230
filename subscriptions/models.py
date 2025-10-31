@@ -1,8 +1,12 @@
 from datetime import timezone
+import uuid
+import requests
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.conf import settings
+from django.utils.timezone import now
 
 from users.models import UserGroup, User
 
@@ -69,9 +73,15 @@ class UserSubscription(models.Model):
         SubscriptionType, on_delete=models.CASCADE, related_name='users')
     status = models.CharField(
         max_length=255, choices=UserSubscriptionChoices.choices)
-
     stripe_subscription_id = models.CharField(
         max_length=32, verbose_name="Stripe Subscription ID", null=True, blank=True)
+    api_key = models.CharField(
+        max_length=256, 
+        blank=True, 
+        null=True,
+        help_text="API key for this subscription. If not provided, will be automatically generated"
+    )
+
 
     max_symbols_count = models.IntegerField(default=-1)
     max_files_count = models.IntegerField(default=0)
@@ -92,9 +102,58 @@ class UserSubscription(models.Model):
 
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-
+    
+    
     def __str__(self):
         return self.user.__str__()
+
+    def is_active(self):
+        """Check if subscription is active using the same logic as permissions."""
+        active_states = {
+            self.UserSubscriptionChoices.INCOMPLETE,
+            self.UserSubscriptionChoices.ACTIVE,
+            self.UserSubscriptionChoices.TRIALING,
+            self.UserSubscriptionChoices.PAST_DUE,
+        }
+        return self.status in active_states
+
+    def create_api_key(self):
+        """
+        Create a new API key by calling the cabinet API endpoint.
+        Returns the generated API key or None if creation fails.
+        """
+        try:
+            # Check if required settings are configured
+            if not settings.CUSTOM_MT_CONSOLE_URL or not settings.CLOUDSTORAGE_API_KEY:
+                return None
+            
+            # Build the API endpoint URL
+            url = settings.CUSTOM_MT_CONSOLE_URL.rstrip('/') + "/cabinet_api/create_api_key/"
+            
+            # Prepare request data (using subscription ID as label)
+            data = {
+                "label": str(self.id)
+            }
+            
+            # Prepare headers with authorization token
+            headers = {
+                "token": settings.CLOUDSTORAGE_API_KEY,
+                "Content-Type": "application/json"
+            }
+            
+            # Make the API request
+            response = requests.post(url, json=data, headers=headers, timeout=30)
+            
+            if response.status_code == 200:
+                result = response.json()
+                return result.get('api_key')
+            else:
+                return None
+                
+        except requests.RequestException:
+            return None
+        except Exception:
+            return None
 
     def save(self, *args, **kwargs):
         if self.subscription:
@@ -105,7 +164,30 @@ class UserSubscription(models.Model):
             self.access_to_writing = self.subscription.access_to_writing
             self.access_to_official_glossaries = self.subscription.access_to_official_glossaries
             self.access_to_sso = self.subscription.access_to_sso
-        super().save(*args, **kwargs)
+        
+        # Auto-generate API key if empty AND subscription is active
+        needs_api_key = (
+            not self.api_key and 
+            self.is_active()
+        )
+        
+        if needs_api_key:
+            # First save to get an ID
+            super().save(*args, **kwargs)
+            
+            # Now generate API key using the subscription ID
+            generated_key = self.create_api_key()
+            if generated_key:
+                self.api_key = generated_key
+            else:
+                # Fallback to UUID if API call fails
+                self.api_key = str(uuid.uuid4())
+            
+            # Save again with the API key
+            super().save()
+        else:
+            # Normal save if API key already exists or not needed
+            super().save(*args, **kwargs)
 
     def clean(self):
         if self.user.subscriptions.all().exclude(id=self.id).exists():

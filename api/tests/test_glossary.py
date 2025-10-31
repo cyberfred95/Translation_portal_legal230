@@ -98,8 +98,7 @@ class GlossaryAPITestCase(TestCase):
 
         # Create API group
         self.group = create_test_user_group(
-            name=TEST_GROUP_NAME,
-            api_key=TEST_API_KEY
+            name=TEST_GROUP_NAME
         )
 
         # Create test user
@@ -118,11 +117,12 @@ class GlossaryAPITestCase(TestCase):
             price=SUBSCRIPTION_PRICE
         )
 
-        # Create user subscription
+        # Create user subscription with API key
         self.user_subscription = UserSubscription.objects.create(
             user=self.user,
             subscription=self.subscription_type,
             status=UserSubscription.UserSubscriptionChoices.ACTIVE,
+            api_key=TEST_API_KEY,
             start_date=timezone.now(),
             end_date=timezone.now() + timedelta(days=30)
         )

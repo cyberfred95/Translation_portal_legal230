@@ -25,14 +25,13 @@ from api.views.error.error_messages import (
     API_KEY_TOO_LONG,
     AUTHORIZATION_HEADER_FORMAT,
     AUTHORIZATION_HEADER_REQUIRED,
-    INVALID_API_KEY_NO_GROUP,
     INVALID_JSON,
     NO_ACTIVE_SUBSCRIPTION,
     SOURCE_LANGUAGE_TOO_LONG,
 )
 from subscriptions.models import SubscriptionType, UserSubscription
 from users.models import User, UserGroup
-from tests.mock import create_test_user_group
+from tests.mock import create_test_user_group, create_test_user_subscription
 
 from .settings import (
     CSV_EXTENSION,
@@ -70,10 +69,9 @@ class APIUtilsTestCase(TestCase):
         """Set up test data for API utilities tests."""
         self.factory = RequestFactory()
 
-        # Create API group with key
+        # Create API group
         self.group = create_test_user_group(
-            name=TEST_GROUP_NAME,
-            api_key=TEST_API_KEY
+            name=TEST_GROUP_NAME
         )
 
         # Create test user
@@ -92,11 +90,12 @@ class APIUtilsTestCase(TestCase):
             price=SUBSCRIPTION_PRICE
         )
 
-        # Create active subscription
+        # Create active subscription with API key
         self.user_subscription = UserSubscription.objects.create(
             user=self.user,
             subscription=self.subscription_type,
             status=UserSubscription.UserSubscriptionChoices.ACTIVE,
+            api_key=TEST_API_KEY,
             start_date=timezone.now(),
             end_date=timezone.now() + timedelta(days=30)
         )
@@ -148,22 +147,21 @@ class APIUtilsTestCase(TestCase):
         request = self.factory.get('/')
         request.headers = {'Authorization': f'Bearer {TEST_API_KEY}'}
 
-        user_group, error = get_api_user(request)
+        user, error = get_api_user(request)
 
         self.assertIsNone(error)
-        self.assertEqual(user_group[0], self.user)
-        self.assertEqual(user_group[1], self.group)
+        self.assertEqual(user, self.user)
 
     def test_get_api_user_invalid_key(self):
         """Test with invalid API key."""
         request = self.factory.get('/')
         request.headers = {'Authorization': f'Bearer {INVALID_API_KEY}'}
 
-        user_group, error = get_api_user(request)
+        user, error = get_api_user(request)
 
-        self.assertIsNone(user_group)
+        self.assertIsNone(user)
         self.assertEqual(
-            error, INVALID_API_KEY_NO_GROUP)
+            error, NO_ACTIVE_SUBSCRIPTION)
 
     def test_get_api_user_no_subscription(self):
         """Test with user lacking API subscription."""
@@ -173,9 +171,9 @@ class APIUtilsTestCase(TestCase):
         request = self.factory.get('/')
         request.headers = {'Authorization': f'Bearer {TEST_API_KEY}'}
 
-        user_group, error = get_api_user(request)
+        user, error = get_api_user(request)
 
-        self.assertIsNone(user_group)
+        self.assertIsNone(user)
         self.assertEqual(
             error, NO_ACTIVE_SUBSCRIPTION)
 

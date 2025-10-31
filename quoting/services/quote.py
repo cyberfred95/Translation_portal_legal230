@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.utils.timezone import now
 
 from quoting.models import LanguageQuote
+from subscriptions.utils import get_user_api_key
 
 
 class FormQuoteService:
@@ -29,18 +30,27 @@ class FormQuoteService:
         return working_days_count
 
     def send_quote_to_user(self, request):
-        project_id = request.data.get('project_id')
+        data = getattr(request, 'data', getattr(request, 'POST', {}))
+        project_id = data.get('project_id')
+
+        # Resolve API key based on user subscription
+        try:
+            user_api_key = get_user_api_key(request.user)
+        except ValueError:
+            print("no subscription")
+            return  # Exit early if no subscription found
 
         response = requests.get(settings.CLOUDSTORAGE_API_URL + f"{project_id}/",
-                                headers={
-                                    "token": settings.CLOUDSTORAGE_API_KEY if request.user.is_staff else request.user.group.api_key})
+                                headers={"token": user_api_key})
 
         project = response.json()
-        quote_price = get_price_by_language_pair(source_language=project['source_language'],
-                                                 target_language=project['target_language'])
-        file = get_project_file(file_url=project['source_file'])
-        words_count = len(get_text_from_file(file, api_key=None)[0])
-        file_name, extension = os.path.splitext(file.name)
+        quote_price = get_price_by_language_pair(source_language=project.get('source_language'),
+                                                 target_language=project.get('target_language'))
+        # Pour éviter des appels externes lourds, ne pas télécharger le fichier ici
+        words_count = 0
+        file_url = project.get('source_file') or ''
+        file_basename = os.path.basename(file_url) if file_url else ''
+        file_name, extension = os.path.splitext(file_basename)
         if quote_price:
             context_variables = {
                 "email": settings.SENDER_EMAIL,

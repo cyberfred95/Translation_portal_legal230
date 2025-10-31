@@ -199,7 +199,7 @@ class SimpleSettersTestCase(TestCase):
         self.assertIsNone(error)
         self.assertIsNotNone(group)
         self.assertEqual(group.name, "NEW GROUP")
-        self.assertIsNotNone(group.api_key)  # API key should be generated
+        # api_key has been moved to UserSubscription; group no longer carries an api_key
 
 
 class SimpleHelpersTestCase(TestCase):

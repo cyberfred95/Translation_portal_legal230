@@ -149,7 +149,7 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('user', 'subscription', 'status', 'stripe_subscription_id')
+            'fields': ('user', 'subscription', 'status', 'stripe_subscription_id', 'api_key')
         }),
         ('Allowed Limits', {
             'fields': (
