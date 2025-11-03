@@ -645,6 +645,20 @@ msgstr "Admin"
 msgid "User"
 msgstr "User"
 
+#: legal/templates/my_team/my_team_users.html:20
+msgid "Usage"
+msgstr ""
+
+#: legal/templates/my_team/my_team_users.html:92
+msgid "Symbols"
+msgstr ""
+
+## removed duplicate 'Words' here; already defined at stats/templates/usage_history.html:250
+
+#: legal/templates/my_team/my_team_users.html:106
+msgid "Files"
+msgstr ""
+
 #: legal/templates/my_team/my_team_users.html:100
 msgid "Cannot edit buyer"
 msgstr ""

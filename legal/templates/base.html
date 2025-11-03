@@ -31,6 +31,9 @@
     <!-- STYLES -->
     <link href="{% static 'css/main.css' %}" rel="stylesheet" />
     <link href="{% static 'css/main-figma.css' %}"rel="stylesheet" />
+    <link href="{% static 'css/base.css' %}" rel="stylesheet" />
+
+    {% block extra_css %}{% endblock %}
 
     <!-- TAILWINDCSS -->
     <script>
@@ -351,6 +354,7 @@
 <script src="{% static 'js/index.js' %}"></script>
 <script src="{% static 'js/response-error.js' %}"></script>
 <script src="{% static 'js/header.js' %}"></script>
+<script src="{% static 'js/base.js' %}"></script>
 
 <script>
     var language_code = "{{ request.LANGUAGE_CODE }}"

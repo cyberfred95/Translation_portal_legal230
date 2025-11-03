@@ -1,31 +1,37 @@
 {% load i18n %}
 
 <!-- Team Members Table -->
-<table class="w-full table-fixed">
+<table class="myteam-table">
     <thead>
-        <tr class="bg-blue-50 border-b border-gray-200">
-            <th style="width: 35%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 12px 16px;">
-                <span style="display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; width: 100%; justify-content: flex-start;">
-                    <i class="ph ph-user" style="font-size: 24px; color: #6B7280; flex: 0 0 auto;"></i>
-                    <span style="display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% trans 'Utilisateur' %}</span>
+        <tr class="myteam-thead-row">
+            <th class="myteam-th myteam-th-user">
+                <span class="my-flex-row my-ellipsis">
+                    <i class="ph ph-user icon-24 icon-muted no-shrink"></i>
+                    <span class="my-ellipsis">{% trans 'Utilisateur' %}</span>
                 </span>
             </th>
-            <th style="width: 25%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 12px 16px;">
-                <span style="display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; width: 100%; justify-content: flex-start;">
-                    <i class="ph ph-certificate" style="font-size: 24px; color: #6B7280; flex: 0 0 auto;"></i>
-                    <span style="display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% trans 'Licence' %}</span>
+            <th class="myteam-th myteam-th-license">
+                <span class="my-flex-row my-ellipsis">
+                    <i class="ph ph-certificate icon-24 icon-muted no-shrink"></i>
+                    <span class="my-ellipsis">{% trans 'Licence' %}</span>
                 </span>
             </th>
-            <th style="width: 20%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 12px 16px;">
-                <span style="display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; width: 100%; justify-content: center;">
-                    <i class="ph ph-briefcase" style="font-size: 24px; color: #6B7280; flex: 0 0 auto;"></i>
-                    <span style="display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% trans 'Role' %}</span>
+            <th class="myteam-th myteam-th-usage">
+                <span class="my-flex-row my-ellipsis center">
+                    <i class="ph ph-chart-bar icon-24 icon-muted no-shrink"></i>
+                    <span class="my-ellipsis">{% trans 'Usage' %}</span>
                 </span>
             </th>
-            <th style="width: 20%; font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 12px 16px;">
-                <span style="display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; width: 100%; justify-content: center;">
-                    <i class="ph ph-wrench" style="font-size: 24px; color: #6B7280; flex: 0 0 auto;"></i>
-                    <span style="display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% trans 'Actions' %}</span>
+            <th class="myteam-th myteam-th-role">
+                <span class="my-flex-row my-ellipsis center">
+                    <i class="ph ph-briefcase icon-24 icon-muted no-shrink"></i>
+                    <span class="my-ellipsis">{% trans 'Role' %}</span>
+                </span>
+            </th>
+            <th class="myteam-th myteam-th-actions">
+                <span class="my-flex-row my-ellipsis center">
+                    <i class="ph ph-wrench icon-24 icon-muted no-shrink"></i>
+                    <span class="my-ellipsis">{% trans 'Actions' %}</span>
                 </span>
             </th>
         </tr>
@@ -33,13 +39,13 @@
     <tbody>
         {% if team_members %}
             {% for member in team_members %}
-            <tr class="border-b border-gray-100 hover:bg-gray-50">
-                <td class="py-3 px-4">
-                    <div class="flex flex-col min-w-0">
-                        <span class="text-sm font-medium text-gray-900 truncate">
+            <tr class="myteam-tr">
+                <td class="myteam-td">
+                    <div class="my-col">
+                        <span class="user-name my-ellipsis">
                             {{ member.username }}
                         </span>
-                        <span class="text-xs text-gray-500 truncate">
+                        <span class="user-email my-ellipsis">
                             {% if member.email %}
                                 {{ member.email }}
                             {% else %}
@@ -48,61 +54,89 @@
                         </span>
                     </div>
                 </td>
-                <td class="py-3 px-4">
-                    <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                <td class="myteam-td">
+                    <div class="my-flex-row my-ellipsis">
                         {% if member.license.status == 'active' %}
                             {% if 'API' in member.license.name %}
-                                <i class="ph-fill ph-code" style="font-size: 20px; color: #8B5CF6; flex-shrink: 0;"></i>
+                                <i class="ph-fill ph-code icon-20 color-violet no-shrink"></i>
                             {% elif 'Premium' in member.license.name %}
-                                <i class="ph-fill ph-crown" style="font-size: 20px; color: #F59E0B; flex-shrink: 0;"></i>
+                                <i class="ph-fill ph-crown icon-20 color-amber no-shrink"></i>
                             {% elif 'Standard' in member.license.name %}
-                                <i class="ph-fill ph-star" style="font-size: 20px; color: #3B82F6; flex-shrink: 0;"></i>
+                                <i class="ph-fill ph-star icon-20 color-blue no-shrink"></i>
                             {% elif 'Essentiel' in member.license.name or 'Essential' in member.license.name %}
-                                <i class="ph-fill ph-check-circle" style="font-size: 20px; color: #10B981; flex-shrink: 0;"></i>
+                                <i class="ph-fill ph-check-circle icon-20 color-green no-shrink"></i>
                             {% else %}
-                                <i class="ph-fill ph-certificate" style="font-size: 20px; color: #6B7280; flex-shrink: 0;"></i>
+                                <i class="ph-fill ph-certificate icon-20 icon-muted no-shrink"></i>
                             {% endif %}
-                            <span style="font-family: 'Poppins', sans-serif; font-weight: 400; font-size: 14px; line-height: 24px; color: #181932; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">
+                            <span class="license-text my-ellipsis">
                                 {{ member.license.name }}
                             </span>
                         {% elif member.license.status == 'no_subscription' %}
-                            <span style="width: 20px; flex-shrink: 0;"></span>
-                            <span style="font-family: 'Poppins', sans-serif; font-weight: 400; font-size: 14px; line-height: 24px; color: #9CA3AF; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">
+                            <span class="spacer-20 no-shrink"></span>
+                            <span class="inactive-text my-ellipsis">
                                 {% trans '(Inactive)' %}
                             </span>
                         {% elif member.license.status == 'error' %}
-                            <i class="ph-fill ph-warning" style="font-size: 20px; color: #DC2626; flex-shrink: 0;"></i>
-                            <span style="font-family: 'Poppins', sans-serif; font-weight: 400; font-size: 14px; line-height: 24px; color: #DC2626; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">
+                            <i class="ph-fill ph-warning icon-20 color-red no-shrink"></i>
+                            <span class="error-text my-ellipsis">
                                 {% trans 'Error' %}
                             </span>
                         {% endif %}
                     </div>
                 </td>
-                <td class="py-3 px-4" style="text-align: center;">
-                    <div style="min-width: 0; display: flex; justify-content: center;">
+                <td class="myteam-td">
+                    <div class="usage-bars" 
+                         data-sym="{{ member.usage.symbols.current }}" data-sym-max="{{ member.usage.symbols.max }}"
+                         data-words="{{ member.usage.words.current }}" data-words-max="{{ member.usage.words.max }}"
+                         data-files="{{ member.usage.files.current }}" data-files-max="{{ member.usage.files.max }}">
+                        <div class="bar-wrapper">
+                            <div class="bar bar--symbols" data-name="{% trans 'Symbols' %}">
+                                <div class="bar-fill"></div>
+                                <span class="bar-infinity">∞</span>
+                            </div>
+                            <div class="bar-tooltip"></div>
+                        </div>
+                        <div class="bar-wrapper">
+                            <div class="bar bar--words" data-name="{% trans 'Words' %}">
+                                <div class="bar-fill"></div>
+                                <span class="bar-infinity">∞</span>
+                            </div>
+                            <div class="bar-tooltip"></div>
+                        </div>
+                        <div class="bar-wrapper">
+                            <div class="bar bar--files" data-name="{% trans 'Files' %}">
+                                <div class="bar-fill"></div>
+                                <span class="bar-infinity">∞</span>
+                            </div>
+                            <div class="bar-tooltip"></div>
+                        </div>
+                    </div>
+                </td>
+                <td class="myteam-td center">
+                    <div class="center-row my-ellipsis">
                         {% if member.is_buyer %}
-                            <span class="role-badge role-badge-buyer" style="display: inline-flex; align-items: center; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 14px; line-height: 24px; padding: 0 4px; border-radius: 4px; border: 0.5px solid #F59E0B; background: #FFFBEB; color: #D97706; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <span class="role-badge role-badge-buyer">
                                 {% trans 'Buyer' %}
                             </span>
                         {% elif member.is_admin %}
-                            <span class="role-badge role-badge-admin" style="display: inline-flex; align-items: center; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 14px; line-height: 24px; padding: 0 4px; border-radius: 4px; border: 0.5px solid #93C5FD; background: #EFF6FF; color: #3B82F6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <span class="role-badge role-badge-admin">
                                 {% trans 'Admin' %}
                             </span>
                         {% else %}
-                            <span class="role-badge role-badge-user" style="display: inline-flex; align-items: center; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 14px; line-height: 24px; padding: 0 4px; border-radius: 4px; border: 0.5px solid #14532D; background: #F0FDF4; color: #14532D; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <span class="role-badge role-badge-user">
                                 {% trans 'User' %}
                             </span>
                         {% endif %}
                     </div>
                 </td>
-                <td class="py-3 px-4" style="text-align: center;">
+                <td class="myteam-td center">
                     {% if member.is_buyer %}
-                        <button type="button" disabled title="{% trans 'Cannot edit buyer' %}" style="background: none; border: none; cursor: not-allowed; opacity: 0.5;">
-                            <i class="ph ph-pencil-simple" style="font-size: 16px; color: #9CA3AF;"></i>
+                        <button type="button" class="btn-icon disabled" disabled title="{% trans 'Cannot edit buyer' %}">
+                            <i class="ph ph-pencil-simple icon-16 color-gray"></i>
                         </button>
                     {% else %}
-                        <button type="button" class="edit-user" data-user-id="{{ member.id }}" data-username="{{ member.username }}" data-email="{{ member.email }}" data-is-admin="{{ member.is_admin|yesno:'true,false' }}" data-has-active-subscription="{% if member.license.status == 'active' %}true{% else %}false{% endif %}" title="{% trans 'Edit user' %}" style="background: none; border: none; cursor: pointer;">
-                            <i class="ph ph-pencil-simple" style="font-size: 16px; color: #374151;"></i>
+                        <button type="button" class="btn-icon edit-user" data-user-id="{{ member.id }}" data-username="{{ member.username }}" data-email="{{ member.email }}" data-is-admin="{{ member.is_admin|yesno:'true,false' }}" data-has-active-subscription="{% if member.license.status == 'active' %}true{% else %}false{% endif %}" title="{% trans 'Edit user' %}">
+                            <i class="ph ph-pencil-simple icon-16 color-dark"></i>
                         </button>
                     {% endif %}
                 </td>

@@ -40,7 +40,7 @@ from subscriptions.utils import get_user_api_key
 from .models import UserGroup, User
 from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer, RegisterUserSerializer, \
     LoginSerializer, ForgotPasswordSerializer, ResetPasswordSerializer
-from legal.views import PAGINATION_PAGE_SIZE
+from legal.views_all import PAGINATION_PAGE_SIZE
 from legal.helpers import password_valid
 
 from emails.models import EmailType

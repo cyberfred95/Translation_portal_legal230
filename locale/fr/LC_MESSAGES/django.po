@@ -643,6 +643,18 @@ msgstr "Admin"
 msgid "User"
 msgstr "Utilisateur"
 
+#: legal/templates/my_team/my_team_users.html:20
+msgid "Usage"
+msgstr "Usage"
+
+#: legal/templates/my_team/my_team_users.html:92
+msgid "Symbols"
+msgstr "Caractères"
+
+#: legal/templates/my_team/my_team_users.html:106
+msgid "Files"
+msgstr "Fichiers"
+
 #: legal/templates/my_team/my_team_users.html:100
 msgid "Cannot edit buyer"
 msgstr ""
