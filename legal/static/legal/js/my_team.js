@@ -104,4 +104,65 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
+    // Initialize usage bars with animation and tooltips
+    function formatDots(n) {
+      const s = String(n);
+      return s.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function initUsageBars() {
+      document.querySelectorAll('.usage-bars').forEach(container => {
+        const sym = Number(container.dataset.sym || 0);
+        const symMax = Number(container.dataset.symMax || 0);
+        const words = Number(container.dataset.words || 0);
+        const wordsMax = Number(container.dataset.wordsMax || 0);
+        const files = Number(container.dataset.files || 0);
+        const filesMax = Number(container.dataset.filesMax || 0);
+
+        const entries = [
+            { value: sym, max: symMax },
+            { value: words, max: wordsMax },
+            { value: files, max: filesMax },
+        ];
+
+        container.querySelectorAll('.bar-wrapper').forEach((wrapper, idx) => {
+            const barEl = wrapper.querySelector('.bar');
+            const fill = barEl.querySelector('.bar-fill');
+            const tooltip = wrapper.querySelector('.bar-tooltip');
+            const name = barEl.dataset.name || '';
+            const { value, max } = entries[idx] || { value: 0, max: 0 };
+            const unlimited = max === -1;
+            let pct = 0;
+            if (unlimited) {
+                pct = 100; // plein pour illimité
+                barEl.classList.add('unlimited');
+            } else if (max > 0) {
+                pct = Math.round((value / max) * 100);
+                if (value >= max) pct = 100;
+                if (pct < 0) pct = 0;
+                if (pct > 100) pct = 100;
+            } else {
+                pct = 0;
+            }
+            // Tooltip content (∞ pour illimité)
+            if (unlimited) {
+                tooltip.textContent = `${name}: ∞`;
+            } else {
+                const maxLabel = formatDots(max);
+                const valLabel = formatDots(value);
+                tooltip.textContent = `${name}: ${valLabel}/${maxLabel} (${pct}%)`;
+            }
+            // Animate bar fill and position tooltip
+          requestAnimationFrame(() => {
+            fill.style.width = pct + '%';
+            // position tooltip by percentage (wrapper and bar have same width due to grid)
+            tooltip.style.left = pct + '%';
+          });
+        });
+      });
+    }
+
+    initUsageBars();
+    window.addEventListener('resize', initUsageBars);
 });

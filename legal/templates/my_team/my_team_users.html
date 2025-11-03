@@ -16,6 +16,12 @@
                     <span class="my-ellipsis">{% trans 'Licence' %}</span>
                 </span>
             </th>
+            <th class="myteam-th myteam-th-usage">
+                <span class="my-flex-row my-ellipsis center">
+                    <i class="ph ph-chart-bar icon-24 icon-muted no-shrink"></i>
+                    <span class="my-ellipsis">{% trans 'Usage' %}</span>
+                </span>
+            </th>
             <th class="myteam-th myteam-th-role">
                 <span class="my-flex-row my-ellipsis center">
                     <i class="ph ph-briefcase icon-24 icon-muted no-shrink"></i>
@@ -76,6 +82,34 @@
                                 {% trans 'Error' %}
                             </span>
                         {% endif %}
+                    </div>
+                </td>
+                <td class="myteam-td">
+                    <div class="usage-bars" 
+                         data-sym="{{ member.usage.symbols.current }}" data-sym-max="{{ member.usage.symbols.max }}"
+                         data-words="{{ member.usage.words.current }}" data-words-max="{{ member.usage.words.max }}"
+                         data-files="{{ member.usage.files.current }}" data-files-max="{{ member.usage.files.max }}">
+                        <div class="bar-wrapper">
+                            <div class="bar bar--symbols" data-name="{% trans 'Symbols' %}">
+                                <div class="bar-fill"></div>
+                                <span class="bar-infinity">∞</span>
+                            </div>
+                            <div class="bar-tooltip"></div>
+                        </div>
+                        <div class="bar-wrapper">
+                            <div class="bar bar--words" data-name="{% trans 'Words' %}">
+                                <div class="bar-fill"></div>
+                                <span class="bar-infinity">∞</span>
+                            </div>
+                            <div class="bar-tooltip"></div>
+                        </div>
+                        <div class="bar-wrapper">
+                            <div class="bar bar--files" data-name="{% trans 'Files' %}">
+                                <div class="bar-fill"></div>
+                                <span class="bar-infinity">∞</span>
+                            </div>
+                            <div class="bar-tooltip"></div>
+                        </div>
                     </div>
                 </td>
                 <td class="myteam-td center">

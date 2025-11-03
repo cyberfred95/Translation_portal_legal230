@@ -145,10 +145,11 @@
 .my-team-page .myteam-table { width: 100%; table-layout: fixed; border-collapse: collapse; }
 .my-team-page .myteam-thead-row { background: #EFF6FF; border-bottom: 1px solid #E5E7EB; }
 .my-team-page .myteam-th { font-weight: 500; color: #5A5A78; font-size: 1rem; padding: 12px 16px; text-align: left; vertical-align: middle; }
-.my-team-page .myteam-th-user { width: 35%; }
+.my-team-page .myteam-th-user { width: 30%; }
 .my-team-page .myteam-th-license { width: 25%; }
+.my-team-page .myteam-th-usage { width: 35%; text-align: left; vertical-align: middle; }
 .my-team-page .myteam-th-role { width: 20%; text-align: center; vertical-align: middle; }
-.my-team-page .myteam-th-actions { width: 20%; text-align: center; vertical-align: middle; }
+.my-team-page .myteam-th-actions { width: 15%; text-align: center; vertical-align: middle; }
 .my-team-page .myteam-tr { border-bottom: 1px solid #F3F4F6; }
 .my-team-page .myteam-tr:hover { background: #F9FAFB; }
 .my-team-page .myteam-td { padding: 12px 16px; vertical-align: middle; }
@@ -170,6 +171,39 @@
 /* Icon buttons */
 .my-team-page .btn-icon { background: none; border: none; cursor: pointer; }
 .my-team-page .btn-icon.disabled { cursor: not-allowed; opacity: 0.5; }
+
+/* --------- Usage bars --------- */
+.my-team-page .usage-bars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; align-items: center; }
+.my-team-page .usage-bars .bar-wrapper { position: relative; }
+.my-team-page .usage-bars .bar { position: relative; height: 14px; background: #E5E7EB; border-radius: 9999px; overflow: hidden; }
+.my-team-page .usage-bars .bar .bar-fill { height: 100%; width: 0%; border-radius: 9999px; transition: width 600ms ease-out; }
+.my-team-page .usage-bars .bar--symbols .bar-fill { background: #8B5CF6; }
+.my-team-page .usage-bars .bar--words .bar-fill { background: #3B82F6; }
+.my-team-page .usage-bars .bar--files .bar-fill { background: #16A34A; }
+.my-team-page .usage-bars .bar.unlimited .bar-fill {
+  background: linear-gradient(90deg, #9CA3AF, #6B7280);
+  transition: none;
+}
+
+.my-team-page .usage-bars .bar .bar-infinity {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.my-team-page .usage-bars .bar.unlimited .bar-infinity {
+  opacity: 1;
+}
+.my-team-page .usage-bars .bar-wrapper .bar-tooltip { position: absolute; top: -40px; left: 0; transform: translateX(-50%); background: #ffffff; color: #111827; padding: 6px 10px; font-size: 14px; border-radius: 8px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 150ms ease; z-index: 10; border: 1px solid #E5E7EB; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+.my-team-page .usage-bars .bar-wrapper:hover .bar-tooltip { opacity: 1; }
 
 /* Role Tags */
 .my-team-page .role-badge {

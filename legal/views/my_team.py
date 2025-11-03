@@ -157,6 +157,14 @@ class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, BaseTemplateView):
                 continue
             is_admin = self.check_admin_status(user)
             is_buyer = (not is_admin) and self.check_buyer_status(user)
+            # Subscription counters
+            user_subscription = user.subscriptions.first()
+            sym_cur = getattr(user_subscription, 'translated_symbols_count', 0) if user_subscription else 0
+            sym_max = getattr(user_subscription, 'max_symbols_count', 0) if user_subscription else 0
+            words_cur = getattr(user_subscription, 'translated_words_count', 0) if user_subscription else 0
+            words_max = getattr(user_subscription, 'max_words_count', 0) if user_subscription else 0
+            files_cur = getattr(user_subscription, 'translated_files_count', 0) if user_subscription else 0
+            files_max = getattr(user_subscription, 'max_files_count', 0) if user_subscription else 0
             member_data = {
                 'id': user.id,
                 'username': user.username,
@@ -169,6 +177,11 @@ class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, BaseTemplateView):
                 'is_premium': self.check_premium_status(user),
                 'date_joined': user.date_joined,
                 'license': license_info,
+                'usage': {
+                    'symbols': {'current': sym_cur, 'max': sym_max},
+                    'words': {'current': words_cur, 'max': words_max},
+                    'files': {'current': files_cur, 'max': files_max},
+                }
             }
             members_with_data.append(member_data)
 
