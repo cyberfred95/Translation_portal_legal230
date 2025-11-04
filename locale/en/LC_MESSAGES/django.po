@@ -1222,3 +1222,11 @@ msgstr "File size exceeds 5MB limit."
 #: glossaries/templates/glossaries.html:153
 msgid "Source and target languages must be different"
 msgstr "Source and target languages must be different"
+
+#: legal/templates/profile_details/profile_security.html:28
+msgid "Logout"
+msgstr "Logout"
+
+#: legal/templates/profile_details/profile_security.html:31
+msgid "Sign out of your account."
+msgstr "Sign out of your account."

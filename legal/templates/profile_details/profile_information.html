@@ -1,11 +1,11 @@
 {% load static %}
 {% load i18n %}
 
-<form name="change-user-data" method="post" class="w-full">
+<form name="change-user-data" method="post" class="profile-form">
     {% csrf_token %}
 
     <!-- Form Fields -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="form-grid form-grid-3 section-spacing">
         <!-- First Name -->
         {% include 'profile_details/profile_information_input.html' with field_id='first_name' field_label='First Name' field_type='text' field_name='first_name' field_value=request.user.first_name|default:'' %}
 
@@ -17,7 +17,7 @@
     </div>
 
     <!-- Email and Username Section -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div class="form-grid form-grid-2 section-spacing">
         <!-- Username -->
         {% include 'profile_details/profile_information_input.html' with field_id='username' field_label='Username' field_type='text' field_name='username' field_value=request.user.username %}
 
@@ -27,10 +27,8 @@
 
 
     <!-- Save Button -->
-    <div class="mt-6 w-full flex justify-end">
-        <button
-                type="submit"
-                class="h-10 px-4 py-2 bg-green-800 hover:bg-green-600 text-white text-sm font-semibold rounded-full tracking-[-0.084px] leading-6 flex items-center gap-2 transition-colors">
+    <div class="actions-row end actions-spacing">
+        <button type="submit" class="btn btn-primary-solid">
             {% trans 'Update Information' %}
         </button>
     </div>
