@@ -1226,3 +1226,11 @@ msgstr "La taille du fichier dépasse la limite de 5 Mo."
 #: glossaries/templates/glossaries.html:153
 msgid "Source and target languages must be different"
 msgstr "Les langues source et cible doivent être différentes"
+
+#: legal/templates/profile_details/profile_security.html:28
+msgid "Logout"
+msgstr "Déconnexion"
+
+#: legal/templates/profile_details/profile_security.html:31
+msgid "Sign out of your account."
+msgstr "Déconnectez-vous de votre compte."

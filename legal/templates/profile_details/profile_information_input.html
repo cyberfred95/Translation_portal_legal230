@@ -2,16 +2,16 @@
 {% load i18n %}
 
 <!-- Reusable form input component -->
-<div class="space-y-1">
-    <label for="{{ field_id }}" class="text-sm font-semibold text-gray-900 tracking-[-0.084px] leading-6">
+<div class="form-field">
+    <label for="{{ field_id }}" class="form-label">
         {% trans field_label %}
     </label>
     {% if field_type == "select" %}
-        <div class="relative">
+        <div class="select-wrapper">
             <select
                     name="{{ field_name }}"
                     id="{{ field_id }}"
-                    class="h-10 rounded-md border border-black/10 bg-white text-sm font-normal text-gray-900 tracking-[-0.084px] leading-6 focus:outline-none focus:ring-1 focus:ring-gray-900 px-3 w-full appearance-none pr-10">
+                    class="form-select">
                 {% for option_value, option_text in field_options %}
                     <option value="{{ option_value }}" {% if field_selected_value == option_value %}selected{% endif %}>
                         {{ option_value|upper }} - {{ option_text }}
@@ -19,10 +19,8 @@
                 {% endfor %}
             </select>
             <!-- Chevron Down Icon -->
-            <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                </svg>
+            <div class="select-chevron">
+                <i class="ph ph-caret-down icon-16"></i>
             </div>
         </div>
     {% else %}
@@ -31,7 +29,7 @@
                 name="{{ field_name }}"
                 id="{{ field_id }}"
                 value="{{ field_value }}"
-                class="h-10 rounded-md border border-black/10 bg-white text-sm font-normal text-gray-900 tracking-[-0.084px] leading-6 focus:outline-none focus:ring-1 focus:ring-gray-900 px-3 w-full"
+                class="form-input"
         />
     {% endif %}
 </div>

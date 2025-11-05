@@ -3,45 +3,44 @@
 {% load static %}
 {% load i18n %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'legal/css/profile_details.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="mx-5 mb-11.5 mt-5">
+<div class="profile-details-page" data-change-url="{% url 'user' id=request.user.id %}">
     <!-- Header -->
-    <div class="mb-6">
-        <h2 class="text-2xl mb-2 font-poppins font-semibold">
+    <div class="header-block">
+        <h2 class="page-title">
             {% trans 'Profile Details' %}
         </h2>
-        <div class="text-base font-poppins font-normal">
+        <div class="page-subtitle">
             {% trans 'Manage your account information and security settings.' %}
         </div>
     </div>
 
     <!-- Main tabs -->
-    <div class="flex justify-between items-center mt-5">
-        <div class="flex gap-2.5 items-center rounded-full bg-gray-100 border-0.5">
-            <button type="button" id="profile-information" class="tab flex gap-2.5 items-center px-4 py-2.5 rounded-full hover:bg-gray-200 text-gray-900 font-medium font-weight-500 bg-white transition-colors duration-300">
-                <span class="text-3.5">{% trans 'Information' %}</span>
+    <div class="tabs-row">
+        <div class="tabs-switch">
+            <button type="button" id="profile-information" class="tab" aria-selected="true">
+                <span>{% trans 'Information' %}</span>
             </button>
-            <button type="button" id="profile-security" class="tab flex gap-2.5 items-center px-4 py-2.5 rounded-full text-gray-900 hover:text-gray-900 text-gray-300 transition-colors duration-300">
-                <span class="text-3.5">{% trans 'Security' %}</span>
+            <button type="button" id="profile-security" class="tab" aria-selected="false">
+                <span>{% trans 'Security' %}</span>
             </button>
         </div>
     </div>
 
-    <div class="my-5">
-        <div class="flex justify-between items-center px-8 w-full bg-white p-2 rounded-lg">
-        <div class="space-y-2.5 w-full">
+    <div class="content-card">
+        <div class="content-card-body">
+            <!--  ------------- TAB-1 -------------  -->
+            <div id="profile-information-content" class="tab-content">
+                {% include 'profile_details/profile_information.html' %}
+            </div>
 
-            <div class="my-5 w-full">
-                <!--  ------------- TAB-1 -------------  -->
-                <div id="profile-information-content" class="tab-content w-full bg-white">
-                    {% include 'profile_details/profile_information.html' %}
-                </div>
-
-                <!--  ------------- TAB-2 -------------  -->
-                <div id="profile-security-content" class="tab-content hidden">
-                    {% include 'profile_details/profile_security.html' %}
-                </div>
-
+            <!--  ------------- TAB-2 -------------  -->
+            <div id="profile-security-content" class="tab-content hidden">
+                {% include 'profile_details/profile_security.html' %}
             </div>
         </div>
     </div>
@@ -54,9 +53,9 @@
 
 </div>
 
-<script src="{% static 'js/profile-details.js' %}"></script>
-<script>
-    var change_data_url = "{% url 'user' id=request.user.id %}"
-</script>
+{% block extra_js %}
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<script src="{% static 'legal/js/profile_details.js' %}"></script>
+{% endblock %}
 
 {% endblock %}

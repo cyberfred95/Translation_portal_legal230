@@ -1,0 +1,146 @@
+.profile-details-page {
+  /* Scope page styles */
+  padding-top: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* Hide utility within scope */
+.profile-details-page .hidden { display: none !important; }
+
+/* Tabs switch (pill group) */
+.profile-details-page .tabs-switch {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  background: #F3F4F6; /* gray-100 */
+  border-radius: 9999px;
+  padding: 4px;
+  width: auto;
+}
+
+.profile-details-page .tabs-row { margin-top: 20px; }
+
+/* Tabs */
+.profile-details-page .tab {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 16px;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: #6B7280; /* gray-500 */
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 200ms ease, color 200ms ease, box-shadow 200ms ease;
+}
+.profile-details-page .tab.is-active {
+  background-color: #ffffff;
+  color: #111827;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+.profile-details-page .tab:hover {
+  background: #E5E7EB; /* gray-200 */
+  color: #111827;
+}
+.profile-details-page .tab span {
+  font-size: 14px;
+}
+
+/* Header */
+.profile-details-page .header-block { margin-bottom: 24px; }
+.profile-details-page .page-title { font-size: 24px; font-weight: 600; margin-bottom: 8px; color: #111827; }
+.profile-details-page .page-subtitle { font-size: 16px; font-weight: 400; color: #111827; opacity: 0.9; }
+
+/* Content Card */
+.profile-details-page .content-card { margin-top: 20px; }
+.profile-details-page .content-card .content-card-body { display: block; width: 100%; background: #ffffff; border-radius: 12px; padding: 16px 40px; box-sizing: border-box; }
+.profile-details-page .content-card .tab-content { width: 100%; background: #ffffff; padding-right: 8px; box-sizing: border-box; }
+
+/* Form fields */
+.profile-details-page .form-field { display: flex; flex-direction: column; gap: 4px; }
+.profile-details-page .form-label { font-size: 14px; font-weight: 600; color: #111827; letter-spacing: -0.084px; line-height: 24px; }
+.profile-details-page .form-input,
+.profile-details-page .form-select {
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.1);
+  background: #ffffff;
+  color: #111827;
+  font-size: 14px;
+  line-height: 24px;
+  padding: 0 12px;
+  width: 100%;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.profile-details-page .form-input:focus,
+.profile-details-page .form-select:focus {
+  outline: none;
+  border-color: #111827;
+  box-shadow: 0 0 0 2px rgba(17,24,39,0.15);
+}
+.profile-details-page .select-wrapper { position: relative; }
+.profile-details-page .select-wrapper .form-select { appearance: none; padding-right: 40px; }
+.profile-details-page .select-chevron { position: absolute; right: 12px; top: 0; bottom: 0; display: flex; align-items: center; pointer-events: none; color: #6B7280; }
+.profile-details-page .icon-16 { width: 16px; height: 16px; }
+
+/* Forms */
+.profile-details-page .profile-form { width: 100%; }
+.profile-details-page .form-grid { display: grid; gap: 24px; }
+.profile-details-page .form-grid-3 { grid-template-columns: 1fr; }
+@media (min-width: 768px) {
+  .profile-details-page .form-grid-3 { grid-template-columns: repeat(3, 1fr); }
+}
+.profile-details-page .form-grid-2 { grid-template-columns: 1fr; }
+@media (min-width: 768px) {
+  .profile-details-page .form-grid-2 { grid-template-columns: repeat(2, 1fr); }
+}
+.profile-details-page .section-spacing { margin-bottom: 24px; }
+.profile-details-page .actions-row { display: flex; width: 100%; }
+.profile-details-page .actions-row.end { justify-content: flex-end; }
+.profile-details-page .actions-spacing { margin-top: 24px; }
+.profile-details-page .btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 9999px; cursor: pointer; transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease; height: 40px; padding: 0 16px; font-size: 14px; font-weight: 600; line-height: 1; }
+.profile-details-page .btn-primary-solid { background: #065F46; color: #fff; border: 1px solid #065F46; }
+.profile-details-page .btn-primary-solid:hover { background: #047857; border-color: #047857; }
+
+/* Icons */
+.profile-details-page .icon-24 { 
+  width: 24px !important; 
+  height: 24px !important; 
+  font-size: 24px !important;
+  color: rgba(0,0,0,0.8); 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center; 
+}
+.profile-details-page .icon-24 svg {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+/* Outline button */
+.profile-details-page .btn-outline { background: #ffffff; color: #181932; border: 1px solid rgba(0,0,0,0.1); padding: 8px 10px; display: inline-flex; align-items: center; gap: 2px; }
+.profile-details-page .btn-outline:hover { background: #F9FAFB; }
+.profile-details-page .btn-outline .icon-24 { flex-shrink: 0; }
+.profile-details-page .btn-label { padding: 0 8px; font-size: 14px; font-weight: 600; color: #181932; line-height: 1.5; }
+
+/* Sections */
+.profile-details-page .security-section { width: 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 32px; }
+.profile-details-page .section-row { width: 100%; display: flex; flex-direction: column; gap: 16px; }
+@media (min-width: 640px) {
+  .profile-details-page .section-row { flex-direction: row; justify-content: space-between; align-items: flex-end; }
+}
+.profile-details-page .section-texts { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; justify-content: center; }
+.profile-details-page .section-title { font-size: 16px; font-weight: 400; color: #181932; line-height: 24px; letter-spacing: -0.176px; }
+.profile-details-page .section-desc { font-size: 14px; font-weight: 400; color: #5A5A78; line-height: 24px; letter-spacing: -0.084px; }
+
+/* Modal */
+.profile-details-page .modal-overlay { position: fixed; inset: 0; background: rgba(107,114,128,0.5); display: flex; align-items: center; justify-content: center; }
+.profile-details-page .modal-card { position: relative; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 800px; margin: 0 16px; }
+.profile-details-page .modal-body { padding: 28px; display: flex; flex-direction: column; gap: 24px; }
+.profile-details-page .modal-body.center { align-items: center; }
+.profile-details-page .modal-title { font-size: 20px; font-weight: 600; color: #111827; }
+
+
+
