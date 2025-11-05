@@ -307,4 +307,10 @@ ACTIVE_TRAIL_USER_PROFILE_FROMNAME = os.environ.get(
 ACTIVE_TRAIL_SEND_EMAIL_REQUEST_URL = 'https://webapi.mymarketing.co.il/api/OperationalMessage/Message'
 ACTIVE_TRAIL_API_KEY = os.environ.get('ACTIVE_TRAIL_API_KEY')
 
+# PDF Conversion method: 'custommt' or 'adobe'
+CONVERSION_METHOD = os.environ.get('CONVERSION_METHOD', 'custommt')
 
+# Adobe PDF Services configuration
+ADOBE_CLIENT_ID = os.environ.get('ADOBE_CLIENT_ID')
+ADOBE_CLIENT_SECRET = os.environ.get('ADOBE_CLIENT_SECRET')
+ADOBE_ORGANIZATION_ID = os.environ.get('ADOBE_ORGANIZATION_ID')
