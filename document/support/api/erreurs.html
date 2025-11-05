@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codes d'erreur - LEXA API</title>
+</head>
+<body>
+    <header>
+        <h1>Codes d'erreur</h1>
+        <p>LEXA API - Référence complète des erreurs</p>
+        <p><a href="index.html">← Retour à la documentation</a></p>
+    </header>
+
+    <nav>
+        <h2>Catégories d'erreurs</h2>
+        <ul>
+            <li><a href="#http-codes">Codes HTTP</a></li>
+            <li><a href="#auth-errors">Erreurs d'authentification</a></li>
+            <li><a href="#validation-errors">Erreurs de validation</a></li>
+            <li><a href="#file-errors">Erreurs de fichiers</a></li>
+            <li><a href="#resource-errors">Erreurs de ressources</a></li>
+            <li><a href="#server-errors">Erreurs serveur</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="introduction">
+            <h2>Introduction</h2>
+            <p>Cette page documente tous les codes d'erreur possibles de LEXA API, leurs causes et les solutions recommandées.</p>
+
+            <h3>Format des erreurs</h3>
+            <p>Toutes les erreurs API sont retournées au format JSON suivant :</p>
+            <pre><code>{
+  "detail": "Message d'erreur descriptif"
+}</code></pre>
+
+            <p>Le code HTTP accompagnant la réponse indique le type d'erreur.</p>
+        </section>
+
+        <section id="http-codes">
+            <h2>Codes HTTP</h2>
+
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Nom</th>
+                        <th>Description</th>
+                        <th>Quand survient-il ?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>200</strong></td>
+                        <td>OK</td>
+                        <td>Requête réussie avec contenu</td>
+                        <td>Succès de la traduction, récupération de données</td>
+                    </tr>
+                    <tr>
+                        <td><strong>204</strong></td>
+                        <td>No Content</td>
+                        <td>Requête réussie sans contenu de retour</td>
+                        <td>Suppression réussie d'un glossaire</td>
+                    </tr>
+                    <tr>
+                        <td><strong>400</strong></td>
+                        <td>Bad Request</td>
+                        <td>Erreur de validation, données invalides</td>
+                        <td>Champ manquant, format incorrect, limite dépassée</td>
+                    </tr>
+                    <tr>
+                        <td><strong>401</strong></td>
+                        <td>Unauthorized</td>
+                        <td>Authentification manquante ou échouée</td>
+                        <td>Clé API manquante, invalide, ou abonnement inactif</td>
+                    </tr>
+                    <tr>
+                        <td><strong>404</strong></td>
+                        <td>Not Found</td>
+                        <td>Ressource non trouvée</td>
+                        <td>Glossaire inexistant, endpoint invalide</td>
+                    </tr>
+                    <tr>
+                        <td><strong>429</strong></td>
+                        <td>Too Many Requests</td>
+                        <td>Limite de taux dépassée</td>
+                        <td>Trop de requêtes dans un court laps de temps</td>
+                    </tr>
+                    <tr>
+                        <td><strong>500</strong></td>
+                        <td>Internal Server Error</td>
+                        <td>Erreur interne du serveur</td>
+                        <td>Problème temporaire côté serveur</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="auth-errors">
+            <h2>Erreurs d'authentification</h2>
+
+            <h3>Header Authorization manquant</h3>
+            <p><strong>Code HTTP :</strong> 401</p>
+            <pre><code>{
+  "detail": "Header Authorization requis"
+}</code></pre>
+            <p><strong>Cause :</strong> Le header Authorization n'est pas présent dans la requête.</p>
+            <p><strong>Solution :</strong> Ajoutez le header <code>Authorization: Bearer VOTRE_CLE_API</code> à toutes vos requêtes.</p>
+
+            <h3>Format du header Authorization invalide</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Le header Authorization doit avoir le format: Bearer &lt;API_KEY&gt;"
+}</code></pre>
+            <p><strong>Causes possibles :</strong></p>
+            <ul>
+                <li>Le mot "Bearer" est manquant</li>
+                <li>Il manque un espace entre "Bearer" et la clé</li>
+                <li>Utilisation d'un autre type d'auth (Basic, etc.)</li>
+            </ul>
+            <p><strong>Solution :</strong> Format correct : <code>Authorization: Bearer abc123...</code></p>
+
+            <h3>Clé API manquante après "Bearer"</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Clé API requise après 'Bearer'"
+}</code></pre>
+            <p><strong>Cause :</strong> Le header contient "Bearer " mais la clé est vide.</p>
+            <p><strong>Solution :</strong> Assurez-vous que votre clé API est bien présente après "Bearer ".</p>
+
+            <h3>Clé API trop longue</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "La clé API ne peut pas dépasser 36 caractères"
+}</code></pre>
+            <p><strong>Cause :</strong> La clé fournie dépasse 36 caractères.</p>
+            <p><strong>Solution :</strong> Vérifiez que vous n'avez pas copié d'espaces ou caractères superflus avec la clé.</p>
+
+            <h3>Clé API invalide</h3>
+            <p><strong>Code HTTP :</strong> 401</p>
+            <pre><code>{
+  "detail": "Clé API invalide"
+}</code></pre>
+            <p><strong>Causes possibles :</strong></p>
+            <ul>
+                <li>La clé ne correspond à aucun compte</li>
+                <li>La clé a été révoquée ou régénérée</li>
+                <li>La clé est mal copiée (caractères manquants ou en trop)</li>
+            </ul>
+            <p><strong>Solution :</strong> Vérifiez votre clé dans le portail LEXA ou générez-en une nouvelle.</p>
+
+            <h3>Aucun abonnement actif</h3>
+            <p><strong>Code HTTP :</strong> 401</p>
+            <pre><code>{
+  "detail": "Aucun abonnement actif trouvé pour cette clé API"
+}</code></pre>
+            <p><strong>Cause :</strong> Votre abonnement LEXA API est expiré ou inactif.</p>
+            <p><strong>Solution :</strong> Renouvelez votre abonnement sur <a href="https://portail.lexamt.fr">portail.lexamt.fr</a>.</p>
+
+            <h3>Plusieurs abonnements actifs détectés</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Plusieurs abonnements actifs trouvés. Veuillez contacter le support."
+}</code></pre>
+            <p><strong>Cause :</strong> Configuration anormale du compte (plusieurs abonnements API actifs simultanément).</p>
+            <p><strong>Solution :</strong> Contactez le support LEXA : <a href="mailto:support@lexamt.fr">support@lexamt.fr</a></p>
+        </section>
+
+        <section id="validation-errors">
+            <h2>Erreurs de validation</h2>
+
+            <h3>Champ requis manquant</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Le champ 'action' est requis"
+}
+
+{
+  "detail": "Le champ 'source_language' est requis"
+}
+
+{
+  "detail": "Le champ 'target_language' est requis"
+}
+
+{
+  "detail": "Le champ 'text' est requis pour l'action 'text_translate'"
+}
+
+{
+  "detail": "Le champ 'document' est requis pour l'action 'file_translate'"
+}</code></pre>
+            <p><strong>Cause :</strong> Un champ obligatoire n'est pas fourni dans la requête.</p>
+            <p><strong>Solution :</strong> Incluez tous les champs requis selon l'action :</p>
+            <ul>
+                <li><strong>text_translate :</strong> action, source_language, target_language, text</li>
+                <li><strong>file_translate :</strong> action, source_language, target_language, document</li>
+            </ul>
+
+            <h3>Action invalide</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Action invalide. Valeurs acceptées: text_translate, file_translate"
+}</code></pre>
+            <p><strong>Cause :</strong> Le champ "action" ne contient pas une valeur valide.</p>
+            <p><strong>Solution :</strong> Utilisez uniquement "text_translate" ou "file_translate".</p>
+
+            <h3>Texte trop long</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Le texte ne peut pas dépasser 2000 caractères"
+}</code></pre>
+            <p><strong>Cause :</strong> Le texte à traduire dépasse 2000 caractères.</p>
+            <p><strong>Solution :</strong> Divisez le texte en segments plus courts ou utilisez la traduction de fichiers.</p>
+
+            <h3>Code de langue invalide</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Code de langue invalide ou trop long (maximum 10 caractères)"
+}</code></pre>
+            <p><strong>Cause :</strong> Le code de langue est trop long ou dans un format incorrect.</p>
+            <p><strong>Solution :</strong> Utilisez des codes ISO standard (ex: "en", "fr", "es") de 10 caractères maximum.</p>
+
+            <h3>Langues source et cible identiques</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Les langues source et cible doivent être différentes"
+}</code></pre>
+            <p><strong>Cause :</strong> Vous essayez de traduire d'une langue vers la même langue.</p>
+            <p><strong>Solution :</strong> Assurez-vous que source_language et target_language sont différents.</p>
+
+            <h3>Nom de domaine trop long</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Le nom du domaine ne peut pas dépasser 128 caractères"
+}</code></pre>
+            <p><strong>Cause :</strong> Le nom du domaine fourni est trop long.</p>
+            <p><strong>Solution :</strong> Utilisez un nom de domaine de 128 caractères maximum.</p>
+
+            <h3>Nom de glossaire trop long</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Le nom du glossaire ne peut pas dépasser 128 caractères"
+}</code></pre>
+            <p><strong>Cause :</strong> Le nom du glossaire dépasse 128 caractères.</p>
+            <p><strong>Solution :</strong> Choisissez un nom plus court (max 128 caractères).</p>
+
+            <h3>Trop de fichiers</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Maximum 10 fichiers par requête"
+}</code></pre>
+            <p><strong>Cause :</strong> Vous essayez de traduire plus de 10 fichiers simultanément.</p>
+            <p><strong>Solution :</strong> Divisez votre batch en groupes de 10 fichiers maximum.</p>
+        </section>
+
+        <section id="file-errors">
+            <h2>Erreurs de fichiers</h2>
+
+            <h3>Fichier base64 invalide</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Le fichier n'est pas un base64 valide"
+}</code></pre>
+            <p><strong>Cause :</strong> Le contenu fourni n'est pas un encodage base64 valide.</p>
+            <p><strong>Solution :</strong> Vérifiez que vous encodez correctement le fichier en base64 avant l'envoi.</p>
+
+            <h3>Type de fichier non supporté</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Type de fichier non supporté. Formats acceptés: TXT, DOCX, XLSX, PPTX, PDF"
+}
+
+{
+  "detail": "Type de glossaire non supporté. Formats acceptés: CSV, XLSX"
+}</code></pre>
+            <p><strong>Cause :</strong> Le format du fichier n'est pas supporté.</p>
+            <p><strong>Solution :</strong></p>
+            <ul>
+                <li><strong>Traduction :</strong> Utilisez TXT, DOCX, XLSX, PPTX ou PDF</li>
+                <li><strong>Glossaires :</strong> Utilisez CSV ou XLSX</li>
+            </ul>
+
+            <h3>Fichier trop volumineux</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Le fichier ne peut pas dépasser 50MB"
+}
+
+{
+  "detail": "Le fichier glossaire ne peut pas dépasser 10MB"
+}</code></pre>
+            <p><strong>Cause :</strong> Le fichier dépasse la taille maximale autorisée.</p>
+            <p><strong>Solution :</strong></p>
+            <ul>
+                <li>Compressez le fichier si possible</li>
+                <li>Divisez les gros documents en plusieurs fichiers</li>
+                <li><strong>Traduction :</strong> Max 50MB par fichier</li>
+                <li><strong>Glossaires :</strong> Max 10MB</li>
+            </ul>
+
+            <h3>Fichier vide</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Le fichier est vide"
+}</code></pre>
+            <p><strong>Cause :</strong> Le fichier uploadé ne contient aucune donnée.</p>
+            <p><strong>Solution :</strong> Vérifiez que le fichier contient bien du contenu avant de l'envoyer.</p>
+
+            <h3>Signature de fichier invalide</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "La signature du fichier ne correspond pas à l'extension déclarée"
+}</code></pre>
+            <p><strong>Cause :</strong> Le contenu du fichier ne correspond pas à son extension (ex: un fichier .txt qui est en réalité un PDF).</p>
+            <p><strong>Solution :</strong> Assurez-vous que l'extension du fichier correspond à son vrai format.</p>
+        </section>
+
+        <section id="resource-errors">
+            <h2>Erreurs de ressources</h2>
+
+            <h3>Langue inexistante</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "Langue source inexistante"
+}
+
+{
+  "detail": "Langue cible inexistante"
+}</code></pre>
+            <p><strong>Cause :</strong> Le code de langue fourni ne correspond à aucune langue disponible.</p>
+            <p><strong>Solution :</strong> Utilisez GET /api/v1/languages/ pour obtenir la liste des langues valides.</p>
+
+            <h3>Glossaire non trouvé</h3>
+            <p><strong>Code HTTP :</strong> 404</p>
+            <pre><code>{
+  "detail": "Glossaire non trouvé"
+}</code></pre>
+            <p><strong>Causes possibles :</strong></p>
+            <ul>
+                <li>L'ID du glossaire n'existe pas</li>
+                <li>Le glossaire appartient à un autre utilisateur</li>
+                <li>Le glossaire a déjà été supprimé</li>
+            </ul>
+            <p><strong>Solution :</strong> Vérifiez l'ID du glossaire et vos permissions.</p>
+
+            <h3>ID de ressource invalide</h3>
+            <p><strong>Code HTTP :</strong> 400</p>
+            <pre><code>{
+  "detail": "ID invalide (doit être un entier PostgreSQL valide: 0-2147483647)"
+}</code></pre>
+            <p><strong>Cause :</strong> L'ID fourni n'est pas un entier valide ou dépasse les limites PostgreSQL.</p>
+            <p><strong>Solution :</strong> Utilisez un entier entre 0 et 2147483647.</p>
+
+            <h3>Domaine non trouvé</h3>
+            <p><strong>Code HTTP :</strong> 404</p>
+            <pre><code>{
+  "detail": "Domaine non trouvé"
+}</code></pre>
+            <p><strong>Cause :</strong> Le domaine spécifié n'existe pas.</p>
+            <p><strong>Solution :</strong> Utilisez GET /api/v1/domains/ pour obtenir la liste des domaines valides.</p>
+        </section>
+
+        <section id="server-errors">
+            <h2>Erreurs serveur</h2>
+
+            <h3>Erreur interne du serveur</h3>
+            <p><strong>Code HTTP :</strong> 500</p>
+            <pre><code>{
+  "detail": "Une erreur interne s'est produite. Veuillez réessayer."
+}</code></pre>
+            <p><strong>Cause :</strong> Problème temporaire côté serveur.</p>
+            <p><strong>Solutions :</strong></p>
+            <ul>
+                <li>Réessayez après quelques secondes</li>
+                <li>Implémentez un retry avec backoff exponentiel</li>
+                <li>Si le problème persiste, contactez le support</li>
+            </ul>
+
+            <h3>Service temporairement indisponible</h3>
+            <p><strong>Code HTTP :</strong> 503</p>
+            <pre><code>{
+  "detail": "Service temporairement indisponible. Veuillez réessayer plus tard."
+}</code></pre>
+            <p><strong>Cause :</strong> Maintenance ou surcharge du serveur.</p>
+            <p><strong>Solution :</strong> Attendez quelques minutes et réessayez.</p>
+
+            <h3>Timeout de requête</h3>
+            <p><strong>Code HTTP :</strong> 504</p>
+            <pre><code>{
+  "detail": "La requête a expiré (timeout)"
+}</code></pre>
+            <p><strong>Causes possibles :</strong></p>
+            <ul>
+                <li>Fichier très volumineux à traiter</li>
+                <li>Charge serveur élevée</li>
+                <li>Problème réseau</li>
+            </ul>
+            <p><strong>Solutions :</strong></p>
+            <ul>
+                <li>Réduisez la taille du fichier ou divisez-le</li>
+                <li>Augmentez le timeout de votre client HTTP</li>
+                <li>Réessayez plus tard</li>
+            </ul>
+        </section>
+
+        <section id="rate-limiting">
+            <h2>Rate Limiting</h2>
+
+            <h3>Limite de taux dépassée</h3>
+            <p><strong>Code HTTP :</strong> 429</p>
+            <pre><code>{
+  "detail": "Trop de requêtes. Veuillez patienter avant de réessayer."
+}</code></pre>
+            <p><strong>Cause :</strong> Vous avez dépassé le nombre de requêtes autorisées dans un laps de temps donné.</p>
+            <p><strong>Solutions :</strong></p>
+            <ul>
+                <li>Attendez quelques secondes/minutes avant de réessayer</li>
+                <li>Implémentez un système de retry avec backoff exponentiel</li>
+                <li>Espacez vos requêtes au lieu de les envoyer toutes simultanément</li>
+                <li>Utilisez le batch processing pour optimiser le nombre de requêtes</li>
+                <li>Contactez le support pour augmenter votre quota si nécessaire</li>
+            </ul>
+
+            <h3>Exemple de retry avec backoff exponentiel (Python)</h3>
+            <pre><code>import time
+import requests
+
+def call_api_with_retry(url, headers, data, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(url, headers=headers, json=data)
+            if response.status_code == 429:
+                wait_time = 2 ** attempt  # 1, 2, 4 secondes
+                print(f"Rate limit, attente de {wait_time}s...")
+                time.sleep(wait_time)
+                continue
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.HTTPError as e:
+            if attempt == max_retries - 1:
+                raise
+    raise Exception("Max retries atteint")</code></pre>
+        </section>
+
+        <section id="troubleshooting">
+            <h2>Guide de dépannage</h2>
+
+            <h3>Comment diagnostiquer une erreur ?</h3>
+            <ol>
+                <li><strong>Notez le code HTTP</strong> : Indique le type d'erreur général</li>
+                <li><strong>Lisez le message "detail"</strong> : Donne la cause spécifique</li>
+                <li><strong>Vérifiez vos paramètres</strong> : Assurez-vous que tous les champs requis sont présents</li>
+                <li><strong>Testez avec curl</strong> : Isolez le problème en testant avec une requête simple</li>
+                <li><strong>Consultez les logs</strong> : Vérifiez vos logs applicatifs pour plus de contexte</li>
+            </ol>
+
+            <h3>Erreurs persistantes ?</h3>
+            <p>Si une erreur persiste malgré vos corrections :</p>
+            <ul>
+                <li>Vérifiez le statut de l'API (page de statut si disponible)</li>
+                <li>Testez votre clé API avec un endpoint simple (GET /languages/)</li>
+                <li>Vérifiez que votre abonnement est actif</li>
+                <li>Contactez le support avec les informations suivantes :
+                    <ul>
+                        <li>Code HTTP de l'erreur</li>
+                        <li>Message "detail" complet</li>
+                        <li>Endpoint appelé</li>
+                        <li>Exemple de requête (sans votre clé API)</li>
+                        <li>Timestamp de l'erreur</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section id="best-practices">
+            <h2>Bonnes pratiques de gestion d'erreurs</h2>
+
+            <h3>Implémentez une gestion robuste</h3>
+            <pre><code>// Exemple JavaScript
+async function translateWithErrorHandling(text, sourceLang, targetLang) {
+    try {
+        const response = await fetch('https://portail.lexamt.fr/api/v1/translate/', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: 'text_translate',
+                source_language: sourceLang,
+                target_language: targetLang,
+                text: text
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+
+            // Gestion par code HTTP
+            switch (response.status) {
+                case 400:
+                    console.error('Erreur de validation:', error.detail);
+                    // Afficher un message convivial à l'utilisateur
+                    break;
+                case 401:
+                    console.error('Erreur d\'authentification:', error.detail);
+                    // Rediriger vers la page de configuration
+                    break;
+                case 429:
+                    console.error('Rate limit:', error.detail);
+                    // Réessayer après un délai
+                    break;
+                case 500:
+                    console.error('Erreur serveur:', error.detail);
+                    // Réessayer automatiquement
+                    break;
+                default:
+                    console.error('Erreur inconnue:', error.detail);
+            }
+
+            throw new Error(error.detail);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Erreur réseau ou parsing:', error);
+        throw error;
+    }
+}</code></pre>
+
+            <h3>Loguez les erreurs</h3>
+            <ul>
+                <li>Enregistrez le code HTTP, le message d'erreur et le contexte</li>
+                <li>N'enregistrez JAMAIS la clé API complète dans les logs</li>
+                <li>Incluez un timestamp pour faciliter le débogage</li>
+                <li>Utilisez des niveaux de log appropriés (ERROR, WARNING, etc.)</li>
+            </ul>
+
+            <h3>Affichez des messages conviviaux</h3>
+            <p>Ne montrez pas les messages techniques bruts aux utilisateurs finaux. Transformez-les en messages compréhensibles :</p>
+            <ul>
+                <li><strong>401/Clé invalide</strong> → "Votre clé API est invalide. Veuillez vérifier vos paramètres."</li>
+                <li><strong>400/Texte trop long</strong> → "Le texte à traduire est trop long (max 2000 caractères)."</li>
+                <li><strong>429/Rate limit</strong> → "Trop de traductions en cours. Veuillez patienter quelques instants."</li>
+                <li><strong>500/Erreur serveur</strong> → "Service temporairement indisponible. Veuillez réessayer."</li>
+            </ul>
+        </section>
+
+        <section id="resources">
+            <h2>Ressources supplémentaires</h2>
+
+            <ul>
+                <li><a href="index.html">Documentation principale LEXA API</a></li>
+                <li><a href="guide-demarrage.html">Guide de démarrage rapide</a></li>
+                <li><a href="authentification.html">Guide d'authentification</a></li>
+                <li><a href="reference.html">Référence des endpoints</a></li>
+                <li><a href="exemples.html">Exemples de code</a></li>
+                <li><a href="../../swagger.yaml">Spécification OpenAPI</a></li>
+            </ul>
+
+            <h3>Support</h3>
+            <p>Pour toute question sur les erreurs ou problèmes techniques :</p>
+            <ul>
+                <li>Email : <a href="mailto:support@lexamt.fr">support@lexamt.fr</a></li>
+                <li>Portail : <a href="https://portail.lexamt.fr">portail.lexamt.fr</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <hr>
+        <p><a href="index.html">← Retour à la documentation</a></p>
+        <p>LEXA API - Codes d'erreur</p>
+        <p>&copy; 2024 LEXA. Tous droits réservés.</p>
+    </footer>
+</body>
+</html>

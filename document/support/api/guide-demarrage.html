@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide de démarrage rapide - LEXA API</title>
+</head>
+<body>
+    <header>
+        <h1>Guide de démarrage rapide</h1>
+        <p>LEXA API - Démarrez en 10 minutes</p>
+        <p><a href="index.html">← Retour à la documentation</a></p>
+    </header>
+
+    <main>
+        <section id="introduction">
+            <h2>Introduction</h2>
+            <p>Ce guide vous permettra d'effectuer votre première requête à LEXA API en moins de 10 minutes. Vous apprendrez à :</p>
+            <ul>
+                <li>Obtenir votre clé API</li>
+                <li>Faire votre première requête de traduction</li>
+                <li>Gérer les langues et domaines</li>
+                <li>Créer et utiliser des glossaires</li>
+            </ul>
+        </section>
+
+        <section id="prerequis">
+            <h2>Prérequis</h2>
+            <ul>
+                <li>Un compte LEXA actif sur <a href="https://portail.lexamt.fr">portail.lexamt.fr</a></li>
+                <li>Un abonnement LEXA API (voir <a href="index.html#pricing">Forfait LEXA API</a>)</li>
+                <li>Un outil pour tester les API (curl, Postman, ou votre langage de programmation préféré)</li>
+                <li>Une connexion Internet</li>
+            </ul>
+        </section>
+
+        <section id="etape1">
+            <h2>Étape 1 : Obtenir votre clé API</h2>
+
+            <h3>Créer un compte et souscrire</h3>
+            <ol>
+                <li>Rendez-vous sur <a href="https://portail.lexamt.fr">portail.lexamt.fr</a></li>
+                <li>Créez un compte si ce n'est pas déjà fait</li>
+                <li>Souscrivez à un abonnement LEXA API</li>
+                <li>Connectez-vous à votre compte</li>
+            </ol>
+
+            <h3>Récupérer votre clé API</h3>
+            <ol>
+                <li>Une fois connecté, cliquez sur <strong>Paramètres</strong> dans le menu</li>
+                <li>Accédez à la section <strong>API</strong> ou <strong>Clé API</strong></li>
+                <li>Votre clé API s'affiche (ou cliquez sur <strong>Générer une clé</strong> si nécessaire)</li>
+                <li>Cliquez sur <strong>Copier</strong> pour copier la clé dans votre presse-papier</li>
+                <li>Conservez cette clé en sécurité (ne jamais la partager publiquement)</li>
+            </ol>
+
+            <p><strong>Exemple de clé API :</strong> <code>abc123def456ghi789jkl012mno345pq</code></p>
+
+            <p><strong>Note :</strong> Votre clé API est unique et confidentielle. Ne la partagez jamais dans du code public, sur GitHub, ou dans des forums.</p>
+        </section>
+
+        <section id="etape2">
+            <h2>Étape 2 : Tester l'authentification</h2>
+
+            <h3>Vérifier que votre clé fonctionne</h3>
+            <p>Testons votre clé API en récupérant la liste des langues disponibles :</p>
+
+            <h4>Avec curl :</h4>
+            <pre><code>curl -X GET https://portail.lexamt.fr/api/v1/languages/ \
+  -H "Authorization: Bearer VOTRE_CLE_API"</code></pre>
+
+            <h4>Réponse attendue :</h4>
+            <pre><code>[
+  {
+    "name": "English",
+    "language_code": "en"
+  },
+  {
+    "name": "French",
+    "language_code": "fr"
+  },
+  {
+    "name": "Spanish",
+    "language_code": "es"
+  }
+  ...
+]</code></pre>
+
+            <p><strong>✓ Si vous obtenez cette réponse :</strong> Votre clé API fonctionne correctement !</p>
+            <p><strong>✗ Si vous obtenez une erreur :</strong> Vérifiez que vous avez bien copié la clé complète et que le header Authorization est correct.</p>
+        </section>
+
+        <section id="etape3">
+            <h2>Étape 3 : Première traduction de texte</h2>
+
+            <h3>Traduire un texte simple</h3>
+            <p>Traduisons un texte de l'anglais vers le français :</p>
+
+            <h4>Avec curl :</h4>
+            <pre><code>curl -X POST https://portail.lexamt.fr/api/v1/translate/ \
+  -H "Authorization: Bearer VOTRE_CLE_API" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "text_translate",
+    "source_language": "en",
+    "target_language": "fr",
+    "text": "This is a legal contract between the parties."
+  }'</code></pre>
+
+            <h4>Réponse attendue :</h4>
+            <pre><code>{
+  "translated_text": "Il s'agit d'un contrat juridique entre les parties."
+}</code></pre>
+
+            <h3>Paramètres de la requête</h3>
+            <ul>
+                <li><code>action</code> : "text_translate" pour traduire du texte</li>
+                <li><code>source_language</code> : Code de la langue source (ex: "en")</li>
+                <li><code>target_language</code> : Code de la langue cible (ex: "fr")</li>
+                <li><code>text</code> : Le texte à traduire (max 2000 caractères)</li>
+                <li><code>domain_name</code> : (Optionnel) Domaine de spécialisation</li>
+            </ul>
+        </section>
+
+        <section id="etape4">
+            <h2>Étape 4 : Traduction avec domaine spécialisé</h2>
+
+            <h3>Récupérer les domaines disponibles</h3>
+            <p>Listons d'abord les domaines juridiques disponibles :</p>
+
+            <h4>Avec curl :</h4>
+            <pre><code>curl -X GET https://portail.lexamt.fr/api/v1/domains/ \
+  -H "Authorization: Bearer VOTRE_CLE_API"</code></pre>
+
+            <h4>Réponse attendue :</h4>
+            <pre><code>[
+  {
+    "id": 1,
+    "domain_group": "Legal",
+    "name": "Contract Law"
+  },
+  {
+    "id": 2,
+    "domain_group": "Legal",
+    "name": "Intellectual Property"
+  }
+  ...
+]</code></pre>
+
+            <h3>Traduire avec un domaine</h3>
+            <p>Utilisons maintenant un domaine pour améliorer la qualité de la traduction :</p>
+
+            <h4>Avec curl :</h4>
+            <pre><code>curl -X POST https://portail.lexamt.fr/api/v1/translate/ \
+  -H "Authorization: Bearer VOTRE_CLE_API" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "text_translate",
+    "source_language": "en",
+    "target_language": "fr",
+    "text": "The party of the first part agrees to indemnify the party of the second part.",
+    "domain_name": "Contract Law"
+  }'</code></pre>
+
+            <p><strong>Avantage :</strong> L'utilisation d'un domaine adapte la terminologie juridique pour une traduction plus précise.</p>
+        </section>
+
+        <section id="etape5">
+            <h2>Étape 5 : Traduction de fichiers</h2>
+
+            <h3>Préparer votre fichier</h3>
+            <p>Pour traduire un fichier, vous devez l'encoder en base64. Voici comment faire :</p>
+
+            <h4>Sur Linux/Mac :</h4>
+            <pre><code>base64 -i document.docx -o document_base64.txt</code></pre>
+
+            <h4>Sur Windows (PowerShell) :</h4>
+            <pre><code>[Convert]::ToBase64String([IO.File]::ReadAllBytes("document.docx")) > document_base64.txt</code></pre>
+
+            <h3>Envoyer le fichier pour traduction</h3>
+            <h4>Avec curl :</h4>
+            <pre><code>curl -X POST https://portail.lexamt.fr/api/v1/translate/ \
+  -H "Authorization: Bearer VOTRE_CLE_API" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "file_translate",
+    "source_language": "en",
+    "target_language": "fr",
+    "document": ["'$(cat document_base64.txt)'"]
+  }'</code></pre>
+
+            <h4>Réponse attendue :</h4>
+            <pre><code>[
+  {
+    "project_id": "12345",
+    "status": "Translated",
+    "translated_file_url": "https://portail.lexamt.fr/media/translations/document_fr.docx"
+  }
+]</code></pre>
+
+            <h3>Formats supportés</h3>
+            <ul>
+                <li>TXT (texte brut)</li>
+                <li>DOCX (Microsoft Word)</li>
+                <li>XLSX (Microsoft Excel)</li>
+                <li>PPTX (Microsoft PowerPoint)</li>
+                <li>PDF (Adobe PDF)</li>
+            </ul>
+
+            <h3>Limites</h3>
+            <ul>
+                <li>Taille maximale : 50MB par fichier</li>
+                <li>Maximum 10 fichiers par requête</li>
+            </ul>
+        </section>
+
+        <section id="etape6">
+            <h2>Étape 6 : Créer un glossaire personnalisé</h2>
+
+            <h3>Préparer votre fichier glossaire</h3>
+            <p>Créez un fichier CSV ou Excel avec deux colonnes : terme source et terme cible.</p>
+
+            <h4>Exemple CSV (glossaire.csv) :</h4>
+            <pre><code>contract,contrat
+party,partie
+indemnify,indemniser
+liability,responsabilité</code></pre>
+
+            <h3>Encoder le fichier en base64</h3>
+            <pre><code>base64 -i glossaire.csv -o glossaire_base64.txt</code></pre>
+
+            <h3>Créer le glossaire via l'API</h3>
+            <h4>Avec curl :</h4>
+            <pre><code>curl -X POST https://portail.lexamt.fr/api/v1/glossary/ \
+  -H "Authorization: Bearer VOTRE_CLE_API" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Mon glossaire juridique EN-FR",
+    "source_language": "en",
+    "target_language": "fr",
+    "file": "'$(cat glossaire_base64.txt)'"
+  }'</code></pre>
+
+            <h4>Réponse attendue :</h4>
+            <pre><code>{
+  "id": 42,
+  "name": "Mon glossaire juridique EN-FR",
+  "source_language": "en",
+  "target_language": "fr",
+  "created_at": "2024-10-26T14:30:00Z"
+}</code></pre>
+
+            <h3>Lister vos glossaires</h3>
+            <pre><code>curl -X GET https://portail.lexamt.fr/api/v1/glossaries/ \
+  -H "Authorization: Bearer VOTRE_CLE_API"</code></pre>
+        </section>
+
+        <section id="exemples-complets">
+            <h2>Exemples complets par langage</h2>
+
+            <h3>Python</h3>
+            <pre><code>import requests
+import json
+
+API_KEY = "votre_cle_api"
+BASE_URL = "https://portail.lexamt.fr/api/v1"
+
+headers = {
+    "Authorization": f"Bearer {API_KEY}",
+    "Content-Type": "application/json"
+}
+
+# Traduction de texte
+data = {
+    "action": "text_translate",
+    "source_language": "en",
+    "target_language": "fr",
+    "text": "This is a legal contract.",
+    "domain_name": "Contract Law"
+}
+
+response = requests.post(f"{BASE_URL}/translate/", headers=headers, json=data)
+result = response.json()
+print(result["translated_text"])</code></pre>
+
+            <h3>JavaScript (Node.js)</h3>
+            <pre><code>const axios = require('axios');
+
+const API_KEY = 'votre_cle_api';
+const BASE_URL = 'https://portail.lexamt.fr/api/v1';
+
+const headers = {
+    'Authorization': `Bearer ${API_KEY}`,
+    'Content-Type': 'application/json'
+};
+
+// Traduction de texte
+const data = {
+    action: 'text_translate',
+    source_language: 'en',
+    target_language: 'fr',
+    text: 'This is a legal contract.',
+    domain_name: 'Contract Law'
+};
+
+axios.post(`${BASE_URL}/translate/`, data, { headers })
+    .then(response => {
+        console.log(response.data.translated_text);
+    })
+    .catch(error => {
+        console.error('Error:', error.response.data);
+    });</code></pre>
+
+            <h3>PHP</h3>
+            <pre><code>&lt;?php
+$apiKey = 'votre_cle_api';
+$baseUrl = 'https://portail.lexamt.fr/api/v1';
+
+$data = array(
+    'action' => 'text_translate',
+    'source_language' => 'en',
+    'target_language' => 'fr',
+    'text' => 'This is a legal contract.',
+    'domain_name' => 'Contract Law'
+);
+
+$options = array(
+    'http' => array(
+        'header'  => "Authorization: Bearer $apiKey\r\n" .
+                     "Content-Type: application/json\r\n",
+        'method'  => 'POST',
+        'content' => json_encode($data)
+    )
+);
+
+$context  = stream_context_create($options);
+$result = file_get_contents("$baseUrl/translate/", false, $context);
+$response = json_decode($result, true);
+
+echo $response['translated_text'];
+?&gt;</code></pre>
+
+            <p>Pour plus d'exemples, consultez la page <a href="exemples.html">Exemples de code</a>.</p>
+        </section>
+
+        <section id="prochaines-etapes">
+            <h2>Prochaines étapes</h2>
+
+            <h3>Approfondissez vos connaissances</h3>
+            <ul>
+                <li><a href="reference.html">Référence des endpoints</a> - Documentation technique complète</li>
+                <li><a href="authentification.html">Guide d'authentification</a> - Sécurisez vos requêtes</li>
+                <li><a href="exemples.html">Exemples de code</a> - Plus d'exemples dans différents langages</li>
+                <li><a href="erreurs.html">Codes d'erreur</a> - Gérez les erreurs efficacement</li>
+                <li><a href="../../swagger.yaml">Spécification OpenAPI</a> - Schéma technique complet</li>
+            </ul>
+
+            <h3>Intégrez LEXA API dans votre application</h3>
+            <ul>
+                <li>Implémentez la gestion d'erreurs robuste</li>
+                <li>Ajoutez un système de retry pour les erreurs temporaires</li>
+                <li>Cachez les résultats des endpoints GET (langues, domaines)</li>
+                <li>Utilisez des variables d'environnement pour stocker la clé API</li>
+                <li>Testez en environnement de développement avant la production</li>
+            </ul>
+
+            <h3>Optimisez votre utilisation</h3>
+            <ul>
+                <li>Utilisez le batch processing pour traduire plusieurs fichiers</li>
+                <li>Créez des glossaires pour améliorer la cohérence des traductions</li>
+                <li>Sélectionnez toujours le domaine approprié pour vos documents juridiques</li>
+                <li>Surveillez votre utilisation dans le portail LEXA</li>
+            </ul>
+        </section>
+
+        <section id="checklist">
+            <h2>Checklist de démarrage</h2>
+
+            <h3>Configuration ✓</h3>
+            <ul>
+                <li>[ ] J'ai créé un compte LEXA</li>
+                <li>[ ] J'ai souscrit à un abonnement LEXA API</li>
+                <li>[ ] J'ai récupéré ma clé API</li>
+                <li>[ ] J'ai testé l'authentification avec succès</li>
+            </ul>
+
+            <h3>Premières requêtes ✓</h3>
+            <ul>
+                <li>[ ] J'ai récupéré la liste des langues</li>
+                <li>[ ] J'ai récupéré la liste des domaines</li>
+                <li>[ ] J'ai traduit mon premier texte</li>
+                <li>[ ] J'ai traduit avec un domaine spécialisé</li>
+                <li>[ ] J'ai traduit un fichier (optionnel)</li>
+                <li>[ ] J'ai créé un glossaire (optionnel)</li>
+            </ul>
+
+            <h3>Intégration ✓</h3>
+            <ul>
+                <li>[ ] J'ai intégré LEXA API dans mon code</li>
+                <li>[ ] J'ai implémenté la gestion d'erreurs</li>
+                <li>[ ] J'ai stocké la clé API de manière sécurisée</li>
+                <li>[ ] J'ai testé en environnement de développement</li>
+            </ul>
+        </section>
+
+        <section id="troubleshooting">
+            <h2>Résolution de problèmes</h2>
+
+            <h3>Erreur d'authentification</h3>
+            <p><strong>Symptôme :</strong> <code>{"detail": "Header Authorization requis"}</code></p>
+            <p><strong>Solution :</strong></p>
+            <ul>
+                <li>Vérifiez que le header Authorization est présent</li>
+                <li>Format correct : <code>Authorization: Bearer VOTRE_CLE</code></li>
+                <li>Pas d'espace supplémentaire avant ou après la clé</li>
+            </ul>
+
+            <h3>Clé API invalide</h3>
+            <p><strong>Symptôme :</strong> <code>{"detail": "Clé API invalide"}</code></p>
+            <p><strong>Solution :</strong></p>
+            <ul>
+                <li>Vérifiez que vous avez copié la clé complète</li>
+                <li>Assurez-vous que votre abonnement est actif</li>
+                <li>Régénérez une nouvelle clé si nécessaire</li>
+            </ul>
+
+            <h3>Champ requis manquant</h3>
+            <p><strong>Symptôme :</strong> <code>{"detail": "Le champ 'text' est requis..."}</code></p>
+            <p><strong>Solution :</strong></p>
+            <ul>
+                <li>Vérifiez que tous les champs requis sont présents</li>
+                <li>Pour text_translate : action, source_language, target_language, text</li>
+                <li>Pour file_translate : action, source_language, target_language, document</li>
+            </ul>
+
+            <h3>Fichier trop volumineux</h3>
+            <p><strong>Symptôme :</strong> Erreur de taille de fichier</p>
+            <p><strong>Solution :</strong></p>
+            <ul>
+                <li>Vérifiez que le fichier fait moins de 50MB</li>
+                <li>Compressez le fichier si possible</li>
+                <li>Divisez en plusieurs fichiers plus petits</li>
+            </ul>
+
+            <p>Pour plus d'aide, consultez <a href="erreurs.html">Codes d'erreur</a> ou contactez <a href="mailto:support@lexamt.fr">support@lexamt.fr</a>.</p>
+        </section>
+
+        <section id="support">
+            <h2>Besoin d'aide ?</h2>
+            <p>Si vous rencontrez des difficultés :</p>
+            <ul>
+                <li>Consultez la <a href="index.html">documentation complète</a></li>
+                <li>Vérifiez les <a href="erreurs.html">codes d'erreur</a></li>
+                <li>Contactez le support : <a href="mailto:support@lexamt.fr">support@lexamt.fr</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <hr>
+        <p><a href="index.html">← Retour à la documentation</a></p>
+        <p>LEXA API - Guide de démarrage rapide</p>
+        <p>&copy; 2024 LEXA. Tous droits réservés.</p>
+    </footer>
+</body>
+</html>

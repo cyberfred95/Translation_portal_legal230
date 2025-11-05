@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation LEXA API</title>
+</head>
+<body>
+    <header>
+        <h1>Documentation LEXA API</h1>
+        <p>API REST de traduction et gestion de glossaires juridiques</p>
+        <p>Version 1.0 | Base URL: <code>https://portail.lexamt.fr/api/v1/</code></p>
+    </header>
+
+    <nav>
+        <h2>Navigation</h2>
+        <ul>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#getting-started">Démarrage rapide</a></li>
+            <li><a href="#authentication">Authentification</a></li>
+            <li><a href="#endpoints">Endpoints</a></li>
+            <li><a href="#errors">Gestion des erreurs</a></li>
+            <li><a href="#limits">Limites et quotas</a></li>
+            <li><a href="#pricing">Forfait LEXA API</a></li>
+            <li><a href="#billing">Facturation LEXA API</a></li>
+            <li><a href="#support">Support</a></li>
+        </ul>
+
+        <h3>Pages détaillées</h3>
+        <ul>
+            <li><a href="guide-demarrage.html">Guide de démarrage rapide</a></li>
+            <li><a href="authentification.html">Guide d'authentification</a></li>
+            <li><a href="reference.html">Référence complète des endpoints</a></li>
+            <li><a href="exemples.html">Exemples de code</a></li>
+            <li><a href="erreurs.html">Codes d'erreur</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="introduction">
+            <h2>Introduction à LEXA API</h2>
+
+            <h3>Qu'est-ce que LEXA API ?</h3>
+            <p>LEXA API est une interface de programmation REST qui permet d'intégrer les services de traduction juridique LEXA dans vos applications, sites web et workflows. Elle offre des traductions de haute qualité spécialisées dans le domaine juridique.</p>
+
+            <h3>Fonctionnalités principales</h3>
+            <ul>
+                <li><strong>Traduction de texte</strong> : Traduisez du texte brut jusqu'à 2000 caractères</li>
+                <li><strong>Traduction de documents</strong> : Supportez TXT, DOCX, XLSX, PPTX et PDF (jusqu'à 50MB par fichier)</li>
+                <li><strong>Gestion de glossaires</strong> : Créez, consultez et supprimez vos glossaires personnalisés</li>
+                <li><strong>Domaines de spécialisation</strong> : Accédez à des traductions spécialisées par domaine juridique</li>
+                <li><strong>Langues multiples</strong> : Supportez de nombreuses paires de langues</li>
+                <li><strong>Batch processing</strong> : Traduisez jusqu'à 10 fichiers simultanément</li>
+            </ul>
+
+            <h3>Avantages de LEXA API</h3>
+            <ul>
+                <li><strong>Qualité juridique</strong> : Traductions spécialisées avec terminologie juridique précise</li>
+                <li><strong>RESTful</strong> : Architecture simple et intuitive basée sur HTTP</li>
+                <li><strong>Sécurisé</strong> : Authentification par clé API et communication HTTPS</li>
+                <li><strong>Fiable</strong> : API stable avec gestion d'erreurs complète</li>
+                <li><strong>Flexible</strong> : Support JSON et multipart/form-data</li>
+                <li><strong>Documenté</strong> : Documentation complète avec exemples de code</li>
+            </ul>
+
+            <h3>Cas d'usage</h3>
+            <ul>
+                <li>Automatisation de traduction de contrats et documents juridiques</li>
+                <li>Intégration dans des systèmes de gestion documentaire (DMS)</li>
+                <li>Création d'interfaces utilisateur personnalisées de traduction</li>
+                <li>Workflows de traduction en masse</li>
+                <li>Applications web et mobiles nécessitant de la traduction juridique</li>
+                <li>Intégration dans des outils métier (CRM, ERP, etc.)</li>
+            </ul>
+        </section>
+
+        <section id="getting-started">
+            <h2>Démarrage rapide</h2>
+
+            <h3>Étape 1 : Obtenir une clé API</h3>
+            <ol>
+                <li>Créez un compte sur <a href="https://portail.lexamt.fr">portail.lexamt.fr</a></li>
+                <li>Souscrivez à un abonnement LEXA API (voir section <a href="#pricing">Forfait LEXA API</a>)</li>
+                <li>Dans votre compte, accédez à <strong>Paramètres</strong> > <strong>API</strong></li>
+                <li>Générez ou copiez votre clé API</li>
+                <li>Conservez cette clé en sécurité (ne jamais la partager publiquement)</li>
+            </ol>
+
+            <h3>Étape 2 : Première requête API</h3>
+            <p>Voici un exemple simple de traduction de texte avec curl :</p>
+
+            <pre><code>curl -X POST https://portail.lexamt.fr/api/v1/translate/ \
+  -H "Authorization: Bearer VOTRE_CLE_API" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "text_translate",
+    "source_language": "en",
+    "target_language": "fr",
+    "text": "This is a legal contract."
+  }'</code></pre>
+
+            <h3>Étape 3 : Traiter la réponse</h3>
+            <p>Réponse attendue :</p>
+            <pre><code>{
+  "translated_text": "Il s'agit d'un contrat juridique."
+}</code></pre>
+
+            <p>Pour plus d'exemples détaillés, consultez le <a href="guide-demarrage.html">Guide de démarrage rapide</a> et la page <a href="exemples.html">Exemples de code</a>.</p>
+        </section>
+
+        <section id="authentication">
+            <h2>Authentification</h2>
+
+            <h3>Méthode d'authentification</h3>
+            <p>LEXA API utilise l'authentification par <strong>Bearer Token</strong> (clé API).</p>
+
+            <h3>Format du header</h3>
+            <pre><code>Authorization: Bearer VOTRE_CLE_API</code></pre>
+
+            <h3>Exemple complet</h3>
+            <pre><code>GET /api/v1/languages/ HTTP/1.1
+Host: portail.lexamt.fr
+Authorization: Bearer abc123def456ghi789jkl012mno345pq
+Content-Type: application/json</code></pre>
+
+            <h3>Obtenir votre clé API</h3>
+            <ol>
+                <li>Connectez-vous à <a href="https://portail.lexamt.fr">portail.lexamt.fr</a></li>
+                <li>Accédez à <strong>Paramètres</strong> dans votre compte</li>
+                <li>Cliquez sur <strong>API</strong> ou <strong>Clé API</strong></li>
+                <li>Cliquez sur <strong>Générer une clé</strong> ou copiez la clé existante</li>
+            </ol>
+
+            <h3>Sécurité de la clé API</h3>
+            <ul>
+                <li><strong>Ne jamais partager</strong> votre clé API publiquement (GitHub, forums, etc.)</li>
+                <li><strong>Ne jamais exposer</strong> la clé dans le code frontend (JavaScript client)</li>
+                <li><strong>Utiliser des variables d'environnement</strong> pour stocker la clé</li>
+                <li><strong>Régénérer la clé</strong> si elle est compromise</li>
+                <li><strong>Limiter les permissions</strong> si possible (selon votre abonnement)</li>
+            </ul>
+
+            <h3>Révoquer ou régénérer une clé</h3>
+            <p>Pour révoquer votre clé actuelle et en générer une nouvelle :</p>
+            <ol>
+                <li>Connectez-vous au portail LEXA</li>
+                <li>Accédez à Paramètres > API</li>
+                <li>Cliquez sur <strong>Régénérer la clé</strong></li>
+                <li>Confirmez l'action (l'ancienne clé cessera immédiatement de fonctionner)</li>
+                <li>Mettez à jour votre code avec la nouvelle clé</li>
+            </ol>
+
+            <p>Pour plus de détails, consultez le <a href="authentification.html">Guide d'authentification</a> complet.</p>
+        </section>
+
+        <section id="endpoints">
+            <h2>Endpoints de l'API</h2>
+
+            <p>LEXA API expose plusieurs endpoints organisés par fonctionnalité. Tous les endpoints sont préfixés par <code>/api/v1/</code>.</p>
+
+            <h3>Vue d'ensemble des endpoints</h3>
+
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Méthode</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="3"><strong>Traduction</strong></td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/translate/</code></td>
+                        <td>POST</td>
+                        <td>Traduire du texte ou des fichiers</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><strong>Langues</strong></td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/languages/</code></td>
+                        <td>GET</td>
+                        <td>Liste des langues disponibles</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><strong>Domaines</strong></td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/domains/</code></td>
+                        <td>GET</td>
+                        <td>Liste des domaines de spécialisation</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/domain/{id}/glossaries/</code></td>
+                        <td>GET</td>
+                        <td>Glossaires par défaut d'un domaine</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><strong>Glossaires</strong></td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/glossaries/</code></td>
+                        <td>GET</td>
+                        <td>Liste vos glossaires personnels</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/glossary/</code></td>
+                        <td>POST</td>
+                        <td>Créer un nouveau glossaire</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/glossary/{id}/</code></td>
+                        <td>GET</td>
+                        <td>Récupérer un glossaire spécifique</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/glossary/{id}/</code></td>
+                        <td>DELETE</td>
+                        <td>Supprimer un glossaire</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Endpoint de traduction</h3>
+            <h4>POST /api/v1/translate/</h4>
+            <p>Cet endpoint permet deux types de traduction :</p>
+
+            <h5>1. Traduction de texte</h5>
+            <pre><code>{
+  "action": "text_translate",
+  "source_language": "en",
+  "target_language": "fr",
+  "text": "Your text here",
+  "domain_name": "Contract Law" (optionnel)
+}</code></pre>
+
+            <h5>2. Traduction de fichiers</h5>
+            <pre><code>{
+  "action": "file_translate",
+  "source_language": "en",
+  "target_language": "fr",
+  "document": ["base64_encoded_file_1", "base64_encoded_file_2"],
+  "domain_name": "Contract Law" (optionnel)
+}</code></pre>
+
+            <p><strong>Formats supportés :</strong> TXT, DOCX, XLSX, PPTX, PDF</p>
+            <p><strong>Taille maximale :</strong> 50MB par fichier, 10 fichiers maximum par requête</p>
+
+            <h3>Endpoint de langues</h3>
+            <h4>GET /api/v1/languages/</h4>
+            <p>Retourne la liste des langues disponibles pour la traduction.</p>
+
+            <p><strong>Réponse :</strong></p>
+            <pre><code>[
+  {
+    "name": "English",
+    "language_code": "en"
+  },
+  {
+    "name": "French",
+    "language_code": "fr"
+  }
+]</code></pre>
+
+            <h3>Endpoint de domaines</h3>
+            <h4>GET /api/v1/domains/</h4>
+            <p>Retourne la liste des domaines de spécialisation juridique.</p>
+
+            <p><strong>Réponse :</strong></p>
+            <pre><code>[
+  {
+    "id": 1,
+    "domain_group": "Legal",
+    "name": "Contract Law"
+  },
+  {
+    "id": 2,
+    "domain_group": "Legal",
+    "name": "Intellectual Property"
+  }
+]</code></pre>
+
+            <h3>Endpoints de glossaires</h3>
+
+            <h4>GET /api/v1/glossaries/</h4>
+            <p>Liste tous vos glossaires personnels.</p>
+
+            <h4>POST /api/v1/glossary/</h4>
+            <p>Crée un nouveau glossaire.</p>
+            <pre><code>{
+  "name": "Mon glossaire juridique",
+  "source_language": "en",
+  "target_language": "fr",
+  "file": "base64_encoded_csv_or_xlsx"
+}</code></pre>
+            <p><strong>Formats acceptés :</strong> CSV, XLSX</p>
+            <p><strong>Taille maximale :</strong> 10MB</p>
+
+            <h4>GET /api/v1/glossary/{id}/</h4>
+            <p>Récupère les détails d'un glossaire spécifique par son ID.</p>
+
+            <h4>DELETE /api/v1/glossary/{id}/</h4>
+            <p>Supprime un glossaire par son ID.</p>
+
+            <p>Pour la documentation complète avec tous les paramètres et exemples, consultez la <a href="reference.html">Référence des endpoints</a>.</p>
+        </section>
+
+        <section id="errors">
+            <h2>Gestion des erreurs</h2>
+
+            <h3>Format des erreurs</h3>
+            <p>Toutes les erreurs sont retournées au format JSON suivant :</p>
+            <pre><code>{
+  "detail": "Message d'erreur descriptif"
+}</code></pre>
+
+            <h3>Codes HTTP</h3>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Signification</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>200</td>
+                        <td>OK</td>
+                        <td>Requête réussie avec contenu</td>
+                    </tr>
+                    <tr>
+                        <td>204</td>
+                        <td>No Content</td>
+                        <td>Requête réussie sans contenu (ex: suppression)</td>
+                    </tr>
+                    <tr>
+                        <td>400</td>
+                        <td>Bad Request</td>
+                        <td>Erreur de validation, données manquantes ou invalides</td>
+                    </tr>
+                    <tr>
+                        <td>401</td>
+                        <td>Unauthorized</td>
+                        <td>Authentification manquante ou invalide</td>
+                    </tr>
+                    <tr>
+                        <td>404</td>
+                        <td>Not Found</td>
+                        <td>Ressource non trouvée</td>
+                    </tr>
+                    <tr>
+                        <td>500</td>
+                        <td>Internal Server Error</td>
+                        <td>Erreur serveur interne</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Erreurs courantes</h3>
+
+            <h4>Erreur d'authentification (401)</h4>
+            <pre><code>{
+  "detail": "Header Authorization requis"
+}</code></pre>
+            <p><strong>Cause :</strong> Header Authorization manquant ou clé API invalide</p>
+            <p><strong>Solution :</strong> Vérifiez que le header <code>Authorization: Bearer VOTRE_CLE</code> est présent</p>
+
+            <h4>Erreur de validation (400)</h4>
+            <pre><code>{
+  "detail": "Le champ 'text' est requis pour l'action 'text_translate'"
+}</code></pre>
+            <p><strong>Cause :</strong> Champ requis manquant ou invalide</p>
+            <p><strong>Solution :</strong> Vérifiez que tous les champs requis sont présents et valides</p>
+
+            <h4>Ressource non trouvée (404)</h4>
+            <pre><code>{
+  "detail": "Glossaire non trouvé"
+}</code></pre>
+            <p><strong>Cause :</strong> L'ID du glossaire n'existe pas ou n'appartient pas à votre compte</p>
+            <p><strong>Solution :</strong> Vérifiez l'ID et vos permissions</p>
+
+            <p>Pour la liste complète des codes d'erreur, consultez la page <a href="erreurs.html">Codes d'erreur</a>.</p>
+        </section>
+
+        <section id="limits">
+            <h2>Limites et quotas</h2>
+
+            <h3>Limites techniques</h3>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Élément</th>
+                        <th>Limite</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Longueur du texte (traduction)</td>
+                        <td>2000 caractères maximum</td>
+                    </tr>
+                    <tr>
+                        <td>Taille d'un fichier (traduction)</td>
+                        <td>50MB maximum</td>
+                    </tr>
+                    <tr>
+                        <td>Nombre de fichiers par requête</td>
+                        <td>10 fichiers maximum</td>
+                    </tr>
+                    <tr>
+                        <td>Taille d'un fichier glossaire</td>
+                        <td>10MB maximum</td>
+                    </tr>
+                    <tr>
+                        <td>Longueur nom de glossaire</td>
+                        <td>128 caractères maximum</td>
+                    </tr>
+                    <tr>
+                        <td>Longueur code de langue</td>
+                        <td>10 caractères maximum</td>
+                    </tr>
+                    <tr>
+                        <td>Longueur nom de domaine</td>
+                        <td>128 caractères maximum</td>
+                    </tr>
+                    <tr>
+                        <td>Longueur clé API</td>
+                        <td>36 caractères maximum</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Formats de fichiers supportés</h3>
+
+            <h4>Traduction de documents</h4>
+            <ul>
+                <li>TXT (texte brut)</li>
+                <li>DOCX (Microsoft Word)</li>
+                <li>XLSX (Microsoft Excel)</li>
+                <li>PPTX (Microsoft PowerPoint)</li>
+                <li>PDF (Portable Document Format)</li>
+            </ul>
+
+            <h4>Glossaires</h4>
+            <ul>
+                <li>CSV (Comma-Separated Values)</li>
+                <li>XLSX (Microsoft Excel)</li>
+            </ul>
+
+            <h3>Quotas d'utilisation</h3>
+            <p>Les quotas d'utilisation dépendent de votre abonnement LEXA API. Consultez la section <a href="#pricing">Forfait LEXA API</a> pour plus de détails.</p>
+
+            <h3>Rate limiting</h3>
+            <p>Pour garantir la qualité de service pour tous les utilisateurs, LEXA API peut appliquer des limites de taux (rate limiting). Si vous dépassez ces limites, vous recevrez une erreur HTTP 429 (Too Many Requests).</p>
+
+            <p><strong>Bonnes pratiques :</strong></p>
+            <ul>
+                <li>Espacez vos requêtes au lieu de les envoyer toutes simultanément</li>
+                <li>Implémentez un système de retry avec backoff exponentiel</li>
+                <li>Utilisez le batch processing (10 fichiers à la fois) pour optimiser</li>
+                <li>Contactez le support pour des besoins de volume élevé</li>
+            </ul>
+        </section>
+
+        <section id="pricing">
+            <h2>Forfait LEXA API</h2>
+
+            <p><em>Cette section sera complétée avec les informations tarifaires.</em></p>
+
+            <h3>Plans d'abonnement</h3>
+            <p><!-- À compléter : Description des différents plans (Starter, Professional, Enterprise, etc.) --></p>
+
+            <h3>Fonctionnalités par plan</h3>
+            <p><!-- À compléter : Tableau comparatif des fonctionnalités selon les plans --></p>
+
+            <h3>Volume de traduction inclus</h3>
+            <p><!-- À compléter : Nombre de caractères, de fichiers ou de requêtes inclus par plan --></p>
+
+            <h3>Options et suppléments</h3>
+            <p><!-- À compléter : Options additionnelles (volume supplémentaire, SLA, support prioritaire, etc.) --></p>
+
+            <h3>Comment souscrire</h3>
+            <p>Pour souscrire à un abonnement LEXA API :</p>
+            <ol>
+                <li>Connectez-vous à <a href="https://portail.lexamt.fr">portail.lexamt.fr</a></li>
+                <li>Accédez à <strong>Abonnements</strong> ou <strong>Tarifs</strong></li>
+                <li>Choisissez le plan adapté à vos besoins</li>
+                <li>Complétez le processus de paiement</li>
+                <li>Votre clé API sera activée immédiatement</li>
+            </ol>
+        </section>
+
+        <section id="billing">
+            <h2>Facturation LEXA API</h2>
+
+            <p><em>Cette section sera complétée avec les informations de facturation.</em></p>
+
+            <h3>Cycle de facturation</h3>
+            <p><!-- À compléter : Périodicité (mensuelle, annuelle, etc.) --></p>
+
+            <h3>Méthodes de paiement acceptées</h3>
+            <p><!-- À compléter : Carte bancaire, virement, prélèvement, etc. --></p>
+
+            <h3>Facturation de l'usage excédentaire</h3>
+            <p><!-- À compléter : Comment est facturé le dépassement des quotas --></p>
+
+            <h3>Consulter vos factures</h3>
+            <p>Pour accéder à vos factures :</p>
+            <ol>
+                <li>Connectez-vous à votre compte LEXA</li>
+                <li>Accédez à <strong>Facturation</strong> ou <strong>Historique des paiements</strong></li>
+                <li>Téléchargez vos factures au format PDF</li>
+            </ol>
+
+            <h3>Modifier vos informations de facturation</h3>
+            <p><!-- À compléter : Procédure pour modifier l'adresse de facturation, le mode de paiement, etc. --></p>
+
+            <h3>Annulation et remboursement</h3>
+            <p><!-- À compléter : Politique d'annulation et de remboursement --></p>
+        </section>
+
+        <section id="support">
+            <h2>Support et ressources</h2>
+
+            <h3>Documentation</h3>
+            <ul>
+                <li><a href="guide-demarrage.html">Guide de démarrage rapide</a> - Commencez en 5 minutes</li>
+                <li><a href="authentification.html">Guide d'authentification</a> - Sécurisez vos requêtes</li>
+                <li><a href="reference.html">Référence des endpoints</a> - Documentation technique complète</li>
+                <li><a href="exemples.html">Exemples de code</a> - Python, JavaScript, PHP, cURL</li>
+                <li><a href="erreurs.html">Codes d'erreur</a> - Résolvez les problèmes rapidement</li>
+            </ul>
+
+            <h3>Fichiers techniques</h3>
+            <ul>
+                <li><a href="../../swagger.yaml">Spécification OpenAPI (Swagger)</a> - Schéma complet de l'API</li>
+            </ul>
+
+            <h3>Contacter le support</h3>
+            <p>Notre équipe de support est disponible pour vous aider :</p>
+            <ul>
+                <li><strong>Email :</strong> <a href="mailto:support@lexamt.fr">support@lexamt.fr</a></li>
+                <li><strong>Portail :</strong> <a href="https://portail.lexamt.fr">portail.lexamt.fr</a></li>
+            </ul>
+
+            <h3>Informations à fournir</h3>
+            <p>Pour une assistance rapide, incluez dans votre demande :</p>
+            <ul>
+                <li>Votre ID de compte ou email associé</li>
+                <li>L'endpoint concerné</li>
+                <li>Le code HTTP de l'erreur</li>
+                <li>Le message d'erreur complet</li>
+                <li>Un exemple de requête (sans votre clé API)</li>
+                <li>La date et l'heure de l'incident</li>
+            </ul>
+
+            <h3>Statut de l'API</h3>
+            <p>Pour vérifier l'état de fonctionnement de LEXA API en temps réel, consultez notre page de statut.</p>
+
+            <h3>Communauté</h3>
+            <p><!-- À compléter : Liens vers forum, GitHub, Stack Overflow, etc. si applicables --></p>
+        </section>
+
+        <section id="best-practices">
+            <h2>Bonnes pratiques</h2>
+
+            <h3>Sécurité</h3>
+            <ul>
+                <li>Stockez votre clé API dans des variables d'environnement, pas dans le code</li>
+                <li>Ne jamais exposer la clé API côté client (JavaScript navigateur)</li>
+                <li>Utilisez HTTPS pour toutes vos requêtes</li>
+                <li>Régénérez votre clé si elle est compromise</li>
+                <li>Limitez les permissions de la clé si possible</li>
+            </ul>
+
+            <h3>Performance</h3>
+            <ul>
+                <li>Utilisez le batch processing pour traduire plusieurs fichiers</li>
+                <li>Cachez les résultats des endpoints GET (langues, domaines)</li>
+                <li>Implémentez un système de retry avec backoff exponentiel</li>
+                <li>Compressez les fichiers avant envoi si possible</li>
+                <li>Utilisez des requêtes asynchrones pour ne pas bloquer votre application</li>
+            </ul>
+
+            <h3>Gestion des erreurs</h3>
+            <ul>
+                <li>Vérifiez toujours le code HTTP de la réponse</li>
+                <li>Loguez les erreurs pour faciliter le débogage</li>
+                <li>Affichez des messages d'erreur conviviaux aux utilisateurs</li>
+                <li>Implémentez des fallbacks pour les erreurs réseau</li>
+                <li>Testez votre gestion d'erreurs en environnement de développement</li>
+            </ul>
+
+            <h3>Optimisation des coûts</h3>
+            <ul>
+                <li>Évitez les traductions redondantes (utilisez un cache)</li>
+                <li>Traduisez uniquement ce qui est nécessaire</li>
+                <li>Regroupez les traductions pour optimiser les appels API</li>
+                <li>Surveillez votre utilisation dans le portail LEXA</li>
+            </ul>
+        </section>
+
+        <section id="changelog">
+            <h2>Historique des versions</h2>
+
+            <h3>Version 1.0 (Actuelle)</h3>
+            <p><strong>Date :</strong> Octobre 2024</p>
+            <p><strong>Nouveautés :</strong></p>
+            <ul>
+                <li>Lancement initial de LEXA API v1</li>
+                <li>Traduction de texte et de fichiers</li>
+                <li>Gestion de glossaires (CRUD)</li>
+                <li>Support de 5 formats de documents</li>
+                <li>Authentification par clé API</li>
+                <li>Domaines de spécialisation juridique</li>
+                <li>Support multilingue</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <hr>
+        <p>LEXA API Documentation - Version 1.0</p>
+        <p>&copy; 2024 LEXA. Tous droits réservés.</p>
+        <p>Dernière mise à jour : Octobre 2024</p>
+        <p><a href="https://portail.lexamt.fr">Portail LEXA</a> | <a href="mailto:support@lexamt.fr">Support</a></p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - LEXA pour Microsoft Word</title>
+</head>
+<body>
+    <header>
+        <h1>Questions fréquentes (FAQ)</h1>
+        <p>LEXA pour Microsoft Word</p>
+        <p><a href="index.html">← Retour au guide principal</a></p>
+    </header>
+
+    <main>
+        <section id="general">
+            <h2>Questions générales</h2>
+
+            <article>
+                <h3>Qu'est-ce que LEXA pour Microsoft Word ?</h3>
+                <p>LEXA pour Microsoft Word est un complément (add-in) qui permet de traduire directement du texte dans vos documents Word. Il est spécialement conçu pour la traduction juridique et préserve le formatage de vos documents.</p>
+            </article>
+
+            <article>
+                <h3>LEXA pour Word est-il gratuit ?</h3>
+                <p>LEXA pour Word nécessite un compte LEXA actif et une clé API valide. L'utilisation du complément dépend de votre abonnement LEXA. Contactez-nous pour connaître les tarifs et options d'abonnement.</p>
+            </article>
+
+            <article>
+                <h3>Quelles versions de Word sont compatibles ?</h3>
+                <p>LEXA pour Word est compatible avec :</p>
+                <ul>
+                    <li>Microsoft Word 2016 ou version ultérieure (Windows)</li>
+                    <li>Microsoft Word 2016 ou version ultérieure (Mac)</li>
+                    <li>Word Online (version web)</li>
+                    <li>Word pour iPad</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>Ai-je besoin d'une connexion Internet ?</h3>
+                <p>Oui, LEXA pour Word nécessite une connexion Internet active pour communiquer avec les serveurs de traduction LEXA et récupérer les traductions.</p>
+            </article>
+
+            <article>
+                <h3>Mes données sont-elles sécurisées ?</h3>
+                <p>Oui, toutes les communications entre LEXA pour Word et les serveurs LEXA sont chiffrées via HTTPS. Votre clé API est stockée localement sur votre ordinateur. Consultez notre politique de confidentialité pour plus d'informations.</p>
+            </article>
+        </section>
+
+        <section id="installation">
+            <h2>Installation et configuration</h2>
+
+            <article>
+                <h3>Comment installer LEXA pour Word ?</h3>
+                <p>Il existe deux méthodes :</p>
+                <ol>
+                    <li><strong>Via le Microsoft Store</strong> : Ouvrez Word > Insertion > Compléments > Recherchez "LEXA" > Installer</li>
+                    <li><strong>Installation manuelle</strong> : Utilisez le fichier manifest.xml fourni par votre administrateur (voir guide d'installation complet)</li>
+                </ol>
+            </article>
+
+            <article>
+                <h3>Où trouver ma clé API LEXA ?</h3>
+                <p>Pour obtenir votre clé API :</p>
+                <ol>
+                    <li>Connectez-vous à <a href="https://portail.lexamt.fr">portail.lexamt.fr</a></li>
+                    <li>Accédez à "Paramètres" ou "Mon compte"</li>
+                    <li>Recherchez la section "Clé API"</li>
+                    <li>Copiez votre clé (une longue chaîne de caractères)</li>
+                </ol>
+            </article>
+
+            <article>
+                <h3>Comment configurer ma clé API dans le complément ?</h3>
+                <p>Une fois LEXA installé :</p>
+                <ol>
+                    <li>Cliquez sur le bouton LEXA dans Word</li>
+                    <li>Cliquez sur l'icône Paramètres (roue dentée)</li>
+                    <li>Collez votre clé API dans le champ prévu</li>
+                    <li>Cliquez sur Sauvegarder</li>
+                    <li>Testez la clé avec le bouton "Tester la clé API"</li>
+                </ol>
+            </article>
+
+            <article>
+                <h3>Je ne vois pas le bouton LEXA dans Word, que faire ?</h3>
+                <p>Solutions possibles :</p>
+                <ul>
+                    <li>Redémarrez Word complètement</li>
+                    <li>Vérifiez dans Fichier > Options > Compléments si LEXA n'est pas désactivé</li>
+                    <li>Assurez-vous que l'installation s'est bien terminée</li>
+                    <li>Vérifiez que vous utilisez Word 2016 ou ultérieur</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>Puis-je utiliser LEXA sur plusieurs ordinateurs ?</h3>
+                <p>Oui, vous pouvez installer LEXA sur plusieurs ordinateurs. Vous devrez configurer votre clé API sur chaque installation. Votre clé API et votre compte LEXA peuvent être utilisés sur plusieurs appareils.</p>
+            </article>
+        </section>
+
+        <section id="utilisation">
+            <h2>Utilisation</h2>
+
+            <article>
+                <h3>Comment traduire du texte avec LEXA ?</h3>
+                <p>Processus en 5 étapes :</p>
+                <ol>
+                    <li>Sélectionnez le texte dans votre document Word</li>
+                    <li>Choisissez les langues source et cible dans le panneau LEXA</li>
+                    <li>Sélectionnez un domaine de spécialisation (optionnel)</li>
+                    <li>Cliquez sur "Traduire"</li>
+                    <li>Cliquez sur "Remplacer" pour insérer la traduction</li>
+                </ol>
+            </article>
+
+            <article>
+                <h3>Le formatage de mon texte est-il préservé ?</h3>
+                <p>Oui, LEXA préserve automatiquement :</p>
+                <ul>
+                    <li>Le gras, l'italique, le souligné et le barré</li>
+                    <li>Les couleurs de texte</li>
+                    <li>Les polices et tailles de caractères</li>
+                    <li>Les listes à puces et numérotées</li>
+                    <li>Les exposants et indices</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>Combien de texte puis-je traduire à la fois ?</h3>
+                <p>Pour de meilleurs résultats, nous recommandons de traduire :</p>
+                <ul>
+                    <li>Paragraphe par paragraphe pour des documents longs</li>
+                    <li>Section par section pour des documents moyens</li>
+                    <li>La limite exacte dépend de votre abonnement LEXA</li>
+                </ul>
+                <p>Traduire de plus petits segments améliore la qualité et la rapidité.</p>
+            </article>
+
+            <article>
+                <h3>Quelle est la différence entre "Remplacer" et "Insérer" ?</h3>
+                <p>Actuellement, LEXA propose principalement le mode "Remplacer" :</p>
+                <ul>
+                    <li><strong>Remplacer</strong> : Le texte original sélectionné est remplacé par la traduction</li>
+                    <li><strong>Insérer</strong> : La traduction est ajoutée après le texte original (fonctionnalité en développement)</li>
+                </ul>
+                <p>Conseil : Avant de remplacer, faites une copie de votre texte original dans un autre document si vous souhaitez le conserver.</p>
+            </article>
+
+            <article>
+                <h3>Puis-je annuler une traduction ?</h3>
+                <p>Oui, utilisez simplement la fonction "Annuler" de Word (Ctrl+Z ou Cmd+Z) immédiatement après avoir inséré une traduction. Cela restaurera votre texte original.</p>
+            </article>
+
+            <article>
+                <h3>Les traductions sont-elles sauvegardées quelque part ?</h3>
+                <p>Les traductions ne sont pas automatiquement sauvegardées par le complément. Une fois insérée dans votre document, la traduction fait partie du document Word que vous devez sauvegarder normalement.</p>
+            </article>
+
+            <article>
+                <h3>Comment changer la langue de l'interface LEXA ?</h3>
+                <p>Pour changer la langue de l'interface :</p>
+                <ol>
+                    <li>Cliquez sur le sélecteur de langue (drapeau) en haut à droite du panneau LEXA</li>
+                    <li>Sélectionnez votre langue préférée parmi : Français, Anglais, Espagnol, Allemand, Italien</li>
+                    <li>L'interface se met à jour immédiatement</li>
+                </ol>
+            </article>
+
+            <article>
+                <h3>Qu'est-ce qu'un domaine de spécialisation et dois-je en choisir un ?</h3>
+                <p>Les domaines de spécialisation sont des catégories juridiques qui améliorent la précision de la traduction :</p>
+                <ul>
+                    <li>Exemples : Droit des contrats, Propriété intellectuelle, Droit du travail, etc.</li>
+                    <li>Choisir un domaine adapte la terminologie à votre type de document</li>
+                    <li>Ce n'est pas obligatoire mais fortement recommandé pour des traductions juridiques</li>
+                </ul>
+            </article>
+        </section>
+
+        <section id="langues">
+            <h2>Langues et traduction</h2>
+
+            <article>
+                <h3>Quelles langues puis-je traduire ?</h3>
+                <p>Les langues disponibles dépendent de votre abonnement LEXA. Les langues sont automatiquement chargées depuis votre compte lorsque vous ouvrez le complément. Contactez le support LEXA pour connaître les paires de langues disponibles dans votre abonnement.</p>
+            </article>
+
+            <article>
+                <h3>Puis-je traduire dans les deux sens (ex: FR→EN et EN→FR) ?</h3>
+                <p>Oui, absolument. Utilisez le bouton d'inversion (⇄) entre les sélecteurs de langues pour échanger rapidement la langue source et la langue cible.</p>
+            </article>
+
+            <article>
+                <h3>LEXA détecte-t-il automatiquement la langue du texte ?</h3>
+                <p>Non, vous devez sélectionner manuellement la langue source. Cependant, LEXA se souvient de vos derniers choix de langues et les préselectionne automatiquement lors de votre prochaine utilisation.</p>
+            </article>
+
+            <article>
+                <h3>Les langues que je veux ne s'affichent pas, pourquoi ?</h3>
+                <p>Causes possibles :</p>
+                <ul>
+                    <li>Votre clé API n'est pas configurée ou est invalide</li>
+                    <li>Problème de connexion Internet</li>
+                    <li>Les langues ne sont pas incluses dans votre abonnement</li>
+                    <li>Erreur temporaire du serveur</li>
+                </ul>
+                <p>Solution : Testez votre clé API dans les Paramètres et vérifiez votre connexion. Contactez le support si le problème persiste.</p>
+            </article>
+        </section>
+
+        <section id="problemes">
+            <h2>Problèmes techniques</h2>
+
+            <article>
+                <h3>Le bouton "Traduire" est grisé, je ne peux pas cliquer dessus</h3>
+                <p>Le bouton "Traduire" est désactivé si :</p>
+                <ul>
+                    <li>Aucun texte n'est sélectionné dans le document</li>
+                    <li>La sélection est vide</li>
+                    <li>Aucune clé API n'est configurée</li>
+                </ul>
+                <p>Solution : Sélectionnez du texte dans votre document et vérifiez que votre clé API est bien configurée.</p>
+            </article>
+
+            <article>
+                <h3>J'obtiens une erreur "Clé API invalide"</h3>
+                <p>Solutions :</p>
+                <ol>
+                    <li>Vérifiez que vous avez copié la clé complète sans espaces superflus</li>
+                    <li>Assurez-vous que votre abonnement LEXA est actif</li>
+                    <li>Générez une nouvelle clé API depuis votre compte LEXA</li>
+                    <li>Contactez le support si le problème persiste</li>
+                </ol>
+            </article>
+
+            <article>
+                <h3>Le panneau LEXA ne s'ouvre pas ou affiche une page blanche</h3>
+                <p>Solutions :</p>
+                <ul>
+                    <li>Vérifiez votre connexion Internet</li>
+                    <li>Fermez et rouvrez Word complètement</li>
+                    <li>Vérifiez que votre pare-feu autorise les connexions à portail.lexamt.fr</li>
+                    <li>Videz le cache de Word et réessayez</li>
+                    <li>Réinstallez le complément si nécessaire</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>La traduction est très lente</h3>
+                <p>Optimisations possibles :</p>
+                <ul>
+                    <li>Traduisez des segments plus courts</li>
+                    <li>Vérifiez la vitesse de votre connexion Internet</li>
+                    <li>Fermez d'autres applications pour libérer des ressources</li>
+                    <li>Évitez de traduire pendant les heures de forte affluence</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>J'obtiens une erreur 429 "Trop de requêtes"</h3>
+                <p>Cette erreur signifie que vous avez atteint la limite de traductions autorisées dans un laps de temps donné. Attendez quelques minutes avant de réessayer. Si cela se produit fréquemment, contactez le support pour discuter de votre volume de traduction et des options d'abonnement.</p>
+            </article>
+
+            <article>
+                <h3>La traduction insérée ne garde pas le formatage</h3>
+                <p>Vérifications :</p>
+                <ul>
+                    <li>Assurez-vous d'utiliser une version récente de Word</li>
+                    <li>Vérifiez que le formatage utilisé fait partie des formats supportés</li>
+                    <li>Un formatage très complexe peut parfois ne pas être entièrement préservé</li>
+                    <li>Signalez le problème au support avec un exemple si cela persiste</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>Puis-je utiliser LEXA hors ligne ?</h3>
+                <p>Non, LEXA pour Word nécessite une connexion Internet pour fonctionner car les traductions sont effectuées sur les serveurs LEXA. Aucune traduction hors ligne n'est possible.</p>
+            </article>
+        </section>
+
+        <section id="securite">
+            <h2>Sécurité et confidentialité</h2>
+
+            <article>
+                <h3>Où est stockée ma clé API ?</h3>
+                <p>Votre clé API est stockée localement dans le stockage local (localStorage) de votre navigateur, sur votre ordinateur. Elle n'est jamais envoyée à des tiers et est uniquement utilisée pour authentifier vos requêtes vers les serveurs LEXA.</p>
+            </article>
+
+            <article>
+                <h3>Mon texte traduit est-il stocké sur les serveurs LEXA ?</h3>
+                <p>Les textes sont traités sur les serveurs LEXA pour effectuer la traduction, mais la politique de conservation dépend de votre contrat. Consultez la politique de confidentialité LEXA ou contactez le support pour plus de détails.</p>
+            </article>
+
+            <article>
+                <h3>Puis-je révoquer ma clé API ?</h3>
+                <p>Oui, connectez-vous à votre compte LEXA sur portail.lexamt.fr et générez une nouvelle clé API. L'ancienne sera automatiquement révoquée. Pensez ensuite à mettre à jour la clé dans le complément Word.</p>
+            </article>
+
+            <article>
+                <h3>LEXA est-il conforme au RGPD ?</h3>
+                <p>LEXA s'engage à respecter le Règlement Général sur la Protection des Données (RGPD). Pour plus d'informations sur la conformité et la protection des données, consultez notre politique de confidentialité sur portail.lexamt.fr.</p>
+            </article>
+        </section>
+
+        <section id="abonnement">
+            <h2>Abonnement et facturation</h2>
+
+            <article>
+                <h3>Comment fonctionne la facturation de LEXA ?</h3>
+                <p>La facturation dépend de votre plan d'abonnement LEXA. Connectez-vous à votre compte sur portail.lexamt.fr pour voir les détails de votre abonnement, votre usage, et vos options de facturation.</p>
+            </article>
+
+            <article>
+                <h3>Y a-t-il une limite au nombre de traductions ?</h3>
+                <p>Cela dépend de votre plan d'abonnement LEXA. Certains plans ont des limites mensuelles, d'autres sont illimités. Vérifiez les détails de votre plan dans votre compte LEXA.</p>
+            </article>
+
+            <article>
+                <h3>Puis-je essayer LEXA gratuitement ?</h3>
+                <p>Contactez le support LEXA pour connaître les options d'essai gratuit ou de démonstration disponibles.</p>
+            </article>
+
+            <article>
+                <h3>Comment mettre à niveau mon abonnement ?</h3>
+                <p>Pour changer de plan ou mettre à niveau votre abonnement, connectez-vous à portail.lexamt.fr et accédez à la section "Abonnement" ou contactez le support commercial.</p>
+            </article>
+        </section>
+
+        <section id="support-section">
+            <h2>Support et assistance</h2>
+
+            <article>
+                <h3>Comment contacter le support LEXA ?</h3>
+                <p>Vous pouvez contacter le support LEXA de plusieurs façons :</p>
+                <ul>
+                    <li><strong>Email</strong> : <a href="mailto:support@lexamt.fr">support@lexamt.fr</a></li>
+                    <li><strong>Portail web</strong> : Via votre compte sur <a href="https://portail.lexamt.fr">portail.lexamt.fr</a></li>
+                    <li><strong>Documentation</strong> : Consultez le <a href="index.html">guide complet</a></li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>Quelles informations fournir lors d'une demande de support ?</h3>
+                <p>Pour une assistance rapide, incluez :</p>
+                <ul>
+                    <li>Votre version de Word (visible dans Fichier > Compte)</li>
+                    <li>Votre système d'exploitation (Windows, Mac, etc.)</li>
+                    <li>Le message d'erreur exact si applicable</li>
+                    <li>Les étapes pour reproduire le problème</li>
+                    <li>Des captures d'écran si possible</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>Où puis-je trouver des tutoriels vidéo ?</h3>
+                <p>Des tutoriels et guides vidéo peuvent être disponibles sur le portail LEXA. Consultez la section "Ressources" ou "Aide" de votre compte LEXA.</p>
+            </article>
+
+            <article>
+                <h3>LEXA propose-t-il des formations ?</h3>
+                <p>Pour les entreprises et organisations, LEXA peut proposer des formations personnalisées. Contactez le support commercial pour plus d'informations.</p>
+            </article>
+        </section>
+
+        <section id="mises-a-jour">
+            <h2>Mises à jour et évolutions</h2>
+
+            <article>
+                <h3>Comment mettre à jour LEXA pour Word ?</h3>
+                <p>Les mises à jour dépendent de votre méthode d'installation :</p>
+                <ul>
+                    <li><strong>Via Microsoft Store</strong> : Les mises à jour sont automatiques</li>
+                    <li><strong>Installation manuelle</strong> : Votre administrateur vous fournira les nouvelles versions</li>
+                </ul>
+            </article>
+
+            <article>
+                <h3>Comment savoir quelle version j'utilise ?</h3>
+                <p>La version du complément peut être visible dans le panneau LEXA ou dans les paramètres du complément dans Word (Fichier > Options > Compléments).</p>
+            </article>
+
+            <article>
+                <h3>Quelles sont les nouvelles fonctionnalités prévues ?</h3>
+                <p>LEXA évolue constamment. Pour connaître la feuille de route et les fonctionnalités à venir, consultez les annonces sur le portail LEXA ou abonnez-vous à notre newsletter.</p>
+            </article>
+
+            <article>
+                <h3>Puis-je suggérer des améliorations ?</h3>
+                <p>Absolument ! Vos suggestions sont précieuses. Envoyez vos idées d'amélioration à <a href="mailto:support@lexamt.fr">support@lexamt.fr</a>. Nous examinons tous les retours utilisateurs pour améliorer LEXA.</p>
+            </article>
+        </section>
+    </main>
+
+    <footer>
+        <hr>
+        <p><a href="index.html">← Retour au guide principal</a></p>
+        <p>LEXA pour Microsoft Word - FAQ</p>
+        <p>&copy; 2024 LEXA. Tous droits réservés.</p>
+    </footer>
+</body>
+</html>

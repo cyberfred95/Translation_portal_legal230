@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide d'authentification - LEXA API</title>
+</head>
+<body>
+    <header>
+        <h1>Guide d'authentification</h1>
+        <p>LEXA API - Sécurisez vos requêtes</p>
+        <p><a href="index.html">← Retour à la documentation</a></p>
+    </header>
+
+    <main>
+        <section id="introduction">
+            <h2>Introduction à l'authentification LEXA API</h2>
+            <p>LEXA API utilise l'authentification par <strong>Bearer Token</strong> (clé API) pour sécuriser l'accès aux endpoints. Cette méthode simple et sécurisée permet d'identifier votre compte et de valider vos permissions.</p>
+
+            <h3>Avantages de l'authentification par clé API</h3>
+            <ul>
+                <li><strong>Simple</strong> : Un seul header HTTP à ajouter</li>
+                <li><strong>Sécurisé</strong> : Communication HTTPS chiffrée</li>
+                <li><strong>Révocable</strong> : Régénérez votre clé à tout moment</li>
+                <li><strong>Sans session</strong> : Stateless, pas de cookies ni de sessions</li>
+                <li><strong>Traçable</strong> : Toutes les requêtes sont liées à votre compte</li>
+            </ul>
+        </section>
+
+        <section id="obtenir-cle">
+            <h2>Obtenir votre clé API</h2>
+
+            <h3>Prérequis</h3>
+            <ul>
+                <li>Un compte LEXA actif</li>
+                <li>Un abonnement LEXA API souscrit</li>
+            </ul>
+
+            <h3>Étapes pour obtenir votre clé</h3>
+            <ol>
+                <li>Connectez-vous à <a href="https://portail.lexamt.fr">portail.lexamt.fr</a></li>
+                <li>Accédez à <strong>Paramètres</strong> dans le menu principal</li>
+                <li>Cliquez sur <strong>API</strong> ou <strong>Clé API</strong> dans le sous-menu</li>
+                <li>Votre clé API s'affiche (si vous en avez déjà une)</li>
+                <li>Si vous n'avez pas de clé, cliquez sur <strong>Générer une clé API</strong></li>
+                <li>La clé s'affiche : cliquez sur <strong>Copier</strong> pour la copier dans le presse-papier</li>
+                <li>Conservez cette clé en lieu sûr (vous ne pourrez plus la visualiser ultérieurement)</li>
+            </ol>
+
+            <h3>Format de la clé API</h3>
+            <p>Une clé API LEXA est une chaîne de caractères alphanumériques d'environ 36 caractères.</p>
+            <p><strong>Exemple :</strong> <code>abc123def456ghi789jkl012mno345pq</code></p>
+
+            <p><strong>Important :</strong> Cette clé est unique et confidentielle. Ne la partagez jamais publiquement.</p>
+        </section>
+
+        <section id="utiliser-cle">
+            <h2>Utiliser votre clé API</h2>
+
+            <h3>Format du header Authorization</h3>
+            <p>Toutes les requêtes à LEXA API doivent inclure le header HTTP suivant :</p>
+
+            <pre><code>Authorization: Bearer VOTRE_CLE_API</code></pre>
+
+            <h3>Exemples par méthode</h3>
+
+            <h4>Avec curl</h4>
+            <pre><code>curl -X GET https://portail.lexamt.fr/api/v1/languages/ \
+  -H "Authorization: Bearer abc123def456ghi789jkl012mno345pq"</code></pre>
+
+            <h4>Avec Python (requests)</h4>
+            <pre><code>import requests
+
+API_KEY = "abc123def456ghi789jkl012mno345pq"
+
+headers = {
+    "Authorization": f"Bearer {API_KEY}"
+}
+
+response = requests.get(
+    "https://portail.lexamt.fr/api/v1/languages/",
+    headers=headers
+)
+
+print(response.json())</code></pre>
+
+            <h4>Avec JavaScript (fetch)</h4>
+            <pre><code>const API_KEY = 'abc123def456ghi789jkl012mno345pq';
+
+const headers = {
+    'Authorization': `Bearer ${API_KEY}`
+};
+
+fetch('https://portail.lexamt.fr/api/v1/languages/', {
+    headers: headers
+})
+.then(response => response.json())
+.then(data => console.log(data));</code></pre>
+
+            <h4>Avec PHP</h4>
+            <pre><code>&lt;?php
+$apiKey = 'abc123def456ghi789jkl012mno345pq';
+
+$options = array(
+    'http' => array(
+        'header' => "Authorization: Bearer $apiKey\r\n"
+    )
+);
+
+$context = stream_context_create($options);
+$result = file_get_contents(
+    'https://portail.lexamt.fr/api/v1/languages/',
+    false,
+    $context
+);
+
+$data = json_decode($result, true);
+print_r($data);
+?&gt;</code></pre>
+        </section>
+
+        <section id="validation">
+            <h2>Processus de validation</h2>
+
+            <h3>Comment LEXA API valide votre clé</h3>
+            <p>Lorsque vous envoyez une requête, LEXA API effectue les vérifications suivantes :</p>
+
+            <ol>
+                <li><strong>Présence du header</strong> : Le header <code>Authorization</code> doit être présent</li>
+                <li><strong>Format du header</strong> : Doit commencer par "Bearer " suivi de la clé</li>
+                <li><strong>Validité de la clé</strong> : La clé doit correspondre à un compte actif</li>
+                <li><strong>Abonnement actif</strong> : Le compte doit avoir un abonnement LEXA API actif</li>
+                <li><strong>Type d'abonnement</strong> : L'abonnement doit autoriser l'usage de l'API</li>
+            </ol>
+
+            <h3>Diagramme du processus</h3>
+            <pre><code>Requête HTTP
+    ↓
+Présence du header Authorization ?
+    ↓ Non → Erreur 401 "Header Authorization requis"
+    ↓ Oui
+Format "Bearer <key>" correct ?
+    ↓ Non → Erreur 400 "Format Authorization invalide"
+    ↓ Oui
+Clé API existe dans la base ?
+    ↓ Non → Erreur 401 "Clé API invalide"
+    ↓ Oui
+Utilisateur a un abonnement actif ?
+    ↓ Non → Erreur 401 "Pas d'abonnement actif"
+    ↓ Oui
+Abonnement autorise l'API ?
+    ↓ Non → Erreur 401 "Abonnement non compatible"
+    ↓ Oui
+✓ Authentification réussie
+    ↓
+Traitement de la requête</code></pre>
+        </section>
+
+        <section id="erreurs">
+            <h2>Erreurs d'authentification</h2>
+
+            <h3>Header Authorization manquant</h3>
+            <p><strong>Code HTTP :</strong> 401 Unauthorized</p>
+            <pre><code>{
+  "detail": "Header Authorization requis"
+}</code></pre>
+            <p><strong>Cause :</strong> Vous n'avez pas inclus le header Authorization dans votre requête.</p>
+            <p><strong>Solution :</strong> Ajoutez le header <code>Authorization: Bearer VOTRE_CLE</code></p>
+
+            <h3>Format du header incorrect</h3>
+            <p><strong>Code HTTP :</strong> 400 Bad Request</p>
+            <pre><code>{
+  "detail": "Le header Authorization doit avoir le format: Bearer <API_KEY>"
+}</code></pre>
+            <p><strong>Causes possibles :</strong></p>
+            <ul>
+                <li>Vous avez oublié le mot "Bearer" avant la clé</li>
+                <li>Il manque un espace entre "Bearer" et la clé</li>
+                <li>Vous avez utilisé un autre type d'authentification (Basic, etc.)</li>
+            </ul>
+            <p><strong>Solution :</strong> Format correct : <code>Authorization: Bearer abc123...</code></p>
+
+            <h3>Clé API manquante après "Bearer"</h3>
+            <p><strong>Code HTTP :</strong> 400 Bad Request</p>
+            <pre><code>{
+  "detail": "Clé API requise après 'Bearer'"
+}</code></pre>
+            <p><strong>Cause :</strong> Le header contient "Bearer " mais la clé est vide.</p>
+            <p><strong>Solution :</strong> Vérifiez que vous avez bien collé votre clé API après "Bearer ".</p>
+
+            <h3>Clé API trop longue</h3>
+            <p><strong>Code HTTP :</strong> 400 Bad Request</p>
+            <pre><code>{
+  "detail": "La clé API ne peut pas dépasser 36 caractères"
+}</code></pre>
+            <p><strong>Cause :</strong> La clé fournie dépasse 36 caractères.</p>
+            <p><strong>Solution :</strong> Vérifiez que vous n'avez pas copié d'espaces ou de caractères superflus.</p>
+
+            <h3>Clé API invalide</h3>
+            <p><strong>Code HTTP :</strong> 401 Unauthorized</p>
+            <pre><code>{
+  "detail": "Clé API invalide"
+}</code></pre>
+            <p><strong>Causes possibles :</strong></p>
+            <ul>
+                <li>La clé ne correspond à aucun compte</li>
+                <li>La clé a été révoquée</li>
+                <li>La clé a été mal copiée (caractères manquants ou en trop)</li>
+            </ul>
+            <p><strong>Solution :</strong> Vérifiez votre clé dans le portail LEXA ou générez-en une nouvelle.</p>
+
+            <h3>Pas d'abonnement actif</h3>
+            <p><strong>Code HTTP :</strong> 401 Unauthorized</p>
+            <pre><code>{
+  "detail": "Aucun abonnement actif trouvé pour cette clé API"
+}</code></pre>
+            <p><strong>Cause :</strong> Votre abonnement LEXA API est expiré ou inactif.</p>
+            <p><strong>Solution :</strong> Renouvelez votre abonnement sur <a href="https://portail.lexamt.fr">portail.lexamt.fr</a>.</p>
+
+            <h3>Plusieurs abonnements actifs</h3>
+            <p><strong>Code HTTP :</strong> 400 Bad Request</p>
+            <pre><code>{
+  "detail": "Plusieurs abonnements actifs trouvés. Contactez le support."
+}</code></pre>
+            <p><strong>Cause :</strong> Configuration anormale du compte (plusieurs abonnements API actifs).</p>
+            <p><strong>Solution :</strong> Contactez le support LEXA à <a href="mailto:support@lexamt.fr">support@lexamt.fr</a>.</p>
+        </section>
+
+        <section id="securite">
+            <h2>Sécurité de la clé API</h2>
+
+            <h3>Bonnes pratiques de sécurité</h3>
+
+            <h4>1. Ne jamais exposer la clé publiquement</h4>
+            <ul>
+                <li>Ne commitez jamais la clé dans Git, GitHub, GitLab, etc.</li>
+                <li>Ne la partagez pas sur des forums, Stack Overflow, etc.</li>
+                <li>Ne l'incluez pas dans du code client (JavaScript navigateur)</li>
+                <li>Ne l'envoyez pas par email non chiffré</li>
+            </ul>
+
+            <h4>2. Utiliser des variables d'environnement</h4>
+            <p><strong>Exemple .env :</strong></p>
+            <pre><code>LEXA_API_KEY=abc123def456ghi789jkl012mno345pq</code></pre>
+
+            <p><strong>Exemple Python :</strong></p>
+            <pre><code>import os
+from dotenv import load_dotenv
+
+load_dotenv()
+API_KEY = os.getenv('LEXA_API_KEY')</code></pre>
+
+            <p><strong>Exemple Node.js :</strong></p>
+            <pre><code>require('dotenv').config();
+const API_KEY = process.env.LEXA_API_KEY;</code></pre>
+
+            <h4>3. Limiter l'accès à la clé</h4>
+            <ul>
+                <li>Stockez la clé dans un gestionnaire de secrets sécurisé</li>
+                <li>Limitez qui peut voir la clé dans votre équipe</li>
+                <li>Utilisez des permissions de fichiers restrictives (chmod 600)</li>
+            </ul>
+
+            <h4>4. Utiliser HTTPS uniquement</h4>
+            <p>LEXA API force HTTPS pour toutes les connexions. Ne tentez jamais d'utiliser HTTP, car :</p>
+            <ul>
+                <li>Votre clé serait transmise en clair</li>
+                <li>Les requêtes HTTP seront rejetées</li>
+            </ul>
+
+            <h4>5. Rotation régulière</h4>
+            <ul>
+                <li>Changez votre clé API périodiquement (tous les 3-6 mois)</li>
+                <li>Régénérez immédiatement si vous suspectez une compromission</li>
+                <li>Gardez une trace de quand la clé a été générée</li>
+            </ul>
+
+            <h3>Que faire si votre clé est compromise ?</h3>
+            <ol>
+                <li><strong>Révoquez immédiatement</strong> : Connectez-vous au portail LEXA</li>
+                <li><strong>Générez une nouvelle clé</strong> : Dans Paramètres > API</li>
+                <li><strong>Mettez à jour votre code</strong> : Remplacez l'ancienne clé partout</li>
+                <li><strong>Vérifiez l'usage</strong> : Consultez l'historique d'utilisation pour détecter des abus</li>
+                <li><strong>Contactez le support</strong> : Signalez l'incident si nécessaire</li>
+            </ol>
+        </section>
+
+        <section id="regenerer">
+            <h2>Régénérer votre clé API</h2>
+
+            <h3>Quand régénérer ?</h3>
+            <ul>
+                <li>Votre clé a été exposée publiquement (commit Git, forum, etc.)</li>
+                <li>Un employé qui avait accès à la clé a quitté l'entreprise</li>
+                <li>Vous détectez une utilisation suspecte de l'API</li>
+                <li>Rotation de sécurité régulière (recommandé tous les 3-6 mois)</li>
+                <li>Changement d'infrastructure ou de fournisseur</li>
+            </ul>
+
+            <h3>Procédure de régénération</h3>
+            <ol>
+                <li>Connectez-vous à <a href="https://portail.lexamt.fr">portail.lexamt.fr</a></li>
+                <li>Accédez à <strong>Paramètres</strong> > <strong>API</strong></li>
+                <li>Cliquez sur <strong>Régénérer la clé API</strong></li>
+                <li>Confirmez l'action (l'ancienne clé cessera de fonctionner immédiatement)</li>
+                <li>Copiez la nouvelle clé affichée</li>
+                <li>Mettez à jour votre code et vos configurations avec la nouvelle clé</li>
+                <li>Testez que la nouvelle clé fonctionne correctement</li>
+            </ol>
+
+            <p><strong>⚠️ Attention :</strong> La régénération révoque immédiatement l'ancienne clé. Assurez-vous de mettre à jour tous vos services avant de régénérer.</p>
+
+            <h3>Stratégie de migration sans interruption</h3>
+            <p>Pour éviter les interruptions de service lors de la rotation de clé :</p>
+            <ol>
+                <li>Préparez votre code pour accepter une nouvelle clé (via variable d'environnement)</li>
+                <li>Régénérez la clé dans le portail</li>
+                <li>Mettez à jour rapidement la variable d'environnement</li>
+                <li>Redémarrez vos services un par un</li>
+                <li>Vérifiez que tous les services fonctionnent avec la nouvelle clé</li>
+            </ol>
+        </section>
+
+        <section id="monitoring">
+            <h2>Surveillance et audit</h2>
+
+            <h3>Surveiller l'utilisation de votre clé</h3>
+            <p>Dans le portail LEXA, vous pouvez :</p>
+            <ul>
+                <li>Voir l'historique d'utilisation de votre API</li>
+                <li>Consulter le nombre de requêtes effectuées</li>
+                <li>Vérifier votre quota d'utilisation restant</li>
+                <li>Détecter des pics d'utilisation inhabituels</li>
+            </ul>
+
+            <h3>Logs d'authentification</h3>
+            <p>Pour vos propres logs d'application, enregistrez :</p>
+            <ul>
+                <li>Les tentatives d'authentification réussies et échouées</li>
+                <li>Les codes d'erreur retournés par l'API</li>
+                <li>Les timestamps de chaque requête</li>
+                <li>Les endpoints appelés</li>
+            </ul>
+
+            <p><strong>Important :</strong> Ne loguez jamais la clé API complète. Si nécessaire, loguez seulement les 4 derniers caractères.</p>
+        </section>
+
+        <section id="limitations">
+            <h2>Limitations de l'authentification</h2>
+
+            <h3>Une clé par compte</h3>
+            <p>Chaque compte LEXA dispose d'une seule clé API active à la fois. Si vous régénérez une clé, l'ancienne est immédiatement révoquée.</p>
+
+            <h3>Pas d'authentification multi-utilisateur</h3>
+            <p>La clé API est liée à votre compte entier, pas à un utilisateur individuel. Toutes les requêtes avec cette clé sont attribuées au même compte.</p>
+
+            <h3>Pas de scopes ou permissions</h3>
+            <p>Actuellement, une clé API donne accès à tous les endpoints LEXA API. Il n'est pas possible de créer des clés avec des permissions limitées.</p>
+
+            <h3>Rate limiting</h3>
+            <p>Même avec une clé valide, votre compte peut être soumis à des limites de taux (rate limiting) selon votre abonnement. Voir la <a href="index.html#limits">documentation sur les limites</a>.</p>
+        </section>
+
+        <section id="troubleshooting">
+            <h2>Dépannage</h2>
+
+            <h3>Ma clé fonctionne par moments, pas toujours</h3>
+            <p><strong>Causes possibles :</strong></p>
+            <ul>
+                <li>Problème de connexion Internet intermittent</li>
+                <li>Vous atteignez les limites de taux (rate limiting)</li>
+                <li>Votre abonnement a expiré entre-temps</li>
+                <li>Problème de cache côté client (ancienne clé en cache)</li>
+            </ul>
+            <p><strong>Solutions :</strong></p>
+            <ul>
+                <li>Vérifiez votre connexion</li>
+                <li>Consultez votre quota dans le portail LEXA</li>
+                <li>Vérifiez que votre abonnement est actif</li>
+                <li>Videz les caches et redémarrez vos services</li>
+            </ul>
+
+            <h3>J'obtiens une erreur "CORS" avec ma clé</h3>
+            <p><strong>Cause :</strong> Vous essayez d'appeler l'API depuis JavaScript navigateur (frontend).</p>
+            <p><strong>Solution :</strong> L'API doit être appelée depuis votre backend (serveur), jamais depuis le frontend. Créez un endpoint sur votre serveur qui appelle LEXA API avec la clé sécurisée.</p>
+
+            <h3>La clé semble valide mais je reçois des erreurs 401</h3>
+            <p><strong>Vérifications :</strong></p>
+            <ol>
+                <li>Vérifiez qu'il n'y a pas d'espaces avant/après la clé</li>
+                <li>Vérifiez le format exact : <code>Authorization: Bearer VOTRE_CLE</code></li>
+                <li>Assurez-vous que "Bearer" a un "B" majuscule</li>
+                <li>Testez avec curl pour isoler le problème</li>
+                <li>Régénérez une nouvelle clé pour être sûr</li>
+            </ol>
+        </section>
+
+        <section id="faq">
+            <h2>FAQ sur l'authentification</h2>
+
+            <h3>Puis-je avoir plusieurs clés API ?</h3>
+            <p>Non, chaque compte ne peut avoir qu'une seule clé API active à la fois.</p>
+
+            <h3>Puis-je partager ma clé avec un collègue ?</h3>
+            <p>Ce n'est pas recommandé pour des raisons de sécurité et de traçabilité. Chaque personne devrait avoir son propre compte LEXA.</p>
+
+            <h3>Ma clé expire-t-elle ?</h3>
+            <p>Non, les clés API LEXA n'expirent pas automatiquement. Elles restent valides tant que votre abonnement est actif. Il est cependant recommandé de les régénérer régulièrement pour des raisons de sécurité.</p>
+
+            <h3>Que se passe-t-il si mon abonnement expire ?</h3>
+            <p>Si votre abonnement expire, votre clé API deviendra invalide et vous recevrez des erreurs 401 "Aucun abonnement actif". Renouvelez votre abonnement pour réactiver la clé.</p>
+
+            <h3>Puis-je utiliser la même clé en développement et en production ?</h3>
+            <p>Techniquement oui, mais ce n'est pas recommandé. Idéalement, utilisez des comptes LEXA distincts pour le développement et la production afin d'isoler les environnements et faciliter le suivi.</p>
+        </section>
+
+        <section id="resources">
+            <h2>Ressources supplémentaires</h2>
+
+            <ul>
+                <li><a href="index.html">Documentation principale LEXA API</a></li>
+                <li><a href="guide-demarrage.html">Guide de démarrage rapide</a></li>
+                <li><a href="reference.html">Référence des endpoints</a></li>
+                <li><a href="erreurs.html">Codes d'erreur</a></li>
+                <li><a href="exemples.html">Exemples de code</a></li>
+            </ul>
+
+            <h3>Support</h3>
+            <p>Pour toute question sur l'authentification :</p>
+            <ul>
+                <li>Email : <a href="mailto:support@lexamt.fr">support@lexamt.fr</a></li>
+                <li>Portail : <a href="https://portail.lexamt.fr">portail.lexamt.fr</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <hr>
+        <p><a href="index.html">← Retour à la documentation</a></p>
+        <p>LEXA API - Guide d'authentification</p>
+        <p>&copy; 2024 LEXA. Tous droits réservés.</p>
+    </footer>
+</body>
+</html>

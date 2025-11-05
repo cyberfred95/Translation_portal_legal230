@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemples de code - LEXA API</title>
+</head>
+<body>
+    <header>
+        <h1>Exemples de code</h1>
+        <p>LEXA API - Intégrez LEXA dans votre langage préféré</p>
+        <p><a href="index.html">← Retour à la documentation</a></p>
+    </header>
+
+    <nav>
+        <h2>Langages</h2>
+        <ul>
+            <li><a href="#python">Python</a></li>
+            <li><a href="#javascript">JavaScript / Node.js</a></li>
+            <li><a href="#php">PHP</a></li>
+            <li><a href="#curl">cURL</a></li>
+            <li><a href="#java">Java</a></li>
+            <li><a href="#csharp">C# / .NET</a></li>
+            <li><a href="#ruby">Ruby</a></li>
+            <li><a href="#go">Go</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="introduction">
+            <h2>Introduction</h2>
+            <p>Cette page contient des exemples de code complets pour intégrer LEXA API dans différents langages de programmation. Chaque exemple inclut :</p>
+            <ul>
+                <li>Configuration de l'authentification</li>
+                <li>Traduction de texte</li>
+                <li>Traduction de fichiers</li>
+                <li>Gestion des glossaires</li>
+                <li>Gestion des erreurs</li>
+            </ul>
+
+            <p><strong>Note :</strong> Remplacez toujours <code>VOTRE_CLE_API</code> par votre vraie clé API obtenue sur <a href="https://portail.lexamt.fr">portail.lexamt.fr</a>.</p>
+        </section>
+
+        <section id="python">
+            <h2>Python</h2>
+
+            <h3>Installation des dépendances</h3>
+            <pre><code>pip install requests python-dotenv</code></pre>
+
+            <h3>Configuration (.env)</h3>
+            <pre><code>LEXA_API_KEY=votre_cle_api_ici</code></pre>
+
+            <h3>Exemple complet</h3>
+            <pre><code>import requests
+import os
+import base64
+from dotenv import load_dotenv
+
+# Charger les variables d'environnement
+load_dotenv()
+
+class LexaAPI:
+    def __init__(self, api_key=None):
+        self.api_key = api_key or os.getenv('LEXA_API_KEY')
+        self.base_url = "https://portail.lexamt.fr/api/v1"
+        self.headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+
+    def get_languages(self):
+        """Récupérer la liste des langues disponibles"""
+        response = requests.get(
+            f"{self.base_url}/languages/",
+            headers=self.headers
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def get_domains(self):
+        """Récupérer la liste des domaines disponibles"""
+        response = requests.get(
+            f"{self.base_url}/domains/",
+            headers=self.headers
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def translate_text(self, text, source_lang, target_lang, domain=None):
+        """Traduire du texte"""
+        data = {
+            "action": "text_translate",
+            "source_language": source_lang,
+            "target_language": target_lang,
+            "text": text
+        }
+        if domain:
+            data["domain_name"] = domain
+
+        response = requests.post(
+            f"{self.base_url}/translate/",
+            headers=self.headers,
+            json=data
+        )
+        response.raise_for_status()
+        return response.json()["translated_text"]
+
+    def translate_file(self, file_path, source_lang, target_lang, domain=None):
+        """Traduire un fichier"""
+        # Lire et encoder le fichier en base64
+        with open(file_path, 'rb') as f:
+            file_content = base64.b64encode(f.read()).decode('utf-8')
+
+        data = {
+            "action": "file_translate",
+            "source_language": source_lang,
+            "target_language": target_lang,
+            "document": [file_content]
+        }
+        if domain:
+            data["domain_name"] = domain
+
+        response = requests.post(
+            f"{self.base_url}/translate/",
+            headers=self.headers,
+            json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def create_glossary(self, name, source_lang, target_lang, file_path):
+        """Créer un glossaire"""
+        with open(file_path, 'rb') as f:
+            file_content = base64.b64encode(f.read()).decode('utf-8')
+
+        data = {
+            "name": name,
+            "source_language": source_lang,
+            "target_language": target_lang,
+            "file": file_content
+        }
+
+        response = requests.post(
+            f"{self.base_url}/glossary/",
+            headers=self.headers,
+            json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def get_glossaries(self):
+        """Récupérer la liste de vos glossaires"""
+        response = requests.get(
+            f"{self.base_url}/glossaries/",
+            headers=self.headers
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def delete_glossary(self, glossary_id):
+        """Supprimer un glossaire"""
+        response = requests.delete(
+            f"{self.base_url}/glossary/{glossary_id}/",
+            headers=self.headers
+        )
+        response.raise_for_status()
+        return response.status_code == 204
+
+
+# Utilisation
+if __name__ == "__main__":
+    api = LexaAPI()
+
+    try:
+        # Récupérer les langues
+        languages = api.get_languages()
+        print(f"Langues disponibles: {len(languages)}")
+
+        # Traduire du texte
+        translated = api.translate_text(
+            text="This is a legal contract.",
+            source_lang="en",
+            target_lang="fr",
+            domain="Contract Law"
+        )
+        print(f"Traduction: {translated}")
+
+        # Traduire un fichier
+        result = api.translate_file(
+            file_path="document.docx",
+            source_lang="en",
+            target_lang="fr",
+            domain="Contract Law"
+        )
+        print(f"Fichier traduit: {result[0]['translated_file_url']}")
+
+    except requests.exceptions.HTTPError as e:
+        print(f"Erreur HTTP: {e.response.status_code}")
+        print(f"Détail: {e.response.json()}")
+    except Exception as e:
+        print(f"Erreur: {e}")
+</code></pre>
+        </section>
+
+        <section id="javascript">
+            <h2>JavaScript / Node.js</h2>
+
+            <h3>Installation des dépendances</h3>
+            <pre><code>npm install axios dotenv</code></pre>
+
+            <h3>Configuration (.env)</h3>
+            <pre><code>LEXA_API_KEY=votre_cle_api_ici</code></pre>
+
+            <h3>Exemple complet</h3>
+            <pre><code>const axios = require('axios');
+const fs = require('fs');
+require('dotenv').config();
+
+class LexaAPI {
+    constructor(apiKey = null) {
+        this.apiKey = apiKey || process.env.LEXA_API_KEY;
+        this.baseUrl = 'https://portail.lexamt.fr/api/v1';
+        this.headers = {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json'
+        };
+    }
+
+    async getLanguages() {
+        const response = await axios.get(`${this.baseUrl}/languages/`, {
+            headers: this.headers
+        });
+        return response.data;
+    }
+
+    async getDomains() {
+        const response = await axios.get(`${this.baseUrl}/domains/`, {
+            headers: this.headers
+        });
+        return response.data;
+    }
+
+    async translateText(text, sourceLang, targetLang, domain = null) {
+        const data = {
+            action: 'text_translate',
+            source_language: sourceLang,
+            target_language: targetLang,
+            text: text
+        };
+        if (domain) {
+            data.domain_name = domain;
+        }
+
+        const response = await axios.post(`${this.baseUrl}/translate/`, data, {
+            headers: this.headers
+        });
+        return response.data.translated_text;
+    }
+
+    async translateFile(filePath, sourceLang, targetLang, domain = null) {
+        const fileContent = fs.readFileSync(filePath);
+        const base64File = fileContent.toString('base64');
+
+        const data = {
+            action: 'file_translate',
+            source_language: sourceLang,
+            target_language: targetLang,
+            document: [base64File]
+        };
+        if (domain) {
+            data.domain_name = domain;
+        }
+
+        const response = await axios.post(`${this.baseUrl}/translate/`, data, {
+            headers: this.headers
+        });
+        return response.data;
+    }
+
+    async createGlossary(name, sourceLang, targetLang, filePath) {
+        const fileContent = fs.readFileSync(filePath);
+        const base64File = fileContent.toString('base64');
+
+        const data = {
+            name: name,
+            source_language: sourceLang,
+            target_language: targetLang,
+            file: base64File
+        };
+
+        const response = await axios.post(`${this.baseUrl}/glossary/`, data, {
+            headers: this.headers
+        });
+        return response.data;
+    }
+
+    async getGlossaries() {
+        const response = await axios.get(`${this.baseUrl}/glossaries/`, {
+            headers: this.headers
+        });
+        return response.data;
+    }
+
+    async deleteGlossary(glossaryId) {
+        const response = await axios.delete(`${this.baseUrl}/glossary/${glossaryId}/`, {
+            headers: this.headers
+        });
+        return response.status === 204;
+    }
+}
+
+// Utilisation
+(async () => {
+    const api = new LexaAPI();
+
+    try {
+        // Récupérer les langues
+        const languages = await api.getLanguages();
+        console.log(`Langues disponibles: ${languages.length}`);
+
+        // Traduire du texte
+        const translated = await api.translateText(
+            'This is a legal contract.',
+            'en',
+            'fr',
+            'Contract Law'
+        );
+        console.log(`Traduction: ${translated}`);
+
+        // Traduire un fichier
+        const result = await api.translateFile(
+            'document.docx',
+            'en',
+            'fr',
+            'Contract Law'
+        );
+        console.log(`Fichier traduit: ${result[0].translated_file_url}`);
+
+    } catch (error) {
+        if (error.response) {
+            console.error(`Erreur HTTP: ${error.response.status}`);
+            console.error(`Détail: ${JSON.stringify(error.response.data)}`);
+        } else {
+            console.error(`Erreur: ${error.message}`);
+        }
+    }
+})();
+</code></pre>
+        </section>
+
+        <section id="php">
+            <h2>PHP</h2>
+
+            <h3>Exemple complet</h3>
+            <pre><code>&lt;?php
+
+class LexaAPI {
+    private $apiKey;
+    private $baseUrl = 'https://portail.lexamt.fr/api/v1';
+
+    public function __construct($apiKey) {
+        $this->apiKey = $apiKey;
+    }
+
+    private function makeRequest($method, $endpoint, $data = null) {
+        $url = $this->baseUrl . $endpoint;
+        $headers = [
+            "Authorization: Bearer {$this->apiKey}",
+            "Content-Type: application/json"
+        ];
+
+        $options = [
+            'http' => [
+                'header' => implode("\r\n", $headers),
+                'method' => $method
+            ]
+        ];
+
+        if ($data !== null) {
+            $options['http']['content'] = json_encode($data);
+        }
+
+        $context = stream_context_create($options);
+        $result = @file_get_contents($url, false, $context);
+
+        if ($result === false) {
+            $error = error_get_last();
+            throw new Exception("Erreur API: " . $error['message']);
+        }
+
+        return json_decode($result, true);
+    }
+
+    public function getLanguages() {
+        return $this->makeRequest('GET', '/languages/');
+    }
+
+    public function getDomains() {
+        return $this->makeRequest('GET', '/domains/');
+    }
+
+    public function translateText($text, $sourceLang, $targetLang, $domain = null) {
+        $data = [
+            'action' => 'text_translate',
+            'source_language' => $sourceLang,
+            'target_language' => $targetLang,
+            'text' => $text
+        ];
+
+        if ($domain !== null) {
+            $data['domain_name'] = $domain;
+        }
+
+        $result = $this->makeRequest('POST', '/translate/', $data);
+        return $result['translated_text'];
+    }
+
+    public function translateFile($filePath, $sourceLang, $targetLang, $domain = null) {
+        $fileContent = file_get_contents($filePath);
+        $base64File = base64_encode($fileContent);
+
+        $data = [
+            'action' => 'file_translate',
+            'source_language' => $sourceLang,
+            'target_language' => $targetLang,
+            'document' => [$base64File]
+        ];
+
+        if ($domain !== null) {
+            $data['domain_name'] = $domain;
+        }
+
+        return $this->makeRequest('POST', '/translate/', $data);
+    }
+
+    public function createGlossary($name, $sourceLang, $targetLang, $filePath) {
+        $fileContent = file_get_contents($filePath);
+        $base64File = base64_encode($fileContent);
+
+        $data = [
+            'name' => $name,
+            'source_language' => $sourceLang,
+            'target_language' => $targetLang,
+            'file' => $base64File
+        ];
+
+        return $this->makeRequest('POST', '/glossary/', $data);
+    }
+
+    public function getGlossaries() {
+        return $this->makeRequest('GET', '/glossaries/');
+    }
+
+    public function deleteGlossary($glossaryId) {
+        $this->makeRequest('DELETE', "/glossary/{$glossaryId}/");
+        return true;
+    }
+}
+
+// Utilisation
+$apiKey = getenv('LEXA_API_KEY') ?: 'votre_cle_api';
+$api = new LexaAPI($apiKey);
+
+try {
+    // Récupérer les langues
+    $languages = $api->getLanguages();
+    echo "Langues disponibles: " . count($languages) . "\n";
+
+    // Traduire du texte
+    $translated = $api->translateText(
+        'This is a legal contract.',
+        'en',
+        'fr',
+        'Contract Law'
+    );
+    echo "Traduction: $translated\n";
+
+    // Traduire un fichier
+    $result = $api->translateFile(
+        'document.docx',
+        'en',
+        'fr',
+        'Contract Law'
+    );
+    echo "Fichier traduit: " . $result[0]['translated_file_url'] . "\n";
+
+} catch (Exception $e) {
+    echo "Erreur: " . $e->getMessage() . "\n";
+}
+?&gt;
+</code></pre>
+        </section>
+
+        <section id="curl">
+            <h2>cURL (Ligne de commande)</h2>
+
+            <h3>Récupérer les langues</h3>
+            <pre><code>curl -X GET https://portail.lexamt.fr/api/v1/languages/ \
+  -H "Authorization: Bearer VOTRE_CLE_API"</code></pre>
+
+            <h3>Récupérer les domaines</h3>
+            <pre><code>curl -X GET https://portail.lexamt.fr/api/v1/domains/ \
+  -H "Authorization: Bearer VOTRE_CLE_API"</code></pre>
+
+            <h3>Traduire du texte</h3>
+            <pre><code>curl -X POST https://portail.lexamt.fr/api/v1/translate/ \
+  -H "Authorization: Bearer VOTRE_CLE_API" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "text_translate",
+    "source_language": "en",
+    "target_language": "fr",
+    "text": "This is a legal contract.",
+    "domain_name": "Contract Law"
+  }'</code></pre>
+
+            <h3>Traduire un fichier</h3>
+            <pre><code># Encoder le fichier en base64
+BASE64_FILE=$(base64 -i document.docx)
+
+# Envoyer la requête
+curl -X POST https://portail.lexamt.fr/api/v1/translate/ \
+  -H "Authorization: Bearer VOTRE_CLE_API" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"action\": \"file_translate\",
+    \"source_language\": \"en\",
+    \"target_language\": \"fr\",
+    \"document\": [\"$BASE64_FILE\"]
+  }"</code></pre>
+
+            <h3>Créer un glossaire</h3>
+            <pre><code># Encoder le glossaire en base64
+BASE64_GLOSSARY=$(base64 -i glossaire.csv)
+
+# Envoyer la requête
+curl -X POST https://portail.lexamt.fr/api/v1/glossary/ \
+  -H "Authorization: Bearer VOTRE_CLE_API" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"name\": \"Mon glossaire EN-FR\",
+    \"source_language\": \"en\",
+    \"target_language\": \"fr\",
+    \"file\": \"$BASE64_GLOSSARY\"
+  }"</code></pre>
+
+            <h3>Lister les glossaires</h3>
+            <pre><code>curl -X GET https://portail.lexamt.fr/api/v1/glossaries/ \
+  -H "Authorization: Bearer VOTRE_CLE_API"</code></pre>
+
+            <h3>Supprimer un glossaire</h3>
+            <pre><code>curl -X DELETE https://portail.lexamt.fr/api/v1/glossary/42/ \
+  -H "Authorization: Bearer VOTRE_CLE_API"</code></pre>
+        </section>
+
+        <section id="java">
+            <h2>Java</h2>
+
+            <h3>Dépendances (Maven)</h3>
+            <pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;com.squareup.okhttp3&lt;/groupId&gt;
+    &lt;artifactId&gt;okhttp&lt;/artifactId&gt;
+    &lt;version&gt;4.10.0&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.google.code.gson&lt;/groupId&gt;
+    &lt;artifactId&gt;gson&lt;/artifactId&gt;
+    &lt;version&gt;2.10.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <h3>Exemple</h3>
+            <pre><code>import okhttp3.*;
+import com.google.gson.Gson;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class LexaAPI {
+    private final String apiKey;
+    private final String baseUrl = "https://portail.lexamt.fr/api/v1";
+    private final OkHttpClient client;
+    private final Gson gson;
+
+    public LexaAPI(String apiKey) {
+        this.apiKey = apiKey;
+        this.client = new OkHttpClient();
+        this.gson = new Gson();
+    }
+
+    public String translateText(String text, String sourceLang, String targetLang, String domain)
+            throws IOException {
+        Map&lt;String, Object&gt; data = new HashMap&lt;&gt;();
+        data.put("action", "text_translate");
+        data.put("source_language", sourceLang);
+        data.put("target_language", targetLang);
+        data.put("text", text);
+        if (domain != null) {
+            data.put("domain_name", domain);
+        }
+
+        String json = gson.toJson(data);
+        RequestBody body = RequestBody.create(
+            json,
+            MediaType.parse("application/json")
+        );
+
+        Request request = new Request.Builder()
+            .url(baseUrl + "/translate/")
+            .header("Authorization", "Bearer " + apiKey)
+            .post(body)
+            .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Erreur HTTP: " + response.code());
+            }
+
+            @SuppressWarnings("unchecked")
+            Map&lt;String, String&gt; result = gson.fromJson(
+                response.body().string(),
+                Map.class
+            );
+            return result.get("translated_text");
+        }
+    }
+
+    public static void main(String[] args) {
+        String apiKey = System.getenv("LEXA_API_KEY");
+        LexaAPI api = new LexaAPI(apiKey);
+
+        try {
+            String translated = api.translateText(
+                "This is a legal contract.",
+                "en",
+                "fr",
+                "Contract Law"
+            );
+            System.out.println("Traduction: " + translated);
+        } catch (IOException e) {
+            System.err.println("Erreur: " + e.getMessage());
+        }
+    }
+}
+</code></pre>
+        </section>
+
+        <section id="csharp">
+            <h2>C# / .NET</h2>
+
+            <h3>Exemple</h3>
+            <pre><code>using System;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+public class LexaAPI
+{
+    private readonly string apiKey;
+    private readonly string baseUrl = "https://portail.lexamt.fr/api/v1";
+    private readonly HttpClient client;
+
+    public LexaAPI(string apiKey)
+    {
+        this.apiKey = apiKey;
+        this.client = new HttpClient();
+        this.client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+    }
+
+    public async Task&lt;string&gt; TranslateTextAsync(string text, string sourceLang,
+                                                   string targetLang, string domain = null)
+    {
+        var data = new
+        {
+            action = "text_translate",
+            source_language = sourceLang,
+            target_language = targetLang,
+            text = text,
+            domain_name = domain
+        };
+
+        var json = JsonConvert.SerializeObject(data);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await client.PostAsync($"{baseUrl}/translate/", content);
+        response.EnsureSuccessStatusCode();
+
+        var result = await response.Content.ReadAsStringAsync();
+        var jsonResult = JObject.Parse(result);
+        return jsonResult["translated_text"].ToString();
+    }
+
+    public static async Task Main(string[] args)
+    {
+        var apiKey = Environment.GetEnvironmentVariable("LEXA_API_KEY");
+        var api = new LexaAPI(apiKey);
+
+        try
+        {
+            var translated = await api.TranslateTextAsync(
+                "This is a legal contract.",
+                "en",
+                "fr",
+                "Contract Law"
+            );
+            Console.WriteLine($"Traduction: {translated}");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Erreur: {e.Message}");
+        }
+    }
+}
+</code></pre>
+        </section>
+
+        <section id="ruby">
+            <h2>Ruby</h2>
+
+            <h3>Installation</h3>
+            <pre><code>gem install httparty dotenv</code></pre>
+
+            <h3>Exemple</h3>
+            <pre><code>require 'httparty'
+require 'dotenv/load'
+require 'base64'
+
+class LexaAPI
+  include HTTParty
+  base_uri 'https://portail.lexamt.fr/api/v1'
+
+  def initialize(api_key = nil)
+    @api_key = api_key || ENV['LEXA_API_KEY']
+    @headers = {
+      'Authorization' => "Bearer #{@api_key}",
+      'Content-Type' => 'application/json'
+    }
+  end
+
+  def get_languages
+    self.class.get('/languages/', headers: @headers)
+  end
+
+  def translate_text(text, source_lang, target_lang, domain = nil)
+    data = {
+      action: 'text_translate',
+      source_language: source_lang,
+      target_language: target_lang,
+      text: text
+    }
+    data[:domain_name] = domain if domain
+
+    response = self.class.post('/translate/',
+      headers: @headers,
+      body: data.to_json
+    )
+    response['translated_text']
+  end
+end
+
+# Utilisation
+api = LexaAPI.new
+
+begin
+  languages = api.get_languages
+  puts "Langues disponibles: #{languages.length}"
+
+  translated = api.translate_text(
+    'This is a legal contract.',
+    'en',
+    'fr',
+    'Contract Law'
+  )
+  puts "Traduction: #{translated}"
+rescue => e
+  puts "Erreur: #{e.message}"
+end
+</code></pre>
+        </section>
+
+        <section id="go">
+            <h2>Go</h2>
+
+            <h3>Exemple</h3>
+            <pre><code>package main
+
+import (
+    "bytes"
+    "encoding/json"
+    "fmt"
+    "io/ioutil"
+    "net/http"
+    "os"
+)
+
+type LexaAPI struct {
+    apiKey  string
+    baseURL string
+}
+
+type TranslateRequest struct {
+    Action         string `json:"action"`
+    SourceLanguage string `json:"source_language"`
+    TargetLanguage string `json:"target_language"`
+    Text           string `json:"text"`
+    DomainName     string `json:"domain_name,omitempty"`
+}
+
+type TranslateResponse struct {
+    TranslatedText string `json:"translated_text"`
+}
+
+func NewLexaAPI(apiKey string) *LexaAPI {
+    if apiKey == "" {
+        apiKey = os.Getenv("LEXA_API_KEY")
+    }
+    return &LexaAPI{
+        apiKey:  apiKey,
+        baseURL: "https://portail.lexamt.fr/api/v1",
+    }
+}
+
+func (api *LexaAPI) TranslateText(text, sourceLang, targetLang, domain string) (string, error) {
+    reqData := TranslateRequest{
+        Action:         "text_translate",
+        SourceLanguage: sourceLang,
+        TargetLanguage: targetLang,
+        Text:           text,
+        DomainName:     domain,
+    }
+
+    jsonData, err := json.Marshal(reqData)
+    if err != nil {
+        return "", err
+    }
+
+    req, err := http.NewRequest("POST", api.baseURL+"/translate/", bytes.NewBuffer(jsonData))
+    if err != nil {
+        return "", err
+    }
+
+    req.Header.Set("Authorization", "Bearer "+api.apiKey)
+    req.Header.Set("Content-Type", "application/json")
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil {
+        return "", err
+    }
+    defer resp.Body.Close()
+
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        return "", err
+    }
+
+    if resp.StatusCode != http.StatusOK {
+        return "", fmt.Errorf("erreur HTTP %d: %s", resp.StatusCode, string(body))
+    }
+
+    var result TranslateResponse
+    err = json.Unmarshal(body, &result)
+    if err != nil {
+        return "", err
+    }
+
+    return result.TranslatedText, nil
+}
+
+func main() {
+    api := NewLexaAPI("")
+
+    translated, err := api.TranslateText(
+        "This is a legal contract.",
+        "en",
+        "fr",
+        "Contract Law",
+    )
+
+    if err != nil {
+        fmt.Printf("Erreur: %v\n", err)
+        return
+    }
+
+    fmt.Printf("Traduction: %s\n", translated)
+}
+</code></pre>
+        </section>
+
+        <section id="bonnes-pratiques">
+            <h2>Bonnes pratiques</h2>
+
+            <h3>Gestion des erreurs</h3>
+            <ul>
+                <li>Toujours vérifier le code HTTP de la réponse</li>
+                <li>Parser les erreurs JSON pour obtenir le message détaillé</li>
+                <li>Implémenter un système de retry avec backoff exponentiel</li>
+                <li>Logger les erreurs pour faciliter le débogage</li>
+            </ul>
+
+            <h3>Sécurité</h3>
+            <ul>
+                <li>Stockez la clé API dans des variables d'environnement</li>
+                <li>Ne jamais committer la clé dans Git</li>
+                <li>Utilisez HTTPS uniquement</li>
+                <li>Ne loguez jamais la clé API complète</li>
+            </ul>
+
+            <h3>Performance</h3>
+            <ul>
+                <li>Réutilisez les connexions HTTP (keep-alive)</li>
+                <li>Cachez les résultats des endpoints GET (langues, domaines)</li>
+                <li>Utilisez le batch processing pour traduire plusieurs fichiers</li>
+                <li>Implémentez des timeouts appropriés</li>
+            </ul>
+
+            <h3>Encodage de fichiers</h3>
+            <ul>
+                <li>Toujours encoder en base64 pour l'envoi via JSON</li>
+                <li>Vérifiez la taille du fichier avant encodage (limite 50MB)</li>
+                <li>Utilisez des streams pour les gros fichiers</li>
+            </ul>
+        </section>
+
+        <section id="resources">
+            <h2>Ressources supplémentaires</h2>
+
+            <ul>
+                <li><a href="index.html">Documentation principale LEXA API</a></li>
+                <li><a href="guide-demarrage.html">Guide de démarrage rapide</a></li>
+                <li><a href="reference.html">Référence des endpoints</a></li>
+                <li><a href="authentification.html">Guide d'authentification</a></li>
+                <li><a href="erreurs.html">Codes d'erreur</a></li>
+                <li><a href="../../swagger.yaml">Spécification OpenAPI</a></li>
+            </ul>
+
+            <h3>Support</h3>
+            <p>Pour des questions sur l'intégration :</p>
+            <ul>
+                <li>Email : <a href="mailto:support@lexamt.fr">support@lexamt.fr</a></li>
+                <li>Portail : <a href="https://portail.lexamt.fr">portail.lexamt.fr</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <hr>
+        <p><a href="index.html">← Retour à la documentation</a></p>
+        <p>LEXA API - Exemples de code</p>
+        <p>&copy; 2024 LEXA. Tous droits réservés.</p>
+    </footer>
+</body>
+</html>

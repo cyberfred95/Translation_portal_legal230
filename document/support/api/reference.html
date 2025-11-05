@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Référence des endpoints - LEXA API</title>
+</head>
+<body>
+    <header>
+        <h1>Référence des endpoints</h1>
+        <p>LEXA API - Documentation technique complète</p>
+        <p><a href="index.html">← Retour à la documentation</a></p>
+    </header>
+
+    <main>
+        <section id="introduction">
+            <h2>Documentation technique complète</h2>
+            <p>Pour la documentation technique détaillée de tous les endpoints de LEXA API, incluant les schémas de données complets, les validations et les exemples de requêtes/réponses, consultez notre spécification OpenAPI (Swagger).</p>
+
+            <h3>Accéder à la spécification OpenAPI</h3>
+            <p><strong>Fichier Swagger :</strong> <a href="../../swagger.yaml">swagger.yaml</a></p>
+
+            <h3>Visualiser avec Swagger UI</h3>
+            <p>Pour une navigation interactive de l'API, vous pouvez utiliser Swagger UI :</p>
+            <ol>
+                <li>Accédez à <a href="https://editor.swagger.io">Swagger Editor</a></li>
+                <li>Cliquez sur <strong>File</strong> > <strong>Import URL</strong></li>
+                <li>Entrez : <code>https://portail.lexamt.fr/document/swagger.yaml</code></li>
+                <li>Explorez tous les endpoints de manière interactive</li>
+            </ol>
+        </section>
+
+        <section id="overview">
+            <h2>Vue d'ensemble des endpoints</h2>
+
+            <p>LEXA API v1 expose les endpoints suivants :</p>
+
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Méthode</th>
+                        <th>Description</th>
+                        <th>Authentification</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4"><strong>TRADUCTION</strong></td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/translate/</code></td>
+                        <td>POST</td>
+                        <td>Traduire du texte ou des fichiers</td>
+                        <td>Bearer Token</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"><strong>LANGUES</strong></td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/languages/</code></td>
+                        <td>GET</td>
+                        <td>Liste des langues disponibles</td>
+                        <td>Bearer Token</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"><strong>DOMAINES</strong></td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/domains/</code></td>
+                        <td>GET</td>
+                        <td>Liste des domaines de spécialisation</td>
+                        <td>Bearer Token</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/domain/{id}/glossaries/</code></td>
+                        <td>GET</td>
+                        <td>Glossaires par défaut d'un domaine</td>
+                        <td>Bearer Token</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"><strong>GLOSSAIRES</strong></td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/glossaries/</code></td>
+                        <td>GET</td>
+                        <td>Liste vos glossaires personnels</td>
+                        <td>Bearer Token</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/glossary/</code></td>
+                        <td>POST</td>
+                        <td>Créer un nouveau glossaire</td>
+                        <td>Bearer Token</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/glossary/{id}/</code></td>
+                        <td>GET</td>
+                        <td>Récupérer un glossaire spécifique</td>
+                        <td>Bearer Token</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/glossary/{id}/</code></td>
+                        <td>DELETE</td>
+                        <td>Supprimer un glossaire</td>
+                        <td>Bearer Token</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="translate">
+            <h2>Endpoint de traduction</h2>
+
+            <h3>POST /api/v1/translate/</h3>
+            <p>Cet endpoint polyvalent permet de traduire du texte ou des fichiers.</p>
+
+            <h4>URL complète</h4>
+            <pre><code>https://portail.lexamt.fr/api/v1/translate/</code></pre>
+
+            <h4>Headers requis</h4>
+            <pre><code>Authorization: Bearer VOTRE_CLE_API
+Content-Type: application/json</code></pre>
+
+            <h4>Traduction de texte</h4>
+            <p><strong>Body (JSON) :</strong></p>
+            <pre><code>{
+  "action": "text_translate",
+  "source_language": "en",
+  "target_language": "fr",
+  "text": "Texte à traduire",
+  "domain_name": "Contract Law" (optionnel)
+}</code></pre>
+
+            <p><strong>Réponse (200 OK) :</strong></p>
+            <pre><code>{
+  "translated_text": "Texte traduit"
+}</code></pre>
+
+            <h4>Traduction de fichiers</h4>
+            <p><strong>Body (JSON avec fichiers en base64) :</strong></p>
+            <pre><code>{
+  "action": "file_translate",
+  "source_language": "en",
+  "target_language": "fr",
+  "document": ["base64_encoded_file"],
+  "domain_name": "Contract Law" (optionnel)
+}</code></pre>
+
+            <p><strong>Réponse (200 OK) :</strong></p>
+            <pre><code>[
+  {
+    "project_id": "12345",
+    "status": "Translated",
+    "translated_file_url": "https://portail.lexamt.fr/media/..."
+  }
+]</code></pre>
+
+            <h4>Paramètres</h4>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Paramètre</th>
+                        <th>Type</th>
+                        <th>Requis</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>action</td>
+                        <td>string</td>
+                        <td>Oui</td>
+                        <td>"text_translate" ou "file_translate"</td>
+                    </tr>
+                    <tr>
+                        <td>source_language</td>
+                        <td>string</td>
+                        <td>Oui</td>
+                        <td>Code ISO de la langue source (max 10 char)</td>
+                    </tr>
+                    <tr>
+                        <td>target_language</td>
+                        <td>string</td>
+                        <td>Oui</td>
+                        <td>Code ISO de la langue cible (max 10 char)</td>
+                    </tr>
+                    <tr>
+                        <td>text</td>
+                        <td>string</td>
+                        <td>Si text_translate</td>
+                        <td>Texte à traduire (max 2000 char)</td>
+                    </tr>
+                    <tr>
+                        <td>document</td>
+                        <td>array</td>
+                        <td>Si file_translate</td>
+                        <td>Fichiers encodés en base64 (max 10 fichiers)</td>
+                    </tr>
+                    <tr>
+                        <td>domain_name</td>
+                        <td>string</td>
+                        <td>Non</td>
+                        <td>Nom du domaine de spécialisation (max 128 char)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Codes de réponse</h4>
+            <ul>
+                <li><strong>200 OK</strong> : Traduction réussie</li>
+                <li><strong>400 Bad Request</strong> : Erreur de validation (champ manquant, format invalide, etc.)</li>
+                <li><strong>401 Unauthorized</strong> : Authentification échouée</li>
+            </ul>
+
+            <p><strong>Pour les détails complets :</strong> Consultez le <a href="../../swagger.yaml">fichier Swagger</a></p>
+        </section>
+
+        <section id="languages">
+            <h2>Endpoint des langues</h2>
+
+            <h3>GET /api/v1/languages/</h3>
+            <p>Retourne la liste de toutes les langues disponibles pour la traduction.</p>
+
+            <h4>URL complète</h4>
+            <pre><code>https://portail.lexamt.fr/api/v1/languages/</code></pre>
+
+            <h4>Headers requis</h4>
+            <pre><code>Authorization: Bearer VOTRE_CLE_API</code></pre>
+
+            <h4>Réponse (200 OK)</h4>
+            <pre><code>[
+  {
+    "name": "English",
+    "language_code": "en"
+  },
+  {
+    "name": "French",
+    "language_code": "fr"
+  },
+  {
+    "name": "Spanish",
+    "language_code": "es"
+  }
+]</code></pre>
+
+            <h4>Codes de réponse</h4>
+            <ul>
+                <li><strong>200 OK</strong> : Liste des langues retournée</li>
+                <li><strong>401 Unauthorized</strong> : Authentification échouée</li>
+            </ul>
+
+            <p><strong>Pour les détails complets :</strong> Consultez le <a href="../../swagger.yaml">fichier Swagger</a></p>
+        </section>
+
+        <section id="domains">
+            <h2>Endpoints des domaines</h2>
+
+            <h3>GET /api/v1/domains/</h3>
+            <p>Retourne la liste de tous les domaines de spécialisation juridique disponibles.</p>
+
+            <h4>URL complète</h4>
+            <pre><code>https://portail.lexamt.fr/api/v1/domains/</code></pre>
+
+            <h4>Headers requis</h4>
+            <pre><code>Authorization: Bearer VOTRE_CLE_API</code></pre>
+
+            <h4>Réponse (200 OK)</h4>
+            <pre><code>[
+  {
+    "id": 1,
+    "domain_group": "Legal",
+    "name": "Contract Law"
+  },
+  {
+    "id": 2,
+    "domain_group": "Legal",
+    "name": "Intellectual Property"
+  }
+]</code></pre>
+
+            <h3>GET /api/v1/domain/{id}/glossaries/</h3>
+            <p>Retourne les glossaires par défaut pour un domaine spécifique.</p>
+
+            <h4>URL complète</h4>
+            <pre><code>https://portail.lexamt.fr/api/v1/domain/{id_domain}/glossaries/</code></pre>
+
+            <h4>Paramètres d'URL</h4>
+            <ul>
+                <li><code>id_domain</code> : ID du domaine (entier)</li>
+            </ul>
+
+            <h4>Paramètres de requête (optionnels)</h4>
+            <ul>
+                <li><code>source_language</code> : Filtrer par langue source</li>
+                <li><code>target_language</code> : Filtrer par langue cible</li>
+            </ul>
+
+            <h4>Exemple</h4>
+            <pre><code>GET /api/v1/domain/1/glossaries/?source_language=en&target_language=fr</code></pre>
+
+            <h4>Réponse (200 OK)</h4>
+            <pre><code>[
+  {
+    "id": 10,
+    "file_url": "https://portail.lexamt.fr/media/glossaries/...",
+    "name": "Glossaire Droit des Contrats EN-FR",
+    "source_language": "en",
+    "target_language": "fr",
+    "file_size": "1.2 MB",
+    "created_at": "2024-01-15T10:30:00Z"
+  }
+]</code></pre>
+
+            <p><strong>Pour les détails complets :</strong> Consultez le <a href="../../swagger.yaml">fichier Swagger</a></p>
+        </section>
+
+        <section id="glossaries">
+            <h2>Endpoints des glossaires</h2>
+
+            <h3>GET /api/v1/glossaries/</h3>
+            <p>Retourne tous vos glossaires personnels.</p>
+
+            <h4>URL complète</h4>
+            <pre><code>https://portail.lexamt.fr/api/v1/glossaries/</code></pre>
+
+            <h4>Réponse (200 OK)</h4>
+            <pre><code>[
+  {
+    "id": 42,
+    "file_url": "https://portail.lexamt.fr/media/...",
+    "name": "Mon glossaire juridique",
+    "source_language": "en",
+    "target_language": "fr",
+    "file_size": "500 KB",
+    "created_at": "2024-10-20T14:30:00Z"
+  }
+]</code></pre>
+
+            <h3>POST /api/v1/glossary/</h3>
+            <p>Crée un nouveau glossaire personnel.</p>
+
+            <h4>URL complète</h4>
+            <pre><code>https://portail.lexamt.fr/api/v1/glossary/</code></pre>
+
+            <h4>Headers requis</h4>
+            <pre><code>Authorization: Bearer VOTRE_CLE_API
+Content-Type: application/json</code></pre>
+
+            <h4>Body (JSON)</h4>
+            <pre><code>{
+  "name": "Mon glossaire",
+  "source_language": "en",
+  "target_language": "fr",
+  "file": "base64_encoded_csv_or_xlsx"
+}</code></pre>
+
+            <h4>Formats acceptés</h4>
+            <ul>
+                <li>CSV (text/csv)</li>
+                <li>XLSX (application/vnd.openxmlformats-officedocument.spreadsheetml.sheet)</li>
+            </ul>
+
+            <h4>Limites</h4>
+            <ul>
+                <li>Taille maximale : 10MB</li>
+                <li>Nom : maximum 128 caractères</li>
+            </ul>
+
+            <h4>Réponse (200 OK)</h4>
+            <pre><code>{
+  "id": 43,
+  "name": "Mon glossaire",
+  "source_language": "en",
+  "target_language": "fr",
+  "created_at": "2024-10-26T15:00:00Z"
+}</code></pre>
+
+            <h3>GET /api/v1/glossary/{id}/</h3>
+            <p>Récupère les détails d'un glossaire spécifique.</p>
+
+            <h4>URL complète</h4>
+            <pre><code>https://portail.lexamt.fr/api/v1/glossary/{id_glossary}/</code></pre>
+
+            <h4>Paramètres d'URL</h4>
+            <ul>
+                <li><code>id_glossary</code> : ID du glossaire (entier)</li>
+            </ul>
+
+            <h4>Codes de réponse</h4>
+            <ul>
+                <li><strong>200 OK</strong> : Glossaire trouvé</li>
+                <li><strong>404 Not Found</strong> : Glossaire inexistant ou non accessible</li>
+            </ul>
+
+            <h3>DELETE /api/v1/glossary/{id}/</h3>
+            <p>Supprime un glossaire.</p>
+
+            <h4>URL complète</h4>
+            <pre><code>https://portail.lexamt.fr/api/v1/glossary/{id_glossary}/</code></pre>
+
+            <h4>Codes de réponse</h4>
+            <ul>
+                <li><strong>204 No Content</strong> : Glossaire supprimé avec succès</li>
+                <li><strong>404 Not Found</strong> : Glossaire inexistant</li>
+            </ul>
+
+            <p><strong>Pour les détails complets :</strong> Consultez le <a href="../../swagger.yaml">fichier Swagger</a></p>
+        </section>
+
+        <section id="schemas">
+            <h2>Schémas de données</h2>
+
+            <p>Pour les schémas complets de tous les objets de données (structures JSON, validations, types, etc.), consultez la section <code>components/schemas</code> du fichier Swagger.</p>
+
+            <h3>Principaux schémas</h3>
+            <ul>
+                <li><strong>TranslateTextRequest</strong> : Requête de traduction de texte</li>
+                <li><strong>TranslateFileRequest</strong> : Requête de traduction de fichiers</li>
+                <li><strong>TranslateTextResponse</strong> : Réponse de traduction de texte</li>
+                <li><strong>TranslateFileResponse</strong> : Réponse de traduction de fichiers</li>
+                <li><strong>GlossaryRequest</strong> : Requête de création de glossaire</li>
+                <li><strong>GlossaryResponse</strong> : Réponse de glossaire</li>
+                <li><strong>DefaultGlossary</strong> : Glossaire par défaut</li>
+                <li><strong>Domain</strong> : Domaine de spécialisation</li>
+                <li><strong>Error</strong> : Format d'erreur standard</li>
+            </ul>
+
+            <p><a href="../../swagger.yaml">Voir les schémas complets dans Swagger</a></p>
+        </section>
+
+        <section id="validation">
+            <h2>Règles de validation</h2>
+
+            <h3>Limites de longueur</h3>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Champ</th>
+                        <th>Limite</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>action</td>
+                        <td>32 caractères</td>
+                    </tr>
+                    <tr>
+                        <td>text</td>
+                        <td>2000 caractères</td>
+                    </tr>
+                    <tr>
+                        <td>source_language / target_language</td>
+                        <td>10 caractères</td>
+                    </tr>
+                    <tr>
+                        <td>domain_name</td>
+                        <td>128 caractères</td>
+                    </tr>
+                    <tr>
+                        <td>name (glossaire)</td>
+                        <td>128 caractères</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Limites de fichiers</h3>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Limite</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Fichier de traduction</td>
+                        <td>50MB maximum</td>
+                    </tr>
+                    <tr>
+                        <td>Nombre de fichiers par requête</td>
+                        <td>10 maximum</td>
+                    </tr>
+                    <tr>
+                        <td>Fichier glossaire</td>
+                        <td>10MB maximum</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Valeurs enum</h3>
+            <ul>
+                <li><strong>action</strong> : "text_translate" | "file_translate"</li>
+            </ul>
+
+            <p><strong>Pour toutes les règles de validation :</strong> Consultez le <a href="../../swagger.yaml">fichier Swagger</a></p>
+        </section>
+
+        <section id="swagger-tools">
+            <h2>Utiliser le fichier Swagger</h2>
+
+            <h3>Avec Swagger Editor</h3>
+            <ol>
+                <li>Accédez à <a href="https://editor.swagger.io">editor.swagger.io</a></li>
+                <li>Cliquez sur <strong>File</strong> > <strong>Import File</strong></li>
+                <li>Sélectionnez le fichier <code>swagger.yaml</code></li>
+                <li>Explorez la documentation interactive</li>
+            </ol>
+
+            <h3>Avec Swagger UI</h3>
+            <p>Pour héberger votre propre Swagger UI :</p>
+            <pre><code>docker run -p 80:8080 -e SWAGGER_JSON=/swagger.yaml \
+  -v /path/to/swagger.yaml:/swagger.yaml \
+  swaggerapi/swagger-ui</code></pre>
+
+            <h3>Génération de code client</h3>
+            <p>Utilisez Swagger Codegen pour générer automatiquement des clients API dans votre langage :</p>
+            <pre><code>swagger-codegen generate -i swagger.yaml -l python -o ./client</code></pre>
+
+            <p>Langages supportés : Python, JavaScript, Java, PHP, Ruby, Go, C#, etc.</p>
+
+            <h3>Validation de requêtes</h3>
+            <p>Utilisez le fichier Swagger pour valider vos requêtes avant de les envoyer à l'API.</p>
+        </section>
+
+        <section id="resources">
+            <h2>Ressources supplémentaires</h2>
+
+            <h3>Documentation</h3>
+            <ul>
+                <li><a href="index.html">Documentation principale LEXA API</a></li>
+                <li><a href="guide-demarrage.html">Guide de démarrage rapide</a></li>
+                <li><a href="authentification.html">Guide d'authentification</a></li>
+                <li><a href="exemples.html">Exemples de code</a></li>
+                <li><a href="erreurs.html">Codes d'erreur</a></li>
+            </ul>
+
+            <h3>Fichiers techniques</h3>
+            <ul>
+                <li><a href="../../swagger.yaml">Spécification OpenAPI (Swagger)</a></li>
+            </ul>
+
+            <h3>Support</h3>
+            <p>Pour toute question sur les endpoints ou les schémas de données :</p>
+            <ul>
+                <li>Email : <a href="mailto:support@lexamt.fr">support@lexamt.fr</a></li>
+                <li>Portail : <a href="https://portail.lexamt.fr">portail.lexamt.fr</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <hr>
+        <p><a href="index.html">← Retour à la documentation</a></p>
+        <p>LEXA API - Référence des endpoints</p>
+        <p>&copy; 2024 LEXA. Tous droits réservés.</p>
+        <p><strong>Documentation technique détaillée :</strong> <a href="../../swagger.yaml">swagger.yaml</a></p>
+    </footer>
+</body>
+</html>
