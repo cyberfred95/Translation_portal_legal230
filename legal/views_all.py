@@ -348,59 +348,6 @@ class FileExpertRevisionView(APIView):
         return Response({"detail": "Sent to post editing"}, status=status.HTTP_200_OK)
 
 
-class ProjectsHistoryView(BaseTemplateView):
-    template_name = 'project_history/project_history.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-        page = self.request.GET.get('page')
-        context['languages'] = languages
-        params = {
-            "page_size": PAGINATION_PAGE_SIZE,
-            "page": page,
-            "user_custom_mt_token": user.uuid if not user.is_staff else None
-        }
-        try:
-            user_api_key = get_user_api_key(user)
-        except ValueError:
-            # En cas d'absence de subscription, on ne peut pas afficher les projets
-            context['projects'] = []
-            return context
-        headers = {
-            "token": user_api_key}
-
-        if page is not None:
-            params["page"] = int(page)
-
-        response = requests.get(
-            settings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
-        if 'results' in response:
-            for project in response['results']:
-                file_name = urlparse(project['source_file']).path.lstrip(
-                    '/').split('/')[-1]
-                original_filename = unquote(file_name)
-                project['source_file_name'] = original_filename
-                project['created_at'] = datetime.fromisoformat(
-                    project['created_at'].replace('Z', '+00:00'))
-                project['display_popup'] = False if get_price_by_language_pair(
-                    source_language=project['source_language'],
-                    target_language=project['target_language']
-                ) else True
-                if user.is_staff:
-                    try:
-                        project['username'] = User.objects.get(
-                            uuid=project['user_custom_mt_token'])
-                    except User.DoesNotExist:
-                        project['username'] = None
-                    except django.core.exceptions.ValidationError:
-                        project['username'] = None
-            context['projects'] = response
-
-        return context
-
-
-
 def get_projects_by_ids(request):
     project_ids = request.query_params.getlist('project_id[]', [])
     responses = []
