@@ -32,6 +32,8 @@
     <link href="{% static 'css/main.css' %}" rel="stylesheet" />
     <link href="{% static 'css/main-figma.css' %}"rel="stylesheet" />
     <link href="{% static 'css/base.css' %}" rel="stylesheet" />
+    <link href="{% static 'legal/css/header.css' %}" rel="stylesheet" />
+    <link href="{% static 'legal/css/sidebar.css' %}" rel="stylesheet" />
 
     {% block extra_css %}{% endblock %}
 
@@ -215,7 +217,7 @@
 
 <div class="flex h-screen overflow-hidden relative">
     <!-- Sidebar -->
-    <div class="fixed top-0 left-0 h-screen w-22 scrollbar-hide">
+    <div class="scrollbar-hide">
         {% include 'sidebar/sidbar.html' %}
     </div>
 
@@ -353,7 +355,8 @@
 <script src="{% static 'js/get-cookie.js' %}"></script>
 <script src="{% static 'js/index.js' %}"></script>
 <script src="{% static 'js/response-error.js' %}"></script>
-<script src="{% static 'js/header.js' %}"></script>
+<script src="{% static 'legal/js/header.js' %}"></script>
+<script src="{% static 'legal/js/sidebar.js' %}"></script>
 <script src="{% static 'js/base.js' %}"></script>
 
 <script>
