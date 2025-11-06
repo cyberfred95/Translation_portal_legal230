@@ -3,140 +3,137 @@
 {% load static %}
 {% load i18n %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'legal/css/project_history.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="mx-5 mb-11.5 mt-5">
-    <h2 class="text-2xl mb-2 font-poppins font-semibold">{% trans 'History' %}</h2>
-    <div class="text-base font-poppins font-normal">{% trans 'Find all your translation history' %}</div>
+<div class="project-history-page">
+    <h2 class="page-title">{% trans 'History' %}</h2>
+    <div class="page-subtitle">{% trans 'Find all your translation history' %}</div>
 
     <!-- Projects Table -->
-    <div class="bg-white rounded-lg p-6 mt-5">
+    <div class="table-wrapper">
         <div class="table-container">
             <table class="dashboard-table">
-            <thead>
-                <tr>
-                    <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-file-text" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Document' %}</span></span></th>
-                    <th><span style="display:flex;align-items:center;gap:0.5rem;justify-content:center;"><i class="ph ph-megaphone" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Languages' %}</span></span></th>
-                    <th class="status-col"><span style="display:flex;align-items:center;gap:0.5rem;justify-content:center;"><i class="ph ph-clock-clockwise" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Status' %}</span></span></th>
-                    <th><span style="display:flex;align-items:center;gap:0.5rem;justify-content:center;"><i class="ph ph-calendar-blank" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Creation date' %}</span></span></th>
-                    <th><span style="display:flex;align-items:center;gap:0.5rem;justify-content:center;"><i class="ph ph-wrench" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Actions' %}</span></span></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if projects.results %}
-                {% for project in projects.results %}
-                <tr>
-                    <td>
-                        <span class="doc-title">{{ project.source_file_name }}</span>
-                    </td>
-                    <td>
-                        <span class="lang-label">{{ project.source_language|upper }} → {{ project.target_language|upper }}</span>
-                    </td>
-                    <td class="status-col">
-                        <span class="status-badge status-default"><span class="status">{{ project.status }}</span></span>
-                    </td>
-                    <td><span class="date-label">{{ project.created_at|date:"d/m/Y" }}</span></td>
-                    <td class="table-actions">
-                        <button 
-                            class="download-file" 
-                            data-translated-file="{{ project.translated_file }}" 
-                            data-reviewed-file="{% if project.reviewed_file %}{{ project.reviewed_file }}{% endif %}"
-                            title="{% trans 'Download' %}"
-                            {% if not project.translated_file and not project.reviewed_file %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
-                            <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
-                        </button>
-                        <button 
-                            class="expert-revision text-green-600 hover:text-green-700 font-poppins text-sm font-normal underline" 
-                            data-translated-file="{{ project.translated_file }}" 
-                            data-id="{{ project.id }}"
-                            data-display="{{ project.display_popup }}"
-                            {% if project.status != 'Translated' %}disabled style="opacity: 0.5; cursor: not-allowed; text-decoration: none;"{% endif %}>
-                            {% trans 'Expert review' %}
-                        </button>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="5" style="text-align: center; padding: 2rem; color: #6b7280;">
-                        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-                            <i class="ph ph-file-text" style="font-size: 48px; opacity: 0.5;"></i>
-                            <p style="font-weight: 600;">{% trans 'No translations found' %}</p>
-                            <p style="font-size: 0.875rem;">{% trans 'Start by translating your first document or text.' %}</p>
-                        </div>
-                    </td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
+                <thead>
+                    <tr>
+                        <th>
+                            <span class="th-inner">
+                                <i class="ph ph-file-text icon-24 icon-muted"></i>
+                                <span class="th-label">{% trans 'Document' %}</span>
+                            </span>
+                        </th>
+                        <th>
+                            <span class="th-inner center">
+                                <i class="ph ph-megaphone icon-24 icon-muted"></i>
+                                <span class="th-label">{% trans 'Languages' %}</span>
+                            </span>
+                        </th>
+                        <th class="status-col">
+                            <span class="th-inner center">
+                                <i class="ph ph-clock-clockwise icon-24 icon-muted"></i>
+                                <span class="th-label">{% trans 'Status' %}</span>
+                            </span>
+                        </th>
+                        <th>
+                            <span class="th-inner center">
+                                <i class="ph ph-calendar-blank icon-24 icon-muted"></i>
+                                <span class="th-label">{% trans 'Creation date' %}</span>
+                            </span>
+                        </th>
+                        <th>
+                            <span class="th-inner center">
+                                <i class="ph ph-wrench icon-24 icon-muted"></i>
+                                <span class="th-label">{% trans 'Actions' %}</span>
+                            </span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if projects.results %}
+                    {% for project in projects.results %}
+                    <tr>
+                        <td>
+                            <span class="doc-title">{{ project.source_file_name }}</span>
+                        </td>
+                        <td>
+                            <span class="lang-label">{{ project.source_language|upper }} → {{ project.target_language|upper }}</span>
+                        </td>
+                        <td class="status-col">
+                            <span class="status-badge status-default"><span class="status">{{ project.status }}</span></span>
+                        </td>
+                        <td>
+                            <span class="date-label">{{ project.created_at|date:"d/m/Y" }}</span>
+                        </td>
+                        <td class="table-actions">
+                            <button 
+                                class="download-file" 
+                                data-translated-file="{{ project.translated_file }}" 
+                                data-reviewed-file="{% if project.reviewed_file %}{{ project.reviewed_file }}{% endif %}"
+                                title="{% trans 'Download' %}"
+                                {% if not project.translated_file and not project.reviewed_file %}disabled{% endif %}>
+                                <i class="ph ph-download icon-16"></i>
+                            </button>
+                            <button 
+                                class="expert-revision" 
+                                data-translated-file="{{ project.translated_file }}" 
+                                data-id="{{ project.id }}"
+                                data-display="{{ project.display_popup }}"
+                                {% if project.status != 'Translated' %}disabled{% endif %}>
+                                {% trans 'Expert review' %}
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="empty-cell">
+                            <div class="empty-state">
+                                <i class="ph ph-file-text empty-icon"></i>
+                                <p class="empty-title">{% trans 'No translations found' %}</p>
+                                <p class="empty-subtitle">{% trans 'Start by translating your first document or text.' %}</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
         </div>
     </div>
 
     <!-- Modal Revision -->
-    <div id="modal-revision"
-         class="fixed inset-0 bg-gray-500 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center">
-        <div class="relative bg-white rounded-lg shadow-xl max-w-172.5 w-full mx-4">
-            <div class="absolute -top-4.5 -right-4.5 -mr-4 -mt-4 z-10">
-                <button type="button" id="close-revision"
-                        class="p-2 text-white hover:text-gray-300 focus:outline-none bg-gray-500 rounded-full">
-                    <i class="ph ph-x" style="font-size: 20px;"></i>
-                </button>
-            </div>
+    {% include 'project_history/project_history_expert_review.html' %}
 
-            <div class="p-12.5 flex flex-col items-center gap-7.5 show-modal-true hidden">
-                <div class="text-5 font-semibold text-gray-600">{% trans 'Quote for revision' %}</div>
-                <span class="text-center text-3.5 text-gray-600">{% trans 'By choosing the options below, you agree that you are sending a request for Quote  of the selected service to Legal230' %}</span>
-
-                <button
-                        type="button"
-                        data-translated-file=""
-                        data-id=""
-                        class="flex gap-2.5 items-center text-gray-600 border border-gray-600 rounded-md px-2.5 py-3 text-3.25 disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225 expert-revision">
-                    {% trans 'Expert revision' %}
-                    <div class="relative group">
-                        <i class="ph ph-info" style="font-size: 20px;"></i>
-                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute z-10 w-48 bg-gray-600 text-white text-2.75 rounded-md bottom-30 left-1/2 transform -translate-x-1/2 translate-y-full">
-                            <span class="py-4 px-4.5 text-justify text-wrap block">
-                                {% trans 'Click the button to see options for improving the quality of the translated file.' %}
-                            </span>
-                            <div class="absolute w-3 h-3 bg-gray-600 transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5"></div>
-                        </div>
-                    </div>
-                </button>
-            </div>
-            <div class="p-12.5 flex flex-col items-center gap-7.5 show-modal-false hidden">
-                <div class="text-5 font-semibold text-gray-600">{% trans 'Quote for revision' %}</div>
-                <span class="text-center text-3.5 text-gray-600">{% trans 'We can not provide an automatic quote for this language pair. Please ask' %} <a href="mailto:contact@lexamt.com">contact@lexamt.com</a> {% trans 'to receive a quote in less than 30 minutes.' %}</span>
-            </div>
-        </div>
-    </div>
-    <div class="pagination flex justify-center items-center py-12.5 w-full gap-18 hidden"
+    <!-- Pagination -->
+    <div class="pagination hidden"
          data-total-items="{{ projects.count }}"
          data-items-per-page="{{ projects.page_size }}"
          data-current-page="{{ projects.current_page }}">
-        <a href="#" id="prev-page" class="flex items-center gap-2.5 text-3.25 text-gray-600">
+        <a href="#" id="prev-page" class="pagination-link">
             <i class="ph ph-caret-left"></i>
             {% trans 'Prev' %}
         </a>
-        <div id="page-numbers" class="flex space-x-3.5 text-3.25 items-end">
+        <div id="page-numbers" class="pagination-numbers">
             <!-- Page numbers will be inserted here dynamically -->
         </div>
-        <a href="#" id="next-page" class="flex items-center gap-2.5 text-3.25 text-gray-600">
+        <a href="#" id="next-page" class="pagination-link">
             {% trans 'Next' %}
             <i class="ph ph-caret-right"></i>
         </a>
     </div>
 </div>
 
-<!-- Scripts -->
+{% block extra_js %}
 <script src="{% static 'js/utils/status-utils.js' %}"></script>
-<script src="{% static 'js/project-history.js' %}"></script>
 <script src="{% static 'js/pagination.js' %}"></script>
-
+<script src="{% static 'legal/js/project_history.js' %}"></script>
 <script>
     // Variables Django injectées dans le contexte global
-    var expert_revision_file_url = "{% url 'expert_revision_file' %}";
-    var single_project = "{% url 'single_project' %}";
-    var language_code = "{{ request.LANGUAGE_CODE }}";
+    window.expert_revision_file_url = "{% url 'expert_revision_file' %}";
+    window.single_project = "{% url 'single_project' %}";
+    window.language_code = "{{ request.LANGUAGE_CODE }}";
 </script>
+{% endblock %}
 
 {% endblock %}

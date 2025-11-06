@@ -1,0 +1,40 @@
+{% load i18n %}
+
+<!-- Modal Revision -->
+<div id="modal-revision" class="modal-overlay hidden">
+    <div class="modal-card">
+        <button type="button" id="close-revision" class="modal-close">
+            <i class="ph ph-x icon-20"></i>
+        </button>
+
+        <div class="modal-body show-modal-true hidden">
+            <div class="modal-title">{% trans 'Quote for revision' %}</div>
+            <span class="modal-text">{% trans 'By choosing the options below, you agree that you are sending a request for Quote  of the selected service to Legal230' %}</span>
+
+            <button
+                type="button"
+                data-translated-file=""
+                data-id=""
+                class="modal-button expert-revision">
+                {% trans 'Expert revision' %}
+                <div class="modal-tooltip-wrapper">
+                    <i class="ph ph-info modal-tooltip-icon"></i>
+                    <div class="modal-tooltip">
+                        <span>{% trans 'Click the button to see options for improving the quality of the translated file.' %}</span>
+                    </div>
+                </div>
+            </button>
+        </div>
+        
+        <div class="modal-body show-modal-false hidden">
+            <div class="modal-title">{% trans 'Quote for revision' %}</div>
+            <span class="modal-text">
+                {% trans 'We can not provide an automatic quote for this language pair. Please ask' %} 
+                <a href="mailto:contact@lexamt.com">contact@lexamt.com</a> 
+                {% trans 'to receive a quote in less than 30 minutes.' %}
+            </span>
+        </div>
+    </div>
+</div>
+
+
