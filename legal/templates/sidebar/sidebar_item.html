@@ -1,16 +1,6 @@
-{% comment %}
-Expected variables:
-- url_name: route name used to determine the active state (can be empty)
-- href: resolved link (URL or mailto:)
-- icon_class: icon classes (e.g., "ph-fill ph-house")
-- aria_label: aria text
-Behavior: if the current route matches url_name, keep the white background; otherwise, apply a 40px hover square.
-{% endcomment %}
-
 <a href="{{ href }}"
-   class="flex p-2 justify-center items-center gap-1.5 rounded-lg transition-colors {% if url_name and request.resolver_match.url_name == url_name %}bg-green-50{% else %}hover:bg-white/10{% endif %}"
-   aria-label="{{ aria_label }}">
-    <i class="{{ icon_class }} {% if url_name and request.resolver_match.url_name == url_name %}text-black/80{% else %}text-white{% endif %} text-[24px]"></i>
+   class="sidebar-item has-tooltip {% if url_name and request.resolver_match.url_name == url_name %}active{% endif %}"
+   aria-label="{{ aria_label }}"
+   data-tooltip="{{ aria_label }}">
+    <i class="{{ icon_class }} sidebar-icon"></i>
 </a>
-
-

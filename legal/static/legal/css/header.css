@@ -1,0 +1,145 @@
+/* ============================================
+   Header Styles
+   Isolé et indépendant de main.css/main-figma.css
+   ============================================ */
+
+/* Variables locales */
+:root {
+  --header-height: 3.5rem; /* 56px */
+  --header-left-offset: 5.5rem; /* 88px - correspond à la largeur de la sidebar */
+  --header-bg: #ffffff;
+  --header-border: rgba(0, 0, 0, 0.1);
+  --header-text-primary: #181932;
+  --header-text-secondary: #5a5a78;
+  --header-hover-bg: #f8fafc;
+}
+
+/* ============================================
+   Header Wrapper
+   ============================================ */
+.header-wrapper {
+  position: fixed;
+  top: 0;
+  left: var(--header-left-offset);
+  right: 0;
+  z-index: 30;
+  display: flex;
+  padding: 0.5rem 0.75rem;
+  justify-content: flex-end;
+  align-items: center;
+  border-bottom: 1px solid var(--header-border);
+  background: var(--header-bg);
+  height: var(--header-height);
+}
+
+/* ============================================
+   Actions Container
+   ============================================ */
+.header-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ============================================
+   Language Switcher
+   ============================================ */
+.header-lang-switcher {
+  display: flex;
+  height: 2.5rem;
+  padding: 0 0.5rem;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.375rem;
+}
+
+.header-lang-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.25rem;
+}
+
+.header-lang-icon {
+  color: #000000;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+}
+
+.header-lang-link {
+  cursor: pointer;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  letter-spacing: -0.084px;
+  transition: color 300ms ease-in-out;
+}
+
+.header-lang-link.active {
+  color: var(--header-text-primary);
+  font-weight: 500;
+}
+
+.header-lang-link.inactive {
+  color: var(--header-text-secondary);
+}
+
+.header-lang-link.inactive:hover {
+  color: var(--header-text-primary);
+}
+
+.header-lang-separator {
+  color: var(--header-text-secondary);
+  font-size: 0.875rem;
+}
+
+/* ============================================
+   Profile Section
+   ============================================ */
+.header-profile-container {
+  display: flex;
+  height: 2.5rem;
+  padding: 0 0.5rem;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.375rem;
+  position: relative;
+}
+
+.header-profile-trigger {
+  display: flex;
+  padding-right: 0.25rem;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  transition: background-color 150ms ease;
+}
+
+.header-profile-trigger:hover {
+  background: var(--header-hover-bg);
+}
+
+.header-profile-avatar {
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+  padding: 0 0.125rem 0.25rem 0.125rem;
+  justify-content: center;
+  align-items: center;
+  border-radius: 9999px;
+  border: 0.5px solid var(--header-border);
+  background: var(--header-hover-bg);
+}
+
+.header-profile-initials {
+  color: var(--header-text-secondary);
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.5rem;
+  letter-spacing: -0.084px;
+}

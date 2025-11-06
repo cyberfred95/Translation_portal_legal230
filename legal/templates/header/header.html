@@ -1,65 +1,33 @@
 {% load static %}
 {% load i18n %}
 
-<header class="fixed top-0 left-22 right-0 z-30 flex px-3 py-2 justify-end items-center border-b border-black/10 bg-white h-14">
-
-    <!-- Center section - Search 
-    <div class="flex justify-center items-center gap-1 flex-1">
-        <div class="flex h-8 px-2 items-center gap-2 rounded-md">
-            <div class="flex w-56 flex-col items-start gap-1">
-                <div class="flex h-8 items-center self-stretch rounded-md border border-black/10 bg-white">
-                    <div class="flex px-1.5 py-1.5 justify-center items-center gap-2 self-stretch">
-                        <svg class="w-5 h-5 text-black/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                    </div>
-                    <input
-                        type="text"
-                        placeholder="{% trans 'Search' %}"
-                        class="h-6 flex-1 overflow-hidden text-[#5a5a78] text-ellipsis whitespace-nowrap font-poppins text-sm font-normal leading-6 tracking-[-0.084px] bg-transparent border-none outline-none placeholder:text-[#5a5a78]"
-                        id="header-search"
-                    />
-                    <div class="flex w-px px-2 items-start gap-2 self-stretch"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    -->
-
-    <!-- Right section - Actions and Profile -->
-    <div class="flex justify-end items-center gap-1">
-
+<header class="header-wrapper">
+    <div class="header-actions">
         <!-- Language switcher -->
-        <div class="flex h-10 px-2 justify-center items-center rounded-md">
-            <div class="flex items-center gap-1 ml-1">
-                <span class="text-black w-[1.25rem] h-[1.25rem] mr-2">
-                    <i class="ph ph-globe text-black"></i> &nbsp;
+        <div class="header-lang-switcher">
+            <div class="header-lang-inner">
+                <span class="header-lang-icon">
+                    <i class="ph ph-globe"></i>
                 </span>
-                <span class="en {% if request.LANGUAGE_CODE == 'en' %}text-[#181932] font-medium{% else %}text-[#5a5a78] hover:text-[#181932] transition duration-300 ease-in-out{% endif %} cursor-pointer text-sm leading-6 tracking-[-0.084px]">
+                <span class="header-lang-link en {% if request.LANGUAGE_CODE == 'en' %}active{% else %}inactive{% endif %}">
                     EN
                 </span>
-                <span class="text-[#5a5a78] text-sm">|</span>
-                <span class="fr {% if request.LANGUAGE_CODE == 'fr' %}text-[#181932] font-medium{% else %}text-[#5a5a78] hover:text-[#181932] transition duration-300 ease-in-out{% endif %} cursor-pointer text-sm leading-6 tracking-[-0.084px]">
+                <span class="header-lang-separator">|</span>
+                <span class="header-lang-link fr {% if request.LANGUAGE_CODE == 'fr' %}active{% else %}inactive{% endif %}">
                     FR
                 </span>
             </div>
         </div>
 
         <!-- Profile section -->
-        <div class="flex h-10 px-2 justify-center items-center rounded-md">
-            <div class="relative profile-container">
-                <a href="{% url 'profile_details' %}" class="flex pr-1 justify-center items-center gap-2 cursor-pointer profile-trigger hover:bg-[#f8fafc] rounded-md transition-colors">
-                    <div class="flex w-8 h-8 px-0.5 py-1 justify-center items-center rounded-full border-[0.5px] border-black/10 bg-[#f8fafc]">
-                        <span class="text-[#5a5a78] text-center font-inter text-sm font-semibold leading-6 tracking-[-0.084px]">
-                            {{ request.user.username|slice:":2"|upper }}
-                        </span>
-                    </div>
-                </a>
-            </div>
+        <div class="header-profile-container">
+            <a href="{% url 'profile_details' %}" class="header-profile-trigger">
+                <div class="header-profile-avatar">
+                    <span class="header-profile-initials">
+                        {{ request.user.username|slice:":2"|upper }}
+                    </span>
+                </div>
+            </a>
         </div>
     </div>
 </header>
-
-<script src="{% static 'js/header.js' %}"></script>
-
-
