@@ -43,10 +43,27 @@ class DashboardView(BaseTemplateView):
                 translated_words_count = user_subscription.translated_words_count
                 translated_symbols_count = user_subscription.translated_symbols_count
                 translated_files_count = user_subscription.translated_files_count
+                # Exposer les plafonds depuis le type d'abonnement si disponible (source de vérité)
+                sub_type = getattr(user_subscription, 'subscription', None)
+                if sub_type:
+                    context['max_symbols_count'] = getattr(sub_type, 'max_symbols_count', -1)
+                    context['max_words_count'] = getattr(sub_type, 'max_words_count', -1)
+                    context['max_files_count'] = getattr(sub_type, 'max_files_count', -1)
+                    context['max_glossaries_count'] = getattr(sub_type, 'custom_glossaries_count', -1)
+                else:
+                    # fallback sur les champs copiés dans UserSubscription
+                    context['max_symbols_count'] = getattr(user_subscription, 'max_symbols_count', -1)
+                    context['max_words_count'] = getattr(user_subscription, 'max_words_count', -1)
+                    context['max_files_count'] = getattr(user_subscription, 'max_files_count', -1)
+                    context['max_glossaries_count'] = getattr(user_subscription, 'custom_glossaries_count', -1)
         except Exception:
             translated_words_count = 0
             translated_symbols_count = 0
             translated_files_count = 0
+            context['max_symbols_count'] = -1
+            context['max_words_count'] = -1
+            context['max_files_count'] = -1
+            context['max_glossaries_count'] = -1
 
         context['translated_words_count'] = translated_words_count
         context['translated_symbols_count'] = translated_symbols_count
