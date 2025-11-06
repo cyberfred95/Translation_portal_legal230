@@ -3,17 +3,27 @@
     <div class="stat-title">{{ title }}</div>
     <div class="stat-value"{% if data_original_count %} data-original-count="{{ data_original_count }}"{% endif %}>{{ value }}</div>
   </div>
-  <span class="dashboard-icon" style="background:{{ bg_color }};">
-    {% if icon == 'file-text' %}
-      <i class="ph-fill ph-file-text" style="font-size: 24px; color: #3b82f6;"></i>
-    {% elif icon == 'words' %}
-      <i class="ph ph-text-aa" style="font-size: 24px; color: #FBBF24; font-weight: bold;"></i>
-    {% elif icon == 'users' %}
-      <i class="ph-fill ph-files" style="font-size: 24px; color: #8B5CF6;"></i>
-    {% elif icon == 'lexicon' %}
-      <i class="ph-fill ph-book-open" style="font-size: 24px; color: #14B8A6;"></i>
-    {% elif icon == 'books' %}
-      <i class="ph-fill ph-books" style="font-size: 24px; color: #14B8A6;"></i>
-    {% endif %}
-  </span>
-</div>
+  <div class="dashboard-icon-wrapper">
+    <!-- Skeleton loader -->
+    <span class="dashboard-icon-skeleton"></span>
+    <!-- Anneau réel (caché initialement) -->
+    {% with color=color_class %}
+      {% if denominator == -1 %}
+        <span class="dashboard-icon-ring {{ color }} has-tooltip dashboard-icon-content" style="--pct: 0; display: none;" data-pct="0" data-tooltip="{{ numerator }} / ∞">
+          <span class="dashboard-icon" data-bg="{{ bg_color }}"><span class="icon-24 {{ color }}"><strong>∞</strong></span></span>
+        </span>
+      {% elif denominator > 0 %}
+        {% widthratio numerator denominator 100 as pct_int %}
+        <span class="dashboard-icon-ring {{ color }} has-tooltip dashboard-icon-content" style="--pct: 0; display: none;" data-pct="{{ pct_int }}" data-tooltip="{{ numerator }} / {{ denominator }}">
+          <span class="dashboard-icon" data-bg="{{ bg_color }}"><span class="icon-24 {{ color }}"><strong>{{ pct_int }}%</strong></span></span>
+        </span>
+      {% else %}
+        <span class="dashboard-icon-ring {{ color }} has-tooltip dashboard-icon-content" style="--pct: 0; display: none;" data-pct="0" data-tooltip="{{ numerator }} / {{ denominator }}">
+          <span class="dashboard-icon" data-bg="{{ bg_color }}"><span class="icon-24 {{ color }}"><strong>0%</strong></span></span>
+        </span>
+      {% endif %}
+    {% endwith %}
+  </div>
+ </div>
+
+ 

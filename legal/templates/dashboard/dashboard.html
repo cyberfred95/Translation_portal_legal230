@@ -3,26 +3,27 @@
 {% load static %}
 {% load i18n %}
 
-{% block content %}
-<link href="{% static 'css/dashboard.css' %}" rel="stylesheet" />
-<link href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css" rel="stylesheet" />
-<link href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/fill/style.css" rel="stylesheet" />
-<div class="mx-5 mb-11.5 mt-5" style="background:#f8fafc;" data-username="{{ request.user.username }}" data-is-group-admin="{{ is_group_admin|yesno:'true,false' }}">
-  <h2 class="text-2xl mb-2 font-poppins font-semibold">{% trans 'Welcome to Lexa' %}</h2>
-  <div class="text-base font-poppins font-normal">{% trans 'Lexa is specially designed to translate legal content with unmatched legal precision' %}</div>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'legal/css/dashboard.css' %}">
+{% endblock %}
 
-  <p style="color:#5a5a78;max-width:800px;margin-bottom:2rem;" class="dashboard-intro"></p>
+{% block content %}
+<div class="dashboard-page" data-username="{{ request.user.username }}" data-is-group-admin="{{ is_group_admin|yesno:'true,false' }}">
+  <h2 class="dash-title">{% trans 'Welcome to Lexa' %}</h2>
+  <div class="dash-subtitle">{% trans 'Lexa is specially designed to translate legal content with unmatched legal precision' %}</div>
+
+  <p class="dashboard-intro" data-style="intro"></p>
   <div class="dashboard-top">
-    <div style="flex:2;">
+    <div class="dashboard-main-col">
       <div class="dashboard-cards-grid">
         {% trans 'CHARACTERS TRANSLATED' as characters_title %}
         {% trans 'WORDS TRANSLATED' as words_title %}
         {% trans 'DOCUMENTS TRANSLATED' as documents_title %}
         {% trans 'ADDED GLOSSARIES' as glossaries_title %}
-        {% include 'dashboard/dashboard_data_card.html' with title=characters_title value=translated_symbols_count|default:0 bg_color='#fffbeb' icon='words' data_original_count=translated_symbols_count|default:0 %}
-        {% include 'dashboard/dashboard_data_card.html' with title=words_title value=translated_words_count|default:0|floatformat:'0' bg_color='#eff6ff' icon='file-text' %}
-        {% include 'dashboard/dashboard_data_card.html' with title=documents_title value=translated_files_count|default:0 bg_color='#f5f3ff' icon='users' %}
-        {% include 'dashboard/dashboard_data_card.html' with title=glossaries_title value=user_glossaries_count|default:0 bg_color='#f0fdfa' icon='books' %}
+        {% include 'dashboard/dashboard_data_card.html' with title=characters_title value=translated_symbols_count|default:0 bg_color='#fffbeb' numerator=translated_symbols_count denominator=max_symbols_count color_class='color-amber' data_original_count=translated_symbols_count|default:0 %}
+        {% include 'dashboard/dashboard_data_card.html' with title=words_title value=translated_words_count|default:0|floatformat:'0' bg_color='#eff6ff' numerator=translated_words_count denominator=max_words_count color_class='color-blue' %}
+        {% include 'dashboard/dashboard_data_card.html' with title=documents_title value=translated_files_count|default:0 bg_color='#f5f3ff' numerator=translated_files_count denominator=max_files_count color_class='color-violet' %}
+        {% include 'dashboard/dashboard_data_card.html' with title=glossaries_title value=user_glossaries_count|default:0 bg_color='#f0fdfa' numerator=user_glossaries_count denominator=max_glossaries_count color_class='color-teal' %}
       </div>
       
     </div>
@@ -31,8 +32,9 @@
   {% include 'dashboard/dashboard_recent_translations.html' %}
 </div>
 
-<!-- JavaScript pour le filtrage -->
-<script src="{% static 'js/utils/status-utils.js' %}"></script>
-<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/utils/status-utils.js' %}"></script>
+<script src="{% static 'legal/js/dashboard.js' %}"></script>
 {% endblock %}
