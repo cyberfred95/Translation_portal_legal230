@@ -1,23 +1,23 @@
 {% load i18n %}
 <div class="quick-actions">
-  <h2 style="color:#181932;font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;">{% trans 'Quick Actions' %}</h2>
+  <h2 class="qa-title">{% trans 'Quick Actions' %}</h2>
   <a href="{% url 'main_index' %}" class="dashboard-btn btn-green">
-    <i class="ph ph-plus" style="font-size: 24px;"></i>
+    <i class="ph ph-plus icon-24"></i>
     {% trans 'New translation' %}
   </a>
   {% if is_group_admin %}
   <a href="{% url 'my_team' %}" class="dashboard-btn btn-outline">
-    <i class="ph ph-users-three" style="font-size: 24px; color: #181932;"></i>
+    <i class="ph ph-users-three icon-24 color-dark"></i>
     {% trans 'Manage my team' %}
   </a>
   {% else %}
   <a href="{% url 'profile_details' %}" class="dashboard-btn btn-outline">
-    <i class="ph ph-user-circle" style="font-size: 24px; color: #181932;"></i>
+    <i class="ph ph-user-circle icon-24 color-dark"></i>
     {% trans 'My profile' %}
   </a>
   {% endif %}
   <a href="{% url 'glossaries' %}" class="dashboard-btn btn-outline">
-    <i class="ph ph-folder-plus" style="font-size: 24px; color: #181932;"></i>
+    <i class="ph ph-folder-plus icon-24 color-dark"></i>
     {% trans 'Add a glossary' %}
   </a>
 </div>

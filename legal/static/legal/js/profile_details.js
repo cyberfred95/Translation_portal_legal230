@@ -5,12 +5,12 @@ document.addEventListener('DOMContentLoaded', function () {
   const changeDataUrl = root.getAttribute('data-change-url') || '';
 
   const tabButtons = {
-    info: document.getElementById('profile-information'),
-    security: document.getElementById('profile-security'),
+    info: root.querySelector('#profile-information'),
+    security: root.querySelector('#profile-security'),
   };
   const tabContents = {
-    info: document.getElementById('profile-information-content'),
-    security: document.getElementById('profile-security-content'),
+    info: root.querySelector('#profile-information-content'),
+    security: root.querySelector('#profile-security-content'),
   };
 
   function showTab(tab) {
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
   showTab('info');
 
   // Handle form submission as PUT to changeDataUrl
-  const form = document.querySelector('form[name="change-user-data"]');
+  const form = root.querySelector('form[name="change-user-data"]');
   if (form && changeDataUrl) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Show success modal
-        const modal = document.getElementById('success-update-user-data');
+        const modal = root.querySelector('#success-update-user-data');
         if (modal) modal.classList.remove('hidden');
       } catch (err) {
         console.error('Update error', err);
@@ -78,8 +78,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Close success modal on button click or overlay click
-  const modal = document.getElementById('success-update-user-data');
-  const modalBtn = document.getElementById('success-update-btn');
+  const modal = root.querySelector('#success-update-user-data');
+  const modalBtn = root.querySelector('#success-update-btn');
   if (modalBtn && modal) {
     modalBtn.addEventListener('click', () => {
       modal.classList.add('hidden');
@@ -92,13 +92,13 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Logout functionality
-  const logoutBtn = document.getElementById('logout-btn');
+  const logoutBtn = root.querySelector('#logout-btn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', function(e) {
       e.preventDefault();
       
       // Get CSRF token
-      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+      const csrfToken = form ? form.querySelector('[name=csrfmiddlewaretoken]') : root.querySelector('[name=csrfmiddlewaretoken]');
       if (!csrfToken) {
         console.error('CSRF token not found');
         return;

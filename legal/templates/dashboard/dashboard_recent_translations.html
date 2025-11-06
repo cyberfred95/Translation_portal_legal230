@@ -1,17 +1,17 @@
 {% load i18n %}
 <div class="table-container">
-  <div style="margin-bottom:1rem;">
-    <h2 style="color:#181932;font-size:1.2rem;font-weight:600;">{% trans 'Recent translations' %}</h2>
+  <div class="section-header">
+    <h2 class="section-title">{% trans 'Recent translations' %}</h2>
   </div>
   
   <table class="dashboard-table">
     <thead>
       <tr>
-        <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-file-text" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Document' %}</span></span></th>
-        <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-megaphone" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Language' %}</span></span></th>
-        <th class="status-col"><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-clock-clockwise" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Status' %}</span></th>
-        <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-calendar-blank" style="font-size: 24px; color: #6b7280;"></i>{% trans 'Creation date' %}</span></th>
-        <th><span style="display:flex;align-items:center;gap:0.5rem;"><i class="ph ph-wrench" style="font-size: 24px; color: #6b7280;"></i><span class="th-label">{% trans 'Actions' %}</span></span></th>
+        <th><span class="th-inner"><i class="ph ph-file-text icon-24 icon-muted"></i><span class="th-label">{% trans 'Document' %}</span></span></th>
+        <th><span class="th-inner"><i class="ph ph-megaphone icon-24 icon-muted"></i><span class="th-label">{% trans 'Language' %}</span></span></th>
+        <th class="status-col"><span class="th-inner"><i class="ph ph-clock-clockwise icon-24 icon-muted"></i>{% trans 'Status' %}</span></th>
+        <th><span class="th-inner"><i class="ph ph-calendar-blank icon-24 icon-muted"></i>{% trans 'Creation date' %}</span></th>
+        <th><span class="th-inner"><i class="ph ph-wrench icon-24 icon-muted"></i><span class="th-label">{% trans 'Actions' %}</span></span></th>
       </tr>
     </thead>
     <tbody>
@@ -28,12 +28,12 @@
           <td>{{ project.created_at|date:"d/m/Y" }}</td>
           <td class="table-actions">
             {% if project.translated_file %}
-            <button title="Download" onclick="window.open('{{ project.translated_file }}', '_blank')">
-              <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
+            <button title="{% trans 'Download' %}" class="btn-icon" onclick="window.open('{{ project.translated_file }}', '_blank')">
+              <i class="ph ph-download icon-16 color-dark-700"></i>
             </button>
             {% else %}
-            <button title="Download" disabled style="opacity: 0.5; cursor: not-allowed;">
-              <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
+            <button title="{% trans 'Download' %}" class="btn-icon disabled" disabled>
+              <i class="ph ph-download icon-16 color-dark-700"></i>
             </button>
             {% endif %}
           </td>
@@ -41,11 +41,11 @@
         {% endfor %}
       {% else %}
         <tr>
-          <td colspan="5" style="text-align: center; padding: 2rem; color: #6b7280;">
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-              <i class="ph ph-file-text" style="font-size: 48px; opacity: 0.5;"></i>
-              <p style="font-weight: 600;">{% trans 'No translations found' %}</p>
-              <p style="font-size: 0.875rem;">{% trans 'Start by translating your first document or text.' %}</p>
+          <td colspan="5" class="empty-cell">
+            <div class="empty-state">
+              <i class="ph ph-file-text empty-icon"></i>
+              <p class="empty-title">{% trans 'No translations found' %}</p>
+              <p class="empty-subtitle">{% trans 'Start by translating your first document or text.' %}</p>
             </div>
           </td>
         </tr>

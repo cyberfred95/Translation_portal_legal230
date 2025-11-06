@@ -3,17 +3,18 @@
 {% load static %}
 {% load i18n %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'legal/css/dashboard.css' %}">
+{% endblock %}
+
 {% block content %}
-<link href="{% static 'css/dashboard.css' %}" rel="stylesheet" />
-<link href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css" rel="stylesheet" />
-<link href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/fill/style.css" rel="stylesheet" />
-<div class="mx-5 mb-11.5 mt-5" style="background:#f8fafc;" data-username="{{ request.user.username }}" data-is-group-admin="{{ is_group_admin|yesno:'true,false' }}">
+<div class="dashboard-page mx-5 mb-11.5 mt-5" data-username="{{ request.user.username }}" data-is-group-admin="{{ is_group_admin|yesno:'true,false' }}">
   <h2 class="text-2xl mb-2 font-poppins font-semibold">{% trans 'Welcome to Lexa' %}</h2>
   <div class="text-base font-poppins font-normal">{% trans 'Lexa is specially designed to translate legal content with unmatched legal precision' %}</div>
 
-  <p style="color:#5a5a78;max-width:800px;margin-bottom:2rem;" class="dashboard-intro"></p>
+  <p class="dashboard-intro" data-style="intro"></p>
   <div class="dashboard-top">
-    <div style="flex:2;">
+    <div class="dashboard-main-col">
       <div class="dashboard-cards-grid">
         {% trans 'CHARACTERS TRANSLATED' as characters_title %}
         {% trans 'WORDS TRANSLATED' as words_title %}
@@ -31,8 +32,9 @@
   {% include 'dashboard/dashboard_recent_translations.html' %}
 </div>
 
-<!-- JavaScript pour le filtrage -->
-<script src="{% static 'js/utils/status-utils.js' %}"></script>
-<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/utils/status-utils.js' %}"></script>
+<script src="{% static 'legal/js/dashboard.js' %}"></script>
 {% endblock %}

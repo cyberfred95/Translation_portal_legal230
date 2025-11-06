@@ -3,17 +3,17 @@
     <div class="stat-title">{{ title }}</div>
     <div class="stat-value"{% if data_original_count %} data-original-count="{{ data_original_count }}"{% endif %}>{{ value }}</div>
   </div>
-  <span class="dashboard-icon" style="background:{{ bg_color }};">
+  <span class="dashboard-icon" data-bg="{{ bg_color }}">
     {% if icon == 'file-text' %}
-      <i class="ph-fill ph-file-text" style="font-size: 24px; color: #3b82f6;"></i>
+      <i class="ph-fill ph-file-text icon-24 color-blue"></i>
     {% elif icon == 'words' %}
-      <i class="ph ph-text-aa" style="font-size: 24px; color: #FBBF24; font-weight: bold;"></i>
+      <i class="ph ph-text-aa icon-24 color-amber"></i>
     {% elif icon == 'users' %}
-      <i class="ph-fill ph-files" style="font-size: 24px; color: #8B5CF6;"></i>
+      <i class="ph-fill ph-files icon-24 color-violet"></i>
     {% elif icon == 'lexicon' %}
-      <i class="ph-fill ph-book-open" style="font-size: 24px; color: #14B8A6;"></i>
+      <i class="ph-fill ph-book-open icon-24 color-teal"></i>
     {% elif icon == 'books' %}
-      <i class="ph-fill ph-books" style="font-size: 24px; color: #14B8A6;"></i>
+      <i class="ph-fill ph-books icon-24 color-teal"></i>
     {% endif %}
   </span>
 </div>

@@ -1,0 +1,63 @@
+.dashboard-page { padding: 0; }
+
+/* Reset local minimal */
+.dashboard-page, .dashboard-page * { box-sizing: border-box; }
+.dashboard-page button,
+.dashboard-page input,
+.dashboard-page select,
+.dashboard-page textarea { font: inherit; color: inherit; }
+
+/* Intro paragraph (remplace le style inline) */
+.dashboard-page .dashboard-intro {
+  color: #5a5a78;
+  max-width: 800px;
+  margin-bottom: 2rem;
+}
+
+/* Placeholder: nous porterons progressivement les styles ici en remplaçant Tailwind/inline */
+
+/* Colonne principale (remplace style inline flex:2) */
+.dashboard-page .dashboard-main-col { flex: 2; }
+
+/* Quick Actions */
+.dashboard-page .qa-title {
+  color: #181932;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+/* Ne pas redéfinir .dashboard-btn pour préserver le style original de main-figma.css */
+
+/* Icons */
+.dashboard-page .icon-24 { width: 24px !important; height: 24px !important; font-size: 24px !important; display: inline-flex; align-items: center; justify-content: center; }
+.dashboard-page .icon-16 { width: 16px !important; height: 16px !important; font-size: 16px !important; display: inline-flex; align-items: center; justify-content: center; }
+.dashboard-page .icon-muted { color: #6b7280; }
+.dashboard-page .color-dark { color: #181932; }
+.dashboard-page .color-dark-700 { color: #374151; }
+.dashboard-page .color-blue { color: #3b82f6; }
+.dashboard-page .color-amber { color: #FBBF24; }
+.dashboard-page .color-violet { color: #8B5CF6; }
+.dashboard-page .color-teal { color: #14B8A6; }
+
+/* Ne pas redéfinir .dashboard-cards-grid/.dashboard-card/.dashboard-icon (déjà défini dans main-figma.css) */
+
+/* Table: limiter au strict nécessaire pour remplacer les styles inline sans modifier le design */
+.dashboard-page .table-container { margin-top: 1.25rem; }
+.dashboard-page .section-header { padding-top: 1.25rem; margin-bottom: 1rem; padding-left: 1.25rem; }
+.dashboard-page .section-title { color: #181932; font-size: 1.2rem; font-weight: 600; }
+.dashboard-page .dashboard-table thead th .th-inner { display: inline-flex; align-items: center; gap: 0.5rem; }
+.dashboard-page .dashboard-table thead th .th-label { display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Ne pas redéfinir .dashboard-table, th, td (déjà défini globalement) */
+/* Boutons d'action: ne pas forcer styles; seulement état disabled */
+.dashboard-page .table-actions .btn-icon.disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Empty state */
+.dashboard-page .empty-cell { text-align: center; padding: 2rem; color: #6b7280; }
+.dashboard-page .empty-state { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.dashboard-page .empty-icon { font-size: 48px; opacity: 0.5; }
+.dashboard-page .empty-title { font-weight: 600; }
+.dashboard-page .empty-subtitle { font-size: 0.875rem; }
+
+/* Ne pas surcharger la grille responsive des cartes; laisser main-figma.css gérer */
+
+

@@ -6,7 +6,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from legal.views_all import TranslateView, FileExpertRevisionView, ProjectsHistoryView, SingleProjectView, \
      GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView, \
-     DashboardView, DisplayMessage
+     DisplayMessage
+from legal.views.dashboard import DashboardView
 from legal.views.profile_details import ProfileDetailsView
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
