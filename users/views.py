@@ -270,14 +270,14 @@ class ForgotPasswordView(BaseTemplateView):
                 "email": base64.b64encode(user.email.encode('utf-8')),
             }
             send_email(
-                email,
+                user.email,
                 EmailType.USER_MANAGEMENT_RESET_PASSWORD,
-                request.user.language,
+                user.language if user.language else 'en',
                 {
                     # TMP : Need to be replaced with actual values when figma integration is done
                     "lexa_username": user.username,
                     "lexa_email": user.email,
-                    "url_reset_password": self.get_register_user_absolute_uri(request, params=params),
+                    "url_reset_password": self.get_reset_password_absolute_url(request, params=params),
                 }
             )
             return JsonResponse({"message": "Code sent successfully"}, status=status.HTTP_200_OK)

@@ -4,9 +4,10 @@ from django.urls import path, re_path
 from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
-from legal.views_all import TranslateView, FileExpertRevisionView, SingleProjectView, \
+from legal.views_all import FileExpertRevisionView, SingleProjectView, \
      GetTemplatesView, GetDomainsView, LanguageDetectView, DetectTextLanguageView, \
      DisplayMessage
+from legal.views.translate import TranslateView
 from legal.views.dashboard import DashboardView
 from legal.views.profile_details import ProfileDetailsView
 from legal.views.project_history import ProjectsHistoryView

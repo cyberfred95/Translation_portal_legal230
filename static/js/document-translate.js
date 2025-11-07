@@ -189,14 +189,14 @@ $(document).ready(function () {
             }
 
             $("div[class^='step-']").addClass('hidden').hide();
-            $('.step-1').removeClass('hidden').show();
+            $('.step-document').removeClass('hidden').show();
             $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             $('.stepindicator-2').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
             $('.stepindicator-3').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
             $('.stepindicator-4').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
         } else if (currentStep === 1) {
             $("div[class^='step-']").addClass('hidden').hide();
-            $('.step-2').removeClass('hidden').show();
+            $('.step-language').removeClass('hidden').show();
             $blockButtons.addClass('justify-between').removeClass('justify-end');
             prevStep.show();
             prevStep.css('display', 'flex');
@@ -235,7 +235,7 @@ $(document).ready(function () {
             checkLanguagesConsistency();
         } else if (currentStep === 2) {
             $("div[class^='step-']").addClass('hidden').hide();
-            $('.step-3').removeClass('hidden').show();
+            $('.step-domain').removeClass('hidden').show();
             $blockButtons.addClass('justify-between').removeClass('justify-end');
             prevStep.show();
             $('span', $nextButton).text(language_code === 'en' ? 'Next' : 'Suivant');
@@ -258,7 +258,7 @@ $(document).ready(function () {
             }
         } else if (currentStep === 3) {
             $("div[class^='step-']").addClass('hidden').hide();
-            $('.step-4').removeClass('hidden').show();
+            $('.step-traduction').removeClass('hidden').show();
             $blockButtons.addClass('justify-between').removeClass('justify-end');
             prevStep.show();
             $('span', $nextButton).text(language_code === 'en' ? 'Finish' : 'Terminé');
@@ -267,15 +267,8 @@ $(document).ready(function () {
             $('.stepindicator-3').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             $('.stepindicator-4').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             
-            // Déclencher la requête de traduction à l'arrivée sur step_4
+            // Déclencher la requête de traduction à l'arrivée sur step-traduction
             fileTranslate();
-        } else if (currentStep === 4) {
-            $("div[class^='step-']").addClass('hidden').hide();
-            $('.step-5').removeClass('hidden').show();
-            $("#restart").show().text(language_code === 'en' ? "New translation" : "Nouveau document");
-            $("#restart-text").show();
-
-            $actionList.css("justify-content", "flex-start");
         } else {
             prevStep.show();
             $blockButtons.removeClass('justify-end').addClass('justify-between');
@@ -324,11 +317,11 @@ $(document).ready(function () {
                 if (!defaultDomain && access_to_default_glossaries) {
                     loadDefaultGlossary();
                     $(".add-glossary-btn").addClass('hidden');
-                    $(".step-4 .default").addClass('bg-gray-600 text-white');
+                    $(".step-domain .default").addClass('bg-gray-600 text-white');
                 } else {
                     loadMyGlossaries();
                     $(".add-glossary-btn").removeClass('hidden');
-                    $(".step-4 .my-glossary").addClass('bg-gray-600 text-white');
+                    $(".step-domain .my-glossary").addClass('bg-gray-600 text-white');
                 }
             }
 
@@ -366,7 +359,7 @@ $(document).ready(function () {
     showStep(currentStep);
 
 
-    // ------------- STEP-1 -------------
+    // ------------- STEP-DOCUMENT -------------
 
 
     const allowedTypes = ['.txt', '.pdf', '.docx', '.xlsx', '.pptx'];
@@ -562,7 +555,7 @@ $(document).ready(function () {
 
 
 
-    // ------------- STEP-2 -------------
+    // ------------- STEP-LANGUAGE -------------
 
     // Fonction pour afficher le statut de détection de langue
     function showLanguageDetectionStatus(message, autoHide = false, color = '#5A5A78', showSpinner = false) {
@@ -740,7 +733,7 @@ $(document).ready(function () {
     }
 
 
-    // ------------- STEP-3 -------------
+    // ------------- STEP-DOMAIN -------------
     
     // Fonction utilitaire pour créer un élément de sélection (radio + label + icône)
     function createSelectionItem(config) {
@@ -936,9 +929,9 @@ $(document).ready(function () {
     }
 
 
-    // ------------- STEP-4 -------------
+    // ------------- STEP-TRADUCTION -------------
 
-    $(".step-4 .default").click(function () {
+    $(".step-domain .default").click(function () {
         if (!defaultDomain || access_to_default_glossaries) {
             selectGlossaryType('default');
             loadDefaultGlossary();
@@ -946,12 +939,12 @@ $(document).ready(function () {
         }
     });
 
-    $(".step-4 .my-glossary").click(function () {
+    $(".step-domain .my-glossary").click(function () {
         selectGlossaryType('my-glossary');
         loadMyGlossaries();
     });
 
-    $(".step-4 .none").click(function () {
+    $(".step-domain .none").click(function () {
         selectGlossaryType('none');
         $('.terminology-step').text(language_code === 'en' ? 'none' : 'aucun').removeClass('hidden');
         selectedGlossary = 'none';
@@ -963,8 +956,8 @@ $(document).ready(function () {
 
     function selectGlossaryType(type) {
         selectedGlossaryType = type;
-        $(".step-4 .glossary-tab").removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
-        $(".step-4 ." + type).removeClass('bg-gray-175 text-gray-375').addClass('bg-gray-600 text-white');
+        $(".step-domain .glossary-tab").removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
+        $(".step-domain ." + type).removeClass('bg-gray-175 text-gray-375').addClass('bg-gray-600 text-white');
 
         if (type === 'my-glossary') {
             $(".add-glossary-btn").removeClass('hidden');
@@ -1046,7 +1039,7 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function (response) {
-                // Afficher dans step_3 (My glossaries tab)
+                // Afficher dans step-domain (My glossaries tab)
                 displayMyGlossariesInStep3(response);
                 
                 // Note: Le bouton Suivant reste actif car le glossaire est optionnel
