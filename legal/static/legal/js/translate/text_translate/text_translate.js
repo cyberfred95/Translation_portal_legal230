@@ -102,32 +102,34 @@ $(document).ready(function () {
     })();
 
     function enhanceSelect2Arrows() {
-        $('.select2-container .select2-selection').each(function () {
+        $('.text-translate-selectors .select2-container .select2-selection').each(function () {
             // Assurer un contexte de positionnement
             $(this).css({ position: 'relative' });
             // Ajouter du padding à droite du texte pour ne pas chevaucher l'icône
-            $(this).find('.select2-selection__rendered').css({ 'padding-right': '2rem' });
+            $(this).find('.select2-selection__rendered').css({ 'padding-right': '1.875rem' });
 
             const $arrow = $(this).find('.select2-selection__arrow');
             // Cacher l'élément flèche par défaut
             $arrow.find('b').hide();
 
-            // Positionner proprement l'icône
+            // Positionner proprement l'icône - alignée horizontalement avec le texte
             $arrow.css({
                 position: 'absolute',
-                right: '8px',
+                right: '10px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                width: '20px',
-                height: '20px',
+                width: '1.125rem',
+                height: '30%',
                 display: 'flex',
                 'align-items': 'center',
                 'justify-content': 'center'
             });
 
-            // Forcer une seule icône et utiliser la version pleine (fill)
-            $arrow.find('i.ph').remove();
-            $arrow.append('<i class="ph ph-caret-down ph-fill text-gray-500 text-lg"></i>');
+            // S'assurer que le pseudo-élément ::after utilise une flèche plus large
+            if ($arrow.length && !$arrow.find('i.ph').length) {
+                // Les styles CSS géreront le ::after, mais on s'assure qu'il n'y a pas d'icône Phosphor
+                $arrow.find('i.ph').remove();
+            }
         });
     }
 

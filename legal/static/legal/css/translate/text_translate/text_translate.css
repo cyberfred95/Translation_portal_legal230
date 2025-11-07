@@ -289,6 +289,47 @@
   height: 400px !important;
 }
 
+/* Styles spécifiques pour les flèches des dropdowns de la page text-translate */
+.text-translate-selectors .select2-container--default .select2-selection--single {
+  display: flex;
+  align-items: center;
+  min-height: auto;
+}
+
+.text-translate-selectors .select2-container--default .select2-selection--single .select2-selection__arrow {
+  width: 1.125rem !important;
+  height: 30% !important;
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.text-translate-selectors .select2-container--default .select2-selection--single .select2-selection__arrow::after {
+  content: "▼" !important;
+  font-size: 12px !important;
+  color: #666;
+  position: static !important;
+  transform: none !important;
+  line-height: 1;
+  display: block;
+}
+
+.text-translate-selectors .select2-container--default .select2-selection--single .select2-selection__arrow b {
+  display: none !important;
+}
+
+/* S'assurer que le texte et la flèche sont alignés sur la même ligne de base */
+.text-translate-selectors .select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  padding-right: 1.875rem !important;
+}
+
 /* ============================================
    Utilities
    ============================================ */
