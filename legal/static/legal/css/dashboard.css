@@ -26,8 +26,9 @@
 /* --- Dashboard layout et cartes (isolé ici) --- */
 .dashboard-page .dashboard-top { display: flex; gap: 2rem; align-items: flex-start; }
 .dashboard-page .dashboard-cards-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; width: 100%; }
-.dashboard-page .dashboard-card { background: #ffffff; border-radius: 12px; padding: 1rem; display: flex; align-items: center; justify-content: space-between; }
+.dashboard-page .dashboard-card { background: #ffffff; border-radius: 12px; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
 .dashboard-page .dashboard-card > div { display: flex; flex-direction: column; gap: .25rem; }
+.dashboard-page .dashboard-card .dashboard-icon-wrapper { flex: 0 0 auto; }
 .dashboard-page .dashboard-card .stat-title { color: #5a5a78; font-size: 0.875rem; font-weight: 600; }
 .dashboard-page .dashboard-card .stat-value { color: #181932; font-size: 1.5rem; font-weight: 600; }
 .dashboard-page .dashboard-icon { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 9999px; }

@@ -1,0 +1,105 @@
+/* ============================================
+   Translate Page Styles
+   Styles communs pour la page translate
+   ============================================ */
+
+/* Variables locales */
+:root {
+  --translate-margin: 1.25rem 1.25rem 2.875rem 1.25rem;
+  --translate-title-size: 1.5rem;
+  --translate-subtitle-size: 1rem;
+}
+
+/* ============================================
+   Page Wrapper
+   ============================================ */
+.translate-page {
+  margin: var(--translate-margin);
+}
+
+/* ============================================
+   Header
+   ============================================ */
+.translate-page .translate-title {
+  font-size: var(--translate-title-size);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-family: 'Poppins', sans-serif;
+  color: #111827;
+}
+
+.translate-page .translate-subtitle {
+  font-size: var(--translate-subtitle-size);
+  font-weight: 400;
+  font-family: 'Poppins', sans-serif;
+  color: #111827;
+}
+
+/* ============================================
+   Tabs
+   ============================================ */
+.translate-page .translate-tabs-wrapper {
+  margin-top: 1.25rem;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.translate-page .translate-tabs {
+  display: inline-flex;
+  gap: 0.625rem;
+  align-items: center;
+  border-radius: 9999px;
+  background: #f3f4f6;
+  border: 0.5px solid rgba(0, 0, 0, 0.1);
+  padding: 0.25rem;
+  width: auto;
+}
+
+.translate-page .translate-tab {
+  display: flex;
+  gap: 0.625rem;
+  align-items: center;
+  padding: 0.625rem 1rem;
+  border-radius: 9999px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.translate-page .translate-tab:hover {
+  color: #111827;
+}
+
+.translate-page .translate-tab-active {
+  background: #ffffff;
+  color: #111827;
+  font-weight: 700;
+}
+
+.translate-page .translate-tab-text {
+  font-size: 0.875rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* ============================================
+   Tab Content
+   ============================================ */
+.translate-page .translate-content {
+  margin-top: 1.25rem;
+}
+
+.translate-page .translate-tab-content {
+  display: block;
+}
+
+.translate-page .translate-tab-content-hidden {
+  display: none;
+}
+
+/* Hide utility */
+.translate-page .hidden {
+  display: none !important;
+}
