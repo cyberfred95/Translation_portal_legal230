@@ -67,6 +67,12 @@ $(document).ready(function () {
         }
         if (savedTargetLang) {
             $('select[name="target_language"]').val(savedTargetLang).trigger('change');
+        } else {
+            // Par défaut, présélectionner l'anglais (en) pour la langue de destination
+            const targetSelect = $('select[name="target_language"]');
+            if (targetSelect.find('option[value="en"]').length > 0) {
+                targetSelect.val('en').trigger('change');
+            }
         }
     }
 
