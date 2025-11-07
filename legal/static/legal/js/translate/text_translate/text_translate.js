@@ -97,14 +97,8 @@ $(document).ready(function () {
         const domainSelect = $('select.domain-select');
         if ($('#glossary-spinner').length === 0 && domainSelect.length) {
             const spinner = $('<span id="glossary-spinner" class="inline-block w-5 h-5 mr-2 rounded-full border border-gray-300 border-t-green-800 animate-spin hidden"></span>');
-            // Insérer le spinner juste avant le conteneur Select2 (qui se trouve juste après le <select>)
-            const select2Container = domainSelect.next('.select2');
-            if (select2Container.length) {
-                select2Container.before(spinner);
-            } else {
-                // fallback: avant le <select>
-                domainSelect.before(spinner);
-            }
+            // Insérer le spinner au début du wrapper pour qu'il soit à gauche
+            domainSelect.parent('.text-translate-domain-wrapper').prepend(spinner);
         }
     })();
 
