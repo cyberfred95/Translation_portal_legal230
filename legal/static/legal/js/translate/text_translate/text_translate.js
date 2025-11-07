@@ -21,7 +21,8 @@ $(document).ready(function () {
 
     $(".source-language").select2();
     $(".target-language").select2();
-    $(".domain-select").select2({
+    
+    const $domainSelect = $(".domain-select").select2({
         placeholder: $(".domain-select").data('placeholder'),
         allowClear: false
     });
@@ -102,27 +103,46 @@ $(document).ready(function () {
     })();
 
     function enhanceSelect2Arrows() {
-        $('.text-translate-selectors .select2-container .select2-selection').each(function () {
-            // Assurer un contexte de positionnement
-            $(this).css({ position: 'relative' });
-            // Ajouter du padding à droite du texte pour ne pas chevaucher l'icône
-            $(this).find('.select2-selection__rendered').css({ 'padding-right': '1.875rem' });
+        // Cibler tous les conteneurs Select2 dans les colonnes
+        $('.text-translate-column .select2-container, .text-translate-column-selector .select2-container').each(function () {
+            // Changer le conteneur Select2 pour qu'il s'adapte à la largeur du contenu
+            $(this).css({ 
+                display: 'inline-block',
+                width: 'auto',
+                minWidth: 'auto'
+            });
+        });
+        
+        // Cibler toutes les sélections dans les colonnes
+        $('.text-translate-column .select2-container .select2-selection, .text-translate-column-selector .select2-container .select2-selection').each(function () {
+            // Changer le conteneur en inline-flex pour que la flèche suive le texte
+            $(this).css({ 
+                display: 'inline-flex',
+                width: 'auto',
+                minWidth: 'auto'
+            });
+            
+            // Réduire le padding du texte pour que la flèche soit collée
+            $(this).find('.select2-selection__rendered').css({ 
+                'padding-right': '0.375rem'
+            });
 
             const $arrow = $(this).find('.select2-selection__arrow');
             // Cacher l'élément flèche par défaut
             $arrow.find('b').hide();
 
-            // Positionner proprement l'icône - alignée horizontalement avec le texte
+            // Positionner la flèche en inline pour qu'elle soit collée au texte
             $arrow.css({
-                position: 'absolute',
-                right: '10px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: '1.125rem',
-                height: '30%',
-                display: 'flex',
+                position: 'static',
+                right: 'auto',
+                top: 'auto',
+                transform: 'none',
+                width: 'auto',
+                height: 'auto',
+                display: 'inline-flex',
                 'align-items': 'center',
-                'justify-content': 'center'
+                'justify-content': 'center',
+                'margin-left': '0.25rem'
             });
 
             // S'assurer que le pseudo-élément ::after utilise une flèche plus large
