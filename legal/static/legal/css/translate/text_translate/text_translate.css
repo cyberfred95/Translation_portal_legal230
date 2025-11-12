@@ -94,6 +94,8 @@
   align-items: center;
   flex: none;
   width: auto;
+  position: relative;
+  --glossary-right-offset: 0px;
 }
 
 /* Select2 styles pour text-translate */
@@ -310,6 +312,19 @@
 .select2-container.languages .select2-dropdown {
   width: 550px !important;
   height: 400px !important;
+}
+
+.select2-dropdown.glossary-resize .select2-results__options {
+  width: 250px !important;
+  max-height: 250px !important;
+}
+
+.select2-dropdown.glossary-resize {
+  width: 250px !important;
+  min-width: 250px !important;
+  left: auto !important;
+  right: var(--glossary-right-offset, 0px) !important;
+  top: calc(100% + 4px) !important;
 }
 
 /* Styles spécifiques pour les flèches des dropdowns de la page text-translate */

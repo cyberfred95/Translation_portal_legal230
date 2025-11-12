@@ -24,7 +24,35 @@ $(document).ready(function () {
     
     const $domainSelect = $(".domain-select").select2({
         placeholder: $(".domain-select").data('placeholder'),
-        allowClear: false
+        allowClear: false,
+        dropdownCssClass: 'glossary-resize',
+        dropdownParent: $('.text-translate-domain-wrapper')
+    });
+
+    const domainSelectInstance = $domainSelect.data('select2');
+    const updateGlossaryDropdownOffset = (instance) => {
+        const $container = instance?.$container;
+        if (!$container || !$container.length) return;
+
+        const triggerWidth = $container.outerWidth();
+        if (!triggerWidth) return;
+
+        const wrapperEl = $container.closest('.text-translate-domain-wrapper').get(0);
+        if (!wrapperEl) return;
+
+        wrapperEl.style.setProperty('--glossary-right-offset', `-${triggerWidth}px`);
+    };
+
+    if (domainSelectInstance) {
+        updateGlossaryDropdownOffset(domainSelectInstance);
+    }
+
+    $domainSelect.on('select2:open', function () {
+        updateGlossaryDropdownOffset($(this).data('select2'));
+    });
+
+    $(window).on('resize.glossaryDropdown', function () {
+        updateGlossaryDropdownOffset($domainSelect.data('select2'));
     });
 
     $sourceSelect = $(".source-language").select2();
