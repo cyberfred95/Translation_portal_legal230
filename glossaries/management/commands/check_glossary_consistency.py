@@ -35,7 +35,6 @@ Options:
 import requests
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from preferences import preferences
 from glossaries.models import Glossary
 from glossaries.helpers import get_glossary_username
 
@@ -85,7 +84,7 @@ Use --help for detailed information and examples.
         self.stdout.write(self.style.WARNING('Configuration:'))
         self.stdout.write(f'  GLOSSARY_SYSTEM: {settings.GLOSSARY_SYSTEM}')
         self.stdout.write(f'  GLOSSARY_API_KEY: {"*" * 10 if settings.GLOSSARY_API_KEY else "NOT SET"}')
-        self.stdout.write(f'  Glossaries URL: {preferences.MainSettings.glossaries_url}')
+        self.stdout.write(f'  Glossaries URL: {settings.GLOSSARY_API_URL}')
         self.stdout.write(f'  Verbose mode: {"ON" if self.verbose else "OFF"}')
         self.stdout.write(f'  ID Null Only mode: {"ON" if id_null_only else "OFF"}')
         self.stdout.write(f'  Delete ID Null mode: {"ON" if del_id_is_null else "OFF"}')
@@ -226,7 +225,7 @@ Use --help for detailed information and examples.
         Returns (exists: bool, error: str|None)
         """
         try:
-            url = preferences.MainSettings.glossaries_url + 'get_glossary'
+            url = settings.GLOSSARY_API_URL + 'get_glossary'
             payload = {
                 "system": settings.GLOSSARY_SYSTEM,
                 "username": get_glossary_username(glossary),
