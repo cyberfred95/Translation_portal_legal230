@@ -66,8 +66,8 @@ admin.site.register(UserGroup, UserGroupAdmin)
 
 class CustomUserAdmin(UserDisplayMixin, UserAdmin):
     ordering = ('-date_joined',)
-    list_display = ('username', 'is_active', 'email',
-                    'language_code', 'truncated_stripe_customer_id', 'stripe_session', 'formatted_date_joined')
+    list_display = ('username', 'is_active', 'email', 'first_name',
+                    'last_name', 'language_code', 'stripe_customer_id', 'stripe_session', 'date_joined')
 
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
@@ -78,25 +78,6 @@ class CustomUserAdmin(UserDisplayMixin, UserAdmin):
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     readonly_fields = ['uuid']
-
-    def formatted_date_joined(self, obj):
-        """Display date_joined in DD/MM/YYYY format"""
-        if obj.date_joined:
-            return obj.date_joined.strftime('%d/%m/%Y')
-        return '-'
-    formatted_date_joined.short_description = 'Date Joined'
-    formatted_date_joined.admin_order_field = 'date_joined'
-
-    def truncated_stripe_customer_id(self, obj):
-        """Display truncated stripe_customer_id (first 4 chars + [...] + last 4 chars)"""
-        if obj.stripe_customer_id:
-            customer_id = obj.stripe_customer_id
-            if len(customer_id) > 8:
-                return f"{customer_id[:4]}[...]{customer_id[-4:]}"
-            return customer_id
-        return '-'
-    truncated_stripe_customer_id.short_description = 'Stripe Customer ID'
-    truncated_stripe_customer_id.admin_order_field = 'stripe_customer_id'
 
 
 # Register the User model with the custom admin class
