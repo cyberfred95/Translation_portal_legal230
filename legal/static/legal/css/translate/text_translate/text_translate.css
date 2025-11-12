@@ -327,7 +327,7 @@
   top: calc(100% + 4px) !important;
 }
 
-/* Styles spécifiques pour les flèches des dropdowns de la page text-translate */
+Je /* Styles spécifiques pour les flèches des dropdowns de la page text-translate */
 .text-translate-column .select2-container,
 .text-translate-column-selector .select2-container {
   display: inline-block !important;
@@ -380,6 +380,63 @@
 .text-translate-column .select2-container--default .select2-selection--single .select2-selection__arrow b,
 .text-translate-column-selector .select2-container--default .select2-selection--single .select2-selection__arrow b {
   display: none !important;
+}
+
+/* ============================================
+   Skeleton Loader
+   ============================================ */
+.text-translate-skeleton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.25rem;
+  padding-right: 2.5rem;
+  background: #ffffff;
+  border: none;
+  border-radius: 0.625rem;
+  min-height: var(--text-translate-editor-min-height);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  line-height: 1.42;
+}
+
+.text-translate-editor-translated.hidden {
+  display: none !important;
+}
+
+.skeleton-line {
+  height: 1em;
+  margin-bottom: 0.42em;
+  background: linear-gradient(90deg, #e8ecef 25%, #d1d9e0 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  border-radius: 0.125rem;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  opacity: 0.6;
+  display: block;
+}
+
+.skeleton-line:last-child {
+  margin-bottom: 0;
+}
+
+/* Classes de fallback pour le skeleton (utilisées dans le HTML si le JS ne s'exécute pas) */
+.skeleton-line-short {
+  width: 65%;
+}
+
+.skeleton-line-medium {
+  width: 85%;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* ============================================
