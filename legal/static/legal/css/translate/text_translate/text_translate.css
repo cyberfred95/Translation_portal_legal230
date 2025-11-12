@@ -327,7 +327,7 @@
   top: calc(100% + 4px) !important;
 }
 
-Je /* Styles spécifiques pour les flèches des dropdowns de la page text-translate */
+/* Styles spécifiques pour les flèches des dropdowns de la page text-translate */
 .text-translate-column .select2-container,
 .text-translate-column-selector .select2-container {
   display: inline-block !important;
