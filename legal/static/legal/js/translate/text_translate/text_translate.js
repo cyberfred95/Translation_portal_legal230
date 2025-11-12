@@ -271,23 +271,177 @@ $(document).ready(function () {
     // Note: trigger('change') dans restoreLanguageSelection() appellera getDomains() automatiquement
     restoreLanguageSelection();
 
-    $('form[name="text-translate"]').on('submit', function (e) {
-        e.preventDefault();
-        const CHAR_LIMIT = 2000;
-        const currentCount = sourceQuill.getText().replace(/\n/g, '').length;
-        if (currentCount > CHAR_LIMIT) {
+    /**
+     * Génère un skeleton loader basé sur le texte d'entrée
+     * Le skeleton correspond exactement au nombre de lignes et à la largeur du texte
+     */
+    function generateSkeletonFromText(quillEditor) {
+        const text = quillEditor.getText().trim();
+        const $skeleton = $('#translation-skeleton');
+        const $qlEditor = $('#source-text .ql-editor');
+        
+        $skeleton.empty();
+        
+        // Si pas de texte, afficher des lignes par défaut
+        if (!text) {
+            $skeleton.append('<div class="skeleton-line" style="width: 60%;"></div>');
+            $skeleton.append('<div class="skeleton-line" style="width: 80%;"></div>');
             return;
         }
-        let htmlContent = sourceQuill.root.innerHTML;
+        
+        const qlEditorElement = $qlEditor[0];
+        if (!qlEditorElement) {
+            $skeleton.append('<div class="skeleton-line" style="width: 80%;"></div>');
+            return;
+        }
+        
+        // Obtenir les styles calculés du Quill editor
+        const computedStyle = window.getComputedStyle(qlEditorElement);
+        const fontFamily = computedStyle.fontFamily || 'Montserrat, sans-serif';
+        const fontSize = parseFloat(computedStyle.fontSize) || 16;
+        const paddingLeft = parseFloat(computedStyle.paddingLeft) || 0;
+        const paddingRight = parseFloat(computedStyle.paddingRight) || 0;
+        const availableWidth = Math.max(100, qlEditorElement.getBoundingClientRect().width - paddingLeft - paddingRight);
+        
+        // Configurer le canvas pour mesurer le texte
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        const cleanFontFamily = fontFamily.split(',')[0].replace(/['"]/g, '').trim();
+        context.font = `${fontSize}px ${cleanFontFamily}`;
+        
+        // Préparer les lignes logiques (supprimer les lignes vides à la fin)
+        const logicalLines = text.split('\n')
+            .map(line => line.trim())
+            .filter((line, index, arr) => {
+                // Garder toutes les lignes sauf les lignes vides à la fin
+                if (line.length > 0) return true;
+                // Pour les lignes vides, vérifier s'il y a du contenu après
+                return arr.slice(index + 1).some(l => l.length > 0);
+            });
+        
+        if (logicalLines.length === 0) {
+            $skeleton.append('<div class="skeleton-line" style="width: 80%;"></div>');
+            return;
+        }
+        
+        // Générer les lignes skeleton
+        const skeletonLines = [];
+        
+        logicalLines.forEach((logicalLine, lineIndex) => {
+            const isLastLogicalLine = lineIndex === logicalLines.length - 1;
+            
+            if (logicalLine.length === 0) {
+                // Ligne vide (espacement entre paragraphes)
+                if (!isLastLogicalLine) {
+                    skeletonLines.push({ width: 0.05 * availableWidth, isEmpty: true });
+                }
+            } else {
+                const lineWidth = context.measureText(logicalLine).width;
+                
+                if (lineWidth <= availableWidth) {
+                    // Ligne simple qui tient sur une ligne
+                    skeletonLines.push({ width: lineWidth });
+                } else {
+                    // Word-wrap : diviser la ligne en plusieurs lignes visuelles
+                    const words = logicalLine.split(/\s+/);
+                    let currentLineWidth = 0;
+                    
+                    words.forEach((word, wordIndex) => {
+                        const wordWithSpace = word + (wordIndex < words.length - 1 ? ' ' : '');
+                        const wordWidth = context.measureText(wordWithSpace).width;
+                        
+                        if (currentLineWidth + wordWidth <= availableWidth) {
+                            currentLineWidth += wordWidth;
+                        } else {
+                            // Nouvelle ligne
+                            if (currentLineWidth > 0) {
+                                skeletonLines.push({ width: currentLineWidth });
+                            }
+                            currentLineWidth = wordWidth;
+                        }
+                    });
+                    
+                    // Dernière ligne de cette ligne logique
+                    if (currentLineWidth > 0) {
+                        skeletonLines.push({ width: currentLineWidth });
+                    }
+                }
+            }
+        });
+        
+        // Supprimer les lignes vides à la fin (double vérification de sécurité)
+        while (skeletonLines.length > 0 && skeletonLines[skeletonLines.length - 1].isEmpty) {
+            skeletonLines.pop();
+        }
+        
+        // Générer le DOM (construction optimisée en une seule opération)
+        if (skeletonLines.length === 0) {
+            // Fallback : une ligne basée sur un échantillon du texte
+            const sampleText = text.substring(0, Math.min(50, text.length));
+            const sampleWidth = context.measureText(sampleText).width;
+            const widthPercent = Math.min(95, Math.max(25, (sampleWidth / availableWidth) * 100));
+            $skeleton.append(`<div class="skeleton-line" style="width: ${widthPercent}%;"></div>`);
+        } else {
+            // Construire le HTML en une seule opération pour améliorer les performances
+            const skeletonHtml = skeletonLines.map((line) => {
+                if (line.isEmpty) {
+                    return '<div class="skeleton-line" style="width: 5%; height: 0.5em; opacity: 0.3;"></div>';
+                } else {
+                    const widthPercent = Math.min(98, Math.max(15, (line.width / availableWidth) * 100));
+                    return `<div class="skeleton-line" style="width: ${widthPercent}%;"></div>`;
+                }
+            }).join('');
+            
+            $skeleton.append(skeletonHtml);
+        }
+    }
 
+    // Protection contre les doubles soumissions
+    let isTranslating = false;
+    
+    $('form[name="text-translate"]').off('submit').on('submit', function (e) {
+        e.preventDefault();
+        
+        // Protection contre les doubles soumissions
+        if (isTranslating) {
+            return false;
+        }
+        
+        // Vérifications de validation
+        const CHAR_LIMIT = 2000;
+        const textContent = sourceQuill.getText().trim();
+        const htmlContent = sourceQuill.root.innerHTML.trim();
+        const currentCount = textContent.replace(/\n/g, '').length;
+        
+        // Vérifier la limite de caractères
+        if (currentCount > CHAR_LIMIT) {
+            return false;
+        }
+        
+        // Vérifier que le contenu n'est pas vide (texte brut ou HTML vide)
+        const isEmptyHtml = !htmlContent || htmlContent === '<p><br></p>' || htmlContent === '<p></p>';
+        if (!textContent || isEmptyHtml) {
+            return false;
+        }
+        
+        // Démarrage de la traduction
+        isTranslating = true;
+        const $translateBtn = $('#btn-translate');
+        const $translatedText = $('#translated-text');
+        const $translationSkeleton = $('#translation-skeleton');
+        
+        // Préparer le formulaire
         $('#text').val(htmlContent);
+        const formData = new FormData(this);
+        
+        // Générer et afficher le skeleton
+        generateSkeletonFromText(sourceQuill);
+        $translatedText.addClass('hidden');
+        $translationSkeleton.removeClass('hidden');
+        translatedQuill.root.innerHTML = '';
+        $translateBtn.prop('disabled', true);
 
-        let form = $(this);
-
-        let formData = new FormData(form[0]);
-
-        $('#main-loader').removeClass('hidden');
-
+        // Envoyer la requête de traduction
         $.ajax({
             url: translate,
             type: 'POST',
@@ -303,11 +457,22 @@ $(document).ready(function () {
             },
             error: function (error) {
                 errorNotification(error?.status, error?.responseJSON?.detail);
+                $translationSkeleton.addClass('hidden');
+                $translatedText.removeClass('hidden');
             },
             complete: function () {
-                $('#main-loader').addClass('hidden');
+                // Masquer le skeleton et afficher le résultat
+                $translationSkeleton.addClass('hidden');
+                $translatedText.removeClass('hidden');
+                resizeTextAreas();
+                
+                // Réinitialiser l'état
+                isTranslating = false;
+                validateTranslateButton();
             }
         });
+        
+        return false;
     });
 
     $("#clear, #clear-source").on("click", function () {
