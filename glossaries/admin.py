@@ -427,6 +427,7 @@ class GlossaryAdmin(admin.ModelAdmin):
     def check_consistency_view(self, request):
         """View to check glossary consistency with remote API"""
         from django.conf import settings
+        from preferences import preferences
 
         context = dict(
             self.admin_site.each_context(request),
@@ -449,7 +450,7 @@ class GlossaryAdmin(admin.ModelAdmin):
             context.update({
                 'glossary_system': settings.GLOSSARY_SYSTEM,
                 'glossary_api_key': '***' if settings.GLOSSARY_API_KEY else 'NOT SET',
-                'glossaries_url': settings.GLOSSARY_API_URL,
+                'glossaries_url': preferences.MainSettings.glossaries_url,
                 'total_glossaries': Glossary.objects.count(),
                 'with_id': Glossary.objects.exclude(glossary_id__isnull=True).exclude(glossary_id='').count(),
                 'without_id': Glossary.objects.filter(glossary_id__isnull=True).count() +
@@ -513,6 +514,7 @@ class GlossaryAdmin(admin.ModelAdmin):
                 return JsonResponse({'error': 'Method not allowed'}, status=405)
 
             from django.conf import settings
+            from preferences import preferences
             from glossaries.helpers import get_glossary_username
             import requests
 
@@ -618,7 +620,7 @@ class GlossaryAdmin(admin.ModelAdmin):
                             }
 
                             try:
-                                url = settings.GLOSSARY_API_URL + 'get_glossary'
+                                url = preferences.MainSettings.glossaries_url + 'get_glossary'
                                 payload = {
                                     "system": settings.GLOSSARY_SYSTEM,
                                     "username": get_glossary_username(glossary),

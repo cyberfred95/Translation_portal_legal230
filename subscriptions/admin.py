@@ -8,7 +8,6 @@ from django.http import JsonResponse
 from django.db import models
 from .models import SubscriptionType, UserSubscription, CountHistory
 from .tasks import process_daily_subscription_renewals
-from .permissions import is_user_subscription_active
 from legal.admin.utils import create_clickable_link
 
 
@@ -104,8 +103,8 @@ class NoStripeCustomerFilter(admin.SimpleListFilter):
 @admin.register(UserSubscription)
 class UserSubscriptionAdmin(admin.ModelAdmin):
     list_display = (
-        'subscription', 'clickable_user', 'colored_status', 'user_type',
-        'truncated_stripe_subscription_id', 'formatted_start_date', 'formatted_end_date'
+        'user', 'subscription', 'status', 'user_type',
+        'start_date', 'end_date', 'stripe_subscription_id'
     )
     list_filter = (
         NoStripeCustomerFilter, 'status', 'subscription',
@@ -210,64 +209,9 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
 
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
-    def clickable_user(self, obj):
-        """Create a clickable link to the User admin page"""
-        return create_clickable_link(obj, 'users', 'user', 'user')
-    clickable_user.short_description = 'User'
-    clickable_user.admin_order_field = 'user__username'
-
     def user_type(self, obj):
-        """Display user type with colors: Buyer in gold, Licence in cyan"""
-        if obj.user.stripe_customer_id:
-            return format_html(
-                '<span style="color: #FFD700; font-weight: bold;">Buyer</span>'
-            )
-        return format_html(
-            '<span style="color: #00CED1; font-weight: bold;">Licence</span>'
-        )
+        return "Buyer" if obj.user.stripe_customer_id else "Licence"
     user_type.short_description = "Type"
-
-    def colored_status(self, obj):
-        """Display status in green if subscription is active, red otherwise"""
-        status_display = obj.get_status_display()
-        if is_user_subscription_active(obj.status):
-            return format_html(
-                '<span style="color: green; font-weight: bold;">{}</span>',
-                status_display
-            )
-        return format_html(
-            '<span style="color: red; font-weight: bold;">{}</span>',
-            status_display
-        )
-    colored_status.short_description = 'Status'
-    colored_status.admin_order_field = 'status'
-
-    def formatted_start_date(self, obj):
-        """Display start_date in DD/MM/YYYY format"""
-        if obj.start_date:
-            return obj.start_date.strftime('%d/%m/%Y')
-        return '-'
-    formatted_start_date.short_description = 'Start Date'
-    formatted_start_date.admin_order_field = 'start_date'
-
-    def formatted_end_date(self, obj):
-        """Display end_date in DD/MM/YYYY format"""
-        if obj.end_date:
-            return obj.end_date.strftime('%d/%m/%Y')
-        return '-'
-    formatted_end_date.short_description = 'End Date'
-    formatted_end_date.admin_order_field = 'end_date'
-
-    def truncated_stripe_subscription_id(self, obj):
-        """Display truncated stripe_subscription_id (first 4 chars + [...] + last 4 chars)"""
-        if obj.stripe_subscription_id:
-            subscription_id = obj.stripe_subscription_id
-            if len(subscription_id) > 8:
-                return f"{subscription_id[:4]}[...]{subscription_id[-4:]}"
-            return subscription_id
-        return '-'
-    truncated_stripe_subscription_id.short_description = 'Stripe Subscription ID'
-    truncated_stripe_subscription_id.admin_order_field = 'stripe_subscription_id'
 
 
 class UserSubscriptionInline(admin.TabularInline):
