@@ -63,8 +63,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         if (!response.ok) {
-          // Optionally handle validation errors
-          console.warn('Update failed', await response.text());
           return;
         }
 
@@ -72,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const modal = root.querySelector('#success-update-user-data');
         if (modal) modal.classList.remove('hidden');
       } catch (err) {
-        console.error('Update error', err);
+        // Silent error handling
       }
     });
   }
@@ -92,33 +90,52 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Logout functionality
-  const logoutBtn = root.querySelector('#logout-btn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      
-      // Get CSRF token
-      const csrfToken = form ? form.querySelector('[name=csrfmiddlewaretoken]') : root.querySelector('[name=csrfmiddlewaretoken]');
-      if (!csrfToken) {
-        console.error('CSRF token not found');
-        return;
+  function handleLogout(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Try to get CSRF token from cookie first
+    let csrfToken = getCookie('csrftoken');
+    
+    // If not found in cookie, try to get it from the form's hidden input
+    if (!csrfToken) {
+      const csrfInput = root.querySelector('[name=csrfmiddlewaretoken]');
+      if (csrfInput) {
+        csrfToken = csrfInput.value;
       }
+    }
+    
+    if (!csrfToken) {
+      return;
+    }
 
-      // Create form and submit to logout URL
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = '/accounts/logout/';
-      
-      const csrfInput = document.createElement('input');
-      csrfInput.type = 'hidden';
-      csrfInput.name = 'csrfmiddlewaretoken';
-      csrfInput.value = csrfToken.value;
-      form.appendChild(csrfInput);
-      
-      document.body.appendChild(form);
-      form.submit();
-    });
+    // Get current language prefix from URL (e.g., /fr/ or /en/)
+    const currentPath = window.location.pathname;
+    const langPrefix = currentPath.split('/')[1] || '';
+    const logoutUrl = langPrefix ? `/${langPrefix}/accounts/logout/` : '/accounts/logout/';
+
+    // Create form and submit to logout URL
+    const logoutForm = document.createElement('form');
+    logoutForm.method = 'POST';
+    logoutForm.action = logoutUrl;
+    
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = csrfToken;
+    logoutForm.appendChild(csrfInput);
+    
+    document.body.appendChild(logoutForm);
+    logoutForm.submit();
   }
+
+  // Attach logout handler using event delegation
+  root.addEventListener('click', function(e) {
+    const logoutBtn = e.target.closest('#logout-btn');
+    if (logoutBtn) {
+      handleLogout(e);
+    }
+  }, true);
 });
 
 
