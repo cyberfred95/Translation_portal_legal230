@@ -2,6 +2,7 @@ import os
 
 import requests
 from django.conf import settings
+from preferences import preferences
 
 from glossaries.helpers import get_glossary_username
 from glossaries.processor import GlossaryProcessor
@@ -33,7 +34,7 @@ class AIGlossaryService:
             }
         }
 
-        url = settings.GLOSSARY_API_URL + "create_glossary"
+        url = preferences.MainSettings.glossaries_url + "create_glossary"
 
         try:
             response = requests.post(
@@ -98,7 +99,7 @@ class AIGlossaryService:
             }
         }
 
-        url = settings.GLOSSARY_API_URL + "update_glossary"
+        url = preferences.MainSettings.glossaries_url + "update_glossary"
 
         try:
             response = requests.post(
@@ -146,7 +147,7 @@ class AIGlossaryService:
             "glossary_id": glossary.glossary_id,
         }
 
-        url = settings.GLOSSARY_API_URL + 'delete_glossary'
+        url = preferences.MainSettings.glossaries_url + 'delete_glossary'
 
         response = requests.post(
             url,
