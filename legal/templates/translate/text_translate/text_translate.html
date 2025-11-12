@@ -7,23 +7,44 @@
         <input type="hidden" name="action" value="text_translate">
         {% csrf_token %}
         
-        <div class="text-translate-main-row">
-            <!-- Colonne gauche : Source -->
-            <div class="text-translate-column text-translate-column-left">
-                <div class="text-translate-column-selector">
-                    <select class="source-language" name="source_language" required>
+        <div class="text-translate-selectors">
+            <div class="text-translate-selector-group">
+                <select class="source-language" name="source_language" required>
+                    <option value=""></option>
+                    {% for translate_language in translate_languages %}
+                    <option value="{{ translate_language.abbreviation|lower }}">
+                        {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                        {{ translate_language.french_name }}
+                        {% else %} {{ translate_language.name }}
+                        {% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="text-translate-selector-group-right">
+                <select class="target-language" name="target_language" required>
+                    <option value=""></option>
+                    {% for translate_language in translate_languages %}
+                    <option value="{{ translate_language.abbreviation|lower }}">
+                        {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                        {{ translate_language.french_name }}
+                        {% else %} {{ translate_language.name }}
+                        {% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <div class="text-translate-domain-wrapper">
+                    <select class="domain-select" name="domain_name" required>
                         <option value=""></option>
-                        {% for translate_language in translate_languages %}
-                        <option value="{{ translate_language.abbreviation|lower }}">
-                            {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                            {{ translate_language.french_name }}
-                            {% else %} {{ translate_language.name }}
-                            {% endif %}
-                        </option>
-                        {% endfor %}
                     </select>
                 </div>
-
+            </div>
+        </div>
+        
+        <div class="text-translate-editors">
+            <div class="text-translate-editor-column">
                 <div class="text-translate-editor-wrapper">
                     <div id="source-text" class="text-translate-editor text-translate-editor-source"></div>
                     <button type="button" id="clear-source" class="text-translate-clear-btn">
@@ -42,31 +63,8 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Colonne droite : Destination -->
-            <div class="text-translate-column text-translate-column-right">
-                <div class="text-translate-column-selectors-row">
-                    <div class="text-translate-column-selector">
-                        <select class="target-language" name="target_language" required>
-                            <option value=""></option>
-                            {% for translate_language in translate_languages %}
-                            <option value="{{ translate_language.abbreviation|lower }}">
-                                {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                                {{ translate_language.french_name }}
-                                {% else %} {{ translate_language.name }}
-                                {% endif %}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="text-translate-domain-wrapper">
-                        <select class="domain-select" name="domain_name" required>
-                            <option value=""></option>
-                        </select>
-                    </div>
-                </div>
-
+            
+            <div class="text-translate-editor-column">
                 <div class="text-translate-editor-wrapper">
                     <div id="translated-text" class="text-translate-editor text-translate-editor-translated"></div>
                     <button type="button" id="btn-copy" class="text-translate-copy-btn copy hidden">
