@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
+from django.urls import reverse
 from .models import User
 from .models import UserGroup
 from stripe_webhooks.tasks_handlers.helper.stripe_session import get_stripe_customer_session_url
@@ -49,7 +50,7 @@ class UserInline(UserDisplayMixin, admin.TabularInline):
 
 
 class UserGroupAdmin(admin.ModelAdmin):
-    fields = ['name', 'api_key', 'admin']
+    fields = ['name', 'admin']
     list_display = ('name', 'id', 'user_count')
     inlines = [UserInline]
 
@@ -66,8 +67,8 @@ admin.site.register(UserGroup, UserGroupAdmin)
 
 class CustomUserAdmin(UserDisplayMixin, UserAdmin):
     ordering = ('-date_joined',)
-    list_display = ('username', 'is_active', 'email', 'first_name',
-                    'last_name', 'language_code', 'stripe_customer_id', 'stripe_session', 'date_joined')
+    list_display = ('username', 'is_active', 'email',
+                    'user_group', 'user_subscription', 'truncated_stripe_customer_id', 'stripe_session', 'formatted_date_joined')
 
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
@@ -78,6 +79,57 @@ class CustomUserAdmin(UserDisplayMixin, UserAdmin):
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     readonly_fields = ['uuid']
+
+    def formatted_date_joined(self, obj):
+        """Display date_joined in DD/MM/YYYY format"""
+        if obj.date_joined:
+            return obj.date_joined.strftime('%d/%m/%Y')
+        return '-'
+    formatted_date_joined.short_description = 'Date Joined'
+    formatted_date_joined.admin_order_field = 'date_joined'
+
+    def truncated_stripe_customer_id(self, obj):
+        """Display truncated stripe_customer_id (first 4 chars + [...] + last 4 chars)"""
+        if obj.stripe_customer_id:
+            customer_id = obj.stripe_customer_id
+            if len(customer_id) > 8:
+                return f"{customer_id[:4]}[...]{customer_id[-4:]}"
+            return customer_id
+        return '-'
+    truncated_stripe_customer_id.short_description = 'Stripe Customer ID'
+    truncated_stripe_customer_id.admin_order_field = 'stripe_customer_id'
+
+    def user_group(self, obj):
+        """Display user group name as clickable link"""
+        if obj.group:
+            return create_clickable_link(obj, 'users', 'usergroup', 'group')
+        return '-'
+    user_group.short_description = 'Group'
+    user_group.admin_order_field = 'group'
+
+    def user_subscription(self, obj):
+        """Display user subscription with different states"""
+        subscriptions = obj.subscriptions.all()
+        count = subscriptions.count()
+        
+        if count == 0:
+            return format_html(
+                '<span style="color: orange; font-weight: bold;">no subscription</span>'
+            )
+        elif count == 1:
+            subscription = subscriptions.first()
+            subscription_name = subscription.subscription.name
+            url = reverse('admin:subscriptions_usersubscription_change', args=[subscription.pk])
+            return format_html(
+                '<a href="{}" style="font-weight: bold;">{}</a>',
+                url, subscription_name
+            )
+        else:
+            return format_html(
+                '<span style="color: red; font-weight: bold;">multiples subscription</span>'
+            )
+    user_subscription.short_description = 'Subscription'
+    user_subscription.admin_order_field = 'subscriptions'
 
 
 # Register the User model with the custom admin class
