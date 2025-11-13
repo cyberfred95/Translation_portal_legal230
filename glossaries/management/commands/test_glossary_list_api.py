@@ -1,7 +1,6 @@
 import requests
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from preferences import preferences
 
 
 class Command(BaseCommand):
@@ -31,7 +30,7 @@ class Command(BaseCommand):
         self.stdout.write('')
 
         # Display configuration
-        api_url = preferences.MainSettings.glossaries_url
+        api_url = settings.GLOSSARY_API_URL
         self.stdout.write('📋 Configuration:')
         self.stdout.write(f'  API URL: {api_url}')
         self.stdout.write(f'  GLOSSARY_SYSTEM: {settings.GLOSSARY_SYSTEM}')
