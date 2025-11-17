@@ -1342,6 +1342,24 @@ $(document).ready(function () {
     const $modalRevision = $('#modal-revision');
     const $closeRevision = $('#close-revision');
 
+    function formatErrorReasonsForAttr(reasons) {
+        if (!reasons) return '';
+        if (Array.isArray(reasons)) {
+            return reasons.join('\n');
+        }
+        return String(reasons);
+    }
+
+    function applyStatusMetadata($statusNode, status, errorReasons) {
+        $statusNode.attr('data-status', status || '');
+        const formatted = formatErrorReasonsForAttr(errorReasons);
+        if (formatted) {
+            $statusNode.attr('data-error-reason', formatted);
+        } else {
+            $statusNode.removeAttr('data-error-reason');
+        }
+    }
+
     function updateProjectTable(projects) {
         const documentsContainer = $('#documents-container');
         documentsContainer.empty();
@@ -1381,15 +1399,7 @@ $(document).ready(function () {
                 </tr>
             `);
 
-            const statusEl = documentRow.find('.status');
-            if (Array.isArray(project.error_reason) && project.error_reason.length > 0) {
-                statusEl.attr('data-error-reason', JSON.stringify(project.error_reason));
-            } else if (project.error_reason) {
-                statusEl.attr('data-error-reason', JSON.stringify([project.error_reason]));
-            } else {
-                statusEl.removeAttr('data-error-reason');
-            }
-
+            applyStatusMetadata(documentRow.find('.status'), project.status, project.error_reason);
             documentsContainer.append(documentRow);
         });
 
@@ -1500,9 +1510,8 @@ $(document).ready(function () {
                 // Mettre à jour le badge de statut et réappliquer le mapping partagé
                 const statusNode = projectRow.find('td:eq(2) .status');
                 const newStatus = 'Sent to post-editing, not accepted yet';
-                statusNode.attr('data-status', newStatus);
-                statusNode.removeAttr('data-error-reason');
                 statusNode.text(newStatus);
+                applyStatusMetadata(statusNode, newStatus, null);
 
                 if (typeof window.applyStatusMapping === 'function' && projectRow.length) {
                     window.applyStatusMapping(projectRow[0]);

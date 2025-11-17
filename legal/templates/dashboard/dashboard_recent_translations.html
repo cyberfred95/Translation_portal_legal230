@@ -27,7 +27,9 @@
               <span
                 class="status"
                 data-status="{{ project.status }}"
-                data-error-reason="{{ project.error_reason|default_if_none:''|join:'&#10;' }}"
+                {% if project.error_reason %}
+                  data-error-reason="{{ project.error_reason|join:'&#10;' }}"
+                {% endif %}
               >{{ project.status }}</span>
             </span>
           </td>

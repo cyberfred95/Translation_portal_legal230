@@ -1,6 +1,16 @@
 'use strict';
 
 (function (global) {
+  var DEFAULT_LANG = 'fr';
+  var BADGE_CLASSES = [
+    'status-completed',
+    'status-error',
+    'status-progress',
+    'status-attention',
+    'status-attention-orange',
+    'status-default',
+    'status-post-editing'
+  ];
   var STATUS_DEFS = [
     { raw: 'Being translated', category: 'in-progress', label: function(){ return 'Processing'; } },
     { raw: 'Processing', category: 'in-progress', label: function(){ return 'Processing'; } },
@@ -14,7 +24,6 @@
     { raw: 'Translated', category: 'completed', label: function(lang){ return lang === 'en' ? 'Translated' : 'Document traduit'; } },
     { raw: 'Error', category: 'error', label: function(lang){ return lang === 'en' ? 'Error' : 'Erreur'; } },
   ];
-
   var STATUS_ALIASES = {
     'being translated': 'Being translated',
     'processing': 'Processing',
@@ -35,8 +44,25 @@
     'document relu importé': 'Post-edited file uploaded',
     'document relu importe': 'Post-edited file uploaded',
     'traitement': 'Processing',
-    'traitement en cours': 'Processing',
+    'traitement en cours': 'Processing'
   };
+  var STATUS_LOOKUP = STATUS_DEFS.reduce(function (acc, def) {
+    acc[def.raw] = def;
+    return acc;
+  }, {});
+  var ICON_LOOKUP = {
+    'completed': 'ph ph-check-circle',
+    'error': 'ph ph-warning-circle',
+    'in-progress': 'ph ph-clock-clockwise',
+    'attention': 'ph ph-megaphone',
+    'attention-orange': 'ph ph-megaphone',
+    'post-editing': 'ph ph-info',
+    'default': 'ph ph-circle'
+  };
+
+  function getLanguage(languageCode) {
+    return languageCode || global.language_code || DEFAULT_LANG;
+  }
 
   function toAsciiLower(value) {
     return value
@@ -45,7 +71,7 @@
       .toLowerCase();
   }
 
-  function normalize(rawStatus) {
+  function normalizeStatus(rawStatus) {
     var raw = (rawStatus || '').toString().trim();
     if (!raw) return '';
     var lower = raw.toLowerCase();
@@ -55,32 +81,48 @@
     return raw;
   }
 
-  function findStatusDef(rawStatus) {
-    var norm = normalize(rawStatus);
-    for (var i = 0; i < STATUS_DEFS.length; i++) {
-      if (STATUS_DEFS[i].raw === norm) return { def: STATUS_DEFS[i], canonical: norm };
-    }
-    return { def: null, canonical: norm };
+  function resolveStatus(rawStatus) {
+    var canonical = normalizeStatus(rawStatus);
+    return {
+      canonical: canonical,
+      def: STATUS_LOOKUP[canonical] || null
+    };
   }
 
   function mapStatus(rawStatus, languageCode) {
-    var lang = languageCode || (global.language_code || 'fr');
-    var lookup = findStatusDef(rawStatus);
-    if (lookup.def) return lookup.def.label(lang);
-    return lookup.canonical;
+    return mapStatusWithCategory(rawStatus, languageCode).label;
   }
 
   function mapStatusWithCategory(rawStatus, languageCode) {
-    var lang = languageCode || (global.language_code || 'fr');
-    var lookup = findStatusDef(rawStatus);
-    if (lookup.def) {
+    var lang = getLanguage(languageCode);
+    var resolved = resolveStatus(rawStatus);
+    if (resolved.def) {
       return {
-        label: lookup.def.label(lang),
-        category: lookup.def.category,
-        canonical: lookup.canonical
+        label: resolved.def.label(lang),
+        category: resolved.def.category,
+        canonical: resolved.canonical
       };
     }
-    return { label: lookup.canonical, category: 'default', canonical: lookup.canonical };
+    return {
+      label: resolved.canonical,
+      category: 'default',
+      canonical: resolved.canonical
+    };
+  }
+
+  function updateBadgeVisuals(badge, category) {
+    var targetClass = categoryToBadgeClass(category);
+    badge.classList.remove.apply(badge.classList, BADGE_CLASSES);
+    badge.classList.add(targetClass);
+    var iconClass = ICON_LOOKUP[category] || ICON_LOOKUP.default;
+    var iconEl = badge.querySelector('i');
+    if (!iconEl) {
+      iconEl = document.createElement('i');
+      badge.insertBefore(iconEl, badge.firstChild);
+    }
+    iconEl.className = iconClass;
+    iconEl.style.fontSize = '16px';
+    iconEl.style.color = 'inherit';
   }
 
   function categoryToBadgeClass(category) {
@@ -95,89 +137,105 @@
     }
   }
 
-  function categoryToIcon(category) {
-    switch (category) {
-      case 'completed': return { iconClass: 'ph ph-check-circle' };
-      case 'error': return { iconClass: 'ph ph-warning-circle' };
-      case 'in-progress': return { iconClass: 'ph ph-clock-clockwise' };
-      case 'attention': return { iconClass: 'ph ph-megaphone' };
-      case 'attention-orange': return { iconClass: 'ph ph-megaphone' };
-      case 'post-editing': return { iconClass: 'ph ph-info' };
-      default: return { iconClass: 'ph ph-circle' };
+  function sanitizeReason(reason) {
+    if (typeof reason !== 'string') {
+      try {
+        return JSON.stringify(reason);
+      } catch (err) {
+        return '';
+      }
     }
+    return reason
+      .replace(/error\s*text\s*:?/i, '')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   function parseErrorReasons(raw) {
     if (!raw) return [];
-    var parsed = [];
+    var buffered = [];
+    var payload = raw;
+
     try {
-      var json = JSON.parse(raw);
-      if (Array.isArray(json)) {
-        parsed = json;
-      } else if (json && typeof json === 'string') {
-        parsed = [json];
+      var parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        buffered = parsed;
+      } else if (parsed) {
+        buffered = [parsed];
       }
-    } catch (e) {
-      parsed = String(raw).split(/\r?\n/);
+    } catch (err) {
+      buffered = String(payload).split(/\r?\n/);
     }
-    return parsed
-      .map(function (item) {
-        if (typeof item !== 'string') {
-          try {
-            return JSON.stringify(item);
-          } catch (err) {
-            return '';
-          }
-        }
-        return item;
-      })
-      .map(function (item) { return item.replace(/\s+/g, ' ').trim(); })
-      .filter(function (item) { return item.length > 0; });
+
+    return buffered
+      .map(sanitizeReason)
+      .filter(function (item) { return item && item.length; });
+  }
+
+  function destroyStatusTooltip(badge) {
+    if (!badge) return;
+    badge.classList.remove('has-tooltip');
+    badge.removeAttribute('data-error-tooltip');
+    var tooltip = badge.querySelector('.status-tooltip');
+    if (tooltip) {
+      tooltip.remove();
+    }
+  }
+
+  function renderStatusTooltip(badge, reasons, languageCode) {
+    if (!badge || !reasons.length) return;
+    var tooltip = badge.querySelector('.status-tooltip');
+    if (!tooltip) {
+      tooltip = document.createElement('div');
+      tooltip.className = 'status-tooltip';
+      badge.appendChild(tooltip);
+    } else {
+      tooltip.innerHTML = '';
+    }
+
+    var heading = document.createElement('div');
+    heading.className = 'status-tooltip-title';
+    heading.textContent = languageCode === 'en' ? 'Error details' : 'Détails de l\u2019erreur';
+    tooltip.appendChild(heading);
+
+    var body = document.createElement('div');
+    body.className = 'status-tooltip-body';
+    reasons.forEach(function (reason) {
+      var line = document.createElement('div');
+      line.className = 'status-tooltip-line';
+      line.textContent = reason;
+      body.appendChild(line);
+    });
+    tooltip.appendChild(body);
+
+    badge.classList.add('has-tooltip');
+    badge.setAttribute('data-error-tooltip', 'true');
   }
 
   function applyStatusMapping(root) {
     var scope = root || document;
-    var lang = global.language_code || 'fr';
+    var lang = getLanguage();
     var nodes = scope.querySelectorAll('.status-badge .status');
+
     nodes.forEach(function (el) {
       var raw = el.getAttribute('data-status') || el.textContent;
       var mapped = mapStatusWithCategory(raw, lang);
       el.textContent = mapped.label;
-      el.setAttribute('data-status', mapped.canonical || mapped.label);
+      el.setAttribute('data-status', mapped.canonical);
+
       var badge = el.closest('.status-badge');
-      if (badge) {
-        badge.classList.remove(
-          'status-completed',
-          'status-error',
-          'status-progress',
-          'status-attention',
-          'status-attention-orange',
-          'status-default',
-          'status-post-editing'
-        );
-        badge.classList.add(categoryToBadgeClass(mapped.category));
-        var iconCfg = categoryToIcon(mapped.category);
-        var iconEl = badge.querySelector('i');
-        if (!iconEl) {
-          iconEl = document.createElement('i');
-          badge.insertBefore(iconEl, badge.firstChild);
-        }
-        iconEl.className = iconCfg.iconClass;
-        iconEl.style.fontSize = '16px';
-        iconEl.style.color = 'inherit';
-      }
+      if (!badge) return;
+
+      updateBadgeVisuals(badge, mapped.category);
 
       if (mapped.category === 'error') {
         var reasons = parseErrorReasons(el.getAttribute('data-error-reason'));
         if (reasons.length) {
-          var tooltip = reasons.map(function (reason) { return '- ' + reason; }).join('\n');
-          badge.setAttribute('title', tooltip);
-          badge.setAttribute('data-error-tooltip', tooltip);
+          renderStatusTooltip(badge, reasons, lang);
           return;
         }
       }
-      badge.removeAttribute('title');
-      badge.removeAttribute('data-error-tooltip');
+      destroyStatusTooltip(badge);
     });
   }
 
