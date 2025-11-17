@@ -1357,9 +1357,8 @@ $(document).ready(function () {
                         <span class="lang-label">${sourceLanguage.toUpperCase()} → ${targetLanguage.toUpperCase()}</span>
                     </td>
                     <td class="status-col">
-                        <span class="status-badge ${getStatusClass(project.status)}">
-                            <i class="ph ${getStatusIcon(project.status)}" style="font-size: 16px;"></i>
-                            ${getStatusText(project.status)}
+                        <span class="status-badge status-default">
+                            <span class="status" data-status="${project.status || ''}">${project.status || ''}</span>
                         </span>
                     </td>
                     <td class="table-actions">
@@ -1387,60 +1386,9 @@ $(document).ready(function () {
 
         initializeDownloadButtons();
         initializeRevisionButtons();
-    }
 
-    function getStatusText(status) {
-        switch (status) {
-                case 'Being translated':
-                return language_code === 'en' ? 'Processing...' : 'En cours...';
-                case 'Translated':
-                return language_code === 'en' ? 'Translated document' : 'Document traduit';
-                case 'Sent to post-editing, not accepted yet':
-                return language_code === 'en' ? 'Request for quote sent' : 'Demande de devis envoyée';
-                case 'Sent to post-editing, accepted':
-                return language_code === 'en' ? 'Request for quote accepted' : 'Demande de devis acceptée';
-                case 'Post-edited file uploaded':
-                return language_code === 'en' ? 'Proofread document uploaded' : 'Document relu importé';
-                case 'Error':
-                return language_code === 'en' ? 'Error' : 'Erreur';
-                default:
-                return status;
-        }
-    }
-
-    function getStatusClass(status) {
-        switch (status) {
-            case 'Being translated':
-                return 'status-progress';
-            case 'Translated':
-                return 'status-completed';
-            case 'Sent to post-editing, not accepted yet':
-            case 'Sent to post-editing, accepted':
-                return 'status-attention';
-            case 'Post-edited file uploaded':
-                return 'status-completed';
-            case 'Error':
-                return 'status-error';
-            default:
-                return 'status-default';
-        }
-    }
-
-    function getStatusIcon(status) {
-        switch (status) {
-            case 'Being translated':
-                return 'ph-clock-clockwise';
-            case 'Translated':
-                return 'ph-check-circle';
-            case 'Sent to post-editing, not accepted yet':
-            case 'Sent to post-editing, accepted':
-                return 'ph-hourglass';
-            case 'Post-edited file uploaded':
-                return 'ph-check-circle';
-            case 'Error':
-                return 'ph-warning-circle';
-            default:
-                return 'ph-circle';
+        if (typeof window.applyStatusMapping === 'function' && documentsContainer.length) {
+            window.applyStatusMapping(documentsContainer[0]);
         }
     }
 
@@ -1540,14 +1488,15 @@ $(document).ready(function () {
             success: function () {
                 const projectRow = $(`button[data-id="${id}"]`).closest('tr');
                 
-                // Mettre à jour le badge de statut (colonne 3, index 2)
-                const statusBadge = projectRow.find('td:eq(2) .status-badge');
-                statusBadge.removeClass('status-completed status-progress status-error status-default')
-                    .addClass('status-attention');
-                statusBadge.find('i').removeClass().addClass('ph ph-hourglass');
-                statusBadge.contents().filter(function() {
-                    return this.nodeType === 3; // Text node
-                }).last().replaceWith(language_code === 'en' ? 'Request for quote sent' : 'Demande de devis envoyée');
+                // Mettre à jour le badge de statut et réappliquer le mapping partagé
+                const statusNode = projectRow.find('td:eq(2) .status');
+                const newStatus = 'Sent to post-editing, not accepted yet';
+                statusNode.attr('data-status', newStatus);
+                statusNode.text(newStatus);
+
+                if (typeof window.applyStatusMapping === 'function' && projectRow.length) {
+                    window.applyStatusMapping(projectRow[0]);
+                }
                 
                 // Désactiver le bouton de révision
                 projectRow.find('.expert-revision').prop('disabled', true).addClass('disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225');
