@@ -1,9 +1,11 @@
 import os
 import re
 from io import BytesIO
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
+from datetime import datetime
 
 import requests
+from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from preferences import preferences
@@ -108,5 +110,78 @@ def rename_file(file: InMemoryUploadedFile, file_name: str = None):
     else:
         file.name = file_name
     return file
+
+
+def get_user_emails_map(user_tokens):
+    """
+    Récupère un dictionnaire mapping UUID -> email pour une liste de tokens utilisateurs.
+    
+    Args:
+        user_tokens: Liste de UUID (strings) des utilisateurs
+        
+    Returns:
+        dict: Dictionnaire {uuid: email} pour les utilisateurs trouvés
+    """
+    if not user_tokens:
+        return {}
+    
+    UserModel = get_user_model()
+    return {
+        str(user_obj['uuid']): user_obj['email']
+        for user_obj in UserModel.objects.filter(uuid__in=user_tokens).values('uuid', 'email')
+    }
+
+
+def process_projects(projects_data, user, email_map=None):
+    """
+    Traite une liste de projets depuis l'API pour les préparer à l'affichage.
+    
+    Args:
+        projects_data: Liste de dictionnaires de projets depuis l'API
+        user: Utilisateur Django
+        email_map: Dictionnaire optionnel {uuid: email} pour enrichir les projets
+        
+    Returns:
+        list: Liste de projets enrichis avec les données nécessaires
+    """
+    for project in projects_data:
+        # Extraction du nom de fichier depuis l'URL
+        file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
+        project['source_file_name'] = unquote(file_name)
+        
+        # Parsing de la date de création
+        project['created_at'] = datetime.fromisoformat(
+            project['created_at'].replace('Z', '+00:00')
+        )
+        
+        # Détermination du type de document
+        project['document_type'] = (
+            'text' if project['source_file_name'].lower().endswith('.txt') 
+            else 'document'
+        )
+        
+        # Ajout de l'email utilisateur si staff et email_map fourni
+        if user.is_staff and email_map:
+            token = project.get('user_custom_mt_token')
+            project['user_email'] = email_map.get(str(token)) if token else None
+    
+    return projects_data
+
+
+def extract_user_tokens_from_projects(projects_data):
+    """
+    Extrait les tokens utilisateurs uniques depuis une liste de projets.
+    
+    Args:
+        projects_data: Liste de dictionnaires de projets
+        
+    Returns:
+        list: Liste de tokens utilisateurs uniques (UUID strings)
+    """
+    return list({
+        project.get('user_custom_mt_token')
+        for project in projects_data
+        if project.get('user_custom_mt_token')
+    })
 
 

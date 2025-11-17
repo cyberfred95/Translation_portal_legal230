@@ -8,6 +8,9 @@
     <thead>
       <tr>
         <th><span class="th-inner"><i class="ph ph-file-text icon-24 icon-muted"></i><span class="th-label">{% trans 'Document' %}</span></span></th>
+        {% if show_user_email %}
+        <th><span class="th-inner"><i class="ph ph-user icon-24 icon-muted"></i><span class="th-label">{% trans 'User email' %}</span></span></th>
+        {% endif %}
         <th><span class="th-inner"><i class="ph ph-megaphone icon-24 icon-muted"></i><span class="th-label">{% trans 'Language' %}</span></span></th>
         <th class="status-col"><span class="th-inner"><i class="ph ph-clock-clockwise icon-24 icon-muted"></i>{% trans 'Status' %}</span></th>
         <th><span class="th-inner"><i class="ph ph-calendar-blank icon-24 icon-muted"></i>{% trans 'Creation date' %}</span></th>
@@ -21,6 +24,11 @@
           <td>
             <span class="doc-title">{{ project.source_file_name }}</span>
           </td>
+          {% if show_user_email %}
+          <td>
+            <span class="user-email">{{ project.user_email|default:"—" }}</span>
+          </td>
+          {% endif %}
           <td><span class="lang-label">{{ project.source_language|upper }} → {{ project.target_language|upper }}</span></td>
           <td class="status-col">
             <span class="status-badge status-default">
@@ -49,7 +57,7 @@
         {% endfor %}
       {% else %}
         <tr>
-          <td colspan="5" class="empty-cell">
+          <td colspan="{% if show_user_email %}6{% else %}5{% endif %}" class="empty-cell">
             <div class="empty-state">
               <i class="ph ph-file-text empty-icon"></i>
               <p class="empty-title">{% trans 'No translations found' %}</p>

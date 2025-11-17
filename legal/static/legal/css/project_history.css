@@ -122,7 +122,7 @@
   text-overflow: ellipsis;
 }
 
-/* Colonnes */
+/* Colonnes du tableau */
 .project-history-page .dashboard-table th.status-col,
 .project-history-page .dashboard-table td.status-col {
   width: 20%;
@@ -131,20 +131,30 @@
   overflow: visible;
 }
 
-.project-history-page .dashboard-table th,
-.project-history-page .dashboard-table td {
-  width: 20%;
-}
-
+/* Largeurs des colonnes spécifiques */
 .project-history-page .dashboard-table th:nth-child(2),
 .project-history-page .dashboard-table td:nth-child(2) {
-  width: 10%;
-  text-align: center;
+  width: 20%; /* User email (si staff) */
+}
+
+.project-history-page .dashboard-table th:nth-child(3),
+.project-history-page .dashboard-table td:nth-child(3) {
+  width: 10%; /* Languages */
 }
 
 .project-history-page .dashboard-table th:nth-child(4),
 .project-history-page .dashboard-table td:nth-child(4) {
-  width: 15%;
+  width: 10%; /* Creation date */
+}
+
+.project-history-page .dashboard-table th:last-child,
+.project-history-page .dashboard-table td:last-child {
+  width: 10%; /* Actions */
+}
+
+/* Alignement centré pour toutes les colonnes sauf la première */
+.project-history-page .dashboard-table th:not(:first-child),
+.project-history-page .dashboard-table td:not(:first-child) {
   text-align: center;
 }
 
