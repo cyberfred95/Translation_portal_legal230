@@ -23,7 +23,13 @@
           </td>
           <td><span class="lang-label">{{ project.source_language|upper }} → {{ project.target_language|upper }}</span></td>
           <td class="status-col">
-            <span class="status-badge status-default"><span class="status">{{ project.status }}</span></span>
+            <span class="status-badge status-default">
+              <span
+                class="status"
+                data-status="{{ project.status }}"
+                data-error-reason="{{ project.error_reason|default_if_none:''|join:'&#10;' }}"
+              >{{ project.status }}</span>
+            </span>
           </td>
           <td>{{ project.created_at|date:"d/m/Y" }}</td>
           <td class="table-actions">

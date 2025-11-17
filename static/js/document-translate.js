@@ -1381,6 +1381,15 @@ $(document).ready(function () {
                 </tr>
             `);
 
+            const statusEl = documentRow.find('.status');
+            if (Array.isArray(project.error_reason) && project.error_reason.length > 0) {
+                statusEl.attr('data-error-reason', JSON.stringify(project.error_reason));
+            } else if (project.error_reason) {
+                statusEl.attr('data-error-reason', JSON.stringify([project.error_reason]));
+            } else {
+                statusEl.removeAttr('data-error-reason');
+            }
+
             documentsContainer.append(documentRow);
         });
 
@@ -1492,6 +1501,7 @@ $(document).ready(function () {
                 const statusNode = projectRow.find('td:eq(2) .status');
                 const newStatus = 'Sent to post-editing, not accepted yet';
                 statusNode.attr('data-status', newStatus);
+                statusNode.removeAttr('data-error-reason');
                 statusNode.text(newStatus);
 
                 if (typeof window.applyStatusMapping === 'function' && projectRow.length) {
