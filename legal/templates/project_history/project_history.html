@@ -61,7 +61,15 @@
                             <span class="lang-label">{{ project.source_language|upper }} → {{ project.target_language|upper }}</span>
                         </td>
                         <td class="status-col">
-                            <span class="status-badge status-default"><span class="status" data-status="{{ project.status }}">{{ project.status }}</span></span>
+                            <span class="status-badge status-default">
+                                <span
+                                    class="status"
+                                    data-status="{{ project.status }}"
+                                    {% if project.error_reason %}
+                                      data-error-reason="{{ project.error_reason|join:'&#10;' }}"
+                                    {% endif %}
+                                >{{ project.status }}</span>
+                            </span>
                         </td>
                         <td>
                             <span class="date-label">{{ project.created_at|date:"d/m/Y" }}</span>

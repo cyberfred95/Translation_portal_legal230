@@ -6,47 +6,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const root = document.querySelector('.project-history-page');
   if (!root) return;
 
-  const STATUS_ALIASES = {
-    'being translated': 'Being translated',
-    'processing': 'Processing',
-    'processing...': 'Processing...',
-    'in progress': 'In progress',
-    'sent to post-editing, not accepted yet': 'Sent to post-editing, not accepted yet',
-    'sent to post-editing, accepted': 'Sent to post-editing, accepted',
-    'post-edited file uploaded': 'Post-edited file uploaded',
-    'translated': 'Translated',
-    'error': 'Error',
-    'demande de devis envoyee': 'Sent to post-editing, not accepted yet',
-    'demande de devis acceptee': 'Sent to post-editing, accepted',
-    'document relu importe': 'Post-edited file uploaded',
-    'document traduit': 'Translated',
-    'en cours': 'In progress',
-    'erreur': 'Error',
-    'traitement': 'Processing',
-    'traitement en cours': 'Processing',
-  };
-
-  function normalizeStatus(raw) {
-    if (!raw) return '';
-    const key = raw.toString().trim().toLowerCase();
-    const asciiKey = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    return STATUS_ALIASES[key] || STATUS_ALIASES[asciiKey] || raw.toString().trim();
+  if (typeof window.applyStatusMapping === 'function') {
+    window.applyStatusMapping(root);
   }
-
-  function applyStatuses(scope) {
-    const container = scope || root;
-    container.querySelectorAll('.status-badge .status').forEach((el) => {
-      const normalized = normalizeStatus(el.dataset.status || el.textContent);
-      el.dataset.status = normalized;
-      el.textContent = normalized;
-    });
-
-    if (typeof window.applyStatusMapping === 'function') {
-      window.applyStatusMapping(container);
-    }
-  }
-
-  applyStatuses(root);
 
   const modalRevision = root.querySelector('#modal-revision');
   const closeRevision = root.querySelector('#close-revision');
