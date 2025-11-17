@@ -1,10 +1,13 @@
 from django.conf import settings
 from legal.views_all import BaseTemplateView
-from datetime import datetime
-from urllib.parse import urlparse, unquote
 import requests
 
 from subscriptions.utils import get_user_api_key
+from legal.helpers import (
+    get_user_emails_map,
+    process_projects,
+    extract_user_tokens_from_projects
+)
 
 
 class DashboardView(BaseTemplateView):
@@ -14,9 +17,6 @@ class DashboardView(BaseTemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         page = self.request.GET.get('page', 1)
-        type_filter = self.request.GET.get('type', '')
-        status_filter = self.request.GET.get('status', '')
-        language_filter = self.request.GET.get('language', '')
 
         params = {
             "page_size": 5,
@@ -26,13 +26,9 @@ class DashboardView(BaseTemplateView):
         try:
             user_api_key = get_user_api_key(user)
         except ValueError:
-            context['projects'] = []
+            context['projects'] = {"results": []}
             return context
         headers = {"token": user_api_key}
-
-        context['current_type_filter'] = type_filter
-        context['current_status_filter'] = status_filter
-        context['current_language_filter'] = language_filter
 
         translated_words_count = 0
         translated_symbols_count = 0
@@ -68,6 +64,7 @@ class DashboardView(BaseTemplateView):
         context['translated_words_count'] = translated_words_count
         context['translated_symbols_count'] = translated_symbols_count
         context['translated_files_count'] = translated_files_count
+        context['show_user_email'] = user.is_staff
 
         glossaries_count = 0
         try:
@@ -95,17 +92,19 @@ class DashboardView(BaseTemplateView):
                 headers=headers
             ).json()
 
-            if 'results' in response:
+            if 'results' in response and response['results']:
+                # Récupération des emails utilisateurs si staff
+                email_map = {}
+                if user.is_staff:
+                    user_tokens = extract_user_tokens_from_projects(response['results'])
+                    email_map = get_user_emails_map(user_tokens)
+
+                # Traitement des projets
+                process_projects(response['results'], user, email_map)
+                
+                # Ajout du status_mapped pour compatibilité
                 for project in response['results']:
-                    file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
-                    original_filename = unquote(file_name)
-                    project['source_file_name'] = original_filename
-
-                    project['created_at'] = datetime.fromisoformat(
-                        project['created_at'].replace('Z', '+00:00'))
-
                     project['status_mapped'] = project['status']
-                    project['document_type'] = 'text' if project['source_file_name'].lower().endswith('.txt') else 'document'
 
                 context['projects'] = response
             else:
