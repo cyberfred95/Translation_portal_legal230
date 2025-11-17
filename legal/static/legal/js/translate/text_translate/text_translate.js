@@ -31,11 +31,32 @@ $(document).ready(function () {
         clearButtons: $('#clear, #clear-source'),
         copyButtons: $('#copy, .copy'),
         detectBtn: $('#detect-language'),
+        detectStatus: $('#text-detect-status'),
         translationSkeleton: $('#translation-skeleton'),
         translatedText: $('#translated-text'),
         tooltip: $('#tooltip'),
         syncBtn: $('#sync-target-to-source'),
     };
+
+    const MIN_DETECTION_WORD_COUNT = 9;
+
+    let detectStatusTimeout = null;
+    let lastAutoDetectedText = '';
+    let isTextLanguageDetectionInProgress = false;
+    let textDetectionTriggered = false;
+    const detectStatusFallbacks = {
+        en: {
+            detecting: 'Detecting language...',
+            success: 'Language detected',
+            error: 'Language detection error',
+        },
+        fr: {
+            detecting: 'Détection de la langue en cours...',
+            success: 'Langue détectée',
+            error: 'Erreur lors de détection de langue',
+        },
+    };
+    const detectStatusMessages = getDetectStatusMessages();
 
     const editors = initQuillEditors();
     initPlaceholders();
@@ -421,31 +442,60 @@ $(document).ready(function () {
 
     function bindDetectLanguage() {
         $els.detectBtn.on('click', () => {
-            const sourceText = editors.source.getText();
-            $('#main-loader').removeClass('hidden');
-
-            $.ajax({
-                url: detect_text_language,
-                type: 'POST',
-                data: { text: sourceText },
-                dataType: 'json',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'Accept': 'application/json',
-                },
-                success(response) {
-                    const detectedLanguage = response.language.toLowerCase();
-                    $els.sourceSelect.val(detectedLanguage).trigger('change');
-                },
-                error(error) {
-                    errorNotification(error?.status, error?.responseJSON?.detail);
-                },
-                complete() {
-                    $('#main-loader').addClass('hidden');
-                }
-            });
+            requestTextLanguageDetection({ autoTriggered: false });
         });
+    }
+
+    function showTextDetectStatus(message, variant = 'loading', autoHide = false) {
+        if (!$els.detectStatus.length) return;
+        clearTimeout(detectStatusTimeout);
+        const variants = ['loading', 'success', 'error'];
+        $els.detectStatus.removeClass('text-detect-status--hidden');
+        variants.forEach(v => $els.detectStatus.removeClass(`text-detect-status--${v}`));
+        $els.detectStatus.addClass(`text-detect-status--${variant}`);
+        $els.detectStatus.find('.text-detect-label').text(variant === 'loading' ? '' : message);
+
+        if (autoHide) {
+            detectStatusTimeout = setTimeout(() => {
+                $els.detectStatus.addClass('text-detect-status--fading');
+                $els.detectStatus.find('.text-detect-label').css('opacity', 0);
+                setTimeout(() => {
+                    hideTextDetectStatus();
+                }, 1000);
+            }, 1000);
+        }
+    }
+
+    function hideTextDetectStatus() {
+        if (!$els.detectStatus.length) return;
+        clearTimeout(detectStatusTimeout);
+        $els.detectStatus.addClass('text-detect-status--hidden');
+        $els.detectStatus.removeClass('text-detect-status--fading');
+        $els.detectStatus.find('.text-detect-label').text('');
+        $els.detectStatus.find('.text-detect-label').css('opacity', 1);
+    }
+
+    function getDetectStatusMessages() {
+        if (!$els.detectStatus.length) {
+            return {};
+        }
+        const $status = $els.detectStatus;
+        const datasetMessages = {
+            detecting: $status.data('message-detecting'),
+            success: $status.data('message-success'),
+            error: $status.data('message-error'),
+        };
+        const langKey = (typeof language_code === 'string' ? language_code : 'en').toLowerCase();
+        const fallback = detectStatusFallbacks[langKey] || detectStatusFallbacks.en;
+        return {
+            detecting: datasetMessages.detecting || fallback.detecting,
+            success: datasetMessages.success || fallback.success,
+            error: datasetMessages.error || fallback.error,
+        };
+    }
+
+    function formatSuccessDetectMessage(languageCode) {
+        return detectStatusMessages.success || detectStatusFallbacks.en.success;
     }
 
     function initPasteLimiter() {
@@ -522,6 +572,7 @@ $(document).ready(function () {
             resizeTextAreas();
             updateCharCount();
             validateTranslateButton();
+            scheduleAutoTextDetection();
         });
 
         editors.translated.on('text-change', () => {
@@ -533,6 +584,112 @@ $(document).ready(function () {
                 $('#btn-copy').addClass('hidden');
             }
         });
+    }
+
+    function scheduleAutoTextDetection() {
+        if (state.sourceLanguage) {
+            return;
+        }
+
+        const textInfo = getSourceTextInfo();
+
+        if (textInfo.wordCount < MIN_DETECTION_WORD_COUNT) {
+            lastAutoDetectedText = '';
+            textDetectionTriggered = false;
+            return;
+        }
+
+        if (textDetectionTriggered || isTextLanguageDetectionInProgress) {
+            return;
+        }
+
+        if (lastAutoDetectedText === textInfo.trimmed) {
+            return;
+        }
+
+        requestTextLanguageDetection({ autoTriggered: true, textInfo });
+    }
+
+    function requestTextLanguageDetection({ autoTriggered = false, textInfo = null } = {}) {
+        const info = textInfo || getSourceTextInfo();
+
+        if (!info.trimmed) {
+            hideTextDetectStatus();
+            return;
+        }
+
+        if (autoTriggered) {
+            if (state.sourceLanguage) {
+                return;
+            }
+            if (info.wordCount < MIN_DETECTION_WORD_COUNT) {
+                return;
+            }
+            if (isTextLanguageDetectionInProgress) {
+                return;
+            }
+            if (textDetectionTriggered) {
+                return;
+            }
+            if (lastAutoDetectedText === info.trimmed) {
+                return;
+            }
+        } else if (isTextLanguageDetectionInProgress) {
+            return;
+        }
+
+        textDetectionTriggered = autoTriggered;
+        isTextLanguageDetectionInProgress = true;
+        const detectingMessage = detectStatusMessages.detecting || detectStatusFallbacks.en.detecting;
+        showTextDetectStatus(detectingMessage, 'loading', false);
+
+        $.ajax({
+            url: detect_text_language,
+            type: 'POST',
+            data: { text: info.raw },
+            dataType: 'json',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Accept': 'application/json',
+            },
+            success(response) {
+                const detectedLanguage = response.language.toLowerCase();
+                const currentSourceValue = $els.sourceSelect.val();
+                if (!currentSourceValue || currentSourceValue.toLowerCase() !== detectedLanguage) {
+                    $els.sourceSelect.val(detectedLanguage).trigger('change');
+                }
+                const successMessage = formatSuccessDetectMessage(detectedLanguage);
+                showTextDetectStatus(successMessage, 'success', true);
+                if (autoTriggered) {
+                    lastAutoDetectedText = info.trimmed;
+                }
+            },
+            error(error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
+                const errorMessage = detectStatusMessages.error || detectStatusFallbacks.en.error;
+                showTextDetectStatus(errorMessage, 'error', true);
+            },
+            complete() {
+                isTextLanguageDetectionInProgress = false;
+                textDetectionTriggered = false;
+            }
+        });
+    }
+
+    function getSourceTextInfo() {
+        const raw = editors.source.getText() || '';
+        const trimmed = raw.trim();
+        return {
+            raw,
+            trimmed,
+            wordCount: getWordCountFromText(trimmed),
+        };
+    }
+
+    function getWordCountFromText(text) {
+        if (!text) return 0;
+        return text.trim().split(/\s+/).filter(Boolean).length;
     }
 
     function resizeTextAreas() {

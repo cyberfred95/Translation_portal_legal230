@@ -23,6 +23,24 @@
                             </option>
                             {% endfor %}
                         </select>
+                        <div class="text-detect-btn-wrapper">
+                            <button type="button"
+                                    id="detect-language"
+                                    class="text-translate-detect-btn"
+                                    aria-label="{% trans 'Detect language' %}">
+                                <i class="ph ph-translate"></i>
+                            </button>
+                            <div class="text-detect-tooltip">
+                                <span>{% trans 'Language detection' %}</span>
+                            </div>
+                        </div>
+                        <div id="text-detect-status"
+                             class="text-detect-status text-detect-status--hidden"
+                             data-message-success="{% trans 'Language detected' %}"
+                             data-message-error="{% trans 'Language detection error' %}">
+                            <i class="ph ph-circle-notch text-detect-spinner"></i>
+                            <span class="text-detect-label"></span>
+                        </div>
                     </div>
                     <button type="button"
                             id="sync-target-to-source"

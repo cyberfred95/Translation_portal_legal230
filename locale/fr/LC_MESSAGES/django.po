@@ -996,6 +996,22 @@ msgstr "Rechercher une langue..."
 msgid "Detect language"
 msgstr "Détecter la langue"
 
+#: legal/templates/translate/text_translate/text_translate.html:33
+msgid "Language detection"
+msgstr "Détection de la langue"
+
+#: legal/templates/translate/text_translate/text_translate.html:34
+msgid "Detecting language..."
+msgstr "Détection de la langue en cours..."
+
+#: legal/templates/translate/text_translate/text_translate.html:35
+msgid "Language detected"
+msgstr "Langue détectée"
+
+#: legal/templates/translate/text_translate/text_translate.html:36
+msgid "Language detection error"
+msgstr "Erreur lors de détection de langue"
+
 #: legal/templates/translate/text_translate/text_translate.html:80
 #: writing/templates/writing.html:138
 msgid "Translate"
