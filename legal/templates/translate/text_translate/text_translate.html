@@ -10,18 +10,26 @@
         <div class="text-translate-main-row">
             <!-- Colonne gauche : Source -->
             <div class="text-translate-column text-translate-column-left">
-                <div class="text-translate-column-selector">
-                    <select class="source-language" name="source_language" required>
-                        <option value=""></option>
-                        {% for translate_language in translate_languages %}
-                        <option value="{{ translate_language.abbreviation|lower }}">
-                            {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                            {{ translate_language.french_name }}
-                            {% else %} {{ translate_language.name }}
-                            {% endif %}
-                        </option>
-                        {% endfor %}
-                    </select>
+                <div class="text-translate-column-selector text-translate-source-selector">
+                    <div class="text-translate-select-wrapper">
+                        <select class="source-language" name="source_language" required>
+                            <option value=""></option>
+                            {% for translate_language in translate_languages %}
+                            <option value="{{ translate_language.abbreviation|lower }}">
+                                {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
+                                {{ translate_language.french_name }}
+                                {% else %} {{ translate_language.name }}
+                                {% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="button"
+                            id="sync-target-to-source"
+                            class="text-translate-force-btn"
+                            aria-label="{% trans 'Copy target language to source' %}">
+                        <i class="ph ph-arrows-left-right"></i>
+                    </button>
                 </div>
 
                 <div class="text-translate-editor-wrapper">

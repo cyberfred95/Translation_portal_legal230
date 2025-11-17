@@ -1,38 +1,124 @@
 $(document).ready(function () {
+    if (window.__textTranslateInitialized) {
+        return;
+    }
+    window.__textTranslateInitialized = true;
 
-    let sourceQuill = new Quill('#source-text', {
-        theme: 'snow',
-        placeholder: language_code === 'en'?'Add your text here':'Ajoutez votre texte ici',
-        modules: {
-            toolbar: false
+    const CHAR_LIMIT = 2000;
+    const STORAGE_KEYS = {
+        source: 'translate_source_language',
+        target: 'translate_target_language',
+        glossaryPrefix: 'translate_glossary_',
+    };
+    const SELECTORS = {
+        source: 'select[name="source_language"]',
+        target: 'select[name="target_language"]',
+        domain: 'select[name="domain_name"]',
+        form: 'form[name="text-translate"]',
+    };
+    const state = {
+        isInitializing: true,
+        isTranslating: false,
+        sourceLanguage: null,
+        targetLanguage: null,
+    };
+    const $els = {
+        sourceSelect: $(SELECTORS.source),
+        targetSelect: $(SELECTORS.target),
+        domainSelect: $(SELECTORS.domain),
+        translateForm: $(SELECTORS.form),
+        translateBtn: $('#btn-translate'),
+        clearButtons: $('#clear, #clear-source'),
+        copyButtons: $('#copy, .copy'),
+        detectBtn: $('#detect-language'),
+        translationSkeleton: $('#translation-skeleton'),
+        translatedText: $('#translated-text'),
+        tooltip: $('#tooltip'),
+        syncBtn: $('#sync-target-to-source'),
+    };
+
+    const editors = initQuillEditors();
+    initPlaceholders();
+    initDomainSelect();
+    enhanceSelect2Arrows();
+    ensureGlossarySpinner();
+    bindGlossaryChange();
+
+    state.sourceLanguage = $els.sourceSelect.val() || null;
+    state.targetLanguage = $els.targetSelect.val() || null;
+
+    bindLanguageHandlers();
+    bindSwapButton();
+    restoreSavedLanguages();
+    state.isInitializing = false;
+    maybeFetchDomains('postRestore');
+
+    setupFormSubmission();
+    bindClearButtons();
+    bindCopyButtons();
+    bindDetectLanguage();
+    initPasteLimiter();
+    initModalToggles();
+    bindEditorEvents();
+    refreshInitialUiState();
+
+    function initQuillEditors() {
+        const source = new Quill('#source-text', {
+            theme: 'snow',
+            placeholder: language_code === 'en' ? 'Add your text here' : 'Ajoutez votre texte ici',
+            modules: { toolbar: false }
+        });
+
+        const translated = new Quill('#translated-text', {
+            theme: 'snow',
+            modules: { toolbar: false }
+        });
+
+        if (typeof window !== 'undefined') {
+            window.sourceQuill = source;
+            window.translatedQuill = translated;
         }
-    });
 
-    let translatedQuill = new Quill('#translated-text', {
-        theme: 'snow',
-        modules: {
-            toolbar: false
-        }
-    });
+        return { source, translated };
+    }
 
-    $(".source-language").attr("data-placeholder", language_code === 'en' ? "Source language" : "Langue source");
-    $(".target-language").attr("data-placeholder", language_code === 'en' ? "Target language" : "Langue cible");
-    $(".domain-select").attr("data-placeholder", language_code === 'en' ? "Glossary" : "Glossaire");
+    function initPlaceholders() {
+        const placeholders = {
+            '.source-language': language_code === 'en' ? 'Source language' : 'Langue source',
+            '.target-language': language_code === 'en' ? 'Target language' : 'Langue cible',
+            '.domain-select': language_code === 'en' ? 'Glossary' : 'Glossaire',
+        };
 
-    $(".source-language").select2();
-    $(".target-language").select2();
-    
-    const $domainSelect = $(".domain-select").select2({
-        placeholder: $(".domain-select").data('placeholder'),
-        allowClear: false,
-        dropdownCssClass: 'glossary-resize',
-        dropdownParent: $('.text-translate-domain-wrapper')
-    });
+        Object.entries(placeholders).forEach(([selector, text]) => {
+            $(selector).attr('data-placeholder', text);
+        });
+    }
 
-    const domainSelectInstance = $domainSelect.data('select2');
-    const updateGlossaryDropdownOffset = (instance) => {
+    function initDomainSelect() {
+        $els.domainSelect.select2({
+            placeholder: $els.domainSelect.data('placeholder'),
+            allowClear: false,
+            dropdownCssClass: 'glossary-resize',
+            dropdownParent: $('.text-translate-domain-wrapper'),
+        });
+
+        updateGlossaryDropdownOffset($els.domainSelect.data('select2'));
+
+        $els.domainSelect.on('select2:open', function () {
+            updateGlossaryDropdownOffset($(this).data('select2'));
+        });
+
+        $(window).on('resize.glossaryDropdown', function () {
+            updateGlossaryDropdownOffset($els.domainSelect.data('select2'));
+        });
+
+        applyLanguageSelect2($els.sourceSelect);
+        applyLanguageSelect2($els.targetSelect);
+    }
+
+    function updateGlossaryDropdownOffset(instance) {
         const $container = instance?.$container;
-        if (!$container || !$container.length) return;
+        if (!$container?.length) return;
 
         const triggerWidth = $container.outerWidth();
         if (!triggerWidth) return;
@@ -41,125 +127,31 @@ $(document).ready(function () {
         if (!wrapperEl) return;
 
         wrapperEl.style.setProperty('--glossary-right-offset', `-${triggerWidth}px`);
-    };
-
-    if (domainSelectInstance) {
-        updateGlossaryDropdownOffset(domainSelectInstance);
     }
 
-    $domainSelect.on('select2:open', function () {
-        updateGlossaryDropdownOffset($(this).data('select2'));
-    });
-
-    $(window).on('resize.glossaryDropdown', function () {
-        updateGlossaryDropdownOffset($domainSelect.data('select2'));
-    });
-
-    $sourceSelect = $(".source-language").select2();
-    $targetSelect = $(".target-language").select2();
-
-    $sourceSelect.data('select2').$container.addClass('languages');
-    $sourceSelect.data('select2').$dropdown.addClass('languages');
-
-    $targetSelect.data('select2').$container.addClass('languages');
-    $targetSelect.data('select2').$dropdown.addClass('languages');
-
-    // Fonctions pour sauvegarder/restaurer les langues et glossaires dans localStorage
-    function saveLanguageSelection() {
-        const sourceLang = $('select[name="source_language"]').val();
-        const targetLang = $('select[name="target_language"]').val();
-        
-        if (sourceLang) localStorage.setItem('translate_source_language', sourceLang);
-        if (targetLang) localStorage.setItem('translate_target_language', targetLang);
+    function applyLanguageSelect2($select) {
+        const select2Instance = $select.select2().data('select2');
+        select2Instance?.$container.addClass('languages');
+        select2Instance?.$dropdown.addClass('languages');
     }
 
-    function saveGlossarySelection() {
-        const glossary = $('select[name="domain_name"]').val();
-        if (glossary) {
-            const sourceLang = $('select[name="source_language"]').val();
-            const targetLang = $('select[name="target_language"]').val();
-            // Sauvegarder avec la combinaison de langues comme clé
-            if (sourceLang && targetLang) {
-                const langKey = `${sourceLang}_${targetLang}`;
-                localStorage.setItem(`translate_glossary_${langKey}`, glossary);
-            }
-        }
+    function ensureGlossarySpinner() {
+        if ($('#glossary-spinner').length) return;
+        const spinner = $('<span id="glossary-spinner" class="inline-block w-5 h-5 mr-2 rounded-full border border-gray-300 border-t-green-800 animate-spin hidden"></span>');
+        $els.domainSelect.parent('.text-translate-domain-wrapper').prepend(spinner);
     }
-
-    function restoreLanguageSelection() {
-        const savedSourceLang = localStorage.getItem('translate_source_language');
-        const savedTargetLang = localStorage.getItem('translate_target_language');
-        
-        if (savedSourceLang) {
-            $('select[name="source_language"]').val(savedSourceLang).trigger('change');
-        }
-        if (savedTargetLang) {
-            $('select[name="target_language"]').val(savedTargetLang).trigger('change');
-        } else {
-            // Par défaut, présélectionner l'anglais (en) pour la langue de destination
-            const targetSelect = $('select[name="target_language"]');
-            if (targetSelect.find('option[value="en"]').length > 0) {
-                targetSelect.val('en').trigger('change');
-            }
-        }
-    }
-
-    function getSavedGlossary() {
-        const sourceLang = $('select[name="source_language"]').val();
-        const targetLang = $('select[name="target_language"]').val();
-        if (sourceLang && targetLang) {
-            const langKey = `${sourceLang}_${targetLang}`;
-            return localStorage.getItem(`translate_glossary_${langKey}`);
-        }
-        return null;
-    }
-
-    // Event listener pour sauvegarder la sélection du glossaire
-    $('select[name="domain_name"]').on('change', function () {
-        saveGlossarySelection();
-        validateTranslateButton();
-    });
-
-    // Spinner pour le chargement des glossaires (placé à gauche du dropdown)
-    (function initGlossarySpinner(){
-        const domainSelect = $('select.domain-select');
-        if ($('#glossary-spinner').length === 0 && domainSelect.length) {
-            const spinner = $('<span id="glossary-spinner" class="inline-block w-5 h-5 mr-2 rounded-full border border-gray-300 border-t-green-800 animate-spin hidden"></span>');
-            // Insérer le spinner au début du wrapper pour qu'il soit à gauche
-            domainSelect.parent('.text-translate-domain-wrapper').prepend(spinner);
-        }
-    })();
 
     function enhanceSelect2Arrows() {
-        // Cibler tous les conteneurs Select2 dans les colonnes
-        $('.text-translate-column .select2-container, .text-translate-column-selector .select2-container').each(function () {
-            // Changer le conteneur Select2 pour qu'il s'adapte à la largeur du contenu
-            $(this).css({ 
-                display: 'inline-block',
-                width: 'auto',
-                minWidth: 'auto'
-            });
-        });
-        
-        // Cibler toutes les sélections dans les colonnes
-        $('.text-translate-column .select2-container .select2-selection, .text-translate-column-selector .select2-container .select2-selection').each(function () {
-            // Changer le conteneur en inline-flex pour que la flèche suive le texte
-            $(this).css({ 
-                display: 'inline-flex',
-                width: 'auto',
-                minWidth: 'auto'
-            });
-            
-            // Réduire le padding du texte pour que la flèche soit collée
-            $(this).find('.select2-selection__rendered').css({ 
-                'padding-right': '0.375rem'
-            });
+        const containersSelector = '.text-translate-column .select2-container, .text-translate-column-selector .select2-container';
+        $(containersSelector).css({ display: 'inline-block', width: 'auto', minWidth: 'auto' });
+
+        const selectionsSelector = '.text-translate-column .select2-selection, .text-translate-column-selector .select2-selection';
+        $(selectionsSelector).each(function () {
+            $(this).css({ display: 'inline-flex', width: 'auto', minWidth: 'auto' });
+            $(this).find('.select2-selection__rendered').css({ 'padding-right': '0.375rem' });
 
             const $arrow = $(this).find('.select2-selection__arrow');
-            // Cacher l'élément flèche par défaut
             $arrow.find('b').hide();
-
-            // Positionner la flèche en inline pour qu'elle soit collée au texte
             $arrow.css({
                 position: 'static',
                 right: 'auto',
@@ -168,517 +160,519 @@ $(document).ready(function () {
                 width: 'auto',
                 height: 'auto',
                 display: 'inline-flex',
-                'align-items': 'center',
-                'justify-content': 'center',
-                'margin-left': '0.25rem'
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginLeft: '0.25rem'
             });
+            $arrow.find('i.ph').remove();
+        });
+    }
 
-            // S'assurer que le pseudo-élément ::after utilise une flèche plus large
-            if ($arrow.length && !$arrow.find('i.ph').length) {
-                // Les styles CSS géreront le ::after, mais on s'assure qu'il n'y a pas d'icône Phosphor
-                $arrow.find('i.ph').remove();
+    function glossaryStorageKey() {
+        if (!state.sourceLanguage || !state.targetLanguage) return null;
+        return `${STORAGE_KEYS.glossaryPrefix}${state.sourceLanguage}_${state.targetLanguage}`;
+    }
+
+    function bindGlossaryChange() {
+        $els.domainSelect.on('change', () => {
+            const glossaryKey = glossaryStorageKey();
+            const glossaryValue = $els.domainSelect.val();
+            if (glossaryKey && glossaryValue) {
+                localStorage.setItem(glossaryKey, glossaryValue);
+            }
+            validateTranslateButton();
+        });
+    }
+
+    function bindLanguageHandlers() {
+        $els.sourceSelect.off('change.textTranslate').on('change.textTranslate', function (event, extra) {
+            handleLanguageChange('source', $(this).val(), event, extra);
+        });
+
+        $els.targetSelect.off('change.textTranslate').on('change.textTranslate', function (event, extra) {
+            handleLanguageChange('target', $(this).val(), event, extra);
+        });
+    }
+
+    function handleLanguageChange(type, value, event, extra) {
+        const prop = type === 'source' ? 'sourceLanguage' : 'targetLanguage';
+        state[prop] = value || null;
+        persistLanguages();
+
+        $els.domainSelect.val(null).trigger('change');
+        validateTranslateButton();
+
+        if (state.isInitializing) {
+            return;
+        }
+
+        maybeFetchDomains(`${type}Change`);
+    }
+
+    function persistLanguages() {
+        if (state.sourceLanguage) {
+            localStorage.setItem(STORAGE_KEYS.source, state.sourceLanguage);
+        }
+        if (state.targetLanguage) {
+            localStorage.setItem(STORAGE_KEYS.target, state.targetLanguage);
+        }
+    }
+
+    function restoreSavedLanguages() {
+        const savedSource = localStorage.getItem(STORAGE_KEYS.source);
+        const savedTarget = localStorage.getItem(STORAGE_KEYS.target);
+
+        if (savedSource) {
+            $els.sourceSelect.val(savedSource).trigger('change');
+        }
+
+        if (savedTarget) {
+            $els.targetSelect.val(savedTarget).trigger('change');
+        } else if ($els.targetSelect.find('option[value="en"]').length) {
+            $els.targetSelect.val('en').trigger('change');
+        }
+    }
+
+    function maybeFetchDomains(reason) {
+        if (!state.sourceLanguage || !state.targetLanguage) {
+            return;
+        }
+        fetchDomains({ reason });
+    }
+
+    function fetchDomains(metadata) {
+        $.ajax({
+            url: `${get_domains}?source_language=${state.sourceLanguage}&target_language=${state.targetLanguage}`,
+            type: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            beforeSend() {
+                $('#glossary-spinner').removeClass('hidden');
+            },
+            success(response) {
+                populateDomains(response);
+            },
+            error(error) {
+                errorNotification(error?.status, error?.responseJSON?.detail);
+            },
+            complete() {
+                $('#glossary-spinner').addClass('hidden');
             }
         });
     }
 
-    // Appliquer les icônes Phosphor aux flèches des dropdowns
-    enhanceSelect2Arrows();
+    function populateDomains(response) {
+        if (!Array.isArray(response?.data) || response.data.length === 0) {
+            return;
+        }
 
-    // Variables pour stocker les langues sélectionnées
-    let sourceLanguage = $('select[name="source_language"]').val();
-    let targetLanguage = $('select[name="target_language"]').val();
+        $els.domainSelect.empty();
+        $els.domainSelect.append($('<option></option>').attr('value', '').text('Domain').prop('disabled', true));
 
-    const getDomains = () => {
-        if (sourceLanguage && targetLanguage) {
+        response.data.forEach((domain) => {
+            $els.domainSelect.append($('<option></option>').attr('value', domain.name).text(domain.name));
+        });
+
+        const savedGlossaryKey = glossaryStorageKey();
+        const savedGlossary = savedGlossaryKey ? localStorage.getItem(savedGlossaryKey) : null;
+
+        let selectedValue = savedGlossary;
+        if (!selectedValue || !$els.domainSelect.find(`option[value="${selectedValue}"]`).length) {
+            selectedValue = $els.domainSelect.find('option:not(:disabled):first').val();
+        }
+
+        if (selectedValue) {
+            $els.domainSelect.val(selectedValue).trigger('change');
+        }
+    }
+
+    function bindSwapButton() {
+        $els.syncBtn.on('click', () => {
+            if (!$els.sourceSelect.length || !$els.targetSelect.length) {
+                return;
+            }
+
+            const previousSource = $els.sourceSelect.val();
+            const previousTarget = $els.targetSelect.val();
+
+            if (!previousSource && !previousTarget) {
+                return;
+            }
+
+            if (previousSource && previousTarget && previousSource === previousTarget) {
+                validateTranslateButton();
+                return;
+            }
+
+            $els.sourceSelect.val(null).trigger('change');
+            $els.targetSelect.val(null).trigger('change');
+
+            if (previousTarget) {
+                $els.sourceSelect.val(previousTarget).trigger('change');
+            }
+
+            if (previousSource) {
+                $els.targetSelect.val(previousSource).trigger('change');
+            }
+        });
+    }
+
+    function setupFormSubmission() {
+        $els.translateForm.off('submit').on('submit', function (event) {
+            event.preventDefault();
+            if (state.isTranslating) return false;
+
+            const textContent = editors.source.getText().trim();
+            const htmlContent = editors.source.root.innerHTML.trim();
+            const currentCount = textContent.replace(/\n/g, '').length;
+            const isEmptyHtml = !htmlContent || htmlContent === '<p><br></p>' || htmlContent === '<p></p>';
+
+            if (currentCount > CHAR_LIMIT || !textContent || isEmptyHtml) {
+                return false;
+            }
+
+            state.isTranslating = true;
+            $els.translateBtn.prop('disabled', true);
+
+            $('#text').val(htmlContent);
+            const formData = new FormData(this);
+
+            generateSkeleton();
+
             $.ajax({
-                url: `${get_domains}?source_language=${sourceLanguage}&target_language=${targetLanguage}`,
-                type: 'GET',
+                url: translate,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRFToken': getCookie('csrftoken'),
                 },
-                beforeSend: function(){
-                    $('#glossary-spinner').removeClass('hidden');
+                success(response) {
+                    editors.translated.root.innerHTML = response.translated_text[0];
                 },
-                success: function (response) {
-                    let domainSelect = $('select[name="domain_name"]');
-                    if (response.data.length !== 0) {
-                        domainSelect.empty();
-                        // laisser activé pour garder le même style
-                        domainSelect.append($('<option></option>').attr('value', '').text('Domain').prop('disabled', true));
-
-                        $.each(response.data, function (index, domain) {
-                            const option = $('<option></option>')
-                                .attr('value', domain.name)
-                                .text(domain.name);
-                            domainSelect.append(option);
-                        });
-
-                        // Essayer de restaurer le glossaire précédemment utilisé pour cette combinaison de langues
-                        const savedGlossary = getSavedGlossary();
-                        let selectedVal = null;
-                        
-                        if (savedGlossary && domainSelect.find(`option[value="${savedGlossary}"]`).length > 0) {
-                            // Le glossaire sauvegardé existe dans la liste, l'utiliser
-                            selectedVal = savedGlossary;
-                        } else {
-                            // Sinon, sélectionner le premier domaine valide (y compris le générique)
-                            selectedVal = domainSelect.find('option:not(:disabled):first').val();
-                        }
-                        
-                        if (selectedVal) {
-                            domainSelect.val(selectedVal).trigger('change');
-                        }
-                        // Revalider le bouton après sélection
-                        if (typeof validateTranslateButton === 'function') {
-                            validateTranslateButton();
-                        }
-                    }
-                },
-                error: function (error) {
+                error(error) {
                     errorNotification(error?.status, error?.responseJSON?.detail);
+                    showTranslationResult();
                 },
-                complete: function(){
-                    $('#glossary-spinner').addClass('hidden');
+                complete() {
+                    showTranslationResult();
+                    resizeTextAreas();
+                    state.isTranslating = false;
+                    validateTranslateButton();
                 }
             });
+
+            return false;
+        });
+    }
+
+    function generateSkeleton() {
+        buildSkeletonFromSource();
+        $els.translatedText.addClass('hidden');
+        $els.translationSkeleton.removeClass('hidden');
+        editors.translated.root.innerHTML = '';
+    }
+
+    function showTranslationResult() {
+        $els.translationSkeleton.addClass('hidden');
+        $els.translatedText.removeClass('hidden');
+    }
+
+    function bindClearButtons() {
+        $els.clearButtons.on('click', () => {
+            editors.source.deleteText(0, editors.source.getLength());
+            editors.translated.deleteText(0, editors.translated.getLength());
+            resizeTextAreas();
+            validateTranslateButton();
+        });
+    }
+
+    function bindCopyButtons() {
+        $els.copyButtons.on('click', () => {
+            const translatedText = editors.translated.getText();
+            const translatedHtml = editors.translated.root.innerHTML;
+
+            if (!translatedHtml) return;
+
+            if (navigator.clipboard && window.ClipboardItem) {
+                const htmlBlob = new Blob([translatedHtml], { type: 'text/html' });
+                const textBlob = new Blob([translatedText], { type: 'text/plain' });
+                const data = [new ClipboardItem({ 'text/html': htmlBlob, 'text/plain': textBlob })];
+
+                navigator.clipboard.write(data).then(showTooltip).catch((error) => {
+                    console.error('Erreur de copie : ', error);
+                });
+            } else {
+                alert('Votre navigateur ne supporte pas Clipboard API. Merci de le mettre à jour.');
+            }
+        });
+    }
+
+    function showTooltip() {
+        $els.tooltip.removeClass('invisible opacity-0').addClass('visible opacity-100');
+        setTimeout(() => {
+            $els.tooltip.removeClass('visible opacity-100').addClass('invisible opacity-0');
+        }, 2000);
+    }
+
+    function bindDetectLanguage() {
+        $els.detectBtn.on('click', () => {
+            const sourceText = editors.source.getText();
+            $('#main-loader').removeClass('hidden');
+
+            $.ajax({
+                url: detect_text_language,
+                type: 'POST',
+                data: { text: sourceText },
+                dataType: 'json',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Accept': 'application/json',
+                },
+                success(response) {
+                    const detectedLanguage = response.language.toLowerCase();
+                    $els.sourceSelect.val(detectedLanguage).trigger('change');
+                },
+                error(error) {
+                    errorNotification(error?.status, error?.responseJSON?.detail);
+                },
+                complete() {
+                    $('#main-loader').addClass('hidden');
+                }
+            });
+        });
+    }
+
+    function initPasteLimiter() {
+        const sourceRoot = document.querySelector('#source-text .ql-editor')?.parentElement;
+        if (!sourceRoot) return;
+
+        sourceRoot.addEventListener('paste', (event) => {
+            const clipboardData = event.clipboardData || window.clipboardData;
+            if (!clipboardData) return;
+
+            const text = clipboardData.getData('text');
+            if (typeof text !== 'string') return;
+
+            const current = getSourceCharCount();
+            const available = CHAR_LIMIT - current;
+
+            if (available <= 0) {
+                event.preventDefault();
+                return;
+            }
+
+            const toInsert = text.replace(/\r?\n/g, ' ').slice(0, available);
+            event.preventDefault();
+
+            const selection = editors.source.getSelection(true) || { index: editors.source.getLength(), length: 0 };
+            editors.source.insertText(selection.index, toInsert, 'user');
+        }, true);
+    }
+
+    function initModalToggles() {
+        const modal = document.getElementById('modal');
+        const closeModalBtn = document.getElementById('closeModal');
+        const closeIcon = document.getElementById('closeIcon');
+        const checkbox = document.querySelector('input[type="checkbox"].peer');
+
+        const closeModal = () => {
+            modal?.classList.add('hidden');
+            if (checkbox) checkbox.checked = false;
+        };
+
+        checkbox?.addEventListener('change', function () {
+            if (!checkbox.checked) {
+                modal?.classList.add('hidden');
+            } else {
+                modal?.classList.remove('hidden');
+            }
+        });
+
+        closeModalBtn?.addEventListener('click', closeModal);
+        closeIcon?.addEventListener('click', closeModal);
+        modal?.addEventListener('click', function (event) {
+            if (event.target === modal) closeModal();
+        });
+    }
+
+    function bindEditorEvents() {
+        editors.source.on('text-change', (delta, oldDelta, source) => {
+            if (source !== 'user') {
+                updateCharCount();
+                validateTranslateButton();
+                return;
+            }
+
+            const current = getSourceCharCount();
+            if (current > CHAR_LIMIT) {
+                const over = current - CHAR_LIMIT;
+                const selection = editors.source.getSelection(true);
+                const deleteIndex = selection ? Math.max(0, selection.index - over) : Math.max(0, editors.source.getLength() - 1 - over);
+                editors.source.deleteText(deleteIndex, over, 'user');
+                updateCharCount();
+                return;
+            }
+
+            resizeTextAreas();
+            updateCharCount();
+            validateTranslateButton();
+        });
+
+        editors.translated.on('text-change', () => {
+            resizeTextAreas();
+            const hasTranslated = editors.translated.getText().replace(/\n/g, '').length > 0;
+            if (hasTranslated) {
+                $('#btn-copy').removeClass('hidden');
+            } else {
+                $('#btn-copy').addClass('hidden');
+            }
+        });
+    }
+
+    function resizeTextAreas() {
+        const $sourceEditor = $('#source-text .ql-editor');
+        const $translatedEditor = $('#translated-text .ql-editor');
+
+        $sourceEditor.css('height', 'auto');
+        $translatedEditor.css('height', 'auto');
+
+        const maxHeight = Math.max(
+            $sourceEditor[0]?.scrollHeight || 0,
+            $translatedEditor[0]?.scrollHeight || 0,
+            400
+        );
+
+        $sourceEditor.css('height', `${maxHeight}px`);
+        $translatedEditor.css('height', `${maxHeight}px`);
+    }
+
+    function getSourceCharCount() {
+        return editors.source.getText().replace(/\n/g, '').length;
+    }
+
+    function updateCharCount() {
+        $('#source-char-count').text(Math.min(getSourceCharCount(), CHAR_LIMIT));
+    }
+
+    function validateTranslateButton() {
+        const sameLanguage = state.sourceLanguage && state.targetLanguage && state.sourceLanguage === state.targetLanguage;
+        const hasDomain = Boolean($els.domainSelect.val());
+        const isReady = state.sourceLanguage && state.targetLanguage && hasDomain && !sameLanguage;
+        $els.translateBtn.prop('disabled', !isReady);
+
+        if (sameLanguage) {
+            return;
         }
     }
 
-    $('select[name="source_language"]').change(function () {
-        sourceLanguage = $(this).val();
-        // Sauvegarder la sélection
-        saveLanguageSelection();
-        // Réinitialiser le glossaire (Select2) lorsqu'on change la langue source
-        const domainSelect = $('select[name="domain_name"]');
-        domainSelect.val(null).trigger('change');
-        validateTranslateButton();
-        getDomains();
-    });
-
-    $('select[name="target_language"]').change(function () {
-        targetLanguage = $(this).val();
-        // Sauvegarder la sélection
-        saveLanguageSelection();
-        // Réinitialiser le glossaire (Select2) lorsqu'on change la langue cible
-        const domainSelect = $('select[name="domain_name"]');
-        domainSelect.val(null).trigger('change');
-        validateTranslateButton();
-        getDomains();
-    });
-
-    // Restaurer les langues sauvegardées au chargement
-    // Note: trigger('change') dans restoreLanguageSelection() appellera getDomains() automatiquement
-    restoreLanguageSelection();
-
-    /**
-     * Génère un skeleton loader basé sur le texte d'entrée
-     * Le skeleton correspond exactement au nombre de lignes et à la largeur du texte
-     */
-    function generateSkeletonFromText(quillEditor) {
-        const text = quillEditor.getText().trim();
-        const $skeleton = $('#translation-skeleton');
+    function buildSkeletonFromSource() {
+        const text = editors.source.getText().trim();
+        const $skeleton = $els.translationSkeleton;
         const $qlEditor = $('#source-text .ql-editor');
-        
         $skeleton.empty();
-        
-        // Si pas de texte, afficher des lignes par défaut
+
         if (!text) {
             $skeleton.append('<div class="skeleton-line" style="width: 60%;"></div>');
             $skeleton.append('<div class="skeleton-line" style="width: 80%;"></div>');
             return;
         }
-        
+
         const qlEditorElement = $qlEditor[0];
         if (!qlEditorElement) {
             $skeleton.append('<div class="skeleton-line" style="width: 80%;"></div>');
             return;
         }
-        
-        // Obtenir les styles calculés du Quill editor
+
         const computedStyle = window.getComputedStyle(qlEditorElement);
         const fontFamily = computedStyle.fontFamily || 'Montserrat, sans-serif';
         const fontSize = parseFloat(computedStyle.fontSize) || 16;
         const paddingLeft = parseFloat(computedStyle.paddingLeft) || 0;
         const paddingRight = parseFloat(computedStyle.paddingRight) || 0;
         const availableWidth = Math.max(100, qlEditorElement.getBoundingClientRect().width - paddingLeft - paddingRight);
-        
-        // Configurer le canvas pour mesurer le texte
+
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
-        const cleanFontFamily = fontFamily.split(',')[0].replace(/['"]/g, '').trim();
-        context.font = `${fontSize}px ${cleanFontFamily}`;
-        
-        // Préparer les lignes logiques (supprimer les lignes vides à la fin)
+        context.font = `${fontSize}px ${fontFamily.split(',')[0].replace(/['"]/g, '').trim()}`;
+
         const logicalLines = text.split('\n')
             .map(line => line.trim())
-            .filter((line, index, arr) => {
-                // Garder toutes les lignes sauf les lignes vides à la fin
-                if (line.length > 0) return true;
-                // Pour les lignes vides, vérifier s'il y a du contenu après
-                return arr.slice(index + 1).some(l => l.length > 0);
-            });
-        
-        if (logicalLines.length === 0) {
+            .filter((line, index, arr) => line.length > 0 || arr.slice(index + 1).some(l => l.length > 0));
+
+        if (!logicalLines.length) {
             $skeleton.append('<div class="skeleton-line" style="width: 80%;"></div>');
             return;
         }
-        
-        // Générer les lignes skeleton
+
         const skeletonLines = [];
-        
+
         logicalLines.forEach((logicalLine, lineIndex) => {
             const isLastLogicalLine = lineIndex === logicalLines.length - 1;
-            
-            if (logicalLine.length === 0) {
-                // Ligne vide (espacement entre paragraphes)
-                if (!isLastLogicalLine) {
-                    skeletonLines.push({ width: 0.05 * availableWidth, isEmpty: true });
-                }
-            } else {
-                const lineWidth = context.measureText(logicalLine).width;
-                
-                if (lineWidth <= availableWidth) {
-                    // Ligne simple qui tient sur une ligne
-                    skeletonLines.push({ width: lineWidth });
-                } else {
-                    // Word-wrap : diviser la ligne en plusieurs lignes visuelles
-                    const words = logicalLine.split(/\s+/);
-                    let currentLineWidth = 0;
-                    
-                    words.forEach((word, wordIndex) => {
-                        const wordWithSpace = word + (wordIndex < words.length - 1 ? ' ' : '');
-                        const wordWidth = context.measureText(wordWithSpace).width;
-                        
-                        if (currentLineWidth + wordWidth <= availableWidth) {
-                            currentLineWidth += wordWidth;
-                        } else {
-                            // Nouvelle ligne
-                            if (currentLineWidth > 0) {
-                                skeletonLines.push({ width: currentLineWidth });
-                            }
-                            currentLineWidth = wordWidth;
-                        }
-                    });
-                    
-                    // Dernière ligne de cette ligne logique
-                    if (currentLineWidth > 0) {
-                        skeletonLines.push({ width: currentLineWidth });
-                    }
-                }
-            }
-        });
-        
-        // Supprimer les lignes vides à la fin (double vérification de sécurité)
-        while (skeletonLines.length > 0 && skeletonLines[skeletonLines.length - 1].isEmpty) {
-            skeletonLines.pop();
-        }
-        
-        // Générer le DOM (construction optimisée en une seule opération)
-        if (skeletonLines.length === 0) {
-            // Fallback : une ligne basée sur un échantillon du texte
-            const sampleText = text.substring(0, Math.min(50, text.length));
-            const sampleWidth = context.measureText(sampleText).width;
-            const widthPercent = Math.min(95, Math.max(25, (sampleWidth / availableWidth) * 100));
-            $skeleton.append(`<div class="skeleton-line" style="width: ${widthPercent}%;"></div>`);
-        } else {
-            // Construire le HTML en une seule opération pour améliorer les performances
-            const skeletonHtml = skeletonLines.map((line) => {
-                if (line.isEmpty) {
-                    return '<div class="skeleton-line" style="width: 5%; height: 0.5em; opacity: 0.3;"></div>';
-                } else {
-                    const widthPercent = Math.min(98, Math.max(15, (line.width / availableWidth) * 100));
-                    return `<div class="skeleton-line" style="width: ${widthPercent}%;"></div>`;
-                }
-            }).join('');
-            
-            $skeleton.append(skeletonHtml);
-        }
-    }
 
-    // Protection contre les doubles soumissions
-    let isTranslating = false;
-    
-    $('form[name="text-translate"]').off('submit').on('submit', function (e) {
-        e.preventDefault();
-        
-        // Protection contre les doubles soumissions
-        if (isTranslating) {
-            return false;
-        }
-        
-        // Vérifications de validation
-        const CHAR_LIMIT = 2000;
-        const textContent = sourceQuill.getText().trim();
-        const htmlContent = sourceQuill.root.innerHTML.trim();
-        const currentCount = textContent.replace(/\n/g, '').length;
-        
-        // Vérifier la limite de caractères
-        if (currentCount > CHAR_LIMIT) {
-            return false;
-        }
-        
-        // Vérifier que le contenu n'est pas vide (texte brut ou HTML vide)
-        const isEmptyHtml = !htmlContent || htmlContent === '<p><br></p>' || htmlContent === '<p></p>';
-        if (!textContent || isEmptyHtml) {
-            return false;
-        }
-        
-        // Démarrage de la traduction
-        isTranslating = true;
-        const $translateBtn = $('#btn-translate');
-        const $translatedText = $('#translated-text');
-        const $translationSkeleton = $('#translation-skeleton');
-        
-        // Préparer le formulaire
-        $('#text').val(htmlContent);
-        const formData = new FormData(this);
-        
-        // Générer et afficher le skeleton
-        generateSkeletonFromText(sourceQuill);
-        $translatedText.addClass('hidden');
-        $translationSkeleton.removeClass('hidden');
-        translatedQuill.root.innerHTML = '';
-        $translateBtn.prop('disabled', true);
-
-        // Envoyer la requête de traduction
-        $.ajax({
-            url: translate,
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-            success: function (response) {
-                translatedQuill.root.innerHTML = response.translated_text[0];
-            },
-            error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
-                $translationSkeleton.addClass('hidden');
-                $translatedText.removeClass('hidden');
-            },
-            complete: function () {
-                // Masquer le skeleton et afficher le résultat
-                $translationSkeleton.addClass('hidden');
-                $translatedText.removeClass('hidden');
-                resizeTextAreas();
-                
-                // Réinitialiser l'état
-                isTranslating = false;
-                validateTranslateButton();
-            }
-        });
-        
-        return false;
-    });
-
-    $("#clear, #clear-source").on("click", function () {
-        translatedQuill.deleteText(0, translatedQuill.getLength());
-        sourceQuill.deleteText(0, sourceQuill.getLength());
-
-        resizeTextAreas();
-        validateTranslateButton();
-    });
-
-
-    $('#copy, .copy').click(function () {
-        var translatedText = translatedQuill.getText();
-        var translatedHtml = translatedQuill.root.innerHTML;
-
-        if (translatedHtml) {
-            if (navigator.clipboard && window.ClipboardItem) {
-                var htmlBlob = new Blob([translatedHtml], { type: 'text/html' });
-                var textBlob = new Blob([translatedText], { type: 'text/plain' });
-                var data = [
-                    new ClipboardItem({
-                        'text/html': htmlBlob,
-                        'text/plain': textBlob
-                    })
-                ];
-
-                navigator.clipboard.write(data).then(function () {
-                    showTooltip();
-                }).catch(function (error) {
-                    console.error('Помилка копіювання: ', error);
-                });
-            } else {
-                console.error('Clipboard API не підтримується у цьому браузері.');
-                alert('Ваш браузер не підтримує Clipboard API. Спробуйте оновити браузер.');
-            }
-        }
-    });
-
-
-    const showTooltip = () => {
-        $('#tooltip').removeClass('invisible opacity-0').addClass('visible opacity-100');
-        setTimeout(function () {
-            $('#tooltip').removeClass('visible opacity-100').addClass('invisible opacity-0');
-        }, 2000);
-    }
-
-    $('#detect-language').click(function () {
-        const sourceText = sourceQuill.getText();
-
-        const data = {text: sourceText}
-
-        $('#main-loader').removeClass('hidden');
-
-        $.ajax({
-            url: detect_text_language,
-            type: 'POST',
-            data: data,
-            dataType: 'json',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Accept': 'application/json',
-            },
-            success: function (response) {
-                const detectedLanguage = response.language.toLowerCase();
-
-                const $select = $('select[name="source_language"]');
-
-                $select.val(detectedLanguage).trigger('change');
-            },
-            error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
-            },
-            complete: function () {
-                $('#main-loader').addClass('hidden');
-            }
-        });
-    });
-
-    function resizeTextAreas() {
-        var $sourceEditor = $("#source-text .ql-editor");
-        var $translatedEditor = $("#translated-text .ql-editor");
-
-        $sourceEditor.css("height", "auto");
-        $translatedEditor.css("height", "auto");
-
-        var maxHeight = Math.max(
-            $sourceEditor[0]?.scrollHeight || 0,
-            $translatedEditor[0]?.scrollHeight || 0
-        );
-
-        maxHeight = Math.max(maxHeight, 400);
-
-        $sourceEditor.css("height", maxHeight + "px");
-        $translatedEditor.css("height", maxHeight + "px");
-    }
-
-    const CHAR_LIMIT = 2000;
-    function getSourceCharCount() {
-        return sourceQuill.getText().replace(/\n/g, '').length;
-    }
-    function updateCharCount() {
-        var count = getSourceCharCount();
-        $('#source-char-count').text(Math.min(count, CHAR_LIMIT));
-    }
-
-    function validateTranslateButton() {
-        const hasSource = $('select[name="source_language"]').val();
-        const hasTarget = $('select[name="target_language"]').val();
-        const hasDomain = $('select[name="domain_name"]').val();
-        const disabled = !(hasSource && hasTarget && hasDomain);
-        $("#btn-translate").prop('disabled', disabled);
-    }
-
-    sourceQuill.on("text-change", function(delta, oldDelta, source){
-        if (source !== 'user') {
-            updateCharCount();
-            validateTranslateButton();
-            return;
-        }
-        var count = getSourceCharCount();
-        if (count > CHAR_LIMIT) {
-            var over = count - CHAR_LIMIT;
-            var sel = sourceQuill.getSelection(true);
-            var deleteIndex = sel ? Math.max(0, sel.index - over) : Math.max(0, sourceQuill.getLength() - 1 - over);
-            sourceQuill.deleteText(deleteIndex, over, 'user');
-            updateCharCount();
-            return;
-        }
-        resizeTextAreas();
-        updateCharCount();
-        validateTranslateButton();
-    });
-    translatedQuill.on("text-change", function(){
-        resizeTextAreas();
-        const hasTranslated = translatedQuill.getText().replace(/\n/g, '').length > 0;
-        if (hasTranslated) {
-            $('#btn-copy').removeClass('hidden');
-        } else {
-            $('#btn-copy').addClass('hidden');
-        }
-    });
-
-    resizeTextAreas();
-    // init état du bouton copier
-    const hasTranslatedInit = translatedQuill.getText().replace(/\n/g, '').length > 0;
-    if (hasTranslatedInit) {
-        $('#btn-copy').removeClass('hidden');
-    } else {
-        $('#btn-copy').addClass('hidden');
-    }
-    updateCharCount();
-    validateTranslateButton();
-});
-
-
-/**
- * MODAL
- */
-document.addEventListener('DOMContentLoaded', function() {
-    // Tronquer proprement le collage au lieu de bloquer complètement
-    const sourceRoot = document.querySelector('#source-text .ql-editor')?.parentElement;
-    if (sourceRoot) {
-        sourceRoot.addEventListener('paste', function (e) {
-            var clipboardData = e.clipboardData || window.clipboardData;
-            if (!clipboardData) return;
-            var text = clipboardData.getData('text');
-            if (typeof text !== 'string') return;
-            var current = (window.sourceQuill || null) ? window.sourceQuill.getText().replace(/\n/g, '').length : getSourceCharCount();
-            var available = 2000 - current;
-            if (available <= 0) {
-                e.preventDefault();
+            if (!logicalLine.length) {
+                if (!isLastLogicalLine) skeletonLines.push({ width: 0.05 * availableWidth, isEmpty: true });
                 return;
             }
-            var toInsert = text.replace(/\r?\n/g, ' ').slice(0, available);
-            e.preventDefault();
-            var sel = (window.sourceQuill || null) ? window.sourceQuill.getSelection(true) : null;
-            if (!sel) sel = { index: (window.sourceQuill || null) ? window.sourceQuill.getLength() : 0, length: 0 };
-            (window.sourceQuill || null) ? window.sourceQuill.insertText(sel.index, toInsert, 'user') : null;
-        }, true);
-    }
-    const modal = document.getElementById('modal');
-    const closeModalBtn = document.getElementById('closeModal');
-    const closeIcon = document.getElementById('closeIcon');
-    const checkbox = document.querySelector('input[type="checkbox"].peer');
 
-    function closeModal() {
-        modal.classList.add('hidden');
-        checkbox.checked = false;
-    }
+            const lineWidth = context.measureText(logicalLine).width;
+            if (lineWidth <= availableWidth) {
+                skeletonLines.push({ width: lineWidth });
+                return;
+            }
 
-    checkbox.addEventListener('change', function() {
-        if (!checkbox.checked) {
-            modal.classList.add('hidden');
-        } else {
-            modal.classList.remove('hidden');
+            const words = logicalLine.split(/\s+/);
+            let currentLineWidth = 0;
+
+            words.forEach((word, index) => {
+                const wordWithSpace = word + (index < words.length - 1 ? ' ' : '');
+                const wordWidth = context.measureText(wordWithSpace).width;
+
+                if (currentLineWidth + wordWidth <= availableWidth) {
+                    currentLineWidth += wordWidth;
+                } else {
+                    if (currentLineWidth > 0) skeletonLines.push({ width: currentLineWidth });
+                    currentLineWidth = wordWidth;
+                }
+            });
+
+            if (currentLineWidth > 0) {
+                skeletonLines.push({ width: currentLineWidth });
+            }
+        });
+
+        while (skeletonLines.length && skeletonLines[skeletonLines.length - 1].isEmpty) {
+            skeletonLines.pop();
         }
-    });
 
-    closeModalBtn?.addEventListener('click', closeModal);
-    closeIcon?.addEventListener('click', closeModal);
-
-    modal?.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeModal();
+        if (!skeletonLines.length) {
+            const sampleWidth = context.measureText(text.substring(0, Math.min(50, text.length))).width;
+            const widthPercent = Math.min(95, Math.max(25, (sampleWidth / availableWidth) * 100));
+            $skeleton.append(`<div class="skeleton-line" style="width: ${widthPercent}%;"></div>`);
+            return;
         }
-    });
+
+        const skeletonHtml = skeletonLines.map((line) => {
+            if (line.isEmpty) {
+                return '<div class="skeleton-line" style="width: 5%; height: 0.5em; opacity: 0.3;"></div>';
+            }
+            const widthPercent = Math.min(98, Math.max(15, (line.width / availableWidth) * 100));
+            return `<div class="skeleton-line" style="width: ${widthPercent}%;"></div>`;
+        }).join('');
+
+        $skeleton.append(skeletonHtml);
+    }
+
+    function refreshInitialUiState() {
+        resizeTextAreas();
+        const hasTranslatedInit = editors.translated.getText().replace(/\n/g, '').length > 0;
+        $('#btn-copy').toggleClass('hidden', !hasTranslatedInit);
+        updateCharCount();
+        validateTranslateButton();
+    }
 });
 
