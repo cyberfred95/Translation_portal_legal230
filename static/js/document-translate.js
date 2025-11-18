@@ -894,7 +894,7 @@ $(document).ready(function () {
                 
                 // Si default_domain === true : masquer la section sous-domaine et utiliser "Generic domain"
                 if (response.default_domain) {
-                    $('#subdomain-section').hide();
+                    $('#subdomain-section').hide().addClass('hidden');
                     $('#glossary-section-number').text('2. ' + (language_code === 'en' ? 'Select a glossary' : 'Sélectionner un glossaire'));
                     selectedSubDomain = 'Generic domain';
                     
@@ -902,7 +902,7 @@ $(document).ready(function () {
                     loadDefaultGlossary();
                 } else {
                     // Sinon, afficher la section sous-domaine
-                    $('#subdomain-section').show();
+                    $('#subdomain-section').show().removeClass('hidden');
                     $('#glossary-section-number').text('3. ' + (language_code === 'en' ? 'Select a glossary' : 'Sélectionner un glossaire'));
                     
                     if (response.data && response.data.length > 0) {
