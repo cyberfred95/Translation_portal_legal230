@@ -97,7 +97,7 @@ def handle_customer_created(payload: dict) -> HttpResponse:
     # Create user and update group information within transaction
     try:
         with transaction.atomic():
-            error_response, user, password = create_user(
+            error_response, user, _ = create_user(
                 stripe_customer_id=stripe_customer_id,
                 email=email,
                 language=language,
@@ -125,20 +125,6 @@ def handle_customer_created(payload: dict) -> HttpResponse:
 
     except Exception as error:
         return exception_error(error)
-
-    # Send welcome email to the new user
-    error_response = send_email(
-        user.email,
-        EmailType.USER_CREATED,
-        user.language,
-        {
-            "lexa_username": user.username,
-            "lexa_email": user.email,
-            "lexa_password": password
-        }
-    )
-    if error_response:
-        return error_response
 
     return success_message("customer_created")
 

@@ -5,9 +5,12 @@ This module handles webhook events related to customer subscription operations,
 including creation, updates, deletions, and trial end notifications for subscriptions.
 """
 
+import random
+import string
+
 from emails.models import EmailType
 from emails.send_email import send_email
-from subscriptions.models import UserSubscription
+from subscriptions.models import SubscriptionType, UserSubscription
 
 from .error.error import HttpResponse, success_message
 from .getter.get_data import (
@@ -96,7 +99,7 @@ def handle_customer_subscription_created(payload: dict) -> HttpResponse:
 
     status = string_to_UserSubscriptionChoices(payload_status)
 
-    error_response, _ = create_userSubscriptions(
+    error_response, userSubscriptions = create_userSubscriptions(
         stripe_customer_id=buyer.stripe_customer_id,
         subscription_type=subscription_type,
         stripe_subscription_id=stripe_subscription_id,
@@ -109,6 +112,8 @@ def handle_customer_subscription_created(payload: dict) -> HttpResponse:
     )
     if error_response:
         return error_response
+
+
 
     if status == UserSubscription.UserSubscriptionChoices.INCOMPLETE:
         for admin in buyer.group.admin.all():
@@ -130,6 +135,43 @@ def handle_customer_subscription_created(payload: dict) -> HttpResponse:
             )
             if error_response:
                 return error_response
+
+    if subscription_type.product_type == SubscriptionType.ProductChoices.LEXA:
+        try:
+            random_password = ''.join(
+                random.choice(string.ascii_letters + string.digits)
+                for _ in range(8)
+            )
+            buyer.set_password(random_password)
+            buyer.save()
+        except Exception as error:
+            return exception_error(error)
+
+        error_response = send_email(
+            buyer.email,
+            EmailType.USER_CREATED,
+            buyer.language,
+            {
+            "lexa_username": buyer.username,
+            "lexa_email": buyer.email,
+            "lexa_password": random_password
+            }
+        )
+        if error_response:
+            return error_response
+    else:
+        error_response = send_email(
+            buyer.email,
+            EmailType.ADDIN_CREATED,
+            buyer.language,
+            {
+            "lexa_username": buyer.username,
+            "lexa_email": buyer.email,
+            "lexa_apikey": userSubscriptions[0].api_key
+            }
+        )
+        if error_response:
+            return error_response
 
     return success_message(
         "customer_subscription_created",
