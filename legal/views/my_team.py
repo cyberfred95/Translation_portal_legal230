@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 
 from django.utils.timezone import now
 from users.models import User
-from subscriptions.models import UserSubscription
+from subscriptions.models import SubscriptionType, UserSubscription
 from subscriptions.permissions import is_user_subscription_active
 
 from emails.models import EmailType
@@ -71,21 +71,38 @@ class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, BaseTemplateView):
                             active_subscription = sub
                             break
                 if active_subscription:
-                    params = {
-                        "email": base64.b64encode(new_email.encode('utf-8')),
-                        "group": base64.b64encode(str(user.group.id).encode('utf-8')) if user.group else None,
-                        "subscription_type_id": base64.b64encode(str(active_subscription.subscription.id).encode('utf-8')),
-                    }
-                    send_email(
-                        new_email,
-                        EmailType.USER_MANAGEMENT_INVITATION,
-                        request.user.language,
-                        {
-                            "lexa_username": user.username,
-                            "lexa_email": new_email,
-                            "url_reset_password": self.get_register_user_absolute_uri(request, params=params),
+                    if active_subscription.subscription.product_type == SubscriptionType.ProductChoices.LEXA:
+                        params = {
+                            "email": base64.b64encode(new_email.encode('utf-8')),
+                            "group": base64.b64encode(str(user.group.id).encode('utf-8')) if user.group else None,
+                            "subscription_type_id": base64.b64encode(str(active_subscription.subscription.id).encode('utf-8')),
                         }
-                    )
+                        send_email(
+                            new_email,
+                            EmailType.USER_MANAGEMENT_INVITATION,
+                            request.user.language,
+                            {
+                                "lexa_username": user.username,
+                                "lexa_email": new_email,
+                                "url_reset_password": self.get_register_user_absolute_uri(request, params=params),
+                            }
+                        )
+                    else:
+                        api_key = active_subscription.api_key
+                        if not api_key:
+                            active_subscription.save()
+                            api_key = active_subscription.api_key
+
+                        send_email(
+                            new_email,
+                            EmailType.ADDIN_CREATED,
+                            request.user.language,
+                            {
+                                "lexa_username": user.username,
+                                "lexa_email": new_email,
+                                "lexa_apikey": api_key
+                            }
+                        )
 
             return redirect('my_team')
 
