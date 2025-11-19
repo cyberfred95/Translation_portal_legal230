@@ -63,6 +63,18 @@
         display: none;
         margin-top: 10px;
     }
+    .actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    #manual-counter {
+        margin-left: 12px;
+        font-weight: bold;
+        color: #155724;
+        display: inline-flex;
+        align-items: center;
+    }
 </style>
 {% endblock %}
 
@@ -88,6 +100,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const activeWithoutStripe = {{ active_without_stripe_count|default:0 }};
     const manualRenewalBtn = document.getElementById('manual-renewal-btn');
     const modal = document.getElementById('renewal-modal');
     const confirmBtn = document.getElementById('confirm-renewal');
@@ -139,6 +152,14 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.appendChild(form);
         form.submit();
     });
+
+    const actionsContainer = document.querySelector('.actions');
+    if (actionsContainer && typeof activeWithoutStripe === 'number') {
+        const counterSpan = document.createElement('span');
+        counterSpan.id = 'manual-counter';
+        counterSpan.textContent = `Abonnement manuel : ${activeWithoutStripe}`;
+        actionsContainer.appendChild(counterSpan);
+    }
 });
 </script>
 {% endblock %}
