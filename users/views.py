@@ -249,6 +249,16 @@ class RegisterUserView(BaseTemplateView):
 class LoginView(BaseTemplateView):
     template_name = 'registration/login.html'
 
+    @staticmethod
+    def _format_errors(errors):
+        messages = []
+        for field, details in errors.items():
+            if isinstance(details, (list, tuple)):
+                messages.extend([str(message) for message in details])
+            else:
+                messages.append(str(details))
+        return messages
+
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=self.request.POST)
         if serializer.is_valid():
@@ -256,7 +266,14 @@ class LoginView(BaseTemplateView):
             user = User.objects.filter(email__iexact=email).first()
             login(request, user)
             return redirect(settings.LOGIN_REDIRECT_URL)
-        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        error_messages = self._format_errors(serializer.errors)
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            detail = error_messages[0] if error_messages else _("An unknown error occurred.")
+            return JsonResponse({"detail": detail}, status=status.HTTP_400_BAD_REQUEST)
+        context = self.get_context_data(**kwargs)
+        context['form_data'] = request.POST
+        context['error_messages'] = error_messages
+        return self.render_to_response(context, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ForgotPasswordView(BaseTemplateView):
