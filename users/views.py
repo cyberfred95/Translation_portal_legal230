@@ -252,7 +252,8 @@ class LoginView(BaseTemplateView):
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=self.request.POST)
         if serializer.is_valid():
-            user = User.objects.filter(email=self.request.POST.get('email')).first()
+            email = serializer.validated_data['email']
+            user = User.objects.filter(email__iexact=email).first()
             login(request, user)
             return redirect(settings.LOGIN_REDIRECT_URL)
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
