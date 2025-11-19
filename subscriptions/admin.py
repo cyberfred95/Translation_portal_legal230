@@ -17,6 +17,18 @@ TRANSLATED_FIELDS = ('translated_symbols_count',
                      'translated_words_count', 'translated_files_count')
 
 
+def get_active_status_values():
+    """
+    Return the list of status values considered active (displayed in green).
+    """
+    active_statuses = []
+    for choice in UserSubscription.UserSubscriptionChoices:
+        value = getattr(choice, 'value', choice)
+        if is_user_subscription_active(value):
+            active_statuses.append(value)
+    return active_statuses
+
+
 @admin.register(CountHistory)
 class CountHistoryAdmin(admin.ModelAdmin):
     list_display = (
@@ -83,6 +95,24 @@ class CountHistoryAdmin(admin.ModelAdmin):
         return False
 
 
+class ActiveWithoutStripeFilter(admin.SimpleListFilter):
+    title = 'Abonnement manuel'
+    parameter_name = 'active_without_stripe'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Abonnement manuel'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            return queryset.filter(
+                status__in=get_active_status_values(),
+                stripe_subscription_id__isnull=True,
+            )
+        return queryset
+
+
 class NoStripeCustomerFilter(admin.SimpleListFilter):
     title = 'User Type'
     parameter_name = 'user_type'
@@ -108,8 +138,8 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
         'truncated_stripe_subscription_id', 'formatted_start_date', 'formatted_end_date'
     )
     list_filter = (
-        NoStripeCustomerFilter, 'status', 'subscription',
-        'start_date', 'end_date'
+        ActiveWithoutStripeFilter, NoStripeCustomerFilter, 'status',
+        'subscription', 'start_date', 'end_date'
     )
     search_fields = (
         'stripe_subscription_id', 'user__email', 'user__username'
@@ -117,6 +147,19 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
     ordering = ('-start_date',)
 
     change_list_template = "admin/subscriptions/usersubscription/change_list.html"
+
+    def changelist_view(self, request, extra_context=None):
+        """
+        Inject custom context for the changelist template, including the number
+        of active subscriptions (green status) without a Stripe ID.
+        """
+        extra_context = extra_context or {}
+        active_statuses = get_active_status_values()
+        extra_context["active_without_stripe_count"] = UserSubscription.objects.filter(
+            status__in=active_statuses,
+            stripe_subscription_id__isnull=True,
+        ).count()
+        return super().changelist_view(request, extra_context=extra_context)
 
     def get_urls(self):
         """Add custom URLs for manual task execution."""
