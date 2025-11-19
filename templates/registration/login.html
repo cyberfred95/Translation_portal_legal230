@@ -26,7 +26,7 @@
             <div class="mb-3">
                 <label class="block text-[#181932] font-semibold text-sm leading-6 tracking-[-0.084px] mb-1">{% trans "Email" %}</label>
                 <div class="relative flex items-center">
-                    <input type="email" id="email" name="email" required placeholder="{% trans 'Email' %}" class="w-full h-10 px-4 pr-12 border border-black/10 rounded-md bg-white text-[#5A5A78] font-normal text-sm leading-6 tracking-[-0.084px] focus:outline-none focus:ring-2 focus:ring-[#052E16] focus:border-transparent" />
+                    <input type="email" id="email" name="email" required placeholder="{% trans 'Email' %}" value="{{ form_data.email|default_if_none:'' }}" class="w-full h-10 px-4 pr-12 border border-black/10 rounded-md bg-white text-[#5A5A78] font-normal text-sm leading-6 tracking-[-0.084px] focus:outline-none focus:ring-2 focus:ring-[#052E16] focus:border-transparent" />
                     <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 flex items-center">
                         <i class="ph ph-pencil-simple text-black/50 text-[24px]"></i>
                     </button>
@@ -43,6 +43,15 @@
                     </button>
                 </div>
             </div>
+            {% if error_messages %}
+            <div class="error-message mb-3 text-sm text-red-500 break-words">
+                {% for message in error_messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="error-message hidden mb-3 text-sm text-red-500 break-words"></div>
+            {% endif %}
             <div class="text-right mb-6">
                 <a href="{% url 'forgot-password' %}" class="text-[#14532D] font-normal text-sm leading-6 tracking-[-0.084px] underline decoration-[#14532D]/20 flex items-center justify-end gap-2">
                     {% trans "I forgot my password" %}

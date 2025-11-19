@@ -90,7 +90,9 @@ class LoginSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if 'email' not in attrs or 'password' not in attrs:
             raise serializers.ValidationError({"detail": "Fill all data for login"})
-        user = User.objects.filter(email=attrs['email']).first()
+        normalized_email = attrs['email'].strip().lower()
+        attrs['email'] = normalized_email
+        user = User.objects.filter(email__iexact=normalized_email).first()
 
         if not user:
             raise serializers.ValidationError({"detail": "That email and password combination didn't work. Try again."})
