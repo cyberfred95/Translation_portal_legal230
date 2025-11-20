@@ -5,19 +5,94 @@ This module contains scheduled tasks for managing user subscriptions,
 including daily renewal processing for non-Stripe subscriptions.
 """
 
+import calendar
 import logging
-import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from celery import shared_task
 from django.utils import timezone
 from django.db import transaction
-from django.conf import settings
 
 from .models import UserSubscription
 from .permissions import is_user_subscription_active
 from stripe_webhooks.tasks_handlers.setter.set_countHistory import reset_subscriptions
 
 logger = logging.getLogger(__name__)
+
+
+def add_one_month_safely(date_value: datetime) -> datetime:
+    """
+    Ajoute un mois en conservant un jour valide (ex: 31 -> 30 si mois suivant plus court).
+    """
+    if date_value.month == 12:
+        target_year = date_value.year + 1
+        target_month = 1
+    else:
+        target_year = date_value.year
+        target_month = date_value.month + 1
+
+    _, last_day = calendar.monthrange(target_year, target_month)
+    target_day = min(date_value.day, last_day)
+    return date_value.replace(year=target_year, month=target_month, day=target_day)
+
+
+def get_offline_subscriptions_to_renew(current_date) -> list[UserSubscription]:
+    """
+    Retourne les souscriptions hors Stripe actives dont la date de fin est aujourd'hui.
+    """
+    offline_subscriptions = UserSubscription.objects.filter(
+        stripe_subscription_id__isnull=True
+    )
+    active_offline_subscriptions = (
+        subscription for subscription in offline_subscriptions
+        if is_user_subscription_active(subscription.status)
+    )
+    return [
+        subscription for subscription in active_offline_subscriptions
+        if subscription.end_date.date() == current_date
+    ]
+
+
+def reset_subscription_counters(subscription: UserSubscription) -> bool:
+    """
+    Réinitialise les compteurs d'une souscription unique via reset_subscriptions.
+    Retourne True si succès, False sinon.
+    """
+    error_response, _ = reset_subscriptions([subscription])
+    if error_response:
+        logger.warning(
+            f"Error during subscription {subscription.id} reset: {error_response}")
+        return False
+    return True
+
+
+def update_subscription_end_date(subscription: UserSubscription) -> datetime:
+    """
+    Calcule et applique la prochaine date de fin pour la souscription fournie.
+    """
+    new_end_date = add_one_month_safely(subscription.end_date)
+    subscription.end_date = new_end_date
+    subscription.save(update_fields=["end_date"])
+    return new_end_date
+
+
+def renew_subscription(subscription: UserSubscription) -> bool:
+    """
+    Réinitialise les compteurs et prolonge la souscription d'un mois.
+    """
+    try:
+        with transaction.atomic():
+            if not reset_subscription_counters(subscription):
+                return False
+
+            new_end_date = update_subscription_end_date(subscription)
+
+        logger.info(
+            f"Subscription {subscription.id} renewed successfully. New end date: {new_end_date}")
+        return True
+    except Exception as exc:
+        logger.error(
+            f"Error processing subscription {subscription.id}: {exc}")
+        return False
 
 
 @shared_task
@@ -34,72 +109,19 @@ def process_daily_subscription_renewals():
     Executed daily at midnight.
     """
     current_date = timezone.now().date()
-
-    # Get UserSubscriptions without stripe_subscription_id and active
-    offline_subscriptions = UserSubscription.objects.filter(
-        stripe_subscription_id__isnull=True
-    )
-
-    # Filter active subscriptions
-    active_offline_subscriptions = [
-        subscription for subscription in offline_subscriptions
-        if is_user_subscription_active(subscription.status)
-    ]
-
-    # Filter those whose end_date corresponds to the current day
-    subscriptions_to_renew = [
-        subscription for subscription in active_offline_subscriptions
-        if subscription.end_date.date() == current_date
-    ]
+    subscriptions_to_renew = get_offline_subscriptions_to_renew(current_date)
 
     renewed_count = 0
     error_count = 0
 
     for subscription in subscriptions_to_renew:
-        try:
-            with transaction.atomic():
-                # Execute reset_subscriptions for this subscription
-                error_response, count_history_list = reset_subscriptions([
-                                                                         subscription])
-
-                if error_response:
-                    error_count += 1
-                    # Only show messages outside of testing
-                    if not ('test' in sys.argv or getattr(settings, 'TESTING', False)):
-                        logger.warning(
-                            f"Error during subscription {subscription.id} reset: {error_response}")
-                    continue
-
-                # Add 1 month to the end_date
-                # Careful calculation to avoid end-of-month issues
-                new_end_date = subscription.end_date
-                if new_end_date.month == 12:
-                    new_end_date = new_end_date.replace(
-                        year=new_end_date.year + 1, month=1)
-                else:
-                    new_end_date = new_end_date.replace(
-                        month=new_end_date.month + 1)
-
-                subscription.end_date = new_end_date
-                subscription.save()
-
-                renewed_count += 1
-                # Only show messages outside of testing
-                if not ('test' in sys.argv or getattr(settings, 'TESTING', False)):
-                    logger.info(
-                        f"Subscription {subscription.id} renewed successfully. New end date: {new_end_date}")
-
-        except Exception as e:
+        if renew_subscription(subscription):
+            renewed_count += 1
+        else:
             error_count += 1
-            # Only show messages outside of testing
-            if not ('test' in sys.argv or getattr(settings, 'TESTING', False)):
-                logger.error(
-                    f"Error processing subscription {subscription.id}: {str(e)}")
 
-    # Only show messages outside of testing
-    if not ('test' in sys.argv or getattr(settings, 'TESTING', False)):
-        logger.info(
-            f"Processing completed. {renewed_count} subscriptions renewed, {error_count} errors.")
+    logger.info(
+        f"Processing completed. {renewed_count} subscriptions renewed, {error_count} errors.")
     return {
         'renewed_count': renewed_count,
         'error_count': error_count,
