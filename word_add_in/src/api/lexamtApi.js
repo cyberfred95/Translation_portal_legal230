@@ -2,12 +2,14 @@
 // Toutes les fonctions ici gèrent les appels réseau à l'API Lexa
 
 // Configuration de l'environnement
-const TEST = false;
-const URL = 'portail.lexamt.fr/api/'
 const API_VERSION = 'v1/';
 
-const URL_TEST = TEST ? 'test.' : ''
-const BASE_URL = `https://${URL_TEST}${URL}${API_VERSION}`;
+function getBaseUrl() {
+  // L'API est toujours sur le même domaine que l'add-in
+  return `https://${window.location.hostname}/api/${API_VERSION}`;
+}
+
+const BASE_URL = getBaseUrl();
 
 async function fetchWithApiKey(url, apiKey) {
   const response = await fetch(url, {
@@ -17,7 +19,7 @@ async function fetchWithApiKey(url, apiKey) {
   try {
     const clone = response.clone();
     debugJson = await clone.json();
-  } catch {}
+  } catch { }
   if (!response.ok) {
     const error = new Error();
     error.status = response.status;
@@ -98,4 +100,46 @@ export async function callLexaAPI(apiKey, text, sourceLang, targetLang, domain) 
   }
   const result = await response.json();
   return result.translated_text;
+}
+
+/**
+ * Récupère l'URL du portail client Stripe.
+ * @param {string} apiKey - La clé API.
+ * @returns {Promise<string>} - L'URL du portail.
+ */
+export async function getPortalUrl(apiKey) {
+  const response = await fetch(`${BASE_URL}stripe-portal-session/`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    // Propager le message d'erreur du backend
+    throw new Error(error.detail || "Erreur lors de la récupération du lien d'abonnement.");
+  }
+
+  const result = await response.json();
+  return result.url;
+}
+
+/**
+ * Vérifie si l'utilisateur a un abonnement Stripe actif.
+ * @param {string} apiKey - La clé API.
+ * @returns {Promise<boolean>} - true si l'utilisateur a un abonnement, false sinon.
+ */
+export async function checkSubscriptionStatus(apiKey) {
+  try {
+    const response = await fetch(`${BASE_URL}stripe-portal-session/?check_only=true`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+    });
+    return response.ok;
+  } catch (error) {
+    return false;
+  }
 } 

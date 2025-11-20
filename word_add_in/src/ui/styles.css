@@ -137,6 +137,39 @@ select:focus, input:focus, textarea:focus {
     opacity: 0.6;
 }
 
+.stripe-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #635BFF, #5548E8);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+}
+
+.stripe-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #5548E8, #4A3FD1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 91, 255, 0.3);
+}
+
+.stripe-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.6;
+}
+
+.subscription-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
 .loading {
     display: none;
     text-align: center;
