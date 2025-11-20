@@ -56,6 +56,27 @@ def extract_and_validate_api_key(auth_header):
     return api_key, None
 
 
+def get_api_user_subscription(request):
+    """
+    Get the UserSubscription associated with the provided API key.
+    """
+    auth_header = request.headers.get('Authorization')
+
+    # Extract and validate API key
+    api_key, error = extract_and_validate_api_key(auth_header)
+    if error:
+        return None, error
+
+    user_subscriptions = UserSubscription.objects.select_related('subscription').filter(api_key=api_key)
+    
+    if not user_subscriptions.exists():
+        return None, NO_ACTIVE_SUBSCRIPTION
+    if user_subscriptions.count() > 1:
+        return None, MULTIPLE_ACTIVE_SUBSCRIPTIONS
+
+    return user_subscriptions.first(), None
+
+
 def get_api_user(request):
     """
     Get user from API key authentication.
@@ -66,22 +87,9 @@ def get_api_user(request):
     Returns:
         tuple: (user, error_message) where error_message is None on success
     """
-    auth_header = request.headers.get('Authorization')
-
-    # Extract and validate API key
-    api_key, error = extract_and_validate_api_key(auth_header)
+    user_subscription, error = get_api_user_subscription(request)
     if error:
         return None, error
-
-    # Find user subscriptions by API key
-    user_subscriptions = UserSubscription.objects.filter(api_key=api_key)
-    
-    if not user_subscriptions.exists():
-        return None, NO_ACTIVE_SUBSCRIPTION
-    if user_subscriptions.count() > 1:
-        return None, MULTIPLE_ACTIVE_SUBSCRIPTIONS
-
-    user_subscription = user_subscriptions.first()
     
     # Check if the subscription product type is supported for API auth
     if user_subscription.subscription.product_type not in [

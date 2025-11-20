@@ -14,6 +14,7 @@ from .views.domain import DomainListAPIView, DomainDefaultGlossariesAPIView
 from .views.glossary import GlossaryAPIView, GlossaryExistAPIView
 from .views.language import LanguageAPIView
 from .views.translate import TranslateAPIView
+from .views.stripe import StripePortalSessionView
 
 
 # API version configuration
@@ -61,5 +62,12 @@ urlpatterns = [
         API_VERSION + 'translate/',
         TranslateAPIView.as_view(),
         name='api-translate'
+    ),
+
+    # Stripe endpoints
+    path(
+        API_VERSION + 'stripe-portal-session/',
+        StripePortalSessionView.as_view(),
+        name='api-stripe-portal-session'
     ),
 ]

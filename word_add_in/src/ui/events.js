@@ -2,7 +2,7 @@
 
 import { showSettingsView, showMainView, setTestResult, showError } from './dom.js';
 import { getApiKey, setApiKey } from '../utils/storage.js';
-import { testApiKey, loadLanguages, loadDomains, callLexaAPI } from '../api/lexamtApi.js';
+import { testApiKey, loadLanguages, loadDomains, callLexaAPI, getPortalUrl, checkSubscriptionStatus } from '../api/lexamtApi.js';
 import { populateSelect } from '../utils/helpers.js';
 import { handleSelectionChange as wordHandleSelectionChange } from '../office/word.js';
 import { setSourceLang, setTargetLang, setSelectedDomain } from '../utils/storage.js';
@@ -127,8 +127,8 @@ const convertOoxmlToHtml = (ooxml) => {
             // Essayer d'abord w:ascii, puis w:hAnsi, puis w:cs
             const fontNode = rFontsNodes[0];
             const fontFamily = fontNode.getAttribute('w:ascii') ||
-                             fontNode.getAttribute('w:hAnsi') ||
-                             fontNode.getAttribute('w:cs');
+              fontNode.getAttribute('w:hAnsi') ||
+              fontNode.getAttribute('w:cs');
             if (fontFamily) {
               styles.fontFamily = fontFamily;
             }
@@ -242,8 +242,20 @@ export function initializeUIEvents() {
         showMainView();
       } else {
         showSettingsView();
+        // Vérifier la visibilité du bouton Stripe
+        try {
+          updateSubscriptionButtonVisibility();
+        } catch (error) {
+          console.error("Erreur lors de la mise à jour de la visibilité du bouton abonnement:", error);
+        }
       }
     });
+  }
+
+  // Listener pour le bouton Stripe
+  const stripeBtn = document.getElementById("stripe-subscription-btn");
+  if (stripeBtn) {
+    stripeBtn.addEventListener("click", onManageSubscription);
   }
 
   if (saveApiKeyBtn) saveApiKeyBtn.addEventListener("click", onSaveApiKey);
@@ -317,6 +329,8 @@ function onSaveApiKey() {
     successMessage.style.display = "block";
     // Ne pas recharger automatiquement les langues et domaines depuis la vue paramètres
     // L'utilisateur peut tester la clé ou retourner à l'accueil où les langues seront chargées
+    // Vérifier la visibilité du bouton Stripe
+    updateSubscriptionButtonVisibility();
   }
 }
 
@@ -425,8 +439,8 @@ async function insertTranslationWithoutReplace() {
           const placeholderText = getPlaceholderText();
           const loadingText = getLoadingText();
           const isValid = translatedHtmlForWord && translatedHtmlForWord.trim() &&
-                         translatedHtmlForWord !== placeholderText &&
-                         !translatedHtmlForWord.startsWith(loadingText);
+            translatedHtmlForWord !== placeholderText &&
+            !translatedHtmlForWord.startsWith(loadingText);
           if (replaceBtn) replaceBtn.disabled = !isValid;
           updateReplaceBtnState();
           console.log("[Traduction] Bouton de remplacement activé :", !replaceBtn.disabled);
@@ -460,8 +474,8 @@ async function replaceSelectionWithTranslationBox() {
   const placeholderText = getPlaceholderText();
   const loadingText = getLoadingText();
   const isValid = translatedHtmlForWord && translatedHtmlForWord.trim() &&
-                 translatedHtmlForWord !== placeholderText &&
-                 !translatedHtmlForWord.startsWith(loadingText);
+    translatedHtmlForWord !== placeholderText &&
+    !translatedHtmlForWord.startsWith(loadingText);
   console.log("[Remplacement] Validation du HTML :", isValid);
 
   if (!isValid) {
@@ -500,7 +514,71 @@ export function updateReplaceBtnState() {
   const placeholderText = getPlaceholderText();
   const loadingText = getLoadingText();
   const hasValidTranslation = translatedHtmlForWord && translatedHtmlForWord.trim() &&
-                              translatedHtmlForWord !== placeholderText &&
-                              !translatedHtmlForWord.startsWith(loadingText);
+    translatedHtmlForWord !== placeholderText &&
+    !translatedHtmlForWord.startsWith(loadingText);
   return hasValidTranslation;
+}
+
+/**
+ * Gère le clic sur le bouton "Gérer mon abonnement Stripe"
+ */
+async function onManageSubscription() {
+  const apiKey = getApiKey();
+  const stripeBtn = document.getElementById("stripe-subscription-btn");
+  const stripeError = document.getElementById("stripe-error");
+  const i18n = getI18n();
+
+  if (!apiKey) {
+    stripeError.textContent = i18n ? i18n.t('ui.noApiKey') : "Aucune clé API configurée.";
+    stripeError.style.display = "block";
+    return;
+  }
+
+  // Afficher l'état de chargement
+  stripeBtn.disabled = true;
+  stripeBtn.textContent = i18n ? i18n.t('ui.subscriptionLoading') : "Chargement...";
+  stripeError.style.display = "none";
+
+  try {
+    const portalUrl = await getPortalUrl(apiKey);
+
+    // Ouvrir l'URL dans une nouvelle fenêtre
+    
+    window.open(portalUrl, '_blank');
+    
+  } catch (error) {
+    // Gérer spécifiquement le cas "pas d'abonnement Stripe"
+    if (error.message && (error.message.includes("no_stripe_customer") || error.message.includes("Aucun abonnement Stripe"))) {
+      stripeError.textContent = i18n ? i18n.t('ui.noStripeSubscription') : "Aucun abonnement Stripe associé. Contactez support@lexamt.com";
+    } else {
+      stripeError.textContent = error.message || (i18n ? i18n.t('ui.subscriptionError') : "Erreur lors de la récupération du lien d'abonnement.");
+    }
+    stripeError.style.display = "block";
+  } finally {
+    // Restaurer le bouton
+    stripeBtn.disabled = false;
+    stripeBtn.textContent = i18n ? i18n.t('ui.manageSubscription') : 'Gérer mon abonnement';
+  }
+}
+
+/**
+ * Met à jour la visibilité du bouton d'abonnement Stripe
+ */
+async function updateSubscriptionButtonVisibility() {
+  const apiKey = getApiKey();
+  const section = document.getElementById("subscription-section");
+
+  if (!section) return;
+
+  if (!apiKey) {
+    section.style.display = "none";
+    return;
+  }
+
+  const hasSubscription = await checkSubscriptionStatus(apiKey);
+  if (hasSubscription) {
+    section.style.display = "block";
+  } else {
+    section.style.display = "none";
+  }
 } 
