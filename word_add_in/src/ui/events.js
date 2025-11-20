@@ -543,11 +543,9 @@ async function onManageSubscription() {
     const portalUrl = await getPortalUrl(apiKey);
 
     // Ouvrir l'URL dans une nouvelle fenêtre
-    if (typeof Office !== 'undefined' && Office.context && Office.context.ui) {
-      Office.context.ui.openBrowserWindow(portalUrl);
-    } else {
-      window.open(portalUrl, '_blank');
-    }
+    
+    window.open(portalUrl, '_blank');
+    
   } catch (error) {
     // Gérer spécifiquement le cas "pas d'abonnement Stripe"
     if (error.message && (error.message.includes("no_stripe_customer") || error.message.includes("Aucun abonnement Stripe"))) {

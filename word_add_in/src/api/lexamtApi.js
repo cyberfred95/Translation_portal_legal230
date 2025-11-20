@@ -138,7 +138,15 @@ export async function checkSubscriptionStatus(apiKey) {
         Authorization: `Bearer ${apiKey}`,
       },
     });
-    return response.ok;
+    if (!response.ok) {
+      return false;
+    }
+    try {
+      const result = await response.json();
+      return Boolean(result && result.status);
+    } catch (error) {
+      return false;
+    }
   } catch (error) {
     return false;
   }
