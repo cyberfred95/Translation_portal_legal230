@@ -506,8 +506,11 @@ $(document).ready(function () {
             const clipboardData = event.clipboardData || window.clipboardData;
             if (!clipboardData) return;
 
-            const text = clipboardData.getData('text');
-            if (typeof text !== 'string') return;
+            // Tenter de récupérer le HTML formaté d'abord
+            let htmlContent = clipboardData.getData('text/html');
+            const textContent = clipboardData.getData('text');
+            
+            if (!textContent || typeof textContent !== 'string') return;
 
             const current = getSourceCharCount();
             const available = CHAR_LIMIT - current;
@@ -517,11 +520,33 @@ $(document).ready(function () {
                 return;
             }
 
-            const toInsert = text.replace(/\r?\n/g, ' ').slice(0, available);
             event.preventDefault();
 
             const selection = editors.source.getSelection(true) || { index: editors.source.getLength(), length: 0 };
+            
+            // Si du contenu HTML est disponible et valide, l'utiliser pour conserver le formatage
+            if (htmlContent && typeof htmlContent === 'string' && htmlContent.trim()) {
+                // Vérifier la longueur du texte et tronquer si nécessaire
+                const textLength = textContent.replace(/\r?\n/g, ' ').length;
+                
+                if (textLength > available) {
+                    // Si le contenu dépasse la limite, utiliser le texte brut tronqué
+                    const toInsert = textContent.replace(/\r?\n/g, ' ').slice(0, available);
+                    editors.source.insertText(selection.index, toInsert, 'user');
+                } else {
+                    // Insérer le HTML formaté en conservant le style
+                    // Supprimer d'abord la sélection s'il y en a une
+                    if (selection.length > 0) {
+                        editors.source.deleteText(selection.index, selection.length, 'user');
+                    }
+                    // Utiliser dangerouslyPasteHTML pour insérer le HTML avec formatage
+                    editors.source.clipboard.dangerouslyPasteHTML(selection.index, htmlContent, 'user');
+                }
+            } else {
+                // Fallback : utiliser le texte brut si pas de HTML disponible
+                const toInsert = textContent.replace(/\r?\n/g, ' ').slice(0, available);
             editors.source.insertText(selection.index, toInsert, 'user');
+            }
         }, true);
     }
 
