@@ -568,6 +568,7 @@
   font-family: 'Montserrat', sans-serif;
   font-size: 16px;
   line-height: 1.42;
+  z-index: 10;
 }
 
 .text-translate-editor-translated.hidden {
