@@ -393,14 +393,14 @@ $(document).ready(function () {
 
     function generateSkeleton() {
         buildSkeletonFromSource();
-        $els.translatedText.addClass('hidden');
+        $els.translatedText.css({ visibility: 'hidden' });
         $els.translationSkeleton.removeClass('hidden');
         editors.translated.root.innerHTML = '';
     }
 
     function showTranslationResult() {
         $els.translationSkeleton.addClass('hidden');
-        $els.translatedText.removeClass('hidden');
+        $els.translatedText.css({ visibility: 'visible' });
     }
 
     function bindClearButtons() {
