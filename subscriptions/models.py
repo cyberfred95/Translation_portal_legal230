@@ -207,3 +207,18 @@ class CountHistory(models.Model):
 
     def __str__(self):
         return f"History for {self.user_subscription} at {self.start_date}"
+
+
+class CountMetered(models.Model):
+    date = models.DateField()
+    user_subscription = models.ForeignKey(
+        UserSubscription, on_delete=models.CASCADE, related_name='count_metered')
+    reported = models.BooleanField(default=False)
+    daily_translated_symbols_count = models.IntegerField(default=0)
+    daily_translated_words_count = models.IntegerField(default=0)
+    daily_translated_files_count = models.IntegerField(default=0)
+
+    def __str__(self):
+        return (
+            f"Metered usage for {self.user_subscription} on {self.date}"
+        )
