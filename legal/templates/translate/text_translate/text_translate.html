@@ -116,5 +116,31 @@
                 </div>
             </div>
         </div>
+
+        <!-- Zone instructions personnalisées (pleine largeur sous les éditeurs) -->
+        <div class="text-translate-instructions-row">
+            <label for="translation-instructions" class="text-translate-field-label">
+                {% trans 'Custom translation instructions' %}
+            </label>
+            <textarea
+                id="translation-instructions"
+                name="instructions"
+                class="text-translate-instructions-textarea"
+                placeholder="{% trans 'e.g., Use formal legal tone, Preserve Latin terms, etc.' %}"
+                rows="2"
+                maxlength="1000"
+            ></textarea>
+        </div>
+
+        <!-- Zone retour qualité (pleine largeur, lecture seule) -->
+        <div id="quality-feedback-row" class="text-translate-quality-row hidden">
+            <label class="text-translate-field-label">
+                {% trans 'Translation quality feedback' %}
+            </label>
+            <div id="quality-feedback-content" class="text-translate-quality-content">
+                <span id="quality-comments-text"></span>
+            </div>
+        </div>
+
     </form>
 </div>
