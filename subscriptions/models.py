@@ -75,6 +75,13 @@ class UserSubscription(models.Model):
         max_length=255, choices=UserSubscriptionChoices.choices)
     stripe_subscription_id = models.CharField(
         max_length=32, verbose_name="Stripe Subscription ID", null=True, blank=True)
+    stripe_subscription_item_id = models.CharField(
+        max_length=64,
+        verbose_name="Stripe Subscription Item ID",
+        null=True,
+        blank=True,
+        help_text="Identifiant Stripe de l'item metered associé",
+    )
     api_key = models.CharField(
         max_length=256, 
         blank=True, 

@@ -41,6 +41,8 @@ def translation_allowed(request, symbols_count: int, words_count: int, files_cou
             return True
         else:
             return False
+
+
 def add_translations(request, words_count: int, symbols_count: int, files_count: int = None):
     if not request.user.group:
         return

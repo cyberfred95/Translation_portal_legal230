@@ -240,6 +240,10 @@ CELERY_BEAT_SCHEDULE = {
     'process_daily_subscription_renewals': {
         'task': 'subscriptions.tasks.process_daily_subscription_renewals',
         'schedule': crontab(minute="0", hour="0")
+    },
+    'report_daily_metered_usage': {
+        'task': 'subscriptions.tasks.report_daily_metered_usage',
+        'schedule': crontab(minute="5", hour="0")
     }
 }
 
