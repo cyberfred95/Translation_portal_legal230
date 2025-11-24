@@ -5,6 +5,7 @@ This module contains tests for getter functions used to retrieve data from
 the database and payload parsing functions.
 """
 
+import copy
 from unittest.mock import patch
 
 from django.test import TestCase
@@ -31,6 +32,7 @@ from stripe_webhooks.tasks_handlers.getter.get_payload import (
     get_item_data_current_period_start,
     get_item_data_product_id,
     get_item_data_quantity,
+    get_item_data_subscription_item_id,
 )
 from stripe_webhooks.tests.settings import (
     ENGLISH_LANG_CODE,
@@ -41,6 +43,7 @@ from stripe_webhooks.tests.settings import (
     ERROR_NOT_FOUND_NAME,
     ERROR_NOT_FOUND_STATUS,
     ERROR_NOT_FOUND_SUBSCRIPTION_TYPE,
+    ERROR_NOT_FOUND_SUBSCRIPTION_ITEM_ID,
     ERROR_NOT_FOUND_USER,
     ERROR_NOT_FOUND_USER_GROUP,
     ERROR_NOT_FOUND_USER_SUBSCRIPTION,
@@ -60,6 +63,7 @@ from stripe_webhooks.tests.settings import (
     TEST_PASSWORD,
     TEST_STRIPE_CUSTOMER_ID,
     TEST_STRIPE_PRODUCT_ID,
+    TEST_SUBSCRIPTION_ITEM_ID,
     TEST_STRIPE_SUBSCRIPTION_ID,
     TEST_SUBSCRIPTION_NAME,
     TEST_SUBSCRIPTION_PAYLOAD,
@@ -377,3 +381,22 @@ class GetPayloadTestCase(TestCase):
         self.assertIsNotNone(error)
         self.assertIsNone(customer_id)
         self.assertEqual(error.code, 400)  # bad request code
+
+    def test_get_item_data_subscription_item_id_success(self):
+        """Test successful extraction of subscription item id from item data."""
+        item_data = copy.deepcopy(TEST_SUBSCRIPTION_PAYLOAD['items']['data'][0])
+        error, subscription_item_id = get_item_data_subscription_item_id(item_data)
+
+        self.assertIsNone(error)
+        self.assertEqual(subscription_item_id, TEST_SUBSCRIPTION_ITEM_ID)
+
+    def test_get_item_data_subscription_item_id_missing(self):
+        """Test error when subscription item id is missing."""
+        item_data = copy.deepcopy(TEST_SUBSCRIPTION_PAYLOAD['items']['data'][0])
+        item_data.pop('id', None)
+
+        error, subscription_item_id = get_item_data_subscription_item_id(item_data)
+
+        self.assertIsNotNone(error)
+        self.assertIsNone(subscription_item_id)
+        self.assertEqual(error.code, 400)

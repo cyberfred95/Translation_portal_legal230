@@ -348,6 +348,7 @@ class SetUserSubscriptionTestCase(TestCase):
         self.assertEqual(subscription.stripe_subscription_id,
                          TEST_STRIPE_SUBSCRIPTION_ID)
         self.assertEqual(subscription.status, SUBSCRIPTION_STATUS_ACTIVE)
+        self.assertEqual(subscription.stripe_subscription_item_id, "si_test")
 
     @patch('stripe_webhooks.tasks_handlers.setter.set_userSubscription.UserSubscription.objects.create')
     def test_create_userSubscriptions_exception_handling(self, mock_create):
@@ -403,6 +404,7 @@ class SetUserSubscriptionTestCase(TestCase):
         self.assertTrue(changed)
         subscription.refresh_from_db()
         self.assertEqual(subscription.status, SUBSCRIPTION_STATUS_CANCELED)
+        self.assertEqual(subscription.stripe_subscription_item_id, "si_updated")
 
     def test_deactivate_userSubscription_success(self):
         """Test successful user subscription deactivation."""
