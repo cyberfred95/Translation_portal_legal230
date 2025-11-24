@@ -262,6 +262,13 @@ def get_item_data_current_period_start(item_data: dict) -> tuple[HttpResponse | 
     return None, dateTime_date
 
 
+def get_item_data_subscription_item_id(item_data: dict) -> tuple[HttpResponse | None, str | None]:
+    subscription_item_id = item_data.get('id')
+    if not subscription_item_id:
+        return error_message("not_found_subscription_item_id"), None
+    return None, subscription_item_id
+
+
 def get_item_data_current_period_end(item_data: dict) -> tuple[HttpResponse | None, datetime | None]:
     """
     Extract and convert current_period_end timestamp from item data.

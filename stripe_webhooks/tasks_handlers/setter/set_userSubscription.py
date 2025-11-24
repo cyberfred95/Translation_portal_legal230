@@ -22,6 +22,7 @@ def create_userSubscriptions(
     stripe_customer_id: str,
     subscription_type: SubscriptionType,
     stripe_subscription_id: str,
+    stripe_subscription_item_id: str,
     start_time: datetime,
     end_time: datetime,
     status: str,
@@ -72,6 +73,7 @@ def create_userSubscriptions(
                     user=user,
                     subscription=subscription_type,
                     stripe_subscription_id=stripe_subscription_id,
+                    stripe_subscription_item_id=stripe_subscription_item_id,
                     start_date=start_time,
                     end_date=end_time,
                     status=status
@@ -93,15 +95,15 @@ def set_new_userSubscription_list_values(
     """
     Update a list of user subscriptions with new values.
 
-    This function updates subscription end dates and statuses for multiple
-    subscriptions. It tracks which email types should be sent based on
+    This function updates subscription end dates, statuses, and Stripe item IDs
+    for multiple subscriptions. It tracks which email types should be sent based on
     status changes and whether any changes were made.
 
     Args:
         userSubscription_list (list[UserSubscription]): List of subscriptions
                                                         to update.
         new_values (dict): Dictionary containing new values to apply.
-                          Can include 'end_date' and 'status' keys.
+                          Can include 'end_date', 'status', and 'stripe_subscription_item_id'.
 
     Returns:
         tuple[HttpResponse | None, list[EmailType], bool]: Error response,
@@ -127,6 +129,11 @@ def set_new_userSubscription_list_values(
             if ('status' in new_values and
                     new_values['status'] != user_subscription.status):
                 user_subscription.status = new_values['status']
+                changed = True
+
+            if ('stripe_subscription_item_id' in new_values and
+                    new_values['stripe_subscription_item_id'] != user_subscription.stripe_subscription_item_id):
+                user_subscription.stripe_subscription_item_id = new_values['stripe_subscription_item_id']
                 changed = True
 
             if changed:

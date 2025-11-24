@@ -330,6 +330,7 @@ class SetUserSubscriptionTestCase(TestCase):
             stripe_customer_id=TEST_STRIPE_CUSTOMER_ID,
             subscription_type=self.subscription_type,
             stripe_subscription_id=TEST_STRIPE_SUBSCRIPTION_ID,
+            stripe_subscription_item_id="si_test",
             start_time=start_date,
             end_time=end_date,
             status=SUBSCRIPTION_STATUS_ACTIVE,
@@ -361,6 +362,7 @@ class SetUserSubscriptionTestCase(TestCase):
             stripe_customer_id=TEST_STRIPE_CUSTOMER_ID,
             subscription_type=self.subscription_type,
             stripe_subscription_id=TEST_STRIPE_SUBSCRIPTION_ID,
+            stripe_subscription_item_id="si_test",
             start_time=start_date,
             end_time=end_date,
             status=SUBSCRIPTION_STATUS_ACTIVE,
@@ -389,7 +391,8 @@ class SetUserSubscriptionTestCase(TestCase):
         new_end_date = datetime.now(dt_timezone.utc)
         new_values = {
             'end_date': new_end_date,
-            'status': SUBSCRIPTION_STATUS_CANCELED
+            'status': SUBSCRIPTION_STATUS_CANCELED,
+            'stripe_subscription_item_id': "si_updated",
         }
 
         error, email_types, changed = set_new_userSubscription_list_values(
