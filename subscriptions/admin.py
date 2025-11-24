@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db import models
-from .models import SubscriptionType, UserSubscription, CountHistory
+from .models import SubscriptionType, UserSubscription, CountHistory, CountMetered
 from .tasks import process_daily_subscription_renewals
 from .permissions import is_user_subscription_active
 from legal.admin.utils import create_clickable_link
@@ -93,6 +93,27 @@ class CountHistoryAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+
+@admin.register(CountMetered)
+class CountMeteredAdmin(admin.ModelAdmin):
+    list_display = (
+        'date',
+        'user_subscription',
+        'reported',
+        'stripe_usage_record_id',
+        'daily_translated_symbols_count',
+        'daily_translated_words_count',
+        'daily_translated_files_count',
+    )
+    list_filter = ('date', 'reported')
+    search_fields = ('user_subscription__user__email', 'stripe_usage_record_id')
+    autocomplete_fields = ('user_subscription',)
+    readonly_fields = (
+        'daily_translated_symbols_count',
+        'daily_translated_words_count',
+        'daily_translated_files_count',
+    )
 
 
 class ActiveWithoutStripeFilter(admin.SimpleListFilter):
