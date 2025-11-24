@@ -156,42 +156,87 @@ class UserSubscription(models.Model):
             return None
 
     def save(self, *args, **kwargs):
-        if self.subscription:
-            self.max_files_count = self.subscription.max_files_count
-            self.max_words_count = self.subscription.max_words_count
-            self.max_symbols_count = self.subscription.max_symbols_count
-            self.custom_glossaries_count = self.subscription.custom_glossaries_count
-            self.access_to_writing = self.subscription.access_to_writing
-            self.access_to_official_glossaries = self.subscription.access_to_official_glossaries
-            self.access_to_sso = self.subscription.access_to_sso
-        
-        # Auto-generate API key if empty AND subscription is active
-        needs_api_key = (
-            not self.api_key and 
-            self.is_active()
-        )
-        
-        if needs_api_key:
-            # First save to get an ID
-            super().save(*args, **kwargs)
-            
-            # Now generate API key using the subscription ID
-            generated_key = self.create_api_key()
-            if generated_key:
-                self.api_key = generated_key
-            else:
-                # Fallback to UUID if API call fails
-                self.api_key = str(uuid.uuid4())
-            
-            # Save again with the API key
-            super().save()
-        else:
-            # Normal save if API key already exists or not needed
-            super().save(*args, **kwargs)
+        self._sync_limits_from_subscription()
+        needs_api_key = self._needs_api_key_generation()
+
+        super().save(*args, **kwargs)
+
+        if needs_api_key and not self.api_key:
+            self._assign_api_key()
+
+        self._ensure_today_metered_exists()
 
     def clean(self):
         if self.user.subscriptions.all().exclude(id=self.id).exists():
             raise ValidationError("Subscription for this user already exists")
+
+    def get_today_count_metered(self):
+        """
+        Retourne le CountMetered déjà créé pour aujourd'hui.
+        L'appelant est responsable de créer l'entrée s'il n'en existe pas.
+        Lève une ValueError si plusieurs enregistrements existent pour la même date.
+        """
+        today = now().date()
+        entries = list(
+            self.count_metered.filter(date=today).order_by('-reported', '-id')[:2]
+        )
+
+        if len(entries) > 1:
+            raise ValueError(
+                f"Multiple CountMetered entries found for {today} on subscription {self.pk}."
+            )
+
+        return entries[0] if entries else None
+
+    def ensure_api_count_metered(self):
+        """
+        Crée un CountMetered pour aujourd'hui si la souscription est de type API.
+        """
+        if not self.subscription:
+            raise ValueError("Cannot create CountMetered because subscription is missing.")
+
+        if self.subscription.product_type != SubscriptionType.ProductChoices.API:
+            return
+
+        today = now().date()
+        CountMetered.objects.get_or_create(
+            user_subscription=self,
+            date=today,
+            defaults={'reported': None},
+        )
+
+    def _sync_limits_from_subscription(self):
+        if not self.subscription:
+            return
+
+        self.max_files_count = self.subscription.max_files_count
+        self.max_words_count = self.subscription.max_words_count
+        self.max_symbols_count = self.subscription.max_symbols_count
+        self.custom_glossaries_count = self.subscription.custom_glossaries_count
+        self.access_to_writing = self.subscription.access_to_writing
+        self.access_to_official_glossaries = self.subscription.access_to_official_glossaries
+        self.access_to_sso = self.subscription.access_to_sso
+
+    def _needs_api_key_generation(self):
+        return not self.api_key and self.is_active()
+
+    def _assign_api_key(self):
+        generated_key = self.create_api_key()
+        self.api_key = generated_key or str(uuid.uuid4())
+        super(UserSubscription, self).save(update_fields=['api_key'])
+
+    def _should_track_api_usage(self):
+        return (
+            self.subscription
+            and self.subscription.product_type == SubscriptionType.ProductChoices.API
+        )
+
+    def _ensure_today_metered_exists(self):
+        if not self._should_track_api_usage():
+            return
+
+        if self.get_today_count_metered() is None:
+            self.ensure_api_count_metered()
 
 
 # New model for counter history
@@ -213,7 +258,15 @@ class CountMetered(models.Model):
     date = models.DateField()
     user_subscription = models.ForeignKey(
         UserSubscription, on_delete=models.CASCADE, related_name='count_metered')
-    reported = models.BooleanField(default=False)
+    reported = models.DateField(
+        null=True, blank=True, 
+        verbose_name="Reported Date",
+    )
+    stripe_usage_record_id = models.CharField(
+        max_length=255, 
+        null=True, blank=True,
+        verbose_name="Stripe Usage Record ID",
+    )
     daily_translated_symbols_count = models.IntegerField(default=0)
     daily_translated_words_count = models.IntegerField(default=0)
     daily_translated_files_count = models.IntegerField(default=0)
@@ -222,3 +275,11 @@ class CountMetered(models.Model):
         return (
             f"Metered usage for {self.user_subscription} on {self.date}"
         )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user_subscription', 'date'],
+                name='unique_metered_usage_per_day'
+            ),
+        ]
