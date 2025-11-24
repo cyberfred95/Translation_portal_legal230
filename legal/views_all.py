@@ -3,6 +3,7 @@ import json
 import os
 import re
 import time
+import logging
 from datetime import datetime
 from decimal import Decimal
 from io import BytesIO
@@ -78,32 +79,165 @@ CACHE_TTL = 3600
 
 
 def text_translation(request):
+    """
+    Text translation using LARA Translation API.
+
+    Flow:
+    1. Call /api/templates/find to get translation memory and glossary IDs (optional)
+    2. Call /api/lara/translate-text with the text and optional parameters
+    """
+    logger = logging.getLogger(__name__)
+    
     text = request.POST.get('text')
+    instructions = request.POST.get('instructions', '')
     words_count = get_word_count(text)
     symbols_count = len(text)
-    if translation_allowed(request=request, words_count=words_count, symbols_count=symbols_count):
+    
+    user_id = request.user.id if request.user.is_authenticated else 'anonymous'
+    user_uuid = request.user.uuid if request.user.is_authenticated else 'anonymous'
+    
+    logger.info(f"LARA_TRANSLATION_START - User: {user_id} ({user_uuid}) - Text length: {len(text)} chars - Words: {words_count} - Source: {request.POST.get('source_language')} -> Target: {request.POST.get('target_language')} - Domain: {request.POST.get('domain_name')}")
+
+    if not translation_allowed(request=request, words_count=words_count, symbols_count=symbols_count):
+        logger.warning(f"LARA_TRANSLATION_DENIED - User: {user_id} - Translation not allowed - Words: {words_count} - Symbols: {symbols_count}")
+        return JsonResponse(
+            {"detail": "You are not allowed to translate such amount of data"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    source_language = request.POST.get('source_language')
+    target_language = request.POST.get('target_language')
+    domain_name = request.POST.get('domain_name')
+
+    # Step 1: Fetch template to get translation memory and glossary IDs (optional)
+    translation_memory_id = None
+    glossary_id = None
+
+    logger.info(f"LARA_TEMPLATES_FIND_START - User: {user_id} - Params: domain={domain_name}, source={source_language}, target={target_language}")
+    
+    try:
+        template_response = requests.get(
+            f"{settings.LARA_API_URL}/api/templates/find",
+            params={
+                'domain': domain_name,
+                'sourceLanguage': source_language,
+                'targetLanguage': target_language,
+            },
+            timeout=10
+        )
+
+        logger.info(f"LARA_TEMPLATES_FIND_RESPONSE - User: {user_id} - Status: {template_response.status_code} - Response time: {template_response.elapsed.total_seconds()}s")
+        
+        if template_response.status_code == 200:
+            templates = template_response.json()
+            logger.debug(f"LARA_TEMPLATES_FIND_SUCCESS - User: {user_id} - Templates found: {len(templates) if templates else 0}")
+            if templates and len(templates) > 0:
+                template = templates[0]
+                translation_memory_id = template.get('translationMemoryId')
+                glossary_id = template.get('glossaryId')
+                logger.info(f"LARA_TEMPLATES_SELECTED - User: {user_id} - TM ID: {translation_memory_id} - Glossary ID: {glossary_id}")
+        else:
+            logger.warning(f"LARA_TEMPLATES_FIND_ERROR - User: {user_id} - Status: {template_response.status_code} - Response: {template_response.text}")
+    except requests.RequestException as e:
+        logger.error(f"LARA_TEMPLATES_FIND_EXCEPTION - User: {user_id} - Exception: {str(e)}")
+        # If template fetch fails, continue without memory/glossary
+        pass
+
+    # Step 2: Build translation request payload
+    translate_payload = {
+        "accessKeyId": settings.LARA_ACCESS_KEY_ID,
+        "accessKeySecret": settings.LARA_ACCESS_KEY_SECRET,
+        "text": text,
+        "source": source_language,
+        "target": target_language,
+    }
+
+    # Add domain if present
+    if domain_name:
+        translate_payload["domain"] = domain_name
+
+    # Add custom instructions if provided
+    if instructions:
+        translate_payload["instructions"] = instructions
+
+    # Add translation memory if found (optional)
+    if translation_memory_id:
+        translate_payload["adaptTo"] = str(translation_memory_id)
+
+    # Add glossary if found (optional)
+    if glossary_id:
+        translate_payload["glossaries"] = str(glossary_id)
+
+    logger.info(f"LARA_TRANSLATE_START - User: {user_id} - Payload: source={source_language}, target={target_language}, domain={domain_name}, instructions={bool(instructions)}, adaptTo={translation_memory_id}, glossaries={glossary_id}, text_length={len(text)}")
+
+    # Step 3: Call LARA translation API
+    try:
+        response = requests.post(
+            f"{settings.LARA_API_URL}/api/lara/translate-text",
+            json=translate_payload,
+            timeout=60
+        )
+        
+        logger.info(f"LARA_TRANSLATE_RESPONSE - User: {user_id} - Status: {response.status_code} - Response time: {response.elapsed.total_seconds()}s")
+        
+    except requests.RequestException as e:
+        logger.error(f"LARA_TRANSLATE_EXCEPTION - User: {user_id} - Exception: {str(e)}")
+        return JsonResponse(
+            {"detail": f"Translation service unavailable: {str(e)}"},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE
+        )
+
+    if response.status_code == 200:
+        result = response.json()
+        translated_text = result.get("translation", "")
+        
+        logger.info(f"LARA_TRANSLATE_SUCCESS - User: {user_id} - Translated text length: {len(translated_text)} - Quality feedback: {bool(result.get('quality_feedback'))}")
+        logger.debug(f"LARA_TRANSLATE_RESULT - User: {user_id} - Original: '{text[:100]}...' - Translated: '{translated_text[:100]}...'")
+
+        # Format response for frontend compatibility
+        formatted_result = {
+            "translated_text": [translated_text],
+        }
+
+        # Add quality feedback if available (text comment, not a score)
+        if result.get("quality_feedback"):
+            formatted_result["quality_feedback"] = result.get("quality_feedback")
+            logger.debug(f"LARA_QUALITY_FEEDBACK - User: {user_id} - Feedback: {result.get('quality_feedback')}")
+
+        # Send statistics
         try:
             api_key = get_user_api_key(request.user)
-        except ValueError:
-            return JsonResponse({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
-        response = requests.post(settings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
-            "text": [text],
-            **get_translate_data(request)
-        }, headers={
-            "token": api_key})
-        if response.status_code == 200:
             send_statistic_request(
-                api_key=api_key, texts=[text],
-                user_uuid=request.user.uuid,
-                words_count=get_word_count(text),
+                api_key=api_key,
+                texts=[text],
+                user_uuid=user_uuid,
+                words_count=words_count,
                 **get_translate_data(request, for_statistic=True),
             )
-            add_translations(request, words_count=words_count,
-                             symbols_count=symbols_count)
-        result = response.json()
-        return JsonResponse(result)
-    return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
-                        status=status.HTTP_400_BAD_REQUEST)
+            logger.info(f"LARA_STATISTICS_SENT - User: {user_id} - API key found and stats sent")
+        except ValueError:
+            logger.warning(f"LARA_STATISTICS_FAILED - User: {user_id} - No active subscription for stats")
+            # No active subscription for stats, but translation succeeded
+            pass
+
+        # Update user translation quota
+        add_translations(request, words_count=words_count, symbols_count=symbols_count)
+        logger.info(f"LARA_TRANSLATION_COMPLETE - User: {user_id} - Quota updated: +{words_count} words, +{symbols_count} symbols")
+
+        return JsonResponse(formatted_result)
+
+    # Handle translation errors
+    try:
+        error_detail = response.json().get('detail', response.text)
+    except (ValueError, KeyError):
+        error_detail = response.text
+    
+    logger.error(f"LARA_TRANSLATE_ERROR - User: {user_id} - Status: {response.status_code} - Error: {error_detail}")
+    
+    return JsonResponse(
+        {"detail": f"Translation error: {error_detail}"},
+        status=response.status_code
+    )
 
 
 def form_glossary_object(request) -> Optional[dict]:
