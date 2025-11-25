@@ -7,159 +7,28 @@
         Manual Renewal
     </a>
 </li>
+<li>
+    <a href="#" id="metered-subscription-btn" class="addlink" title="Configurer un abonnement API metered">
+        Metered Subscription
+    </a>
+</li>
 {{ block.super }}
 {% endblock %}
 
 {% block extrahead %}
 {{ block.super }}
-<style>
-    #manual-renewal-btn {
-        background-color: #ffc107;
-        color: #212529;
-        border-color: #ffc107;
-    }
-    #manual-renewal-btn:hover {
-        background-color: #e0a800;
-        border-color: #d39e00;
-    }
-    .renewal-modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.5);
-    }
-    .renewal-modal-content {
-        background-color: #fefefe;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 400px;
-        border-radius: 5px;
-        text-align: center;
-    }
-    .renewal-modal-buttons {
-        margin-top: 20px;
-    }
-    .renewal-modal-buttons button {
-        margin: 0 10px;
-        padding: 8px 15px;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
-    }
-    .btn-confirm {
-        background-color: #007cba;
-        color: white;
-    }
-    .btn-cancel {
-        background-color: #666;
-        color: white;
-    }
-    .loading {
-        display: none;
-        margin-top: 10px;
-    }
-    .actions {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    #manual-counter {
-        margin-left: 12px;
-        font-weight: bold;
-        color: #155724;
-        display: inline-flex;
-        align-items: center;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'usersubscription/css/usersubscription_admin_base.css' %}">
+<link rel="stylesheet" href="{% static 'usersubscription/css/manual_renewal.css' %}">
+<link rel="stylesheet" href="{% static 'usersubscription/css/metered_admin.css' %}">
 {% endblock %}
 
 {% block content %}
 {{ block.super }}
 
-<!-- Modal for confirmation -->
-<div id="renewal-modal" class="renewal-modal">
-    <div class="renewal-modal-content">
-        <h3>Manual Subscription Renewal</h3>
-        <p>This will manually execute the daily subscription renewal task.</p>
-        <p><strong>Are you sure you want to proceed?</strong></p>
-        <div class="loading" id="loading-indicator">
-            <p>Processing renewals, please wait...</p>
-            <div style="text-align: center;">🔄 Loading...</div>
-        </div>
-        <div class="renewal-modal-buttons" id="modal-buttons">
-            <button type="button" class="btn-confirm" id="confirm-renewal">Yes, Execute</button>
-            <button type="button" class="btn-cancel" id="cancel-renewal">Cancel</button>
-        </div>
-    </div>
-</div>
+{% include "admin/subscriptions/usersubscription/_manual_renewal_modal.html" %}
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const activeWithoutStripe = {{ active_without_stripe_count|default:0 }};
-    const manualRenewalBtn = document.getElementById('manual-renewal-btn');
-    const modal = document.getElementById('renewal-modal');
-    const confirmBtn = document.getElementById('confirm-renewal');
-    const cancelBtn = document.getElementById('cancel-renewal');
-    const loadingIndicator = document.getElementById('loading-indicator');
-    const modalButtons = document.getElementById('modal-buttons');
+{% include "admin/subscriptions/usersubscription/_metered_modal.html" %}
 
-    // Show modal on button click
-    manualRenewalBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        modal.style.display = 'block';
-    });
-
-    // Hide modal on cancel
-    cancelBtn.addEventListener('click', function() {
-        modal.style.display = 'none';
-        loadingIndicator.style.display = 'none';
-        modalButtons.style.display = 'block';
-    });
-
-    // Hide modal when clicking outside
-    window.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-            loadingIndicator.style.display = 'none';
-            modalButtons.style.display = 'block';
-        }
-    });
-
-    // Execute renewal on confirm
-    confirmBtn.addEventListener('click', function() {
-        // Show loading indicator
-        loadingIndicator.style.display = 'block';
-        modalButtons.style.display = 'none';
-
-        // Create and submit form
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '{% url "admin:subscriptions_usersubscription_manual_renewal" %}';
-        
-        // Add CSRF token
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        const csrfInput = document.createElement('input');
-        csrfInput.type = 'hidden';
-        csrfInput.name = 'csrfmiddlewaretoken';
-        csrfInput.value = csrfToken;
-        form.appendChild(csrfInput);
-        
-        document.body.appendChild(form);
-        form.submit();
-    });
-
-    const actionsContainer = document.querySelector('.actions');
-    if (actionsContainer && typeof activeWithoutStripe === 'number') {
-        const counterSpan = document.createElement('span');
-        counterSpan.id = 'manual-counter';
-        counterSpan.textContent = `Abonnement manuel : ${activeWithoutStripe}`;
-        actionsContainer.appendChild(counterSpan);
-    }
-});
-</script>
+<script src="{% static 'usersubscription/js/manual_renewal.js' %}"></script>
+<script src="{% static 'usersubscription/js/metered_admin.js' %}"></script>
 {% endblock %}

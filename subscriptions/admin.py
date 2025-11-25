@@ -1,20 +1,28 @@
 from django.contrib import admin
-from django.urls import reverse, path
+from django.contrib import messages
+from django.db import models
+from django.http import JsonResponse
+from django.shortcuts import redirect
+from django.urls import path, reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.shortcuts import redirect
-from django.contrib import messages
-from django.http import JsonResponse
-from django.db import models
 from .models import SubscriptionType, UserSubscription, CountHistory, CountMetered
 from .tasks import process_daily_subscription_renewals
 from .permissions import is_user_subscription_active
+from .stripe_utils import (
+    StripeCheckoutConfigurationError,
+    create_metered_checkout_session,
+    list_active_stripe_prices,
+)
 from legal.admin.utils import create_clickable_link
 
 
 # Constants for translated fields (used in multiple admin classes)
-TRANSLATED_FIELDS = ('translated_symbols_count',
-                     'translated_words_count', 'translated_files_count')
+TRANSLATED_FIELDS = (
+    'translated_symbols_count',
+    'translated_words_count',
+    'translated_files_count',
+)
 
 
 def get_active_status_values():
@@ -180,6 +188,9 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
             status__in=active_statuses,
             stripe_subscription_id__isnull=True,
         ).count()
+        extra_context["api_subscription_types"] = SubscriptionType.objects.filter(
+            product_type=SubscriptionType.ProductChoices.API
+        ).order_by("name")
         return super().changelist_view(request, extra_context=extra_context)
 
     def get_urls(self):
@@ -188,6 +199,16 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
         custom_urls = [
             path('manual-renewal/', self.admin_site.admin_view(self.manual_renewal_view),
                  name='subscriptions_usersubscription_manual_renewal'),
+            path(
+                'api-prices/',
+                self.admin_site.admin_view(self.api_prices_view),
+                name='subscriptions_usersubscription_api_prices',
+            ),
+            path(
+                'api-checkout/',
+                self.admin_site.admin_view(self.checkout_session_view),
+                name='subscriptions_usersubscription_checkout_session',
+            ),
         ]
         return custom_urls + urls
 
@@ -211,6 +232,43 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
                     request, f"Error during manual renewal: {str(e)}")
 
         return redirect('admin:subscriptions_usersubscription_changelist')
+
+    def api_prices_view(self, request):
+        """Return the Stripe price IDs for a given product."""
+        product_id = request.GET.get('product_id')
+        if not product_id:
+            return JsonResponse({'error': 'product_id requis'}, status=400)
+
+        try:
+            prices = list_active_stripe_prices(product_id)
+        except stripe.error.StripeError as exc:
+            return JsonResponse({'error': str(exc)}, status=502)
+        except Exception as exc:  # pragma: no cover - defensive
+            return JsonResponse({'error': str(exc)}, status=500)
+
+        return JsonResponse({'prices': prices})
+
+    def checkout_session_view(self, request):
+        """Create a Stripe Checkout session and redirect the admin to Stripe."""
+        if request.method != 'POST':
+            messages.error(request, "Méthode non autorisée.")
+            return redirect('admin:subscriptions_usersubscription_changelist')
+
+        price_id = request.POST.get('price_id')
+        if not price_id:
+            messages.error(request, "Veuillez sélectionner un Price ID.")
+            return redirect('admin:subscriptions_usersubscription_changelist')
+
+        try:
+            session = create_metered_checkout_session(price_id)
+        except StripeCheckoutConfigurationError as exc:
+            messages.error(request, str(exc))
+            return redirect('admin:subscriptions_usersubscription_changelist')
+        except stripe.error.StripeError as exc:
+            messages.error(request, f"Erreur Stripe : {exc}")
+            return redirect('admin:subscriptions_usersubscription_changelist')
+
+        return redirect(session.url)
 
     fieldsets = (
         (None, {

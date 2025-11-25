@@ -156,7 +156,10 @@ LOCALE_PATHS = [ BASE_DIR / 'locale/', ]
 # Static & media files
 # ============================================================================
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [ os.path.join(BASE_DIR, "static") ]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "templates", "static"),
+]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_collected')
 
 if not DEBUG:
@@ -305,6 +308,8 @@ STATS_API_KEY = os.environ.get('STATS_API_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY')
 STRIPE_PORTAL_RETURN_URL = "https://portail.lexamt.fr/fr/profile-details/"
+STRIPE_CHECKOUT_SUCCESS_URL = "https://portail.lexamt.fr"
+STRIPE_CHECKOUT_CANCEL_URL = "https://portail.lexamt.fr"
 
 # Active Trail Configuration
 ACTIVE_TRAIL_SENDING_PROFILE_ID = int(

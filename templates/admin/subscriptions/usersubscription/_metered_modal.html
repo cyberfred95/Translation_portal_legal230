@@ -1,0 +1,36 @@
+<div id="metered-modal" class="renewal-modal">
+    <div class="renewal-modal-content">
+        <h3>Nouvelle consommation API</h3>
+        <p>Sélectionnez le type d'abonnement API à associer.</p>
+        {% if api_subscription_types %}
+            <label for="metered-subscription-select" style="display:block; text-align:left;">Subscription Type</label>
+            <select id="metered-subscription-select">
+                {% for subscription in api_subscription_types %}
+                    <option value="{{ subscription.pk }}" data-stripe-product-id="{{ subscription.stripe_product_id|default_if_none:'' }}">{{ subscription.name }}</option>
+                {% endfor %}
+            </select>
+            <form id="metered-checkout-form" method="post" action="{% url 'admin:subscriptions_usersubscription_checkout_session' %}">
+                {% csrf_token %}
+                <div class="metered-price-section" id="metered-price-section" style="display:none;">
+                    <label for="metered-price-select">Price ID</label>
+                    <select id="metered-price-select" name="price_id"></select>
+                    <div class="loading-text" id="metered-price-loading">Chargement des Price ID…</div>
+                    <div class="error-text" id="metered-price-error"></div>
+                </div>
+                <div class="metered-checkout-section" id="metered-checkout-section" style="display:none;">
+                    <button type="submit" class="btn-confirm" id="metered-checkout-button" disabled>Créer la session Checkout Stripe</button>
+                </div>
+            </form>
+        {% else %}
+            <p><strong>Aucun SubscriptionType de produit API n'est disponible.</strong></p>
+        {% endif %}
+        <div class="renewal-modal-buttons" style="margin-top: 20px;">
+            <button type="button" class="btn-cancel" id="close-metered-modal">Fermer</button>
+        </div>
+    </div>
+</div>
+
+<div id="metered-modal-config"
+     data-api-prices-url="{% url 'admin:subscriptions_usersubscription_api_prices' %}">
+</div>
+
