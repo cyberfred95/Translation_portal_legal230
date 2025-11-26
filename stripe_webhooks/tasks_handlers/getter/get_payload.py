@@ -235,6 +235,12 @@ def get_item_data_quantity(item_data: dict) -> tuple[HttpResponse | None, int | 
         or None and validated quantity on success.
     """
     quantity = item_data.get('quantity')
+
+    # Metered subscriptions may omit quantity; default to 1 for billing logic
+    usage_type = item_data.get('plan', {}).get('usage_type')
+    if quantity is None and usage_type == 'metered':
+        quantity = 1
+
     if quantity is None:
         return error_message("not_found_quantity"), None
 
