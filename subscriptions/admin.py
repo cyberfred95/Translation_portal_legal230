@@ -1,3 +1,4 @@
+import stripe
 from django.contrib import admin
 from django.contrib import messages
 from django.db import models
@@ -259,8 +260,11 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
             messages.error(request, "Veuillez sélectionner un Price ID.")
             return redirect('admin:subscriptions_usersubscription_changelist')
 
+        # Check if SERPA (payment method collection) is required
+        with_serpa = request.POST.get('with_serpa', 'true').lower() == 'true'
+
         try:
-            session = create_metered_checkout_session(price_id)
+            session = create_metered_checkout_session(price_id, with_serpa=with_serpa)
         except StripeCheckoutConfigurationError as exc:
             messages.error(request, str(exc))
             return redirect('admin:subscriptions_usersubscription_changelist')

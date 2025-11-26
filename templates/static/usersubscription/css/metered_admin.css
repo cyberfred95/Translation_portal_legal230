@@ -33,3 +33,8 @@
     text-align: left;
 }
 
+.metered-checkout-section button {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+

@@ -18,7 +18,9 @@
                     <div class="error-text" id="metered-price-error"></div>
                 </div>
                 <div class="metered-checkout-section" id="metered-checkout-section" style="display:none;">
-                    <button type="submit" class="btn-confirm" id="metered-checkout-button" disabled>Créer la session Checkout Stripe</button>
+                    <input type="hidden" name="with_serpa" id="with-serpa-input" value="true">
+                    <button type="button" class="btn-confirm" id="metered-checkout-button-with-serpa" disabled>Avec SERPA</button>
+                    <button type="button" class="btn-confirm" id="metered-checkout-button-without-serpa" disabled>Sans Serpa</button>
                 </div>
             </form>
         {% else %}

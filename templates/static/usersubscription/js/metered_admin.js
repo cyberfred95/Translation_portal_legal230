@@ -2,14 +2,27 @@
     'use strict';
 
     document.addEventListener('DOMContentLoaded', () => {
-        const element = document.getElementById('metered-modal-config');
-        const pricesUrl = element?.dataset.apiPricesUrl || '';
-        new MeteredModalController(pricesUrl).init();
+        const config = getMeteredConfig();
+        if (!config) {
+            console.error('Metered modal configuration introuvable.');
+            return;
+        }
+        new MeteredModalController(config).init();
     });
 
+    function getMeteredConfig() {
+        const element = document.getElementById('metered-modal-config');
+        if (!element) {
+            return null;
+        }
+        return {
+            apiPricesUrl: element.dataset.apiPricesUrl || ''
+        };
+    }
+
     class MeteredModalController {
-        constructor(pricesUrl) {
-            this.pricesUrl = pricesUrl;
+        constructor(config) {
+            this.pricesUrl = config.apiPricesUrl;
             this.modal = document.getElementById('metered-modal');
             this.openButton = document.getElementById('metered-subscription-btn');
             this.closeButton = document.getElementById('close-metered-modal');
@@ -19,29 +32,76 @@
             this.priceLoading = document.getElementById('metered-price-loading');
             this.priceError = document.getElementById('metered-price-error');
             this.checkoutSection = document.getElementById('metered-checkout-section');
-            this.checkoutButton = document.getElementById('metered-checkout-button');
+            this.checkoutButtonWithSerpa = document.getElementById('metered-checkout-button-with-serpa');
+            this.checkoutButtonWithoutSerpa = document.getElementById('metered-checkout-button-without-serpa');
+            this.withSerpaInput = document.getElementById('with-serpa-input');
+            this.checkoutForm = document.getElementById('metered-checkout-form');
             this.boundBackdropHandler = this.handleBackdropClick.bind(this);
         }
 
         init() {
             if (!this.isReady()) {
+                console.error('Metered modal incomplet, initialisation annulée.');
                 return;
             }
+            this.registerBaseEvents();
+            this.registerCheckoutButtons();
+            this.updateCheckoutState();
+        }
+
+        isReady() {
+            return Boolean(
+                this.pricesUrl !== undefined &&
+                this.modal &&
+                this.openButton &&
+                this.subscriptionSelect &&
+                this.checkoutForm &&
+                this.withSerpaInput
+            );
+        }
+
+        registerBaseEvents() {
             this.openButton.addEventListener('click', (event) => {
                 event.preventDefault();
                 this.showModal();
                 this.loadPrices();
             });
-            this.closeButton.addEventListener('click', () => this.hideModal());
+
+            if (this.closeButton) {
+                this.closeButton.addEventListener('click', () => this.hideModal());
+            }
+
             this.subscriptionSelect.addEventListener('change', () => this.loadPrices());
+
             if (this.priceSelect) {
                 this.priceSelect.addEventListener('change', () => this.updateCheckoutState());
             }
+
             window.addEventListener('click', this.boundBackdropHandler);
         }
 
-        isReady() {
-            return Boolean(this.modal && this.openButton && this.subscriptionSelect);
+        registerCheckoutButtons() {
+            this.addCheckoutListener(this.checkoutButtonWithSerpa, true);
+            this.addCheckoutListener(this.checkoutButtonWithoutSerpa, false);
+        }
+
+        addCheckoutListener(button, withSerpa) {
+            if (!button) {
+                return;
+            }
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                this.handleCheckoutClick(withSerpa);
+            });
+        }
+
+        handleCheckoutClick(withSerpa) {
+            if (!this.canSubmit()) {
+                console.error('Formulaire de checkout indisponible.');
+                return;
+            }
+            this.setWithSerpa(withSerpa);
+            this.checkoutForm.submit();
         }
 
         handleBackdropClick(event) {
@@ -195,17 +255,33 @@
             if (this.checkoutSection) {
                 this.checkoutSection.style.display = 'none';
             }
-            if (this.checkoutButton) {
-                this.checkoutButton.disabled = true;
-            }
+            this.setCheckoutButtonsDisabled(true);
         }
 
         updateCheckoutState() {
-            if (this.checkoutButton && this.priceSelect) {
-                this.checkoutButton.disabled = !this.priceSelect.value;
+            const shouldDisable = !this.hasPriceSelection() || !this.canSubmit();
+            this.setCheckoutButtonsDisabled(shouldDisable);
+        }
+
+        hasPriceSelection() {
+            return Boolean(this.priceSelect && this.priceSelect.value);
+        }
+
+        canSubmit() {
+            return Boolean(this.checkoutForm && this.withSerpaInput);
+        }
+
+        setCheckoutButtonsDisabled(disabled) {
+            if (this.checkoutButtonWithSerpa) {
+                this.checkoutButtonWithSerpa.disabled = disabled;
+            }
+            if (this.checkoutButtonWithoutSerpa) {
+                this.checkoutButtonWithoutSerpa.disabled = disabled;
             }
         }
+
+        setWithSerpa(value) {
+            this.withSerpaInput.value = value ? 'true' : 'false';
+        }
     }
-
 })();
-
