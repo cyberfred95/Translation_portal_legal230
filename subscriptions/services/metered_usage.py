@@ -86,15 +86,33 @@ class MeteredUsageReporter:
                 "Aucun subscription_item Stripe n'est associé à cette souscription."
             )
 
+        meter_event_name = getattr(settings, 'STRIPE_METER_EVENT_NAME', None)
+        if not meter_event_name:
+            raise MeteredUsageError(
+                "STRIPE_METER_EVENT_NAME n'est pas configuré."
+            )
+
+        customer_id = entry.user_subscription.user.stripe_customer_id
+        if not customer_id:
+            raise MeteredUsageError(
+                "La souscription n'a pas de stripe_customer_id associé."
+            )
+
         timestamp = self._midnight_timestamp(entry.date)
-        usage_record = stripe.UsageRecord.create(
-            subscription_item=subscription_item_id,
-            action="set",
-            quantity=entry.daily_translated_symbols_count,
+        unique_id = f"countmetered-{entry.id}-{entry.date.isoformat()}"
+
+        meter_event = stripe.billing.MeterEvent.create(
+            event_name=meter_event_name,
+            payload={
+                "value": entry.daily_translated_symbols_count,
+                "subscription_item": subscription_item_id,
+                "customer": customer_id,
+            },
             timestamp=timestamp,
+            unique_id=unique_id,
             api_key=settings.STRIPE_API_KEY,
         )
-        return usage_record.id
+        return meter_event.id
 
     def _midnight_timestamp(self, entry_date):
         midnight = datetime.combine(

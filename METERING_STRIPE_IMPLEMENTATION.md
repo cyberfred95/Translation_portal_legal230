@@ -193,3 +193,4 @@ celery -A legal beat --loglevel=info
 - Les erreurs sont loggées mais n'arrêtent pas le traitement
 - Un seul `CountMetered` par jour par souscription (contrainte d'unicité)
 
+
