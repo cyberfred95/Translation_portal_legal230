@@ -198,15 +198,16 @@ class UserSubscription(models.Model):
     def ensure_api_count_metered(self):
         """
         Crée un CountMetered pour aujourd'hui si la souscription est de type API.
+        Retourne un tuple (CountMetered, created) où created est True si l'objet a été créé.
         """
         if not self.subscription:
             raise ValueError("Cannot create CountMetered because subscription is missing.")
 
         if self.subscription.product_type != SubscriptionType.ProductChoices.API:
-            return
+            return None, False
 
         today = now().date()
-        CountMetered.objects.get_or_create(
+        return CountMetered.objects.get_or_create(
             user_subscription=self,
             date=today,
             defaults={'reported': None},
@@ -223,7 +224,7 @@ class UserSubscription(models.Model):
         self.access_to_writing = self.subscription.access_to_writing
         self.access_to_official_glossaries = self.subscription.access_to_official_glossaries
         self.access_to_sso = self.subscription.access_to_sso
-
+        
     def _needs_api_key_generation(self):
         return not self.api_key and self.is_active()
 
@@ -284,9 +285,4 @@ class CountMetered(models.Model):
         )
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user_subscription', 'date'],
-                name='unique_metered_usage_per_day'
-            ),
-        ]
+        pass

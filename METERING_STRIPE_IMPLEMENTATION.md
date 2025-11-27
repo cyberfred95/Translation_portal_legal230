@@ -117,7 +117,7 @@ Tous les tests passent (66 tests):
 - **Product ID**: `prod_TOPELuhp8luEEZ`
 - **Type**: Metered billing
 - **Métrique**: Nombre de caractères traduits (`daily_translated_symbols_count`)
-- **Clé Stripe**: `API_NbCar_Standard`
+- **Clé Stripe**: `apinbchar_standard`
 
 ## ⚠️ Points d'attention
 

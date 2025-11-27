@@ -253,7 +253,7 @@ CELERY_BEAT_SCHEDULE = {
 # ============================================================================
 # Stripe Metering
 # ============================================================================
-STRIPE_METER_EVENT_NAME = os.environ.get('STRIPE_METER_EVENT_NAME', 'API_NbCar_Standard')
+STRIPE_METER_EVENT_NAME = os.environ.get('STRIPE_METER_EVENT_NAME', 'apinbchar_standard')
 
 # ============================================================================
 # Logging

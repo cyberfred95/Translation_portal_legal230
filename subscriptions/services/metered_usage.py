@@ -29,35 +29,41 @@ class MeteredUsageReporter:
     def __init__(self) -> None:
         self.today = timezone.now().date()
 
-    def run(self) -> dict:
+    def run(self) -> dict[str, int]:
+        """Traite toutes les entrées à reporter et retourne les statistiques."""
         stats = {"processed": 0, "reported": 0, "errors": 0}
 
         for entry in self._entries_to_report():
             stats["processed"] += 1
-            try:
-                usage_record_id = self._send_to_stripe(entry)
-            except MeteredUsageError as error:
+            
+            if self._process_entry(entry):
+                stats["reported"] += 1
+            else:
                 stats["errors"] += 1
-                logger.error(
-                    "Transmission ignorée pour CountMetered %s (subscription=%s) : %s",
-                    entry.id,
-                    entry.user_subscription_id,
-                    error,
-                )
-                continue
-            except Exception:  # noqa: BLE001
-                stats["errors"] += 1
-                logger.exception(
-                    "Erreur inattendue lors de l'envoi de CountMetered %s (subscription=%s)",
-                    entry.id,
-                    entry.user_subscription_id,
-                )
-                continue
-
-            self._finalize_entry(entry, usage_record_id)
-            stats["reported"] += 1
 
         return stats
+
+    def _process_entry(self, entry: CountMetered) -> bool:
+        """Traite une entrée : envoie à Stripe et finalise. Retourne True si succès."""
+        try:
+            usage_record_id = self._send_to_stripe(entry)
+            self._finalize_entry(entry, usage_record_id)
+            return True
+        except MeteredUsageError as error:
+            logger.error(
+                "Transmission ignorée pour CountMetered %s (subscription=%s) : %s",
+                entry.id,
+                entry.user_subscription_id,
+                error,
+            )
+            return False
+        except Exception:  # noqa: BLE001
+            logger.exception(
+                "Erreur inattendue lors de l'envoi de CountMetered %s (subscription=%s)",
+                entry.id,
+                entry.user_subscription_id,
+            )
+            return False
 
     def _entries_to_report(self) -> Iterable[CountMetered]:
         """
@@ -79,40 +85,56 @@ class MeteredUsageReporter:
 
         return latest_per_subscription.values()
 
-    def _send_to_stripe(self, entry: CountMetered) -> str:
-        subscription_item_id = entry.user_subscription.stripe_subscription_item_id
-        if not subscription_item_id:
+    def _send_to_stripe(self, entry: CountMetered) -> str | None:
+        """Envoie les données d'usage à Stripe et retourne l'identifier de l'événement."""
+        self._validate_entry_for_stripe(entry)
+        
+        meter_event = self._create_stripe_meter_event(entry)
+        return self._extract_event_identifier(meter_event, entry.id)
+
+    def _validate_entry_for_stripe(self, entry: CountMetered) -> None:
+        """Valide que l'entrée a toutes les informations nécessaires pour Stripe."""
+        if not entry.user_subscription.stripe_subscription_item_id:
             raise MeteredUsageError(
                 "Aucun subscription_item Stripe n'est associé à cette souscription."
             )
 
-        meter_event_name = getattr(settings, 'STRIPE_METER_EVENT_NAME', None)
-        if not meter_event_name:
+        if not getattr(settings, 'STRIPE_METER_EVENT_NAME', None):
             raise MeteredUsageError(
                 "STRIPE_METER_EVENT_NAME n'est pas configuré."
             )
 
-        customer_id = entry.user_subscription.user.stripe_customer_id
-        if not customer_id:
+        if not entry.user_subscription.user.stripe_customer_id:
             raise MeteredUsageError(
                 "La souscription n'a pas de stripe_customer_id associé."
             )
 
+    def _create_stripe_meter_event(self, entry: CountMetered):
+        """Crée l'événement Meter dans Stripe."""
+        meter_event_name = settings.STRIPE_METER_EVENT_NAME
         timestamp = self._midnight_timestamp(entry.date)
-        unique_id = f"countmetered-{entry.id}-{entry.date.isoformat()}"
-
-        meter_event = stripe.billing.MeterEvent.create(
+        
+        return stripe.billing.MeterEvent.create(
             event_name=meter_event_name,
             payload={
-                "value": entry.daily_translated_symbols_count,
-                "subscription_item": subscription_item_id,
-                "customer": customer_id,
+                "APINbChar": entry.daily_translated_symbols_count,
+                "subscription_item": entry.user_subscription.stripe_subscription_item_id,
+                "stripe_customer_id": entry.user_subscription.user.stripe_customer_id,
             },
             timestamp=timestamp,
-            unique_id=unique_id,
             api_key=settings.STRIPE_API_KEY,
         )
-        return meter_event.id
+
+    def _extract_event_identifier(self, meter_event, entry_id: int) -> str | None:
+        """Extrait l'identifier de l'événement Meter retourné par Stripe."""
+        try:
+            return meter_event.identifier
+        except AttributeError:
+            logger.warning(
+                "Aucun identifier trouvé dans la réponse Stripe pour CountMetered %s",
+                entry_id
+            )
+            return None
 
     def _midnight_timestamp(self, entry_date):
         midnight = datetime.combine(
@@ -122,7 +144,8 @@ class MeteredUsageReporter:
         )
         return int(midnight.timestamp())
 
-    def _finalize_entry(self, entry: CountMetered, usage_record_id: str):
+    def _finalize_entry(self, entry: CountMetered, usage_record_id: str | None) -> None:
+        """Marque l'entrée comme reportée et crée le compteur suivant."""
         entry.reported = self.today
         update_fields = ['reported']
 
@@ -131,16 +154,42 @@ class MeteredUsageReporter:
             update_fields.append('stripe_usage_record_id')
 
         entry.save(update_fields=update_fields)
+        logger.info(
+            "CountMetered %s (subscription=%s, date=%s) marqué comme reporté.",
+            entry.id, entry.user_subscription_id, entry.date
+        )
         self._ensure_next_counter(entry.user_subscription)
 
-    @staticmethod
-    def _ensure_next_counter(subscription: UserSubscription):
+    def _ensure_next_counter(self, subscription: UserSubscription) -> None:
+        """
+        Crée un nouveau CountMetered pour aujourd'hui après avoir reporté.
+        La date correspond au moment de création.
+        """
+        if not self._should_create_counter(subscription):
+            return
+
         try:
-            subscription.ensure_api_count_metered()
-        except ValueError as error:
-            logger.error(
-                "Impossible de créer le compteur du jour pour la souscription %s : %s",
-                subscription.id,
-                error,
+            count_metered = CountMetered.objects.create(
+                user_subscription=subscription,
+                date=self.today,
+                reported=None,
             )
+            logger.info(
+                "Nouveau CountMetered créé pour la souscription %s (date=%s).",
+                subscription.id,
+                self.today
+            )
+        except Exception:
+            logger.exception(
+                "Erreur lors de la création du compteur pour la souscription %s",
+                subscription.id,
+            )
+
+    @staticmethod
+    def _should_create_counter(subscription: UserSubscription) -> bool:
+        """Vérifie si un nouveau compteur doit être créé pour cette souscription."""
+        return (
+            subscription.subscription is not None
+            and subscription.subscription.product_type == SubscriptionType.ProductChoices.API
+        )
 
