@@ -78,7 +78,13 @@ CACHE_TTL = 3600
 
 
 def text_translation(request):
-    text = request.POST.get('text')
+    text = request.POST.get('text')  # This is HTML content from Quill editor
+
+    # DEBUG: Log HTML to see how Quill encodes colors
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"=== HTML FROM QUILL ===\n{text}\n======================")
+
     words_count = get_word_count(text)
     symbols_count = len(text)
     if translation_allowed(request=request, words_count=words_count, symbols_count=symbols_count):
@@ -86,22 +92,145 @@ def text_translation(request):
             api_key = get_user_api_key(request.user)
         except ValueError:
             return JsonResponse({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
-        response = requests.post(settings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
-            "text": [text],
-            **get_translate_data(request)
-        }, headers={
-            "token": api_key})
-        if response.status_code == 200:
+
+        # Create DOCX file from HTML text preserving formatting
+        import uuid
+        from docx import Document
+        from htmldocx import HtmlToDocx
+
+        doc = Document()
+        parser = HtmlToDocx()
+        parser.add_html_to_document(text, doc)
+        
+        # Save to temporary file
+        temp_filename = f"text_translation_{uuid.uuid4().hex}.docx"
+        temp_path = os.path.join(settings.MEDIA_ROOT, 'docx', temp_filename)
+        doc.save(temp_path)
+
+        # DEBUG: Log DOCX creation success and verify colors
+        logger.info(f"DOCX created successfully: {temp_path}")
+        
+        try:
+            # Read the file and create InMemoryUploadedFile
+            with open(temp_path, 'rb') as f:
+                file_content = f.read()
+            
+            file = InMemoryUploadedFile(
+                BytesIO(file_content),
+                None,
+                temp_filename,
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                len(file_content),
+                None
+            )
+            
+            # Submit for translation
+            data = {
+                "user_custom_mt_token": request.user.uuid,
+                **get_translate_data(request),
+                "glossary": json.dumps(form_glossary_object(request))
+            }
+            
+            response = requests.post(
+                settings.CLOUDSTORAGE_API_URL,
+                data=data,
+                headers={
+                    "token": api_key,
+                    "X-API-Key": settings.STATS_API_KEY
+                },
+                files={
+                    'source_file': file
+                }
+            )
+            
+            if response.status_code != 200:
+                return JsonResponse({"detail": "Translation submission failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            project_id = response.json().get('id')
+            
+            # Poll for translation completion (max 120 seconds for long texts)
+            max_attempts = 60  # Increased from 30 to 60 for longer texts
+            attempt = 0
+            translated_file_url = None
+
+            while attempt < max_attempts:
+                time.sleep(2)
+                status_response = requests.get(
+                    settings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+                    headers={"token": api_key}
+                )
+                
+                if status_response.status_code == 200:
+                    project_data = status_response.json()
+                    if project_data.get('status') == 'Translated':
+                        translated_file_url = project_data.get('translated_file')
+                        break
+                    elif project_data.get('status') == 'Error':
+                        return JsonResponse({"detail": "Translation failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+                attempt += 1
+            
+            if not translated_file_url:
+                return JsonResponse({"detail": "Translation timeout"}, status=status.HTTP_408_REQUEST_TIMEOUT)
+            
+            # Download translated DOCX
+            translated_response = requests.get(translated_file_url)
+            if translated_response.status_code != 200:
+                return JsonResponse({"detail": "Failed to download translated file"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            # Convert translated DOCX to HTML preserving colors
+            # Using python-docx to read and custom converter to preserve RGB colors
+            from docx import Document as DocxDocument
+
+            translated_doc = DocxDocument(BytesIO(translated_response.content))
+            html_parts = []
+
+            for para in translated_doc.paragraphs:
+                para_html = []
+                for run in para.runs:
+                    text_content = run.text
+                    if not text_content:
+                        continue
+
+                    # Build style attributes
+                    styles = []
+                    if run.bold:
+                        styles.append("font-weight: bold")
+                    if run.italic:
+                        styles.append("font-style: italic")
+                    if run.underline:
+                        styles.append("text-decoration: underline")
+
+                    # Preserve color
+                    if run.font.color and run.font.color.rgb:
+                        rgb = run.font.color.rgb
+                        r, g, b = rgb[0], rgb[1], rgb[2]
+                        styles.append(f"color: rgb({r}, {g}, {b})")
+
+                    style_attr = f' style="{"; ".join(styles)}"' if styles else ''
+                    para_html.append(f'<span{style_attr}>{text_content}</span>')
+
+                html_parts.append(f'<p>{"".join(para_html)}</p>')
+
+            translated_html = "".join(html_parts)
+            logger.info(f"DOCX to HTML conversion completed with {len(html_parts)} paragraphs")
+            
+            # Send statistics
             send_statistic_request(
                 api_key=api_key, texts=[text],
                 user_uuid=request.user.uuid,
-                words_count=get_word_count(text),
+                words_count=words_count,
                 **get_translate_data(request, for_statistic=True),
             )
-            add_translations(request, words_count=words_count,
-                             symbols_count=symbols_count)
-        result = response.json()
-        return JsonResponse(result)
+            add_translations(request, words_count=words_count, symbols_count=symbols_count)
+            
+            return JsonResponse({"translated_text": [translated_html]})
+            
+        finally:
+            # Clean up temporary file
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+    
     return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
                         status=status.HTTP_400_BAD_REQUEST)
 
