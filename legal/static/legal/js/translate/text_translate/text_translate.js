@@ -346,19 +346,22 @@ $(document).ready(function () {
             if (state.isTranslating) return false;
 
             const textContent = editors.source.getText().trim();
-            const htmlContent = editors.source.root.innerHTML.trim();
+            const deltaContent = editors.source.getContents(); // Get Quill Delta format
+            const deltaJson = JSON.stringify(deltaContent);
+            const htmlContent = editors.source.root.innerHTML; // Get HTML for fallback method
             const currentCount = textContent.replace(/\n/g, '').length;
-            const isEmptyHtml = !htmlContent || htmlContent === '<p><br></p>' || htmlContent === '<p></p>';
+            const isEmpty = !textContent || textContent.length === 0;
 
-            if (currentCount > CHAR_LIMIT || !textContent || isEmptyHtml) {
+            if (currentCount > CHAR_LIMIT || !textContent || isEmpty) {
                 return false;
             }
 
             state.isTranslating = true;
             $els.translateBtn.prop('disabled', true);
 
-            $('#text').val(htmlContent);
+            $('#text').val(deltaJson); // Send Delta JSON
             const formData = new FormData(this);
+            formData.append('html_content', htmlContent); // Also send HTML for fallback method
 
             generateSkeleton();
 
