@@ -82,14 +82,10 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
     Translate text using Delta JSON -> DOCX -> Translation -> HTML conversion.
     This method preserves formatting including colors, lists, bold, italic, underline.
     """
-    import logging
     import uuid
     from docx import Document
     from docx.shared import RGBColor
     from docx import Document as DocxDocument
-
-    logger = logging.getLogger(__name__)
-    logger.info(f"=== USING DELTA->DOCX METHOD ===")
 
     doc = Document()
     para = doc.add_paragraph()
@@ -155,8 +151,6 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
     temp_filename = f"text_translation_{uuid.uuid4().hex}.docx"
     temp_path = os.path.join(settings.MEDIA_ROOT, 'docx', temp_filename)
     doc.save(temp_path)
-
-    logger.info(f"DOCX created successfully: {temp_path}")
 
     try:
         # Read the file and create InMemoryUploadedFile
@@ -232,10 +226,7 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
         current_list_type = None
         list_items = []
 
-        logger.info(f"=== ANALYZING TRANSLATED DOCX ===")
-        logger.info(f"Total paragraphs: {len(translated_doc.paragraphs)}")
-
-        for para_idx, para in enumerate(translated_doc.paragraphs):
+        for para in translated_doc.paragraphs:
             para_html = []
 
             # Check if this is a list item
@@ -243,10 +234,6 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
             is_bullet_list = 'bullet' in style_name_lower or para.style.name == 'List Bullet'
             is_number_list = 'number' in style_name_lower or para.style.name == 'List Number'
             is_list = is_bullet_list or is_number_list
-
-            logger.info(f"Para {para_idx}: style='{para.style.name}', is_list={is_list}, text='{para.text[:50]}...'")
-            if is_list:
-                logger.info(f"  -> List type: {'BULLET' if is_bullet_list else 'NUMBER'}")
 
             # Build the content with formatting
             for run in para.runs:
@@ -303,7 +290,6 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
             html_parts.append(f'<ol>{"".join(list_items)}</ol>')
 
         translated_html = "".join(html_parts)
-        logger.info(f"DOCX to HTML conversion completed with {len(html_parts)} paragraphs")
 
         # Send statistics
         send_statistic_request(
@@ -328,11 +314,6 @@ def translate_via_text_api(html_text, api_key, request, plain_text, words_count,
     This is the old method that sends HTML directly to the translation API without DOCX conversion.
     Used for PASDOC tests or single-paragraph texts.
     """
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.info(f"=== USING ORIGINAL TEXT API METHOD (NO DOCX) ===")
-    logger.info(f"HTML content: {html_text[:200]}...")
-
     # Call the original text translation API directly
     response = requests.post(
         settings.CUSTOM_MT_CONSOLE_URL + "translation/translate",
@@ -345,19 +326,16 @@ def translate_via_text_api(html_text, api_key, request, plain_text, words_count,
 
     # Check if the request was successful
     if response.status_code != 200:
-        logger.error(f"Text API returned status {response.status_code}")
         return JsonResponse(
             {"detail": f"Translation API error: {response.status_code}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
     result = response.json()
-    logger.info(f"Text API response: {result}")
 
     # Check if the response contains an error
     if 'error' in result:
         error_message = result.get('error', 'Unknown error from translation API')
-        logger.error(f"Text API returned error: {error_message}")
         return JsonResponse(
             {"detail": f"Translation error: {error_message}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -379,10 +357,7 @@ def translate_via_text_api(html_text, api_key, request, plain_text, words_count,
 def text_translation(request):
     delta_json = request.POST.get('text')  # This is Delta JSON from Quill editor
 
-    import logging
     import json
-    logger = logging.getLogger(__name__)
-    logger.info(f"=== DELTA FROM QUILL ===\n{delta_json}\n======================")
 
     # Parse Delta JSON
     try:
@@ -401,21 +376,15 @@ def text_translation(request):
         except ValueError:
             return JsonResponse({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
 
-        # Check if we should use the new Delta->DOCX method or the old HTML->DOCX method
+        # Check if we should use the new Delta->DOCX method or the old text API method
         # Use old method if: text starts with "PASDOC" OR text has only one paragraph
         starts_with_pasdoc = plain_text.strip().upper().startswith('PASDOC')
         paragraph_count = plain_text.count('\n')
         use_old_method = starts_with_pasdoc or paragraph_count <= 1
 
-        logger.info(f"=== TRANSLATION METHOD SELECTION ===")
-        logger.info(f"Starts with PASDOC: {starts_with_pasdoc}")
-        logger.info(f"Paragraph count: {paragraph_count}")
-        logger.info(f"Using old text API method: {use_old_method}")
-
         if use_old_method:
             # Use HTML sent from frontend (Quill's root.innerHTML)
             html_text = request.POST.get('html_content', '')
-            logger.info(f"Using HTML from Quill: {html_text[:200]}...")
             return translate_via_text_api(html_text, api_key, request, plain_text, words_count, symbols_count)
         else:
             # Use new Delta->DOCX method
