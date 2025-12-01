@@ -145,9 +145,15 @@ def process_projects(projects_data, user, email_map=None):
         list: Liste de projets enrichis avec les données nécessaires
     """
     for project in projects_data:
-        # Extraction du nom de fichier depuis l'URL
-        file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
-        project['source_file_name'] = unquote(file_name)
+        # Extraction du nom de fichier - utiliser source_file_name si disponible (Lara API)
+        # sinon fallback sur extraction depuis l'URL (Custom.MT)
+        if project.get('source_file_name'):
+            pass  # Déjà défini par Lara API
+        elif project.get('source_file'):
+            file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
+            project['source_file_name'] = unquote(file_name)
+        else:
+            project['source_file_name'] = 'Unknown'
         
         # Parsing de la date de création
         project['created_at'] = datetime.fromisoformat(

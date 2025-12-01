@@ -3,7 +3,6 @@ import requests
 
 from legal.views_all import BaseTemplateView, PAGINATION_PAGE_SIZE
 from legal.credentials import languages
-from subscriptions.utils import get_user_api_key
 from quoting.helpers import get_price_by_language_pair
 from legal.helpers import (
     get_user_emails_map,
@@ -20,30 +19,21 @@ class ProjectsHistoryView(BaseTemplateView):
         user = self.request.user
         page = self.request.GET.get('page')
         context['languages'] = languages
+
+        # Paramètres pour l'API Django Lara
         params = {
             "page_size": PAGINATION_PAGE_SIZE,
-            "page": page,
-            "user_custom_mt_token": user.uuid if not user.is_staff else None
+            "page": page if page is not None else 1,
         }
-        try:
-            user_api_key = get_user_api_key(user)
-        except ValueError:
-            # En cas d'absence de subscription, on ne peut pas afficher les projets
-            context['projects'] = {"results": []}
-            context['show_user_email'] = user.is_staff
-            return context
-        headers = {
-            "token": user_api_key
-        }
-
-        if page is not None:
-            params["page"] = int(page)
+        # Si l'utilisateur n'est pas staff, filtrer par son user_token
+        if not user.is_staff:
+            params["user_token"] = str(user.uuid)
 
         try:
             response = requests.get(
-                settings.CLOUDSTORAGE_API_URL, 
-                params=params, 
-                headers=headers
+                f"{settings.LARA_API_URL}/api/lara/documents",
+                params=params,
+                timeout=10
             ).json()
             
             if 'results' in response and response['results']:

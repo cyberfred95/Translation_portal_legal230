@@ -256,11 +256,21 @@ def form_glossary_object(request) -> Optional[dict]:
 
 
 def file_translate(request):
+    """
+    Document translation using LARA Translation API (Django Lara).
+
+    Flow:
+    1. Call /api/templates/find to get translation memory and glossary IDs
+    2. Call /api/lara/translate-document with the file and template parameters
+    """
+    logger = logging.getLogger(__name__)
+
     files = request.FILES.getlist('document[]', [])
     try:
         api_key = get_user_api_key(request.user)
     except ValueError:
         return JsonResponse({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
+
     cache_data = cache.get(f"{request.user.uuid}")
 
     if cache_data:
@@ -278,38 +288,124 @@ def file_translate(request):
         symbols_count += sum(len(word) for word in file_texts)
         file = rename_file(file=file, file_name=file_name)
 
-    if translation_allowed(request, words_count=words_count, files_count=len(files), symbols_count=symbols_count):
-        data = {
-            "user_custom_mt_token": request.user.uuid,
-            **get_translate_data(request),
-            "glossary": json.dumps(form_glossary_object(request))
+    if not translation_allowed(request, words_count=words_count, files_count=len(files), symbols_count=symbols_count):
+        return JsonResponse({"detail": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
+
+    source_language = request.POST.get('source_language')
+    target_language = request.POST.get('target_language')
+    domain_name_raw = request.POST.get('domain_name')
+
+    # Convert domain name from French to English if needed
+    # Django Lara templates use English domain names
+    domain = Domain.objects.filter(french_name=domain_name_raw).first()
+    if not domain:
+        domain = Domain.objects.filter(name=domain_name_raw).first()
+    domain_name = domain.name if domain else domain_name_raw
+
+    user_id = request.user.id if request.user.is_authenticated else 'anonymous'
+    logger.info(f"LARA_DOC_TRANSLATE_START - User: {user_id} - Files: {len(files)} - Source: {source_language} -> Target: {target_language} - Domain: {domain_name} (raw: {domain_name_raw})")
+
+    # Step 1: Fetch template to get translation memory and glossary IDs
+    translation_memory_id = None
+    glossary_id = None
+    template_id = None
+    template_name = None
+
+    try:
+        template_response = requests.get(
+            f"{settings.LARA_API_URL}/api/templates/find",
+            params={
+                'domain': domain_name,
+                'sourceLanguage': source_language,
+                'targetLanguage': target_language,
+            },
+            timeout=10
+        )
+
+        logger.info(f"LARA_DOC_TEMPLATES_RESPONSE - User: {user_id} - Status: {template_response.status_code}")
+
+        if template_response.status_code == 200:
+            templates = template_response.json()
+            if templates and len(templates) > 0:
+                template = templates[0]
+                template_id = template.get('id')
+                template_name = template.get('name')
+                translation_memory_id = template.get('translationMemoryId')
+                glossary_id = template.get('glossaryId')
+                logger.info(f"LARA_DOC_TEMPLATE_SELECTED - User: {user_id} - Template: {template_name} (ID: {template_id}) - TM ID: {translation_memory_id} - Glossary ID: {glossary_id}")
+    except requests.RequestException as e:
+        logger.error(f"LARA_DOC_TEMPLATES_EXCEPTION - User: {user_id} - Exception: {str(e)}")
+        # Continue without template info
+
+    # Step 2: Translate each document via Django Lara
+    projects = []
+    for file in files:
+        file = lowercase_file_extension(file)
+
+        # Build form data for Django Lara
+        translate_data = {
+            'accessKeyId': settings.LARA_ACCESS_KEY_ID,
+            'accessKeySecret': settings.LARA_ACCESS_KEY_SECRET,
+            'source': source_language,
+            'target': target_language,
+            'userToken': str(request.user.uuid) if request.user.is_authenticated else '',
         }
-        projects = []
-        for file in files:
-            file = lowercase_file_extension(file)
+
+        if domain_name:
+            translate_data['domain'] = domain_name
+        if template_id:
+            translate_data['templateId'] = str(template_id)
+        if template_name:
+            translate_data['templateName'] = template_name
+        if translation_memory_id:
+            translate_data['adaptTo'] = str(translation_memory_id)
+        if glossary_id:
+            translate_data['glossaries'] = str(glossary_id)
+
+        logger.info(f"LARA_DOC_TRANSLATE_CALL - User: {user_id} - File: {file.name} - adaptTo: {translation_memory_id} - glossaries: {glossary_id}")
+
+        try:
             response = requests.post(
-                settings.CLOUDSTORAGE_API_URL,
-                data=data,
-                headers={
-                    "token": api_key,
-                    "X-API-Key": settings.STATS_API_KEY
-                },
-                files={
-                    'source_file': file
-                }
+                f"{settings.LARA_API_URL}/api/lara/translate-document",
+                data=translate_data,
+                files={'file': (file.name, file, file.content_type)},
+                timeout=300  # 5 minutes timeout for large documents
             )
+
+            logger.info(f"LARA_DOC_TRANSLATE_RESPONSE - User: {user_id} - File: {file.name} - Status: {response.status_code}")
+
+            if response.status_code == 200:
+                result = response.json()
+                projects.append({
+                    'id': result.get('id'),
+                    'file_name': file.name,
+                    'file_extension': os.path.splitext(file.name)[1],
+                    'status': result.get('status'),
+                    'download_url': result.get('downloadUrl')
+                })
+            else:
+                logger.error(f"LARA_DOC_TRANSLATE_ERROR - User: {user_id} - File: {file.name} - Response: {response.text}")
+                projects.append({
+                    'id': None,
+                    'file_name': file.name,
+                    'file_extension': os.path.splitext(file.name)[1],
+                    'status': 'Error',
+                    'error': response.text
+                })
+
+        except requests.RequestException as e:
+            logger.error(f"LARA_DOC_TRANSLATE_EXCEPTION - User: {user_id} - File: {file.name} - Exception: {str(e)}")
             projects.append({
-                'id': response.json().get('id'),
+                'id': None,
                 'file_name': file.name,
-                'file_extension': os.path.splitext(file.name)[1]
+                'file_extension': os.path.splitext(file.name)[1],
+                'status': 'Error',
+                'error': str(e)
             })
-        time.sleep(0.1)
-        for project in projects:
-            project_id = project.get('id')
-            res = requests.get(settings.CLOUDSTORAGE_API_URL + f"{project_id}/",
-                               headers={
-                                   "token": api_key})
-            
+
+    # Send notification email for successful translations
+    for project in projects:
+        if project.get('id'):
             send_email(
                 settings.QUOTE_CC_EMAIL,
                 EmailType.USER_ADM_TR_FILE,
@@ -317,20 +413,24 @@ def file_translate(request):
                 {
                     "lexa_username": 'admin',
                     "lexa_sender_email": request.user.email if request.user.email else '(no email)',
-                    "url_source_file": res.json().get('source_file'),
+                    "url_source_file": f"Document traduit via LARA - {project['file_name']}",
                     "translation_name": project['file_name'],
                     "file_ext": project['file_extension']
                 }
             )
-            
-        add_translations(request, words_count=words_count,
-                         files_count=len(files), symbols_count=symbols_count)
-        return JsonResponse({"project_ids": [project.get('id') for project in projects],
-                            "display_popup": False if get_price_by_language_pair(
-            source_language=request.POST.get(
-                'source_language'),
-            target_language=request.POST.get('target_language')) else True})
-    return JsonResponse({"detail": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Update translation quota
+    add_translations(request, words_count=words_count,
+                     files_count=len(files), symbols_count=symbols_count)
+
+    logger.info(f"LARA_DOC_TRANSLATE_COMPLETE - User: {user_id} - Projects: {len(projects)} - Quota updated")
+
+    return JsonResponse({
+        "project_ids": [project.get('id') for project in projects if project.get('id')],
+        "display_popup": False if get_price_by_language_pair(
+            source_language=source_language,
+            target_language=target_language) else True
+    })
 
 
 class GetTemplatesView(APIView):
@@ -447,26 +547,82 @@ class FileExpertRevisionView(APIView):
 
 
 def get_projects_by_ids(request):
+    """
+    Get project status by IDs - now supports Django Lara documents.
+
+    Calls Django Lara document-status endpoint and maps response to
+    match frontend expected format.
+    """
+    logger = logging.getLogger(__name__)
+
     project_ids = request.query_params.getlist('project_id[]', [])
     responses = []
-    try:
-        user_api_key = get_user_api_key(request.user)
-    except ValueError:
-        return Response({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
-    for project_id in project_ids:
-        response = requests.get(settings.CLOUDSTORAGE_API_URL + f"{project_id}/",
-                                headers={
-                                    "token": user_api_key})
-        res = response.json()
-        file_name = urlparse(response.json()['source_file']).path.lstrip(
-            '/').split('/')[-1]
-        original_filename = unquote(file_name)
-        res['source_file_name'] = original_filename
-        res['display_popup'] = False if get_price_by_language_pair(source_language=res['source_language'],
-                                                                   target_language=res['target_language']) else True
 
-        responses.append(res)
+    for project_id in project_ids:
+        try:
+            # Call Django Lara document-status endpoint
+            response = requests.get(
+                f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}",
+                timeout=10
+            )
+
+            if response.status_code == 200:
+                lara_result = response.json()
+
+                # Map Django Lara response to frontend expected format
+                # Frontend expects: id, status, source_file_name, translated_file, source_language, target_language
+                res = {
+                    'id': lara_result.get('id'),
+                    'status': map_lara_status_to_lexa(lara_result.get('status')),
+                    'source_file_name': lara_result.get('filename', ''),
+                    'source_language': lara_result.get('source_language', ''),
+                    'target_language': lara_result.get('target_language', ''),
+                    'translated_file': lara_result.get('downloadUrl') if lara_result.get('status') == 'translated' else None,
+                    'reviewed_file': None,  # LARA doesn't have post-editing yet
+                    'display_popup': False if get_price_by_language_pair(
+                        source_language=lara_result.get('source_language', ''),
+                        target_language=lara_result.get('target_language', '')
+                    ) else True
+                }
+
+                # Add error reason if status is error
+                if lara_result.get('status') == 'error':
+                    res['error_reason'] = lara_result.get('error_message', 'Translation failed')
+
+                responses.append(res)
+            else:
+                logger.error(f"LARA_DOC_STATUS_ERROR - Project: {project_id} - Status: {response.status_code}")
+                responses.append({
+                    'id': project_id,
+                    'status': 'Error',
+                    'error_reason': f'Failed to get status: {response.status_code}'
+                })
+
+        except requests.RequestException as e:
+            logger.error(f"LARA_DOC_STATUS_EXCEPTION - Project: {project_id} - Exception: {str(e)}")
+            responses.append({
+                'id': project_id,
+                'status': 'Error',
+                'error_reason': str(e)
+            })
+
     return responses
+
+
+def map_lara_status_to_lexa(lara_status):
+    """
+    Map Django Lara status to Lexa frontend expected status.
+
+    Lara statuses: pending, processing, translated, error
+    Lexa statuses: Being translated, Translated, Error
+    """
+    status_map = {
+        'pending': 'Being translated',
+        'processing': 'Being translated',
+        'translated': 'Translated',
+        'error': 'Error'
+    }
+    return status_map.get(lara_status, 'Being translated')
 
 
 class SingleProjectView(APIView):
