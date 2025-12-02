@@ -89,6 +89,9 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
 
     # Placeholder for ampersand character to avoid issues during translation
     AMPERSAND_PLACEHOLDER = '[[[]]]'
+    # Placeholders for underline (not preserved by translation API)
+    UNDERLINE_START = '[[u]]'
+    UNDERLINE_END = '[[/u]]'
 
     doc = Document()
     para = doc.add_paragraph()
@@ -108,7 +111,11 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
             parts = text_insert.split('\n')
             for i, part in enumerate(parts):
                 if part:  # Add text to current paragraph
-                    run = para.add_run(part)
+                    # Add underline markers if text is underlined (workaround for translation API)
+                    text_to_add = part
+                    if attrs.get('underline'):
+                        text_to_add = f'{UNDERLINE_START}{part}{UNDERLINE_END}'
+                    run = para.add_run(text_to_add)
                     # Apply text formatting (bold, italic, underline, color)
                     if attrs.get('bold'):
                         run.bold = True
@@ -126,17 +133,26 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
 
                 # Create new paragraph for each newline (except the last one)
                 if i < len(parts) - 1:
+                    # Check if this is a header (h1, h2, h3, etc.)
+                    header_level = attrs.get('header')
+                    if header_level:
+                        # Apply heading style to current paragraph before creating new one
+                        para.style = f'Heading {header_level}'
+                        para = doc.add_paragraph()
                     # Check if this is a list item
-                    list_type = attrs.get('list')
-                    if list_type == 'bullet':
+                    elif attrs.get('list') == 'bullet':
                         para = doc.add_paragraph(style='List Bullet')
-                    elif list_type == 'ordered':
+                    elif attrs.get('list') == 'ordered':
                         para = doc.add_paragraph(style='List Number')
                     else:
                         para = doc.add_paragraph()
         else:
             # No newlines - just add the text to current paragraph
-            run = para.add_run(text_insert)
+            # Add underline markers if text is underlined (workaround for translation API)
+            text_to_add = text_insert
+            if attrs.get('underline'):
+                text_to_add = f'{UNDERLINE_START}{text_insert}{UNDERLINE_END}'
+            run = para.add_run(text_to_add)
             # Apply text formatting
             if attrs.get('bold'):
                 run.bold = True
@@ -234,10 +250,23 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
         for para in translated_doc.paragraphs:
             para_html = []
 
+            # Check paragraph style
+            style_name = para.style.name
+            style_name_lower = style_name.lower()
+
+            # Check if this is a heading (h1, h2, h3, etc.)
+            heading_level = None
+            if style_name.startswith('Heading ') or 'heading' in style_name_lower:
+                # Extract heading level (e.g., "Heading 2" -> 2, "P68B1DB1-Heading22" -> 2)
+                import re
+                # Look for the first digit after "heading" (h1-h6 only need single digit)
+                match = re.search(r'heading\s*(\d)', style_name_lower)
+                if match:
+                    heading_level = int(match.group(1))
+
             # Check if this is a list item
-            style_name_lower = para.style.name.lower()
-            is_bullet_list = 'bullet' in style_name_lower or para.style.name == 'List Bullet'
-            is_number_list = 'number' in style_name_lower or para.style.name == 'List Number'
+            is_bullet_list = 'bullet' in style_name_lower or style_name == 'List Bullet'
+            is_number_list = 'number' in style_name_lower or style_name == 'List Number'
             is_list = is_bullet_list or is_number_list
 
             # Build the content with formatting
@@ -248,23 +277,29 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
                 # Restore ampersand from placeholder
                 text_content = text_content.replace(AMPERSAND_PLACEHOLDER, '&')
 
-                # Build style attributes
-                styles = []
-                if run.bold:
-                    styles.append("font-weight: bold")
-                if run.italic:
-                    styles.append("font-style: italic")
-                if run.underline:
-                    styles.append("text-decoration: underline")
+                # Restore underline from markers (workaround for translation API not preserving underline)
+                text_content = text_content.replace(UNDERLINE_START, '<u>').replace(UNDERLINE_END, '</u>')
 
-                # Preserve color
+                # Build HTML with semantic tags for Quill compatibility
+                # Quill recognizes <strong>, <em>, <u> but not style="font-weight: bold"
+                html_content = text_content
+
+                # Apply formatting with semantic HTML tags
+                if run.bold:
+                    html_content = f'<strong>{html_content}</strong>'
+                if run.italic:
+                    html_content = f'<em>{html_content}</em>'
+                # Note: underline is now handled via markers above (run.underline not reliable after translation)
+                if run.underline and UNDERLINE_START not in run.text:
+                    html_content = f'<u>{html_content}</u>'
+
+                # Preserve color with span style (Quill handles this)
                 if run.font.color and run.font.color.rgb:
                     rgb = run.font.color.rgb
                     r, g, b = rgb[0], rgb[1], rgb[2]
-                    styles.append(f"color: rgb({r}, {g}, {b})")
+                    html_content = f'<span style="color: rgb({r}, {g}, {b})">{html_content}</span>'
 
-                style_attr = f' style="{"; ".join(styles)}"' if styles else ''
-                para_html.append(f'<span{style_attr}>{text_content}</span>')
+                para_html.append(html_content)
 
             content = "".join(para_html)
 
@@ -289,8 +324,11 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
                     list_items = []
                     current_list_type = None
 
-                # Regular paragraph
-                html_parts.append(f'<p>{content}</p>')
+                # Check if this is a heading or regular paragraph
+                if heading_level:
+                    html_parts.append(f'<h{heading_level}>{content}</h{heading_level}>')
+                else:
+                    html_parts.append(f'<p>{content}</p>')
 
         # Close final list if still open
         if current_list_type:
