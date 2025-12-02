@@ -87,12 +87,17 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
     from docx.shared import RGBColor
     from docx import Document as DocxDocument
 
+    # Placeholder for ampersand character to avoid issues during translation
+    AMPERSAND_PLACEHOLDER = '[[[]]]'
+
     doc = Document()
     para = doc.add_paragraph()
 
     # Convert Delta to DOCX
     for op in delta.get('ops', []):
         text_insert = op.get('insert', '')
+        # Replace ampersand with placeholder before adding to DOCX
+        text_insert = text_insert.replace('&', AMPERSAND_PLACEHOLDER)
         attrs = op.get('attributes', {})
 
         if not text_insert:
@@ -240,6 +245,8 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
                 text_content = run.text
                 if not text_content:
                     continue
+                # Restore ampersand from placeholder
+                text_content = text_content.replace(AMPERSAND_PLACEHOLDER, '&')
 
                 # Build style attributes
                 styles = []
