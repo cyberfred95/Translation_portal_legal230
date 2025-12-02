@@ -77,31 +77,335 @@ PAGINATION_PAGE_SIZE = 20
 CACHE_TTL = 3600
 
 
+def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, symbols_count):
+    """
+    Translate text using Delta JSON -> DOCX -> Translation -> HTML conversion.
+    This method preserves formatting including colors, lists, bold, italic, underline.
+    """
+    import uuid
+    from docx import Document
+    from docx.shared import RGBColor
+    from docx import Document as DocxDocument
+
+    doc = Document()
+    para = doc.add_paragraph()
+
+    # Convert Delta to DOCX
+    for op in delta.get('ops', []):
+        text_insert = op.get('insert', '')
+        attrs = op.get('attributes', {})
+
+        if not text_insert:
+            continue
+
+        # Handle newlines
+        if '\n' in text_insert:
+            parts = text_insert.split('\n')
+            for i, part in enumerate(parts):
+                if part:  # Add text to current paragraph
+                    run = para.add_run(part)
+                    # Apply text formatting (bold, italic, underline, color)
+                    if attrs.get('bold'):
+                        run.bold = True
+                    if attrs.get('italic'):
+                        run.italic = True
+                    if attrs.get('underline'):
+                        run.underline = True
+                    if 'color' in attrs:
+                        color_hex = attrs['color'].lstrip('#')
+                        if len(color_hex) == 6:
+                            r = int(color_hex[0:2], 16)
+                            g = int(color_hex[2:4], 16)
+                            b = int(color_hex[4:6], 16)
+                            run.font.color.rgb = RGBColor(r, g, b)
+
+                # Create new paragraph for each newline (except the last one)
+                if i < len(parts) - 1:
+                    # Check if this is a list item
+                    list_type = attrs.get('list')
+                    if list_type == 'bullet':
+                        para = doc.add_paragraph(style='List Bullet')
+                    elif list_type == 'ordered':
+                        para = doc.add_paragraph(style='List Number')
+                    else:
+                        para = doc.add_paragraph()
+        else:
+            # No newlines - just add the text to current paragraph
+            run = para.add_run(text_insert)
+            # Apply text formatting
+            if attrs.get('bold'):
+                run.bold = True
+            if attrs.get('italic'):
+                run.italic = True
+            if attrs.get('underline'):
+                run.underline = True
+            if 'color' in attrs:
+                color_hex = attrs['color'].lstrip('#')
+                if len(color_hex) == 6:
+                    r = int(color_hex[0:2], 16)
+                    g = int(color_hex[2:4], 16)
+                    b = int(color_hex[4:6], 16)
+                    run.font.color.rgb = RGBColor(r, g, b)
+
+    # Save to temporary file
+    temp_filename = f"text_translation_{uuid.uuid4().hex}.docx"
+    temp_path = os.path.join(settings.MEDIA_ROOT, 'docx', temp_filename)
+    doc.save(temp_path)
+
+    try:
+        # Read the file and create InMemoryUploadedFile
+        with open(temp_path, 'rb') as f:
+            file_content = f.read()
+
+        file = InMemoryUploadedFile(
+            BytesIO(file_content),
+            None,
+            temp_filename,
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            len(file_content),
+            None
+        )
+
+        # Submit for translation
+        data = {
+            "user_custom_mt_token": request.user.uuid,
+            **get_translate_data(request),
+            "glossary": json.dumps(form_glossary_object(request))
+        }
+
+        response = requests.post(
+            settings.CLOUDSTORAGE_API_URL,
+            data=data,
+            headers={
+                "token": api_key,
+                "X-API-Key": settings.STATS_API_KEY
+            },
+            files={
+                'source_file': file
+            }
+        )
+
+        if response.status_code != 200:
+            return JsonResponse({"detail": "Translation submission failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        project_id = response.json().get('id')
+
+        # Poll for translation completion (max 120 seconds for long texts)
+        max_attempts = 60
+        attempt = 0
+        translated_file_url = None
+
+        while attempt < max_attempts:
+            time.sleep(2)
+            status_response = requests.get(
+                settings.CLOUDSTORAGE_API_URL + f"{project_id}/",
+                headers={"token": api_key}
+            )
+
+            if status_response.status_code == 200:
+                project_data = status_response.json()
+                if project_data.get('status') == 'Translated':
+                    translated_file_url = project_data.get('translated_file')
+                    break
+                elif project_data.get('status') == 'Error':
+                    return JsonResponse({"detail": "Translation failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            attempt += 1
+
+        if not translated_file_url:
+            return JsonResponse({"detail": "Translation timeout"}, status=status.HTTP_408_REQUEST_TIMEOUT)
+
+        # Download translated DOCX
+        translated_response = requests.get(translated_file_url)
+        if translated_response.status_code != 200:
+            return JsonResponse({"detail": "Failed to download translated file"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Convert translated DOCX to HTML preserving colors and lists
+        translated_doc = DocxDocument(BytesIO(translated_response.content))
+        html_parts = []
+        current_list_type = None
+        list_items = []
+
+        for para in translated_doc.paragraphs:
+            para_html = []
+
+            # Check if this is a list item
+            style_name_lower = para.style.name.lower()
+            is_bullet_list = 'bullet' in style_name_lower or para.style.name == 'List Bullet'
+            is_number_list = 'number' in style_name_lower or para.style.name == 'List Number'
+            is_list = is_bullet_list or is_number_list
+
+            # Build the content with formatting
+            for run in para.runs:
+                text_content = run.text
+                if not text_content:
+                    continue
+
+                # Build style attributes
+                styles = []
+                if run.bold:
+                    styles.append("font-weight: bold")
+                if run.italic:
+                    styles.append("font-style: italic")
+                if run.underline:
+                    styles.append("text-decoration: underline")
+
+                # Preserve color
+                if run.font.color and run.font.color.rgb:
+                    rgb = run.font.color.rgb
+                    r, g, b = rgb[0], rgb[1], rgb[2]
+                    styles.append(f"color: rgb({r}, {g}, {b})")
+
+                style_attr = f' style="{"; ".join(styles)}"' if styles else ''
+                para_html.append(f'<span{style_attr}>{text_content}</span>')
+
+            content = "".join(para_html)
+
+            # Handle list items - Quill uses <ol> for both bullets and numbered lists
+            if is_list:
+                data_list_attr = 'bullet' if is_bullet_list else 'ordered'
+
+                # Starting a new list or continuing same list type
+                if current_list_type != data_list_attr:
+                    # Close previous list if exists
+                    if current_list_type:
+                        html_parts.append(f'<ol>{"".join(list_items)}</ol>')
+                        list_items = []
+                    current_list_type = data_list_attr
+
+                # Add item to current list with Quill's data-list attribute
+                list_items.append(f'<li data-list="{data_list_attr}">{content}</li>')
+            else:
+                # Close any open list
+                if current_list_type:
+                    html_parts.append(f'<ol>{"".join(list_items)}</ol>')
+                    list_items = []
+                    current_list_type = None
+
+                # Regular paragraph
+                html_parts.append(f'<p>{content}</p>')
+
+        # Close final list if still open
+        if current_list_type:
+            html_parts.append(f'<ol>{"".join(list_items)}</ol>')
+
+        translated_html = "".join(html_parts)
+
+        # Send statistics
+        send_statistic_request(
+            api_key=api_key, texts=[plain_text],
+            user_uuid=request.user.uuid,
+            words_count=words_count,
+            **get_translate_data(request, for_statistic=True),
+        )
+        add_translations(request, words_count=words_count, symbols_count=symbols_count)
+
+        return JsonResponse({"translated_text": [translated_html]})
+
+    finally:
+        # Clean up temporary file
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+
+
+def translate_via_text_api(html_text, api_key, request, plain_text, words_count, symbols_count):
+    """
+    Translate text using the original direct text translation API.
+    This is the old method that sends HTML directly to the translation API without DOCX conversion.
+    Used for PASDOC tests or single-paragraph texts.
+    """
+    # Call the original text translation API directly
+    response = requests.post(
+        settings.CUSTOM_MT_CONSOLE_URL + "translation/translate",
+        data={
+            "text": [html_text],
+            **get_translate_data(request)
+        },
+        headers={"token": api_key}
+    )
+
+    # Check if the request was successful
+    if response.status_code != 200:
+        return JsonResponse(
+            {"detail": f"Translation API error: {response.status_code}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    result = response.json()
+
+    # Check if the response contains an error
+    if 'error' in result:
+        error_message = result.get('error', 'Unknown error from translation API')
+        return JsonResponse(
+            {"detail": f"Translation error: {error_message}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    # Success - send statistics
+    send_statistic_request(
+        api_key=api_key,
+        texts=[plain_text],
+        user_uuid=request.user.uuid,
+        words_count=words_count,
+        **get_translate_data(request, for_statistic=True),
+    )
+    add_translations(request, words_count=words_count, symbols_count=symbols_count)
+
+    return JsonResponse(result)
+
+
 def text_translation(request):
-    text = request.POST.get('text')
-    words_count = get_word_count(text)
-    symbols_count = len(text)
+    text_input = request.POST.get('text')  # Can be Delta JSON (from Quill) or plain text/HTML (from API)
+
+    import json
+
+    # Try to parse as Delta JSON, fallback to plain text/HTML for API compatibility
+    delta = None
+    is_delta_format = False
+
+    try:
+        parsed = json.loads(text_input)
+        # Check if it's a valid Delta format (must have 'ops' key with a list)
+        if isinstance(parsed, dict) and 'ops' in parsed and isinstance(parsed.get('ops'), list):
+            delta = parsed
+            is_delta_format = True
+            # Get plain text from Delta for word count
+            plain_text = ''.join([op.get('insert', '') for op in delta.get('ops', [])])
+        else:
+            # It's JSON but not Delta format, treat as plain text
+            plain_text = text_input
+    except (json.JSONDecodeError, TypeError):
+        # Not JSON, treat as plain text or HTML (API compatibility)
+        plain_text = text_input if text_input else ''
+
+    words_count = get_word_count(plain_text)
+    symbols_count = len(plain_text)
+
     if translation_allowed(request=request, words_count=words_count, symbols_count=symbols_count):
         try:
             api_key = get_user_api_key(request.user)
         except ValueError:
             return JsonResponse({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
-        response = requests.post(settings.CUSTOM_MT_CONSOLE_URL + "translation/translate", data={
-            "text": [text],
-            **get_translate_data(request)
-        }, headers={
-            "token": api_key})
-        if response.status_code == 200:
-            send_statistic_request(
-                api_key=api_key, texts=[text],
-                user_uuid=request.user.uuid,
-                words_count=get_word_count(text),
-                **get_translate_data(request, for_statistic=True),
-            )
-            add_translations(request, words_count=words_count,
-                             symbols_count=symbols_count)
-        result = response.json()
-        return JsonResponse(result)
+
+        # If not Delta format, always use the old text API method (for API compatibility)
+        if not is_delta_format:
+            html_text = request.POST.get('html_content', '') or text_input
+            return translate_via_text_api(html_text, api_key, request, plain_text, words_count, symbols_count)
+
+        # For Delta format: check if we should use the new Delta->DOCX method or the old text API method
+        # Use old method if: text starts with "PASDOC" OR text has only one paragraph
+        starts_with_pasdoc = plain_text.strip().upper().startswith('PASDOC')
+        paragraph_count = plain_text.count('\n')
+        use_old_method = starts_with_pasdoc or paragraph_count <= 1
+
+        if use_old_method:
+            # Use HTML sent from frontend (Quill's root.innerHTML)
+            html_text = request.POST.get('html_content', '')
+            return translate_via_text_api(html_text, api_key, request, plain_text, words_count, symbols_count)
+        else:
+            # Use new Delta->DOCX method
+            return translate_via_delta_docx(delta, api_key, request, plain_text, words_count, symbols_count)
+    
     return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
                         status=status.HTTP_400_BAD_REQUEST)
 
