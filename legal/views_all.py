@@ -355,18 +355,29 @@ def translate_via_text_api(html_text, api_key, request, plain_text, words_count,
 
 
 def text_translation(request):
-    delta_json = request.POST.get('text')  # This is Delta JSON from Quill editor
+    text_input = request.POST.get('text')  # Can be Delta JSON (from Quill) or plain text/HTML (from API)
 
     import json
 
-    # Parse Delta JSON
-    try:
-        delta = json.loads(delta_json)
-    except json.JSONDecodeError:
-        return JsonResponse({"detail": "Invalid Delta format"}, status=status.HTTP_400_BAD_REQUEST)
+    # Try to parse as Delta JSON, fallback to plain text/HTML for API compatibility
+    delta = None
+    is_delta_format = False
 
-    # Get plain text for word count
-    plain_text = ''.join([op.get('insert', '') for op in delta.get('ops', [])])
+    try:
+        parsed = json.loads(text_input)
+        # Check if it's a valid Delta format (must have 'ops' key with a list)
+        if isinstance(parsed, dict) and 'ops' in parsed and isinstance(parsed.get('ops'), list):
+            delta = parsed
+            is_delta_format = True
+            # Get plain text from Delta for word count
+            plain_text = ''.join([op.get('insert', '') for op in delta.get('ops', [])])
+        else:
+            # It's JSON but not Delta format, treat as plain text
+            plain_text = text_input
+    except (json.JSONDecodeError, TypeError):
+        # Not JSON, treat as plain text or HTML (API compatibility)
+        plain_text = text_input if text_input else ''
+
     words_count = get_word_count(plain_text)
     symbols_count = len(plain_text)
 
@@ -376,7 +387,12 @@ def text_translation(request):
         except ValueError:
             return JsonResponse({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
 
-        # Check if we should use the new Delta->DOCX method or the old text API method
+        # If not Delta format, always use the old text API method (for API compatibility)
+        if not is_delta_format:
+            html_text = request.POST.get('html_content', '') or text_input
+            return translate_via_text_api(html_text, api_key, request, plain_text, words_count, symbols_count)
+
+        # For Delta format: check if we should use the new Delta->DOCX method or the old text API method
         # Use old method if: text starts with "PASDOC" OR text has only one paragraph
         starts_with_pasdoc = plain_text.strip().upper().startswith('PASDOC')
         paragraph_count = plain_text.count('\n')
