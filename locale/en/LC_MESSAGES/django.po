@@ -1246,3 +1246,19 @@ msgstr "Logout"
 #: legal/templates/profile_details/profile_security.html:31
 msgid "Sign out of your account."
 msgstr "Sign out of your account."
+
+#: legal/templates/translate/text_translate/text_translate.html:123
+msgid "Custom translation instructions"
+msgstr "Custom translation instructions"
+
+#: legal/templates/translate/text_translate/text_translate.html:129
+msgid "e.g., Use formal legal tone, Preserve Latin terms, etc."
+msgstr "e.g., Use formal legal tone, Preserve Latin terms, etc."
+
+#: legal/templates/translate/text_translate/text_translate.html:138
+msgid "Translation quality feedback"
+msgstr "Translation quality feedback"
+
+#: legal/templates/translate/text_translate/text_translate.html:48
+msgid "Copy target language to source"
+msgstr "Copy target language to source"

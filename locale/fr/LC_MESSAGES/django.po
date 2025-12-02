@@ -1233,7 +1233,7 @@ msgstr ""
 
 #: writing/templates/writing_2.html:177
 msgid "Copy Result"
-msgstr ""
+msgstr "Copier le résultat"
 
 #: glossaries/templates/glossaries.html:148
 msgid "File size exceeds 5MB limit."
@@ -1250,3 +1250,19 @@ msgstr "Déconnexion"
 #: legal/templates/profile_details/profile_security.html:31
 msgid "Sign out of your account."
 msgstr "Déconnectez-vous de votre compte."
+
+#: legal/templates/translate/text_translate/text_translate.html:123
+msgid "Custom translation instructions"
+msgstr "Instructions de traduction personnalisées"
+
+#: legal/templates/translate/text_translate/text_translate.html:129
+msgid "e.g., Use formal legal tone, Preserve Latin terms, etc."
+msgstr "Ex. : Utiliser un ton juridique formel, Conserver les termes latins, etc."
+
+#: legal/templates/translate/text_translate/text_translate.html:138
+msgid "Translation quality feedback"
+msgstr "Retour sur la qualité de la traduction"
+
+#: legal/templates/translate/text_translate/text_translate.html:48
+msgid "Copy target language to source"
+msgstr "Copier la langue cible vers la source"
