@@ -1080,7 +1080,7 @@ $(document).ready(function () {
         if (!glossaries || glossaries.length === 0) {
             container.html(`
                 <div class="flex flex-col items-center justify-center pt-6 pb-0">
-                    <p class="font-poppins font-normal text-gray-600" style="font-size: 14px; line-height: 24px;">${language_code === 'en' ? 'No glossaries found' : 'Aucun glossaire trouvé'}</p>
+                    <p class="font-poppins font-normal text-gray-600 text-center" style="font-size: 14px; line-height: 24px;">${language_code === 'en' ? 'No personal glossary found. The best glossary prepared by Lexa experts will be used, otherwise choose "no glossary".' : 'Aucun glossaire personnel trouvé. Le meilleur glossaire préparé par les experts Lexa sera utilisé, sinon choisissez "aucun glossaire".'}</p>
                 </div>
             `);
             return;
