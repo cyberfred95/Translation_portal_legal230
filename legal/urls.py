@@ -13,7 +13,6 @@ from legal.views.profile_details import ProfileDetailsView
 from legal.views.project_history import ProjectsHistoryView
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
-from writing.views import refresh_prompts_view
 from legal.views.my_team import MyTeamView
 
 urlpatterns = i18n_patterns(
@@ -30,8 +29,6 @@ urlpatterns = i18n_patterns(
     path('profile-details/', login_required(ProfileDetailsView.as_view()), name='profile_details'),
     
     path('alert/', DisplayMessage.as_view(), name='alert'),
-
-    path('refresh_prompts/', refresh_prompts_view, name='refresh_prompts'),
 
     path('detect_language/', login_required(LanguageDetectView.as_view()), name='detect_language'),
     path('detect_text_language/', login_required(DetectTextLanguageView.as_view()), name='detect_text_language'),

@@ -5,7 +5,6 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
-from django.conf import settings
 
 
 class BaseTemplateView(TemplateView):
@@ -30,18 +29,13 @@ from subscriptions.permissions import SubscribedPermission
 from subscriptions.models import UserSubscription, SubscriptionType
 from subscriptions.utils import get_user_api_key
 from .serializers import PromptSerializer
-from .tasks import refresh_prompts, send_statistic_request
+from .tasks import send_statistic_request
 
 from .models import Prompt
 import requests
 
 
 # Create your views here.
-
-def refresh_prompts_view(request):
-    refresh_prompts()
-    return HttpResponseRedirect(reverse('admin:writing_prompt_changelist'))
-
 
 class WritingView(BaseTemplateView):
     template_name = 'writing.html'

@@ -229,10 +229,6 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
 CELERY_ALWAYS_EAGER = bool(os.environ.get("CELERY_ALWAYS_EAGER", False))
 CELERY_BEAT_SCHEDULE = {
-    'update_prompts': {
-        'task': 'writing.tasks.refresh_prompts',
-        'schedule': crontab(minute="0", hour="0")
-    },
     'process_daily_subscription_renewals': {
         'task': 'subscriptions.tasks.process_daily_subscription_renewals',
         'schedule': crontab(minute="0", hour="0")

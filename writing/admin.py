@@ -25,8 +25,6 @@ class PromptAdmin(admin.ModelAdmin):
     fields = ('prompt', 'variables', 'temperature', 'gpt_model', 'icon')
     inlines = [PromptTranslationInline]
 
-    change_list_template = "admin/writing/Prompt/change_list.html"
-
     @staticmethod
     def icon_display(obj: Prompt):
         if getattr(obj, 'icon', None):
