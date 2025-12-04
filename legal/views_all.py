@@ -47,7 +47,7 @@ class BaseTemplateView(TemplateView):
 
 from subscriptions.models import SubscriptionType
 from stripe_webhooks.tasks_handlers.helper.stripe_session import get_stripe_customer_session_url
-from .helpers import get_translate_data, lowercase_file_extension, get_word_count, get_text_from_file, get_project_file, \
+from .helpers import lowercase_file_extension, get_word_count, get_text_from_file, get_project_file, \
     rename_file
 
 from emails.models import EmailType
@@ -61,7 +61,6 @@ from preferences import preferences
 import langdetect
 
 from .services.post_editing import FileExpertRevisionService
-from .tasks import send_statistic_request
 from glossaries.models import Glossary
 from typing import Optional
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -203,22 +202,6 @@ def text_translation(request):
         if result.get("quality_feedback"):
             formatted_result["quality_feedback"] = result.get("quality_feedback")
             logger.debug(f"LARA_QUALITY_FEEDBACK - User: {user_id} - Feedback: {result.get('quality_feedback')}")
-
-        # Send statistics
-        try:
-            api_key = get_user_api_key(request.user)
-            send_statistic_request(
-                api_key=api_key,
-                texts=[text],
-                user_uuid=user_uuid,
-                words_count=words_count,
-                **get_translate_data(request, for_statistic=True),
-            )
-            logger.info(f"LARA_STATISTICS_SENT - User: {user_id} - API key found and stats sent")
-        except ValueError:
-            logger.warning(f"LARA_STATISTICS_FAILED - User: {user_id} - No active subscription for stats")
-            # No active subscription for stats, but translation succeeded
-            pass
 
         # Update user translation quota
         add_translations(request, words_count=words_count, symbols_count=symbols_count)

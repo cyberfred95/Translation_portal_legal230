@@ -59,49 +59,6 @@ class StatsProcessor:
             chars += len(paragraph['text'])
         return chars
 
-    def get_template_name(self, source_language, target_language, domain_name):
-        response = requests.post(
-            settings.CUSTOM_MT_CONSOLE_URL + "translation/get_template_by_language_pair_and_domain",
-            headers={
-                "token": self._api_key
-            },
-            data={
-                "source_language": source_language,
-                "target_language": target_language,
-                "domain_name": domain_name
-            }
-        )
-        return response.json().get('name')
-
-    def send_request(self,
-                     texts: list,
-                     user_uuid,
-                     domain_name,
-                     source_language,
-                     target_language,
-                     file_name='Text translate',
-                     words_count=None,
-                     ):
-        template_name = self.get_template_name(source_language, target_language, domain_name)
-        response = requests.post(
-            settings.STATS_API_URL + "add_statistic/",
-            headers={
-                'token': settings.STATS_API_KEY,
-                'X-API-KEY': self._api_key,
-            },
-            data={
-                "messages": texts,
-                "uuid": user_uuid,
-                'template_name': template_name,
-                'file_name': file_name,
-                'meta': json.dumps(
-                    {
-                        "words_count": words_count
-                    }
-                )
-            }
-        )
-
     def send_writing_request(self,
                              texts: list,
                              user_uuid,

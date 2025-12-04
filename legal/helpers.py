@@ -14,30 +14,6 @@ from domains.models import Domain
 from stats.calculator import StatsProcessor
 
 
-def get_translate_data(request, for_statistic=False):
-    translate_data = {
-        'source_language': request.POST.get('source_language'),
-        'target_language': request.POST.get('target_language'),
-    }
-    domain = Domain.objects.filter(
-        french_name=request.POST.get('domain_name')).first()
-    if not domain:
-        domain = Domain.objects.filter(
-            name=request.POST.get('domain_name')).first()
-
-    if not domain and preferences.DefaultTranslation.enabled:
-        if for_statistic:
-            translate_data['domain_name'] = preferences.DefaultTranslation.name
-        else:
-            translate_data[
-                'template_name'] = f"Custom.MT Default Template {request.POST.get('source_language')} {request.POST.get('target_language')}"
-    else:
-        lang_code = getattr(request, 'LANGUAGE_CODE', 'en')
-        translate_data['domain_name'] = domain.name if lang_code == 'fr' else request.POST.get('domain_name')
-
-    return translate_data
-
-
 def lowercase_file_extension(file: InMemoryUploadedFile) -> InMemoryUploadedFile:
     # Split the file name and extension
     name, ext = os.path.splitext(file.name)
