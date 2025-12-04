@@ -416,36 +416,6 @@ def file_translate(request):
     })
 
 
-class GetTemplatesView(APIView):
-    permission_classes = (SubscribedPermission, IsAuthenticated)
-
-    def get(self, request):
-        if not request.user.is_staff and not request.user.group:
-            return Response({"detail": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
-        if 'source_language' not in self.request.query_params or 'target_language' not in self.request.query_params:
-            return Response({"detail": "Missing source language or target language"},
-                            status=status.HTTP_400_BAD_REQUEST)
-        try:
-            user_api_key = get_user_api_key(self.request.user)
-        except ValueError:
-            return Response({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
-        templates = requests.post(
-            url=settings.CUSTOM_MT_CONSOLE_URL + "translation/get-templates",
-            data={
-                "source_language": self.request.query_params['source_language'].lower(),
-                "target_language": self.request.query_params['target_language'].lower()
-            },
-            headers={
-                'token': user_api_key
-            }
-        )
-        template_names = []
-        for template in templates.json():
-            template_names.append(template['template_name'])
-
-        return Response({"data": template_names}, status=status.HTTP_200_OK)
-
-
 class GetDomainsView(APIView):
     permission_classes = (SubscribedPermission, IsAuthenticated)
 
