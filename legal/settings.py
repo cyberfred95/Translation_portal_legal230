@@ -229,10 +229,6 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
 CELERY_ALWAYS_EAGER = bool(os.environ.get("CELERY_ALWAYS_EAGER", False))
 CELERY_BEAT_SCHEDULE = {
-    'update_domains': {
-        'task': 'domains.tasks.update_domains',
-        'schedule': crontab(minute="0", hour="0")
-    },
     'update_prompts': {
         'task': 'writing.tasks.refresh_prompts',
         'schedule': crontab(minute="0", hour="0")
