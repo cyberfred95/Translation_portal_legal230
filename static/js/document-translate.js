@@ -323,15 +323,9 @@ $(document).ready(function () {
                 }
             }
             if (currentStep === 2) {
-                if (!defaultDomain && access_to_default_glossaries) {
-                    loadDefaultGlossary();
-                    $(".add-glossary-btn").addClass('hidden');
-                    $(".step-domain .default").addClass('bg-gray-600 text-white');
-                } else {
-                    loadMyGlossaries();
-                    $(".add-glossary-btn").removeClass('hidden');
-                    $(".step-domain .my-glossary").addClass('bg-gray-600 text-white');
-                }
+                loadMyGlossaries();
+                $(".add-glossary-btn").removeClass('hidden');
+                $(".step-domain .my-glossary").addClass('bg-gray-600 text-white');
             }
 
             if (currentStep === 3) {
@@ -874,7 +868,6 @@ $(document).ready(function () {
                     selectedSubDomainId = $(this).data('domain-id');
                     selectedSubDomainEnglishName = $(this).data('english-name');
                     $('.domain-step').text(selectedSubDomain).removeClass('hidden');
-                    loadDefaultGlossary();
                 }
             });
 
@@ -885,7 +878,6 @@ $(document).ready(function () {
                 selectedSubDomainId = domainId;
                 selectedSubDomainEnglishName = domainEnglishName;
                 $('.domain-step').text(selectedSubDomain).removeClass('hidden');
-                loadDefaultGlossary();
             }
         });
     }
@@ -924,9 +916,6 @@ $(document).ready(function () {
                     $('#subdomain-section').hide().addClass('hidden');
                     $('#glossary-section-number').text('2. ' + (language_code === 'en' ? 'Select a glossary' : 'Sélectionner un glossaire'));
                     selectedSubDomain = 'Generic domain';
-                    
-                    // Charger le glossaire par défaut pour Generic domain
-                    loadDefaultGlossary();
                 } else {
                     // Sinon, afficher la section sous-domaine
                     $('#subdomain-section').show().removeClass('hidden');
@@ -940,9 +929,6 @@ $(document).ready(function () {
                         selectedSubDomain = '';
                     }
                 }
-                
-                // Note: L'affichage du tab "Standard" sera géré par loadDefaultGlossary()
-                // en fonction du résultat de l'API default_glossary
                 
                 // Activer le bouton Suivant
                     nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
@@ -959,11 +945,8 @@ $(document).ready(function () {
     // ------------- STEP-TRADUCTION -------------
 
     $(".step-domain .default").click(function () {
-        if (!defaultDomain || access_to_default_glossaries) {
-            selectGlossaryType('default');
-            loadDefaultGlossary();
-            $('.terminology-step').text('default').removeClass('hidden');
-        }
+        selectGlossaryType('default');
+        $('.terminology-step').text('default').removeClass('hidden');
     });
 
     $(".step-domain .my-glossary").click(function () {
@@ -997,59 +980,6 @@ $(document).ready(function () {
         $(".glossary-list").empty();
     }
 
-    function loadDefaultGlossary() {
-        const data = {
-            source_language: sourceLanguage,
-            target_language: targetLanguage,
-            domain_name: selectedSubDomain
-        };
-
-        $.ajax({
-            url: get_default_glossary,
-            type: 'POST',
-            data: data,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-            success: function (response) {
-                // Si la réponse est un objet vide {}, cacher le tab Standard
-                if (!response || Object.keys(response).length === 0) {
-                    $("#step2-default").addClass('hidden');
-                    $("#step2-my-glossary").removeClass('pr-4').addClass('pr-4 pl-0');
-                    $(".add-glossary-btn").removeClass('hidden');
-                    selectedGlossaryType = 'my-glossary';
-                    
-                    // Attendre un court instant que loadMyGlossaries() se termine avant de basculer
-                    setTimeout(function() {
-                        showTab('my-glossary');
-                    }, 300);
-                } else {
-                    // Afficher le tab Standard et afficher le glossaire
-                    $("#step2-default").removeClass('hidden');
-                    $("#step2-my-glossary").removeClass('pl-0').addClass('pl-4');
-                    $(".add-glossary-btn").addClass('hidden');
-                    selectedGlossaryType = 'default';
-                    displayDefaultGlossaryInStep3(response);
-                    // Basculer vers "Standard"
-                    showTab('default');
-                }
-            },
-            error: function (error) {
-                // En cas d'erreur, cacher le tab Standard et basculer vers My glossaries
-                $("#step2-default").addClass('hidden');
-                $("#step2-my-glossary").removeClass('pr-4').addClass('pr-4 pl-0');
-                $(".add-glossary-btn").removeClass('hidden');
-                selectedGlossaryType = 'my-glossary';
-                
-                // Attendre un court instant que loadMyGlossaries() se termine avant de basculer
-                setTimeout(function() {
-                    showTab('my-glossary');
-                }, 300);
-            }
-        });
-    }
-
     function loadMyGlossaries() {
         // Reset selected personal glossaries when loading new list
         selectedPersonalGlossaries = [];
@@ -1079,28 +1009,6 @@ $(document).ready(function () {
                 errorNotification(error?.status, error?.responseJSON?.detail);
             },
         });
-    }
-
-    function displayDefaultGlossaryInStep3(glossary) {
-        const container = $('.glossary-list');
-        container.empty();
-        
-        const { listItem, container: glossaryContainer } = createSelectionItem({
-            radioId: 'default-glossary-radio',
-            radioName: 'default-glossary-radio',
-            value: glossary.id,
-            isChecked: true,
-            icon: 'file',
-            label: glossary.name,
-            containerClass: '',
-            containerStyle: 'flex: 0 0 100%;'
-        });
-        
-        // Ajouter un ID unique pour la restauration lors du changement de tab
-        glossaryContainer.attr('id', 'default-glossary-container');
-        
-        container.append(listItem);
-        selectedGlossary = glossary.id;
     }
 
     function displayMyGlossariesInStep3(glossaries) {
@@ -1663,7 +1571,6 @@ $(document).ready(function () {
 
         // Réinitialiser toutes les sélections visuelles
         $('.subdomain-container').removeClass('bg-blue-50');
-        // Ne pas réinitialiser le glossaire par défaut dans le tab Standard
         $('#step2-tab-my-glossary-content .glossary-container').removeClass('bg-blue-50');
         $('input[type="radio"][name="sub_domain"]').prop('checked', false);
         $('input[type="radio"][name="glossary-radio"]').prop('checked', false);
@@ -1671,16 +1578,7 @@ $(document).ready(function () {
         // Afficher le contenu du tab sélectionné et sélectionner automatiquement le premier élément
         if (tabId === 'default') {
             $('#step2-tab-default-content').show();
-            // Restaurer le glossaire par défaut s'il existe
-            const defaultGlossaryContainer = $('#default-glossary-container');
-            if (defaultGlossaryContainer.length) {
-                const defaultGlossaryRadio = defaultGlossaryContainer.find('input[type="radio"]');
-                defaultGlossaryRadio.prop('checked', true);
-                defaultGlossaryContainer.addClass('bg-blue-50');
-                selectedGlossary = defaultGlossaryRadio.val();
-            } else {
-                selectedGlossary = 'none';
-            }
+            selectedGlossary = 'none';
         } else if (tabId === 'no-glossary') {
             $('#step2-tab-no-glossary-content').show();
             // Pour "No glossary", sélectionner automatiquement "none"
