@@ -17,7 +17,6 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
-from glossaries.helpers import get_glossary_username
 from glossaries.processor import GlossaryProcessor
 from quoting.models import LanguageQuote
 from django.utils.timezone import now
@@ -238,21 +237,6 @@ def text_translation(request):
         {"detail": f"Translation error: {error_detail}"},
         status=response.status_code
     )
-
-
-def form_glossary_object(request) -> Optional[dict]:
-    try:
-        glossary = Glossary.objects.get(id=request.POST.get('glossary'))
-        if glossary:
-            return {
-                "system": settings.GLOSSARY_SYSTEM,
-                "username": get_glossary_username(glossary),
-                "glossary_id": glossary.glossary_id,
-            }
-    except Glossary.DoesNotExist:
-        return {}
-    except ValueError:
-        return {}
 
 
 def file_translate(request):
