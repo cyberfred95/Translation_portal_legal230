@@ -378,7 +378,9 @@ def file_translate(request):
         if all_glossaries:
             translate_data['glossaries'] = ','.join(all_glossaries)
 
-        logger.info(f"LARA_DOC_TRANSLATE_CALL - User: {user_id} - File: {file.name} - domainId: {domain_id} - adaptTo: {translation_memory_id} - glossaries: {all_glossaries}")
+        # Log payload complet avant envoi (sans les credentials)
+        payload_log = {k: v for k, v in translate_data.items() if k not in ['accessKeyId', 'accessKeySecret']}
+        logger.info(f"LARA_DOC_TRANSLATE_CALL - User: {user_id} - File: {file.name} - Payload: {payload_log}")
 
         try:
             response = requests.post(
@@ -435,18 +437,39 @@ def file_translate(request):
                 }
             )
 
-    # Update translation quota
-    add_translations(request, words_count=words_count,
-                     files_count=len(files), symbols_count=symbols_count)
+    # Check for errors in projects
+    successful_projects = [p for p in projects if p.get('id')]
+    failed_projects = [p for p in projects if not p.get('id')]
 
-    logger.info(f"LARA_DOC_TRANSLATE_COMPLETE - User: {user_id} - Projects: {len(projects)} - Quota updated")
+    # If all projects failed, return error
+    if not successful_projects and failed_projects:
+        error_messages = [p.get('error', 'Unknown error') for p in failed_projects]
+        logger.error(f"LARA_DOC_TRANSLATE_ALL_FAILED - User: {user_id} - Errors: {error_messages}")
+        return JsonResponse({
+            "detail": "Translation failed",
+            "errors": error_messages
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    return JsonResponse({
-        "project_ids": [project.get('id') for project in projects if project.get('id')],
+    # Update translation quota only for successful translations
+    if successful_projects:
+        add_translations(request, words_count=words_count,
+                         files_count=len(successful_projects), symbols_count=symbols_count)
+
+    logger.info(f"LARA_DOC_TRANSLATE_COMPLETE - User: {user_id} - Successful: {len(successful_projects)} - Failed: {len(failed_projects)}")
+
+    # If some projects failed but some succeeded, return partial success with warning
+    response_data = {
+        "project_ids": [p.get('id') for p in successful_projects],
         "display_popup": False if get_price_by_language_pair(
             source_language=source_language,
             target_language=target_language) else True
-    })
+    }
+
+    if failed_projects:
+        response_data["warnings"] = [{"file": p.get('file_name'), "error": p.get('error')} for p in failed_projects]
+        return JsonResponse(response_data, status=status.HTTP_207_MULTI_STATUS)
+
+    return JsonResponse(response_data)
 
 
 class GetTemplatesView(APIView):
