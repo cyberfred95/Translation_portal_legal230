@@ -168,7 +168,8 @@ def process_projects(projects_data, user, email_map=None):
         
         # Ajout de l'email utilisateur si staff et email_map fourni
         if user.is_staff and email_map:
-            token = project.get('user_custom_mt_token')
+            # Support both LARA API (user_uuid) and Custom.MT (user_custom_mt_token)
+            token = project.get('user_uuid') or project.get('user_custom_mt_token')
             project['user_email'] = email_map.get(str(token)) if token else None
     
     return projects_data
@@ -177,17 +178,18 @@ def process_projects(projects_data, user, email_map=None):
 def extract_user_tokens_from_projects(projects_data):
     """
     Extrait les tokens utilisateurs uniques depuis une liste de projets.
-    
+
     Args:
         projects_data: Liste de dictionnaires de projets
-        
+
     Returns:
         list: Liste de tokens utilisateurs uniques (UUID strings)
     """
+    # Support both LARA API (user_uuid) and Custom.MT (user_custom_mt_token)
     return list({
-        project.get('user_custom_mt_token')
+        project.get('user_uuid') or project.get('user_custom_mt_token')
         for project in projects_data
-        if project.get('user_custom_mt_token')
+        if project.get('user_uuid') or project.get('user_custom_mt_token')
     })
 
 

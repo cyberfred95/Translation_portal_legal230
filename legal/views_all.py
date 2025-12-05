@@ -361,6 +361,8 @@ def file_translate(request):
 
         if domain_id:
             translate_data['domainId'] = int(domain_id)
+        if domain_name:
+            translate_data['domain'] = domain_name  # English domain name
         if template_id:
             translate_data['templateId'] = str(template_id)
         if template_name:
