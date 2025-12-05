@@ -156,6 +156,7 @@ $(document).ready(function () {
     let defaultDomain = false;
     let selectedGlossaryType = 'default';
     let selectedGlossary = 'none';
+    let selectedPersonalGlossaries = [];  // Array for multi-select personal glossaries
     let glossaryFile = '';
     let selectedFiles = [];
 
@@ -1024,14 +1025,17 @@ $(document).ready(function () {
     }
 
     function loadMyGlossaries() {
+        // Reset selected personal glossaries when loading new list
+        selectedPersonalGlossaries = [];
+
         const data = {
             source_language: sourceLanguage,
             target_language: targetLanguage,
-            domain_name: selectedSubDomain
+            domain: '*'  // Personal glossaries use '*' as domain
         };
 
         $.ajax({
-            url: api_list_glossaries,
+            url: api_lara_glossary_search,
             type: 'POST',
             data: data,
             headers: {
@@ -1041,7 +1045,7 @@ $(document).ready(function () {
             success: function (response) {
                 // Afficher dans step-domain (My glossaries tab)
                 displayMyGlossariesInStep3(response);
-                
+
                 // Note: Le bouton Suivant reste actif car le glossaire est optionnel
                 // Il sera géré par showTab() si nécessaire
             },
@@ -1076,7 +1080,10 @@ $(document).ready(function () {
     function displayMyGlossariesInStep3(glossaries) {
         const container = $('#step2-tab-my-glossary-content');
         container.empty();
-        
+
+        // Reset personal glossaries selection
+        selectedPersonalGlossaries = [];
+
         if (!glossaries || glossaries.length === 0) {
             container.html(`
                 <div class="flex flex-col items-center justify-center pt-6 pb-0">
@@ -1085,37 +1092,67 @@ $(document).ready(function () {
             `);
             return;
         }
-        
+
+        // Add info text for multi-select
+        const infoText = $('<p>', {
+            class: 'font-poppins text-sm text-gray-500 mb-3',
+            text: language_code === 'en' ? 'Select one or more personal glossaries:' : 'Sélectionnez un ou plusieurs glossaires personnels :'
+        });
+        container.append(infoText);
+
         const glossaryList = $('<ul>', {
             class: 'flex flex-row flex-wrap items-start w-full gap-2'
         });
-        
+
         glossaries.forEach((glossary, index) => {
-            const isFirst = index === 0;
-            
-            const { listItem } = createSelectionItem({
-                radioId: `glossary-radio-${index}`,
-                radioName: 'glossary-radio',
-                value: glossary.id,
-                isChecked: isFirst,
-                icon: 'file',
-                label: glossary.name,
-                containerClass: 'glossary-container',
-                containerStyle: 'flex: 0 0 calc(25% - 6px);',
-                onChange: function () {
-                    $('.glossary-container').removeClass('bg-blue-50');
-                    $(this).closest('.glossary-container').addClass('bg-blue-50');
-                    selectedGlossary = $(this).val();
-                }
+            // Create checkbox item for multi-select
+            const listItem = $('<li>', {
+                class: 'flex items-center',
+                style: 'flex: 0 0 calc(25% - 6px);'
             });
-            
+
+            const itemContainer = $('<div>', {
+                class: 'flex items-center w-full rounded-lg p-2 cursor-pointer transition-colors hover:bg-blue-50 glossary-checkbox-container',
+                'data-value': glossary.id
+            });
+
+            const checkbox = $('<input>', {
+                id: `glossary-checkbox-${index}`,
+                type: 'checkbox',
+                name: 'glossary-checkbox',
+                value: glossary.id,
+                class: 'w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500'
+            });
+
+            checkbox.on('change', function() {
+                const glossaryId = $(this).val();
+                if ($(this).is(':checked')) {
+                    // Add to selected glossaries
+                    if (!selectedPersonalGlossaries.includes(glossaryId)) {
+                        selectedPersonalGlossaries.push(glossaryId);
+                    }
+                    $(this).closest('.glossary-checkbox-container').addClass('bg-blue-50');
+                } else {
+                    // Remove from selected glossaries
+                    selectedPersonalGlossaries = selectedPersonalGlossaries.filter(id => id !== glossaryId);
+                    $(this).closest('.glossary-checkbox-container').removeClass('bg-blue-50');
+                }
+                console.log('Selected personal glossaries:', selectedPersonalGlossaries);
+            });
+
+            const iconHtml = '<i class="ph ph-file mx-2" style="font-size: 24px;" aria-hidden="true"></i>';
+
+            const label = $('<label>', {
+                for: `glossary-checkbox-${index}`,
+                class: 'ms-2 flex h-8 items-center cursor-pointer',
+                html: iconHtml + `<span class="font-poppins text-sm font-normal leading-6 tracking-[-0.084px]" style="font-size: 14px; line-height: 24px;">${glossary.name}</span>`
+            });
+
+            itemContainer.append(checkbox).append(label);
+            listItem.append(itemContainer);
             glossaryList.append(listItem);
-            
-            if (isFirst) {
-                selectedGlossary = glossary.id;
-            }
         });
-        
+
         container.append(glossaryList);
     }
 
@@ -1298,6 +1335,7 @@ $(document).ready(function () {
         console.log('=== INFORMATIONS DE TRADUCTION ===');
         console.log('Domaine sélectionné:', selectedSubDomain);
         console.log('Glossaire sélectionné:', selectedGlossary);
+        console.log('Glossaires personnels sélectionnés:', selectedPersonalGlossaries);
         console.log('Langue source:', sourceLanguage);
         console.log('Langue cible:', targetLanguage);
         console.log('================================');
@@ -1312,6 +1350,11 @@ $(document).ready(function () {
         formData.append('source_language', sourceLanguage);
         formData.append('target_language', targetLanguage);
         formData.append('action', 'file_translate');
+
+        // Add personal glossaries if any selected
+        if (selectedPersonalGlossaries && selectedPersonalGlossaries.length > 0) {
+            formData.append('personal_glossaries', JSON.stringify(selectedPersonalGlossaries));
+        }
 
         $('#loader-row').removeClass('hidden');
 

@@ -295,6 +295,13 @@ def file_translate(request):
     target_language = request.POST.get('target_language')
     domain_name_raw = request.POST.get('domain_name')
 
+    # Get personal glossaries from request (JSON array of glossary names)
+    personal_glossaries_json = request.POST.get('personal_glossaries', '[]')
+    try:
+        personal_glossaries = json.loads(personal_glossaries_json) if personal_glossaries_json else []
+    except json.JSONDecodeError:
+        personal_glossaries = []
+
     # Convert domain name from French to English if needed
     # Django Lara templates use English domain names
     domain = Domain.objects.filter(french_name=domain_name_raw).first()
@@ -303,7 +310,7 @@ def file_translate(request):
     domain_name = domain.name if domain else domain_name_raw
 
     user_id = request.user.id if request.user.is_authenticated else 'anonymous'
-    logger.info(f"LARA_DOC_TRANSLATE_START - User: {user_id} - Files: {len(files)} - Source: {source_language} -> Target: {target_language} - Domain: {domain_name} (raw: {domain_name_raw})")
+    logger.info(f"LARA_DOC_TRANSLATE_START - User: {user_id} - Files: {len(files)} - Source: {source_language} -> Target: {target_language} - Domain: {domain_name} (raw: {domain_name_raw}) - Personal glossaries: {personal_glossaries}")
 
     # Step 1: Fetch template to get translation memory and glossary IDs
     translation_memory_id = None
@@ -359,10 +366,18 @@ def file_translate(request):
             translate_data['templateName'] = template_name
         if translation_memory_id:
             translate_data['adaptTo'] = str(translation_memory_id)
-        if glossary_id:
-            translate_data['glossaries'] = str(glossary_id)
 
-        logger.info(f"LARA_DOC_TRANSLATE_CALL - User: {user_id} - File: {file.name} - adaptTo: {translation_memory_id} - glossaries: {glossary_id}")
+        # Build glossaries list: system glossary (if any) + personal glossaries
+        all_glossaries = []
+        if glossary_id:
+            all_glossaries.append(str(glossary_id))
+        if personal_glossaries:
+            all_glossaries.extend(personal_glossaries)
+
+        if all_glossaries:
+            translate_data['glossaries'] = ','.join(all_glossaries)
+
+        logger.info(f"LARA_DOC_TRANSLATE_CALL - User: {user_id} - File: {file.name} - adaptTo: {translation_memory_id} - glossaries: {all_glossaries}")
 
         try:
             response = requests.post(

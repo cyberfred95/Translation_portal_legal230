@@ -1,14 +1,18 @@
 import csv
 import io
+import logging
 import os.path
 
 import django.core.exceptions
 import openpyxl
+import requests as http_requests
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.functions import Lower
 from django.core.paginator import Paginator
 from django.views.generic import TemplateView
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 
 class BaseTemplateView(TemplateView):
@@ -185,3 +189,62 @@ class GetDefaultGlossaryView(APIView):
         if glossary:
             return Response(GlossarySerializer(glossary).data, status=status.HTTP_200_OK)
         return Response({}, status=status.HTTP_200_OK)
+
+
+class LaraGlossarySearchView(APIView):
+    """
+    Proxy endpoint to search glossaries in LARA backend.
+
+    Calls /lara-django/api/lara/glossaries-list/search/ with user's UUID
+    to find personal glossaries.
+    """
+    permission_classes = (SubscribedPermission, IsAuthenticated)
+
+    def post(self, request):
+        source_language = request.data.get('source_language', '').upper()
+        target_language = request.data.get('target_language', '').upper()
+        domain = request.data.get('domain', '*')
+
+        if not source_language or not target_language:
+            return Response(
+                {"detail": "source_language and target_language are required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Get user UUID for personal glossaries
+        user_uuid = str(request.user.uuid) if hasattr(request.user, 'uuid') else None
+
+        if not user_uuid:
+            return Response({
+                'glossaries': [],
+                'count': 0
+            }, status=status.HTTP_200_OK)
+
+        try:
+            # Call LARA backend glossary search endpoint
+            lara_response = http_requests.get(
+                f"{settings.LARA_API_URL}/api/lara/glossaries-list/search/",
+                params={
+                    'uuid': user_uuid,
+                    'source_language': source_language,
+                    'target_languages': target_language,
+                    'domain': domain
+                },
+                timeout=10
+            )
+
+            if lara_response.status_code == 200:
+                data = lara_response.json()
+                # Transform to format expected by frontend
+                glossaries = [
+                    {'id': name, 'name': name}
+                    for name in data.get('glossaries', [])
+                ]
+                return Response(glossaries, status=status.HTTP_200_OK)
+            else:
+                logger.error(f"LARA glossary search failed: {lara_response.status_code} - {lara_response.text}")
+                return Response([], status=status.HTTP_200_OK)
+
+        except http_requests.RequestException as e:
+            logger.error(f"LARA glossary search exception: {str(e)}")
+            return Response([], status=status.HTTP_200_OK)
