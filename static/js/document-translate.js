@@ -1,4 +1,10 @@
 $(document).ready(function () {
+    // Get API URL from translate-config element (set by translate.js)
+    var api_lara_glossary_search = window.api_lara_glossary_search || (function() {
+        var el = document.getElementById('translate-config');
+        return el ? el.dataset.apiLaraGlossarySearch : null;
+    })();
+
     var $fileInput = $('#file-input');
     var $fileUploadZone = $('#file-upload-zone');
     var $warningAlert = $('#warning-alert');
