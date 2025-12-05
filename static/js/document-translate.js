@@ -46,9 +46,9 @@ $(document).ready(function () {
         
         // Si sélection pendant la détection, marquer comme annulé et afficher message
         const $status = $('#language-detection-status');
-        if (!$status.hasClass('hidden') && $status.find('span').text().includes(language_code === 'en' ? 'Detecting' : 'Détection')) {
+        if (!$status.hasClass('hidden') && $status.find('span').text().includes(getTranslation('Detecting', 'Détection'))) {
             detectionCancelled = true;
-            const cancelMessage = language_code === 'en' ? 'Detection cancelled' : 'Détection annulée';
+            const cancelMessage = getTranslation('Detection cancelled', 'Détection annulée');
             showLanguageDetectionStatus(cancelMessage, true, '#F59E0B');
         }
         
@@ -162,7 +162,6 @@ $(document).ready(function () {
     let selectedSubDomainId = null;  // Domain ID for LARA backend
     let selectedSubDomainEnglishName = '';  // English domain name for LARA
     let defaultDomain = false;
-    let selectedGlossaryType = 'default';
     let selectedGlossary = 'none';
     let selectedPersonalGlossaries = [];  // Array for multi-select personal glossaries
     let glossaryFile = '';
@@ -192,9 +191,9 @@ $(document).ready(function () {
             
             // Activer/désactiver selon les fichiers
             if (selectedFiles.length > 0) {
-                nextStep.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+                enableNextButton();
             } else {
-                nextStep.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+                disableNextButton();
             }
 
             $("div[class^='step-']").addClass('hidden').hide();
@@ -235,7 +234,7 @@ $(document).ready(function () {
             $('#language-warning-alert').addClass('hidden');
             
             // Désactiver le bouton Suivant jusqu'à sélection des langues
-            nextStep.addClass('opacity-50 cursor-not-allowed').prop('disabled', true);
+            disableNextButton();
             
             // Lancer la détection de langue
             detectLanguageFiles();
@@ -247,16 +246,14 @@ $(document).ready(function () {
             $('.step-domain').removeClass('hidden').show();
             $blockButtons.addClass('justify-between').removeClass('justify-end');
             prevStep.show();
-            $('span', $nextButton).text(language_code === 'en' ? 'Next' : 'Suivant');
+            $('span', $nextButton).text(getTranslation('Next', 'Suivant'));
             $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             $('.stepindicator-2').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             $('.stepindicator-3').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             $('.stepindicator-4').removeClass('border-[1.5px] border-[#166534]').addClass('border border-gray-300');
             
             // Activer le bouton Suivant par défaut sur step 3 (glossaire optionnel)
-            nextStep.removeClass('border-gray-225 text-gray-225 opacity-50 cursor-not-allowed')
-                .addClass('border-green-700 text-green-700')
-                .prop("disabled", false);
+            enableNextButton();
             
             // Charger automatiquement les groupes de domaines
             getDomainsGroups();
@@ -270,7 +267,7 @@ $(document).ready(function () {
             $('.step-traduction').removeClass('hidden').show();
             $blockButtons.addClass('justify-between').removeClass('justify-end');
             prevStep.show();
-            $('span', $nextButton).text(language_code === 'en' ? 'Finish' : 'Terminé');
+            $('span', $nextButton).text(getTranslation('Finish', 'Terminé'));
             $('.stepindicator-1').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             $('.stepindicator-2').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
             $('.stepindicator-3').removeClass('border border-gray-300').addClass('border-[1.5px] border-[#166534]');
@@ -325,7 +322,6 @@ $(document).ready(function () {
             if (currentStep === 2) {
                 loadMyGlossaries();
                 $(".add-glossary-btn").removeClass('hidden');
-                $(".step-domain .my-glossary").addClass('bg-gray-600 text-white');
             }
 
             if (currentStep === 3) {
@@ -348,7 +344,7 @@ $(document).ready(function () {
             if (currentStep > 0) {
                 currentStep--;
                 showStep(currentStep);
-                nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none').addClass('border-green-700 text-green-700').prop("disabled", false);
+                enableNextButton();
 
                 $('.step-container').removeClass('bg-red-100 border-red-200');
             }
@@ -540,9 +536,9 @@ $(document).ready(function () {
             
             // Activer/désactiver selon les fichiers
             if (filesExist) {
-                nextStep.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+                enableNextButton();
             } else {
-                nextStep.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+                disableNextButton();
             }
         }
 
@@ -609,7 +605,7 @@ $(document).ready(function () {
         detectionCancelled = false;
 
         // Afficher le message de détection en cours avec spinner
-        const detectionMessage = language_code === 'en' ? 'Detecting language...' : 'Détection de la langue en cours...';
+        const detectionMessage = getTranslation('Detecting language...', 'Détection de la langue en cours...');
         showLanguageDetectionStatus(detectionMessage, false, '#5A5A78', true);
 
         const formData = new FormData();
@@ -623,10 +619,7 @@ $(document).ready(function () {
             data: formData,
             processData: false,
             contentType: false,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
+            headers: getAjaxHeaders(),
             success: function (response) {
                 // Si détection annulée, ne rien faire
                 if (detectionCancelled) {
@@ -636,7 +629,7 @@ $(document).ready(function () {
                 // Si l'utilisateur a sélectionné une langue pendant le chargement, marquer comme annulé
                 if (sourceLanguage && sourceLanguage !== '') {
                     detectionCancelled = true;
-                    const cancelMessage = language_code === 'en' ? 'Detection cancelled' : 'Détection annulée';
+                    const cancelMessage = getTranslation('Detection cancelled', 'Détection annulée');
                     showLanguageDetectionStatus(cancelMessage, true, '#F59E0B');
                     return;
                 }
@@ -676,7 +669,7 @@ $(document).ready(function () {
                     }
                     
                     // Afficher message de succès
-                    const successMessage = language_code === 'en' ? 'Language detected' : 'Langue détectée';
+                    const successMessage = getTranslation('Language detected', 'Langue détectée');
                     showLanguageDetectionStatus(successMessage, true, '#16A34A');
                 }
                 
@@ -689,7 +682,7 @@ $(document).ready(function () {
                 }
                 
                 // En cas d'erreur, afficher un message d'erreur
-                const errorMessage = language_code === 'en' ? 'Language detection error' : 'Erreur lors de détection de langue';
+                const errorMessage = getTranslation('Language detection error', 'Erreur lors de détection de langue');
                 showLanguageDetectionStatus(errorMessage, true, '#DC2626');
             },
             complete: function () {
@@ -707,15 +700,9 @@ $(document).ready(function () {
         const canProceed = hasSourceLanguage && hasTargetLanguage && languagesAreDifferent;
 
         if (!canProceed) {
-            // Désactiver le bouton Suivant
-            nextStep.removeClass('border-green-700 text-white text-green-700')
-                .addClass('border-gray-225 text-gray-225 opacity-50 cursor-not-allowed')
-                .prop("disabled", true);
+            disableNextButton();
         } else {
-            // Activer le bouton Suivant
-            nextStep.removeClass('border-gray-225 text-gray-225 opacity-50 cursor-not-allowed')
-                .addClass('border-green-700 text-green-700')
-                .prop("disabled", false);
+            enableNextButton();
             $('.language-step').removeClass('hidden');
         }
     }
@@ -882,280 +869,321 @@ $(document).ready(function () {
         });
     }
 
+    // ============= UTILITY FUNCTIONS =============
+    
+    /**
+     * Get translation based on current language code
+     * @param {string} enText - English text
+     * @param {string} frText - French text
+     * @returns {string} Translated text
+     */
+    function getTranslation(enText, frText) {
+        return language_code === 'en' ? enText : frText;
+    }
+
+    /**
+     * Get standard AJAX headers for API calls
+     */
+    function getAjaxHeaders() {
+        return {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': getCookie('csrftoken')
+        };
+    }
+
+    /**
+     * Standard error handler for AJAX calls
+     */
+    function handleAjaxError(error) {
+        errorNotification(error?.status, error?.responseJSON?.detail);
+    }
+
+    /**
+     * Enable the Next button
+     */
+    function enableNextButton() {
+        nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none opacity-50 cursor-not-allowed')
+            .addClass('border-green-700 text-green-700')
+            .prop("disabled", false);
+    }
+
+    /**
+     * Disable the Next button
+     */
+    function disableNextButton() {
+        nextStep.removeClass('border-green-700 text-green-700')
+            .addClass('border-gray-225 text-gray-225 opacity-50 cursor-not-allowed')
+            .prop("disabled", true);
+    }
+
+    /**
+     * Update glossary section number based on step
+     */
+    function updateGlossarySectionNumber(stepNumber) {
+        const text = getTranslation('Select or not, one or more glossaries', 'Sélectionner ou non, un ou plusieurs glossaires');
+        $('#glossary-section-number').text(`${stepNumber}. ${text}`);
+    }
+
+    /**
+     * Handle default domain response (when no specific domains available)
+     */
+    function handleDefaultDomain() {
+        $('#subdomain-section').hide().addClass('hidden');
+        updateGlossarySectionNumber(2);
+        selectedSubDomain = 'Generic domain';
+    }
+
+    /**
+     * Handle specific domains response
+     */
+    function handleSpecificDomains(domains) {
+        $('#subdomain-section').show().removeClass('hidden');
+        updateGlossarySectionNumber(3);
+        
+        if (domains && domains.length > 0) {
+            updateSubDomainsList(domains);
+        } else {
+            $('.sub-domain-list').empty();
+            selectedSubDomain = '';
+        }
+    }
+
+    // ============= DOMAIN MANAGEMENT =============
+
+    /**
+     * Fetch domain groups from API
+     */
     const getDomainsGroups = () => {
         $.ajax({
             url: domain_groups,
             type: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
+            headers: getAjaxHeaders(),
             success: function (response) {
                 updateDomainsList(response);
             },
-            error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
-            },
+            error: handleAjaxError
         });
-    }
+    };
 
-
+    /**
+     * Fetch domains for selected domain group
+     */
     const getDomains = () => {
         $.ajax({
             url: `${get_domains}?domain_group=${selectedDomain}`,
             type: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
+            headers: getAjaxHeaders(),
             success: function (response) {
                 defaultDomain = response.default_domain;
                 
-                // Si default_domain === true : masquer la section sous-domaine et utiliser "Generic domain"
                 if (response.default_domain) {
-                    $('#subdomain-section').hide().addClass('hidden');
-                    $('#glossary-section-number').text('2. ' + (language_code === 'en' ? 'Select a glossary' : 'Sélectionner un glossaire'));
-                    selectedSubDomain = 'Generic domain';
+                    handleDefaultDomain();
                 } else {
-                    // Sinon, afficher la section sous-domaine
-                    $('#subdomain-section').show().removeClass('hidden');
-                    $('#glossary-section-number').text('3. ' + (language_code === 'en' ? 'Select a glossary' : 'Sélectionner un glossaire'));
-                    
-                    if (response.data && response.data.length > 0) {
-                        // Mettre à jour la liste des sous-domaines
-                        updateSubDomainsList(response.data);
-                    } else {
-                        $('.sub-domain-list').empty();
-                        selectedSubDomain = '';
-                    }
+                    handleSpecificDomains(response.data);
                 }
                 
-                // Activer le bouton Suivant
-                    nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
-                        .addClass('border-green-700 text-green-700')
-                        .prop("disabled", false);
+                enableNextButton();
             },
-            error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
-            },
+            error: handleAjaxError
         });
-    }
+    };
 
 
     // ------------- STEP-TRADUCTION -------------
 
-    $(".step-domain .default").click(function () {
-        selectGlossaryType('default');
-        $('.terminology-step').text('default').removeClass('hidden');
-    });
+    // ============= GLOSSARY MANAGEMENT =============
 
-    $(".step-domain .my-glossary").click(function () {
-        selectGlossaryType('my-glossary');
-        loadMyGlossaries();
-    });
+    /**
+     * Reset personal glossaries selection
+     */
+    function resetPersonalGlossariesSelection() {
+        selectedPersonalGlossaries = [];
+    }
 
-    $(".step-domain .none").click(function () {
-        selectGlossaryType('none');
-        $('.terminology-step').text(language_code === 'en' ? 'none' : 'aucun').removeClass('hidden');
-        selectedGlossary = 'none';
-        nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
-            .addClass('border-green-700 text-green-700')
-            .prop("disabled", false);
-        clearGlossaryList();
-    });
-
-    function selectGlossaryType(type) {
-        selectedGlossaryType = type;
-        $(".step-domain .glossary-tab").removeClass('bg-gray-600 text-white').addClass('bg-gray-175 text-gray-375');
-        $(".step-domain ." + type).removeClass('bg-gray-175 text-gray-375').addClass('bg-gray-600 text-white');
-
-        if (type === 'my-glossary') {
-            $(".add-glossary-btn").removeClass('hidden');
+    /**
+     * Handle glossary checkbox change event
+     */
+    function handleGlossaryCheckboxChange(checkbox) {
+        const glossaryId = $(checkbox).val();
+        const $container = $(checkbox).closest('.glossary-checkbox-container');
+        
+        if ($(checkbox).is(':checked')) {
+            if (!selectedPersonalGlossaries.includes(glossaryId)) {
+                selectedPersonalGlossaries.push(glossaryId);
+            }
+            $container.addClass('bg-blue-50');
         } else {
-            $(".add-glossary-btn").addClass('hidden');
+            selectedPersonalGlossaries = selectedPersonalGlossaries.filter(id => id !== glossaryId);
+            $container.removeClass('bg-blue-50');
         }
     }
 
-    function clearGlossaryList() {
-        $(".glossary-list").empty();
-    }
-
-    function loadMyGlossaries() {
-        // Reset selected personal glossaries when loading new list
-        selectedPersonalGlossaries = [];
-
-        const data = {
-            source_language: sourceLanguage,
-            target_language: targetLanguage,
-            domain: '*'  // Personal glossaries use '*' as domain
-        };
-
-        $.ajax({
-            url: api_lara_glossary_search,
-            type: 'POST',
-            data: data,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-            success: function (response) {
-                // Afficher dans step-domain (My glossaries tab)
-                displayMyGlossariesInStep3(response);
-
-                // Note: Le bouton Suivant reste actif car le glossaire est optionnel
-                // Il sera géré par showTab() si nécessaire
-            },
-            error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
-            },
+    /**
+     * Create a glossary checkbox item element
+     */
+    function createGlossaryCheckboxItem(glossary, index) {
+        const listItem = $('<li>', {
+            class: 'flex items-center',
+            style: 'flex: 0 0 calc(25% - 6px);'
         });
+
+        const itemContainer = $('<div>', {
+            class: 'flex items-center w-full rounded-lg p-2 cursor-pointer transition-colors hover:bg-blue-50 glossary-checkbox-container',
+            'data-value': glossary.id
+        });
+
+        const checkbox = $('<input>', {
+            id: `glossary-checkbox-${index}`,
+            type: 'checkbox',
+            name: 'glossary-checkbox',
+            value: glossary.id,
+            class: 'w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500'
+        });
+
+        checkbox.on('change', function() {
+            handleGlossaryCheckboxChange(this);
+        });
+
+        const iconHtml = '<i class="ph ph-file mx-2" style="font-size: 24px;" aria-hidden="true"></i>';
+        const label = $('<label>', {
+            for: `glossary-checkbox-${index}`,
+            class: 'ms-2 flex h-8 items-center cursor-pointer',
+            html: iconHtml + `<span class="font-poppins text-sm font-normal leading-6 tracking-[-0.084px]" style="font-size: 14px; line-height: 24px;">${glossary.name}</span>`
+        });
+
+        itemContainer.append(checkbox).append(label);
+        listItem.append(itemContainer);
+        
+        return listItem;
     }
 
-    function displayMyGlossariesInStep3(glossaries) {
-        const container = $('#step2-tab-my-glossary-content');
-        container.empty();
+    /**
+     * Display empty glossary message
+     */
+    function displayEmptyGlossaryMessage(container) {
+        const message = getTranslation(
+            'No personal glossary found. The best glossary prepared by Lexa experts will be used.',
+            'Aucun glossaire personnel trouvé. Le meilleur glossaire préparé par les experts Lexa sera utilisé.'
+        );
+        
+        container.html(`
+            <div class="flex flex-col items-center justify-center pt-6 pb-0">
+                <p class="font-poppins font-normal text-gray-600 text-center" style="font-size: 14px; line-height: 24px;">${message}</p>
+            </div>
+        `);
+    }
 
-        // Reset personal glossaries selection
-        selectedPersonalGlossaries = [];
+    /**
+     * Display glossaries list in the glossary content area
+     */
+    function displayMyGlossariesInStep3(glossaries) {
+        const container = $('#glossary-content');
+        container.empty();
+        resetPersonalGlossariesSelection();
 
         if (!glossaries || glossaries.length === 0) {
-            container.html(`
-                <div class="flex flex-col items-center justify-center pt-6 pb-0">
-                    <p class="font-poppins font-normal text-gray-600 text-center" style="font-size: 14px; line-height: 24px;">${language_code === 'en' ? 'No personal glossary found. The best glossary prepared by Lexa experts will be used, otherwise choose "no glossary".' : 'Aucun glossaire personnel trouvé. Le meilleur glossaire préparé par les experts Lexa sera utilisé, sinon choisissez "aucun glossaire".'}</p>
-                </div>
-            `);
+            displayEmptyGlossaryMessage(container);
             return;
         }
-
-        // Add info text for multi-select
-        const infoText = $('<p>', {
-            class: 'font-poppins text-sm text-gray-500 mb-3',
-            text: language_code === 'en' ? 'Select one or more personal glossaries:' : 'Sélectionnez un ou plusieurs glossaires personnels :'
-        });
-        container.append(infoText);
 
         const glossaryList = $('<ul>', {
             class: 'flex flex-row flex-wrap items-start w-full gap-2'
         });
 
         glossaries.forEach((glossary, index) => {
-            // Create checkbox item for multi-select
-            const listItem = $('<li>', {
-                class: 'flex items-center',
-                style: 'flex: 0 0 calc(25% - 6px);'
-            });
-
-            const itemContainer = $('<div>', {
-                class: 'flex items-center w-full rounded-lg p-2 cursor-pointer transition-colors hover:bg-blue-50 glossary-checkbox-container',
-                'data-value': glossary.id
-            });
-
-            const checkbox = $('<input>', {
-                id: `glossary-checkbox-${index}`,
-                type: 'checkbox',
-                name: 'glossary-checkbox',
-                value: glossary.id,
-                class: 'w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500'
-            });
-
-            checkbox.on('change', function() {
-                const glossaryId = $(this).val();
-                if ($(this).is(':checked')) {
-                    // Add to selected glossaries
-                    if (!selectedPersonalGlossaries.includes(glossaryId)) {
-                        selectedPersonalGlossaries.push(glossaryId);
-                    }
-                    $(this).closest('.glossary-checkbox-container').addClass('bg-blue-50');
-                } else {
-                    // Remove from selected glossaries
-                    selectedPersonalGlossaries = selectedPersonalGlossaries.filter(id => id !== glossaryId);
-                    $(this).closest('.glossary-checkbox-container').removeClass('bg-blue-50');
-                }
-                console.log('Selected personal glossaries:', selectedPersonalGlossaries);
-            });
-
-            const iconHtml = '<i class="ph ph-file mx-2" style="font-size: 24px;" aria-hidden="true"></i>';
-
-            const label = $('<label>', {
-                for: `glossary-checkbox-${index}`,
-                class: 'ms-2 flex h-8 items-center cursor-pointer',
-                html: iconHtml + `<span class="font-poppins text-sm font-normal leading-6 tracking-[-0.084px]" style="font-size: 14px; line-height: 24px;">${glossary.name}</span>`
-            });
-
-            itemContainer.append(checkbox).append(label);
-            listItem.append(itemContainer);
+            const listItem = createGlossaryCheckboxItem(glossary, index);
             glossaryList.append(listItem);
         });
 
         container.append(glossaryList);
     }
 
-    function updateGlossaryList(glossaries, isDefault) {
+    /**
+     * Load user's personal glossaries from API
+     */
+    function loadMyGlossaries() {
+        resetPersonalGlossariesSelection();
 
-        const $list = $(".glossary-list");
-
-        $list.empty();
-
-        glossaries.forEach(function (glossary) {
-            const $item = $(`<button type="button" class="border border-gray-300  glossary-item text-3.5 py-3 px-7.5 ${isDefault ? "bg-green-700 text-white" : "bg-gray-175 text-gray-375"} rounded-md hover:bg-green-700 hover:text-white transition duration-300 ease-in-out">${glossary.name}</button>`);
-            $item.click(function () {
-                if (selectedGlossary === glossary.id) {
-                    $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-175 text-gray-375');
-                    selectedGlossary = 'none';
-                    $('.terminology-step').text('').removeClass('hidden');
-                    if (selectedGlossaryType === 'my-glossary') {
-                        nextStep.removeClass('border-green-700 text-white text-green-700')
-                            .addClass('border-gray-225 text-gray-225 pointer-events-none')
-                            .prop("disabled", true);
-                    }
-                } else {
-                    $(".glossary-item").removeClass('bg-green-700 text-white').addClass('bg-gray-175 text-gray-375');
-                    $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-green-700 text-white');
-                    selectedGlossary = glossary.id;
-                    $('.terminology-step').text(glossary.name).removeClass('hidden');
-
-                    if (selectedGlossaryType === 'my-glossary') {
-                        nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
-                            .addClass('border-green-700 text-green-700')
-                            .prop("disabled", false);
-                    }
-                }
-            });
-            $list.append($item);
+        $.ajax({
+            url: api_lara_glossary_search,
+            type: 'POST',
+            data: {
+                source_language: sourceLanguage,
+                target_language: targetLanguage,
+                domain: '*'  // Personal glossaries use '*' as domain
+            },
+            headers: getAjaxHeaders(),
+            success: function (response) {
+                displayMyGlossariesInStep3(response);
+            },
+            error: handleAjaxError
         });
     }
+
+
+    // ============= GLOSSARY MODAL MANAGEMENT =============
 
     const $modal = $('#modalGlossary');
     const $closeIcon = $('#closeIcon');
     const maxFileSize = 5 * 1024 * 1024; // 5MB
 
-    $(document).on('click', '.openGlossary', function(event) {
-        event.preventDefault(); // Empêche clic par défaut si besoin (par ex lien)
-        $modal.removeClass('hidden');
-        $closeIcon.removeClass('hidden');
-        $('input[name=openGlossary]').prop('checked', 'checked');
-    });
-
-    $('#closeModal, #closeIcon').on('click', function () {
-        // Réinitialise les styles des boutons comme avant
+    /**
+     * Reset glossary modal styles to default state
+     */
+    function resetGlossaryModalStyles() {
         $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
         $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-700 text-green-700 border border-green-700');
         $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
+    }
 
+    /**
+     * Close glossary modal
+     */
+    function closeGlossaryModal() {
+        resetGlossaryModalStyles();
         $modal.addClass('hidden');
         $closeIcon.addClass('hidden');
-
-        // Désactive la checkbox et le style "peer-checked"
         $('input[name=openGlossary]').prop('checked', false).trigger('change');
+    }
+
+    /**
+     * Open glossary modal
+     */
+    function openGlossaryModal() {
+        $modal.removeClass('hidden');
+        $closeIcon.removeClass('hidden');
+        $('input[name=openGlossary]').prop('checked', 'checked');
+    }
+
+    /**
+     * Handle glossary file upload
+     */
+    function handleGlossaryFileUpload(file) {
+        if (!file) return;
+
+        resetGlossaryModalStyles();
+        
+        if (file.size <= maxFileSize) {
+            showUploadedFile(file.name);
+        } else {
+            alert('File size exceeds 5MB limit.');
+            $('.glossary-file').val('');
+        }
+    }
+
+    // Event handlers
+    $(document).on('click', '.openGlossary', function(event) {
+        event.preventDefault();
+        openGlossaryModal();
+    });
+
+    $('#closeModal, #closeIcon').on('click', function () {
+        closeGlossaryModal();
     });
 
     $(window).on('click', function (event) {
         if (event.target == $modal[0]) {
-            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
-            $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-700 text-green-700 border border-green-700');
-            $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
-            $modal.addClass('hidden');
-            $closeIcon.addClass('hidden');
+            closeGlossaryModal();
         }
     });
 
@@ -1165,17 +1193,7 @@ $(document).ready(function () {
 
     $('.glossary-file').on('change', function (e) {
         glossaryFile = e.target.files[0];
-        if (glossaryFile) {
-            $('#uploadButton').removeClass('bg-transparent border border-red-400 text-red-400').addClass('bg-green-700');
-            $('#downloadSample').removeClass('bg-transparent border border-gray-200 text-gray-400').addClass('bg-green-700 text-green-700 border border-green-700');
-            $('.glossary-container').removeClass('bg-red-150').addClass('bg-gray-25');
-            if (glossaryFile.size <= maxFileSize) {
-                showUploadedFile(glossaryFile.name);
-            } else {
-                alert('File size exceeds 5MB limit.');
-                $(this).val('');
-            }
-        }
+        handleGlossaryFileUpload(glossaryFile);
     });
 
     function showUploadedFile(fileName) {
@@ -1217,10 +1235,7 @@ $(document).ready(function () {
             data: formData,
             processData: false,
             contentType: false,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
+            headers: getAjaxHeaders(),
             success: function (response) {
                 glossaryFile = null;
                 $('#fileInfo').addClass('hidden');
@@ -1229,34 +1244,12 @@ $(document).ready(function () {
                 $modal.addClass('hidden');
                 $closeIcon.addClass('hidden');
 
-                const $list = $(".glossary-list");
-
-                const $item = $(`<button type="button" class="border border-gray-300  border border-gray-300 glossary-item text-3.5 py-3 px-7.5 bg-gray-175 text-gray-375 rounded-md hover:bg-green-700 hover:text-white">${response.name}</button>`);
-
-                $item.click(function () {
-                    if (selectedGlossary === response.id) {
-                        $(this).removeClass('bg-green-700 text-white').addClass('bg-gray-175 text-gray-375');
-                        selectedGlossary = 'none';
-                        $('.terminology-step').text('').removeClass('hidden');
-                        nextStep.removeClass('border-green-700 text-green-700 ')
-                            .addClass('border-gray-225 text-gray-225 pointer-events-none')
-                            .prop("disabled", true);
-                    } else {
-                        $(".glossary-item").removeClass('bg-green-700 text-white').addClass('bg-gray-175 text-gray-375');
-                        $(this).removeClass('bg-gray-175 text-gray-375').addClass('bg-green-700 text-white');
-                        selectedGlossary = response.id;
-                        $('.terminology-step').text(response.name).removeClass('hidden');
-                        nextStep.removeClass('border-gray-225 text-gray-225 pointer-events-none')
-                            .addClass('border-green-700 text-green-700')
-                            .prop("disabled", false);
-                    }
-                });
-
-                $list.append($item);
+                // Recharger la liste des glossaires pour afficher le nouveau glossaire
+                if (sourceLanguage && targetLanguage && selectedSubDomain) {
+                    loadMyGlossaries();
+                }
             },
-            error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
-            },
+            error: handleAjaxError
         });
     });
 
@@ -1306,18 +1299,13 @@ $(document).ready(function () {
             data: formData,
             processData: false,
             contentType: false,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
+            headers: getAjaxHeaders(),
             success: function (response) {
                 if (response && response.project_ids && response.project_ids.length > 0) {
                     startStatusCheck(response.project_ids);
                 }
             },
-            error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
-            },
+            error: handleAjaxError,
             complete: function () {
                 $('#loader-row').addClass('hidden');
             }
@@ -1369,7 +1357,7 @@ $(document).ready(function () {
                             class="download-file" 
                             data-translated-file="${project.translated_file}" 
                             data-reviewed-file="${project.reviewed_file || ''}"
-                            title="${language_code === 'en' ? 'Download' : 'Télécharger'}"
+                            title="${getTranslation('Download', 'Télécharger')}"
                             ${project.status !== 'Translated' ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
                             <i class="ph ph-download" style="font-size: 16px; color: #374151;"></i>
                         </button>
@@ -1378,7 +1366,7 @@ $(document).ready(function () {
                             data-translated-file="${project.translated_file}" 
                             data-id="${project.id}"
                             ${project.status !== 'Translated' ? 'disabled style="opacity: 0.5; cursor: not-allowed; text-decoration: none;"' : ''}>
-                            ${language_code === 'en' ? 'Expert review' : 'Révision d\'un expert'}
+                            ${getTranslation('Expert review', 'Révision d\'un expert')}
                         </button>
                     </td>
                 </tr>
@@ -1508,9 +1496,7 @@ $(document).ready(function () {
                 $modalRevision.addClass('hidden');
                 $closeRevision.addClass('hidden');
             },
-            error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
-            },
+            error: handleAjaxError
         });
     });
 
@@ -1549,9 +1535,7 @@ $(document).ready(function () {
                         clearInterval(statusCheckInterval);
                     }
                 },
-                error: function (error) {
-                    errorNotification(error?.status, error?.responseJSON?.detail);
-                },
+                error: handleAjaxError,
                 complete: function () {
                     $('#loader-row').addClass('hidden');
                 }
@@ -1563,67 +1547,6 @@ $(document).ready(function () {
         statusCheckInterval = setInterval(checkDocumentStatus, 10000);
     };
 
-    function showTab(tabId) {
-        // Masquer tous les contenus de tabs
-        $('#step2-tab-default-content').hide();
-        $('#step2-tab-no-glossary-content').hide();
-        $('#step2-tab-my-glossary-content').hide();
-
-        // Réinitialiser toutes les sélections visuelles
-        $('.subdomain-container').removeClass('bg-blue-50');
-        $('#step2-tab-my-glossary-content .glossary-container').removeClass('bg-blue-50');
-        $('input[type="radio"][name="sub_domain"]').prop('checked', false);
-        $('input[type="radio"][name="glossary-radio"]').prop('checked', false);
-
-        // Afficher le contenu du tab sélectionné et sélectionner automatiquement le premier élément
-        if (tabId === 'default') {
-            $('#step2-tab-default-content').show();
-            selectedGlossary = 'none';
-        } else if (tabId === 'no-glossary') {
-            $('#step2-tab-no-glossary-content').show();
-            // Pour "No glossary", sélectionner automatiquement "none"
-            selectedGlossary = 'none';
-            $('.terminology-step').text(language_code === 'en' ? 'none' : 'aucun').removeClass('hidden');
-        } else if (tabId === 'my-glossary') {
-        $(`#step2-tab-${tabId}-content`).show();
-            
-            // Sélectionner automatiquement le premier glossaire My glossaries s'il existe
-            const firstGlossary = $('#step2-tab-my-glossary-content .glossary-container').first();
-            if (firstGlossary.length) {
-                firstGlossary.addClass('bg-blue-50');
-                const firstRadio = firstGlossary.find('input[type="radio"]');
-                firstRadio.prop('checked', true);
-                selectedGlossary = firstRadio.val();
-            } else {
-                selectedGlossary = 'none';
-            }
-        }
-
-        // Retirer les styles actifs de tous les boutons
-        $('button.tab-button').removeClass('border-b-0.5 border-b-black');
-        $(`#step2-${tabId}`).addClass('border-b-0.5 border-b-black');
-        
-        // S'assurer que le bouton Suivant reste actif lors du changement de tab
-        nextStep.removeClass('border-gray-225 text-gray-225 opacity-50 cursor-not-allowed')
-            .addClass('border-green-700 text-green-700')
-            .prop("disabled", false);
-    }
-
-    $('#step2-default').click(function () {
-        showTab('default');
-    });
-
-    $('#step2-my-glossary').click(function () {
-        showTab('my-glossary');
-        // Charger les glossaires de l'utilisateur
-        if (sourceLanguage && targetLanguage && selectedSubDomain) {
-            loadMyGlossaries();
-        }
-    });
-
-    $('#step2-no-glossary').click(function () {
-        showTab('no-glossary');
-    });
 
     // Gestion du clic sur les blocs radio
     $('ul.flex li > div.flex.items-center.mr-2').click(function() {
