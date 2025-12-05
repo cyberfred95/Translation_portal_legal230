@@ -159,6 +159,8 @@ $(document).ready(function () {
     let targetLanguage = '';
     let selectedDomain = '';
     let selectedSubDomain = '';
+    let selectedSubDomainId = null;  // Domain ID for LARA backend
+    let selectedSubDomainEnglishName = '';  // English domain name for LARA
     let defaultDomain = false;
     let selectedGlossaryType = 'default';
     let selectedGlossary = 'none';
@@ -753,21 +755,22 @@ $(document).ready(function () {
             label,
             containerClass = '',
             containerStyle = '',
+            dataAttributes = {},
             onChange
         } = config;
-        
+
         // Créer l'élément liste
         const listItem = $('<li>', {
             class: 'flex items-center',
             style: containerStyle
         });
-        
+
         // Créer le conteneur
         const container = $('<div>', {
             class: `flex items-center w-full rounded-lg p-2 cursor-pointer transition-colors hover:bg-blue-50 ${containerClass} ${isChecked ? 'bg-blue-50' : ''}`,
             'data-value': value
         });
-        
+
         // Créer le radio button (12x12)
         const radio = $('<input>', {
             id: radioId,
@@ -777,7 +780,14 @@ $(document).ready(function () {
             class: 'w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500',
             checked: isChecked
         });
-        
+
+        // Ajouter les data attributes au radio button
+        if (dataAttributes) {
+            Object.keys(dataAttributes).forEach(key => {
+                radio.data(key, dataAttributes[key]);
+            });
+        }
+
         if (onChange) {
             radio.on('change', onChange);
         }
@@ -839,9 +849,11 @@ $(document).ready(function () {
 
         subDomains.forEach((subDomain, index) => {
             const domainName = typeof subDomain === 'object' ? subDomain.name : subDomain;
+            const domainId = typeof subDomain === 'object' ? subDomain.id : null;
+            const domainEnglishName = typeof subDomain === 'object' ? subDomain.english_name : subDomain;
             const domainIcon = typeof subDomain === 'object' && subDomain.icon ? subDomain.icon : null;
             const isFirst = index === 0;
-            
+
             const { listItem } = createSelectionItem({
                 radioId: `subdomain-radio-${index}`,
                 radioName: 'subdomain-radio',
@@ -851,19 +863,27 @@ $(document).ready(function () {
                 label: domainName,
                 containerClass: 'subdomain-container',
                 containerStyle: 'flex: 0 0 calc(20% - 6.4px);',
+                dataAttributes: {
+                    'domain-id': domainId,
+                    'english-name': domainEnglishName
+                },
                 onChange: function () {
                     $('.sub-domain-list .subdomain-container').removeClass('bg-blue-50');
                     $(this).closest('.subdomain-container').addClass('bg-blue-50');
                     selectedSubDomain = $(this).val();
+                    selectedSubDomainId = $(this).data('domain-id');
+                    selectedSubDomainEnglishName = $(this).data('english-name');
                     $('.domain-step').text(selectedSubDomain).removeClass('hidden');
                     loadDefaultGlossary();
                 }
             });
-            
+
             subDomainsList.append(listItem);
-            
+
             if (isFirst) {
                 selectedSubDomain = domainName;
+                selectedSubDomainId = domainId;
+                selectedSubDomainEnglishName = domainEnglishName;
                 $('.domain-step').text(selectedSubDomain).removeClass('hidden');
                 loadDefaultGlossary();
             }
@@ -1340,6 +1360,8 @@ $(document).ready(function () {
         // Console log pour afficher le domaine et le glossaire sélectionnés
         console.log('=== INFORMATIONS DE TRADUCTION ===');
         console.log('Domaine sélectionné:', selectedSubDomain);
+        console.log('Domaine ID:', selectedSubDomainId);
+        console.log('Domaine (anglais):', selectedSubDomainEnglishName);
         console.log('Glossaire sélectionné:', selectedGlossary);
         console.log('Glossaires personnels sélectionnés:', selectedPersonalGlossaries);
         console.log('Langue source:', sourceLanguage);
@@ -1351,16 +1373,22 @@ $(document).ready(function () {
             formData.append(`document[]`, file.file);
         });
 
-        formData.append('domain_name', selectedSubDomain);
-        formData.append('glossary', selectedGlossary);
+        // Envoyer domain_id pour LARA (le nom anglais est retrouvé via l'ID côté backend)
+        formData.append('domain_id', selectedSubDomainId || '');
+
+        // Combine selected glossary and personal glossaries into one glossary parameter
+        let glossaries = [];
+        if (selectedGlossary && selectedGlossary !== 'none') {
+            glossaries.push(selectedGlossary);
+        }
+        if (selectedPersonalGlossaries && selectedPersonalGlossaries.length > 0) {
+            glossaries = glossaries.concat(selectedPersonalGlossaries);
+        }
+        formData.append('glossary', glossaries.length > 0 ? glossaries.join(',') : 'none');
+
         formData.append('source_language', sourceLanguage);
         formData.append('target_language', targetLanguage);
         formData.append('action', 'file_translate');
-
-        // Add personal glossaries if any selected
-        if (selectedPersonalGlossaries && selectedPersonalGlossaries.length > 0) {
-            formData.append('personal_glossaries', JSON.stringify(selectedPersonalGlossaries));
-        }
 
         $('#loader-row').removeClass('hidden');
 

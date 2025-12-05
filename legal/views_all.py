@@ -293,24 +293,25 @@ def file_translate(request):
 
     source_language = request.POST.get('source_language')
     target_language = request.POST.get('target_language')
-    domain_name_raw = request.POST.get('domain_name')
+    domain_id = request.POST.get('domain_id')
 
-    # Get personal glossaries from request (JSON array of glossary names)
-    personal_glossaries_json = request.POST.get('personal_glossaries', '[]')
-    try:
-        personal_glossaries = json.loads(personal_glossaries_json) if personal_glossaries_json else []
-    except json.JSONDecodeError:
-        personal_glossaries = []
+    # Get glossaries from request (comma-separated list of glossary IDs)
+    glossary_param = request.POST.get('glossary', 'none')
+    if glossary_param and glossary_param != 'none':
+        user_glossaries = [g.strip() for g in glossary_param.split(',') if g.strip()]
+    else:
+        user_glossaries = []
 
-    # Convert domain name from French to English if needed
-    # Django Lara templates use English domain names
-    domain = Domain.objects.filter(french_name=domain_name_raw).first()
-    if not domain:
-        domain = Domain.objects.filter(name=domain_name_raw).first()
-    domain_name = domain.name if domain else domain_name_raw
+    # Get domain by ID
+    domain = None
+    domain_name = ''
+    if domain_id:
+        domain = Domain.objects.filter(id=domain_id).first()
+        if domain:
+            domain_name = domain.name  # English name for templates/find
 
     user_id = request.user.id if request.user.is_authenticated else 'anonymous'
-    logger.info(f"LARA_DOC_TRANSLATE_START - User: {user_id} - Files: {len(files)} - Source: {source_language} -> Target: {target_language} - Domain: {domain_name} (raw: {domain_name_raw}) - Personal glossaries: {personal_glossaries}")
+    logger.info(f"LARA_DOC_TRANSLATE_START - User: {user_id} - Files: {len(files)} - Source: {source_language} -> Target: {target_language} - Domain: {domain_name} (id: {domain_id}) - Glossaries: {user_glossaries}")
 
     # Step 1: Fetch template to get translation memory and glossary IDs
     translation_memory_id = None
@@ -358,8 +359,8 @@ def file_translate(request):
             'userToken': str(request.user.uuid) if request.user.is_authenticated else '',
         }
 
-        if domain_name:
-            translate_data['domain'] = domain_name
+        if domain_id:
+            translate_data['domainId'] = int(domain_id)
         if template_id:
             translate_data['templateId'] = str(template_id)
         if template_name:
@@ -367,17 +368,17 @@ def file_translate(request):
         if translation_memory_id:
             translate_data['adaptTo'] = str(translation_memory_id)
 
-        # Build glossaries list: system glossary (if any) + personal glossaries
+        # Build glossaries list: system glossary (from template) + user-selected glossaries
         all_glossaries = []
         if glossary_id:
             all_glossaries.append(str(glossary_id))
-        if personal_glossaries:
-            all_glossaries.extend(personal_glossaries)
+        if user_glossaries:
+            all_glossaries.extend(user_glossaries)
 
         if all_glossaries:
             translate_data['glossaries'] = ','.join(all_glossaries)
 
-        logger.info(f"LARA_DOC_TRANSLATE_CALL - User: {user_id} - File: {file.name} - adaptTo: {translation_memory_id} - glossaries: {all_glossaries}")
+        logger.info(f"LARA_DOC_TRANSLATE_CALL - User: {user_id} - File: {file.name} - domainId: {domain_id} - adaptTo: {translation_memory_id} - glossaries: {all_glossaries}")
 
         try:
             response = requests.post(
@@ -503,19 +504,21 @@ class GetDomainsView(APIView):
             else:
                 return Response({"data": [{"name": preferences.DefaultTranslation.name, "icon": None}], "default_domain": True}, )
         
-        # Construire la liste avec nom et icône
+        # Construire la liste avec id, nom et icône
         domain_data = []
         for domain in domains:
             if request.LANGUAGE_CODE == 'fr':
                 domain_name = domain.french_name if domain.french_name else domain.name
             else:
                 domain_name = domain.name
-            
+
             domain_data.append({
+                "id": domain.id,
                 "name": domain_name,
+                "english_name": domain.name,  # Toujours inclure le nom anglais pour LARA
                 "icon": domain.icon
             })
-        
+
         return Response({"data": domain_data, "default_domain": False}, status=status.HTTP_200_OK)
 
 

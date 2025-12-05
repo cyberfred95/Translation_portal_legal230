@@ -235,10 +235,10 @@ class LaraGlossarySearchView(APIView):
 
             if lara_response.status_code == 200:
                 data = lara_response.json()
-                # Transform to format expected by frontend
+                # Transform to format expected by frontend (with glossary_id)
                 glossaries = [
-                    {'id': name, 'name': name}
-                    for name in data.get('glossaries', [])
+                    {'id': g.get('glossary_id', ''), 'name': g.get('name', '')}
+                    for g in data.get('glossaries', [])
                 ]
                 return Response(glossaries, status=status.HTTP_200_OK)
             else:
