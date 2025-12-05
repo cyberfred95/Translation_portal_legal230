@@ -364,6 +364,10 @@ def file_translate(request):
         if all_glossaries:
             translate_data['glossaries'] = ','.join(all_glossaries)
 
+        # Add document statistics
+        translate_data['wordsCount'] = words_count
+        translate_data['charactersCount'] = symbols_count
+
         # Log payload complet avant envoi (sans les credentials)
         payload_log = {k: v for k, v in translate_data.items() if k not in ['accessKeyId', 'accessKeySecret']}
         logger.info(f"LARA_DOC_TRANSLATE_CALL - User: {user_id} - File: {file.name} - Payload: {payload_log}")
