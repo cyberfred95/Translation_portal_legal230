@@ -45,8 +45,8 @@ class GlossaryProcessor:
         output_stream.seek(0)
 
         converted_file = InMemoryUploadedFile(
-            file=io.BytesIO(output_stream.getvalue().encode("utf-8")),  # Convert to BytesIO
-            field_name=csv_glossary_file.field_name,
+            file=io.BytesIO(output_stream.getvalue().encode("utf-8")),
+            field_name=getattr(csv_glossary_file, 'field_name', 'file'),
             name=csv_glossary_file.name,
             content_type="text/csv",
             size=len(output_stream.getvalue()),
