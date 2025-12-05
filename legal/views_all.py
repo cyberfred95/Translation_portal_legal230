@@ -482,28 +482,10 @@ class GetDomainsView(APIView):
     permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def get(self, request):
-        if 'source_language' not in self.request.query_params or 'target_language' not in self.request.query_params:
-            return Response({"message": "Missing source language or target language"},
-                            status=status.HTTP_400_BAD_REQUEST)
-        try:
-            user_api_key = get_user_api_key(self.request.user)
-        except ValueError:
-            return Response({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
-        domains = requests.post(
-            settings.CUSTOM_MT_CONSOLE_URL + "translation/get-domains",
-            data={
-                "source_language": self.request.query_params['source_language'].lower(),
-                "target_language": self.request.query_params['target_language'].lower()
-            },
-            headers={
-                'token': user_api_key
-            }
-        )
-        domain_names = []
-        for domain in domains.json():
-            domain_names.append(domain['domain_name'])
-        domains = Domain.objects.filter(
-            name__in=domain_names).order_by('-featured', 'name')
+        # Récupérer les domaines directement depuis la base de données
+        domains = Domain.objects.all().order_by('-featured', 'name')
+        
+        # Filtrer par domain_group si fourni
         if self.request.query_params.get('domain_group'):
             if request.LANGUAGE_CODE == 'fr':
                 domains = domains.filter(

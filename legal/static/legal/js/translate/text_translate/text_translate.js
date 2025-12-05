@@ -267,7 +267,7 @@ $(document).ready(function () {
 
     function fetchDomains(metadata) {
         $.ajax({
-            url: `${get_domains}?source_language=${state.sourceLanguage}&target_language=${state.targetLanguage}`,
+            url: `${get_domains}`,
             type: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',

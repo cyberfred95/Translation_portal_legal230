@@ -884,7 +884,7 @@ $(document).ready(function () {
 
     const getDomains = () => {
         $.ajax({
-            url: `${get_domains}?source_language=${sourceLanguage}&target_language=${targetLanguage}&domain_group=${selectedDomain}`,
+            url: `${get_domains}?domain_group=${selectedDomain}`,
             type: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
