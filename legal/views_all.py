@@ -152,6 +152,10 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
     temp_path = os.path.join(settings.MEDIA_ROOT, 'docx', temp_filename)
     doc.save(temp_path)
 
+    # Indique si la traduction s'est terminée avec succès.
+    # En cas d'erreur, on conserve le fichier temporaire pour analyse.
+    success = False
+
     try:
         # Read the file and create InMemoryUploadedFile
         with open(temp_path, 'rb') as f:
@@ -208,7 +212,15 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
                     translated_file_url = project_data.get('translated_file')
                     break
                 elif project_data.get('status') == 'Error':
-                    return JsonResponse({"detail": "Translation failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    # Exposer les détails de l'erreur renvoyée par le service de traduction
+                    error_info = project_data.get('error') or project_data
+                    return JsonResponse(
+                        {
+                            "detail": "Translation failed",
+                            "translation_error": error_info,
+                        },
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    )
 
             attempt += 1
 
@@ -300,11 +312,12 @@ def translate_via_delta_docx(delta, api_key, request, plain_text, words_count, s
         )
         add_translations(request, words_count=words_count, symbols_count=symbols_count)
 
+        success = True
         return JsonResponse({"translated_text": [translated_html]})
 
     finally:
-        # Clean up temporary file
-        if os.path.exists(temp_path):
+        # Clean up temporary file uniquement si la traduction a réussi
+        if success and os.path.exists(temp_path):
             os.remove(temp_path)
 
 
