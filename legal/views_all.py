@@ -297,44 +297,17 @@ def file_translate(request):
     user_id = request.user.id if request.user.is_authenticated else 'anonymous'
     logger.info(f"LARA_DOC_TRANSLATE_START - User: {user_id} - Files: {len(files)} - Source: {source_language} -> Target: {target_language} - Domain: {domain_name} (id: {domain_id}) - Glossaries: {user_glossaries}")
 
-    # Step 1: Fetch template to get translation memory and glossary IDs
-    translation_memory_id = None
-    glossary_id = None
-    template_id = None
-    template_name = None
+    # Template lookup is now done automatically by lara-django backend
+    # We just need to send the domain and language info
 
-    try:
-        template_response = requests.get(
-            f"{settings.LARA_API_URL}/api/templates/find",
-            params={
-                'domain': domain_name,
-                'sourceLanguage': source_language,
-                'targetLanguage': target_language,
-            },
-            timeout=10
-        )
-
-        logger.info(f"LARA_DOC_TEMPLATES_RESPONSE - User: {user_id} - Status: {template_response.status_code}")
-
-        if template_response.status_code == 200:
-            templates = template_response.json()
-            if templates and len(templates) > 0:
-                template = templates[0]
-                template_id = template.get('id')
-                template_name = template.get('name')
-                translation_memory_id = template.get('translationMemoryId')
-                glossary_id = template.get('glossaryId')
-                logger.info(f"LARA_DOC_TEMPLATE_SELECTED - User: {user_id} - Template: {template_name} (ID: {template_id}) - TM ID: {translation_memory_id} - Glossary ID: {glossary_id}")
-    except requests.RequestException as e:
-        logger.error(f"LARA_DOC_TEMPLATES_EXCEPTION - User: {user_id} - Exception: {str(e)}")
-        # Continue without template info
-
-    # Step 2: Translate each document via Django Lara
+    # Translate each document via Django Lara
     projects = []
     for file in files:
         file = lowercase_file_extension(file)
 
         # Build form data for Django Lara
+        # Note: Template, translation memory and glossary are now auto-detected by the backend
+        # based on domain and language pair. User-selected glossaries are still sent.
         translate_data = {
             'accessKeyId': settings.LARA_ACCESS_KEY_ID,
             'accessKeySecret': settings.LARA_ACCESS_KEY_SECRET,
@@ -347,22 +320,10 @@ def file_translate(request):
             translate_data['domainId'] = int(domain_id)
         if domain_name:
             translate_data['domain'] = domain_name  # English domain name
-        if template_id:
-            translate_data['templateId'] = str(template_id)
-        if template_name:
-            translate_data['templateName'] = template_name
-        if translation_memory_id:
-            translate_data['adaptTo'] = str(translation_memory_id)
 
-        # Build glossaries list: system glossary (from template) + user-selected glossaries
-        all_glossaries = []
-        if glossary_id:
-            all_glossaries.append(str(glossary_id))
+        # Send user-selected glossaries (additional to auto-detected ones from template)
         if user_glossaries:
-            all_glossaries.extend(user_glossaries)
-
-        if all_glossaries:
-            translate_data['glossaries'] = ','.join(all_glossaries)
+            translate_data['glossaries'] = ','.join(user_glossaries)
 
         # Add document statistics
         translate_data['wordsCount'] = words_count
