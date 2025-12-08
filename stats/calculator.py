@@ -1,3 +1,4 @@
+import logging
 import os
 
 from django.conf import settings
@@ -5,16 +6,16 @@ import requests
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from legal.services.file_processing import FileTextExtractorFactory
+from legal.services.adobe_pdf import AdobePDFService
+
+# Configuration du logger
+logger = logging.getLogger(__name__)
 
 
 class StatsProcessor:
     """Processeur de statistiques pour les fichiers."""
 
     PDF_EXTENSION = '.pdf'
-    ERROR_PDF_NOT_SUPPORTED = (
-        "Les fichiers PDF doivent être convertis en DOCX avant l'extraction de texte. "
-        "Cette méthode ne traite pas les PDF directement."
-    )
 
     def __init__(self, api_key):
         self._api_key = api_key
@@ -23,6 +24,8 @@ class StatsProcessor:
         """
         Extrait le texte d'un fichier en utilisant le service local.
         
+        Les fichiers PDF sont automatiquement convertis en DOCX avant l'extraction.
+        
         Args:
             file: Fichier en mémoire à traiter
             
@@ -30,15 +33,17 @@ class StatsProcessor:
             dict: Résultat au format {"texts": [{"text": "..."}]}
             
         Raises:
-            ValueError: Si le format n'est pas supporté ou si c'est un PDF
-            
-        Note:
-            Les fichiers PDF doivent être convertis en DOCX avant d'appeler cette méthode.
+            ValueError: Si le format n'est pas supporté
+            Exception: Si la conversion PDF échoue
         """
         file_extension = self._get_file_extension(file)
+        logger.info(f"Traitement du fichier: {file.name} (extension: {file_extension})")
         
+        # Si c'est un PDF, le convertir en DOCX d'abord
         if file_extension == self.PDF_EXTENSION:
-            raise ValueError(self.ERROR_PDF_NOT_SUPPORTED)
+            logger.info("Conversion PDF requise avant l'extraction")
+            file = self._convert_pdf_to_docx(file)
+            logger.info("Conversion PDF réussie, extraction du texte du DOCX")
         
         try:
             return FileTextExtractorFactory.extract_text(file)
@@ -47,6 +52,22 @@ class StatsProcessor:
                 f"Format de fichier non supporté: {file_extension}. "
                 f"Formats supportés: {', '.join(FileTextExtractorFactory.get_supported_extensions())}"
             ) from e
+
+    def _convert_pdf_to_docx(self, pdf_file: InMemoryUploadedFile) -> InMemoryUploadedFile:
+        """
+        Convertit un fichier PDF en DOCX en utilisant Adobe PDF Services.
+        
+        Args:
+            pdf_file: Fichier PDF en mémoire
+            
+        Returns:
+            InMemoryUploadedFile: Fichier DOCX converti
+            
+        Raises:
+            Exception: Si la conversion échoue
+        """
+        adobe_service = AdobePDFService()
+        return adobe_service.convert_pdf_to_docx(pdf_file)
 
     def get_chars(self, file: InMemoryUploadedFile) -> int:
         """

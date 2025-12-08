@@ -41,13 +41,15 @@ class TextExtractorTest(FileProcessingTestCase):
         
         self.assertGreaterEqual(len(result.texts), 2)
     
-    def test_format_compatibility(self):
-        """Test que le format de retour est compatible avec Custom_mt."""
-        content = b"Test content"
-        file = self.create_test_file(content, "test.txt")
+    def test_extract_real_txt_file(self):
+        """Test d'extraction avec le fichier TXT réel et vérification du format."""
+        file = self.load_fixture_file("test_txt.txt")
         
         extractor = TextExtractor()
         result = extractor.extract(file)
+        
+        self.assertIsInstance(result, ExtractionResult)
+        self.assertGreater(len(result.texts), 0)
         self.assert_result_format(result.to_dict())
 
 
@@ -56,16 +58,18 @@ class WordExtractorTest(FileProcessingTestCase):
     
     def test_word_extractor_import(self):
         """Test que python-docx peut être importé."""
-        try:
-            WordExtractor()
-        except ImportError:
-            self.skipTest("python-docx n'est pas installé")
+        self.skip_if_dependency_missing(WordExtractor, "python-docx")
     
-    def test_format_compatibility(self):
-        """Test que le format de retour est compatible."""
-        file = self.create_word_file(["Test paragraph"])
+    def test_extract_real_docx_file(self):
+        """Test d'extraction avec le fichier DOCX réel et vérification du format."""
+        self.skip_if_dependency_missing(WordExtractor, "python-docx")
         extractor = WordExtractor()
+        
+        file = self.load_fixture_file("test_docx.docx")
         result = extractor.extract(file)
+        
+        self.assertIsInstance(result, ExtractionResult)
+        self.assertGreater(len(result.texts), 0)
         self.assert_result_format(result.to_dict())
 
 
@@ -74,16 +78,18 @@ class ExcelExtractorTest(FileProcessingTestCase):
     
     def test_excel_extractor_import(self):
         """Test que openpyxl peut être importé."""
-        try:
-            ExcelExtractor()
-        except ImportError:
-            self.skipTest("openpyxl n'est pas installé")
+        self.skip_if_dependency_missing(ExcelExtractor, "openpyxl")
     
-    def test_format_compatibility(self):
-        """Test que le format de retour est compatible."""
-        file = self.create_excel_file({'A1': 'Cell 1', 'B1': 'Cell 2', 'A2': 'Cell 3'})
+    def test_extract_real_xlsx_file(self):
+        """Test d'extraction avec le fichier XLSX réel et vérification du format."""
+        self.skip_if_dependency_missing(ExcelExtractor, "openpyxl")
         extractor = ExcelExtractor()
+        
+        file = self.load_fixture_file("test_xlsx.xlsx")
         result = extractor.extract(file)
+        
+        self.assertIsInstance(result, ExtractionResult)
+        self.assertGreater(len(result.texts), 0)
         self.assert_result_format(result.to_dict())
 
 
@@ -92,16 +98,18 @@ class PowerPointExtractorTest(FileProcessingTestCase):
     
     def test_powerpoint_extractor_import(self):
         """Test que python-pptx peut être importé."""
-        try:
-            PowerPointExtractor()
-        except ImportError:
-            self.skipTest("python-pptx n'est pas installé")
+        self.skip_if_dependency_missing(PowerPointExtractor, "python-pptx")
     
-    def test_format_compatibility(self):
-        """Test que le format de retour est compatible."""
-        file = self.create_powerpoint_file("Test Title")
+    def test_extract_real_pptx_file(self):
+        """Test d'extraction avec le fichier PPTX réel et vérification du format."""
+        self.skip_if_dependency_missing(PowerPointExtractor, "python-pptx")
         extractor = PowerPointExtractor()
+        
+        file = self.load_fixture_file("test_pptx.pptx")
         result = extractor.extract(file)
+        
+        self.assertIsInstance(result, ExtractionResult)
+        self.assertGreater(len(result.texts), 0)
         self.assert_result_format(result.to_dict())
 
 
@@ -110,16 +118,19 @@ class FileTextExtractorFactoryTest(FileProcessingTestCase):
     
     def test_get_extractor_docx(self):
         """Test de récupération de l'extracteur Word."""
+        self.skip_if_dependency_missing(WordExtractor, "python-docx")
         extractor = FileTextExtractorFactory.get_extractor('.docx')
         self.assertIsInstance(extractor, WordExtractor)
     
     def test_get_extractor_pptx(self):
         """Test de récupération de l'extracteur PowerPoint."""
+        self.skip_if_dependency_missing(PowerPointExtractor, "python-pptx")
         extractor = FileTextExtractorFactory.get_extractor('.pptx')
         self.assertIsInstance(extractor, PowerPointExtractor)
     
     def test_get_extractor_xlsx(self):
         """Test de récupération de l'extracteur Excel."""
+        self.skip_if_dependency_missing(ExcelExtractor, "openpyxl")
         extractor = FileTextExtractorFactory.get_extractor('.xlsx')
         self.assertIsInstance(extractor, ExcelExtractor)
     
@@ -143,8 +154,7 @@ class FileTextExtractorFactoryTest(FileProcessingTestCase):
     
     def test_extract_text_method(self):
         """Test de la méthode extract_text qui retourne directement un dict."""
-        content = b"Test content"
-        file = self.create_test_file(content, "test.txt")
+        file = self.load_fixture_file("test_txt.txt")
         
         result = FileTextExtractorFactory.extract_text(file)
         
@@ -173,8 +183,7 @@ class CompatibilityTest(FileProcessingTestCase):
             ]
         }
         """
-        content = b"Premier paragraphe\n\nDeuxieme paragraphe"
-        file = self.create_test_file(content, "test.txt")
+        file = self.load_fixture_file("test_txt.txt")
         
         result = FileTextExtractorFactory.extract_text(file)
         
@@ -198,9 +207,9 @@ class CompatibilityTest(FileProcessingTestCase):
     
     def test_file_seek_reset(self):
         """Test que le fichier est repositionné après extraction."""
-        content = b"Test content"
-        file = self.create_test_file(content, "test.txt")
-        original_content = content
+        file = self.load_fixture_file("test_txt.txt")
+        file.seek(0)
+        original_content = file.read()
         
         FileTextExtractorFactory.extract_text(file)
         

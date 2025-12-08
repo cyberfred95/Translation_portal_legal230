@@ -33,6 +33,9 @@ def get_text_from_file(file: InMemoryUploadedFile, api_key):
         texts = StatsProcessor(api_key).get_texts(file=file)
     except UnicodeEncodeError:
         raise ValueError({"detail": "Invalid characters in file name"})
+    except ImportError as e:
+        # Gérer les dépendances manquantes (ex: python-pptx)
+        raise ValueError({"detail": str(e)})
 
     formated_texts = [
         word

@@ -43,19 +43,42 @@ class FileTextExtractor(ABC):
     
     @contextmanager
     def _reset_file_position(self, file: InMemoryUploadedFile):
-        """Context manager pour s'assurer que le fichier est repositionné."""
+        """
+        Context manager pour s'assurer que le fichier est repositionné.
+        
+        Sauvegarde la position actuelle et la restaure après utilisation.
+        """
+        original_position = file.tell()
+        file.seek(0)
         try:
-            file.seek(0)
             yield
         finally:
-            file.seek(0)
+            file.seek(original_position)
     
     def _read_file_content(self, file: InMemoryUploadedFile) -> bytes:
-        """Lit le contenu du fichier et le repositionne."""
-        file.seek(0)
-        content = file.read()
-        file.seek(0)
-        return content
+        """
+        Lit le contenu binaire du fichier.
+        
+        Note: À utiliser dans un context manager _reset_file_position.
+        """
+        return file.read()
+    
+    def _read_file_with_reset(self, file: InMemoryUploadedFile) -> bytes:
+        """
+        Lit le contenu du fichier en réinitialisant sa position.
+        
+        Helper pour éviter la duplication du pattern:
+        with self._reset_file_position(file):
+            content = self._read_file_content(file)
+        
+        Args:
+            file: Fichier en mémoire
+            
+        Returns:
+            bytes: Contenu binaire du fichier
+        """
+        with self._reset_file_position(file):
+            return self._read_file_content(file)
     
     @staticmethod
     def _create_text_item(text: str) -> Dict[str, str]:
@@ -63,18 +86,22 @@ class FileTextExtractor(ABC):
         return {"text": text}
     
     @staticmethod
-    def _check_dependency(package_name: str):
+    def _check_dependency(package_name: str, import_name: str = None):
         """
         Vérifie qu'une dépendance est disponible.
         
         Args:
             package_name: Nom du package à vérifier (ex: 'python-docx')
+            import_name: Nom du module à importer (ex: 'docx'). 
+                        Si None, déduit depuis package_name.
             
         Raises:
             ImportError: Si le package n'est pas installé
         """
-        # Convertir le nom du package pour l'import (python-docx -> docx)
-        import_name = package_name.replace('python-', '').replace('-', '_')
+        if import_name is None:
+            # Convertir le nom du package pour l'import (python-docx -> docx)
+            import_name = package_name.replace('python-', '').replace('-', '_')
+        
         try:
             __import__(import_name)
         except ImportError:
@@ -88,17 +115,15 @@ class WordExtractor(FileTextExtractor):
     """Extracteur de texte pour les fichiers Word (.docx)."""
     
     def __init__(self):
-        self._check_dependency('python-docx')
+        self._check_dependency('python-docx', 'docx')
         from docx import Document
         self.Document = Document
     
     def extract(self, file: InMemoryUploadedFile) -> ExtractionResult:
         """Extrait le texte d'un document Word."""
-        with self._reset_file_position(file):
-            content = self._read_file_content(file)
-            doc = self.Document(BytesIO(content))
-            texts = self._extract_paragraphs(doc) + self._extract_tables(doc)
-        
+        content = self._read_file_with_reset(file)
+        doc = self.Document(BytesIO(content))
+        texts = self._extract_paragraphs(doc) + self._extract_tables(doc)
         return ExtractionResult(texts=texts)
     
     def _extract_paragraphs(self, doc) -> List[Dict[str, str]]:
@@ -125,17 +150,15 @@ class PowerPointExtractor(FileTextExtractor):
     """Extracteur de texte pour les fichiers PowerPoint (.pptx)."""
     
     def __init__(self):
-        self._check_dependency('python-pptx')
+        self._check_dependency('python-pptx', 'pptx')
         from pptx import Presentation
         self.Presentation = Presentation
     
     def extract(self, file: InMemoryUploadedFile) -> ExtractionResult:
         """Extrait le texte d'une présentation PowerPoint."""
-        with self._reset_file_position(file):
-            content = self._read_file_content(file)
-            prs = self.Presentation(BytesIO(content))
-            texts = self._extract_slides(prs)
-        
+        content = self._read_file_with_reset(file)
+        prs = self.Presentation(BytesIO(content))
+        texts = self._extract_slides(prs)
         return ExtractionResult(texts=texts)
     
     def _extract_slides(self, prs) -> List[Dict[str, str]]:
@@ -154,17 +177,15 @@ class ExcelExtractor(FileTextExtractor):
     """Extracteur de texte pour les fichiers Excel (.xlsx)."""
     
     def __init__(self):
-        self._check_dependency('openpyxl')
+        self._check_dependency('openpyxl', 'openpyxl')
         from openpyxl import load_workbook
         self.load_workbook = load_workbook
     
     def extract(self, file: InMemoryUploadedFile) -> ExtractionResult:
         """Extrait le texte d'un classeur Excel."""
-        with self._reset_file_position(file):
-            content = self._read_file_content(file)
-            workbook = self.load_workbook(BytesIO(content), data_only=True)
-            texts = self._extract_sheets(workbook)
-        
+        content = self._read_file_with_reset(file)
+        workbook = self.load_workbook(BytesIO(content), data_only=True)
+        texts = self._extract_sheets(workbook)
         return ExtractionResult(texts=texts)
     
     def _extract_sheets(self, workbook) -> List[Dict[str, str]]:
@@ -194,11 +215,9 @@ class TextExtractor(FileTextExtractor):
     
     def extract(self, file: InMemoryUploadedFile) -> ExtractionResult:
         """Extrait le texte d'un fichier texte."""
-        with self._reset_file_position(file):
-            content = self._read_file_content(file)
-            text = self._decode_content(content)
-            texts = self._parse_paragraphs(text)
-        
+        content = self._read_file_with_reset(file)
+        text = self._decode_content(content)
+        texts = self._parse_paragraphs(text)
         return ExtractionResult(texts=texts)
     
     def _decode_content(self, content: bytes) -> str:
@@ -261,6 +280,7 @@ class FileTextExtractorFactory:
             
         Raises:
             ValueError: Si l'extension n'est pas supportée
+            ImportError: Si une dépendance requise n'est pas installée
         """
         file_extension = file_extension.lower()
         extractor_class = cls._EXTRACTOR_MAP.get(file_extension)
@@ -272,7 +292,14 @@ class FileTextExtractorFactory:
                 f"Extensions supportées: {supported}"
             )
         
-        return extractor_class()
+        try:
+            return extractor_class()
+        except ImportError as e:
+            # Re-lancer l'ImportError avec un message plus clair
+            raise ImportError(
+                f"Impossible de traiter le fichier '{file_extension}': {str(e)}. "
+                f"Veuillez installer la dépendance manquante."
+            ) from e
     
     @classmethod
     def extract_text(cls, file: InMemoryUploadedFile) -> dict:
