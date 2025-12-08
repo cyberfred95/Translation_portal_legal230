@@ -35,7 +35,7 @@ class StatsProcessor:
         Note:
             Les fichiers PDF doivent être convertis en DOCX avant d'appeler cette méthode.
         """
-        file_extension = os.path.splitext(file.name)[1].lower()
+        file_extension = self._get_file_extension(file)
         
         if file_extension == self.PDF_EXTENSION:
             raise ValueError(self.ERROR_PDF_NOT_SUPPORTED)
@@ -60,6 +60,11 @@ class StatsProcessor:
         """
         result = self.get_texts(file)
         return sum(len(paragraph['text']) for paragraph in result['texts'])
+
+    @staticmethod
+    def _get_file_extension(file: InMemoryUploadedFile) -> str:
+        """Extrait l'extension du fichier en minuscules."""
+        return os.path.splitext(file.name)[1].lower()
 
     def send_writing_request(self,
                              texts: list,

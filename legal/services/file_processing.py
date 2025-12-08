@@ -14,25 +14,6 @@ from contextlib import contextmanager
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
-# Imports conditionnels pour les bibliothèques optionnelles
-try:
-    from docx import Document
-    DOCX_AVAILABLE = True
-except ImportError:
-    DOCX_AVAILABLE = False
-
-try:
-    from pptx import Presentation
-    PPTX_AVAILABLE = True
-except ImportError:
-    PPTX_AVAILABLE = False
-
-try:
-    from openpyxl import load_workbook
-    OPENPYXL_AVAILABLE = True
-except ImportError:
-    OPENPYXL_AVAILABLE = False
-
 
 @dataclass(frozen=True)
 class ExtractionResult:
@@ -75,37 +56,60 @@ class FileTextExtractor(ABC):
         content = file.read()
         file.seek(0)
         return content
+    
+    @staticmethod
+    def _create_text_item(text: str) -> Dict[str, str]:
+        """Crée un élément de texte au format standardisé."""
+        return {"text": text}
+    
+    @staticmethod
+    def _check_dependency(package_name: str):
+        """
+        Vérifie qu'une dépendance est disponible.
+        
+        Args:
+            package_name: Nom du package à vérifier (ex: 'python-docx')
+            
+        Raises:
+            ImportError: Si le package n'est pas installé
+        """
+        # Convertir le nom du package pour l'import (python-docx -> docx)
+        import_name = package_name.replace('python-', '').replace('-', '_')
+        try:
+            __import__(import_name)
+        except ImportError:
+            raise ImportError(
+                f"{package_name} n'est pas installé. "
+                f"Installez-le avec: pip install {package_name}"
+            )
 
 
 class WordExtractor(FileTextExtractor):
     """Extracteur de texte pour les fichiers Word (.docx)."""
     
     def __init__(self):
-        if not DOCX_AVAILABLE:
-            raise ImportError(
-                "python-docx n'est pas installé. "
-                "Installez-le avec: pip install python-docx"
-            )
+        self._check_dependency('python-docx')
+        from docx import Document
+        self.Document = Document
     
     def extract(self, file: InMemoryUploadedFile) -> ExtractionResult:
         """Extrait le texte d'un document Word."""
         with self._reset_file_position(file):
             content = self._read_file_content(file)
-            doc = Document(BytesIO(content))
+            doc = self.Document(BytesIO(content))
             texts = self._extract_paragraphs(doc) + self._extract_tables(doc)
         
         return ExtractionResult(texts=texts)
     
-    def _extract_paragraphs(self, doc: Document) -> List[Dict[str, str]]:
+    def _extract_paragraphs(self, doc) -> List[Dict[str, str]]:
         """Extrait le texte des paragraphes."""
-        texts = []
-        for paragraph in doc.paragraphs:
-            text = paragraph.text.strip()
-            if text:
-                texts.append({"text": text})
-        return texts
+        return [
+            self._create_text_item(paragraph.text.strip())
+            for paragraph in doc.paragraphs
+            if paragraph.text.strip()
+        ]
     
-    def _extract_tables(self, doc: Document) -> List[Dict[str, str]]:
+    def _extract_tables(self, doc) -> List[Dict[str, str]]:
         """Extrait le texte des tableaux."""
         texts = []
         for table in doc.tables:
@@ -113,7 +117,7 @@ class WordExtractor(FileTextExtractor):
                 for cell in row.cells:
                     cell_text = cell.text.strip()
                     if cell_text:
-                        texts.append({"text": cell_text})
+                        texts.append(self._create_text_item(cell_text))
         return texts
 
 
@@ -121,22 +125,20 @@ class PowerPointExtractor(FileTextExtractor):
     """Extracteur de texte pour les fichiers PowerPoint (.pptx)."""
     
     def __init__(self):
-        if not PPTX_AVAILABLE:
-            raise ImportError(
-                "python-pptx n'est pas installé. "
-                "Installez-le avec: pip install python-pptx"
-            )
+        self._check_dependency('python-pptx')
+        from pptx import Presentation
+        self.Presentation = Presentation
     
     def extract(self, file: InMemoryUploadedFile) -> ExtractionResult:
         """Extrait le texte d'une présentation PowerPoint."""
         with self._reset_file_position(file):
             content = self._read_file_content(file)
-            prs = Presentation(BytesIO(content))
+            prs = self.Presentation(BytesIO(content))
             texts = self._extract_slides(prs)
         
         return ExtractionResult(texts=texts)
     
-    def _extract_slides(self, prs: Presentation) -> List[Dict[str, str]]:
+    def _extract_slides(self, prs) -> List[Dict[str, str]]:
         """Extrait le texte de toutes les diapositives."""
         texts = []
         for slide in prs.slides:
@@ -144,7 +146,7 @@ class PowerPointExtractor(FileTextExtractor):
                 if hasattr(shape, "text"):
                     text = shape.text.strip()
                     if text:
-                        texts.append({"text": text})
+                        texts.append(self._create_text_item(text))
         return texts
 
 
@@ -152,17 +154,15 @@ class ExcelExtractor(FileTextExtractor):
     """Extracteur de texte pour les fichiers Excel (.xlsx)."""
     
     def __init__(self):
-        if not OPENPYXL_AVAILABLE:
-            raise ImportError(
-                "openpyxl n'est pas installé. "
-                "Installez-le avec: pip install openpyxl"
-            )
+        self._check_dependency('openpyxl')
+        from openpyxl import load_workbook
+        self.load_workbook = load_workbook
     
     def extract(self, file: InMemoryUploadedFile) -> ExtractionResult:
         """Extrait le texte d'un classeur Excel."""
         with self._reset_file_position(file):
             content = self._read_file_content(file)
-            workbook = load_workbook(BytesIO(content), data_only=True)
+            workbook = self.load_workbook(BytesIO(content), data_only=True)
             texts = self._extract_sheets(workbook)
         
         return ExtractionResult(texts=texts)
@@ -174,7 +174,7 @@ class ExcelExtractor(FileTextExtractor):
             for row in sheet.iter_rows(values_only=True):
                 row_texts = self._extract_row_values(row)
                 if row_texts:
-                    texts.append({"text": " ".join(row_texts)})
+                    texts.append(self._create_text_item(" ".join(row_texts)))
         return texts
     
     def _extract_row_values(self, row) -> List[str]:
@@ -189,6 +189,9 @@ class ExcelExtractor(FileTextExtractor):
 class TextExtractor(FileTextExtractor):
     """Extracteur de texte pour les fichiers texte (.txt)."""
     
+    # Encodages à essayer dans l'ordre de préférence
+    _ENCODINGS = ('utf-8', 'latin-1')
+    
     def extract(self, file: InMemoryUploadedFile) -> ExtractionResult:
         """Extrait le texte d'un fichier texte."""
         with self._reset_file_position(file):
@@ -200,7 +203,7 @@ class TextExtractor(FileTextExtractor):
     
     def _decode_content(self, content: bytes) -> str:
         """Décode le contenu avec plusieurs encodages en fallback."""
-        for encoding in ('utf-8', 'latin-1'):
+        for encoding in self._ENCODINGS:
             try:
                 return content.decode(encoding)
             except UnicodeDecodeError:
@@ -219,12 +222,12 @@ class TextExtractor(FileTextExtractor):
                 current_paragraph.append(stripped_line)
             elif current_paragraph:
                 # Ligne vide = fin de paragraphe
-                texts.append({"text": " ".join(current_paragraph)})
+                texts.append(self._create_text_item(" ".join(current_paragraph)))
                 current_paragraph = []
         
         # Ajouter le dernier paragraphe s'il existe
         if current_paragraph:
-            texts.append({"text": " ".join(current_paragraph)})
+            texts.append(self._create_text_item(" ".join(current_paragraph)))
         
         return texts
 
@@ -285,7 +288,7 @@ class FileTextExtractorFactory:
         Raises:
             ValueError: Si l'extension n'est pas supportée
         """
-        file_extension = os.path.splitext(file.name)[1]
+        file_extension = os.path.splitext(file.name)[1].lower()
         extractor = cls.get_extractor(file_extension)
         result = extractor.extract(file)
         return result.to_dict()

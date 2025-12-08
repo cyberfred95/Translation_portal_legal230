@@ -5,9 +5,6 @@ Ces tests vérifient la compatibilité avec l'API Custom_mt et testent
 chaque extracteur individuellement.
 """
 
-from io import BytesIO
-from django.test import TestCase
-
 from legal.services.file_processing import (
     FileTextExtractorFactory,
     WordExtractor,
@@ -51,12 +48,7 @@ class TextExtractorTest(FileProcessingTestCase):
         
         extractor = TextExtractor()
         result = extractor.extract(file)
-        result_dict = result.to_dict()
-        
-        self.assertIn("texts", result_dict)
-        self.assertIsInstance(result_dict["texts"], list)
-        if result_dict["texts"]:
-            self.assertIn("text", result_dict["texts"][0])
+        self.assert_result_format(result.to_dict())
 
 
 class WordExtractorTest(FileProcessingTestCase):
@@ -71,25 +63,10 @@ class WordExtractorTest(FileProcessingTestCase):
     
     def test_format_compatibility(self):
         """Test que le format de retour est compatible."""
-        try:
-            from docx import Document
-            
-            doc = Document()
-            doc.add_paragraph("Test paragraph")
-            
-            buffer = BytesIO()
-            doc.save(buffer)
-            buffer.seek(0)
-            
-            file = self.create_test_file(buffer.read(), "test.docx")
-            extractor = WordExtractor()
-            result = extractor.extract(file)
-            result_dict = result.to_dict()
-            
-            self.assertIn("texts", result_dict)
-            self.assertIsInstance(result_dict["texts"], list)
-        except ImportError:
-            self.skipTest("python-docx n'est pas installé")
+        file = self.create_word_file(["Test paragraph"])
+        extractor = WordExtractor()
+        result = extractor.extract(file)
+        self.assert_result_format(result.to_dict())
 
 
 class ExcelExtractorTest(FileProcessingTestCase):
@@ -104,28 +81,10 @@ class ExcelExtractorTest(FileProcessingTestCase):
     
     def test_format_compatibility(self):
         """Test que le format de retour est compatible."""
-        try:
-            from openpyxl import Workbook
-            
-            wb = Workbook()
-            ws = wb.active
-            ws['A1'] = "Cell 1"
-            ws['B1'] = "Cell 2"
-            ws['A2'] = "Cell 3"
-            
-            buffer = BytesIO()
-            wb.save(buffer)
-            buffer.seek(0)
-            
-            file = self.create_test_file(buffer.read(), "test.xlsx")
-            extractor = ExcelExtractor()
-            result = extractor.extract(file)
-            result_dict = result.to_dict()
-            
-            self.assertIn("texts", result_dict)
-            self.assertIsInstance(result_dict["texts"], list)
-        except ImportError:
-            self.skipTest("openpyxl n'est pas installé")
+        file = self.create_excel_file({'A1': 'Cell 1', 'B1': 'Cell 2', 'A2': 'Cell 3'})
+        extractor = ExcelExtractor()
+        result = extractor.extract(file)
+        self.assert_result_format(result.to_dict())
 
 
 class PowerPointExtractorTest(FileProcessingTestCase):
@@ -140,26 +99,10 @@ class PowerPointExtractorTest(FileProcessingTestCase):
     
     def test_format_compatibility(self):
         """Test que le format de retour est compatible."""
-        try:
-            from pptx import Presentation
-            
-            prs = Presentation()
-            slide = prs.slides.add_slide(prs.slide_layouts[0])
-            slide.shapes.title.text = "Test Title"
-            
-            buffer = BytesIO()
-            prs.save(buffer)
-            buffer.seek(0)
-            
-            file = self.create_test_file(buffer.read(), "test.pptx")
-            extractor = PowerPointExtractor()
-            result = extractor.extract(file)
-            result_dict = result.to_dict()
-            
-            self.assertIn("texts", result_dict)
-            self.assertIsInstance(result_dict["texts"], list)
-        except ImportError:
-            self.skipTest("python-pptx n'est pas installé")
+        file = self.create_powerpoint_file("Test Title")
+        extractor = PowerPointExtractor()
+        result = extractor.extract(file)
+        self.assert_result_format(result.to_dict())
 
 
 class FileTextExtractorFactoryTest(FileProcessingTestCase):
@@ -235,7 +178,6 @@ class CompatibilityTest(FileProcessingTestCase):
         
         result = FileTextExtractorFactory.extract_text(file)
         
-        # Vérifier la structure exacte
         self.assertIn("texts", result)
         self.assertIsInstance(result["texts"], list)
         
@@ -262,6 +204,5 @@ class CompatibilityTest(FileProcessingTestCase):
         
         FileTextExtractorFactory.extract_text(file)
         
-        # Le fichier devrait être repositionné
         file.seek(0)
         self.assertEqual(file.read(), original_content)
