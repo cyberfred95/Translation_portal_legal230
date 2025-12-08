@@ -963,6 +963,10 @@ msgstr "Sélectionner un sous-domaine"
 msgid "Select a glossary"
 msgstr "Sélectionner un glossaire"
 
+#: legal/templates/translate/document_translate/step_domain/step_domain.html:23
+msgid "Select or not, one or more glossaries"
+msgstr "Sélectionner ou non, un ou plusieurs glossaires"
+
 #: legal/templates/translate/document_translate/step_domain/step_3.html:32
 msgid "Standard"
 msgstr "Standard"

@@ -285,11 +285,6 @@ SENDER_EMAIL = os.environ.get('SENDER_EMAIL')
 QUOTE_CC_EMAIL = os.environ.get('QUOTE_CC_EMAIL')
 SUPPORT_EMAIL = os.environ.get('SUPPORT_EMAIL')
 
-# Glossary Configuration
-GLOSSARY_SYSTEM = os.environ.get("GLOSSARY_SYSTEM")
-GLOSSARY_API_KEY = os.environ.get("GLOSSARY_API_KEY")
-GLOSSARY_API_URL = os.environ.get("GLOSSARY_API_URL")
-
 # Statistics Service Configuration
 STATS_API_URL = os.environ.get('STATS_API_URL')
 STATS_API_KEY = os.environ.get('STATS_API_KEY')

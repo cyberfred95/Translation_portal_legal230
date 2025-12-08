@@ -17,7 +17,6 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
-from glossaries.helpers import get_glossary_username
 from glossaries.processor import GlossaryProcessor
 from quoting.models import LanguageQuote
 from django.utils.timezone import now
@@ -223,21 +222,6 @@ def text_translation(request):
     )
 
 
-def form_glossary_object(request) -> Optional[dict]:
-    try:
-        glossary = Glossary.objects.get(id=request.POST.get('glossary'))
-        if glossary:
-            return {
-                "system": settings.GLOSSARY_SYSTEM,
-                "username": get_glossary_username(glossary),
-                "glossary_id": glossary.glossary_id,
-            }
-    except Glossary.DoesNotExist:
-        return {}
-    except ValueError:
-        return {}
-
-
 def file_translate(request):
     """
     Document translation using LARA Translation API (Django Lara).
@@ -276,56 +260,37 @@ def file_translate(request):
 
     source_language = request.POST.get('source_language')
     target_language = request.POST.get('target_language')
-    domain_name_raw = request.POST.get('domain_name')
+    domain_id = request.POST.get('domain_id')
 
-    # Convert domain name from French to English if needed
-    # Django Lara templates use English domain names
-    domain = Domain.objects.filter(french_name=domain_name_raw).first()
-    if not domain:
-        domain = Domain.objects.filter(name=domain_name_raw).first()
-    domain_name = domain.name if domain else domain_name_raw
+    # Get glossaries from request (comma-separated list of glossary IDs)
+    glossary_param = request.POST.get('glossary', 'none')
+    if glossary_param and glossary_param != 'none':
+        user_glossaries = [g.strip() for g in glossary_param.split(',') if g.strip()]
+    else:
+        user_glossaries = []
+
+    # Get domain by ID
+    domain = None
+    domain_name = ''
+    if domain_id:
+        domain = Domain.objects.filter(id=domain_id).first()
+        if domain:
+            domain_name = domain.name  # English name for templates/find
 
     user_id = request.user.id if request.user.is_authenticated else 'anonymous'
-    logger.info(f"LARA_DOC_TRANSLATE_START - User: {user_id} - Files: {len(files)} - Source: {source_language} -> Target: {target_language} - Domain: {domain_name} (raw: {domain_name_raw})")
+    logger.info(f"LARA_DOC_TRANSLATE_START - User: {user_id} - Files: {len(files)} - Source: {source_language} -> Target: {target_language} - Domain: {domain_name} (id: {domain_id}) - Glossaries: {user_glossaries}")
 
-    # Step 1: Fetch template to get translation memory and glossary IDs
-    translation_memory_id = None
-    glossary_id = None
-    template_id = None
-    template_name = None
+    # Template lookup is now done automatically by lara-django backend
+    # We just need to send the domain and language info
 
-    try:
-        template_response = requests.get(
-            f"{settings.LARA_API_URL}/api/templates/find",
-            params={
-                'domain': domain_name,
-                'sourceLanguage': source_language,
-                'targetLanguage': target_language,
-            },
-            timeout=10
-        )
-
-        logger.info(f"LARA_DOC_TEMPLATES_RESPONSE - User: {user_id} - Status: {template_response.status_code}")
-
-        if template_response.status_code == 200:
-            templates = template_response.json()
-            if templates and len(templates) > 0:
-                template = templates[0]
-                template_id = template.get('id')
-                template_name = template.get('name')
-                translation_memory_id = template.get('translationMemoryId')
-                glossary_id = template.get('glossaryId')
-                logger.info(f"LARA_DOC_TEMPLATE_SELECTED - User: {user_id} - Template: {template_name} (ID: {template_id}) - TM ID: {translation_memory_id} - Glossary ID: {glossary_id}")
-    except requests.RequestException as e:
-        logger.error(f"LARA_DOC_TEMPLATES_EXCEPTION - User: {user_id} - Exception: {str(e)}")
-        # Continue without template info
-
-    # Step 2: Translate each document via Django Lara
+    # Translate each document via Django Lara
     projects = []
     for file in files:
         file = lowercase_file_extension(file)
 
         # Build form data for Django Lara
+        # Note: Template, translation memory and glossary are now auto-detected by the backend
+        # based on domain and language pair. User-selected glossaries are still sent.
         translate_data = {
             'accessKeyId': settings.LARA_ACCESS_KEY_ID,
             'accessKeySecret': settings.LARA_ACCESS_KEY_SECRET,
@@ -334,18 +299,22 @@ def file_translate(request):
             'userToken': str(request.user.uuid) if request.user.is_authenticated else '',
         }
 
+        if domain_id:
+            translate_data['domainId'] = int(domain_id)
         if domain_name:
-            translate_data['domain'] = domain_name
-        if template_id:
-            translate_data['templateId'] = str(template_id)
-        if template_name:
-            translate_data['templateName'] = template_name
-        if translation_memory_id:
-            translate_data['adaptTo'] = str(translation_memory_id)
-        if glossary_id:
-            translate_data['glossaries'] = str(glossary_id)
+            translate_data['domain'] = domain_name  # English domain name
 
-        logger.info(f"LARA_DOC_TRANSLATE_CALL - User: {user_id} - File: {file.name} - adaptTo: {translation_memory_id} - glossaries: {glossary_id}")
+        # Send user-selected glossaries (additional to auto-detected ones from template)
+        if user_glossaries:
+            translate_data['glossaries'] = ','.join(user_glossaries)
+
+        # Add document statistics
+        translate_data['wordsCount'] = words_count
+        translate_data['charactersCount'] = symbols_count
+
+        # Log payload complet avant envoi (sans les credentials)
+        payload_log = {k: v for k, v in translate_data.items() if k not in ['accessKeyId', 'accessKeySecret']}
+        logger.info(f"LARA_DOC_TRANSLATE_CALL - User: {user_id} - File: {file.name} - Payload: {payload_log}")
 
         try:
             response = requests.post(
@@ -402,46 +371,49 @@ def file_translate(request):
                 }
             )
 
-    # Update translation quota
-    add_translations(request, words_count=words_count,
-                     files_count=len(files), symbols_count=symbols_count)
+    # Check for errors in projects
+    successful_projects = [p for p in projects if p.get('id')]
+    failed_projects = [p for p in projects if not p.get('id')]
 
-    logger.info(f"LARA_DOC_TRANSLATE_COMPLETE - User: {user_id} - Projects: {len(projects)} - Quota updated")
+    # If all projects failed, return error
+    if not successful_projects and failed_projects:
+        error_messages = [p.get('error', 'Unknown error') for p in failed_projects]
+        logger.error(f"LARA_DOC_TRANSLATE_ALL_FAILED - User: {user_id} - Errors: {error_messages}")
+        return JsonResponse({
+            "detail": "Translation failed",
+            "errors": error_messages
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    return JsonResponse({
-        "project_ids": [project.get('id') for project in projects if project.get('id')],
+    # Update translation quota only for successful translations
+    if successful_projects:
+        add_translations(request, words_count=words_count,
+                         files_count=len(successful_projects), symbols_count=symbols_count)
+
+    logger.info(f"LARA_DOC_TRANSLATE_COMPLETE - User: {user_id} - Successful: {len(successful_projects)} - Failed: {len(failed_projects)}")
+
+    # If some projects failed but some succeeded, return partial success with warning
+    response_data = {
+        "project_ids": [p.get('id') for p in successful_projects],
         "display_popup": False if get_price_by_language_pair(
             source_language=source_language,
             target_language=target_language) else True
-    })
+    }
+
+    if failed_projects:
+        response_data["warnings"] = [{"file": p.get('file_name'), "error": p.get('error')} for p in failed_projects]
+        return JsonResponse(response_data, status=status.HTTP_207_MULTI_STATUS)
+
+    return JsonResponse(response_data)
 
 
 class GetDomainsView(APIView):
     permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def get(self, request):
-        if 'source_language' not in self.request.query_params or 'target_language' not in self.request.query_params:
-            return Response({"message": "Missing source language or target language"},
-                            status=status.HTTP_400_BAD_REQUEST)
-        try:
-            user_api_key = get_user_api_key(self.request.user)
-        except ValueError:
-            return Response({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
-        domains = requests.post(
-            settings.CUSTOM_MT_CONSOLE_URL + "translation/get-domains",
-            data={
-                "source_language": self.request.query_params['source_language'].lower(),
-                "target_language": self.request.query_params['target_language'].lower()
-            },
-            headers={
-                'token': user_api_key
-            }
-        )
-        domain_names = []
-        for domain in domains.json():
-            domain_names.append(domain['domain_name'])
-        domains = Domain.objects.filter(
-            name__in=domain_names).order_by('-featured', 'name')
+        # Récupérer les domaines directement depuis la base de données
+        domains = Domain.objects.all().order_by('-featured', 'name')
+        
+        # Filtrer par domain_group si fourni
         if self.request.query_params.get('domain_group'):
             if request.LANGUAGE_CODE == 'fr':
                 domains = domains.filter(
@@ -459,19 +431,21 @@ class GetDomainsView(APIView):
             else:
                 return Response({"data": [{"name": preferences.DefaultTranslation.name, "icon": None}], "default_domain": True}, )
         
-        # Construire la liste avec nom et icône
+        # Construire la liste avec id, nom et icône
         domain_data = []
         for domain in domains:
             if request.LANGUAGE_CODE == 'fr':
                 domain_name = domain.french_name if domain.french_name else domain.name
             else:
                 domain_name = domain.name
-            
+
             domain_data.append({
+                "id": domain.id,
                 "name": domain_name,
+                "english_name": domain.name,  # Toujours inclure le nom anglais pour LARA
                 "icon": domain.icon
             })
-        
+
         return Response({"data": domain_data, "default_domain": False}, status=status.HTTP_200_OK)
 
 
