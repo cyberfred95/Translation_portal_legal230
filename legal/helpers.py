@@ -49,7 +49,7 @@ def _convert_pdf_if_needed(file: InMemoryUploadedFile) -> InMemoryUploadedFile:
     return file
 
 
-def get_text_from_file(file: InMemoryUploadedFile, api_key):
+def get_text_from_file(file: InMemoryUploadedFile):
     """
     Extrait le texte d'un fichier et retourne le fichier converti si nécessaire.
     
@@ -59,7 +59,6 @@ def get_text_from_file(file: InMemoryUploadedFile, api_key):
     
     Args:
         file: Fichier en mémoire à traiter
-        api_key: Clé API pour le traitement
         
     Returns:
         tuple: (formated_texts, full_texts, processed_file)
@@ -70,7 +69,7 @@ def get_text_from_file(file: InMemoryUploadedFile, api_key):
     processed_file = _convert_pdf_if_needed(file)
     
     try:
-        texts = StatsProcessor(api_key).get_texts(file=processed_file)
+        texts = StatsProcessor().get_texts(file=processed_file)
     except UnicodeEncodeError:
         raise ValueError({"detail": "Invalid characters in file name"})
     except ImportError as e:

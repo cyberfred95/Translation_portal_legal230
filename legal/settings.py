@@ -273,9 +273,9 @@ LARA_API_URL = os.environ.get('LARA_API_URL', 'https://api.portail.lexamt.fr/lar
 LARA_ACCESS_KEY_ID = os.environ.get('LARA_ACCESS_KEY_ID')
 LARA_ACCESS_KEY_SECRET = os.environ.get('LARA_ACCESS_KEY_SECRET')
 
-# Cloud Storage API Configuration
-CLOUDSTORAGE_API_URL = os.environ.get('CLOUDSTORAGE_API_URL')
-CLOUDSTORAGE_API_KEY = os.environ.get('CLOUDSTORAGE_API_KEY')
+# Cloud Storage API Configuration - DÉSACTIVÉ
+# CLOUDSTORAGE_API_URL = os.environ.get('CLOUDSTORAGE_API_URL')
+# CLOUDSTORAGE_API_KEY = os.environ.get('CLOUDSTORAGE_API_KEY')
 
 # Email Configuration
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL')

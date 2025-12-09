@@ -59,7 +59,6 @@ import requests
 from preferences import preferences
 import langdetect
 
-from .services.post_editing import FileExpertRevisionService
 from glossaries.models import Glossary
 from typing import Optional
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -69,8 +68,6 @@ from quoting.helpers import get_price_by_language_pair
 
 import csv
 from subscriptions.helpers import translation_allowed, add_translations
-
-from quoting.services.quote import FormQuoteService
 
 PAGINATION_PAGE_SIZE = 20
 CACHE_TTL = 3600
@@ -233,8 +230,9 @@ def file_translate(request):
     logger = logging.getLogger(__name__)
 
     files = request.FILES.getlist('document[]', [])
+    # Vérification que l'utilisateur a une subscription active
     try:
-        api_key = get_user_api_key(request.user)
+        get_user_api_key(request.user)
     except ValueError:
         return JsonResponse({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
 
@@ -249,7 +247,7 @@ def file_translate(request):
     processed_files = []
     for file in files:
         file = rename_file(file=file)
-        file_words, file_texts, processed_file = get_text_from_file(file, api_key)
+        file_words, file_texts, processed_file = get_text_from_file(file)
         words_count += len(file_words)
         symbols_count += sum(len(word) for word in file_texts)
         processed_files.append(processed_file)
@@ -450,27 +448,36 @@ class GetDomainsView(APIView):
 
 
 class FileExpertRevisionView(APIView):
+    """
+    Vue pour la révision experte de fichiers.
+    
+    Note: Cette fonctionnalité est temporairement désactivée car le service
+    CloudStorage n'est plus disponible. Les méthodes sont conservées pour
+    référence future lors d'une refonte.
+    """
 
     def get(self, request):
-        project_id = request.query_params.get('project_id')
-        post_editing_service = FileExpertRevisionService()
-        post_editing_service.send_to_post_editing(
-            request=request, project_id=project_id)
-        quote_service = FormQuoteService()
-        quote_service.send_quote_to_user(request)
-        return HttpResponse(
-            f'<h1>Sent to post-editing</h1><br/><a href="{request.build_absolute_uri(reverse("main_index"))}">Return to main page</a>')
+        """
+        Méthode GET désactivée - service CloudStorage non disponible.
+        """
+        return Response(
+            {"detail": "This feature is temporarily unavailable"},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE
+        )
 
     def post(self, request):
+        """
+        Méthode POST désactivée - service CloudStorage non disponible.
+        """
         if not request.user.is_staff and not request.user.group:
-            return Response({"detail": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
-        project_id = request.POST['project_id']
-        post_editing_service = FileExpertRevisionService()
-        post_editing_service.send_to_post_editing(
-            request=request, project_id=project_id)
-        quote_service = FormQuoteService()
-        quote_service.send_quote_to_user(request)
-        return Response({"detail": "Sent to post editing"}, status=status.HTTP_200_OK)
+            return Response(
+                {"detail": "You have to be staff or to be in group"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return Response(
+            {"detail": "This feature is temporarily unavailable"},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE
+        )
 
 
 def get_projects_by_ids(request):
@@ -553,24 +560,26 @@ def map_lara_status_to_lexa(lara_status):
 
 
 class SingleProjectView(APIView):
+    """
+    Vue pour récupérer le statut des projets de traduction.
+    
+    Permet uniquement la lecture (GET) des statuts des projets.
+    La suppression de projets n'est plus supportée.
+    """
     permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def get(self, request):
+        """
+        Récupère le statut des projets de traduction par leurs IDs.
+        
+        Args:
+            request: Requête HTTP contenant les project_id[] en paramètres de requête
+            
+        Returns:
+            Response: Liste des statuts des projets au format JSON
+        """
         responses = get_projects_by_ids(request)
         return Response(responses, status=status.HTTP_200_OK)
-
-    def delete(self, request):
-        project_id = self.request.data.get('project_id')
-
-        try:
-            user_api_key = get_user_api_key(request.user)
-        except ValueError:
-            return Response({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
-        response = requests.delete(settings.CLOUDSTORAGE_API_URL + f"{project_id}/",
-                                   headers={
-                                       "token": user_api_key})
-
-        return Response({"detail": "Sucessfully deleted"}, status=status.HTTP_204_NO_CONTENT)
 
 
 class LanguageDetectView(APIView):
@@ -586,11 +595,10 @@ class LanguageDetectView(APIView):
             file = lowercase_file_extension(file)
 
             try:
-                api_key = get_user_api_key(request.user)
+                get_user_api_key(request.user)  # Vérification de subscription active
             except ValueError:
                 return JsonResponse({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
             text_for_detection, words_count, symbols_count = self.get_text_for_detection(
-                api_key=api_key,
                 file=file,
                 words_count=words_count,
                 symbols_count=symbols_count
@@ -631,10 +639,21 @@ class LanguageDetectView(APIView):
             file.name = file_name
         return file
 
-    def get_text_for_detection(self, file, api_key, words_count, symbols_count):
+    def get_text_for_detection(self, file, words_count, symbols_count):
+        """
+        Extrait le texte d'un fichier pour la détection de langue.
+        
+        Args:
+            file: Fichier à traiter
+            words_count: Compteur de mots (sera incrémenté)
+            symbols_count: Compteur de symboles (sera incrémenté)
+            
+        Returns:
+            tuple: (text_for_detection, words_count, symbols_count)
+        """
         file_name = file.name
         file = self.rename_file(file)
-        formated_texts, full_text, processed_file = get_text_from_file(file, api_key)
+        formated_texts, full_text, processed_file = get_text_from_file(file)
         words_count += len(formated_texts)
         symbols_count += sum(len(word) for word in full_text)
         text_for_detection = ' '.join(

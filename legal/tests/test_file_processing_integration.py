@@ -24,7 +24,7 @@ class IntegrationTestCase(FileProcessingTestCase):
         """
         file = self.load_fixture_file("test_txt.txt")
         
-        words, texts, processed_file = get_text_from_file(file, self.api_key)
+        words, texts, processed_file = get_text_from_file(file)
         
         self.assertIsInstance(words, list)
         self.assertIsInstance(texts, list)
@@ -38,7 +38,7 @@ class IntegrationTestCase(FileProcessingTestCase):
         """Test que StatsProcessor.get_texts() fonctionne avec le nouveau service."""
         file = self.load_fixture_file("test_txt.txt")
         
-        processor = StatsProcessor(self.api_key)
+        processor = StatsProcessor()
         result = processor.get_texts(file)
         
         self.assertIsInstance(result, dict)
@@ -51,7 +51,7 @@ class IntegrationTestCase(FileProcessingTestCase):
         """Test que StatsProcessor.get_texts() fonctionne avec un fichier DOCX réel."""
         file = self.load_fixture_file("test_docx.docx")
         
-        processor = StatsProcessor(self.api_key)
+        processor = StatsProcessor()
         result = processor.get_texts(file)
         
         self.assertIsInstance(result, dict)
@@ -63,7 +63,7 @@ class IntegrationTestCase(FileProcessingTestCase):
         """Test que StatsProcessor.get_chars() fonctionne avec le nouveau service."""
         file = self.load_fixture_file("test_txt.txt")
         
-        processor = StatsProcessor(self.api_key)
+        processor = StatsProcessor()
         chars_count = processor.get_chars(file)
         
         self.assertIsInstance(chars_count, int)
@@ -124,7 +124,7 @@ class IntegrationTestCase(FileProcessingTestCase):
         content = b"Some content"
         file = self.create_test_file(content, "test.xyz")
         
-        processor = StatsProcessor(self.api_key)
+        processor = StatsProcessor()
         
         with self.assertRaises(ValueError) as context:
             processor.get_texts(file)
@@ -141,7 +141,7 @@ class IntegrationTestCase(FileProcessingTestCase):
         file.seek(0)
         original_content = file.read()
         
-        processor = StatsProcessor(self.api_key)
+        processor = StatsProcessor()
         processor.get_texts(file)
         
         file.seek(0)
@@ -151,7 +151,7 @@ class IntegrationTestCase(FileProcessingTestCase):
         """Test que le même fichier peut être extrait plusieurs fois."""
         file = self.load_fixture_file("test_txt.txt")
         
-        processor = StatsProcessor(self.api_key)
+        processor = StatsProcessor()
         result1 = processor.get_texts(file)
         result2 = processor.get_texts(file)
         

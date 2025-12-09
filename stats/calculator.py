@@ -12,10 +12,16 @@ logger = logging.getLogger(__name__)
 
 
 class StatsProcessor:
-    """Processeur de statistiques pour les fichiers."""
+    """
+    Processeur de statistiques pour les fichiers.
+    
+    Ce processeur utilise des bibliothèques locales pour extraire le texte
+    des fichiers, sans nécessiter de clé API externe.
+    """
 
-    def __init__(self, api_key):
-        self._api_key = api_key
+    def __init__(self):
+        """Initialise le processeur de statistiques."""
+        pass
 
     def get_texts(self, file: InMemoryUploadedFile) -> dict:
         """
