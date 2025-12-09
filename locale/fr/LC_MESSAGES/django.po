@@ -1270,3 +1270,11 @@ msgstr "Retour sur la qualité de la traduction"
 #: legal/templates/translate/text_translate/text_translate.html:48
 msgid "Copy target language to source"
 msgstr "Copier la langue cible vers la source"
+
+#: writing/templates/writing.html
+msgid "This feature will be back soon"
+msgstr "Cette fonctionnalité reviendra bientôt"
+
+#: writing/templates/writing.html
+msgid "We are currently working on improving this feature. It will be available again soon."
+msgstr "Nous travaillons actuellement à l'amélioration de cette fonctionnalité. Elle sera à nouveau disponible bientôt."

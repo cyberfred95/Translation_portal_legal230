@@ -62,22 +62,27 @@ class StatsProcessor:
         """Extrait l'extension du fichier en minuscules."""
         return os.path.splitext(file.name)[1].lower()
 
-    def send_writing_request(self,
-                             texts: list,
-                             user_uuid,
-                             file_name='Text writing',
-                             gpt_model='gpt-3.5-turbo-0613'):
-        response = requests.post(
-            settings.STATS_API_URL + "add_writing_statistic/",
-            headers={
-                'token': settings.STATS_API_KEY,
-                'X-API-KEY': self._api_key,
-            },
-            data={
-                "messages": texts,
-                "uuid": user_uuid,
-                'file_name': file_name,
-                "gpt_model": gpt_model,
-            }
-
-        )
+    # ============================================================================
+    # WRITING FUNCTIONALITY - TEMPORARILY DISABLED
+    # ============================================================================
+    # Cette méthode est temporairement désactivée en prévision d'une refonte.
+    # Le code est conservé en commentaire pour référence future.
+    # ============================================================================
+    # def send_writing_request(self,
+    #                          texts: list,
+    #                          user_uuid,
+    #                          file_name='Text writing',
+    #                          gpt_model='gpt-3.5-turbo-0613'):
+    #     response = requests.post(
+    #         settings.STATS_API_URL + "add_writing_statistic/",
+    #         headers={
+    #             'token': settings.STATS_API_KEY,
+    #             'X-API-KEY': self._api_key,
+    #         },
+    #         data={
+    #             "messages": texts,
+    #             "uuid": user_uuid,
+    #             'file_name': file_name,
+    #             "gpt_model": gpt_model,
+    #         }
+    #     )

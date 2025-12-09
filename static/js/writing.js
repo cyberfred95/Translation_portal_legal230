@@ -1,3 +1,11 @@
+// ============================================================================
+// WRITING FUNCTIONALITY - TEMPORARILY DISABLED
+// ============================================================================
+// Cette fonctionnalité est temporairement désactivée en prévision d'une refonte.
+// Tout le code est conservé en commentaire pour référence future.
+// ============================================================================
+
+/*
 document.addEventListener('DOMContentLoaded', function() {
     // Récupération des data-attributes du root
     const root = document.getElementById('writing-root');
@@ -188,3 +196,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+*/

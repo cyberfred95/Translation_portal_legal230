@@ -20,7 +20,7 @@ from tests.mock import create_test_user_group, create_test_user_subscription
 
 # Import des fonctions à tester
 from api.utils import get_api_user, get_user_and_data
-from writing.views import WritingProcessAPIView
+# from writing.views import WritingProcessAPIView  # COMMENTED - Feature disabled
 from users.views import DeleteAllDataView
 from stats.views import UsageView
 from quoting.services.quote import FormQuoteService
@@ -118,27 +118,30 @@ class APIMigrationTestCase(TestCase):
         self.assertEqual(user, self.user)
         self.assertEqual(result_data, data)
     
-    @patch('requests.post')
-    def test_writing_views_api_key_usage(self, mock_post):
-        """Test de l'utilisation de l'API key dans writing/views.py."""
-        mock_response = Mock()
-        mock_response.json.return_value = {'result': ['test result']}
-        mock_post.return_value = mock_response
-        
-        request = self.factory.post('/writing/process/', {
-            'prompt': 1,
-            'text': 'test text'
-        })
-        request.user = self.user
-        
-        view = WritingProcessAPIView()
-        response = view.post(request)
-        
-        # Vérifier que la requête a été faite avec la bonne API key
-        self.assertTrue(mock_post.called)
-        # Vérifier que parmi les appels, l'en-tête contient la bonne clé
-        matched = any(kwargs.get('headers', {}).get('token') == 'test-api-key-12345' for args, kwargs in mock_post.call_args_list)
-        self.assertTrue(matched)
+    # ============================================================================
+    # WRITING FUNCTIONALITY - TEMPORARILY DISABLED
+    # ============================================================================
+    # @patch('requests.post')
+    # def test_writing_views_api_key_usage(self, mock_post):
+    #     """Test de l'utilisation de l'API key dans writing/views.py."""
+    #     mock_response = Mock()
+    #     mock_response.json.return_value = {'result': ['test result']}
+    #     mock_post.return_value = mock_response
+    #     
+    #     request = self.factory.post('/writing/process/', {
+    #         'prompt': 1,
+    #         'text': 'test text'
+    #     })
+    #     request.user = self.user
+    #     
+    #     view = WritingProcessAPIView()
+    #     response = view.post(request)
+    #     
+    #     # Vérifier que la requête a été faite avec la bonne API key
+    #     self.assertTrue(mock_post.called)
+    #     # Vérifier que parmi les appels, l'en-tête contient la bonne clé
+    #     matched = any(kwargs.get('headers', {}).get('token') == 'test-api-key-12345' for args, kwargs in mock_post.call_args_list)
+    #     self.assertTrue(matched)
     
     @patch('requests.get')
     def test_users_views_api_key_usage(self, mock_get):

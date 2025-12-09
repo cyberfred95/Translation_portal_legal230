@@ -8,7 +8,7 @@
 <link href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css" rel="stylesheet" />
 <link href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/fill/style.css" rel="stylesheet" />
 <div class="mx-5 mb-11.5 mt-5 relative" id="writing-root"
-     data-url-process="{% url 'process' %}"
+     data-url-process="#"
      data-trans-processing="{% trans 'Processing...' %}"
      data-trans-select-a-prompt="{% trans 'Please select a prompt and enter some text.' %}"
      data-trans-error-occured="{% trans 'An error occurred while processing your text.' %}"
@@ -49,11 +49,6 @@
                                                      border-y-4 border-y-transparent border-r-4 border-r-white"></span>
                                     </span>
                                 </div>
-
-
-                                <!--<span class="text-xs text-gray-500 truncate">
-                                    {{ prompt.description }}
-                                </span>-->
                             </div>
                         </div>
                     </div>
@@ -65,7 +60,6 @@
                         </div>
                     </div>
                     {% endfor %}
-
                 </div>
             </div>
         </div>
@@ -98,8 +92,6 @@
                                 </button>
                             </div>
                         </div>
-
-
                     </div>
                 </div>
             </div>
@@ -121,8 +113,6 @@
                             <div class="flex-1 p-3 rounded-md overflow-auto">
                                 <div id="result-text" class="p-3 text-gray-600 text-base leading-normal whitespace-pre-wrap"></div>
                             </div>
-
-                            
                         </div>
                     </div>
                 </div>
@@ -131,11 +121,28 @@
     </div>
 </div>
 
-<!-- JavaScript moved to static/js/writing.js -->
+<!-- Overlay pour bloquer la fonctionnalité -->
+<!-- Couvre uniquement le contenu principal (pas le header ni la sidebar) -->
+<div class="fixed bg-gray-900 bg-opacity-50 z-40 flex items-center justify-center" 
+     style="top: 3.5rem; left: 5.5rem; right: 0; bottom: 0;">
+    <div class="bg-white rounded-lg shadow-xl p-8 max-w-md mx-4 z-50">
+        <div class="flex flex-col items-center text-center">
+            <div class="mb-4">
+                <i class="ph ph-warning text-5xl text-yellow-400" aria-hidden="true"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-3">
+                {% trans "This feature will be back soon" %}
+            </h3>
+            <p class="text-base text-gray-600">
+                {% trans "We are currently working on improving this feature. It will be available again soon." %}
+            </p>
+        </div>
+    </div>
+</div>
 
+<!-- JavaScript moved to static/js/writing.js -->
 <!-- CSRF Token for AJAX -->
 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-
 <script src="{% static 'js/writing.js' %}"></script>
 
 {% endblock %}
