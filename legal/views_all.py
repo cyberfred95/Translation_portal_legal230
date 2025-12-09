@@ -246,14 +246,13 @@ def file_translate(request):
         cache.delete(f"{request.user.uuid}")
     words_count = 0
     symbols_count = 0
+    processed_files = []
     for file in files:
-        files = request.FILES.getlist('document[]', [])
-        file_name = file.name
         file = rename_file(file=file)
-        file_words, file_texts = get_text_from_file(file, api_key)
+        file_words, file_texts, processed_file = get_text_from_file(file, api_key)
         words_count += len(file_words)
         symbols_count += sum(len(word) for word in file_texts)
-        file = rename_file(file=file, file_name=file_name)
+        processed_files.append(processed_file)
 
     if not translation_allowed(request, words_count=words_count, files_count=len(files), symbols_count=symbols_count):
         return JsonResponse({"detail": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
@@ -284,8 +283,9 @@ def file_translate(request):
     # We just need to send the domain and language info
 
     # Translate each document via Django Lara
+    # Utiliser les fichiers traités (PDF convertis en DOCX si nécessaire)
     projects = []
-    for file in files:
+    for file in processed_files:
         file = lowercase_file_extension(file)
 
         # Build form data for Django Lara
@@ -634,12 +634,13 @@ class LanguageDetectView(APIView):
     def get_text_for_detection(self, file, api_key, words_count, symbols_count):
         file_name = file.name
         file = self.rename_file(file)
-        formated_texts, full_text = get_text_from_file(file, api_key)
+        formated_texts, full_text, processed_file = get_text_from_file(file, api_key)
         words_count += len(formated_texts)
         symbols_count += sum(len(word) for word in full_text)
         text_for_detection = ' '.join(
             formated_texts[:self.WORDS_COUNT_FOR_DETECTION])
-        file = self.rename_file(file, file_name=file_name)
+        # Le fichier traité n'est pas utilisé pour la détection de langue,
+        # seulement pour l'extraction de texte
         return text_for_detection, words_count, symbols_count
 
 

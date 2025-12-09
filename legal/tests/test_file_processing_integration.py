@@ -24,13 +24,15 @@ class IntegrationTestCase(FileProcessingTestCase):
         """
         file = self.load_fixture_file("test_txt.txt")
         
-        words, texts = get_text_from_file(file, self.api_key)
+        words, texts, processed_file = get_text_from_file(file, self.api_key)
         
         self.assertIsInstance(words, list)
         self.assertIsInstance(texts, list)
         self.assertGreater(len(texts), 0)
         for text in texts:
             self.assertIsInstance(text, str)
+        # Pour un fichier non-PDF, le fichier traité doit être le même
+        self.assertEqual(processed_file.name, file.name)
     
     def test_stats_processor_get_texts(self):
         """Test que StatsProcessor.get_texts() fonctionne avec le nouveau service."""
@@ -67,13 +69,12 @@ class IntegrationTestCase(FileProcessingTestCase):
         self.assertIsInstance(chars_count, int)
         self.assertGreater(chars_count, 0)
     
-    @patch('stats.calculator.AdobePDFService')
-    @patch('stats.calculator.FileTextExtractorFactory')
-    def test_pdf_conversion_to_docx(self, mock_extractor_factory, mock_adobe_service):
+    @patch('legal.helpers.AdobePDFService')
+    def test_pdf_conversion_in_get_text_from_file(self, mock_adobe_service):
         """
-        Test que les PDF sont automatiquement convertis en DOCX avant l'extraction.
+        Test que get_text_from_file convertit les PDF en DOCX et retourne le DOCX.
         
-        Le test mocke le service Adobe et l'extracteur pour éviter les appels réels.
+        Le test mocke le service Adobe pour éviter les appels réels.
         """
         # Créer un mock du service Adobe
         mock_service_instance = MagicMock()
@@ -84,34 +85,23 @@ class IntegrationTestCase(FileProcessingTestCase):
         mock_docx_file = self.create_test_file(docx_content, "test.docx")
         mock_service_instance.convert_pdf_to_docx.return_value = mock_docx_file
         
-        # Mock de l'extraction pour retourner un résultat valide
-        expected_result = {"texts": [{"text": "Texte extrait du DOCX"}]}
-        mock_extractor_factory.extract_text.return_value = expected_result
-        
         # Créer un fichier PDF de test
         pdf_content = b"%PDF-1.4 fake pdf content"
         pdf_file = self.create_test_file(pdf_content, "test.pdf")
         
-        processor = StatsProcessor(self.api_key)
-        
-        # Le traitement devrait appeler la conversion puis l'extraction
-        result = processor.get_texts(pdf_file)
+        # Appeler get_text_from_file qui devrait convertir le PDF
+        words, texts, processed_file = get_text_from_file(pdf_file, self.api_key)
         
         # Vérifier que la conversion a été appelée
         mock_service_instance.convert_pdf_to_docx.assert_called_once()
         
-        # Vérifier que l'extraction a été appelée avec le fichier DOCX converti
-        mock_extractor_factory.extract_text.assert_called_once()
-        call_args = mock_extractor_factory.extract_text.call_args[0][0]
-        self.assertEqual(call_args.name, "test.docx")
-        
-        # Vérifier que le résultat est valide
-        self.assertIsInstance(result, dict)
-        self.assertIn("texts", result)
-        self.assertEqual(result, expected_result)
+        # Vérifier que le fichier retourné est le DOCX converti
+        self.assertEqual(processed_file.name, "test.docx")
+        self.assertIsInstance(words, list)
+        self.assertIsInstance(texts, list)
     
-    @patch('stats.calculator.AdobePDFService')
-    def test_pdf_conversion_error(self, mock_adobe_service):
+    @patch('legal.helpers.AdobePDFService')
+    def test_pdf_conversion_error_in_get_text_from_file(self, mock_adobe_service):
         """
         Test que les erreurs de conversion PDF sont correctement propagées.
         """
@@ -123,11 +113,9 @@ class IntegrationTestCase(FileProcessingTestCase):
         pdf_content = b"%PDF-1.4 fake pdf content"
         pdf_file = self.create_test_file(pdf_content, "test.pdf")
         
-        processor = StatsProcessor(self.api_key)
-        
         # Le traitement devrait lever une exception
         with self.assertRaises(Exception) as context:
-            processor.get_texts(pdf_file)
+            get_text_from_file(pdf_file, self.api_key)
         
         self.assertIn("conversion", str(context.exception).lower())
     

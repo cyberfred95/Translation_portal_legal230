@@ -28,13 +28,52 @@ def get_word_count(segment):
     return result
 
 
+def _convert_pdf_if_needed(file: InMemoryUploadedFile) -> InMemoryUploadedFile:
+    """
+    Convertit un PDF en DOCX si nécessaire.
+    
+    Args:
+        file: Fichier en mémoire à vérifier
+        
+    Returns:
+        InMemoryUploadedFile: Fichier DOCX converti si PDF, sinon fichier original
+    """
+    from legal.services.adobe_pdf import AdobePDFService
+    
+    file_extension = os.path.splitext(file.name)[1].lower()
+    
+    if file_extension == '.pdf':
+        adobe_service = AdobePDFService()
+        return adobe_service.convert_pdf_to_docx(file)
+    
+    return file
+
+
 def get_text_from_file(file: InMemoryUploadedFile, api_key):
+    """
+    Extrait le texte d'un fichier et retourne le fichier converti si nécessaire.
+    
+    Si le fichier est un PDF, il sera converti en DOCX et le DOCX sera retourné
+    à la place du PDF original. Le nom du fichier est automatiquement mis à jour
+    avec l'extension .docx.
+    
+    Args:
+        file: Fichier en mémoire à traiter
+        api_key: Clé API pour le traitement
+        
+    Returns:
+        tuple: (formated_texts, full_texts, processed_file)
+            - formated_texts: Liste de mots formatés
+            - full_texts: Liste de textes complets
+            - processed_file: Fichier traité (DOCX si PDF original, sinon fichier original)
+    """
+    processed_file = _convert_pdf_if_needed(file)
+    
     try:
-        texts = StatsProcessor(api_key).get_texts(file=file)
+        texts = StatsProcessor(api_key).get_texts(file=processed_file)
     except UnicodeEncodeError:
         raise ValueError({"detail": "Invalid characters in file name"})
     except ImportError as e:
-        # Gérer les dépendances manquantes (ex: python-pptx)
         raise ValueError({"detail": str(e)})
 
     formated_texts = [
@@ -42,8 +81,8 @@ def get_text_from_file(file: InMemoryUploadedFile, api_key):
         for text in texts['texts']
         for word in re.sub(r'<[^>]*>', '', text['text']).split()
     ]
-    file.seek(0)
-    return formated_texts, [text['text'] for text in texts['texts']]
+    processed_file.seek(0)
+    return formated_texts, [text['text'] for text in texts['texts']], processed_file
 
 
 def get_project_file(file_url) -> InMemoryUploadedFile:
