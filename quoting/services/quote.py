@@ -1,7 +1,7 @@
 import math
 import os
 from typing import Optional
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 from django.conf import settings
 from preferences import preferences
 from legal.helpers import get_project_file, get_text_from_file
@@ -49,7 +49,12 @@ class FormQuoteService:
         # Pour éviter des appels externes lourds, ne pas télécharger le fichier ici
         words_count = 0
         file_url = project.get('source_file') or ''
-        file_basename = os.path.basename(file_url) if file_url else ''
+        # Nettoyer l'URL en retirant la query string avant d'extraire le nom de fichier
+        if file_url:
+            parsed_url = urlparse(file_url)
+            file_basename = os.path.basename(parsed_url.path)
+        else:
+            file_basename = ''
         file_name, extension = os.path.splitext(file_basename)
         if quote_price:
             context_variables = {
@@ -60,7 +65,7 @@ class FormQuoteService:
                 'contract_name': request.data.get('company',
                                                   request.user.group.name if request.user.group else "Administrator"),
                 "language_pair": f"{str(project['source_language']).upper()} -> {str(project['target_language']).upper()}",
-                'file_name': file.name if len(str(file_name)) < 20 else f"{file_name[:20]}...-{extension}",
+                'file_name': file_name if len(str(file_name)) < 20 else f"{file_name[:20]}...{extension}",
                 'word_price': quote_price.price,
                 'words_count': words_count,
                 'working_days': self.get_working_days(words_count, quote_price=quote_price),
