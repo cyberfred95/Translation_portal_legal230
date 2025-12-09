@@ -164,7 +164,7 @@ def process_projects(projects_data, user, email_map=None):
     """
     for project in projects_data:
         # Extraction du nom de fichier - utiliser source_file_name si disponible (Lara API)
-        # sinon fallback sur extraction depuis l'URL (Custom.MT)
+        # sinon fallback sur extraction depuis l'URL
         if project.get('source_file_name'):
             pass  # Déjà défini par Lara API
         elif project.get('source_file'):
@@ -186,7 +186,7 @@ def process_projects(projects_data, user, email_map=None):
         
         # Ajout de l'email utilisateur si staff et email_map fourni
         if user.is_staff and email_map:
-            # Support both LARA API (user_uuid) and Custom.MT (user_custom_mt_token)
+            # Support both LARA API (user_uuid) and legacy format (user_custom_mt_token)
             token = project.get('user_uuid') or project.get('user_custom_mt_token')
             project['user_email'] = email_map.get(str(token)) if token else None
     

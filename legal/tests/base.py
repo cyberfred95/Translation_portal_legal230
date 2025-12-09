@@ -64,7 +64,7 @@ class FileProcessingTestCase(TestCase):
     
     def assert_result_format(self, result_dict: dict):
         """
-        Vérifie que le format de résultat est compatible avec Custom_mt.
+        Vérifie que le format de résultat correspond au format standardisé.
         
         Args:
             result_dict: Dictionnaire de résultat à vérifier

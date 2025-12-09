@@ -265,9 +265,6 @@ LOGGING = {
 AUTH_USER_MODEL = 'users.User'
 ROSETTA_SHOW_AT_ADMIN_PANEL = True
 
-# Files Processing API
-FILES_PROCESSING_API_URL = 'https://office.fileprocessing.custom.mt'
-
 # Custom MT Console Configuration
 CUSTOM_MT_CONSOLE_URL = os.environ.get('CUSTOM_MT_CONSOLE_URL')
 

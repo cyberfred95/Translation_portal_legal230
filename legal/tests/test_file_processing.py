@@ -1,7 +1,7 @@
 """
 Tests unitaires pour le service d'extraction de texte.
 
-Ces tests vérifient la compatibilité avec l'API Custom_mt et testent
+Ces tests vérifient le format de sortie standardisé et testent
 chaque extracteur individuellement.
 """
 
@@ -165,17 +165,16 @@ class FileTextExtractorFactoryTest(FileProcessingTestCase):
 
 class CompatibilityTest(FileProcessingTestCase):
     """
-    Tests de compatibilité avec l'ancien service Custom_mt.
+    Tests de format de sortie standardisé.
     
-    Ces tests vérifient que le nouveau service retourne le même format
-    que l'ancien service Custom_mt.
+    Ces tests vérifient que le service retourne le format standardisé attendu.
     """
     
-    def test_result_structure_matches_custom_mt(self):
+    def test_result_structure_matches_standard_format(self):
         """
-        Test que la structure de résultat correspond à celle de Custom_mt.
+        Test que la structure de résultat correspond au format standardisé.
         
-        Format attendu de Custom_mt:
+        Format attendu:
         {
             "texts": [
                 {"text": "Premier paragraphe..."},

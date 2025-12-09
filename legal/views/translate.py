@@ -44,7 +44,7 @@ class TranslateView(BaseTemplateView):
             logger.info("Calling text_translation function (LARA)")
             return text_translation(request)
         elif request.POST.get('action') == 'file_translate':
-            logger.info("Calling file_translate function (Custom.MT)")
+            logger.info("Calling file_translate function")
             return file_translate(request)
         return JsonResponse({})
 

@@ -1,8 +1,7 @@
 """
 Service d'extraction de texte depuis les fichiers Office.
 
-Ce module remplace l'appel au service Custom_mt pour l'extraction de texte
-en utilisant des bibliothèques Python locales.
+Ce module fournit l'extraction de texte en utilisant des bibliothèques Python locales.
 """
 
 import os
@@ -17,7 +16,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 
 @dataclass(frozen=True)
 class ExtractionResult:
-    """Résultat de l'extraction de texte au format compatible avec Custom_mt."""
+    """Résultat de l'extraction de texte au format standardisé."""
     texts: List[Dict[str, str]]
     
     def to_dict(self) -> dict:
@@ -304,7 +303,7 @@ class FileTextExtractorFactory:
     @classmethod
     def extract_text(cls, file: InMemoryUploadedFile) -> dict:
         """
-        Extrait le texte d'un fichier et retourne le format compatible Custom_mt.
+        Extrait le texte d'un fichier et retourne le format standardisé.
         
         Args:
             file: Fichier en mémoire à traiter
