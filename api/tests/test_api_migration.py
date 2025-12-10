@@ -22,7 +22,6 @@ from tests.mock import create_test_user_group, create_test_user_subscription
 from api.utils import get_api_user, get_user_and_data
 # from writing.views import WritingProcessAPIView  # COMMENTED - Feature disabled
 from users.views import DeleteAllDataView
-from stats.views import UsageView
 from quoting.services.quote import FormQuoteService
 from legal.views_all import text_translation, file_translate
 
@@ -162,21 +161,6 @@ class APIMigrationTestCase(TestCase):
         mock_get.assert_called()
         call_args = mock_get.call_args
         self.assertEqual(call_args[1]['headers']['token'], 'test-api-key-12345')
-    
-    @patch('requests.get')
-    def test_stats_views_api_key_usage(self, mock_get):
-        """Test de l'utilisation de l'API key dans stats/views.py."""
-        mock_response = Mock()
-        mock_response.json.return_value = {'num_pages': 1, 'results': []}
-        mock_get.return_value = mock_response
-        
-        request = self.factory.get('/stats/usage/')
-        request.user = self.user
-        
-        # Vérifier que get_user_api_key retourne la bonne API key
-        from subscriptions.utils import get_user_api_key
-        api_key = get_user_api_key(self.user)
-        self.assertEqual(api_key, 'test-api-key-12345')
     
     @patch('requests.get')
     def test_quoting_services_api_key_usage(self, mock_get):

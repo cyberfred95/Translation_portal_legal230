@@ -33,10 +33,8 @@ urlpatterns = i18n_patterns(
     path('detect_text_language/', login_required(DetectTextLanguageView.as_view()), name='detect_text_language'),
     path('my-team/', login_required(MyTeamView.as_view()), name='my_team'),
     
-    path('statistics/', include('stats.urls')),
     path('glossaries/', include('glossaries.urls')),
     path('domains/', include('domains.urls')),
-    path('usage/', include('stats.urls')),
     path('users/', include('users.urls')),
     path('writing/', include('writing.urls')),
     path('quoting/', include('quoting.urls')),
