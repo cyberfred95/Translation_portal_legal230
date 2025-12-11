@@ -126,6 +126,14 @@ class GlossaryAdmin(admin.ModelAdmin):
     list_filter = [DomainFilter, SourceLanguageFilter,
                    TargetLanguageFilter, UserFilter, 'created_at']
     search_fields = ['name', 'domain__name']
+    
+    def has_add_permission(self, request):
+        """Disable adding glossaries from admin - use frontend instead."""
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        """Disable deleting glossaries from admin - use frontend instead."""
+        return False
 
     def has_remote_id(self, obj):
         """Display whether glossary has a remote glossary_id"""

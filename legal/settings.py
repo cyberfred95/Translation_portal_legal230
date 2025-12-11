@@ -269,7 +269,7 @@ ROSETTA_SHOW_AT_ADMIN_PANEL = True
 CUSTOM_MT_CONSOLE_URL = os.environ.get('CUSTOM_MT_CONSOLE_URL')
 
 # LARA Translation API Configuration
-LARA_API_URL = os.environ.get('LARA_API_URL', 'https://api.portail.lexamt.fr/lara')
+LARA_API_URL = os.environ.get('LARA_API_URL')
 LARA_ACCESS_KEY_ID = os.environ.get('LARA_ACCESS_KEY_ID')
 LARA_ACCESS_KEY_SECRET = os.environ.get('LARA_ACCESS_KEY_SECRET')
 
