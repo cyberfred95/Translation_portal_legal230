@@ -2,6 +2,7 @@ import csv
 import io
 import logging
 import os.path
+from typing import Optional
 
 import django.core.exceptions
 import openpyxl
@@ -117,6 +118,35 @@ class UserGlossariesView(BaseTemplateView):
 
 class AddGlossaryView(APIView):
     permission_classes = (SubscribedPermission, IsAuthenticated)
+    
+    # Default error messages by status code
+    DEFAULT_ERROR_MESSAGES = {
+        400: "Les données envoyées sont invalides. Veuillez vérifier le format du fichier CSV et réessayer.",
+        401: "Authentification requise. Veuillez vous reconnecter.",
+        403: "Vous n'avez pas les permissions nécessaires pour créer un glossaire.",
+        404: "L'endpoint de création de glossaire est introuvable. Veuillez contacter le support technique.",
+        502: "Le serveur LARA n'a pas pu traiter votre demande. Veuillez réessayer dans quelques instants ou contacter le support si le problème persiste.",
+        504: "L'import du glossaire a pris trop de temps (timeout après 30 secondes).",
+    }
+    
+    # Error prefixes to remove from messages
+    ERROR_PREFIXES = [
+        "Error creating glossary: ",
+        "LARA error: ",
+        "LARA error:",
+        "Erreur lors de la création du glossaire : ",
+        "Erreur lors de la création du glossaire :",
+    ]
+    
+    # Empty error message patterns
+    EMPTY_ERROR_PATTERNS = [
+        "lara error:",
+        "lara error: ",
+        "error creating glossary:",
+        "error creating glossary: ",
+        "erreur lors de la création du glossaire :",
+        "erreur lors de la création du glossaire : ",
+    ]
 
     def dispatch(self, request, *args, **kwargs):
         """
@@ -124,63 +154,17 @@ class AddGlossaryView(APIView):
         DRF automatically parses request.POST into request.data for multipart/form-data,
         but we don't need source_language/target_language fields anymore.
         """
-        # Remove source_language and target_language from request.POST before DRF parses it
-        # This prevents MultiValueDictKeyError if something tries to access these fields
         if hasattr(request, 'POST') and request.method == 'POST':
             from django.http import QueryDict
             if isinstance(request.POST, QueryDict):
-                # Make POST mutable and remove unwanted fields
                 mutable_post = request.POST.copy()
-                if 'source_language' in mutable_post:
-                    mutable_post.pop('source_language', None)
-                if 'target_language' in mutable_post:
-                    mutable_post.pop('target_language', None)
-                # Replace request.POST with cleaned version
+                mutable_post.pop('source_language', None)
+                mutable_post.pop('target_language', None)
                 request.POST = mutable_post
         
         return super().dispatch(request, *args, **kwargs)
 
-    def _extract_error_message(self, response):
-        """
-        Extract error message from LARA API response.
-        
-        Args:
-            response: requests.Response object
-            
-        Returns:
-            str: Error message, or default message if extraction fails
-        """
-        if not response.content:
-            return f"Erreur HTTP {response.status_code} : réponse vide du serveur LARA"
-        
-        try:
-            error_data = response.json()
-            # Try multiple possible error field names
-            error_fields = ['error', 'detail', 'message', 'errors']
-            for field in error_fields:
-                error_value = error_data.get(field)
-                if error_value:
-                    # Handle both string and dict/list errors
-                    if isinstance(error_value, str):
-                        error_value = error_value.strip()
-                        # Check if message is empty or just "LARA error:" with nothing after
-                        if error_value and not self._is_empty_error_message(error_value):
-                            return error_value
-                    elif isinstance(error_value, (list, dict)) and error_value:
-                        return str(error_value)
-        except (ValueError, KeyError, AttributeError):
-            pass
-        
-        # If JSON parsing fails, try to get text content
-        if response.text:
-            text_content = response.text.strip()[:500]
-            if text_content and not self._is_empty_error_message(text_content):
-                return text_content
-        
-        # Default fallback - return None to trigger default message in _format_error_message
-        return None
-    
-    def _is_empty_error_message(self, message):
+    def _is_empty_error_message(self, message: str) -> bool:
         """
         Check if error message is effectively empty (just prefixes without content).
         
@@ -193,24 +177,63 @@ class AddGlossaryView(APIView):
         if not message or not message.strip():
             return True
         
-        # Check for common empty error patterns
-        empty_patterns = [
-            "LARA error:",
-            "LARA error: ",
-            "Error creating glossary:",
-            "Error creating glossary: ",
-            "Erreur lors de la création du glossaire :",
-            "Erreur lors de la création du glossaire : ",
-        ]
-        
         message_lower = message.strip().lower()
-        for pattern in empty_patterns:
-            if message_lower == pattern.lower() or message_lower == pattern.lower().rstrip():
-                return True
+        return message_lower in self.EMPTY_ERROR_PATTERNS
+
+    def _extract_error_message(self, response) -> Optional[str]:
+        """
+        Extract error message from LARA API response.
         
-        return False
+        Args:
+            response: requests.Response object
+            
+        Returns:
+            str: Error message, or None if extraction fails
+        """
+        if not response.content:
+            return f"Erreur HTTP {response.status_code} : réponse vide du serveur LARA"
+        
+        # Try to extract from JSON response
+        try:
+            error_data = response.json()
+            error_fields = ['error', 'detail', 'message', 'errors']
+            for field in error_fields:
+                error_value = error_data.get(field)
+                if error_value:
+                    if isinstance(error_value, str):
+                        error_value = error_value.strip()
+                        if error_value and not self._is_empty_error_message(error_value):
+                            return error_value
+                    elif isinstance(error_value, (list, dict)) and error_value:
+                        return str(error_value)
+        except (ValueError, KeyError, AttributeError):
+            pass
+        
+        # Fallback to text content
+        if response.text:
+            text_content = response.text.strip()[:500]
+            if text_content and not self._is_empty_error_message(text_content):
+                return text_content
+        
+        return None
     
-    def _format_error_message(self, status_code, error_detail):
+    def _clean_error_message(self, error_detail: str) -> str:
+        """
+        Clean error message by removing common prefixes.
+        
+        Args:
+            error_detail: Raw error message
+            
+        Returns:
+            Cleaned error message
+        """
+        error_detail = error_detail.strip()
+        for prefix in self.ERROR_PREFIXES:
+            if error_detail.startswith(prefix):
+                error_detail = error_detail[len(prefix):].strip()
+        return error_detail
+    
+    def _format_error_message(self, status_code: int, error_detail: Optional[str]) -> str:
         """
         Format error message for user display.
         
@@ -221,39 +244,19 @@ class AddGlossaryView(APIView):
         Returns:
             str: Formatted, user-friendly error message
         """
-        # If error detail is None, empty, or just whitespace/prefixes, provide default message
+        # Use default message if error_detail is empty or just prefixes
         if not error_detail or not error_detail.strip() or self._is_empty_error_message(error_detail):
-            if status_code == 400:
-                return "Les données envoyées sont invalides. Veuillez vérifier le format du fichier CSV et réessayer."
-            elif status_code == 401:
-                return "Authentification requise. Veuillez vous reconnecter."
-            elif status_code == 403:
-                return "Vous n'avez pas les permissions nécessaires pour créer un glossaire."
-            elif status_code == 404:
-                return "L'endpoint de création de glossaire est introuvable. Veuillez contacter le support technique."
-            elif status_code == 502:
-                return "Le serveur LARA n'a pas pu traiter votre demande. Veuillez réessayer dans quelques instants ou contacter le support si le problème persiste."
-            elif status_code == 504:
-                return "L'import du glossaire a pris trop de temps (timeout après 30 secondes)."
+            if status_code in self.DEFAULT_ERROR_MESSAGES:
+                return self.DEFAULT_ERROR_MESSAGES[status_code]
             elif status_code >= 500:
                 return "Une erreur serveur s'est produite lors de la création du glossaire. Veuillez réessayer plus tard ou contacter le support technique."
             else:
                 return f"Erreur lors de la création du glossaire (code HTTP {status_code}). Veuillez réessayer ou contacter le support si le problème persiste."
         
-        # Clean up common error prefixes
-        error_detail = error_detail.strip()
-        prefixes_to_remove = [
-            "Error creating glossary: ",
-            "LARA error: ",
-            "LARA error:",
-            "Erreur lors de la création du glossaire : ",
-            "Erreur lors de la création du glossaire :",
-        ]
-        for prefix in prefixes_to_remove:
-            if error_detail.startswith(prefix):
-                error_detail = error_detail[len(prefix):].strip()
+        # Clean up error prefixes
+        error_detail = self._clean_error_message(error_detail)
         
-        # If after cleaning the message is empty or just the prefix, use default
+        # If after cleaning the message is empty, use default
         if not error_detail or self._is_empty_error_message(error_detail):
             if status_code >= 500:
                 return "Une erreur serveur s'est produite lors de la création du glossaire. Veuillez réessayer plus tard ou contacter le support technique."
