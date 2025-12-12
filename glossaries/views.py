@@ -233,6 +233,8 @@ class AddGlossaryView(APIView):
                 return "L'endpoint de création de glossaire est introuvable. Veuillez contacter le support technique."
             elif status_code == 502:
                 return "Le serveur LARA n'a pas pu traiter votre demande. Veuillez réessayer dans quelques instants ou contacter le support si le problème persiste."
+            elif status_code == 504:
+                return "L'import du glossaire a pris trop de temps (timeout après 30 secondes)."
             elif status_code >= 500:
                 return "Une erreur serveur s'est produite lors de la création du glossaire. Veuillez réessayer plus tard ou contacter le support technique."
             else:
