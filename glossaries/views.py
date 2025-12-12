@@ -140,6 +140,126 @@ class AddGlossaryView(APIView):
         
         return super().dispatch(request, *args, **kwargs)
 
+    def _extract_error_message(self, response):
+        """
+        Extract error message from LARA API response.
+        
+        Args:
+            response: requests.Response object
+            
+        Returns:
+            str: Error message, or default message if extraction fails
+        """
+        if not response.content:
+            return f"Erreur HTTP {response.status_code} : réponse vide du serveur LARA"
+        
+        try:
+            error_data = response.json()
+            # Try multiple possible error field names
+            error_fields = ['error', 'detail', 'message', 'errors']
+            for field in error_fields:
+                error_value = error_data.get(field)
+                if error_value:
+                    # Handle both string and dict/list errors
+                    if isinstance(error_value, str):
+                        error_value = error_value.strip()
+                        # Check if message is empty or just "LARA error:" with nothing after
+                        if error_value and not self._is_empty_error_message(error_value):
+                            return error_value
+                    elif isinstance(error_value, (list, dict)) and error_value:
+                        return str(error_value)
+        except (ValueError, KeyError, AttributeError):
+            pass
+        
+        # If JSON parsing fails, try to get text content
+        if response.text:
+            text_content = response.text.strip()[:500]
+            if text_content and not self._is_empty_error_message(text_content):
+                return text_content
+        
+        # Default fallback - return None to trigger default message in _format_error_message
+        return None
+    
+    def _is_empty_error_message(self, message):
+        """
+        Check if error message is effectively empty (just prefixes without content).
+        
+        Args:
+            message: Error message string
+            
+        Returns:
+            bool: True if message is empty or just contains error prefixes
+        """
+        if not message or not message.strip():
+            return True
+        
+        # Check for common empty error patterns
+        empty_patterns = [
+            "LARA error:",
+            "LARA error: ",
+            "Error creating glossary:",
+            "Error creating glossary: ",
+            "Erreur lors de la création du glossaire :",
+            "Erreur lors de la création du glossaire : ",
+        ]
+        
+        message_lower = message.strip().lower()
+        for pattern in empty_patterns:
+            if message_lower == pattern.lower() or message_lower == pattern.lower().rstrip():
+                return True
+        
+        return False
+    
+    def _format_error_message(self, status_code, error_detail):
+        """
+        Format error message for user display.
+        
+        Args:
+            status_code: HTTP status code
+            error_detail: Raw error message from API (can be None)
+            
+        Returns:
+            str: Formatted, user-friendly error message
+        """
+        # If error detail is None, empty, or just whitespace/prefixes, provide default message
+        if not error_detail or not error_detail.strip() or self._is_empty_error_message(error_detail):
+            if status_code == 400:
+                return "Les données envoyées sont invalides. Veuillez vérifier le format du fichier CSV et réessayer."
+            elif status_code == 401:
+                return "Authentification requise. Veuillez vous reconnecter."
+            elif status_code == 403:
+                return "Vous n'avez pas les permissions nécessaires pour créer un glossaire."
+            elif status_code == 404:
+                return "L'endpoint de création de glossaire est introuvable. Veuillez contacter le support technique."
+            elif status_code == 502:
+                return "Le serveur LARA n'a pas pu traiter votre demande. Veuillez réessayer dans quelques instants ou contacter le support si le problème persiste."
+            elif status_code >= 500:
+                return "Une erreur serveur s'est produite lors de la création du glossaire. Veuillez réessayer plus tard ou contacter le support technique."
+            else:
+                return f"Erreur lors de la création du glossaire (code HTTP {status_code}). Veuillez réessayer ou contacter le support si le problème persiste."
+        
+        # Clean up common error prefixes
+        error_detail = error_detail.strip()
+        prefixes_to_remove = [
+            "Error creating glossary: ",
+            "LARA error: ",
+            "LARA error:",
+            "Erreur lors de la création du glossaire : ",
+            "Erreur lors de la création du glossaire :",
+        ]
+        for prefix in prefixes_to_remove:
+            if error_detail.startswith(prefix):
+                error_detail = error_detail[len(prefix):].strip()
+        
+        # If after cleaning the message is empty or just the prefix, use default
+        if not error_detail or self._is_empty_error_message(error_detail):
+            if status_code >= 500:
+                return "Une erreur serveur s'est produite lors de la création du glossaire. Veuillez réessayer plus tard ou contacter le support technique."
+            else:
+                return "Une erreur s'est produite lors de la création du glossaire. Veuillez réessayer."
+        
+        return error_detail
+
     def post(self, request):
         """
         Create a personal glossary via Lara-django API.
@@ -152,14 +272,14 @@ class AddGlossaryView(APIView):
         
         if not user_uuid:
             return Response(
-                {"detail": "User UUID not found"},
+                {"detail": "UUID utilisateur introuvable. Veuillez vous reconnecter."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
         gloss_file = request.FILES.get('file')
         if not gloss_file:
             return Response(
-                {"detail": "File is required"},
+                {"detail": "Un fichier est requis pour créer un glossaire. Veuillez sélectionner un fichier CSV."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -167,7 +287,7 @@ class AddGlossaryView(APIView):
         max_file_size = 5 * 1024 * 1024
         if gloss_file.size > max_file_size:
             return Response(
-                {"detail": "File size exceeds 5MB limit"},
+                {"detail": f"La taille du fichier ({gloss_file.size / (1024*1024):.2f} MB) dépasse la limite autorisée de 5 MB. Veuillez utiliser un fichier plus petit."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -175,7 +295,7 @@ class AddGlossaryView(APIView):
         if not settings.LARA_API_URL:
             logger.error("LARA_API_URL is not configured in settings")
             return Response(
-                {"detail": "LARA API URL is not configured. Please contact support."},
+                {"detail": "La configuration du serveur LARA est manquante. Veuillez contacter le support technique."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
@@ -183,7 +303,7 @@ class AddGlossaryView(APIView):
         if settings.LARA_API_URL.startswith('http://') and ('django' in settings.LARA_API_URL or 'laradjango' in settings.LARA_API_URL):
             logger.error(f"LARA_API_URL is configured with Docker service name: {settings.LARA_API_URL}")
             return Response(
-                {"detail": "LARA API URL is misconfigured. Please use the public URL (https://api.portail.lexamt.fr/lara-django) instead of Docker service name."},
+                {"detail": "La configuration de l'URL LARA est incorrecte. Veuillez contacter le support technique."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
@@ -209,9 +329,9 @@ class AddGlossaryView(APIView):
                 try:
                     lara_data = response.json()
                 except (ValueError, KeyError) as e:
-                    logger.error(f"Failed to parse JSON response from LARA API: {str(e)}")
+                    logger.error(f"Failed to parse JSON response from LARA API: {str(e)} - Response content: {response.text[:200]}")
                     return Response(
-                        {"detail": "Invalid response format from LARA API"},
+                        {"detail": "Le serveur LARA a retourné une réponse dans un format invalide. Le glossaire a peut-être été créé, mais nous n'avons pas pu confirmer. Veuillez vérifier votre liste de glossaires."},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR
                     )
                 
@@ -225,18 +345,23 @@ class AddGlossaryView(APIView):
                 }, status=status.HTTP_201_CREATED)
             else:
                 # Handle error response
-                error_detail = 'Unknown error'
-                try:
-                    if response.content:
-                        error_data = response.json()
-                        error_detail = error_data.get('error') or error_data.get('detail') or error_data.get('message', 'Unknown error')
-                except (ValueError, KeyError):
-                    # If JSON parsing fails, try to get text content
-                    error_detail = response.text[:200] if response.text else f"HTTP {response.status_code} error"
+                error_detail = self._extract_error_message(response)
                 
-                logger.error(f"Lara-django glossary creation failed: {response.status_code} - {error_detail} - URL: {lara_url}")
+                # Log detailed error information for debugging
+                logger.error(
+                    f"Lara-django glossary creation failed: {response.status_code} - {error_detail} - URL: {lara_url}",
+                    extra={
+                        'response_status': response.status_code,
+                        'response_headers': dict(response.headers),
+                        'response_body': response.text[:500] if response.text else None,
+                    }
+                )
+                
+                # Format user-friendly error message
+                formatted_error = self._format_error_message(response.status_code, error_detail)
+                
                 return Response(
-                    {"detail": error_detail},
+                    {"detail": formatted_error},
                     status=response.status_code if response.status_code < 500 else status.HTTP_502_BAD_GATEWAY
                 )
         except requests.exceptions.ConnectionError as e:
@@ -244,29 +369,41 @@ class AddGlossaryView(APIView):
             logger.error(f"Cannot connect to LARA API at {settings.LARA_API_URL}: {error_msg}", exc_info=True)
             if 'name resolution' in error_msg.lower() or 'failed to establish' in error_msg.lower():
                 return Response(
-                    {"detail": f"Cannot connect to LARA API. Please check LARA_API_URL configuration. Current value: {settings.LARA_API_URL}"},
+                    {"detail": f"Impossible de se connecter au serveur LARA. Veuillez vérifier la configuration (URL actuelle : {settings.LARA_API_URL}). Si le problème persiste, contactez le support."},
                     status=status.HTTP_502_BAD_GATEWAY
                 )
             return Response(
-                {"detail": f"Connection error: {error_msg}"},
+                {"detail": f"Erreur de connexion au serveur LARA : {error_msg}. Veuillez réessayer plus tard."},
                 status=status.HTTP_502_BAD_GATEWAY
             )
         except requests.exceptions.Timeout as e:
             logger.error(f"Timeout calling LARA API: {str(e)}", exc_info=True)
             return Response(
-                {"detail": "Request to LARA API timed out. Please try again."},
+                {"detail": "Le délai d'attente de la requête a été dépassé. Le fichier est peut-être trop volumineux ou le serveur est surchargé. Veuillez réessayer avec un fichier plus petit ou plus tard."},
                 status=status.HTTP_504_GATEWAY_TIMEOUT
             )
         except requests.RequestException as e:
-            logger.error(f"Error calling Lara-django API: {str(e)}", exc_info=True)
+            error_msg = str(e)
+            logger.error(f"Error calling Lara-django API: {error_msg}", exc_info=True)
+            # Format error message more clearly
+            if not error_msg or error_msg.strip() == "":
+                formatted_error = "Une erreur s'est produite lors de la communication avec le serveur LARA. Veuillez réessayer plus tard."
+            else:
+                formatted_error = f"Erreur lors de la création du glossaire : {error_msg}"
             return Response(
-                {"detail": f"Error creating glossary: {str(e)}"},
+                {"detail": formatted_error},
                 status=status.HTTP_502_BAD_GATEWAY
             )
         except Exception as e:
-            logger.error(f"Unexpected error in AddGlossaryView: {str(e)}", exc_info=True)
+            error_msg = str(e)
+            logger.error(f"Unexpected error in AddGlossaryView: {error_msg}", exc_info=True)
+            formatted_error = (
+                f"Une erreur inattendue s'est produite lors de la création du glossaire : {error_msg}"
+                if error_msg and error_msg.strip()
+                else "Une erreur inattendue s'est produite lors de la création du glossaire. Veuillez réessayer ou contacter le support."
+            )
             return Response(
-                {"detail": f"An unexpected error occurred: {str(e)}"},
+                {"detail": formatted_error},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
