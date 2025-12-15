@@ -363,6 +363,7 @@ $(document).ready(function () {
 
 
     const allowedTypes = ['.txt', '.pdf', '.docx', '.xlsx', '.pptx'];
+    const MAX_CSV_FILENAME_LENGTH = 128;
 
     const fileInput = $('<input>', {
         type: 'file',
@@ -427,6 +428,20 @@ $(document).ready(function () {
         var filteredFiles = filesArray.filter(function (file) {
             var ext = '.' + file.name.split('.').pop().toLowerCase();
             return allowedTypes.includes(ext);
+        });
+
+        // Validation spécifique pour les CSV : longueur max du nom de fichier
+        filteredFiles = filteredFiles.filter(function (file) {
+            var ext = '.' + file.name.split('.').pop().toLowerCase();
+            if (ext === '.csv' && file.name.length > MAX_CSV_FILENAME_LENGTH) {
+                // Message UI clair, sans déclencher d'upload inutile
+                alert(getTranslation(
+                    'The CSV filename must not exceed 128 characters.',
+                    'Le nom du fichier CSV ne doit pas dépasser 128 caractères.'
+                ));
+                return false;
+            }
+            return true;
         });
 
         // Filtrer les fichiers déjà présents (par nom et taille)
@@ -1325,7 +1340,19 @@ $(document).ready(function () {
         if (!file) return;
 
         resetGlossaryModalStyles();
-        
+
+        // Sécurité : limiter la longueur du nom de fichier CSV côté front
+        var ext = '.' + file.name.split('.').pop().toLowerCase();
+        if (ext === '.csv' && file.name.length > MAX_CSV_FILENAME_LENGTH) {
+            alert(getTranslation(
+                'The CSV filename must not exceed 128 characters.',
+                'Le nom du fichier CSV ne doit pas dépasser 128 caractères.'
+            ));
+            $('.glossary-file').val('');
+            glossaryFile = null;
+            return;
+        }
+
         if (file.size <= maxFileSize) {
             showUploadedFile(file.name);
         } else {
