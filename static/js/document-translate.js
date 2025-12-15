@@ -1019,39 +1019,64 @@ $(document).ready(function () {
     }
 
     /**
-     * Create a glossary checkbox item element
+     * Create glossary checkbox item element
+     * @param {Object} glossary - Glossary object with id and name
+     * @param {number} index - Index for unique ID generation
+     * @returns {jQuery} List item element
      */
     function createGlossaryCheckboxItem(glossary, index) {
-        const listItem = $('<li>', {
-            class: 'flex items-center',
-            style: 'flex: 0 0 calc(25% - 6px);'
-        });
-
-        const itemContainer = $('<div>', {
-            class: 'flex items-center w-full rounded-lg p-2 cursor-pointer transition-colors hover:bg-blue-50 glossary-checkbox-container',
-            'data-value': glossary.id
-        });
-
+        // Constants for layout (4 items per row with gap-2 = 8px, so 3 gaps = 24px total)
+        const GLOSSARIES_PER_ROW = 4;
+        const GAP_SIZE_PX = 24; // 3 gaps * 8px
+        const ITEM_FLEX_BASIS = `calc((100% - ${GAP_SIZE_PX}px) / ${GLOSSARIES_PER_ROW})`;
+        
+        const checkboxId = `glossary-checkbox-${index}`;
+        
+        // Create checkbox input
         const checkbox = $('<input>', {
-            id: `glossary-checkbox-${index}`,
+            id: checkboxId,
             type: 'checkbox',
             name: 'glossary-checkbox',
             value: glossary.id,
-            class: 'w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500'
+            class: 'w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0'
         });
-
         checkbox.on('change', function() {
             handleGlossaryCheckboxChange(this);
         });
 
-        const iconHtml = '<i class="ph ph-file mx-2" style="font-size: 24px;" aria-hidden="true"></i>';
-        const label = $('<label>', {
-            for: `glossary-checkbox-${index}`,
-            class: 'ms-2 flex h-8 items-center cursor-pointer',
-            html: iconHtml + `<span class="font-poppins text-sm font-normal leading-6 tracking-[-0.084px]" style="font-size: 14px; line-height: 24px;">${glossary.name}</span>`
+        // Create icon element
+        const icon = $('<i>', {
+            class: 'ph ph-file mx-2 flex-shrink-0',
+            style: 'font-size: 24px;',
+            'aria-hidden': 'true'
         });
 
+        // Create glossary name span with truncation and tooltip
+        const nameSpan = $('<span>', {
+            class: 'font-poppins text-sm font-normal leading-6 tracking-[-0.084px] truncate',
+            text: glossary.name,
+            title: glossary.name
+        });
+
+        // Create label with icon and name
+        const label = $('<label>', {
+            for: checkboxId,
+            class: 'ms-2 flex h-8 items-center cursor-pointer min-w-0 flex-1'
+        });
+        label.append(icon).append(nameSpan);
+
+        // Create container for checkbox and label
+        const itemContainer = $('<div>', {
+            class: 'flex items-center w-full rounded-lg p-2 cursor-pointer transition-colors hover:bg-blue-50 glossary-checkbox-container min-w-0',
+            'data-value': glossary.id
+        });
         itemContainer.append(checkbox).append(label);
+
+        // Create list item with proper flex basis for 4 items per row
+        const listItem = $('<li>', {
+            class: 'flex items-center min-w-0',
+            style: `flex: 0 0 ${ITEM_FLEX_BASIS};`
+        });
         listItem.append(itemContainer);
         
         return listItem;
