@@ -68,6 +68,8 @@ from quoting.helpers import get_price_by_language_pair
 
 import csv
 from subscriptions.helpers import translation_allowed, add_translations
+from quoting.services.quote import FormQuoteService
+from quoting.mail_helpers import send_quote_email
 
 PAGINATION_PAGE_SIZE = 20
 CACHE_TTL = 3600
@@ -447,37 +449,190 @@ class GetDomainsView(APIView):
         return Response({"data": domain_data, "default_domain": False}, status=status.HTTP_200_OK)
 
 
+def _fetch_document_from_lara(project_id: str) -> dict:
+    """
+    Récupère les données d'un document depuis lara-django.
+    
+    Args:
+        project_id: UUID du document
+        
+    Returns:
+        dict: Données du document
+        
+    Raises:
+        requests.RequestException: Si la requête échoue
+        ValueError: Si le document n'est pas trouvé
+    """
+    logger = logging.getLogger(__name__)
+    response = requests.get(
+        f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}",
+        timeout=10
+    )
+    
+    if response.status_code != 200:
+        logger.error(f"Failed to fetch document from LARA: {response.status_code}")
+        raise ValueError("Document not found in LARA")
+    
+    return response.json()
+
+
+def _update_document_status_in_lara(project_id: str, new_status: str) -> None:
+    """
+    Met à jour le statut d'un document dans lara-django.
+    
+    Args:
+        project_id: UUID du document
+        new_status: Nouveau statut à assigner
+        
+    Raises:
+        requests.RequestException: Si la requête échoue
+        ValueError: Si la mise à jour échoue
+    """
+    logger = logging.getLogger(__name__)
+    response = requests.patch(
+        f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}/update",
+        json={"status": new_status},
+        timeout=10
+    )
+    
+    if response.status_code != 200:
+        logger.error(f"Failed to update document status in LARA: {response.status_code}")
+        raise ValueError("Failed to update document status")
+
+
+def _build_quote_context(
+    doc_data: dict,
+    quote_price,
+    words_count: int,
+    project_id: str,
+    user,
+    request
+) -> dict:
+    """
+    Construit le contexte pour le template PDF de devis.
+    
+    Args:
+        doc_data: Données du document depuis lara-django
+        quote_price: Objet LanguageQuote avec les prix
+        words_count: Nombre de mots à traduire
+        project_id: UUID du document
+        user: Utilisateur Django
+        request: Objet request Django pour générer les URLs
+        
+    Returns:
+        dict: Variables de contexte pour le template
+    """
+    source_lang = doc_data.get('source_language', '')
+    target_lang = doc_data.get('target_language', '')
+    
+    total_price = words_count * quote_price.price
+    working_days = FormQuoteService.get_working_days(words_count, quote_price)
+    company_name = user.group.name if user.group else "Administrator"
+    
+    return {
+        "email": settings.SENDER_EMAIL,
+        "username": user.username,
+        "user_email": user.email,
+        "company": company_name,
+        "contract_name": company_name,
+        "language_pair": f"{source_lang.upper()} -> {target_lang.upper()}",
+        "file_name": doc_data.get('filename', 'document'),
+        "word_price": quote_price.price,
+        "words_count": words_count,
+        "working_days": working_days,
+        "total_price": total_price,
+        "created_at": now(),
+        "seller_email": settings.SENDER_EMAIL,
+        "quote_number": (
+            user.group.generate_quoting_number()
+            if user.group
+            else f"{now().strftime('%Y/%m')}/0"
+        ),
+        # Placeholder pour le lien de validation (sera corrigé à l'étape suivante)
+        "accept_expert_revision_file_absolute_url": request.build_absolute_uri(
+            f"/expert-review/accept/{project_id}"
+        )
+    }
+
+
 class FileExpertRevisionView(APIView):
     """
     Vue pour la révision experte de fichiers.
     
-    Note: Cette fonctionnalité est temporairement désactivée car le service
-    CloudStorage n'est plus disponible. Les méthodes sont conservées pour
-    référence future lors d'une refonte.
+    Gère la demande de devis pour une révision experte :
+    - Met à jour le statut du document dans lara-django
+    - Envoie un email avec un PDF de devis au client
     """
-
-    def get(self, request):
-        """
-        Méthode GET désactivée - service CloudStorage non disponible.
-        """
-        return Response(
-            {"detail": "This feature is temporarily unavailable"},
-            status=status.HTTP_503_SERVICE_UNAVAILABLE
-        )
+    permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def post(self, request):
         """
-        Méthode POST désactivée - service CloudStorage non disponible.
+        Traite une demande de révision experte.
+        
+        Args:
+            request.data contient:
+                - project_id: UUID du document dans lara-django
+                - file_url: URL du fichier traduit (optionnel)
         """
-        if not request.user.is_staff and not request.user.group:
+        logger = logging.getLogger(__name__)
+        project_id = request.data.get('project_id')
+        
+        if not project_id:
             return Response(
-                {"detail": "You have to be staff or to be in group"},
-                status=status.HTTP_403_FORBIDDEN
+                {"detail": "project_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
             )
-        return Response(
-            {"detail": "This feature is temporarily unavailable"},
-            status=status.HTTP_503_SERVICE_UNAVAILABLE
-        )
+        
+        try:
+            # Récupérer les données du document
+            doc_data = _fetch_document_from_lara(project_id)
+            source_lang = doc_data.get('source_language', '')
+            target_lang = doc_data.get('target_language', '')
+            
+            # Vérifier qu'un devis existe pour cette paire de langues
+            quote_price = get_price_by_language_pair(source_lang, target_lang)
+            if not quote_price:
+                return Response(
+                    {"detail": "No quote available for this language pair"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Récupérer le nombre de mots
+            words_count = doc_data.get('words_count', 0) or 0
+            if words_count == 0:
+                logger.warning(f"Document {project_id} has no words_count, defaulting to 0")
+            
+            # Construire le contexte pour le PDF
+            context_variables = _build_quote_context(
+                doc_data, quote_price, words_count, project_id, request.user, request
+            )
+            
+            # Mettre à jour le statut dans lara-django
+            _update_document_status_in_lara(project_id, "quote_requested")
+            
+            # Envoyer l'email avec le PDF
+            send_quote_email(request.user.id, request, context_variables)
+            
+            logger.info(f"Quote request sent for document {project_id} - User: {request.user.id}")
+            return Response({"detail": "Quote request sent successfully"})
+            
+        except ValueError as e:
+            error_msg = str(e)
+            logger.error(f"Validation error in expert revision request: {error_msg}")
+            status_code = status.HTTP_404_NOT_FOUND if "not found" in error_msg.lower() else status.HTTP_500_INTERNAL_SERVER_ERROR
+            return Response({"detail": error_msg}, status=status_code)
+        except requests.RequestException as e:
+            logger.error(f"Error communicating with LARA API: {str(e)}")
+            return Response(
+                {"detail": f"Error communicating with translation service: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        except Exception as e:
+            logger.error(f"Unexpected error in expert revision request: {str(e)}", exc_info=True)
+            return Response(
+                {"detail": "An unexpected error occurred"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 def _map_lara_project_to_frontend(lara_result: dict) -> dict:
@@ -561,13 +716,14 @@ def map_lara_status_to_lexa(lara_status):
     """
     Map Django Lara status to Lexa frontend expected status.
 
-    Lara statuses: pending, processing, translated, error
-    Lexa statuses: Being translated, Translated, Error
+    Lara statuses: pending, processing, translated, quote_requested, error
+    Lexa statuses: Being translated, Translated, Sent to post-editing not accepted yet, Error
     """
     status_map = {
         'pending': 'Being translated',
         'processing': 'Being translated',
         'translated': 'Translated',
+        'quote_requested': 'Sent to post-editing, not accepted yet',
         'error': 'Error'
     }
     return status_map.get(lara_status, 'Being translated')
