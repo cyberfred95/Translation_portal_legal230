@@ -246,7 +246,7 @@ def file_translate(request):
     symbols_count = 0
     processed_files = []
     for file in files:
-        file = rename_file(file=file)
+        # Ne plus renommer le fichier en "file.ext" afin de conserver le nom original
         file_words, file_texts, processed_file = get_text_from_file(file)
         words_count += len(file_words)
         symbols_count += sum(len(word) for word in file_texts)

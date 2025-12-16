@@ -320,7 +320,8 @@ $(document).ready(function () {
                 }
             }
             if (currentStep === 2) {
-                loadMyGlossaries();
+                // Don't reset selections when clicking Next (user might have selected glossaries)
+                loadMyGlossaries(false);
                 $(".add-glossary-btn").removeClass('hidden');
             }
 
@@ -362,6 +363,7 @@ $(document).ready(function () {
 
 
     const allowedTypes = ['.txt', '.pdf', '.docx', '.xlsx', '.pptx'];
+    const MAX_CSV_FILENAME_LENGTH = 128;
 
     const fileInput = $('<input>', {
         type: 'file',
@@ -426,6 +428,20 @@ $(document).ready(function () {
         var filteredFiles = filesArray.filter(function (file) {
             var ext = '.' + file.name.split('.').pop().toLowerCase();
             return allowedTypes.includes(ext);
+        });
+
+        // Validation spécifique pour les CSV : longueur max du nom de fichier
+        filteredFiles = filteredFiles.filter(function (file) {
+            var ext = '.' + file.name.split('.').pop().toLowerCase();
+            if (ext === '.csv' && file.name.length > MAX_CSV_FILENAME_LENGTH) {
+                // Message UI clair, sans déclencher d'upload inutile
+                alert(getTranslation(
+                    'The CSV filename must not exceed 128 characters.',
+                    'Le nom du fichier CSV ne doit pas dépasser 128 caractères.'
+                ));
+                return false;
+            }
+            return true;
         });
 
         // Filtrer les fichiers déjà présents (par nom et taille)
@@ -993,6 +1009,33 @@ $(document).ready(function () {
 
     // ============= GLOSSARY MANAGEMENT =============
 
+    // Constants for glossary layout (4 items per row with gap-2 = 8px, so 3 gaps = 24px total)
+    const GLOSSARY_LAYOUT = {
+        ITEMS_PER_ROW: 4,
+        GAP_SIZE_PX: 24,
+        get flexBasis() {
+            return `calc((100% - ${this.GAP_SIZE_PX}px) / ${this.ITEMS_PER_ROW})`;
+        }
+    };
+
+    // Constants for glossary API requests
+    const GLOSSARY_API = {
+        PERSONAL_DOMAIN: '*', // Personal glossaries use '*' as domain
+        CHECKBOX_NAME: 'glossary-checkbox',
+        CHECKBOX_ID_PREFIX: 'glossary-checkbox-'
+    };
+
+    // CSS classes constants for glossary items
+    const GLOSSARY_CLASSES = {
+        checkbox: 'w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0',
+        icon: 'ph ph-file mx-2 flex-shrink-0',
+        nameSpan: 'font-poppins text-sm font-normal leading-6 tracking-[-0.084px] truncate',
+        label: 'ms-2 flex h-8 items-center cursor-pointer min-w-0 flex-1',
+        container: 'flex items-center w-full rounded-lg p-2 cursor-pointer transition-colors hover:bg-blue-50 glossary-checkbox-container min-w-0',
+        containerSelected: 'bg-blue-50',
+        listItem: 'flex items-center min-w-0'
+    };
+
     /**
      * Reset personal glossaries selection
      */
@@ -1001,64 +1044,180 @@ $(document).ready(function () {
     }
 
     /**
-     * Handle glossary checkbox change event
+     * Check if a glossary is currently selected
+     * @param {string} glossaryId - Glossary ID to check
+     * @returns {boolean} True if glossary is selected
      */
-    function handleGlossaryCheckboxChange(checkbox) {
-        const glossaryId = $(checkbox).val();
-        const $container = $(checkbox).closest('.glossary-checkbox-container');
-        
-        if ($(checkbox).is(':checked')) {
-            if (!selectedPersonalGlossaries.includes(glossaryId)) {
-                selectedPersonalGlossaries.push(glossaryId);
-            }
-            $container.addClass('bg-blue-50');
-        } else {
-            selectedPersonalGlossaries = selectedPersonalGlossaries.filter(id => id !== glossaryId);
-            $container.removeClass('bg-blue-50');
+    function isGlossarySelected(glossaryId) {
+        return selectedPersonalGlossaries.includes(glossaryId);
+    }
+
+    /**
+     * Add glossary to selection
+     * @param {string} glossaryId - Glossary ID to add
+     */
+    function addGlossaryToSelection(glossaryId) {
+        if (!isGlossarySelected(glossaryId)) {
+            selectedPersonalGlossaries.push(glossaryId);
         }
     }
 
     /**
-     * Create a glossary checkbox item element
+     * Remove glossary from selection
+     * @param {string} glossaryId - Glossary ID to remove
      */
-    function createGlossaryCheckboxItem(glossary, index) {
-        const listItem = $('<li>', {
-            class: 'flex items-center',
-            style: 'flex: 0 0 calc(25% - 6px);'
-        });
+    function removeGlossaryFromSelection(glossaryId) {
+        selectedPersonalGlossaries = selectedPersonalGlossaries.filter(id => id !== glossaryId);
+    }
 
-        const itemContainer = $('<div>', {
-            class: 'flex items-center w-full rounded-lg p-2 cursor-pointer transition-colors hover:bg-blue-50 glossary-checkbox-container',
-            'data-value': glossary.id
-        });
+    /**
+     * Update visual state of glossary container based on selection
+     * @param {jQuery} $container - Container element
+     * @param {boolean} isSelected - Whether glossary is selected
+     */
+    function updateGlossaryContainerState($container, isSelected) {
+        if (isSelected) {
+            $container.addClass(GLOSSARY_CLASSES.containerSelected);
+        } else {
+            $container.removeClass(GLOSSARY_CLASSES.containerSelected);
+        }
+    }
 
+    /**
+     * Handle glossary checkbox change event
+     * @param {HTMLElement} checkbox - Checkbox element that changed
+     */
+    function handleGlossaryCheckboxChange(checkbox) {
+        const $checkbox = $(checkbox);
+        const glossaryId = $checkbox.val();
+        const $container = $checkbox.closest('.glossary-checkbox-container');
+        const isChecked = $checkbox.is(':checked');
+
+        if (isChecked) {
+            addGlossaryToSelection(glossaryId);
+        } else {
+            removeGlossaryFromSelection(glossaryId);
+        }
+
+        updateGlossaryContainerState($container, isChecked);
+    }
+
+    /**
+     * Create glossary checkbox input element
+     * @param {string} checkboxId - Unique checkbox ID
+     * @param {string} glossaryId - Glossary ID value
+     * @param {boolean} isChecked - Whether checkbox should be checked
+     * @returns {jQuery} Checkbox element
+     */
+    function createGlossaryCheckbox(checkboxId, glossaryId, isChecked) {
         const checkbox = $('<input>', {
-            id: `glossary-checkbox-${index}`,
+            id: checkboxId,
             type: 'checkbox',
-            name: 'glossary-checkbox',
-            value: glossary.id,
-            class: 'w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500'
+            name: GLOSSARY_API.CHECKBOX_NAME,
+            value: glossaryId,
+            class: GLOSSARY_CLASSES.checkbox,
+            checked: isChecked
         });
-
         checkbox.on('change', function() {
             handleGlossaryCheckboxChange(this);
         });
+        return checkbox;
+    }
 
-        const iconHtml = '<i class="ph ph-file mx-2" style="font-size: 24px;" aria-hidden="true"></i>';
-        const label = $('<label>', {
-            for: `glossary-checkbox-${index}`,
-            class: 'ms-2 flex h-8 items-center cursor-pointer',
-            html: iconHtml + `<span class="font-poppins text-sm font-normal leading-6 tracking-[-0.084px]" style="font-size: 14px; line-height: 24px;">${glossary.name}</span>`
+    /**
+     * Create glossary icon element
+     * @returns {jQuery} Icon element
+     */
+    function createGlossaryIcon() {
+        return $('<i>', {
+            class: GLOSSARY_CLASSES.icon,
+            style: 'font-size: 24px;',
+            'aria-hidden': 'true'
         });
+    }
 
-        itemContainer.append(checkbox).append(label);
-        listItem.append(itemContainer);
+    /**
+     * Create glossary name span with truncation and tooltip
+     * @param {string} glossaryName - Name of the glossary
+     * @returns {jQuery} Name span element
+     */
+    function createGlossaryNameSpan(glossaryName) {
+        return $('<span>', {
+            class: GLOSSARY_CLASSES.nameSpan,
+            text: glossaryName,
+            title: glossaryName
+        });
+    }
+
+    /**
+     * Create glossary label with icon and name
+     * @param {string} checkboxId - ID of associated checkbox
+     * @param {string} glossaryName - Name of the glossary
+     * @returns {jQuery} Label element
+     */
+    function createGlossaryLabel(checkboxId, glossaryName) {
+        const label = $('<label>', {
+            for: checkboxId,
+            class: GLOSSARY_CLASSES.label
+        });
+        label.append(createGlossaryIcon()).append(createGlossaryNameSpan(glossaryName));
+        return label;
+    }
+
+    /**
+     * Create glossary item container
+     * @param {string} glossaryId - Glossary ID
+     * @param {jQuery} checkbox - Checkbox element
+     * @param {jQuery} label - Label element
+     * @param {boolean} isSelected - Whether glossary is selected
+     * @returns {jQuery} Container element
+     */
+    function createGlossaryContainer(glossaryId, checkbox, label, isSelected) {
+        const container = $('<div>', {
+            class: GLOSSARY_CLASSES.container,
+            'data-value': glossaryId
+        });
+        container.append(checkbox).append(label);
         
+        if (isSelected) {
+            container.addClass(GLOSSARY_CLASSES.containerSelected);
+        }
+        
+        return container;
+    }
+
+    /**
+     * Create glossary checkbox item element
+     * @param {Object} glossary - Glossary object with id and name
+     * @param {number} index - Index for unique ID generation
+     * @returns {jQuery} List item element
+     */
+    /**
+     * Create glossary checkbox item element
+     * @param {Object} glossary - Glossary object with id and name
+     * @param {number} index - Index for unique ID generation
+     * @returns {jQuery} List item element
+     */
+    function createGlossaryCheckboxItem(glossary, index) {
+        const checkboxId = `${GLOSSARY_API.CHECKBOX_ID_PREFIX}${index}`;
+        const isSelected = isGlossarySelected(glossary.id);
+
+        const checkbox = createGlossaryCheckbox(checkboxId, glossary.id, isSelected);
+        const label = createGlossaryLabel(checkboxId, glossary.name);
+        const container = createGlossaryContainer(glossary.id, checkbox, label, isSelected);
+
+        const listItem = $('<li>', {
+            class: GLOSSARY_CLASSES.listItem,
+            style: `flex: 0 0 ${GLOSSARY_LAYOUT.flexBasis};`
+        });
+        listItem.append(container);
+
         return listItem;
     }
 
     /**
      * Display empty glossary message
+     * @param {jQuery} container - Container element to display message in
      */
     function displayEmptyGlossaryMessage(container) {
         const message = getTranslation(
@@ -1074,35 +1233,54 @@ $(document).ready(function () {
     }
 
     /**
+     * Create glossary list container
+     * @returns {jQuery} List element
+     */
+    function createGlossaryList() {
+        return $('<ul>', {
+            class: 'flex flex-row flex-wrap items-start w-full gap-2'
+        });
+    }
+
+    /**
+     * Render glossary items into list
+     * @param {Array} glossaries - Array of glossary objects
+     * @param {jQuery} glossaryList - List element to append items to
+     */
+    function renderGlossaryItems(glossaries, glossaryList) {
+        glossaries.forEach((glossary, index) => {
+            const listItem = createGlossaryCheckboxItem(glossary, index);
+            glossaryList.append(listItem);
+        });
+    }
+
+    /**
      * Display glossaries list in the glossary content area
+     * Note: Does not reset selection to preserve user choices when list is refreshed
+     * @param {Array} glossaries - Array of glossary objects to display
      */
     function displayMyGlossariesInStep3(glossaries) {
         const container = $('#glossary-content');
         container.empty();
-        resetPersonalGlossariesSelection();
 
         if (!glossaries || glossaries.length === 0) {
             displayEmptyGlossaryMessage(container);
             return;
         }
 
-        const glossaryList = $('<ul>', {
-            class: 'flex flex-row flex-wrap items-start w-full gap-2'
-        });
-
-        glossaries.forEach((glossary, index) => {
-            const listItem = createGlossaryCheckboxItem(glossary, index);
-            glossaryList.append(listItem);
-        });
-
+        const glossaryList = createGlossaryList();
+        renderGlossaryItems(glossaries, glossaryList);
         container.append(glossaryList);
     }
 
     /**
      * Load user's personal glossaries from API
+     * @param {boolean} shouldReset - Whether to reset selected glossaries (default: true)
      */
-    function loadMyGlossaries() {
-        resetPersonalGlossariesSelection();
+    function loadMyGlossaries(shouldReset = true) {
+        if (shouldReset) {
+            resetPersonalGlossariesSelection();
+        }
 
         $.ajax({
             url: api_lara_glossary_search,
@@ -1110,7 +1288,7 @@ $(document).ready(function () {
             data: {
                 source_language: sourceLanguage,
                 target_language: targetLanguage,
-                domain: '*'  // Personal glossaries use '*' as domain
+                domain: GLOSSARY_API.PERSONAL_DOMAIN
             },
             headers: getAjaxHeaders(),
             success: function (response) {
@@ -1162,7 +1340,19 @@ $(document).ready(function () {
         if (!file) return;
 
         resetGlossaryModalStyles();
-        
+
+        // Sécurité : limiter la longueur du nom de fichier CSV côté front
+        var ext = '.' + file.name.split('.').pop().toLowerCase();
+        if (ext === '.csv' && file.name.length > MAX_CSV_FILENAME_LENGTH) {
+            alert(getTranslation(
+                'The CSV filename must not exceed 128 characters.',
+                'Le nom du fichier CSV ne doit pas dépasser 128 caractères.'
+            ));
+            $('.glossary-file').val('');
+            glossaryFile = null;
+            return;
+        }
+
         if (file.size <= maxFileSize) {
             showUploadedFile(file.name);
         } else {
@@ -1245,8 +1435,9 @@ $(document).ready(function () {
                 $closeIcon.addClass('hidden');
 
                 // Recharger la liste des glossaires pour afficher le nouveau glossaire
+                // Preserve existing selections when reloading after creating a new glossary
                 if (sourceLanguage && targetLanguage && selectedSubDomain) {
-                    loadMyGlossaries();
+                    loadMyGlossaries(false);
                 }
             },
             error: handleAjaxError
