@@ -47,7 +47,7 @@ class BaseTemplateView(TemplateView):
 from subscriptions.models import SubscriptionType
 from stripe_webhooks.tasks_handlers.helper.stripe_session import get_stripe_customer_session_url
 from .helpers import lowercase_file_extension, get_word_count, get_text_from_file, get_project_file, \
-    rename_file
+    rename_file, extract_language_codes_from_project
 
 from emails.models import EmailType
 from emails.send_email import send_email
@@ -480,21 +480,55 @@ class FileExpertRevisionView(APIView):
         )
 
 
+def _map_lara_project_to_frontend(lara_result: dict) -> dict:
+    """
+    Mappe une réponse de projet LARA vers le format attendu par le frontend.
+    
+    Args:
+        lara_result: Dictionnaire de réponse LARA depuis document-status
+        
+    Returns:
+        Dictionnaire au format frontend
+    """
+    source_lang, target_lang = extract_language_codes_from_project(lara_result)
+    
+    res = {
+        'id': lara_result.get('id'),
+        'status': map_lara_status_to_lexa(lara_result.get('status')),
+        'source_file_name': lara_result.get('filename', ''),
+        'source_language': source_lang,
+        'target_language': target_lang,
+        'translated_file': lara_result.get('downloadUrl') if lara_result.get('status') == 'translated' else None,
+        'reviewed_file': None,  # LARA doesn't have post-editing yet
+        'display_popup': not bool(get_price_by_language_pair(source_lang, target_lang))
+    }
+    
+    # Add error reason if status is error
+    if lara_result.get('status') == 'error':
+        res['error_reason'] = lara_result.get('error_message', 'Translation failed')
+    
+    return res
+
+
 def get_projects_by_ids(request):
     """
-    Get project status by IDs - now supports Django Lara documents.
-
-    Calls Django Lara document-status endpoint and maps response to
-    match frontend expected format.
+    Récupère le statut des projets de traduction par leurs IDs.
+    
+    Appelle l'endpoint Django Lara document-status et mappe les réponses
+    vers le format attendu par le frontend.
+    
+    Args:
+        request: Requête HTTP contenant les project_id[] en paramètres
+        
+    Returns:
+        Liste de dictionnaires représentant les projets au format frontend
     """
     logger = logging.getLogger(__name__)
-
     project_ids = request.query_params.getlist('project_id[]', [])
     responses = []
 
     for project_id in project_ids:
         try:
-            # Call Django Lara document-status endpoint
             response = requests.get(
                 f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}",
                 timeout=10
@@ -502,28 +536,8 @@ def get_projects_by_ids(request):
 
             if response.status_code == 200:
                 lara_result = response.json()
-
-                # Map Django Lara response to frontend expected format
-                # Frontend expects: id, status, source_file_name, translated_file, source_language, target_language
-                res = {
-                    'id': lara_result.get('id'),
-                    'status': map_lara_status_to_lexa(lara_result.get('status')),
-                    'source_file_name': lara_result.get('filename', ''),
-                    'source_language': lara_result.get('source_language', ''),
-                    'target_language': lara_result.get('target_language', ''),
-                    'translated_file': lara_result.get('downloadUrl') if lara_result.get('status') == 'translated' else None,
-                    'reviewed_file': None,  # LARA doesn't have post-editing yet
-                    'display_popup': False if get_price_by_language_pair(
-                        source_language=lara_result.get('source_language', ''),
-                        target_language=lara_result.get('target_language', '')
-                    ) else True
-                }
-
-                # Add error reason if status is error
-                if lara_result.get('status') == 'error':
-                    res['error_reason'] = lara_result.get('error_message', 'Translation failed')
-
-                responses.append(res)
+                mapped_result = _map_lara_project_to_frontend(lara_result)
+                responses.append(mapped_result)
             else:
                 logger.error(f"LARA_DOC_STATUS_ERROR - Project: {project_id} - Status: {response.status_code}")
                 responses.append({
