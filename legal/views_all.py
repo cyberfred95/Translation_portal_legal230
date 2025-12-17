@@ -1,36 +1,67 @@
 import base64
 import json
+import logging
 import os
 import re
 import time
-import logging
 from datetime import datetime
 from decimal import Decimal
 from io import BytesIO
 from pprint import pprint
 from urllib.parse import urlparse, unquote, urlencode
 
+import django
+import langdetect
 import openpyxl
+import requests
 from django.conf import settings
-from django.urls import reverse
-from django.shortcuts import render
-from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-
-from glossaries.processor import GlossaryProcessor
-from quoting.models import LanguageQuote
+from django.contrib.auth.models import User
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
+from django.shortcuts import render
+from django.urls import reverse
 from django.utils.timezone import now
-from subscriptions.models import UserSubscription
-from subscriptions.permissions import is_user_subscription_active
-from subscriptions.utils import get_user_api_key
-
+from django.views.generic import TemplateView
+from preferences import preferences
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status
-from django.views.generic import TemplateView
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
-import django
 from rest_framework.views import APIView
+
+from domains.models import Domain
+from emails.models import EmailType
+from emails.send_email import send_email
+from glossaries.models import Glossary
+from glossaries.processor import GlossaryProcessor
+from languages.models import Language
+from quoting.models import LanguageQuote
+from subscriptions.helpers import add_translations, translation_allowed
+from subscriptions.models import SubscriptionType, UserSubscription
+from subscriptions.permissions import SubscribedPermission, is_user_subscription_active
+from subscriptions.utils import get_user_api_key
+from stripe_webhooks.tasks_handlers.helper.stripe_session import get_stripe_customer_session_url
+from users.models import User, UserGroup
+
+from .credentials import languages
+from .helpers import (
+    extract_language_codes_from_project,
+    get_project_file,
+    get_text_from_file,
+    get_word_count,
+    lowercase_file_extension,
+    rename_file,
+)
+
+import csv
+from typing import Optional
+
+from django.core.cache import cache
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from quoting.helpers import get_price_by_language_pair
+from quoting.mail_helpers import send_quote_email
+from quoting.services.quote import FormQuoteService
+
+logger = logging.getLogger(__name__)
 
 
 class BaseTemplateView(TemplateView):
@@ -80,6 +111,29 @@ def _build_admin_document_url(document_id: str) -> str:
     return f"https://api.portail.lexamt.fr/lara-django/admin/translation/documenttranslation/{document_id}/change/"
 
 
+def _get_user_email_from_uuid(user_uuid: str) -> str:
+    """
+    Récupère l'email d'un utilisateur depuis son UUID.
+    
+    Args:
+        user_uuid: UUID de l'utilisateur
+        
+    Returns:
+        str: Email de l'utilisateur ou SUPPORT_EMAIL par défaut
+    """
+    if not user_uuid:
+        return settings.SUPPORT_EMAIL
+    
+    try:
+        user = User.objects.filter(uuid=user_uuid).first()
+        if user and user.email:
+            return user.email
+    except Exception as e:
+        logger.warning(f"Could not retrieve user email for UUID {user_uuid}: {str(e)}")
+    
+    return settings.SUPPORT_EMAIL
+
+
 def _send_quote_validation_notification(project_id: str, package_url: str, user_uuid: str = None) -> None:
     """
     Envoie un email de notification à l'admin lorsqu'un devis est validé.
@@ -87,22 +141,12 @@ def _send_quote_validation_notification(project_id: str, package_url: str, user_
     Args:
         project_id: UUID du document
         package_url: URL du package ZIP généré
-        user_uuid: UUID de l'utilisateur qui a validé le devis
+        user_uuid: UUID de l'utilisateur qui a validé le devis (optionnel)
     """
-    logger = logging.getLogger(__name__)
     try:
         admin_url = _build_admin_document_url(project_id)
         full_package_url = _build_package_url(package_url)
-        
-        # Récupérer l'email de l'utilisateur
-        user_email = settings.SUPPORT_EMAIL  # Valeur par défaut
-        if user_uuid:
-            try:
-                user = User.objects.filter(uuid=user_uuid).first()
-                if user and user.email:
-                    user_email = user.email
-            except Exception as e:
-                logger.warning(f"Could not retrieve user email for UUID {user_uuid}: {str(e)}")
+        user_email = _get_user_email_from_uuid(user_uuid)
         
         send_email(
             settings.QUOTE_CC_EMAIL,
@@ -116,7 +160,10 @@ def _send_quote_validation_notification(project_id: str, package_url: str, user_
             }
         )
     except Exception as e:
-        logger.error(f"Error sending admin notification email for quote acceptance: {str(e)}", exc_info=True)
+        logger.error(
+            f"Error sending admin notification email for quote acceptance: {str(e)}",
+            exc_info=True
+        )
         # On continue même si l'email échoue
 
 
@@ -130,7 +177,6 @@ def _accept_quote_in_lara(project_id: str) -> tuple[bool, str, dict]:
     Returns:
         tuple: (success: bool, error_message: str, response_data: dict)
     """
-    logger = logging.getLogger(__name__)
     try:
         response = requests.post(
             f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}/accept-quote",
@@ -139,13 +185,13 @@ def _accept_quote_in_lara(project_id: str) -> tuple[bool, str, dict]:
         response.raise_for_status()
         response_data = response.json()
         return True, "", response_data
-    except requests.HTTPError:
-        status_code = response.status_code if 'response' in locals() else 'unknown'
-        logger.error(f"Failed to accept quote in LARA: {status_code}")
+    except requests.HTTPError as e:
+        status_code = e.response.status_code if hasattr(e, 'response') else 'unknown'
+        logger.error(f"Failed to accept quote in LARA: HTTP {status_code}")
         try:
-            error_data = response.json() if 'response' in locals() else {}
+            error_data = e.response.json() if hasattr(e, 'response') else {}
             error_msg = error_data.get('error', 'Échec de l\'acceptation du devis.')
-        except (ValueError, AttributeError):
+        except (ValueError, AttributeError, json.JSONDecodeError):
             error_msg = 'Échec de l\'acceptation du devis.'
         return False, error_msg, {}
     except requests.RequestException as e:
@@ -191,33 +237,8 @@ class ExpertReviewAcceptView(BaseTemplateView):
         context['project_id'] = project_id
         return context
 
-from subscriptions.models import SubscriptionType
-from stripe_webhooks.tasks_handlers.helper.stripe_session import get_stripe_customer_session_url
-from .helpers import lowercase_file_extension, get_word_count, get_text_from_file, get_project_file, \
-    rename_file, extract_language_codes_from_project
 
-from emails.models import EmailType
-from emails.send_email import send_email
-from domains.models import Domain
-from languages.models import Language
-from users.models import User, UserGroup
-from .credentials import languages
-import requests
-from preferences import preferences
-import langdetect
-
-from glossaries.models import Glossary
-from typing import Optional
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from subscriptions.permissions import SubscribedPermission
-from django.core.cache import cache
-from quoting.helpers import get_price_by_language_pair
-
-import csv
-from subscriptions.helpers import translation_allowed, add_translations
-from quoting.services.quote import FormQuoteService
-from quoting.mail_helpers import send_quote_email
-
+# Constants
 PAGINATION_PAGE_SIZE = 20
 CACHE_TTL = 3600
 
@@ -610,7 +631,6 @@ def _fetch_document_from_lara(project_id: str) -> dict:
         requests.RequestException: Si la requête échoue
         ValueError: Si le document n'est pas trouvé
     """
-    logger = logging.getLogger(__name__)
     try:
         response = requests.get(
             f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}",
@@ -638,7 +658,6 @@ def _update_document_status_in_lara(project_id: str, new_status: str) -> None:
         requests.RequestException: Si la requête échoue
         ValueError: Si la mise à jour échoue
     """
-    logger = logging.getLogger(__name__)
     try:
         response = requests.patch(
             f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}/update",
