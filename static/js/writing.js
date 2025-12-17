@@ -1,11 +1,3 @@
-// ============================================================================
-// WRITING FUNCTIONALITY - TEMPORARILY DISABLED
-// ============================================================================
-// Cette fonctionnalité est temporairement désactivée en prévision d'une refonte.
-// Tout le code est conservé en commentaire pour référence future.
-// ============================================================================
-
-/*
 document.addEventListener('DOMContentLoaded', function() {
     // Récupération des data-attributes du root
     const root = document.getElementById('writing-root');
@@ -57,20 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Show prompt details
                 const promptId = radio.value;
-                console.log(promptData);
-                console.log(promptId);
                 const prompt = promptData[promptId];
-                console.log(prompt);
 
                 if (prompt) {
-                    // document.getElementById('selected-prompt-name').textContent = prompt.name;
-                    // document.getElementById('selected-prompt-description').textContent = prompt.description;
-                    // document.getElementById('selected-prompt-model').textContent = prompt.model;
-                    // document.getElementById('selected-prompt-temperature').textContent = prompt.temperature;
-
-                    // Show meta info
-                    // promptMeta.style.display = 'flex';
-
                     // Enable text input
                     inputText.disabled = false;
 
@@ -166,6 +147,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     resultText.textContent = Array.isArray(data.result) ? data.result.join('\n') : data.result;
                     noResults.classList.add('hidden');
                     resultsArea.classList.remove('hidden');
+                } else if (data.detail) {
+                    // Show error from API
+                    alert(data.detail);
                 } else {
                     alert(trans.error_occured);
                 }
@@ -196,4 +180,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-*/

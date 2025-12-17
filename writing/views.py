@@ -1,12 +1,11 @@
-# ============================================================================
-# WRITING FUNCTIONALITY - TEMPORARILY DISABLED
-# ============================================================================
-# Cette fonctionnalité est temporairement désactivée en prévision d'une refonte.
-# Tout le code est conservé en commentaire pour référence future.
-# ============================================================================
-
 from django.views.generic import TemplateView
 from django.conf import settings
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from subscriptions.permissions import SubscribedPermission
 
 
 class BaseTemplateView(TemplateView):
@@ -21,107 +20,112 @@ class BaseTemplateView(TemplateView):
         return context
 
 
-# ============================================================================
-# ORIGINAL CODE - COMMENTED FOR FUTURE REFACTORING
-# ============================================================================
-# import json
-# from django.http import HttpResponseRedirect
-# from django.urls import reverse
-# from django.views.decorators.csrf import csrf_exempt
-# from rest_framework import status
-# from rest_framework.decorators import api_view
-# from rest_framework.permissions import IsAuthenticated
-# from rest_framework.response import Response
-# from preferences import preferences
-# from rest_framework.views import APIView
-# from subscriptions.permissions import SubscribedPermission
-# from subscriptions.models import UserSubscription, SubscriptionType
-# from subscriptions.utils import get_user_api_key
-# from .serializers import PromptSerializer
-# from .tasks import send_statistic_request
-# from .models import Prompt
-# import requests
-# ============================================================================
-
-
 class WritingView(BaseTemplateView):
     """
-    Vue pour la page Writing - Temporairement désactivée.
-    Affiche un message indiquant que la fonctionnalité reviendra bientôt.
+    Vue pour la page Writing.
+    Affiche l'interface de modification de texte avec GPT.
     """
     template_name = 'writing.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Charger les prompts pour afficher la page (mais fonctionnalité bloquée par overlay)
         context['prompts'] = self.get_prompts()
         return context
 
     def get_prompts(self):
-        # ============================================================================
-        # ORIGINAL CODE - COMMENTED FOR FUTURE REFACTORING
-        # ============================================================================
-        # from .serializers import PromptSerializer
-        # from .models import Prompt
-        # prompts = Prompt.objects.all()
-        # return PromptSerializer(prompts, many=True, context={'request': self.request}).data
-        # ============================================================================
-        # Retourner une liste vide pour éviter les erreurs (les modèles sont commentés)
-        return []
+        from .serializers import PromptSerializer
+        from .models import Prompt
+        prompts = Prompt.objects.all()
+        return PromptSerializer(prompts, many=True, context={'request': self.request}).data
 
 
-# ============================================================================
-# ORIGINAL WritingProcessAPIView - COMMENTED FOR FUTURE REFACTORING
-# ============================================================================
-# class WritingProcessAPIView(APIView):
-#     requires_writing_access = True
-#     permission_classes = (SubscribedPermission, IsAuthenticated)
-# 
-#     def post(self, request):
-#         data = getattr(request, 'data', request.POST)
-#         if not request.user.is_staff and not request.user.group:
-#             return Response({"detail": "You have to be staff or to be in group"}, status=status.HTTP_403_FORBIDDEN)
-#         prompt = Prompt.objects.filter(id=data.get('prompt')).first()
-#         if not prompt:
-#             # Valeurs par défaut pour permettre l'appel externe dans les tests
-#             class _Tmp:
-#                 prompt = ''
-#                 gpt_model = 'gpt-4'
-#                 temperature = 0
-#                 variables = {}
-#             prompt = _Tmp()
-#         prompt.variables['text'] = data.get('text')
-#         data = {
-#             "text": data['text'],
-#             "prompt": prompt.prompt,
-#             "gpt_model": prompt.gpt_model,
-#             "temperature": int(prompt.temperature),
-#             "variables": prompt.variables,
-#         }
-#         # Resolve API key based on user subscription
-#         try:
-#             user_api_key = get_user_api_key(request.user)
-#         except ValueError:
-#             print("no subscription")
-#             return Response({"detail": "no subscription"}, status=status.HTTP_403_FORBIDDEN)
-# 
-#         response = requests.post(
-#             url=settings.CUSTOM_MT_CONSOLE_URL +
-#             'gpt-processing/foreign_gpt_process/',
-#             headers={
-#                 'token': user_api_key
-#             },
-#             json=data
-#         )
-#         result = response.json().get('result')
-#         if not result:
-#             result = []
-#         send_statistic_request(
-#             api_key=user_api_key,
-#             texts=result,
-#             gpt_model=prompt.gpt_model,
-#             user_uuid=request.user.uuid,
-#         )
-# 
-#         return Response(response.json(), status=status.HTTP_200_OK)
-# ============================================================================
+class WritingProcessAPIView(APIView):
+    """
+    API endpoint for processing text with GPT.
+
+    Requires:
+    - User authentication
+    - Active subscription with access_to_writing=True
+    - User must be staff OR belong to a group
+    """
+    requires_writing_access = True
+    permission_classes = (SubscribedPermission, IsAuthenticated)
+
+    def post(self, request):
+        from .services import OpenAIClient, OpenAIClientError
+        from .models import Prompt
+        from subscriptions.helpers import translation_allowed, add_translations
+        from legal.helpers import get_word_count
+
+        data = getattr(request, 'data', request.POST)
+
+        # Validate user permissions
+        if not request.user.is_staff and not request.user.group:
+            return Response(
+                {"detail": "You have to be staff or to be in group"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Get input text
+        text = data.get('text', '')
+        if not text:
+            return Response(
+                {"detail": "Text is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Count words and symbols for quota check
+        words_count = get_word_count(text)
+        symbols_count = len(text)
+
+        # Check quota BEFORE processing
+        if not translation_allowed(request, words_count=words_count, symbols_count=symbols_count):
+            return Response(
+                {"detail": "You have exceeded your usage quota"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Load prompt configuration
+        prompt_obj = Prompt.objects.filter(id=data.get('prompt')).first()
+        if not prompt_obj:
+            return Response(
+                {"detail": "Prompt not found"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Build variables dict with user text
+        variables = dict(prompt_obj.variables) if prompt_obj.variables else {}
+        variables['text'] = text
+
+        # Call OpenAI API
+        try:
+            client = OpenAIClient()
+            response = client.process_text(
+                text=text,
+                prompt=prompt_obj.prompt,
+                model=prompt_obj.gpt_model,
+                temperature=float(prompt_obj.temperature),
+                variables=variables
+            )
+
+            if not response.success:
+                return Response(
+                    {"detail": response.error},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+            # Update quota AFTER successful processing
+            add_translations(request, words_count=words_count, symbols_count=symbols_count)
+
+            # Format response (split by newlines to match expected format for frontend)
+            result = [line for line in response.content.split('\n') if line.strip()]
+            if not result:
+                result = [response.content]
+
+            return Response({"result": result}, status=status.HTTP_200_OK)
+
+        except OpenAIClientError as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
