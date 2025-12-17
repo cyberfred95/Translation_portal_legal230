@@ -44,6 +44,73 @@ class BaseTemplateView(TemplateView):
         context['QUOTE_CC_EMAIL'] = settings.QUOTE_CC_EMAIL
         return context
 
+
+def _accept_quote_in_lara(project_id: str) -> tuple[bool, str]:
+    """
+    Appelle lara-django pour accepter un devis et générer le package ZIP.
+    
+    Args:
+        project_id: UUID du document
+        
+    Returns:
+        tuple: (success: bool, error_message: str)
+    """
+    logger = logging.getLogger(__name__)
+    try:
+        response = requests.post(
+            f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}/accept-quote",
+            timeout=30
+        )
+        response.raise_for_status()
+        return True, ""
+    except requests.HTTPError:
+        status_code = response.status_code if 'response' in locals() else 'unknown'
+        logger.error(f"Failed to accept quote in LARA: {status_code}")
+        try:
+            error_data = response.json() if 'response' in locals() else {}
+            error_msg = error_data.get('error', 'Échec de l\'acceptation du devis.')
+        except (ValueError, AttributeError):
+            error_msg = 'Échec de l\'acceptation du devis.'
+        return False, error_msg
+    except requests.RequestException as e:
+        logger.error(f"Network error accepting quote in LARA: {str(e)}")
+        return False, "Une erreur est survenue lors de la communication avec le service de traduction."
+    except Exception as e:
+        logger.error(f"Unexpected error accepting quote: {str(e)}", exc_info=True)
+        return False, "Une erreur inattendue est survenue."
+
+
+class ExpertReviewAcceptView(BaseTemplateView):
+    """
+    Vue pour accepter un devis de révision experte.
+    
+    Quand l'utilisateur clique sur le lien dans le PDF, cette vue:
+    - Appelle lara-django pour accepter le devis et générer le package ZIP
+    - Affiche une page de confirmation
+    """
+    template_name = 'expert_review_accept.html'
+    
+    def get_context_data(self, **kwargs):
+        """
+        Traite l'acceptation du devis et prépare le contexte.
+        """
+        context = super().get_context_data(**kwargs)
+        project_id = kwargs.get('project_id')
+        
+        if not project_id:
+            context['error'] = "Identifiant de projet manquant."
+            return context
+        
+        success, error_message = _accept_quote_in_lara(project_id)
+        
+        if success:
+            context['success'] = True
+        else:
+            context['error'] = error_message
+        
+        context['project_id'] = project_id
+        return context
+
 from subscriptions.models import SubscriptionType
 from stripe_webhooks.tasks_handlers.helper.stripe_session import get_stripe_customer_session_url
 from .helpers import lowercase_file_extension, get_word_count, get_text_from_file, get_project_file, \
@@ -464,16 +531,19 @@ def _fetch_document_from_lara(project_id: str) -> dict:
         ValueError: Si le document n'est pas trouvé
     """
     logger = logging.getLogger(__name__)
-    response = requests.get(
-        f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}",
-        timeout=10
-    )
-    
-    if response.status_code != 200:
+    try:
+        response = requests.get(
+            f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}",
+            timeout=10
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.HTTPError as e:
         logger.error(f"Failed to fetch document from LARA: {response.status_code}")
-        raise ValueError("Document not found in LARA")
-    
-    return response.json()
+        raise ValueError("Document not found in LARA") from e
+    except requests.RequestException as e:
+        logger.error(f"Network error fetching document from LARA: {str(e)}")
+        raise
 
 
 def _update_document_status_in_lara(project_id: str, new_status: str) -> None:
@@ -489,15 +559,19 @@ def _update_document_status_in_lara(project_id: str, new_status: str) -> None:
         ValueError: Si la mise à jour échoue
     """
     logger = logging.getLogger(__name__)
-    response = requests.patch(
-        f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}/update",
-        json={"status": new_status},
-        timeout=10
-    )
-    
-    if response.status_code != 200:
+    try:
+        response = requests.patch(
+            f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}/update",
+            json={"status": new_status},
+            timeout=10
+        )
+        response.raise_for_status()
+    except requests.HTTPError as e:
         logger.error(f"Failed to update document status in LARA: {response.status_code}")
-        raise ValueError("Failed to update document status")
+        raise ValueError("Failed to update document status") from e
+    except requests.RequestException as e:
+        logger.error(f"Network error updating document status in LARA: {str(e)}")
+        raise
 
 
 def _build_quote_context(
@@ -548,7 +622,6 @@ def _build_quote_context(
             if user.group
             else f"{now().strftime('%Y/%m')}/0"
         ),
-        # Placeholder pour le lien de validation (sera corrigé à l'étape suivante)
         "accept_expert_revision_file_absolute_url": request.build_absolute_uri(
             f"/expert-review/accept/{project_id}"
         )
@@ -716,14 +789,15 @@ def map_lara_status_to_lexa(lara_status):
     """
     Map Django Lara status to Lexa frontend expected status.
 
-    Lara statuses: pending, processing, translated, quote_requested, error
-    Lexa statuses: Being translated, Translated, Sent to post-editing not accepted yet, Error
+    Lara statuses: pending, processing, translated, quote_requested, quote_accepted, error
+    Lexa statuses: Being translated, Translated, Sent to post-editing not accepted yet, Sent to post-editing accepted, Error
     """
     status_map = {
         'pending': 'Being translated',
         'processing': 'Being translated',
         'translated': 'Translated',
         'quote_requested': 'Sent to post-editing, not accepted yet',
+        'quote_accepted': 'Sent to post-editing, accepted',
         'error': 'Error'
     }
     return status_map.get(lara_status, 'Being translated')

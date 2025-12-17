@@ -6,7 +6,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from legal.views_all import FileExpertRevisionView, SingleProjectView, \
      GetDomainsView, LanguageDetectView, DetectTextLanguageView, \
-     DisplayMessage
+     DisplayMessage, ExpertReviewAcceptView
 from legal.views.translate import TranslateView
 from legal.views.dashboard import DashboardView
 from legal.views.profile_details import ProfileDetailsView
@@ -22,6 +22,7 @@ urlpatterns = i18n_patterns(
     path("accounts/", include("django.contrib.auth.urls")),
     path('dashboard/', login_required(DashboardView.as_view()), name='dashboard'),
     path('expert-revision-file', login_required(FileExpertRevisionView.as_view()), name='expert_revision_file'),
+    path('expert-review/accept/<uuid:project_id>', ExpertReviewAcceptView.as_view(), name='expert_review_accept'),
     path('project-history/', login_required(ProjectsHistoryView.as_view()), name='project_history'),
     path('project/', login_required(SingleProjectView.as_view()), name='single_project'),
     path('get-domains/', login_required(GetDomainsView.as_view()), name='get_domains'),
