@@ -45,7 +45,82 @@ class BaseTemplateView(TemplateView):
         return context
 
 
-def _accept_quote_in_lara(project_id: str) -> tuple[bool, str]:
+def _build_package_url(package_url: str) -> str:
+    """
+    Construit l'URL complète du package ZIP depuis l'URL relative retournée par Django.
+    
+    Args:
+        package_url: URL relative du package (généralement /media/path)
+        
+    Returns:
+        str: URL complète du package
+    """
+    if not package_url:
+        return ''
+    
+    if package_url.startswith('/media/'):
+        # Ajouter le préfixe lara-django pour correspondre à la structure
+        return f"{settings.LARA_API_URL}/lara-django{package_url}"
+    elif not package_url.startswith('http'):
+        return f"{settings.LARA_API_URL}{package_url}"
+    
+    return package_url
+
+
+def _build_admin_document_url(document_id: str) -> str:
+    """
+    Construit l'URL admin Django pour un document translation.
+    
+    Args:
+        document_id: UUID du document
+        
+    Returns:
+        str: URL complète vers la page admin du document
+    """
+    return f"https://api.portail.lexamt.fr/lara-django/admin/translation/documenttranslation/{document_id}/change/"
+
+
+def _send_quote_validation_notification(project_id: str, package_url: str, user_uuid: str = None) -> None:
+    """
+    Envoie un email de notification à l'admin lorsqu'un devis est validé.
+    
+    Args:
+        project_id: UUID du document
+        package_url: URL du package ZIP généré
+        user_uuid: UUID de l'utilisateur qui a validé le devis
+    """
+    logger = logging.getLogger(__name__)
+    try:
+        admin_url = _build_admin_document_url(project_id)
+        full_package_url = _build_package_url(package_url)
+        
+        # Récupérer l'email de l'utilisateur
+        user_email = settings.SUPPORT_EMAIL  # Valeur par défaut
+        if user_uuid:
+            try:
+                user = User.objects.filter(uuid=user_uuid).first()
+                if user and user.email:
+                    user_email = user.email
+            except Exception as e:
+                logger.warning(f"Could not retrieve user email for UUID {user_uuid}: {str(e)}")
+        
+        send_email(
+            settings.QUOTE_CC_EMAIL,
+            EmailType.USER_ADM_VALIDE_QUOTE,
+            'fr',
+            {
+                "lexa_username": 'admin',
+                "lexa_sender_email": user_email,
+                "url_admin_doctrans": admin_url,
+                "url_translated_pack": full_package_url
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error sending admin notification email for quote acceptance: {str(e)}", exc_info=True)
+        # On continue même si l'email échoue
+
+
+def _accept_quote_in_lara(project_id: str) -> tuple[bool, str, dict]:
     """
     Appelle lara-django pour accepter un devis et générer le package ZIP.
     
@@ -53,7 +128,7 @@ def _accept_quote_in_lara(project_id: str) -> tuple[bool, str]:
         project_id: UUID du document
         
     Returns:
-        tuple: (success: bool, error_message: str)
+        tuple: (success: bool, error_message: str, response_data: dict)
     """
     logger = logging.getLogger(__name__)
     try:
@@ -62,7 +137,8 @@ def _accept_quote_in_lara(project_id: str) -> tuple[bool, str]:
             timeout=30
         )
         response.raise_for_status()
-        return True, ""
+        response_data = response.json()
+        return True, "", response_data
     except requests.HTTPError:
         status_code = response.status_code if 'response' in locals() else 'unknown'
         logger.error(f"Failed to accept quote in LARA: {status_code}")
@@ -71,13 +147,13 @@ def _accept_quote_in_lara(project_id: str) -> tuple[bool, str]:
             error_msg = error_data.get('error', 'Échec de l\'acceptation du devis.')
         except (ValueError, AttributeError):
             error_msg = 'Échec de l\'acceptation du devis.'
-        return False, error_msg
+        return False, error_msg, {}
     except requests.RequestException as e:
         logger.error(f"Network error accepting quote in LARA: {str(e)}")
-        return False, "Une erreur est survenue lors de la communication avec le service de traduction."
+        return False, "Une erreur est survenue lors de la communication avec le service de traduction.", {}
     except Exception as e:
         logger.error(f"Unexpected error accepting quote: {str(e)}", exc_info=True)
-        return False, "Une erreur inattendue est survenue."
+        return False, "Une erreur inattendue est survenue.", {}
 
 
 class ExpertReviewAcceptView(BaseTemplateView):
@@ -101,10 +177,14 @@ class ExpertReviewAcceptView(BaseTemplateView):
             context['error'] = "Identifiant de projet manquant."
             return context
         
-        success, error_message = _accept_quote_in_lara(project_id)
+        success, error_message, response_data = _accept_quote_in_lara(project_id)
         
         if success:
             context['success'] = True
+            # Envoyer un email de notification à l'admin
+            package_url = response_data.get('package_url', '')
+            user_uuid = response_data.get('user_uuid')
+            _send_quote_validation_notification(project_id, package_url, user_uuid)
         else:
             context['error'] = error_message
         
