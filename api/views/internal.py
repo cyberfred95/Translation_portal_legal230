@@ -13,6 +13,7 @@ from django.conf import settings
 
 from domains.models import Domain, DomainGroup
 from users.models import User
+from subscriptions.models import UserSubscription
 
 
 # =============================================================================
@@ -72,6 +73,8 @@ class InternalUserSerializer(serializers.ModelSerializer):
     """Serializer for User model in internal API."""
 
     customer_id = serializers.CharField(source='stripe_customer_id')
+    subscription_type = serializers.SerializerMethodField()
+    subscription_product_type = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -85,7 +88,23 @@ class InternalUserSerializer(serializers.ModelSerializer):
             'customer_id',
             'language',
             'is_active',
+            'subscription_type',
+            'subscription_product_type',
         ]
+
+    def get_subscription_type(self, obj):
+        """Return the active subscription type name."""
+        active_sub = obj.subscriptions.filter(status='ACTIVE').first()
+        if active_sub and active_sub.subscription:
+            return active_sub.subscription.name
+        return None
+
+    def get_subscription_product_type(self, obj):
+        """Return the active subscription product type (LEXA, WORD_ADD_IN, API)."""
+        active_sub = obj.subscriptions.filter(status='ACTIVE').first()
+        if active_sub and active_sub.subscription:
+            return active_sub.subscription.product_type
+        return None
 
 
 # =============================================================================
@@ -158,5 +177,45 @@ class InternalUserDetailView(APIView):
         except User.DoesNotExist:
             return Response(
                 {'error': 'User not found', 'uuid': str(uuid)},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class InternalSubscriptionByApiKeyView(APIView):
+    """
+    GET /api/internal/subscription-by-api-key/?api_key=xxx
+
+    Returns subscription details by API key.
+    Used by Lara bridge to determine the actual source of a translation request.
+    Restricted to internal network access.
+    """
+
+    permission_classes = [IsInternalNetwork]
+
+    def get(self, request):
+        api_key = request.query_params.get('api_key')
+
+        if not api_key:
+            return Response(
+                {'error': 'api_key parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user_subscription = UserSubscription.objects.select_related(
+                'subscription', 'user'
+            ).get(api_key=api_key)
+
+            return Response({
+                'subscription_id': user_subscription.id,
+                'subscription_type': user_subscription.subscription.name if user_subscription.subscription else None,
+                'subscription_product_type': user_subscription.subscription.product_type if user_subscription.subscription else None,
+                'user_uuid': str(user_subscription.user.uuid),
+                'user_email': user_subscription.user.email,
+                'status': user_subscription.status,
+            })
+        except UserSubscription.DoesNotExist:
+            return Response(
+                {'error': 'Subscription not found for this API key'},
                 status=status.HTTP_404_NOT_FOUND
             )

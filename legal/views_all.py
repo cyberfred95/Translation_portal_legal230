@@ -258,6 +258,7 @@ def file_translate(request):
     source_language = request.POST.get('source_language')
     target_language = request.POST.get('target_language')
     domain_id = request.POST.get('domain_id')
+    domain_name_param = request.POST.get('domain_name')  # Direct domain name from API
 
     # Get glossaries from request (comma-separated list of glossary IDs)
     glossary_param = request.POST.get('glossary', 'none')
@@ -266,13 +267,21 @@ def file_translate(request):
     else:
         user_glossaries = []
 
-    # Get domain by ID
+    # Get domain: either by ID (from web interface) or by name (from API)
     domain = None
     domain_name = ''
     if domain_id:
+        # Web interface sends domain_id
         domain = Domain.objects.filter(id=domain_id).first()
         if domain:
             domain_name = domain.name  # English name for templates/find
+    elif domain_name_param:
+        # API sends domain_name directly
+        domain_name = domain_name_param
+        # Try to find matching domain for domainId
+        domain = Domain.objects.filter(name__iexact=domain_name_param).first()
+        if not domain:
+            domain = Domain.objects.filter(french_name__iexact=domain_name_param).first()
 
     user_id = request.user.id if request.user.is_authenticated else 'anonymous'
     logger.info(f"LARA_DOC_TRANSLATE_START - User: {user_id} - Files: {len(files)} - Source: {source_language} -> Target: {target_language} - Domain: {domain_name} (id: {domain_id}) - Glossaries: {user_glossaries}")
@@ -297,8 +306,12 @@ def file_translate(request):
             'userToken': str(request.user.uuid) if request.user.is_authenticated else '',
         }
 
+        # Send domain info: either from domain_id or from domain lookup by name
         if domain_id:
             translate_data['domainId'] = int(domain_id)
+        elif domain:
+            # Domain found by name lookup - send its ID
+            translate_data['domainId'] = domain.id
         if domain_name:
             translate_data['domain'] = domain_name  # English domain name
 

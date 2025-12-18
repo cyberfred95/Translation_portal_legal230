@@ -19,6 +19,7 @@ from .views.internal import (
     InternalDomainGroupsView,
     InternalUsersView,
     InternalUserDetailView,
+    InternalSubscriptionByApiKeyView,
 )
 
 
@@ -93,5 +94,10 @@ urlpatterns = [
         'internal/users/<uuid:uuid>/',
         InternalUserDetailView.as_view(),
         name='api-internal-user-detail'
+    ),
+    path(
+        'internal/subscription-by-api-key/',
+        InternalSubscriptionByApiKeyView.as_view(),
+        name='api-internal-subscription-by-api-key'
     ),
 ]
