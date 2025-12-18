@@ -81,8 +81,11 @@ def _build_package_url(package_url: str) -> str:
     """
     Construit l'URL complète du package ZIP depuis l'URL relative retournée par Django.
     
+    Détecte automatiquement les préfixes communs entre LARA_API_URL et package_url
+    pour éviter les doublons sans hardcoder de valeurs.
+    
     Args:
-        package_url: URL relative du package (généralement /media/path)
+        package_url: URL relative du package retournée par Django
         
     Returns:
         str: URL complète du package
@@ -90,13 +93,50 @@ def _build_package_url(package_url: str) -> str:
     if not package_url:
         return ''
     
-    if package_url.startswith('/media/'):
-        # Ajouter le préfixe lara-django pour correspondre à la structure
-        return f"{settings.LARA_API_URL}/lara-django{package_url}"
-    elif not package_url.startswith('http'):
-        return f"{settings.LARA_API_URL}{package_url}"
+    # Si l'URL est déjà complète, la retourner telle quelle
+    if package_url.startswith('http'):
+        return package_url
     
-    return package_url
+    base_url = settings.LARA_API_URL.rstrip('/')
+    package_path = package_url.lstrip('/')
+    
+    # Parser les URLs pour extraire uniquement les segments de chemin
+    base_parsed = urlparse(base_url)
+    package_segments = [seg for seg in package_path.split('/') if seg]
+    
+    # Extraire les segments de chemin de base_url (sans le protocole et le domaine)
+    base_path_segments = [seg for seg in base_parsed.path.split('/') if seg]
+    
+    # Comparer le dernier segment de base_path avec le premier segment de package_path
+    if base_path_segments and package_segments:
+        if base_path_segments[-1] == package_segments[0]:
+            # Le préfixe est déjà dans base_url, ne pas le répéter
+            remaining_segments = '/'.join(package_segments[1:])
+            return f"{base_url}/{remaining_segments}" if remaining_segments else base_url
+    
+    # Pas de préfixe commun, concaténation normale
+    return f"{base_url}/{package_path}"
+
+
+def _extract_error_message_from_response(exception: requests.HTTPError, default_message: str) -> str:
+    """
+    Extrait le message d'erreur depuis une exception HTTP.
+    
+    Args:
+        exception: Exception HTTP de requests
+        default_message: Message par défaut si l'extraction échoue
+        
+    Returns:
+        str: Message d'erreur extrait ou message par défaut
+    """
+    if not hasattr(exception, 'response'):
+        return default_message
+    
+    try:
+        error_data = exception.response.json()
+        return error_data.get('error', default_message)
+    except (ValueError, AttributeError, json.JSONDecodeError):
+        return default_message
 
 
 def _build_admin_document_url(document_id: str) -> str:
@@ -109,7 +149,8 @@ def _build_admin_document_url(document_id: str) -> str:
     Returns:
         str: URL complète vers la page admin du document
     """
-    return f"https://api.portail.lexamt.fr/lara-django/admin/translation/documenttranslation/{document_id}/change/"
+    base_url = settings.LARA_API_URL.rstrip('/')
+    return f"{base_url}/admin/translation/documenttranslation/{document_id}/change/"
 
 
 def _get_user_email_from_uuid(user_uuid: str) -> str:
@@ -187,13 +228,9 @@ def _accept_quote_in_lara(project_id: str) -> tuple[bool, str, dict]:
         response_data = response.json()
         return True, "", response_data
     except requests.HTTPError as e:
-        status_code = e.response.status_code if hasattr(e, 'response') else 'unknown'
+        status_code = getattr(e.response, 'status_code', 'unknown') if hasattr(e, 'response') else 'unknown'
         logger.error(f"Failed to accept quote in LARA: HTTP {status_code}")
-        try:
-            error_data = e.response.json() if hasattr(e, 'response') else {}
-            error_msg = error_data.get('error', 'Échec de l\'acceptation du devis.')
-        except (ValueError, AttributeError, json.JSONDecodeError):
-            error_msg = 'Échec de l\'acceptation du devis.'
+        error_msg = _extract_error_message_from_response(e, 'Échec de l\'acceptation du devis.')
         return False, error_msg, {}
     except requests.RequestException as e:
         logger.error(f"Network error accepting quote in LARA: {str(e)}")
