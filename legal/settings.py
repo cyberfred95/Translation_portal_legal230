@@ -265,8 +265,11 @@ LOGGING = {
 AUTH_USER_MODEL = 'users.User'
 ROSETTA_SHOW_AT_ADMIN_PANEL = True
 
-# Custom MT Console Configuration
+# Custom MT Console Configuration (legacy)
 CUSTOM_MT_CONSOLE_URL = os.environ.get('CUSTOM_MT_CONSOLE_URL')
+
+# OpenAI Configuration
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 # LARA Translation API Configuration
 LARA_API_URL = os.environ.get('LARA_API_URL')
@@ -281,6 +284,7 @@ LARA_ACCESS_KEY_SECRET = os.environ.get('LARA_ACCESS_KEY_SECRET')
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL')
 QUOTE_CC_EMAIL = os.environ.get('QUOTE_CC_EMAIL')
 SUPPORT_EMAIL = os.environ.get('SUPPORT_EMAIL')
+MINIMUM_QUOTE_AMOUNT = float(os.environ.get('MINIMUM_QUOTE_AMOUNT', '0'))
 
 # Statistics Service Configuration
 STATS_API_URL = os.environ.get('STATS_API_URL')

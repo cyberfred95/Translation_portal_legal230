@@ -210,3 +210,21 @@ def extract_user_tokens_from_projects(projects_data):
     })
 
 
+def extract_language_codes_from_project(project: dict) -> tuple[str, str]:
+    """
+    Extrait les codes de langue depuis un dictionnaire de projet LARA.
+    
+    Supporte les formats 'source'/'target' et 'source_language'/'target_language'
+    pour compatibilité avec différentes versions de l'API.
+    
+    Args:
+        project: Dictionnaire de projet depuis l'API LARA
+        
+    Returns:
+        Tuple (source_language, target_language)
+    """
+    source_lang = project.get('source') or project.get('source_language', '')
+    target_lang = project.get('target') or project.get('target_language', '')
+    return source_lang, target_lang
+
+
