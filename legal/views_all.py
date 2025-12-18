@@ -34,7 +34,7 @@ from emails.send_email import send_email
 from glossaries.models import Glossary
 from glossaries.processor import GlossaryProcessor
 from languages.models import Language
-from quoting.models import LanguageQuote
+from quoting.models import LanguageQuote, QuotePDF
 from subscriptions.helpers import add_translations, translation_allowed
 from subscriptions.models import SubscriptionType, UserSubscription
 from subscriptions.permissions import SubscribedPermission, is_user_subscription_active
@@ -56,9 +56,10 @@ import csv
 from typing import Optional
 
 from django.core.cache import cache
+from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from quoting.helpers import get_price_by_language_pair
-from quoting.mail_helpers import send_quote_email
+from quoting.mail_helpers import generate_quote_pdf, send_quote_email
 from quoting.services.quote import FormQuoteService
 
 logger = logging.getLogger(__name__)
@@ -251,7 +252,6 @@ def text_translation(request):
     1. Call /api/templates/find to get translation memory and glossary IDs (optional)
     2. Call /api/lara/translate-text with the text and optional parameters
     """
-    logger = logging.getLogger(__name__)
     
     text = request.POST.get('text')
     instructions = request.POST.get('instructions', '')
@@ -397,7 +397,6 @@ def file_translate(request):
     1. Call /api/templates/find to get translation memory and glossary IDs
     2. Call /api/lara/translate-document with the file and template parameters
     """
-    logger = logging.getLogger(__name__)
 
     files = request.FILES.getlist('document[]', [])
     # Vérification que l'utilisateur a une subscription active
@@ -675,10 +674,10 @@ def _update_document_status_in_lara(project_id: str, new_status: str) -> None:
 
 def _build_quote_context(
     doc_data: dict,
-    quote_price,
+    quote_price: LanguageQuote,
     words_count: int,
     project_id: str,
-    user,
+    user: User,
     request
 ) -> dict:
     """
@@ -698,18 +697,23 @@ def _build_quote_context(
     source_lang = doc_data.get('source_language', '')
     target_lang = doc_data.get('target_language', '')
     
-    # Calcul du prix total
-    total_price = words_count * quote_price.price
-    
-    # Appliquer le montant minimum depuis les settings
-    if total_price < settings.MINIMUM_QUOTE_AMOUNT:
-        total_price = settings.MINIMUM_QUOTE_AMOUNT
+    # Calcul du prix total avec application du minimum
+    total_price = max(
+        words_count * quote_price.price,
+        settings.MINIMUM_QUOTE_AMOUNT
+    )
     
     working_days = FormQuoteService.get_working_days(words_count, quote_price)
     company_name = user.group.name if user.group else "Administrator"
+    quote_number = (
+        user.group.generate_quoting_number()
+        if user.group
+        else f"{now().strftime('%Y/%m')}/0"
+    )
+    sender_email = settings.SENDER_EMAIL
     
     return {
-        "email": settings.SENDER_EMAIL,
+        "email": sender_email,
         "username": user.username,
         "user_email": user.email,
         "company": company_name,
@@ -721,16 +725,47 @@ def _build_quote_context(
         "working_days": working_days,
         "total_price": total_price,
         "created_at": now(),
-        "seller_email": settings.SENDER_EMAIL,
-        "quote_number": (
-            user.group.generate_quoting_number()
-            if user.group
-            else f"{now().strftime('%Y/%m')}/0"
-        ),
+        "seller_email": sender_email,
+        "quote_number": quote_number,
         "accept_expert_revision_file_absolute_url": request.build_absolute_uri(
             f"/expert-review/accept/{project_id}"
         )
     }
+
+
+def _create_quote_pdf_record(
+    user: User,
+    pdf_bytes: bytes,
+    filename: str,
+    context_variables: dict,
+    language_quote: LanguageQuote,
+    source_language: str,
+    target_language: str
+) -> QuotePDF:
+    """
+    Crée un enregistrement QuotePDF dans la base de données.
+    
+    Args:
+        user: Utilisateur qui a créé le devis
+        pdf_bytes: Contenu binaire du PDF
+        filename: Nom du fichier PDF
+        context_variables: Variables de contexte du PDF
+        language_quote: Instance de LanguageQuote utilisée
+        source_language: Code de la langue source
+        target_language: Code de la langue cible
+        
+    Returns:
+        QuotePDF: Instance créée
+    """
+    return QuotePDF.objects.create(
+        user=user,
+        words_count=context_variables.get('words_count', 0),
+        total_amount=context_variables.get('total_price', 0),
+        language_quote=language_quote,
+        source_language=source_language.lower() if source_language else '',
+        target_language=target_language.lower() if target_language else '',
+        pdf_file=ContentFile(pdf_bytes, name=filename)
+    )
 
 
 class FileExpertRevisionView(APIView):
@@ -752,7 +787,6 @@ class FileExpertRevisionView(APIView):
                 - project_id: UUID du document dans lara-django
                 - file_url: URL du fichier traduit (optionnel)
         """
-        logger = logging.getLogger(__name__)
         project_id = request.data.get('project_id')
         
         if not project_id:
@@ -788,8 +822,28 @@ class FileExpertRevisionView(APIView):
             # Mettre à jour le statut dans lara-django
             _update_document_status_in_lara(project_id, "quote_requested")
             
+            # Générer le PDF
+            pdf_bytes, filename = generate_quote_pdf(context_variables)
+            
             # Envoyer l'email avec le PDF
-            send_quote_email(request.user.id, request, context_variables)
+            send_quote_email(
+                request.user.id,
+                request,
+                context_variables,
+                pdf_bytes,
+                filename
+            )
+            
+            # Créer l'enregistrement QuotePDF après l'envoi de l'email
+            _create_quote_pdf_record(
+                user=request.user,
+                pdf_bytes=pdf_bytes,
+                filename=filename,
+                context_variables=context_variables,
+                language_quote=quote_price,
+                source_language=source_lang,
+                target_language=target_lang
+            )
             
             logger.info(f"Quote request sent for document {project_id} - User: {request.user.id}")
             return Response({"detail": "Quote request sent successfully"})
@@ -856,7 +910,6 @@ def get_projects_by_ids(request):
     Returns:
         Liste de dictionnaires représentant les projets au format frontend
     """
-    logger = logging.getLogger(__name__)
     project_ids = request.query_params.getlist('project_id[]', [])
     responses = []
 
