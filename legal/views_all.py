@@ -698,7 +698,13 @@ def _build_quote_context(
     source_lang = doc_data.get('source_language', '')
     target_lang = doc_data.get('target_language', '')
     
+    # Calcul du prix total
     total_price = words_count * quote_price.price
+    
+    # Appliquer le montant minimum depuis les settings
+    if total_price < settings.MINIMUM_QUOTE_AMOUNT:
+        total_price = settings.MINIMUM_QUOTE_AMOUNT
+    
     working_days = FormQuoteService.get_working_days(words_count, quote_price)
     company_name = user.group.name if user.group else "Administrator"
     

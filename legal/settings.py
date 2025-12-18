@@ -281,6 +281,7 @@ LARA_ACCESS_KEY_SECRET = os.environ.get('LARA_ACCESS_KEY_SECRET')
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL')
 QUOTE_CC_EMAIL = os.environ.get('QUOTE_CC_EMAIL')
 SUPPORT_EMAIL = os.environ.get('SUPPORT_EMAIL')
+MINIMUM_QUOTE_AMOUNT = float(os.environ.get('MINIMUM_QUOTE_AMOUNT', '0'))
 
 # Statistics Service Configuration
 STATS_API_URL = os.environ.get('STATS_API_URL')
