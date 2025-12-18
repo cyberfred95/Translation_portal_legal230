@@ -37,7 +37,7 @@ urlpatterns = i18n_patterns(
     path('glossaries/', include('glossaries.urls')),
     path('domains/', include('domains.urls')),
     path('users/', include('users.urls')),
-    path('writing/', include('writing.urls')),
+    path('writing/', include(('writing.urls', 'writing'), namespace='writing')),
     path('quoting/', include('quoting.urls')),
 
     re_path(r'^rosetta/', include('rosetta.urls'))
