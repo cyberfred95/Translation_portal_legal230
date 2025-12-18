@@ -445,20 +445,27 @@ def file_translate(request):
     cache_data = cache.get(f"{request.user.uuid}")
 
     if cache_data:
-        words_count = cache_data['words_count']
-        symbols_count = cache_data['symbols_count']
         cache.delete(f"{request.user.uuid}")
-    words_count = 0
-    symbols_count = 0
+
+    # Calculate statistics per file (not cumulative)
+    total_words_count = 0
+    total_symbols_count = 0
     processed_files = []
+    file_stats = []  # Store individual stats for each file
     for file in files:
         # Ne plus renommer le fichier en "file.ext" afin de conserver le nom original
         file_words, file_texts, processed_file = get_text_from_file(file)
-        words_count += len(file_words)
-        symbols_count += sum(len(word) for word in file_texts)
+        file_words_count = len(file_words)
+        file_symbols_count = sum(len(word) for word in file_texts)
+        total_words_count += file_words_count
+        total_symbols_count += file_symbols_count
         processed_files.append(processed_file)
+        file_stats.append({
+            'words_count': file_words_count,
+            'symbols_count': file_symbols_count
+        })
 
-    if not translation_allowed(request, words_count=words_count, files_count=len(files), symbols_count=symbols_count):
+    if not translation_allowed(request, words_count=total_words_count, files_count=len(files), symbols_count=total_symbols_count):
         return JsonResponse({"detail": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
 
     source_language = request.POST.get('source_language')
@@ -489,7 +496,7 @@ def file_translate(request):
     # Translate each document via Django Lara
     # Utiliser les fichiers traités (PDF convertis en DOCX si nécessaire)
     projects = []
-    for file in processed_files:
+    for idx, file in enumerate(processed_files):
         file = lowercase_file_extension(file)
 
         # Build form data for Django Lara
@@ -512,9 +519,9 @@ def file_translate(request):
         if user_glossaries:
             translate_data['glossaries'] = ','.join(user_glossaries)
 
-        # Add document statistics
-        translate_data['wordsCount'] = words_count
-        translate_data['charactersCount'] = symbols_count
+        # Add document statistics (per file, not cumulative)
+        translate_data['wordsCount'] = file_stats[idx]['words_count']
+        translate_data['charactersCount'] = file_stats[idx]['symbols_count']
 
         # Log payload complet avant envoi (sans les credentials)
         payload_log = {k: v for k, v in translate_data.items() if k not in ['accessKeyId', 'accessKeySecret']}
@@ -590,8 +597,8 @@ def file_translate(request):
 
     # Update translation quota only for successful translations
     if successful_projects:
-        add_translations(request, words_count=words_count,
-                         files_count=len(successful_projects), symbols_count=symbols_count)
+        add_translations(request, words_count=total_words_count,
+                         files_count=len(successful_projects), symbols_count=total_symbols_count)
 
     logger.info(f"LARA_DOC_TRANSLATE_COMPLETE - User: {user_id} - Successful: {len(successful_projects)} - Failed: {len(failed_projects)}")
 
