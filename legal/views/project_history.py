@@ -7,7 +7,8 @@ from quoting.helpers import get_price_by_language_pair
 from legal.helpers import (
     get_user_emails_map,
     process_projects,
-    extract_user_tokens_from_projects
+    extract_user_tokens_from_projects,
+    extract_language_codes_from_project
 )
 
 
@@ -48,9 +49,10 @@ class ProjectsHistoryView(BaseTemplateView):
                 
                 # Ajout des propriétés spécifiques à project_history
                 for project in response['results']:
+                    source_lang, target_lang = extract_language_codes_from_project(project)
                     project['display_popup'] = not bool(get_price_by_language_pair(
-                        source_language=project['source_language'],
-                        target_language=project['target_language']
+                        source_language=source_lang,
+                        target_language=target_lang
                     ))
                 
                 context['projects'] = response

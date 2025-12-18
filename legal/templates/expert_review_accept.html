@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans 'Acceptation du devis' %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-8">
+        {% if success %}
+        <div class="text-center">
+            <!-- Icon de succès -->
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            
+            <!-- Message de succès -->
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">
+                {% trans 'Devis accepté' %}
+            </h2>
+            <p class="text-gray-600 mb-6">
+                {% trans 'Votre révision experte est en cours d\'évaluation.' %}
+            </p>
+            
+            <!-- Bouton retour au dashboard -->
+            <a href="{% url 'dashboard' %}" 
+               class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                {% trans 'Revenir au dashboard' %}
+            </a>
+        </div>
+        {% else %}
+        <div class="text-center">
+            <!-- Icon d'erreur -->
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+                <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </div>
+            
+            <!-- Message d'erreur -->
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">
+                {% trans 'Erreur' %}
+            </h2>
+            <p class="text-gray-600 mb-6">
+                {{ error|default:"Une erreur est survenue lors de l'acceptation du devis." }}
+            </p>
+            
+            <!-- Bouton retour au dashboard -->
+            <a href="{% url 'dashboard' %}" 
+               class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                {% trans 'Revenir au dashboard' %}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

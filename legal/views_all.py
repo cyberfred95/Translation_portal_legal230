@@ -1,36 +1,68 @@
 import base64
 import json
+import logging
 import os
 import re
 import time
-import logging
 from datetime import datetime
 from decimal import Decimal
 from io import BytesIO
 from pprint import pprint
 from urllib.parse import urlparse, unquote, urlencode
 
+import django
+import langdetect
 import openpyxl
+import requests
 from django.conf import settings
-from django.urls import reverse
-from django.shortcuts import render
-from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-
-from glossaries.processor import GlossaryProcessor
-from quoting.models import LanguageQuote
+from django.contrib.auth.models import User
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
+from django.shortcuts import render
+from django.urls import reverse
 from django.utils.timezone import now
-from subscriptions.models import UserSubscription
-from subscriptions.permissions import is_user_subscription_active
-from subscriptions.utils import get_user_api_key
-
+from django.views.generic import TemplateView
+from preferences import preferences
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status
-from django.views.generic import TemplateView
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
-import django
 from rest_framework.views import APIView
+
+from domains.models import Domain
+from emails.models import EmailType
+from emails.send_email import send_email
+from glossaries.models import Glossary
+from glossaries.processor import GlossaryProcessor
+from languages.models import Language
+from quoting.models import LanguageQuote, QuotePDF
+from subscriptions.helpers import add_translations, translation_allowed
+from subscriptions.models import SubscriptionType, UserSubscription
+from subscriptions.permissions import SubscribedPermission, is_user_subscription_active
+from subscriptions.utils import get_user_api_key
+from stripe_webhooks.tasks_handlers.helper.stripe_session import get_stripe_customer_session_url
+from users.models import User, UserGroup
+
+from .credentials import languages
+from .helpers import (
+    extract_language_codes_from_project,
+    get_project_file,
+    get_text_from_file,
+    get_word_count,
+    lowercase_file_extension,
+    rename_file,
+)
+
+import csv
+from typing import Optional
+
+from django.core.cache import cache
+from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from quoting.helpers import get_price_by_language_pair
+from quoting.mail_helpers import generate_quote_pdf, send_quote_email
+from quoting.services.quote import FormQuoteService
+
+logger = logging.getLogger(__name__)
 
 
 class BaseTemplateView(TemplateView):
@@ -44,31 +76,207 @@ class BaseTemplateView(TemplateView):
         context['QUOTE_CC_EMAIL'] = settings.QUOTE_CC_EMAIL
         return context
 
-from subscriptions.models import SubscriptionType
-from stripe_webhooks.tasks_handlers.helper.stripe_session import get_stripe_customer_session_url
-from .helpers import lowercase_file_extension, get_word_count, get_text_from_file, get_project_file, \
-    rename_file
 
-from emails.models import EmailType
-from emails.send_email import send_email
-from domains.models import Domain
-from languages.models import Language
-from users.models import User, UserGroup
-from .credentials import languages
-import requests
-from preferences import preferences
-import langdetect
+def _build_package_url(package_url: str) -> str:
+    """
+    Construit l'URL complète du package ZIP depuis l'URL relative retournée par Django.
+    
+    Détecte automatiquement les préfixes communs entre LARA_API_URL et package_url
+    pour éviter les doublons sans hardcoder de valeurs.
+    
+    Args:
+        package_url: URL relative du package retournée par Django
+        
+    Returns:
+        str: URL complète du package
+    """
+    if not package_url:
+        return ''
+    
+    # Si l'URL est déjà complète, la retourner telle quelle
+    if package_url.startswith('http'):
+        return package_url
+    
+    base_url = settings.LARA_API_URL.rstrip('/')
+    package_path = package_url.lstrip('/')
+    
+    # Parser les URLs pour extraire uniquement les segments de chemin
+    base_parsed = urlparse(base_url)
+    package_segments = [seg for seg in package_path.split('/') if seg]
+    
+    # Extraire les segments de chemin de base_url (sans le protocole et le domaine)
+    base_path_segments = [seg for seg in base_parsed.path.split('/') if seg]
+    
+    # Comparer le dernier segment de base_path avec le premier segment de package_path
+    if base_path_segments and package_segments:
+        if base_path_segments[-1] == package_segments[0]:
+            # Le préfixe est déjà dans base_url, ne pas le répéter
+            remaining_segments = '/'.join(package_segments[1:])
+            return f"{base_url}/{remaining_segments}" if remaining_segments else base_url
+    
+    # Pas de préfixe commun, concaténation normale
+    return f"{base_url}/{package_path}"
 
-from glossaries.models import Glossary
-from typing import Optional
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from subscriptions.permissions import SubscribedPermission
-from django.core.cache import cache
-from quoting.helpers import get_price_by_language_pair
 
-import csv
-from subscriptions.helpers import translation_allowed, add_translations
+def _extract_error_message_from_response(exception: requests.HTTPError, default_message: str) -> str:
+    """
+    Extrait le message d'erreur depuis une exception HTTP.
+    
+    Args:
+        exception: Exception HTTP de requests
+        default_message: Message par défaut si l'extraction échoue
+        
+    Returns:
+        str: Message d'erreur extrait ou message par défaut
+    """
+    if not hasattr(exception, 'response'):
+        return default_message
+    
+    try:
+        error_data = exception.response.json()
+        return error_data.get('error', default_message)
+    except (ValueError, AttributeError, json.JSONDecodeError):
+        return default_message
 
+
+def _build_admin_document_url(document_id: str) -> str:
+    """
+    Construit l'URL admin Django pour un document translation.
+    
+    Args:
+        document_id: UUID du document
+        
+    Returns:
+        str: URL complète vers la page admin du document
+    """
+    base_url = settings.LARA_API_URL.rstrip('/')
+    return f"{base_url}/admin/translation/documenttranslation/{document_id}/change/"
+
+
+def _get_user_email_from_uuid(user_uuid: str) -> str:
+    """
+    Récupère l'email d'un utilisateur depuis son UUID.
+    
+    Args:
+        user_uuid: UUID de l'utilisateur
+        
+    Returns:
+        str: Email de l'utilisateur ou SUPPORT_EMAIL par défaut
+    """
+    if not user_uuid:
+        return settings.SUPPORT_EMAIL
+    
+    try:
+        user = User.objects.filter(uuid=user_uuid).first()
+        if user and user.email:
+            return user.email
+    except Exception as e:
+        logger.warning(f"Could not retrieve user email for UUID {user_uuid}: {str(e)}")
+    
+    return settings.SUPPORT_EMAIL
+
+
+def _send_quote_validation_notification(project_id: str, package_url: str, user_uuid: str = None) -> None:
+    """
+    Envoie un email de notification à l'admin lorsqu'un devis est validé.
+    
+    Args:
+        project_id: UUID du document
+        package_url: URL du package ZIP généré
+        user_uuid: UUID de l'utilisateur qui a validé le devis (optionnel)
+    """
+    try:
+        admin_url = _build_admin_document_url(project_id)
+        full_package_url = _build_package_url(package_url)
+        user_email = _get_user_email_from_uuid(user_uuid)
+        
+        send_email(
+            settings.QUOTE_CC_EMAIL,
+            EmailType.USER_ADM_VALIDE_QUOTE,
+            'fr',
+            {
+                "lexa_username": 'admin',
+                "lexa_sender_email": user_email,
+                "url_admin_doctrans": admin_url,
+                "url_translated_pack": full_package_url
+            }
+        )
+    except Exception as e:
+        logger.error(
+            f"Error sending admin notification email for quote acceptance: {str(e)}",
+            exc_info=True
+        )
+        # On continue même si l'email échoue
+
+
+def _accept_quote_in_lara(project_id: str) -> tuple[bool, str, dict]:
+    """
+    Appelle lara-django pour accepter un devis et générer le package ZIP.
+    
+    Args:
+        project_id: UUID du document
+        
+    Returns:
+        tuple: (success: bool, error_message: str, response_data: dict)
+    """
+    try:
+        response = requests.post(
+            f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}/accept-quote",
+            timeout=30
+        )
+        response.raise_for_status()
+        response_data = response.json()
+        return True, "", response_data
+    except requests.HTTPError as e:
+        status_code = getattr(e.response, 'status_code', 'unknown') if hasattr(e, 'response') else 'unknown'
+        logger.error(f"Failed to accept quote in LARA: HTTP {status_code}")
+        error_msg = _extract_error_message_from_response(e, 'Échec de l\'acceptation du devis.')
+        return False, error_msg, {}
+    except requests.RequestException as e:
+        logger.error(f"Network error accepting quote in LARA: {str(e)}")
+        return False, "Une erreur est survenue lors de la communication avec le service de traduction.", {}
+    except Exception as e:
+        logger.error(f"Unexpected error accepting quote: {str(e)}", exc_info=True)
+        return False, "Une erreur inattendue est survenue.", {}
+
+
+class ExpertReviewAcceptView(BaseTemplateView):
+    """
+    Vue pour accepter un devis de révision experte.
+    
+    Quand l'utilisateur clique sur le lien dans le PDF, cette vue:
+    - Appelle lara-django pour accepter le devis et générer le package ZIP
+    - Affiche une page de confirmation
+    """
+    template_name = 'expert_review_accept.html'
+    
+    def get_context_data(self, **kwargs):
+        """
+        Traite l'acceptation du devis et prépare le contexte.
+        """
+        context = super().get_context_data(**kwargs)
+        project_id = kwargs.get('project_id')
+        
+        if not project_id:
+            context['error'] = "Identifiant de projet manquant."
+            return context
+        
+        success, error_message, response_data = _accept_quote_in_lara(project_id)
+        
+        if success:
+            context['success'] = True
+            # Envoyer un email de notification à l'admin
+            package_url = response_data.get('package_url', '')
+            user_uuid = response_data.get('user_uuid')
+            _send_quote_validation_notification(project_id, package_url, user_uuid)
+        else:
+            context['error'] = error_message
+        
+        context['project_id'] = project_id
+        return context
+
+
+# Constants
 PAGINATION_PAGE_SIZE = 20
 CACHE_TTL = 3600
 
@@ -81,7 +289,6 @@ def text_translation(request):
     1. Call /api/templates/find to get translation memory and glossary IDs (optional)
     2. Call /api/lara/translate-text with the text and optional parameters
     """
-    logger = logging.getLogger(__name__)
     
     text = request.POST.get('text')
     instructions = request.POST.get('instructions', '')
@@ -227,7 +434,6 @@ def file_translate(request):
     1. Call /api/templates/find to get translation memory and glossary IDs
     2. Call /api/lara/translate-document with the file and template parameters
     """
-    logger = logging.getLogger(__name__)
 
     files = request.FILES.getlist('document[]', [])
     # Vérification que l'utilisateur a une subscription active
@@ -447,54 +653,305 @@ class GetDomainsView(APIView):
         return Response({"data": domain_data, "default_domain": False}, status=status.HTTP_200_OK)
 
 
+def _fetch_document_from_lara(project_id: str) -> dict:
+    """
+    Récupère les données d'un document depuis lara-django.
+    
+    Args:
+        project_id: UUID du document
+        
+    Returns:
+        dict: Données du document
+        
+    Raises:
+        requests.RequestException: Si la requête échoue
+        ValueError: Si le document n'est pas trouvé
+    """
+    try:
+        response = requests.get(
+            f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}",
+            timeout=10
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.HTTPError as e:
+        logger.error(f"Failed to fetch document from LARA: {response.status_code}")
+        raise ValueError("Document not found in LARA") from e
+    except requests.RequestException as e:
+        logger.error(f"Network error fetching document from LARA: {str(e)}")
+        raise
+
+
+def _update_document_status_in_lara(project_id: str, new_status: str) -> None:
+    """
+    Met à jour le statut d'un document dans lara-django.
+    
+    Args:
+        project_id: UUID du document
+        new_status: Nouveau statut à assigner
+        
+    Raises:
+        requests.RequestException: Si la requête échoue
+        ValueError: Si la mise à jour échoue
+    """
+    try:
+        response = requests.patch(
+            f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}/update",
+            json={"status": new_status},
+            timeout=10
+        )
+        response.raise_for_status()
+    except requests.HTTPError as e:
+        logger.error(f"Failed to update document status in LARA: {response.status_code}")
+        raise ValueError("Failed to update document status") from e
+    except requests.RequestException as e:
+        logger.error(f"Network error updating document status in LARA: {str(e)}")
+        raise
+
+
+def _build_quote_context(
+    doc_data: dict,
+    quote_price: LanguageQuote,
+    words_count: int,
+    project_id: str,
+    user: User,
+    request
+) -> dict:
+    """
+    Construit le contexte pour le template PDF de devis.
+    
+    Args:
+        doc_data: Données du document depuis lara-django
+        quote_price: Objet LanguageQuote avec les prix
+        words_count: Nombre de mots à traduire
+        project_id: UUID du document
+        user: Utilisateur Django
+        request: Objet request Django pour générer les URLs
+        
+    Returns:
+        dict: Variables de contexte pour le template
+    """
+    source_lang = doc_data.get('source_language', '')
+    target_lang = doc_data.get('target_language', '')
+    
+    # Calcul du prix total avec application du minimum
+    total_price = max(
+        words_count * quote_price.price,
+        settings.MINIMUM_QUOTE_AMOUNT
+    )
+    
+    working_days = FormQuoteService.get_working_days(words_count, quote_price)
+    company_name = user.group.name if user.group else "Administrator"
+    quote_number = (
+        user.group.generate_quoting_number()
+        if user.group
+        else f"{now().strftime('%Y/%m')}/0"
+    )
+    sender_email = settings.SENDER_EMAIL
+    
+    return {
+        "email": sender_email,
+        "username": user.username,
+        "user_email": user.email,
+        "company": company_name,
+        "contract_name": company_name,
+        "language_pair": f"{source_lang.upper()} -> {target_lang.upper()}",
+        "file_name": doc_data.get('filename', 'document'),
+        "word_price": quote_price.price,
+        "words_count": words_count,
+        "working_days": working_days,
+        "total_price": total_price,
+        "created_at": now(),
+        "seller_email": sender_email,
+        "quote_number": quote_number,
+        "accept_expert_revision_file_absolute_url": request.build_absolute_uri(
+            f"/expert-review/accept/{project_id}"
+        )
+    }
+
+
+def _create_quote_pdf_record(
+    user: User,
+    pdf_bytes: bytes,
+    filename: str,
+    context_variables: dict,
+    language_quote: LanguageQuote,
+    source_language: str,
+    target_language: str
+) -> QuotePDF:
+    """
+    Crée un enregistrement QuotePDF dans la base de données.
+    
+    Args:
+        user: Utilisateur qui a créé le devis
+        pdf_bytes: Contenu binaire du PDF
+        filename: Nom du fichier PDF
+        context_variables: Variables de contexte du PDF
+        language_quote: Instance de LanguageQuote utilisée
+        source_language: Code de la langue source
+        target_language: Code de la langue cible
+        
+    Returns:
+        QuotePDF: Instance créée
+    """
+    return QuotePDF.objects.create(
+        user=user,
+        words_count=context_variables.get('words_count', 0),
+        total_amount=context_variables.get('total_price', 0),
+        language_quote=language_quote,
+        source_language=source_language.lower() if source_language else '',
+        target_language=target_language.lower() if target_language else '',
+        pdf_file=ContentFile(pdf_bytes, name=filename)
+    )
+
+
 class FileExpertRevisionView(APIView):
     """
     Vue pour la révision experte de fichiers.
     
-    Note: Cette fonctionnalité est temporairement désactivée car le service
-    CloudStorage n'est plus disponible. Les méthodes sont conservées pour
-    référence future lors d'une refonte.
+    Gère la demande de devis pour une révision experte :
+    - Met à jour le statut du document dans lara-django
+    - Envoie un email avec un PDF de devis au client
     """
-
-    def get(self, request):
-        """
-        Méthode GET désactivée - service CloudStorage non disponible.
-        """
-        return Response(
-            {"detail": "This feature is temporarily unavailable"},
-            status=status.HTTP_503_SERVICE_UNAVAILABLE
-        )
+    permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def post(self, request):
         """
-        Méthode POST désactivée - service CloudStorage non disponible.
+        Traite une demande de révision experte.
+        
+        Args:
+            request.data contient:
+                - project_id: UUID du document dans lara-django
+                - file_url: URL du fichier traduit (optionnel)
         """
-        if not request.user.is_staff and not request.user.group:
+        project_id = request.data.get('project_id')
+        
+        if not project_id:
             return Response(
-                {"detail": "You have to be staff or to be in group"},
-                status=status.HTTP_403_FORBIDDEN
+                {"detail": "project_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
             )
-        return Response(
-            {"detail": "This feature is temporarily unavailable"},
-            status=status.HTTP_503_SERVICE_UNAVAILABLE
-        )
+        
+        try:
+            # Récupérer les données du document
+            doc_data = _fetch_document_from_lara(project_id)
+            source_lang = doc_data.get('source_language', '')
+            target_lang = doc_data.get('target_language', '')
+            
+            # Vérifier qu'un devis existe pour cette paire de langues
+            quote_price = get_price_by_language_pair(source_lang, target_lang)
+            if not quote_price:
+                return Response(
+                    {"detail": "No quote available for this language pair"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Récupérer le nombre de mots
+            words_count = doc_data.get('words_count', 0) or 0
+            if words_count == 0:
+                logger.warning(f"Document {project_id} has no words_count, defaulting to 0")
+            
+            # Construire le contexte pour le PDF
+            context_variables = _build_quote_context(
+                doc_data, quote_price, words_count, project_id, request.user, request
+            )
+            
+            # Mettre à jour le statut dans lara-django
+            _update_document_status_in_lara(project_id, "quote_requested")
+            
+            # Générer le PDF
+            pdf_bytes, filename = generate_quote_pdf(context_variables)
+            
+            # Envoyer l'email avec le PDF
+            send_quote_email(
+                request.user.id,
+                request,
+                context_variables,
+                pdf_bytes,
+                filename
+            )
+            
+            # Créer l'enregistrement QuotePDF après l'envoi de l'email
+            _create_quote_pdf_record(
+                user=request.user,
+                pdf_bytes=pdf_bytes,
+                filename=filename,
+                context_variables=context_variables,
+                language_quote=quote_price,
+                source_language=source_lang,
+                target_language=target_lang
+            )
+            
+            logger.info(f"Quote request sent for document {project_id} - User: {request.user.id}")
+            return Response({"detail": "Quote request sent successfully"})
+            
+        except ValueError as e:
+            error_msg = str(e)
+            logger.error(f"Validation error in expert revision request: {error_msg}")
+            status_code = status.HTTP_404_NOT_FOUND if "not found" in error_msg.lower() else status.HTTP_500_INTERNAL_SERVER_ERROR
+            return Response({"detail": error_msg}, status=status_code)
+        except requests.RequestException as e:
+            logger.error(f"Error communicating with LARA API: {str(e)}")
+            return Response(
+                {"detail": f"Error communicating with translation service: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        except Exception as e:
+            logger.error(f"Unexpected error in expert revision request: {str(e)}", exc_info=True)
+            return Response(
+                {"detail": "An unexpected error occurred"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+def _map_lara_project_to_frontend(lara_result: dict) -> dict:
+    """
+    Mappe une réponse de projet LARA vers le format attendu par le frontend.
+    
+    Args:
+        lara_result: Dictionnaire de réponse LARA depuis document-status
+        
+    Returns:
+        Dictionnaire au format frontend
+    """
+    source_lang, target_lang = extract_language_codes_from_project(lara_result)
+    
+    res = {
+        'id': lara_result.get('id'),
+        'status': map_lara_status_to_lexa(lara_result.get('status')),
+        'source_file_name': lara_result.get('filename', ''),
+        'source_language': source_lang,
+        'target_language': target_lang,
+        'translated_file': lara_result.get('downloadUrl') if lara_result.get('status') == 'translated' else None,
+        'reviewed_file': None,  # LARA doesn't have post-editing yet
+        'display_popup': not bool(get_price_by_language_pair(source_lang, target_lang))
+    }
+    
+    # Add error reason if status is error
+    if lara_result.get('status') == 'error':
+        res['error_reason'] = lara_result.get('error_message', 'Translation failed')
+    
+    return res
 
 
 def get_projects_by_ids(request):
     """
-    Get project status by IDs - now supports Django Lara documents.
-
-    Calls Django Lara document-status endpoint and maps response to
-    match frontend expected format.
+    Récupère le statut des projets de traduction par leurs IDs.
+    
+    Appelle l'endpoint Django Lara document-status et mappe les réponses
+    vers le format attendu par le frontend.
+    
+    Args:
+        request: Requête HTTP contenant les project_id[] en paramètres
+        
+    Returns:
+        Liste de dictionnaires représentant les projets au format frontend
     """
-    logger = logging.getLogger(__name__)
-
     project_ids = request.query_params.getlist('project_id[]', [])
     responses = []
 
     for project_id in project_ids:
         try:
-            # Call Django Lara document-status endpoint
             response = requests.get(
                 f"{settings.LARA_API_URL}/api/lara/document-status/{project_id}",
                 timeout=10
@@ -502,28 +959,8 @@ def get_projects_by_ids(request):
 
             if response.status_code == 200:
                 lara_result = response.json()
-
-                # Map Django Lara response to frontend expected format
-                # Frontend expects: id, status, source_file_name, translated_file, source_language, target_language
-                res = {
-                    'id': lara_result.get('id'),
-                    'status': map_lara_status_to_lexa(lara_result.get('status')),
-                    'source_file_name': lara_result.get('filename', ''),
-                    'source_language': lara_result.get('source_language', ''),
-                    'target_language': lara_result.get('target_language', ''),
-                    'translated_file': lara_result.get('downloadUrl') if lara_result.get('status') == 'translated' else None,
-                    'reviewed_file': None,  # LARA doesn't have post-editing yet
-                    'display_popup': False if get_price_by_language_pair(
-                        source_language=lara_result.get('source_language', ''),
-                        target_language=lara_result.get('target_language', '')
-                    ) else True
-                }
-
-                # Add error reason if status is error
-                if lara_result.get('status') == 'error':
-                    res['error_reason'] = lara_result.get('error_message', 'Translation failed')
-
-                responses.append(res)
+                mapped_result = _map_lara_project_to_frontend(lara_result)
+                responses.append(mapped_result)
             else:
                 logger.error(f"LARA_DOC_STATUS_ERROR - Project: {project_id} - Status: {response.status_code}")
                 responses.append({
@@ -547,13 +984,15 @@ def map_lara_status_to_lexa(lara_status):
     """
     Map Django Lara status to Lexa frontend expected status.
 
-    Lara statuses: pending, processing, translated, error
-    Lexa statuses: Being translated, Translated, Error
+    Lara statuses: pending, processing, translated, quote_requested, quote_accepted, error
+    Lexa statuses: Being translated, Translated, Sent to post-editing not accepted yet, Sent to post-editing accepted, Error
     """
     status_map = {
         'pending': 'Being translated',
         'processing': 'Being translated',
         'translated': 'Translated',
+        'quote_requested': 'Sent to post-editing, not accepted yet',
+        'quote_accepted': 'Sent to post-editing, accepted',
         'error': 'Error'
     }
     return status_map.get(lara_status, 'Being translated')
