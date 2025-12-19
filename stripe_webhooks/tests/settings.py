@@ -5,6 +5,9 @@ This module contains all constants used across stripe_webhooks test files
 to ensure consistency and ease of maintenance.
 """
 
+import copy
+import os
+
 # Stripe Customer IDs
 TEST_STRIPE_CUSTOMER_ID = 'cus_test123456789'
 TEST_STRIPE_CUSTOMER_ID_2 = 'cus_test987654321'
@@ -19,6 +22,10 @@ INVALID_STRIPE_SUBSCRIPTION_ID = 'sub_invalid'
 TEST_STRIPE_PRODUCT_ID = 'prod_test123456789'
 TEST_STRIPE_PRODUCT_ID_2 = 'prod_test987654321'
 INVALID_STRIPE_PRODUCT_ID = 'prod_invalid'
+
+# Stripe Subscription Item IDs
+TEST_SUBSCRIPTION_ITEM_ID = 'si_test123456789'
+TEST_SUBSCRIPTION_ITEM_ID_2 = 'si_test987654321'
 
 # User Information
 TEST_USERNAME = 'testuser'
@@ -92,6 +99,7 @@ TEST_SUBSCRIPTION_PAYLOAD = {
     'status': STRIPE_STATUS_ACTIVE,
     'items': {
         'data': [{
+            'id': TEST_SUBSCRIPTION_ITEM_ID,
             'price': {
                 'product': TEST_STRIPE_PRODUCT_ID
             },
@@ -138,6 +146,7 @@ ERROR_NOT_FOUND_USER = 'not_found_user_by_stripe_customer_id'
 ERROR_NOT_FOUND_SUBSCRIPTION_TYPE = 'not_found_subscriptionType_by_stripe_product_id'
 ERROR_NOT_FOUND_USER_SUBSCRIPTION = 'not_found_userSubscription_by_stripe_subscription_id'
 ERROR_NOT_FOUND_USER_GROUP = 'not_found_userGroup_by_group_name'
+ERROR_NOT_FOUND_SUBSCRIPTION_ITEM_ID = 'not_found_subscription_item_id'
 ERROR_EXCEPTION = 'exception'
 
 # Test Data Helpers
@@ -145,7 +154,7 @@ ERROR_EXCEPTION = 'exception'
 
 def get_test_payload_with_missing_field(field_name):
     """Return a test payload with a specific field missing."""
-    payload = TEST_CUSTOMER_PAYLOAD.copy()
+    payload = copy.deepcopy(TEST_CUSTOMER_PAYLOAD)
     if field_name in payload:
         del payload[field_name]
     return payload
@@ -153,7 +162,7 @@ def get_test_payload_with_missing_field(field_name):
 
 def get_test_subscription_payload_with_missing_field(field_name):
     """Return a test subscription payload with a specific field missing."""
-    payload = TEST_SUBSCRIPTION_PAYLOAD.copy()
+    payload = copy.deepcopy(TEST_SUBSCRIPTION_PAYLOAD)
     if field_name in payload:
         del payload[field_name]
     return payload
@@ -186,5 +195,4 @@ CONVERTER_EXPECTED_PAIRS = [
 ]
 
 # Stripe Session URLs
-import os
 TEST_STRIPE_SESSION_URL = os.environ.get('STRIPE_SESSION_URL')

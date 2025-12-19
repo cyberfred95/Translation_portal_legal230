@@ -330,6 +330,7 @@ class SetUserSubscriptionTestCase(TestCase):
             stripe_customer_id=TEST_STRIPE_CUSTOMER_ID,
             subscription_type=self.subscription_type,
             stripe_subscription_id=TEST_STRIPE_SUBSCRIPTION_ID,
+            stripe_subscription_item_id="si_test",
             start_time=start_date,
             end_time=end_date,
             status=SUBSCRIPTION_STATUS_ACTIVE,
@@ -347,6 +348,7 @@ class SetUserSubscriptionTestCase(TestCase):
         self.assertEqual(subscription.stripe_subscription_id,
                          TEST_STRIPE_SUBSCRIPTION_ID)
         self.assertEqual(subscription.status, SUBSCRIPTION_STATUS_ACTIVE)
+        self.assertEqual(subscription.stripe_subscription_item_id, "si_test")
 
     @patch('stripe_webhooks.tasks_handlers.setter.set_userSubscription.UserSubscription.objects.create')
     def test_create_userSubscriptions_exception_handling(self, mock_create):
@@ -361,6 +363,7 @@ class SetUserSubscriptionTestCase(TestCase):
             stripe_customer_id=TEST_STRIPE_CUSTOMER_ID,
             subscription_type=self.subscription_type,
             stripe_subscription_id=TEST_STRIPE_SUBSCRIPTION_ID,
+            stripe_subscription_item_id="si_test",
             start_time=start_date,
             end_time=end_date,
             status=SUBSCRIPTION_STATUS_ACTIVE,
@@ -389,7 +392,8 @@ class SetUserSubscriptionTestCase(TestCase):
         new_end_date = datetime.now(dt_timezone.utc)
         new_values = {
             'end_date': new_end_date,
-            'status': SUBSCRIPTION_STATUS_CANCELED
+            'status': SUBSCRIPTION_STATUS_CANCELED,
+            'stripe_subscription_item_id': "si_updated",
         }
 
         error, email_types, changed = set_new_userSubscription_list_values(
@@ -400,6 +404,7 @@ class SetUserSubscriptionTestCase(TestCase):
         self.assertTrue(changed)
         subscription.refresh_from_db()
         self.assertEqual(subscription.status, SUBSCRIPTION_STATUS_CANCELED)
+        self.assertEqual(subscription.stripe_subscription_item_id, "si_updated")
 
     def test_deactivate_userSubscription_success(self):
         """Test successful user subscription deactivation."""

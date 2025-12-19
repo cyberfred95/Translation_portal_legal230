@@ -1,3 +1,13 @@
+import logging
+
+from django.utils.timezone import now
+
+from subscriptions.models import SubscriptionType
+
+
+logger = logging.getLogger(__name__)
+
+
 def translation_allowed(request, symbols_count: int, words_count: int, files_count: int = None) -> bool:
     if request.user.is_staff:
         return True
@@ -34,12 +44,100 @@ def translation_allowed(request, symbols_count: int, words_count: int, files_cou
 
 
 def add_translations(request, words_count: int, symbols_count: int, files_count: int = None):
-    if request.user.group:
-        # detects if user is admin because
-        user_subscription = request.user.subscriptions.first()
-        if user_subscription:                                  # only admin can use portal without subscription
-            user_subscription.translated_words_count += words_count
-            user_subscription.translated_symbols_count += symbols_count
-            if files_count:
-                user_subscription.translated_files_count += files_count
-            user_subscription.save()
+    if not request.user.group:
+        return
+
+    user_subscription = request.user.subscriptions.first()
+    if not user_subscription:
+        return
+
+    _increment_subscription_totals(
+        user_subscription,
+        words_count,
+        symbols_count,
+        files_count,
+    )
+
+    if _is_api_subscription(user_subscription):
+        _increment_daily_metered_usage(
+            user_subscription,
+            words_count,
+            symbols_count,
+            files_count,
+        )
+
+
+def _increment_subscription_totals(
+    user_subscription, words_count: int, symbols_count: int, files_count: int | None
+) -> None:
+    """Incrémente les compteurs totaux de la souscription."""
+    user_subscription.translated_words_count += words_count
+    user_subscription.translated_symbols_count += symbols_count
+    update_fields = ['translated_words_count', 'translated_symbols_count']
+
+    if files_count:
+        user_subscription.translated_files_count += files_count
+        update_fields.append('translated_files_count')
+
+    user_subscription.save(update_fields=update_fields)
+
+
+def _increment_daily_metered_usage(
+    user_subscription, words_count: int, symbols_count: int, files_count: int | None
+) -> None:
+    """Incrémente les compteurs quotidiens du CountMetered actif."""
+    count_metered = _get_active_metered_entry(user_subscription)
+    if not count_metered:
+        return
+
+    count_metered.daily_translated_words_count += words_count
+    count_metered.daily_translated_symbols_count += symbols_count
+    update_fields = ['daily_translated_words_count', 'daily_translated_symbols_count']
+
+    if files_count:
+        count_metered.daily_translated_files_count += files_count
+        update_fields.append('daily_translated_files_count')
+
+    count_metered.save(update_fields=update_fields)
+
+
+def _get_active_metered_entry(user_subscription):
+    """
+    Retourne le CountMetered actif (non reporté) pour aujourd'hui.
+    Retourne None si aucun n'est trouvé ou s'il est déjà reporté.
+    """
+    try:
+        count_metered = user_subscription.get_today_count_metered()
+    except ValueError as error:
+        logger.error(
+            "Multiple CountMetered entries detected for subscription %s: %s",
+            user_subscription.id,
+            error,
+        )
+        return None
+
+    if count_metered is None:
+        logger.error(
+            "No CountMetered entry found for subscription %s on %s.",
+            user_subscription.id,
+            now().date(),
+        )
+        return None
+
+    if count_metered.reported:
+        logger.error(
+            "Attempt to update already reported CountMetered for subscription %s on %s.",
+            user_subscription.id,
+            count_metered.date,
+        )
+        return None
+
+    return count_metered
+
+
+def _is_api_subscription(user_subscription) -> bool:
+    """Vérifie si la souscription est de type API."""
+    return (
+        user_subscription.subscription is not None
+        and user_subscription.subscription.product_type == SubscriptionType.ProductChoices.API
+    )

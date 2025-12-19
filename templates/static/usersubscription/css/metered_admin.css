@@ -1,0 +1,50 @@
+#metered-subscription-btn {
+    background-color: #17a2b8;
+    color: #fff;
+    border-color: #17a2b8;
+}
+
+#metered-subscription-btn:hover {
+    background-color: #138496;
+    border-color: #117a8b;
+}
+
+.metered-price-section {
+    margin-top: 15px;
+    text-align: left;
+}
+
+.metered-price-section .loading-text {
+    color: #007cba;
+    font-style: italic;
+    margin-top: 8px;
+    display: none;
+}
+
+.metered-price-section .error-text {
+    color: #b00020;
+    font-weight: bold;
+    margin-top: 8px;
+    display: none;
+}
+
+.metered-checkout-section {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.metered-checkout-section button {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+/* Forcer le style des <select> dans la modale metered, au-dessus du CSS admin */
+#metered-modal select {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 40px;
+    line-height: 1.4;
+    padding: 10px 8px;
+    font-size: 14px;
+}
+

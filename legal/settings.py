@@ -156,7 +156,10 @@ LOCALE_PATHS = [ BASE_DIR / 'locale/', ]
 # Static & media files
 # ============================================================================
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [ os.path.join(BASE_DIR, "static") ]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "templates", "static"),
+]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_collected')
 
 if not DEBUG:
@@ -232,8 +235,17 @@ CELERY_BEAT_SCHEDULE = {
     'process_daily_subscription_renewals': {
         'task': 'subscriptions.tasks.process_daily_subscription_renewals',
         'schedule': crontab(minute="0", hour="0")
+    },
+    'report_daily_metered_usage': {
+        'task': 'subscriptions.tasks.report_daily_metered_usage',
+        'schedule': crontab(minute="5", hour="0")
     }
 }
+
+# ============================================================================
+# Stripe Metering
+# ============================================================================
+STRIPE_METER_EVENT_NAME = os.environ.get('STRIPE_METER_EVENT_NAME', 'apinbchar_standard')
 
 # ============================================================================
 # Logging
@@ -294,6 +306,8 @@ STATS_API_KEY = os.environ.get('STATS_API_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY')
 STRIPE_PORTAL_RETURN_URL = "https://portail.lexamt.fr/fr/profile-details/"
+STRIPE_CHECKOUT_SUCCESS_URL = "https://portail.lexamt.fr"
+STRIPE_CHECKOUT_CANCEL_URL = "https://portail.lexamt.fr"
 
 # Active Trail Configuration
 ACTIVE_TRAIL_SENDING_PROFILE_ID = int(

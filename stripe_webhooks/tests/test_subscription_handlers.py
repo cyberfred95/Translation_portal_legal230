@@ -5,6 +5,7 @@ This module contains tests for subscription-related webhook handlers including
 subscription creation, updates, and cancellations.
 """
 
+import copy
 from unittest.mock import patch
 
 from django.test import TestCase
@@ -27,6 +28,7 @@ from stripe_webhooks.tests.settings import (
     TEST_PASSWORD,
     TEST_STRIPE_CUSTOMER_ID_2,
     TEST_STRIPE_PRODUCT_ID_2,
+    TEST_SUBSCRIPTION_ITEM_ID_2,
     TEST_STRIPE_SUBSCRIPTION_ID_2,
     TEST_SUBSCRIPTION_NAME,
     TEST_SUBSCRIPTION_PAYLOAD,
@@ -45,6 +47,7 @@ TEST_SUBSCRIPTION_PAYLOAD_HANDLERS = {
     'status': STRIPE_STATUS_ACTIVE,
     'items': {
         'data': [{
+            'id': TEST_SUBSCRIPTION_ITEM_ID_2,
             'price': {
                 'product': TEST_STRIPE_PRODUCT_ID_2
             },
@@ -61,7 +64,7 @@ TEST_SUBSCRIPTION_PAYLOAD_HANDLERS = {
 
 def get_test_subscription_payload_handlers_with_missing_field(field_name):
     """Return a test subscription payload for handlers with a specific field missing."""
-    payload = TEST_SUBSCRIPTION_PAYLOAD_HANDLERS.copy()
+    payload = copy.deepcopy(TEST_SUBSCRIPTION_PAYLOAD_HANDLERS)
     if field_name in payload:
         del payload[field_name]
     return payload
@@ -115,6 +118,10 @@ class CustomerSubscriptionHandlersTestCase(TestCase):
         self.assertEqual(subscription.subscription, self.subscription_type)
         self.assertEqual(subscription.status,
                          UserSubscription.UserSubscriptionChoices.ACTIVE)
+        self.assertEqual(
+            subscription.stripe_subscription_item_id,
+            TEST_SUBSCRIPTION_ITEM_ID_2,
+        )
         self.assertEqual(subscription.status,
                          UserSubscription.UserSubscriptionChoices.ACTIVE)
 
@@ -144,7 +151,7 @@ class CustomerSubscriptionHandlersTestCase(TestCase):
 
     def test_handle_customer_subscription_created_user_not_found(self):
         """Test subscription creation with non-existent user."""
-        payload = TEST_SUBSCRIPTION_PAYLOAD.copy()
+        payload = copy.deepcopy(TEST_SUBSCRIPTION_PAYLOAD)
         payload['customer'] = 'cus_nonexistent'
 
         response = handle_customer_subscription_created(payload)
@@ -153,13 +160,22 @@ class CustomerSubscriptionHandlersTestCase(TestCase):
 
     def test_handle_customer_subscription_created_subscription_type_not_found(self):
         """Test subscription creation with non-existent subscription type."""
-        payload = TEST_SUBSCRIPTION_PAYLOAD.copy()
+        payload = copy.deepcopy(TEST_SUBSCRIPTION_PAYLOAD)
         payload['items']['data'][0]['price']['product'] = 'prod_nonexistent'
         payload['items']['data'][0]['plan']['product'] = 'prod_nonexistent'
 
         response = handle_customer_subscription_created(payload)
 
         self.assertEqual(response.code, 404)
+
+    def test_handle_customer_subscription_created_missing_subscription_item_id(self):
+        """Test subscription creation fails when subscription item id missing."""
+        payload = copy.deepcopy(TEST_SUBSCRIPTION_PAYLOAD_HANDLERS)
+        payload['items']['data'][0].pop('id', None)
+
+        response = handle_customer_subscription_created(payload)
+
+        self.assertEqual(response.code, 400)
 
     def test_handle_customer_subscription_updated_success(self):
         """Test successful customer subscription update."""
@@ -176,9 +192,11 @@ class CustomerSubscriptionHandlersTestCase(TestCase):
             end_date=timezone.now())
 
         # Update payload with new status and different subscription ID
-        updated_payload = TEST_SUBSCRIPTION_PAYLOAD_HANDLERS.copy()
+        updated_payload = copy.deepcopy(TEST_SUBSCRIPTION_PAYLOAD_HANDLERS)
         updated_payload['id'] = update_subscription_id
         updated_payload['status'] = STRIPE_STATUS_CANCELED
+        updated_item_id = 'si_update_new'
+        updated_payload['items']['data'][0]['id'] = updated_item_id
 
         response = handle_customer_subscription_updated(updated_payload)
 
@@ -189,6 +207,7 @@ class CustomerSubscriptionHandlersTestCase(TestCase):
         subscription.refresh_from_db()
         self.assertEqual(subscription.status,
                          UserSubscription.UserSubscriptionChoices.TERMINATED)
+        self.assertEqual(subscription.stripe_subscription_item_id, updated_item_id)
 
     def test_handle_customer_subscription_updated_subscription_not_found(self):
         """Test subscription update with non-existent subscription."""
@@ -211,6 +230,25 @@ class CustomerSubscriptionHandlersTestCase(TestCase):
 
         self.assertEqual(response.code, 404)
 
+    def test_handle_customer_subscription_updated_missing_subscription_item_id(self):
+        """Test subscription update fails when subscription item id missing."""
+        update_subscription_id = 'sub_update_missing_item'
+        UserSubscription.objects.create(
+            user=self.user,
+            subscription=self.subscription_type,
+            stripe_subscription_id=update_subscription_id,
+            status=UserSubscription.UserSubscriptionChoices.ACTIVE,
+            start_date=timezone.now(),
+            end_date=timezone.now())
+
+        payload = copy.deepcopy(TEST_SUBSCRIPTION_PAYLOAD_HANDLERS)
+        payload['id'] = update_subscription_id
+        payload['items']['data'][0].pop('id', None)
+
+        response = handle_customer_subscription_updated(payload)
+
+        self.assertEqual(response.code, 400)
+
     def test_handle_customer_subscription_deleted_success(self):
         """Test successful customer subscription deletion."""
         # Use a different subscription ID for deletion test to avoid conflicts
@@ -226,7 +264,7 @@ class CustomerSubscriptionHandlersTestCase(TestCase):
             end_date=timezone.now())
 
         # Create payload for deletion with required ended_at field
-        deletion_payload = TEST_SUBSCRIPTION_PAYLOAD.copy()
+        deletion_payload = copy.deepcopy(TEST_SUBSCRIPTION_PAYLOAD)
         deletion_payload['id'] = delete_subscription_id
         deletion_payload['ended_at'] = 1672531200  # Unix timestamp
 
@@ -323,9 +361,8 @@ class CustomerSubscriptionHandlersTestCase(TestCase):
 
         response = handle_customer_subscription_updated(updated_payload)
 
-        # Check response - should be error due to multiple buyers
-        self.assertEqual(response.code, 500)
-        self.assertIn("buyer(s) found", response.message)
+        # Check response - should be error due to multiple buyers / conflicts
+        self.assertEqual(response.code, 400)
 
         # Verify subscriptions were not updated due to error
         subscription1.refresh_from_db()

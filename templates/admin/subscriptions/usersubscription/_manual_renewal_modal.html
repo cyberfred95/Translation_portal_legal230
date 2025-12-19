@@ -1,0 +1,21 @@
+<div id="renewal-modal" class="renewal-modal">
+    <div class="renewal-modal-content">
+        <h3>Manual Subscription Renewal</h3>
+        <p>This will manually execute the daily subscription renewal task.</p>
+        <p><strong>Are you sure you want to proceed?</strong></p>
+        <div class="loading" id="loading-indicator">
+            <p>Processing renewals, please wait...</p>
+            <div style="text-align: center;">🔄 Loading...</div>
+        </div>
+        <div class="renewal-modal-buttons" id="modal-buttons">
+            <button type="button" class="btn-confirm" id="confirm-renewal">Yes, Execute</button>
+            <button type="button" class="btn-cancel" id="cancel-renewal">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="manual-renewal-config"
+     data-active-without-stripe="{{ active_without_stripe_count|default:0 }}"
+     data-manual-renewal-url="{% url 'admin:subscriptions_usersubscription_manual_renewal' %}">
+</div>
+

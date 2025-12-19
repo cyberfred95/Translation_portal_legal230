@@ -26,5 +26,10 @@ app.conf.beat_schedule = {
         'task': "subscriptions.tasks.process_daily_subscription_renewals",
         "schedule": crontab(minute='0', hour='0'),
         "args": (),
+    },
+    'report_daily_metered_usage': {
+        'task': "subscriptions.tasks.report_daily_metered_usage",
+        "schedule": crontab(minute='5', hour='0'),
+        "args": (),
     }
 }

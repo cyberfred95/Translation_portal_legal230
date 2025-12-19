@@ -15,6 +15,7 @@ from django.db import transaction
 from .models import UserSubscription
 from .permissions import is_user_subscription_active
 from stripe_webhooks.tasks_handlers.setter.set_countHistory import reset_subscriptions
+from .services.metered_usage import report_metered_usage_to_stripe
 
 logger = logging.getLogger(__name__)
 
@@ -127,3 +128,18 @@ def process_daily_subscription_renewals():
         'error_count': error_count,
         'total_processed': len(subscriptions_to_renew)
     }
+
+
+@shared_task
+def report_daily_metered_usage():
+    """
+    Envoie les compteurs CountMetered non reportés à Stripe puis prépare
+    le compteur du jour suivant.
+    """
+    result = report_metered_usage_to_stripe()
+    logger.info(
+        "Report metered usage terminé. Envoyés=%s, erreurs=%s",
+        result["reported"],
+        result["errors"],
+    )
+    return result
