@@ -17,11 +17,6 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    'refresh_domains_from_console': {
-        'task': "domains.tasks.update_domains",
-        "schedule": crontab(minute='0', hour='0'),
-        "args": (),
-    },
     # 'reset_quote_counter': {
     #    'task': "quoting.tasks.reset_quote_counter",
     #    "schedule": crontab(minute='0', hour='0', day_of_month=1),

@@ -15,6 +15,12 @@ from .views.glossary import GlossaryAPIView, GlossaryExistAPIView
 from .views.language import LanguageAPIView
 from .views.translate import TranslateAPIView
 from .views.stripe import StripePortalSessionView
+from .views.internal import (
+    InternalDomainGroupsView,
+    InternalUsersView,
+    InternalUserDetailView,
+    InternalSubscriptionByApiKeyView,
+)
 
 
 # API version configuration
@@ -69,5 +75,29 @@ urlpatterns = [
         API_VERSION + 'stripe-portal-session/',
         StripePortalSessionView.as_view(),
         name='api-stripe-portal-session'
+    ),
+
+    # ==========================================================================
+    # Internal API endpoints (service-to-service, restricted to Docker network)
+    # ==========================================================================
+    path(
+        'internal/domain-groups/',
+        InternalDomainGroupsView.as_view(),
+        name='api-internal-domain-groups'
+    ),
+    path(
+        'internal/users/',
+        InternalUsersView.as_view(),
+        name='api-internal-users'
+    ),
+    path(
+        'internal/users/<uuid:uuid>/',
+        InternalUserDetailView.as_view(),
+        name='api-internal-user-detail'
+    ),
+    path(
+        'internal/subscription-by-api-key/',
+        InternalSubscriptionByApiKeyView.as_view(),
+        name='api-internal-subscription-by-api-key'
     ),
 ]

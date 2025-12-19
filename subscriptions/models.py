@@ -1,14 +1,12 @@
 from datetime import timezone
-import uuid
-import requests
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.conf import settings
 from django.utils.timezone import now
 
 from users.models import UserGroup, User
+from subscriptions.services.api_key_generator import APIKeyService
 
 
 class SubscriptionType(models.Model):
@@ -117,43 +115,20 @@ class UserSubscription(models.Model):
         }
         return self.status in active_states
 
-    def create_api_key(self):
+    def create_api_key(self) -> str:
         """
-        Create a new API key by calling the cabinet API endpoint.
-        Returns the generated API key or None if creation fails.
+        Crée une nouvelle clé API locale unique.
+        
+        Cette méthode génère une clé API localement et vérifie qu'elle n'existe
+        pas déjà dans la base de données avant de la retourner.
+        
+        Returns:
+            str: Clé API unique générée au format UUID.
+            
+        Raises:
+            RuntimeError: Si aucune clé unique n'a pu être générée.
         """
-        try:
-            # Check if required settings are configured
-            if not settings.CUSTOM_MT_CONSOLE_URL or not settings.CLOUDSTORAGE_API_KEY:
-                return None
-            
-            # Build the API endpoint URL
-            url = settings.CUSTOM_MT_CONSOLE_URL.rstrip('/') + "/cabinet_api/create_api_key/"
-            
-            # Prepare request data (using subscription ID as label)
-            data = {
-                "label": str(self.id)
-            }
-            
-            # Prepare headers with authorization token
-            headers = {
-                "token": settings.CLOUDSTORAGE_API_KEY,
-                "Content-Type": "application/json"
-            }
-            
-            # Make the API request
-            response = requests.post(url, json=data, headers=headers, timeout=30)
-            
-            if response.status_code == 200:
-                result = response.json()
-                return result.get('api_key')
-            else:
-                return None
-                
-        except requests.RequestException:
-            return None
-        except Exception:
-            return None
+        return APIKeyService.create_api_key_for_subscription(self)
 
     def save(self, *args, **kwargs):
         # Copier les valeurs depuis SubscriptionType uniquement lors de la création
@@ -176,13 +151,9 @@ class UserSubscription(models.Model):
             # First save to get an ID
             super().save(*args, **kwargs)
             
-            # Now generate API key using the subscription ID
-            generated_key = self.create_api_key()
-            if generated_key:
-                self.api_key = generated_key
-            else:
-                # Fallback to UUID if API call fails
-                self.api_key = str(uuid.uuid4())
+            # Generate unique API key using the local service
+            # Le service garantit l'unicité et génère une clé de manière fiable
+            self.api_key = self.create_api_key()
             
             # Save again with the API key
             super().save()

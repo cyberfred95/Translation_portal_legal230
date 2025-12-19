@@ -963,6 +963,10 @@ msgstr "Sélectionner un sous-domaine"
 msgid "Select a glossary"
 msgstr "Sélectionner un glossaire"
 
+#: legal/templates/translate/document_translate/step_domain/step_domain.html:23
+msgid "Select or not, one or more glossaries"
+msgstr "Sélectionner ou non, un ou plusieurs glossaires"
+
 #: legal/templates/translate/document_translate/step_domain/step_3.html:32
 msgid "Standard"
 msgstr "Standard"
@@ -1233,7 +1237,7 @@ msgstr ""
 
 #: writing/templates/writing_2.html:177
 msgid "Copy Result"
-msgstr ""
+msgstr "Copier le résultat"
 
 #: glossaries/templates/glossaries.html:148
 msgid "File size exceeds 5MB limit."
@@ -1250,3 +1254,27 @@ msgstr "Déconnexion"
 #: legal/templates/profile_details/profile_security.html:31
 msgid "Sign out of your account."
 msgstr "Déconnectez-vous de votre compte."
+
+#: legal/templates/translate/text_translate/text_translate.html:123
+msgid "Custom translation instructions"
+msgstr "Instructions de traduction personnalisées"
+
+#: legal/templates/translate/text_translate/text_translate.html:129
+msgid "e.g., Use formal legal tone, Preserve Latin terms, etc."
+msgstr "Ex. : Utiliser un ton juridique formel, Conserver les termes latins, etc."
+
+#: legal/templates/translate/text_translate/text_translate.html:138
+msgid "Translation quality feedback"
+msgstr "Retour sur la qualité de la traduction"
+
+#: legal/templates/translate/text_translate/text_translate.html:48
+msgid "Copy target language to source"
+msgstr "Copier la langue cible vers la source"
+
+#: writing/templates/writing.html
+msgid "This feature will be back soon"
+msgstr "Cette fonctionnalité reviendra bientôt"
+
+#: writing/templates/writing.html
+msgid "We are currently working on improving this feature. It will be available again soon."
+msgstr "Nous travaillons actuellement à l'amélioration de cette fonctionnalité. Elle sera à nouveau disponible bientôt."

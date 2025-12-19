@@ -1,17 +1,5 @@
 $(document).ready(function () {
 
-    $(".glossary-language-source").attr("data-placeholder", language_code === 'en'? "Select from the list": "Sélectionner dans la liste");
-    $(".glossary-language-target").attr("data-placeholder", language_code === 'en'? "Select from the list": "Sélectionner dans la liste");
-
-    $(".glossary-language-source").select2();
-    $(".glossary-language-target").select2();
-
-    $('.glossary-language-select').select2().each(function () {
-        var $select = $(this);
-        $select.data('select2').$container.addClass('glossary languages');
-        $select.data('select2').$dropdown.addClass('glossary languages');
-    });
-
     let file
 
     const $modal = $('#modal');
@@ -165,16 +153,6 @@ $(document).ready(function () {
         }
     });
 
-    let sourceLanguage, targetLanguage
-
-    $('.glossary-language-source[name="source_language"]').on('change', function () {
-        sourceLanguage = $(this).val();
-    });
-
-    $('.glossary-language-target[name="target_language"]').on('change', function () {
-        targetLanguage = $(this).val();
-    });
-
     $(document).on('click', '.create-glossary', function (e) {
         e.preventDefault();
 
@@ -197,10 +175,8 @@ $(document).ready(function () {
         $button.prepend(spinner);
 
         const formData = new FormData();
-
         formData.append('file', file);
-        formData.append('source_language', sourceLanguage);
-        formData.append('target_language', targetLanguage);
+        // Languages are now automatically detected from CSV file
 
         $.ajax({
             url: add_glossary,
@@ -243,19 +219,14 @@ $(document).ready(function () {
     window.showGlossaryWarning = showWarning;
     window.hideGlossaryWarning = hideWarning;
     
-    // Validation du formulaire de la modal
+    // Validation du formulaire de la modal (only file required now)
     function validateGlossaryForm() {
-        const sourceLanguage = $('.glossary-language-source').val();
-        const targetLanguage = $('.glossary-language-target').val();
         const hasFile = $('.glossary-file')[0]?.files.length > 0;
         
         // Cacher le warning lors de la validation
         hideWarning();
         
-        const isValid = sourceLanguage && 
-                       targetLanguage && 
-                       sourceLanguage !== targetLanguage && 
-                       hasFile;
+        const isValid = hasFile;
         
         const $continueButton = $('#continueButton');
         
@@ -270,12 +241,6 @@ $(document).ready(function () {
         }
     }
     
-    // Vérifier lors du changement de langue source
-    $('.glossary-language-source').on('change', validateGlossaryForm);
-    
-    // Vérifier lors du changement de langue cible
-    $('.glossary-language-target').on('change', validateGlossaryForm);
-    
     // Vérifier lors de la sélection d'un fichier
     $('.glossary-file').on('change', validateGlossaryForm);
     
@@ -286,8 +251,6 @@ $(document).ready(function () {
     
     // Réinitialiser le formulaire quand la modal se ferme
     $('#closeModal, #closeIcon').on('click', function() {
-        $('.glossary-language-source').val('').trigger('change');
-        $('.glossary-language-target').val('').trigger('change');
         $('.glossary-file').val('');
         hideWarning();
         

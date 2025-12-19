@@ -10,6 +10,7 @@
   window.domain_groups = el.dataset.domainGroups;
   window.get_default_glossary = el.dataset.getDefaultGlossary;
   window.api_list_glossaries = el.dataset.apiListGlossaries;
+  window.api_lara_glossary_search = el.dataset.apiLaraGlossarySearch;
   window.expert_revision_file_url = el.dataset.expertRevisionFileUrl;
   window.add_glossary = el.dataset.addGlossary;
   window.language_code = el.dataset.languageCode;

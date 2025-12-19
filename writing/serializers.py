@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from legal.constants import EN
-
 from writing.models import Prompt
 
 
