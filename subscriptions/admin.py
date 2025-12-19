@@ -5,6 +5,7 @@ from django.db import models
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import path, reverse
+from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from .models import SubscriptionType, UserSubscription, CountHistory, CountMetered
@@ -62,8 +63,11 @@ class CountHistoryAdmin(admin.ModelAdmin):
     list_filter = ('subscription_type', 'start_date')
 
     def formatted_start_date(self, obj):
-        """Format start_date to display month/year (day)"""
-        return obj.start_date.strftime('%m/%y (%d)') if obj.start_date else '-'
+        """Format start_date to display month/year (day) (local time)"""
+        if obj.start_date:
+            local_time = timezone.localtime(obj.start_date)
+            return local_time.strftime('%m/%y (%d)')
+        return '-'
     formatted_start_date.short_description = 'Start Date'
     formatted_start_date.admin_order_field = 'start_date'
 
@@ -369,17 +373,19 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
     colored_status.admin_order_field = 'status'
 
     def formatted_start_date(self, obj):
-        """Display start_date in DD/MM/YYYY format"""
+        """Display start_date in DD/MM/YYYY format (local time)"""
         if obj.start_date:
-            return obj.start_date.strftime('%d/%m/%Y')
+            local_time = timezone.localtime(obj.start_date)
+            return local_time.strftime('%d/%m/%Y')
         return '-'
     formatted_start_date.short_description = 'Start Date'
     formatted_start_date.admin_order_field = 'start_date'
 
     def formatted_end_date(self, obj):
-        """Display end_date in DD/MM/YYYY format"""
+        """Display end_date in DD/MM/YYYY format (local time)"""
         if obj.end_date:
-            return obj.end_date.strftime('%d/%m/%Y')
+            local_time = timezone.localtime(obj.end_date)
+            return local_time.strftime('%d/%m/%Y')
         return '-'
     formatted_end_date.short_description = 'End Date'
     formatted_end_date.admin_order_field = 'end_date'

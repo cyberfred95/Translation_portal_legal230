@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
 from languages.models import Language
 from users.models import User
@@ -86,7 +87,8 @@ class QuotePDF(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"Devis PDF - {self.user.username} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+        local_time = timezone.localtime(self.created_at)
+        return f"Devis PDF - {self.user.username} - {local_time.strftime('%Y-%m-%d %H:%M')}"
 
     def delete(self, *args, **kwargs):
         """
