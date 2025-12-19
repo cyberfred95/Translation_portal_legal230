@@ -87,6 +87,22 @@ class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, BaseTemplateView):
                                 "url_reset_password": self.get_register_user_absolute_uri(request, params=params),
                             }
                         )
+                    elif active_subscription.subscription.product_type == SubscriptionType.ProductChoices.API:
+                        api_key = active_subscription.api_key
+                        if not api_key:
+                            active_subscription.save()
+                            api_key = active_subscription.api_key
+
+                        send_email(
+                            new_email,
+                            EmailType.API_CREATED,
+                            request.user.language,
+                            {
+                                "lexa_username": user.username,
+                                "lexa_email": new_email,
+                                "lexa_apikey": api_key
+                            }
+                        )
                     else:
                         api_key = active_subscription.api_key
                         if not api_key:
