@@ -13,38 +13,38 @@
   ];
   var STATUS_DEFS = [
     { raw: 'Being translated', category: 'in-progress', label: function(){ return 'Processing'; } },
-    { raw: 'Processing', category: 'in-progress', label: function(){ return 'Processing'; } },
-    { raw: 'Processing...', category: 'in-progress', label: function(){ return 'Processing'; } },
-    { raw: 'In progress', category: 'in-progress', label: function(lang){ return lang === 'en' ? 'In progress' : 'En cours'; } },
-
-    { raw: 'Sent to post-editing, not accepted yet', category: 'attention-orange', label: function(lang){ return lang === 'en' ? 'Request for quote sent' : 'Demande de devis envoyée'; } },
-    { raw: 'Sent to post-editing, accepted', category: 'attention', label: function(lang){ return lang === 'en' ? 'Request for quote accepted' : 'Demande de devis acceptée'; } },
-    { raw: 'Post-edited file uploaded', category: 'post-editing', label: function(lang){ return lang === 'en' ? 'Proofread document uploaded' : 'Document relu importé'; } },
-
-    { raw: 'Translated', category: 'completed', label: function(lang){ return lang === 'en' ? 'Translated' : 'Document traduit'; } },
+    { raw: 'Sent to post-editing, not accepted yet', category: 'attention-orange', label: function(lang){ return lang === 'en' ? 'Quote sent' : 'Devis envoyé'; } },
+    { raw: 'Sent to post-editing, accepted', category: 'attention', label: function(lang){ return lang === 'en' ? 'Quote accepted' : 'Devis accepté'; } },
+    { raw: 'Review in progress', category: 'attention-orange', label: function(lang){ return lang === 'en' ? 'Reviewing' : 'Révision'; } },
+    { raw: 'Document reviewed', category: 'completed', label: function(lang){ return lang === 'en' ? 'Reviewed' : 'Relu'; } },
+    { raw: 'Translated', category: 'completed', label: function(lang){ return lang === 'en' ? 'Translated' : 'Traduit'; } },
     { raw: 'Error', category: 'error', label: function(lang){ return lang === 'en' ? 'Error' : 'Erreur'; } },
   ];
   var STATUS_ALIASES = {
     'being translated': 'Being translated',
-    'processing': 'Processing',
-    'processing...': 'Processing...',
-    'processing…': 'Processing...',
-    'in progress': 'In progress',
-    'en cours': 'In progress',
+    'processing': 'Being translated',
     'sent to post-editing, not accepted yet': 'Sent to post-editing, not accepted yet',
     'sent to post-editing, accepted': 'Sent to post-editing, accepted',
-    'post-edited file uploaded': 'Post-edited file uploaded',
     'translated': 'Translated',
     'document traduit': 'Translated',
+    'traduit': 'Translated',
     'error': 'Error',
     'erreur': 'Error',
     'demande de devis envoyee': 'Sent to post-editing, not accepted yet',
+    'demande de devis envoyée': 'Sent to post-editing, not accepted yet',
+    'devis envoyé': 'Sent to post-editing, not accepted yet',
+    'devis envoye': 'Sent to post-editing, not accepted yet',
+    'quote sent': 'Sent to post-editing, not accepted yet',
     'demande de devis acceptée': 'Sent to post-editing, accepted',
     'demande de devis acceptee': 'Sent to post-editing, accepted',
-    'document relu importé': 'Post-edited file uploaded',
-    'document relu importe': 'Post-edited file uploaded',
-    'traitement': 'Processing',
-    'traitement en cours': 'Processing'
+    'devis accepté': 'Sent to post-editing, accepted',
+    'devis accepte': 'Sent to post-editing, accepted',
+    'quote accepted': 'Sent to post-editing, accepted',
+    'review in progress': 'Review in progress',
+    'révision en cour': 'Review in progress',
+    'revision en cour': 'Review in progress',
+    'document reviewed': 'Document reviewed',
+    'document relu': 'Document reviewed'
   };
   var STATUS_LOOKUP = STATUS_DEFS.reduce(function (acc, def) {
     acc[def.raw] = def;

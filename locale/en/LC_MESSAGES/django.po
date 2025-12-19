@@ -964,6 +964,10 @@ msgstr "Select subdomain"
 msgid "Select a glossary"
 msgstr "Select a glossary"
 
+#: legal/templates/translate/document_translate/step_domain/step_domain.html:23
+msgid "Select or not, one or more glossaries"
+msgstr "Select or not, one or more glossaries"
+
 #: legal/templates/translate/document_translate/step_domain/step_3.html:32
 msgid "Standard"
 msgstr "Standard"
@@ -1246,3 +1250,27 @@ msgstr "Logout"
 #: legal/templates/profile_details/profile_security.html:31
 msgid "Sign out of your account."
 msgstr "Sign out of your account."
+
+#: legal/templates/translate/text_translate/text_translate.html:123
+msgid "Custom translation instructions"
+msgstr "Custom translation instructions"
+
+#: legal/templates/translate/text_translate/text_translate.html:129
+msgid "e.g., Use formal legal tone, Preserve Latin terms, etc."
+msgstr "e.g., Use formal legal tone, Preserve Latin terms, etc."
+
+#: legal/templates/translate/text_translate/text_translate.html:138
+msgid "Translation quality feedback"
+msgstr "Translation quality feedback"
+
+#: legal/templates/translate/text_translate/text_translate.html:48
+msgid "Copy target language to source"
+msgstr "Copy target language to source"
+
+#: writing/templates/writing.html
+msgid "This feature will be back soon"
+msgstr "This feature will be back soon"
+
+#: writing/templates/writing.html
+msgid "We are currently working on improving this feature. It will be available again soon."
+msgstr "We are currently working on improving this feature. It will be available again soon."

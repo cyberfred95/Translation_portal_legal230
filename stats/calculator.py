@@ -1,123 +1,94 @@
-import json
+import logging
 import os
 
 from django.conf import settings
 import requests
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from preferences import preferences
+
+from legal.services.file_processing import FileTextExtractorFactory
+
+# Configuration du logger
+logger = logging.getLogger(__name__)
 
 
 class StatsProcessor:
+    """
+    Processeur de statistiques pour les fichiers.
+    
+    Ce processeur utilise des bibliothèques locales pour extraire le texte
+    des fichiers, sans nécessiter de clé API externe.
+    """
 
-    def __init__(self, api_key):
-        self._api_key = api_key
+    def __init__(self):
+        """Initialise le processeur de statistiques."""
+        pass
 
-    file_extension_route_mapping = {
-        '.docx': 'word',
-        '.pptx': 'powerpoint',
-        '.txt': 'text',
-        '.pdf': 'word',
-        '.xlsx': 'excel',
-    }
+    def get_texts(self, file: InMemoryUploadedFile) -> dict:
+        """
+        Extrait le texte d'un fichier en utilisant le service local.
+        
+        Note: Cette méthode ne convertit plus les PDF en DOCX.
+        La conversion doit être effectuée avant l'appel à cette méthode.
+        
+        Args:
+            file: Fichier en mémoire à traiter (doit déjà être converti si PDF)
+            
+        Returns:
+            dict: Résultat au format {"texts": [{"text": "..."}]}
+            
+        Raises:
+            ValueError: Si le format n'est pas supporté
+        """
+        file_extension = self._get_file_extension(file)
+        logger.info(f"Traitement du fichier: {file.name} (extension: {file_extension})")
+        
+        try:
+            return FileTextExtractorFactory.extract_text(file)
+        except ValueError as e:
+            raise ValueError(
+                f"Format de fichier non supporté: {file_extension}. "
+                f"Formats supportés: {', '.join(FileTextExtractorFactory.get_supported_extensions())}"
+            ) from e
 
-    def get_files_processing_api_url(self, file_extension):
-        return f"{settings.FILES_PROCESSING_API_URL}/api/{self.file_extension_route_mapping[file_extension]}"
+    def get_chars(self, file: InMemoryUploadedFile) -> int:
+        """
+        Calcule le nombre de caractères dans un fichier.
+        
+        Args:
+            file: Fichier en mémoire à traiter
+            
+        Returns:
+            int: Nombre total de caractères
+        """
+        result = self.get_texts(file)
+        return sum(len(paragraph['text']) for paragraph in result['texts'])
 
-    def get_texts(self, file: InMemoryUploadedFile):
-        file_extension = os.path.splitext(file.name)[1]
-        file_name = file.name
-        file_content = file.read()
-        if file_extension == '.pdf':
-            converted_file_response = requests.post(
-                f"{settings.FILES_PROCESSING_API_URL}/api/pdf/convert",
-                headers={
-                    "Content-Type": file_extension,
-                    "Content-Disposition": f'attachment; '
-                                           f'filename="{file_name}"',
-                },
-                data=file_content
-            )
-            file_content = converted_file_response.content
-            file_extension = '.docx'
+    @staticmethod
+    def _get_file_extension(file: InMemoryUploadedFile) -> str:
+        """Extrait l'extension du fichier en minuscules."""
+        return os.path.splitext(file.name)[1].lower()
 
-        response = requests.post(
-            self.get_files_processing_api_url(file_extension) + '/export',
-            headers={
-                "Content-Type": file_extension,
-                "Content-Disposition": f'attachment; '
-                                       f'filename="{file_name}"',
-            },
-            data=file_content
-        )
-        file.seek(0)
-        return response.json()
-
-    def get_chars(self, file):
-        response = self.get_texts(file)
-        chars = 0
-        for paragraph in response.json()['texts']:
-            chars += len(paragraph['text'])
-        return chars
-
-    def get_template_name(self, source_language, target_language, domain_name):
-        response = requests.post(
-            settings.CUSTOM_MT_CONSOLE_URL + "translation/get_template_by_language_pair_and_domain",
-            headers={
-                "token": self._api_key
-            },
-            data={
-                "source_language": source_language,
-                "target_language": target_language,
-                "domain_name": domain_name
-            }
-        )
-        return response.json().get('name')
-
-    def send_request(self,
-                     texts: list,
-                     user_uuid,
-                     domain_name,
-                     source_language,
-                     target_language,
-                     file_name='Text translate',
-                     words_count=None,
-                     ):
-        template_name = self.get_template_name(source_language, target_language, domain_name)
-        response = requests.post(
-            settings.STATS_API_URL + "add_statistic/",
-            headers={
-                'token': settings.STATS_API_KEY,
-                'X-API-KEY': self._api_key,
-            },
-            data={
-                "messages": texts,
-                "uuid": user_uuid,
-                'template_name': template_name,
-                'file_name': file_name,
-                'meta': json.dumps(
-                    {
-                        "words_count": words_count
-                    }
-                )
-            }
-        )
-
-    def send_writing_request(self,
-                             texts: list,
-                             user_uuid,
-                             file_name='Text writing',
-                             gpt_model='gpt-3.5-turbo-0613'):
-        response = requests.post(
-            settings.STATS_API_URL + "add_writing_statistic/",
-            headers={
-                'token': settings.STATS_API_KEY,
-                'X-API-KEY': self._api_key,
-            },
-            data={
-                "messages": texts,
-                "uuid": user_uuid,
-                'file_name': file_name,
-                "gpt_model": gpt_model,
-            }
-
-        )
+    # ============================================================================
+    # WRITING FUNCTIONALITY - TEMPORARILY DISABLED
+    # ============================================================================
+    # Cette méthode est temporairement désactivée en prévision d'une refonte.
+    # Le code est conservé en commentaire pour référence future.
+    # ============================================================================
+    # def send_writing_request(self,
+    #                          texts: list,
+    #                          user_uuid,
+    #                          file_name='Text writing',
+    #                          gpt_model='gpt-3.5-turbo-0613'):
+    #     response = requests.post(
+    #         settings.STATS_API_URL + "add_writing_statistic/",
+    #         headers={
+    #             'token': settings.STATS_API_KEY,
+    #             'X-API-KEY': self._api_key,
+    #         },
+    #         data={
+    #             "messages": texts,
+    #             "uuid": user_uuid,
+    #             'file_name': file_name,
+    #             "gpt_model": gpt_model,
+    #         }
+    #     )

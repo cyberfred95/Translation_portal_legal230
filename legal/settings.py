@@ -232,14 +232,6 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
 CELERY_ALWAYS_EAGER = bool(os.environ.get("CELERY_ALWAYS_EAGER", False))
 CELERY_BEAT_SCHEDULE = {
-    'update_domains': {
-        'task': 'domains.tasks.update_domains',
-        'schedule': crontab(minute="0", hour="0")
-    },
-    'update_prompts': {
-        'task': 'writing.tasks.refresh_prompts',
-        'schedule': crontab(minute="0", hour="0")
-    },
     'process_daily_subscription_renewals': {
         'task': 'subscriptions.tasks.process_daily_subscription_renewals',
         'schedule': crontab(minute="0", hour="0")
@@ -285,25 +277,26 @@ LOGGING = {
 AUTH_USER_MODEL = 'users.User'
 ROSETTA_SHOW_AT_ADMIN_PANEL = True
 
-# Files Processing API
-FILES_PROCESSING_API_URL = 'https://office.fileprocessing.custom.mt'
-
-# Custom MT Console Configuration
+# Custom MT Console Configuration (legacy)
 CUSTOM_MT_CONSOLE_URL = os.environ.get('CUSTOM_MT_CONSOLE_URL')
 
-# Cloud Storage API Configuration
-CLOUDSTORAGE_API_URL = os.environ.get('CLOUDSTORAGE_API_URL')
-CLOUDSTORAGE_API_KEY = os.environ.get('CLOUDSTORAGE_API_KEY')
+# OpenAI Configuration
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+
+# LARA Translation API Configuration
+LARA_API_URL = os.environ.get('LARA_API_URL')
+LARA_ACCESS_KEY_ID = os.environ.get('LARA_ACCESS_KEY_ID')
+LARA_ACCESS_KEY_SECRET = os.environ.get('LARA_ACCESS_KEY_SECRET')
+
+# Cloud Storage API Configuration - DÉSACTIVÉ
+# CLOUDSTORAGE_API_URL = os.environ.get('CLOUDSTORAGE_API_URL')
+# CLOUDSTORAGE_API_KEY = os.environ.get('CLOUDSTORAGE_API_KEY')
 
 # Email Configuration
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL')
 QUOTE_CC_EMAIL = os.environ.get('QUOTE_CC_EMAIL')
 SUPPORT_EMAIL = os.environ.get('SUPPORT_EMAIL')
-
-# Glossary Configuration
-GLOSSARY_SYSTEM = os.environ.get("GLOSSARY_SYSTEM")
-GLOSSARY_API_KEY = os.environ.get("GLOSSARY_API_KEY")
-GLOSSARY_API_URL = os.environ.get("GLOSSARY_API_URL")
+MINIMUM_QUOTE_AMOUNT = float(os.environ.get('MINIMUM_QUOTE_AMOUNT', '0'))
 
 # Statistics Service Configuration
 STATS_API_URL = os.environ.get('STATS_API_URL')
@@ -323,5 +316,10 @@ ACTIVE_TRAIL_USER_PROFILE_FROMNAME = os.environ.get(
     'ACTIVE_TRAIL_USER_PROFILE_FROMNAME')
 ACTIVE_TRAIL_SEND_EMAIL_REQUEST_URL = 'https://webapi.mymarketing.co.il/api/OperationalMessage/Message'
 ACTIVE_TRAIL_API_KEY = os.environ.get('ACTIVE_TRAIL_API_KEY')
+
+# Adobe PDF Services Configuration
+ADOBE_CLIENT_ID = os.environ.get('ADOBE_CLIENT_ID')
+ADOBE_CLIENT_SECRET = os.environ.get('ADOBE_CLIENT_SECRET')
+ADOBE_ORGANIZATION_ID = os.environ.get('ADOBE_ORGANIZATION_ID')
 
 

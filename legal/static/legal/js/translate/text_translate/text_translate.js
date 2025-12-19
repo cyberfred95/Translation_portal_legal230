@@ -36,6 +36,10 @@ $(document).ready(function () {
         translatedText: $('#translated-text'),
         tooltip: $('#tooltip'),
         syncBtn: $('#sync-target-to-source'),
+        // LARA: Nouveaux champs pour instructions et retour qualité
+        instructionsField: $('#translation-instructions'),
+        qualityFeedbackRow: $('#quality-feedback-row'),
+        qualityCommentsText: $('#quality-comments-text'),
     };
 
     const MIN_DETECTION_WORD_COUNT = 9;
@@ -263,7 +267,7 @@ $(document).ready(function () {
 
     function fetchDomains(metadata) {
         $.ajax({
-            url: `${get_domains}?source_language=${state.sourceLanguage}&target_language=${state.targetLanguage}`,
+            url: `${get_domains}`,
             type: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
@@ -361,6 +365,7 @@ $(document).ready(function () {
             const formData = new FormData(this);
 
             generateSkeleton();
+            hideQualityFeedback(); // LARA: Masquer le retour qualité précédent
 
             $.ajax({
                 url: translate,
@@ -374,6 +379,11 @@ $(document).ready(function () {
                 },
                 success(response) {
                     editors.translated.root.innerHTML = response.translated_text[0];
+
+                    // LARA: Afficher le retour qualité s'il existe (commentaire texte)
+                    if (response.quality_feedback) {
+                        showQualityFeedback(response.quality_feedback);
+                    }
                 },
                 error(error) {
                     errorNotification(error?.status, error?.responseJSON?.detail);
@@ -403,10 +413,44 @@ $(document).ready(function () {
         $els.translatedText.css({ visibility: 'visible' });
     }
 
+    // LARA: Fonctions pour gérer l'affichage du retour qualité
+    function showQualityFeedback(qualityData) {
+        if (!qualityData) return;
+
+        // Le retour qualité est un commentaire texte, pas un chiffre
+        const { comments, suggestions } = qualityData;
+
+        let feedbackText = '';
+
+        if (comments) {
+            feedbackText = comments;
+        }
+
+        if (suggestions) {
+            if (feedbackText) {
+                feedbackText += '\n\n' + suggestions;
+            } else {
+                feedbackText = suggestions;
+            }
+        }
+
+        if (feedbackText) {
+            $els.qualityCommentsText.text(feedbackText);
+            $els.qualityFeedbackRow.removeClass('hidden');
+        }
+    }
+
+    function hideQualityFeedback() {
+        $els.qualityFeedbackRow.addClass('hidden');
+        $els.qualityCommentsText.text('');
+    }
+
     function bindClearButtons() {
         $els.clearButtons.on('click', () => {
             editors.source.deleteText(0, editors.source.getLength());
             editors.translated.deleteText(0, editors.translated.getLength());
+            $els.instructionsField.val(''); // LARA: Vider les instructions
+            hideQualityFeedback();           // LARA: Masquer le retour qualité
             resizeTextAreas();
             validateTranslateButton();
         });

@@ -8,6 +8,25 @@
 {% endblock %}
 
 {% block content %}
+<div id="translate-config"
+     data-get-domains="{% url 'get_domains' %}"
+     data-translate="{% url 'main_index' %}"
+     data-single-project="{% url 'single_project' %}"
+     data-detect-language="{% url 'detect_language' %}"
+     data-detect-text-language="{% url 'detect_text_language' %}"
+     data-domain-groups="{% url 'domain_groups' %}"
+     data-get-default-glossary="{% url 'get_default_glossary' %}"
+     data-api-list-glossaries="{% url 'api_list_glossaries' %}"
+     data-api-lara-glossary-search="{% url 'api_lara_glossary_search' %}"
+     data-expert-revision-file-url="{% url 'expert_revision_file' %}"
+     data-add-glossary="{% url 'add_glossary' %}"
+     data-language-code="{{ request.LANGUAGE_CODE }}"
+     data-access-to-default-glossaries="{{ access_to_default_glossaries|yesno:'true,false' }}"
+     data-languages='[
+        {% for language in translate_languages %}{"id":{{ language.id }},"abbreviation":"{{ language.abbreviation }}","name":"{% if request.LANGUAGE_CODE == 'fr' and language.french_name %}{{ language.french_name|escapejs }}{% else %}{{ language.name|escapejs }}{% endif %}"}{% if not forloop.last %},{% endif %}{% endfor %}
+     ]'>
+</div>
+
 <div class="translate-page">
     <h2 class="translate-title">{% trans 'Translation' %}</h2>
     <div class="translate-subtitle">{% trans 'Instantly translate your texts and documents into multiple languages' %}</div>
@@ -34,24 +53,6 @@
             {% include 'translate/document_translate/document_translate.html' %}
         </div>
     </div>
-</div>
-
-<div id="translate-config"
-     data-get-domains="{% url 'get_domains' %}"
-     data-translate="{% url 'main_index' %}"
-     data-single-project="{% url 'single_project' %}"
-     data-detect-language="{% url 'detect_language' %}"
-     data-detect-text-language="{% url 'detect_text_language' %}"
-     data-domain-groups="{% url 'domain_groups' %}"
-     data-get-default-glossary="{% url 'get_default_glossary' %}"
-     data-api-list-glossaries="{% url 'api_list_glossaries' %}"
-     data-expert-revision-file-url="{% url 'expert_revision_file' %}"
-     data-add-glossary="{% url 'add_glossary' %}"
-     data-language-code="{{ request.LANGUAGE_CODE }}"
-     data-access-to-default-glossaries="{{ access_to_default_glossaries|yesno:'true,false' }}"
-     data-languages='[
-        {% for language in translate_languages %}{"id":{{ language.id }},"abbreviation":"{{ language.abbreviation }}","name":"{% if request.LANGUAGE_CODE == 'fr' and language.french_name %}{{ language.french_name|escapejs }}{% else %}{{ language.name|escapejs }}{% endif %}"}{% if not forloop.last %},{% endif %}{% endfor %}
-     ]'>
 </div>
 
 {% block extra_js %}

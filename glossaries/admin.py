@@ -126,6 +126,14 @@ class GlossaryAdmin(admin.ModelAdmin):
     list_filter = [DomainFilter, SourceLanguageFilter,
                    TargetLanguageFilter, UserFilter, 'created_at']
     search_fields = ['name', 'domain__name']
+    
+    def has_add_permission(self, request):
+        """Disable adding glossaries from admin - use frontend instead."""
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        """Disable deleting glossaries from admin - use frontend instead."""
+        return False
 
     def has_remote_id(self, obj):
         """Display whether glossary has a remote glossary_id"""
@@ -447,9 +455,9 @@ class GlossaryAdmin(admin.ModelAdmin):
 
             # Display the check options page
             context.update({
-                'glossary_system': settings.GLOSSARY_SYSTEM,
-                'glossary_api_key': '***' if settings.GLOSSARY_API_KEY else 'NOT SET',
-                'glossaries_url': settings.GLOSSARY_API_URL,
+                'glossary_system': getattr(settings, 'GLOSSARY_SYSTEM', None),
+                'glossary_api_key': '***' if getattr(settings, 'GLOSSARY_API_KEY', None) else 'NOT SET',
+                'glossaries_url': getattr(settings, 'GLOSSARY_API_URL', None),
                 'total_glossaries': Glossary.objects.count(),
                 'with_id': Glossary.objects.exclude(glossary_id__isnull=True).exclude(glossary_id='').count(),
                 'without_id': Glossary.objects.filter(glossary_id__isnull=True).count() +
@@ -474,7 +482,7 @@ class GlossaryAdmin(admin.ModelAdmin):
             cache.delete(f'check_progress_{check_id}')
 
             context.update({
-                'glossary_system': settings.GLOSSARY_SYSTEM,
+                'glossary_system': getattr(settings, 'GLOSSARY_SYSTEM', None),
                 'verbose': verbose,
                 'id_null_only': id_null_only,
                 'check_id': check_id,
@@ -538,7 +546,7 @@ class GlossaryAdmin(admin.ModelAdmin):
                     results = {
                         'verbose': verbose,
                         'id_null_only': id_null_only,
-                        'glossary_system': settings.GLOSSARY_SYSTEM,
+                        'glossary_system': getattr(settings, 'GLOSSARY_SYSTEM', None),
                         'total_glossaries': Glossary.objects.count(),
                     }
 
@@ -618,14 +626,20 @@ class GlossaryAdmin(admin.ModelAdmin):
                             }
 
                             try:
-                                url = settings.GLOSSARY_API_URL + 'get_glossary'
+                                api_url = getattr(settings, 'GLOSSARY_API_URL', None)
+                                if not api_url:
+                                    # Custom.MT API not configured, skip check
+                                    glossary_info['error'] = "Custom.MT API not configured"
+                                    return ('error', glossary_info)
+
+                                url = api_url + 'get_glossary'
                                 payload = {
-                                    "system": settings.GLOSSARY_SYSTEM,
+                                    "system": getattr(settings, 'GLOSSARY_SYSTEM', None),
                                     "username": get_glossary_username(glossary),
                                     "glossary_id": glossary.glossary_id,
                                 }
                                 headers = {
-                                    "API-KEY": settings.GLOSSARY_API_KEY
+                                    "API-KEY": getattr(settings, 'GLOSSARY_API_KEY', None)
                                 }
 
                                 response = requests.post(url, headers=headers, json=payload, timeout=60)
@@ -986,5 +1000,5 @@ class GlossaryAdmin(admin.ModelAdmin):
         from django.conf import settings
         extra_context = extra_context or {}
         extra_context['show_batch_upload'] = True
-        extra_context['glossary_system'] = settings.GLOSSARY_SYSTEM
+        extra_context['glossary_system'] = getattr(settings, 'GLOSSARY_SYSTEM', None)
         return super().changelist_view(request, extra_context)

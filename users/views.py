@@ -32,11 +32,9 @@ from rest_framework.generics import DestroyAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
-import requests
 from glossaries.models import Glossary
 from subscriptions.models import SubscriptionType, UserSubscription
 from subscriptions.permissions import SubscribedPermission
-from subscriptions.utils import get_user_api_key
 from .models import UserGroup, User
 from .serializers import GroupSerializer, UserSerializer, ChangePasswordSerializer, RegisterUserSerializer, \
     LoginSerializer, ForgotPasswordSerializer, ResetPasswordSerializer
@@ -73,44 +71,11 @@ class ChangePasswordView(APIView):
 class DeleteAllDataView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @staticmethod
-    def delete_all_projects(user):
-        params = {
-            "page_size": PAGINATION_PAGE_SIZE,
-            "user_custom_mt_token": user.uuid if not user.is_staff else None
-        }
-        
-        # Resolve API key based on user subscription
-        try:
-            user_api_key = get_user_api_key(user)
-        except ValueError:
-            print("no subscription")
-            return  # Exit early if no subscription found
-            
-        headers = {"token": user_api_key}
-
-        response = requests.get(settings.CLOUDSTORAGE_API_URL, params=params, headers=headers).json()
-        num_pages = response.get('num_pages')
-        page = 1
-        while page < num_pages:
-            params['page'] = page
-            response = requests.get(
-                settings.CLOUDSTORAGE_API_URL,
-                params=params,
-                headers=headers,
-            ).json()
-            if 'results' in response:
-                for project in response['results']:
-                    requests.delete(
-                        settings.CLOUDSTORAGE_API_URL + f"{project['id']}/",
-                        headers=headers,
-                    )
-
     def post(self, request):
         if password_valid(request):
             user = request.user
             Glossary.objects.filter(user=request.user).delete()
-            self.delete_all_projects(user)
+            # Note: Suppression des projets CloudStorage désactivée (service non disponible)
             return Response({"message": "All data deleted successfully"}, status=status.HTTP_200_OK)
         return Response({"detail": "invalid password"}, status=status.HTTP_403_FORBIDDEN)
 
@@ -193,7 +158,7 @@ class InviteUserAPIView(APIView):
                         {
                             # TMP : Need to be replaced with actual values when figma integration is done
                             "lexa_username": "name",
-                            "lexa_email": user.email,
+                            "lexa_email": email,
                             "url_reset_password" : self.get_register_user_absolute_uri(request, params=params),
                         }
                     )

@@ -1,10 +1,8 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from .models import Prompt, PromptTranslation, Prompt
+from .models import Prompt, PromptTranslation
 from legal.constants import LANGUAGES, EN, FR
 
-
-# Register your models here.
 
 class PromptTranslationInline(admin.StackedInline):
     model = PromptTranslation
@@ -24,8 +22,6 @@ class PromptAdmin(admin.ModelAdmin):
     list_display = ('id', 'gpt_model', 'name_en', 'name_fr', 'icon_display')
     fields = ('prompt', 'variables', 'temperature', 'gpt_model', 'icon')
     inlines = [PromptTranslationInline]
-
-    change_list_template = "admin/writing/Prompt/change_list.html"
 
     @staticmethod
     def icon_display(obj: Prompt):

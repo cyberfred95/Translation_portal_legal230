@@ -1,102 +1,146 @@
+"""
+Django signals for glossary model.
+
+Handles automatic synchronization with LARA backend on save/delete.
+"""
+import logging
 import os
 
-import requests
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 
-from .helpers import get_glossary_username
 from .models import Glossary
-from .services import AIGlossaryService
+from .services import LaraGlossaryService
+from .services.lara_client import LaraClientError
+
+logger = logging.getLogger(__name__)
 
 
 @receiver(post_save, sender=Glossary)
-def create_glossary_on_service(sender, instance: Glossary, created, **kwargs):
-    import logging
-    logger = logging.getLogger(__name__)
+def sync_glossary_to_lara(sender, instance: Glossary, created, **kwargs):
+    """
+    Synchronize glossary with LARA backend on save.
 
+    On create: Creates glossary in LARA and stores glossary_id.
+    On update with file: Updates glossary in LARA with new file content.
+
+    Args:
+        sender: Model class
+        instance: Glossary instance being saved
+        created: True if this is a new record
+    """
     # Prevent recursive signal calls
     if getattr(instance, '_skip_signal', False):
         return
 
-    ai_glossary_service = AIGlossaryService()
+    # Skip if no file to process
+    if not _has_valid_file(instance):
+        if created:
+            logger.warning(f"New glossary {instance.name} has no file, skipping LARA sync")
+        return
 
-    if created:
-        try:
-            instance.glossary_id = ai_glossary_service.create_glossary(instance)
-            # Set flag to prevent recursive call, then save
-            instance._skip_signal = True
-            instance.save(update_fields=['glossary_id'])
-        except ValidationError as e:
-            # Re-raise ValidationError so it can be caught by the batch processor
-            logger.error(f"Failed to create glossary_id for {instance.name}: {str(e)}", exc_info=True)
-            # Delete the instance since validation failed
+    service = LaraGlossaryService()
+
+    try:
+        if created:
+            _handle_create(instance, service)
+        else:
+            _handle_update(instance, service)
+
+        # Cleanup file after successful sync
+        _cleanup_and_save(instance)
+
+    except ValidationError as e:
+        logger.error(f"Validation error for glossary {instance.name}: {e}")
+        if created:
             instance.delete()
-            raise
-        except Exception as e:
-            logger.error(f"Failed to create glossary_id for {instance.name}: {str(e)}", exc_info=True)
-            # Delete the instance since creation failed
+        raise
+
+    except LaraClientError as e:
+        logger.error(f"LARA error for glossary {instance.name}: {e}")
+        if created:
             instance.delete()
-            # Re-raise the exception so it can be caught by the batch processor
-            raise
+        raise
 
-    # Only process file if it exists and has a valid path
-    if instance.file and hasattr(instance.file, 'name') and instance.file.name:
-        try:
-            # Check if file actually exists on disk
-            if hasattr(instance.file, 'path'):
-                file_exists = os.path.exists(instance.file.path)
-            else:
-                file_exists = False
+    except Exception as e:
+        logger.error(f"Unexpected error for glossary {instance.name}: {e}", exc_info=True)
+        if created:
+            instance.delete()
+        raise
 
-            if file_exists:
-                try:
-                    if instance.glossary_id:
-                        # Glossary already has a remote ID, update it
-                        ai_glossary_service.update_glossary(instance)
-                    else:
-                        # Glossary exists locally but has no remote ID, create it on API
-                        instance.glossary_id = ai_glossary_service.create_glossary(instance)
-                        # Will be saved after file cleanup below
-                except ValidationError as e:
-                    # Re-raise ValidationError for update/create failures
-                    logger.error(f"Failed to update/create glossary on service for {instance.name}: {str(e)}", exc_info=True)
-                    raise
-                except Exception as e:
-                    logger.error(f"Failed to update/create glossary on service for {instance.name}: {str(e)}", exc_info=True)
-                    raise
 
-                instance.name = os.path.splitext(os.path.basename(instance.file.name))[0]
+def _has_valid_file(instance: Glossary) -> bool:
+    """Check if instance has a valid file on disk."""
+    if not instance.file or not hasattr(instance.file, 'name') or not instance.file.name:
+        return False
 
-                try:
-                    instance.file.delete(save=False)
-                except Exception as e:
-                    logger.warning(f"Failed to delete file for {instance.name}: {str(e)}")
+    if hasattr(instance.file, 'path'):
+        return os.path.exists(instance.file.path)
 
-                instance.file = None
+    return False
 
-                if instance._state.adding is False:
-                    # Set flag to prevent recursive call
-                    instance._skip_signal = True
-                    # Save with glossary_id if it was just created
-                    instance.save()
-            else:
-                logger.warning(f"File does not exist on disk for glossary {instance.name}, skipping file processing")
-        except Exception as e:
-            logger.error(f"Error processing file for glossary {instance.name}: {str(e)}", exc_info=True)
-            raise
+
+def _handle_create(instance: Glossary, service: LaraGlossaryService) -> None:
+    """Handle glossary creation in LARA."""
+    logger.info(f"Creating glossary in LARA: {instance.name}")
+
+    glossary_id = service.create_glossary(instance)
+    instance.glossary_id = glossary_id
+
+    # Save glossary_id without triggering signal
+    instance._skip_signal = True
+    instance.save(update_fields=['glossary_id'])
+
+
+def _handle_update(instance: Glossary, service: LaraGlossaryService) -> None:
+    """Handle glossary update in LARA."""
+    if instance.glossary_id:
+        logger.info(f"Updating glossary in LARA: {instance.glossary_id}")
+        service.update_glossary(instance)
+    else:
+        logger.info(f"No glossary_id, creating in LARA: {instance.name}")
+        glossary_id = service.create_glossary(instance)
+        instance.glossary_id = glossary_id
+
+
+def _cleanup_and_save(instance: Glossary) -> None:
+    """Clean up file and save instance."""
+    # Update name from file
+    if instance.file and instance.file.name:
+        instance.name = os.path.splitext(os.path.basename(instance.file.name))[0]
+
+    # Delete file from disk
+    try:
+        instance.file.delete(save=False)
+    except Exception as e:
+        logger.warning(f"Failed to delete file for {instance.name}: {e}")
+
+    instance.file = None
+
+    # Save changes without triggering signal
+    if not instance._state.adding:
+        instance._skip_signal = True
+        instance.save()
 
 
 @receiver(pre_delete, sender=Glossary)
-def delete_glossary_from_service(sender, instance: Glossary, **kwargs):
-    import logging
-    logger = logging.getLogger(__name__)
+def delete_glossary_from_lara(sender, instance: Glossary, **kwargs):
+    """
+    Delete glossary from LARA backend before local deletion.
 
-    # Only call API if glossary_id exists
-    if instance.glossary_id:
-        try:
-            AIGlossaryService().delete_glossary(instance)
-        except Exception as e:
-            logger.error(f"Failed to delete glossary from external service: {instance.name} - {str(e)}", exc_info=True)
-            # Don't raise - allow Django deletion to proceed even if API fails
+    Args:
+        sender: Model class
+        instance: Glossary instance being deleted
+    """
+    if not instance.glossary_id:
+        return
+
+    logger.info(f"Deleting glossary from LARA: {instance.glossary_id}")
+
+    try:
+        service = LaraGlossaryService()
+        service.delete_glossary(instance)
+    except Exception as e:
+        # Log but don't block local deletion
+        logger.error(f"Failed to delete glossary from LARA: {instance.name} - {e}")

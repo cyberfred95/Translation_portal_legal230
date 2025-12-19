@@ -44,6 +44,9 @@ from .error.error import error_message, success_message
 def validate_glossary_request(request, data):
     """
     Validate glossary request data for both JSON and form submissions.
+    
+    Note: source_language and target_language are no longer required as they are
+    automatically detected from the CSV file.
 
     Args:
         request: Django HttpRequest object
@@ -52,17 +55,16 @@ def validate_glossary_request(request, data):
     Returns:
         dict or None: Error details if validation fails, None if valid
     """
-    required_fields = ["name", "source_language", "target_language"]
-    for field in required_fields:
-        value = data.get(field)
-        if value is None or not isinstance(value, str):
-            return error_message(FIELD_REQUIRED.format(field=field))
-
-        # Field-specific length validation
-        if field == "name" and len(value) > MAX_GLOSSARY_NAME_LENGTH:
-            return error_message(FIELD_TOO_LONG_GLOSSARY_NAME.format(field=field))
-        elif field in ["source_language", "target_language"] and len(value) > MAX_LANGUAGE_CODE_LENGTH:
-            return error_message(FIELD_TOO_LONG_LANGUAGE.format(field=field))
+    # Only validate name if provided (optional for form submissions)
+    name = data.get("name")
+    if name is not None:
+        if not isinstance(name, str):
+            return error_message(FIELD_REQUIRED.format(field="name"))
+        if len(name) > MAX_GLOSSARY_NAME_LENGTH:
+            return error_message(FIELD_TOO_LONG_GLOSSARY_NAME.format(field="name"))
+    
+    # source_language and target_language are no longer required
+    # They are automatically detected from the CSV file
 
     # Validate glossary file
     if request.content_type and request.content_type.startswith('application/json'):
@@ -102,7 +104,9 @@ def inject_glossary_from_json_file(request, data):
         data: Dictionary containing request data with base64 file
     """
     glossary_b64 = data.get("file")
-    file_name = f"{data.get('name')}_{data.get('source_language')}_{data.get('target_language')}"
+    # Use name from data if provided, otherwise use default
+    name = data.get('name', 'glossary')
+    file_name = name
 
     if glossary_b64:
         file_content = base64.b64decode(glossary_b64)
@@ -125,10 +129,9 @@ def inject_glossary_from_form_urlencoded_file(request):
     Args:
         request: Django HttpRequest object to modify
     """
-    request.data = dict(request.POST)
-    for key, value in request.data.items():
-        if isinstance(value, list) and len(value) == 1:
-            request.data[key] = value[0]
+    # Only include file in request.data, not language fields (they're auto-detected)
+    request.data = {}
+    # File is already in request.FILES, no need to add it to request.data
 
 
 def handle_add_glossary_post(request):

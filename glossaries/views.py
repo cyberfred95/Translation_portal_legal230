@@ -1,14 +1,20 @@
 import csv
 import io
+import logging
 import os.path
+from typing import Optional
 
 import django.core.exceptions
 import openpyxl
+import requests as http_requests
+import requests
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.functions import Lower
 from django.core.paginator import Paginator
 from django.views.generic import TemplateView
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 
 class BaseTemplateView(TemplateView):
@@ -61,67 +67,350 @@ class UserGlossariesView(BaseTemplateView):
         return Language.objects.order_by('name').all()
 
     def get_glossaries(self):
-        tmp_glossaries = Glossary.objects.filter(user=self.request.user)
-
-        formatted_glossaries = [
-            glossary.to_json(self.request)
-            for glossary in tmp_glossaries
-        ]
-        return formatted_glossaries
+        """
+        Fetch personal glossaries from Lara-django API (read-only).
+        Only fetches glossaries with UUID != '*' (personal glossaries).
+        """
+        from django.conf import settings
+        import requests
+        
+        user_uuid = str(self.request.user.uuid) if hasattr(self.request.user, 'uuid') else None
+        
+        if not user_uuid:
+            # If user has no UUID, return empty list
+            return []
+        
+        try:
+            # Fetch personal glossaries from Lara-django
+            lara_url = f"{settings.LARA_API_URL}/api/lara/glossaries-list/search/"
+            response = requests.get(
+                lara_url,
+                params={
+                    'uuid': user_uuid,
+                },
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                # Transform to format expected by frontend
+                formatted_glossaries = []
+                for g in data.get('glossaries', []):
+                    # Use user_glossary_name if available, otherwise name
+                    display_name = g.get('user_glossary_name') or g.get('name', '')
+                    formatted_glossaries.append({
+                        'id': g.get('glossary_id', ''),
+                        'name': display_name,
+                        'source_language': g.get('source_language', ''),
+                        'target_language': g.get('target_languages', '').split(',')[0] if g.get('target_languages') else '',
+                        'created_at': g.get('generated_at', ''),
+                    })
+                return formatted_glossaries
+            else:
+                logger.error(f"Failed to fetch glossaries from Lara-django: {response.status_code}")
+                return []
+        except Exception as e:
+            logger.error(f"Error fetching glossaries from Lara-django: {str(e)}")
+            return []
 
 
 
 
 class AddGlossaryView(APIView):
     permission_classes = (SubscribedPermission, IsAuthenticated)
+    
+    # Default error messages by status code
+    DEFAULT_ERROR_MESSAGES = {
+        400: "Les données envoyées sont invalides. Veuillez vérifier le format du fichier CSV et réessayer.",
+        401: "Authentification requise. Veuillez vous reconnecter.",
+        403: "Vous n'avez pas les permissions nécessaires pour créer un glossaire.",
+        404: "L'endpoint de création de glossaire est introuvable. Veuillez contacter le support technique.",
+        502: "Le serveur LARA n'a pas pu traiter votre demande. Veuillez réessayer dans quelques instants ou contacter le support si le problème persiste.",
+        504: "L'import du glossaire a pris trop de temps (timeout après 30 secondes).",
+    }
+    
+    # Error prefixes to remove from messages
+    ERROR_PREFIXES = [
+        "Error creating glossary: ",
+        "LARA error: ",
+        "LARA error:",
+        "Erreur lors de la création du glossaire : ",
+        "Erreur lors de la création du glossaire :",
+    ]
+    
+    # Empty error message patterns
+    EMPTY_ERROR_PATTERNS = [
+        "lara error:",
+        "lara error: ",
+        "error creating glossary:",
+        "error creating glossary: ",
+        "erreur lors de la création du glossaire :",
+        "erreur lors de la création du glossaire : ",
+    ]
 
-    @staticmethod
-    def validate(request):
-        if not request.user.is_staff:
-            user_subscription = request.user.subscriptions.first()
-            if user_subscription.custom_glossaries_count > 0:
-                user_glossaries_count = Glossary.objects.filter(
-                    user=request.user).count()
-                if user_glossaries_count + 1 > user_subscription.custom_glossaries_count:
-                    raise serializers.ValidationError({
-                        "detail": "You are not allowed to add more glossaries. Please contact your group administator"})
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Override dispatch to clean request.POST before DRF parses it into request.data.
+        DRF automatically parses request.POST into request.data for multipart/form-data,
+        but we don't need source_language/target_language fields anymore.
+        """
+        if hasattr(request, 'POST') and request.method == 'POST':
+            from django.http import QueryDict
+            if isinstance(request.POST, QueryDict):
+                mutable_post = request.POST.copy()
+                mutable_post.pop('source_language', None)
+                mutable_post.pop('target_language', None)
+                request.POST = mutable_post
+        
+        return super().dispatch(request, *args, **kwargs)
 
-        languages_list = Language.objects.all().values_list(
-            Lower('abbreviation'), flat=True)
-        if request.data["source_language"] == request.data["target_language"]:
-            raise serializers.ValidationError(
-                {"detail": _("Source and target languages cannot be the same")})
-        if request.data["source_language"] not in languages_list:
-            raise serializers.ValidationError(
-                {"detail": _("Invalid source language")})
-        if request.data["target_language"] not in languages_list:
-            raise serializers.ValidationError(
-                {"detail": _("Invalid target language")})
+    def _is_empty_error_message(self, message: str) -> bool:
+        """
+        Check if error message is effectively empty (just prefixes without content).
+        
+        Args:
+            message: Error message string
+            
+        Returns:
+            bool: True if message is empty or just contains error prefixes
+        """
+        if not message or not message.strip():
+            return True
+        
+        message_lower = message.strip().lower()
+        return message_lower in self.EMPTY_ERROR_PATTERNS
 
-        gloss_file = request.FILES.get('file')
-        processor = GlossaryProcessor()
-        if os.path.splitext(gloss_file.name)[1] == '.csv':
-            request.FILES['file'] = processor.convert_file_to_utf_8(gloss_file)
+    def _extract_error_message(self, response) -> Optional[str]:
+        """
+        Extract error message from LARA API response.
+        
+        Args:
+            response: requests.Response object
+            
+        Returns:
+            str: Error message, or None if extraction fails
+        """
+        if not response.content:
+            return f"Erreur HTTP {response.status_code} : réponse vide du serveur LARA"
+        
+        # Try to extract from JSON response
         try:
-            processor.validate_file(gloss_file)
-        except django.core.exceptions.ValidationError as e:
-            raise serializers.ValidationError({"detail": str(list(e)[0])})
+            error_data = response.json()
+            error_fields = ['error', 'detail', 'message', 'errors']
+            for field in error_fields:
+                error_value = error_data.get(field)
+                if error_value:
+                    if isinstance(error_value, str):
+                        error_value = error_value.strip()
+                        if error_value and not self._is_empty_error_message(error_value):
+                            return error_value
+                    elif isinstance(error_value, (list, dict)) and error_value:
+                        return str(error_value)
+        except (ValueError, KeyError, AttributeError):
+            pass
+        
+        # Fallback to text content
+        if response.text:
+            text_content = response.text.strip()[:500]
+            if text_content and not self._is_empty_error_message(text_content):
+                return text_content
+        
+        return None
+    
+    def _clean_error_message(self, error_detail: str) -> str:
+        """
+        Clean error message by removing common prefixes.
+        
+        Args:
+            error_detail: Raw error message
+            
+        Returns:
+            Cleaned error message
+        """
+        error_detail = error_detail.strip()
+        for prefix in self.ERROR_PREFIXES:
+            if error_detail.startswith(prefix):
+                error_detail = error_detail[len(prefix):].strip()
+        return error_detail
+    
+    def _format_error_message(self, status_code: int, error_detail: Optional[str]) -> str:
+        """
+        Format error message for user display.
+        
+        Args:
+            status_code: HTTP status code
+            error_detail: Raw error message from API (can be None)
+            
+        Returns:
+            str: Formatted, user-friendly error message
+        """
+        # Use default message if error_detail is empty or just prefixes
+        if not error_detail or not error_detail.strip() or self._is_empty_error_message(error_detail):
+            if status_code in self.DEFAULT_ERROR_MESSAGES:
+                return self.DEFAULT_ERROR_MESSAGES[status_code]
+            elif status_code >= 500:
+                return "Une erreur serveur s'est produite lors de la création du glossaire. Veuillez réessayer plus tard ou contacter le support technique."
+            else:
+                return f"Erreur lors de la création du glossaire (code HTTP {status_code}). Veuillez réessayer ou contacter le support si le problème persiste."
+        
+        # Clean up error prefixes
+        error_detail = self._clean_error_message(error_detail)
+        
+        # If after cleaning the message is empty, use default
+        if not error_detail or self._is_empty_error_message(error_detail):
+            if status_code >= 500:
+                return "Une erreur serveur s'est produite lors de la création du glossaire. Veuillez réessayer plus tard ou contacter le support technique."
+            else:
+                return "Une erreur s'est produite lors de la création du glossaire. Veuillez réessayer."
+        
+        return error_detail
 
     def post(self, request):
-        self.validate(request)
+        """
+        Create a personal glossary via Lara-django API.
+        Languages are automatically detected from CSV file.
+        """
+        from django.conf import settings
+        import requests
+        
+        user_uuid = str(request.user.uuid) if hasattr(request.user, 'uuid') else None
+        
+        if not user_uuid:
+            return Response(
+                {"detail": "UUID utilisateur introuvable. Veuillez vous reconnecter."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
         gloss_file = request.FILES.get('file')
-        source_language = Language.objects.get(
-            abbreviation__iexact=request.data.get('source_language').upper())
-        target_language = Language.objects.get(
-            abbreviation__iexact=request.data.get('target_language').upper())
-
-        glossary = Glossary.objects.create(
-            user=request.user,
-            source_language=source_language,
-            target_language=target_language,
-            file=gloss_file,
-        )
-        return Response(GlossarySerializer(glossary).data, status=status.HTTP_201_CREATED)
+        if not gloss_file:
+            return Response(
+                {"detail": "Un fichier est requis pour créer un glossaire. Veuillez sélectionner un fichier CSV."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate file size (5MB max)
+        max_file_size = 5 * 1024 * 1024
+        if gloss_file.size > max_file_size:
+            return Response(
+                {"detail": f"La taille du fichier ({gloss_file.size / (1024*1024):.2f} MB) dépasse la limite autorisée de 5 MB. Veuillez utiliser un fichier plus petit."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate LARA_API_URL configuration
+        if not settings.LARA_API_URL:
+            logger.error("LARA_API_URL is not configured in settings")
+            return Response(
+                {"detail": "La configuration du serveur LARA est manquante. Veuillez contacter le support technique."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+        # Check if URL uses Docker service name (common misconfiguration)
+        if settings.LARA_API_URL.startswith('http://') and ('django' in settings.LARA_API_URL or 'laradjango' in settings.LARA_API_URL):
+            logger.error(f"LARA_API_URL is configured with Docker service name: {settings.LARA_API_URL}")
+            return Response(
+                {"detail": "La configuration de l'URL LARA est incorrecte. Veuillez contacter le support technique."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+        try:
+            # Call Lara-django create-from-lexa endpoint
+            lara_url = f"{settings.LARA_API_URL}/api/lara/glossaries-list/create-from-lexa/"
+            
+            files = {
+                'glossary_file': (gloss_file.name, gloss_file, gloss_file.content_type)
+            }
+            headers = {
+                'X-User-UUID': user_uuid
+            }
+            
+            response = requests.post(
+                lara_url,
+                files=files,
+                headers=headers,
+                timeout=300  # 5 minutes for large files
+            )
+            
+            if response.status_code == 201:
+                try:
+                    lara_data = response.json()
+                except (ValueError, KeyError) as e:
+                    logger.error(f"Failed to parse JSON response from LARA API: {str(e)} - Response content: {response.text[:200]}")
+                    return Response(
+                        {"detail": "Le serveur LARA a retourné une réponse dans un format invalide. Le glossaire a peut-être été créé, mais nous n'avons pas pu confirmer. Veuillez vérifier votre liste de glossaires."},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
+                
+                # Transform to format expected by frontend
+                return Response({
+                    'id': lara_data.get('glossary_id', ''),
+                    'name': lara_data.get('user_glossary_name', lara_data.get('name', '')),
+                    'source_language': lara_data.get('source_language', ''),
+                    'target_language': lara_data.get('target_languages', '').split(',')[0] if lara_data.get('target_languages') else '',
+                    'created_at': lara_data.get('generated_at', ''),
+                }, status=status.HTTP_201_CREATED)
+            else:
+                # Handle error response
+                error_detail = self._extract_error_message(response)
+                
+                # Log detailed error information for debugging
+                logger.error(
+                    f"Lara-django glossary creation failed: {response.status_code} - {error_detail} - URL: {lara_url}",
+                    extra={
+                        'response_status': response.status_code,
+                        'response_headers': dict(response.headers),
+                        'response_body': response.text[:500] if response.text else None,
+                    }
+                )
+                
+                # Format user-friendly error message
+                formatted_error = self._format_error_message(response.status_code, error_detail)
+                
+                return Response(
+                    {"detail": formatted_error},
+                    status=response.status_code if response.status_code < 500 else status.HTTP_502_BAD_GATEWAY
+                )
+        except requests.exceptions.ConnectionError as e:
+            error_msg = str(e)
+            logger.error(f"Cannot connect to LARA API at {settings.LARA_API_URL}: {error_msg}", exc_info=True)
+            if 'name resolution' in error_msg.lower() or 'failed to establish' in error_msg.lower():
+                return Response(
+                    {"detail": f"Impossible de se connecter au serveur LARA. Veuillez vérifier la configuration (URL actuelle : {settings.LARA_API_URL}). Si le problème persiste, contactez le support."},
+                    status=status.HTTP_502_BAD_GATEWAY
+                )
+            return Response(
+                {"detail": f"Erreur de connexion au serveur LARA : {error_msg}. Veuillez réessayer plus tard."},
+                status=status.HTTP_502_BAD_GATEWAY
+            )
+        except requests.exceptions.Timeout as e:
+            logger.error(f"Timeout calling LARA API: {str(e)}", exc_info=True)
+            return Response(
+                {"detail": "Le délai d'attente de la requête a été dépassé. Le fichier est peut-être trop volumineux ou le serveur est surchargé. Veuillez réessayer avec un fichier plus petit ou plus tard."},
+                status=status.HTTP_504_GATEWAY_TIMEOUT
+            )
+        except requests.RequestException as e:
+            error_msg = str(e)
+            logger.error(f"Error calling Lara-django API: {error_msg}", exc_info=True)
+            # Format error message more clearly
+            if not error_msg or error_msg.strip() == "":
+                formatted_error = "Une erreur s'est produite lors de la communication avec le serveur LARA. Veuillez réessayer plus tard."
+            else:
+                formatted_error = f"Erreur lors de la création du glossaire : {error_msg}"
+            return Response(
+                {"detail": formatted_error},
+                status=status.HTTP_502_BAD_GATEWAY
+            )
+        except Exception as e:
+            error_msg = str(e)
+            logger.error(f"Unexpected error in AddGlossaryView: {error_msg}", exc_info=True)
+            formatted_error = (
+                f"Une erreur inattendue s'est produite lors de la création du glossaire : {error_msg}"
+                if error_msg and error_msg.strip()
+                else "Une erreur inattendue s'est produite lors de la création du glossaire. Veuillez réessayer ou contacter le support."
+            )
+            return Response(
+                {"detail": formatted_error},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class SingleGlossaryView(RetrieveUpdateDestroyAPIView):
@@ -129,11 +418,78 @@ class SingleGlossaryView(RetrieveUpdateDestroyAPIView):
     serializer_class = GlossarySerializer
 
     def get_object(self):
-        return get_object_or_404(
-            Glossary,
-            user=self.request.user,
-            id=self.kwargs['pk']
-        )
+        """
+        Fetch glossary from Lara-django API instead of local DB.
+        """
+        from django.conf import settings
+        import requests
+        
+        user_uuid = str(self.request.user.uuid) if hasattr(self.request.user, 'uuid') else None
+        glossary_id = self.kwargs['pk']
+        
+        if not user_uuid:
+            from rest_framework.exceptions import NotFound
+            raise NotFound("User UUID not found")
+        
+        try:
+            # Fetch from Lara-django search endpoint
+            lara_url = f"{settings.LARA_API_URL}/api/lara/glossaries-list/search/"
+            response = requests.get(
+                lara_url,
+                params={'uuid': user_uuid},
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                # Find glossary by ID
+                for g in data.get('glossaries', []):
+                    if g.get('glossary_id') == glossary_id:
+                        # Return a mock object with the data
+                        class MockGlossary:
+                            def __init__(self, data):
+                                self.id = data.get('glossary_id', '')
+                                # Use user_glossary_name if available, otherwise name
+                                self.name = data.get('user_glossary_name') or data.get('name', '')
+                                self.source_language = type('obj', (object,), {'abbreviation': data.get('source_language', '')})()
+                                self.target_language = type('obj', (object,), {'abbreviation': data.get('target_languages', '').split(',')[0] if data.get('target_languages') else ''})()
+                                self.created_at = data.get('generated_at', '')
+                        return MockGlossary(g)
+            
+            from rest_framework.exceptions import NotFound
+            raise NotFound("Glossary not found")
+        except requests.RequestException as e:
+            logger.error(f"Error fetching glossary from Lara-django: {str(e)}")
+            from rest_framework.exceptions import NotFound
+            raise NotFound("Error fetching glossary")
+    
+    def delete(self, request, *args, **kwargs):
+        """
+        Delete glossary via Lara-django API.
+        """
+        from django.conf import settings
+        import requests
+        
+        glossary_id = self.kwargs['pk']
+        
+        try:
+            lara_url = f"{settings.LARA_API_URL}/api/lara/glossaries-list/{glossary_id}/delete/"
+            response = requests.delete(lara_url, timeout=10)
+            
+            if response.status_code == 200:
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            else:
+                error_detail = response.json().get('error', 'Unknown error') if response.content else 'Unknown error'
+                return Response(
+                    {"detail": error_detail},
+                    status=response.status_code
+                )
+        except requests.RequestException as e:
+            logger.error(f"Error deleting glossary from Lara-django: {str(e)}")
+            return Response(
+                {"detail": f"Error deleting glossary: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class GlossariesListAPIView(APIView):
@@ -185,3 +541,62 @@ class GetDefaultGlossaryView(APIView):
         if glossary:
             return Response(GlossarySerializer(glossary).data, status=status.HTTP_200_OK)
         return Response({}, status=status.HTTP_200_OK)
+
+
+class LaraGlossarySearchView(APIView):
+    """
+    Proxy endpoint to search glossaries in LARA backend.
+
+    Calls /lara-django/api/lara/glossaries-list/search/ with user's UUID
+    to find personal glossaries.
+    """
+    permission_classes = (SubscribedPermission, IsAuthenticated)
+
+    def post(self, request):
+        source_language = request.data.get('source_language', '').upper()
+        target_language = request.data.get('target_language', '').upper()
+        domain = request.data.get('domain', '*')
+
+        if not source_language or not target_language:
+            return Response(
+                {"detail": "source_language and target_language are required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Get user UUID for personal glossaries
+        user_uuid = str(request.user.uuid) if hasattr(request.user, 'uuid') else None
+
+        if not user_uuid:
+            return Response({
+                'glossaries': [],
+                'count': 0
+            }, status=status.HTTP_200_OK)
+
+        try:
+            # Call LARA backend glossary search endpoint
+            lara_response = http_requests.get(
+                f"{settings.LARA_API_URL}/api/lara/glossaries-list/search/",
+                params={
+                    'uuid': user_uuid,
+                    'source_language': source_language,
+                    'target_languages': target_language,
+                    'domain': domain
+                },
+                timeout=10
+            )
+
+            if lara_response.status_code == 200:
+                data = lara_response.json()
+                # Transform to format expected by frontend (with glossary_id)
+                glossaries = [
+                    {'id': g.get('glossary_id', ''), 'name': g.get('name', '')}
+                    for g in data.get('glossaries', [])
+                ]
+                return Response(glossaries, status=status.HTTP_200_OK)
+            else:
+                logger.error(f"LARA glossary search failed: {lara_response.status_code} - {lara_response.text}")
+                return Response([], status=status.HTTP_200_OK)
+
+        except http_requests.RequestException as e:
+            logger.error(f"LARA glossary search exception: {str(e)}")
+            return Response([], status=status.HTTP_200_OK)

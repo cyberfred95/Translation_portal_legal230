@@ -1,14 +1,9 @@
-from datetime import timezone
-import uuid
-import requests
-
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.conf import settings
 from django.utils.timezone import now
 
-from users.models import UserGroup, User
+from subscriptions.services.api_key_generator import APIKeyService
 
 
 class SubscriptionType(models.Model):
@@ -112,10 +107,15 @@ class UserSubscription(models.Model):
     
     
     def __str__(self):
-        return self.user.__str__()
+        return str(self.user)
 
     def is_active(self):
-        """Check if subscription is active using the same logic as permissions."""
+        """
+        Vérifie si la souscription est active.
+        
+        Returns:
+            bool: True si la souscription est dans un état actif.
+        """
         active_states = {
             self.UserSubscriptionChoices.INCOMPLETE,
             self.UserSubscriptionChoices.ACTIVE,
@@ -124,56 +124,39 @@ class UserSubscription(models.Model):
         }
         return self.status in active_states
 
-    def create_api_key(self):
+    def create_api_key(self) -> str:
         """
-        Create a new API key by calling the cabinet API endpoint.
-        Returns the generated API key or None if creation fails.
+        Crée une nouvelle clé API locale unique.
+        
+        Cette méthode génère une clé API localement et vérifie qu'elle n'existe
+        pas déjà dans la base de données avant de la retourner.
+        
+        Returns:
+            str: Clé API unique générée au format UUID.
+            
+        Raises:
+            RuntimeError: Si aucune clé unique n'a pu être générée.
         """
-        try:
-            # Check if required settings are configured
-            if not settings.CUSTOM_MT_CONSOLE_URL or not settings.CLOUDSTORAGE_API_KEY:
-                return None
-            
-            # Build the API endpoint URL
-            url = settings.CUSTOM_MT_CONSOLE_URL.rstrip('/') + "/cabinet_api/create_api_key/"
-            
-            # Prepare request data (using subscription ID as label)
-            data = {
-                "label": str(self.id)
-            }
-            
-            # Prepare headers with authorization token
-            headers = {
-                "token": settings.CLOUDSTORAGE_API_KEY,
-                "Content-Type": "application/json"
-            }
-            
-            # Make the API request
-            response = requests.post(url, json=data, headers=headers, timeout=30)
-            
-            if response.status_code == 200:
-                result = response.json()
-                return result.get('api_key')
-            else:
-                return None
-                
-        except requests.RequestException:
-            return None
-        except Exception:
-            return None
+        return APIKeyService.create_api_key_for_subscription(self)
 
     def save(self, *args, **kwargs):
-        self._sync_limits_from_subscription()
-        needs_api_key = self._needs_api_key_generation()
-
-        super().save(*args, **kwargs)
-
-        if needs_api_key and not self.api_key:
-            self._assign_api_key()
-
+        """
+        Surcharge de save() pour :
+        - Initialiser les valeurs depuis SubscriptionType lors de la création
+        - Générer automatiquement une clé API si nécessaire
+        - S'assurer que le CountMetered existe pour les souscriptions API
+        """
+        self._initialize_from_subscription_type()
+        self._generate_api_key_if_needed(*args, **kwargs)
         self._ensure_today_metered_exists()
 
     def clean(self):
+        """
+        Valide que l'utilisateur n'a qu'une seule souscription.
+        
+        Raises:
+            ValidationError: Si l'utilisateur a déjà une autre souscription.
+        """
         if self.user.subscriptions.all().exclude(id=self.id).exists():
             raise ValidationError("Subscription for this user already exists")
 
@@ -213,8 +196,12 @@ class UserSubscription(models.Model):
             defaults={'reported': None},
         )
 
-    def _sync_limits_from_subscription(self):
-        if not self.subscription:
+    def _initialize_from_subscription_type(self):
+        """
+        Initialise les valeurs depuis SubscriptionType uniquement lors de la création.
+        Cette méthode ne fait rien si l'objet existe déjà (mise à jour).
+        """
+        if not self.subscription or self.pk is not None:
             return
 
         self.max_files_count = self.subscription.max_files_count
@@ -224,22 +211,46 @@ class UserSubscription(models.Model):
         self.access_to_writing = self.subscription.access_to_writing
         self.access_to_official_glossaries = self.subscription.access_to_official_glossaries
         self.access_to_sso = self.subscription.access_to_sso
-        
+
     def _needs_api_key_generation(self):
+        """Vérifie si une clé API doit être générée."""
         return not self.api_key and self.is_active()
 
-    def _assign_api_key(self):
-        generated_key = self.create_api_key()
-        self.api_key = generated_key or str(uuid.uuid4())
-        super(UserSubscription, self).save(update_fields=['api_key'])
+    def _generate_api_key_if_needed(self, *args, **kwargs):
+        """
+        Génère automatiquement une clé API si nécessaire.
+        Effectue un premier save() pour obtenir un ID, puis génère la clé et sauvegarde à nouveau.
+        """
+        if not self._needs_api_key_generation():
+            super().save(*args, **kwargs)
+            return
+
+        # Premier save pour obtenir un ID
+        super().save(*args, **kwargs)
+        
+        # Génération de la clé API unique
+        self.api_key = self.create_api_key()
+        
+        # Sauvegarde finale avec la clé API
+        super().save()
 
     def _should_track_api_usage(self):
+        """
+        Vérifie si l'utilisation API doit être suivie pour cette souscription.
+        
+        Returns:
+            bool: True si la souscription est de type API.
+        """
         return (
             self.subscription
             and self.subscription.product_type == SubscriptionType.ProductChoices.API
         )
 
     def _ensure_today_metered_exists(self):
+        """
+        S'assure qu'un CountMetered existe pour aujourd'hui si nécessaire.
+        Ne fait rien si la souscription n'est pas de type API.
+        """
         if not self._should_track_api_usage():
             return
 
@@ -247,7 +258,6 @@ class UserSubscription(models.Model):
             self.ensure_api_count_metered()
 
 
-# New model for counter history
 class CountHistory(models.Model):
     user_subscription = models.ForeignKey(
         UserSubscription, on_delete=models.CASCADE, related_name='count_histories')
@@ -283,6 +293,3 @@ class CountMetered(models.Model):
         return (
             f"Metered usage for {self.user_subscription} on {self.date}"
         )
-
-    class Meta:
-        pass
