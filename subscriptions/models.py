@@ -131,7 +131,8 @@ class UserSubscription(models.Model):
         return APIKeyService.create_api_key_for_subscription(self)
 
     def save(self, *args, **kwargs):
-        if self.subscription:
+        # Copier les valeurs depuis SubscriptionType uniquement lors de la création
+        if self.subscription and self.pk is None:
             self.max_files_count = self.subscription.max_files_count
             self.max_words_count = self.subscription.max_words_count
             self.max_symbols_count = self.subscription.max_symbols_count
