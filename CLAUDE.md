@@ -8,7 +8,7 @@ This system consists of three interconnected components:
 
 1. **Lexa** (this repository) - Main translation portal built with Django. Provides web UI and REST API for translation services, user management, subscriptions, and glossary management.
 
-2. **Lara Bridge** (external, `laradjango` container on port 8001) - Django backend that receives translation requests from Lexa. Determines optimal translation memory (MT) and glossary (GL) parameters. Admin interface for configuration.
+2. **Lara Bridge** (external, `laradjango` container on port 8001, source code at `~/lara`) - Django backend that receives translation requests from Lexa. Determines optimal translation memory (MT) and glossary (GL) parameters. Admin interface for configuration.
 
 3. **Lara Server** (external) - The actual translation engine. Receives translation requests via the "lara translation" SDK. Stores translation memories and glossaries.
 
