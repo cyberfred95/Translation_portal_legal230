@@ -309,7 +309,16 @@ def text_translation(request):
 
     source_language = request.POST.get('source_language')
     target_language = request.POST.get('target_language')
-    domain_name = request.POST.get('domain_name')
+    domain_name_param = request.POST.get('domain_name')
+
+    # Convert domain name to English if needed
+    domain_name = domain_name_param
+    if domain_name_param:
+        domain = Domain.objects.filter(name__iexact=domain_name_param).first()
+        if not domain:
+            domain = Domain.objects.filter(french_name__iexact=domain_name_param).first()
+        if domain:
+            domain_name = domain.name  # Use English name
 
     # Step 1: Fetch template to get translation memory and glossary IDs (optional)
     translation_memory_id = None
@@ -352,6 +361,7 @@ def text_translation(request):
         "text": text,
         "source": source_language,
         "target": target_language,
+        "userToken": str(user_uuid) if user_uuid != 'anonymous' else '',
     }
 
     # Add domain if present
