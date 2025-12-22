@@ -130,13 +130,13 @@
                     </div>
                 </td>
                 <td class="myteam-td center">
-                    {% if member.is_buyer %}
-                        <button type="button" class="btn-icon disabled" disabled title="{% trans 'Cannot edit buyer' %}">
-                            <i class="ph ph-pencil-simple icon-16 color-gray"></i>
-                        </button>
-                    {% else %}
+                    {% if member.is_editable %}
                         <button type="button" class="btn-icon edit-user" data-user-id="{{ member.id }}" data-username="{{ member.username }}" data-email="{{ member.email }}" data-is-admin="{{ member.is_admin|yesno:'true,false' }}" data-has-active-subscription="{% if member.license.status == 'active' %}true{% else %}false{% endif %}" title="{% trans 'Edit user' %}">
                             <i class="ph ph-pencil-simple icon-16 color-dark"></i>
+                        </button>
+                    {% else %}
+                        <button type="button" class="btn-icon disabled" disabled title="{% if member.is_buyer %}{% trans 'Cannot edit buyer' %}{% else %}{% trans 'Cannot edit API or Word Add-in subscription' %}{% endif %}">
+                            <i class="ph ph-pencil-simple icon-16 color-gray"></i>
                         </button>
                     {% endif %}
                 </td>
