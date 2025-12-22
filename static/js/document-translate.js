@@ -1691,39 +1691,76 @@ $(document).ready(function () {
         });
     });
 
+    /**
+     * Constants for status checking
+     */
+    const STATUS_CHECK_INTERVAL_MS = 5000;
+    const TRANSLATING_STATUS = 'Being translated';
+
+    /**
+     * Build URL parameters for project status check
+     */
+    const buildProjectStatusParams = (projectIds) => {
+        const params = new URLSearchParams();
+        projectIds.forEach(projectId => {
+            params.append('project_id[]', projectId);
+        });
+        return params;
+    };
+
+    /**
+     * Check if all projects have finished translation
+     */
+    const areAllProjectsFinished = (projects) => {
+        return projects && projects.length > 0 && 
+               projects.every(project => project.status !== TRANSLATING_STATUS);
+    };
+
+    /**
+     * Handle modal display based on project response
+     */
+    const handleProjectModalDisplay = (response) => {
+        if (!response || response.length === 0) {
+            return;
+        }
+        
+        if (response[0].display_popup) {
+            $('.show-modal-false').removeClass('hidden');
+        } else {
+            $('.show-modal-true').removeClass('hidden');
+        }
+    };
+
+    /**
+     * Start polling project status until all translations are complete
+     */
     const startStatusCheck = (projectIds) => {
-        let statusCheckInterval;
+        if (!projectIds || projectIds.length === 0) {
+            return;
+        }
+
+        let statusCheckInterval = null;
         
         const checkDocumentStatus = () => {
-            let params = new URLSearchParams();
-
-            projectIds.forEach(projectId => {
-                params.append('project_id[]', projectId);
-            });
+            const params = buildProjectStatusParams(projectIds);
+            const url = `${single_project}?${params.toString()}`;
 
             $.ajax({
                 type: 'GET',
-                url: `${single_project}?${params.toString()}`,
+                url: url,
                 processData: false,
                 contentType: false,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': getCookie('csrftoken'),
-                },
+                headers: getAjaxHeaders(),
                 success: function (response) {
-                    if (response[0].display_popup) {
-                        $('.show-modal-false').removeClass('hidden');
-                    } else {
-                        $('.show-modal-true').removeClass('hidden');
-                    }
+                    handleProjectModalDisplay(response);
                     updateProjectTable(response);
                     
-                    // Vérifier si tous les projets ont un statut différent de "Being translated"
-                    const allProjectsFinished = response.every(project => project.status !== 'Being translated');
-                    
-                    if (allProjectsFinished) {
+                    if (areAllProjectsFinished(response)) {
                         console.log('Tous les projets sont terminés, arrêt de la boucle de vérification');
-                        clearInterval(statusCheckInterval);
+                        if (statusCheckInterval) {
+                            clearInterval(statusCheckInterval);
+                            statusCheckInterval = null;
+                        }
                     }
                 },
                 error: handleAjaxError,
@@ -1733,9 +1770,9 @@ $(document).ready(function () {
             });
         };
 
+        // Check immediately, then poll at interval
         checkDocumentStatus();
-
-        statusCheckInterval = setInterval(checkDocumentStatus, 10000);
+        statusCheckInterval = setInterval(checkDocumentStatus, STATUS_CHECK_INTERVAL_MS);
     };
 
 
