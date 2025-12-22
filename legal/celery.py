@@ -2,8 +2,9 @@ import os
 from celery import Celery
 from celery.schedules import crontab
 
-# set the default Django settings module for the 'celery' program.
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "legal.settings")
+# Use environment variable if set, otherwise default to legal.settings
+if "DJANGO_SETTINGS_MODULE" not in os.environ:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "legal.settings")
 
 app = Celery("legal")
 
@@ -17,11 +18,6 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    # 'reset_quote_counter': {
-    #    'task': "quoting.tasks.reset_quote_counter",
-    #    "schedule": crontab(minute='0', hour='0', day_of_month=1),
-    #    "args": (),
-    # },
     'process_daily_subscription_renewals': {
         'task': "subscriptions.tasks.process_daily_subscription_renewals",
         "schedule": crontab(minute='0', hour='0'),
