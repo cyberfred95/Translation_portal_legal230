@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-10 16:13+0300\n"
+"POT-Creation-Date: 2025-12-22 16:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -54,7 +54,7 @@ msgstr "Utilisateur"
 msgid "french_name"
 msgstr ""
 
-#: domains/models.py:21 domains/models.py:39
+#: domains/models.py:21 domains/models.py:39 writing/models.py:14
 msgid "icon"
 msgstr ""
 
@@ -70,276 +70,140 @@ msgstr ""
 "La qualité de votre document affecte le résultat de la traduction. Les PDFs "
 "scannés ou peu lisibles ne permettent pas un rendu de qualité."
 
-#: glossaries/templates/glossaries.html:7
-#: glossaries/templates/glossaries_2.html:25
+#: glossaries/templates/glossaries.html:8
 msgid "Glossary"
 msgstr "Glossaires"
 
-#: glossaries/templates/glossaries.html:8
-#: glossaries/templates/glossaries_2.html:28
+#: glossaries/templates/glossaries.html:10
 msgid "Find all your personal glossaries"
 msgstr "Retrouvez tous vos glossaires personnels"
 
-#: glossaries/templates/glossaries.html:25
-msgid "Search for a user"
-msgstr ""
-
-#: glossaries/templates/glossaries.html:38
-#: glossaries/templates/glossaries.html:162
+#: glossaries/templates/glossaries.html:15
+#: glossaries/templates/glossaries_add_glossary.html:13
 msgid "Add glossary"
 msgstr "Ajouter un glossaire"
 
 # ########################################
 # ############################################### GLOSSARIES ###############################################
-#: glossaries/templates/glossaries.html:53
-#: stats/templates/usage_history.html:90 stats/templates/usage_history.html:245
+#: glossaries/templates/glossaries.html:27
 msgid "File name"
 msgstr "Nom du fichier"
 
-#: glossaries/templates/glossaries.html:57
-#, fuzzy
-#| msgid "Target language"
-msgid "Original languages"
-msgstr "Langue cible"
+#: glossaries/templates/glossaries.html:33
+msgid "Source"
+msgstr ""
 
-#: glossaries/templates/glossaries.html:61
-#, fuzzy
-#| msgid "Target language"
-msgid "Traduction languages"
-msgstr "Langue cible"
+#: glossaries/templates/glossaries.html:39
+msgid "Target"
+msgstr ""
 
-#: glossaries/templates/glossaries.html:65
-#: glossaries/templates/glossaries_2.html:315
-#: legal/templates/dashboard/dashboard_recent_translations.html:13
-#: legal/templates/project_history.html:37
-#: legal/templates/project_history_2.html:120
+#: glossaries/templates/glossaries.html:45
+#: legal/templates/dashboard/dashboard_recent_translations.html:16
+#: legal/templates/project_history/project_history.html:50
 msgid "Creation date"
 msgstr "Date de création"
 
-#: glossaries/templates/glossaries.html:69
-#: glossaries/templates/glossaries_2.html:340
-#: legal/templates/dashboard/dashboard_recent_translations.html:14
-#: legal/templates/my_team/my_team_users.html:28
-#: legal/templates/project_history.html:41
-#: legal/templates/project_history_2.html:129
-#: legal/templates/translate/document_translate/step_traduction/step_4.html:11
+#: glossaries/templates/glossaries.html:51
+#: legal/templates/dashboard/dashboard_recent_translations.html:17
+#: legal/templates/my_team/my_team_users.html:34
+#: legal/templates/project_history/project_history.html:56
+#: legal/templates/translate/document_translate/step_traduction/step_traduction.html:11
 msgid "Actions"
 msgstr "Actions"
 
-#: glossaries/templates/glossaries.html:181
-#: glossaries/templates/glossaries.html:184
-#: glossaries/templates/glossaries.html:199
-#: glossaries/templates/glossaries_2.html:446
-#: legal/templates/translate/document_translate/step_language/step_2.html:9
-msgid "Source language"
-msgstr "Langue source"
+#: glossaries/templates/glossaries.html:94
+#: glossaries/templates/glossaries.html:104
+#, fuzzy
+#| msgid "My glossaries"
+msgid "No glossaries found"
+msgstr "Mes glossaires"
 
-#: glossaries/templates/glossaries.html:196
-#: glossaries/templates/glossaries_2.html:460
-#: legal/templates/translate/document_translate/step_language/step_2.html:15
-msgid "Target language"
-msgstr "Langue cible"
+#: glossaries/templates/glossaries.html:95
+#: glossaries/templates/glossaries.html:105
+msgid "Create your first glossary to get started."
+msgstr ""
 
-#: glossaries/templates/glossaries.html:219
-#: glossaries/templates/glossaries_2.html:502
+#: glossaries/templates/glossaries.html:128
+msgid "File size exceeds 5MB limit."
+msgstr "La taille du fichier dépasse la limite de 5 Mo."
+
+#: glossaries/templates/glossaries.html:129
+msgid "Please select a file to upload"
+msgstr ""
+
+#: glossaries/templates/glossaries.html:130
+msgid "An error occurred while adding the glossary."
+msgstr ""
+
+#: glossaries/templates/glossaries.html:131
+msgid "Glossary added successfully!"
+msgstr ""
+
+#: glossaries/templates/glossaries.html:132
+msgid "Source and target languages must be different"
+msgstr "Les langues source et cible doivent être différentes"
+
+#: glossaries/templates/glossaries_add_glossary.html:19
+msgid "Close"
+msgstr ""
+
+#: glossaries/templates/glossaries_add_glossary.html:34
 msgid "Upload file"
 msgstr "Ajouter un fichier"
 
-#: glossaries/templates/glossaries.html:247
-#: glossaries/templates/glossaries_2.html:513
+#: glossaries/templates/glossaries_add_glossary.html:49
 msgid "Download sample"
 msgstr "Télécharger un modèle"
 
-#: glossaries/templates/glossaries.html:249
-#: glossaries/templates/glossaries_2.html:515
+#: glossaries/templates/glossaries_add_glossary.html:52
 msgid "Supported Files: .csv, .xlsx max 5mb"
 msgstr "Formats pris en charge : .csv, .xlsx max 5mb"
 
-#: glossaries/templates/glossaries.html:253
-#: glossaries/templates/glossaries_2.html:521
+#: glossaries/templates/glossaries_add_glossary.html:58
 msgid ""
 "The first row of the file should start with the language (i.e: French or FR)"
 msgstr "La première ligne de votre glossaire doit contenir les codes de langue"
 
-#: glossaries/templates/glossaries.html:254
-#: glossaries/templates/glossaries_2.html:522
+#: glossaries/templates/glossaries_add_glossary.html:59
 msgid "Your file should not include any comments"
 msgstr "Le glossaire ne doit contenir aucun commentaires"
 
-#: glossaries/templates/glossaries.html:255
-#: glossaries/templates/glossaries_2.html:523
+#: glossaries/templates/glossaries_add_glossary.html:60
 msgid "Your file should have only 2 columns"
 msgstr "Le glossaire ne doit pas avoir plus de deux colonnes"
 
-#: glossaries/templates/glossaries.html:256
-#: glossaries/templates/glossaries_2.html:524
+#: glossaries/templates/glossaries_add_glossary.html:61
 msgid ""
 "Your file should include only one entry per each source text (no duplicates "
 "are allowed)"
 msgstr "Un même terme ne doit pas être répété plusieurs fois"
 
-#: glossaries/templates/glossaries.html:257
-#: glossaries/templates/glossaries_2.html:525
+#: glossaries/templates/glossaries_add_glossary.html:62
 msgid "Your file must not contain empty lines, empty sources or empty targets"
 msgstr "Votre glossaire ne doit pas contenir de lignes ou de cellules vides"
 
-#: glossaries/templates/glossaries.html:258
-#: glossaries/templates/glossaries_2.html:526
+#: glossaries/templates/glossaries_add_glossary.html:63
 msgid "Entries must not have leading or trailing empty spaces"
 msgstr ""
 "Les termes de votre glossaire ne doivent ni commencer ni finir par un espace"
 
-#: glossaries/templates/glossaries.html:259
-#: glossaries/templates/glossaries_2.html:527
+#: glossaries/templates/glossaries_add_glossary.html:64
 msgid "Table formatting is not allowed, only plain text"
 msgstr ""
 "Votre glossaire ne doit pas contenir de tableau formaté, uniquement du texte"
 
-#: glossaries/templates/glossaries.html:260
-#: glossaries/templates/glossaries_2.html:528
+#: glossaries/templates/glossaries_add_glossary.html:65
 msgid "Commas are not allowed"
 msgstr "Le glossaire ne doit pas contenir de virgules"
 
-#: glossaries/templates/glossaries.html:265
-#: glossaries/templates/glossaries.html:296
-msgid "Continue"
-msgstr "Continuer"
-
-#: glossaries/templates/glossaries.html:313
-#: legal/templates/project_history.html:237
-#: stats/templates/usage_history.html:342
-msgid "Prev"
-msgstr "Précédent"
-
-#: glossaries/templates/glossaries.html:319
-#: glossaries/templates/glossaries_2.html:394
-#: legal/templates/project_history.html:243
-#: legal/templates/translate/document_translate/document_translate.html:51
-#: legal/templates/translate/document_translate/document_translate_2.html:174
-#: stats/templates/usage_history.html:348
-msgid "Next"
-msgstr "Suivant"
-
-#: glossaries/templates/glossaries_2.html:47
-#, fuzzy
-#| msgid "No glossary"
-msgid "Search for a glossary"
-msgstr "Aucun glossaire"
-
-#: glossaries/templates/glossaries_2.html:63
-#: glossaries/templates/glossaries_2.html:420
-#: legal/templates/dashboard/dashboard_quick_actions.html:21
-msgid "Add a glossary"
-msgstr "Ajouter un glossaire"
-
-#: glossaries/templates/glossaries_2.html:104
-#, fuzzy
-#| msgid "Glossaries"
-msgid "Glossary name"
-msgstr "glossaires"
-
-#: glossaries/templates/glossaries_2.html:131
-#, fuzzy
-#| msgid "Target language"
-msgid "Original language"
-msgstr "Langue cible"
-
-#: glossaries/templates/glossaries_2.html:223
-#: legal/templates/project_history_2.html:61
-msgid "Translation language"
-msgstr "Langues de traduction"
-
-# ##########################################
-# ################################################# DOCUMENT TRANSLATE #####################################################
-#: glossaries/templates/glossaries_2.html:375
-#, fuzzy
-#| msgid "Following"
-msgid "Showing"
-msgstr "Suivant"
-
-#: glossaries/templates/glossaries_2.html:375
-msgid "to"
-msgstr ""
-
-#: glossaries/templates/glossaries_2.html:375
-msgid "of"
-msgstr ""
-
-#: glossaries/templates/glossaries_2.html:375
-msgid "results"
-msgstr ""
-
-#: glossaries/templates/glossaries_2.html:380
-#: legal/templates/translate/document_translate/document_translate.html:39
-msgid "Previous"
-msgstr "Précédent"
-
-#: glossaries/templates/glossaries_2.html:438
-msgid "Step 1 of 2: How would you like to add a glossary to your collection?"
-msgstr ""
-
-#: glossaries/templates/glossaries_2.html:448
-#, fuzzy
-#| msgid "Select target language"
-msgid "Select source language"
-msgstr "Sélectionnez votre langue cible"
-
-#: glossaries/templates/glossaries_2.html:462
-msgid "Select target language"
-msgstr "Sélectionnez votre langue cible"
-
-#: glossaries/templates/glossaries_2.html:488
-msgid "Import an existing glossary"
-msgstr ""
-
-#: glossaries/templates/glossaries_2.html:491
-msgid "Use a .csv file"
-msgstr ""
-
-#: glossaries/templates/glossaries_2.html:538
-#: legal/templates/my_team/my_team_edit_user.html:96
+#: glossaries/templates/glossaries_add_glossary.html:79
+#: legal/templates/my_team/my_team_edit_user.html:93
 msgid "Cancel"
 msgstr "Annuler"
 
-#: glossaries/templates/glossaries_2.html:551
-#, fuzzy
-#| msgid "Important"
-msgid "Import"
-msgstr "Attention"
-
-#: glossaries/templates/glossaries_2.html:658
-#, fuzzy
-#| msgid "Select target language"
-msgid "Please select both source and target languages"
-msgstr "Sélectionnez votre langue cible"
-
-#: glossaries/templates/glossaries_2.html:663
-msgid "Please select a file to upload"
-msgstr ""
-
-#: glossaries/templates/glossaries_2.html:686
-msgid "Glossary added successfully!"
-msgstr ""
-
-#: glossaries/templates/glossaries_2.html:693
-msgid "An error occurred while adding the glossary."
-msgstr ""
-
-#: glossaries/templates/glossaries_2.html:701
-msgid "Are you sure you want to delete this glossary?"
-msgstr ""
-
-#: glossaries/views.py:113
-msgid "Source and target languages cannot be the same"
-msgstr "Les langues source et cible ne sont pas les mêmes"
-
-#: glossaries/views.py:116
-msgid "Invalid source language"
-msgstr "Langue source non valide"
-
-#: glossaries/views.py:119
-msgid "Invalid target language"
-msgstr "Langue cible non valide"
+#: glossaries/templates/glossaries_add_glossary.html:85
+msgid "Continue"
+msgstr "Continuer"
 
 # ################################ PROFILE DETAILS #####################################
 # change data
@@ -358,11 +222,11 @@ msgid "Name in French"
 msgstr "Français"
 
 # ######################## HEADER ###
-#: legal/settings.py:172
+#: legal/settings.py:145
 msgid "English"
 msgstr "Anglais"
 
-#: legal/settings.py:173
+#: legal/settings.py:146
 msgid "French"
 msgstr "Français"
 
@@ -370,21 +234,22 @@ msgstr "Français"
 msgid "Alert"
 msgstr ""
 
-#: legal/templates/base.html:292
+#: legal/templates/base.html:291
 msgid "Invite people by email"
 msgstr "Inviter par e-mail"
 
-#: legal/templates/base.html:295
-#: legal/templates/my_team/my_team_edit_user.html:47
+#: legal/templates/base.html:294
+#: legal/templates/my_team/my_team_edit_user.html:46
+#: templates/registration/forgot_password.html:17
 #: templates/registration/login.html:27 templates/registration/login.html:29
 msgid "Email"
 msgstr "E-mail"
 
-#: legal/templates/base.html:302
+#: legal/templates/base.html:301
 msgid "Start typing..."
 msgstr "Ecrivez ici"
 
-#: legal/templates/base.html:325
+#: legal/templates/base.html:324
 msgid ""
 "Add emails separated by commas to send multiple invitations to the "
 "Translation Portal. The invitation will be valid for"
@@ -392,63 +257,19 @@ msgstr ""
 "Vous pouvez envoyer plusieurs invitations en séparant les adresses e-mail "
 "par des virgules. Le mail d’invitation sera valide pendant "
 
-#: legal/templates/base.html:326
+#: legal/templates/base.html:325
 msgid "72 hours"
 msgstr "72 heures."
 
-#: legal/templates/base.html:347
+#: legal/templates/base.html:346
 msgid "Invite"
 msgstr "Inviter"
 
-#: legal/templates/blocks/domains.html:10
-#: legal/templates/blocks/domains.html:65
-#: legal/templates/blocks/domains.html:76
-#: legal/templates/blocks/domains.html:87
-#: legal/templates/blocks/domains.html:98
-msgid "Business"
-msgstr ""
-
-#: legal/templates/blocks/domains.html:21
-msgid "Corporate"
-msgstr ""
-
-#: legal/templates/blocks/domains.html:32
-msgid "Miscellaneous"
-msgstr ""
-
-#: legal/templates/blocks/domains.html:43
-msgid "Real Estate Law"
-msgstr ""
-
-#: legal/templates/blocks/domains.html:54
-msgid "Maritime law"
-msgstr ""
-
-#: legal/templates/blocks/specializations.html:11
-msgid "Competition"
-msgstr ""
-
-#: legal/templates/blocks/specializations.html:22
-#, fuzzy
-#| msgid "Characters"
-msgid "Contracts"
-msgstr "Caractères"
-
-#: legal/templates/blocks/specializations.html:33
-msgid "Customs"
-msgstr ""
-
-#: legal/templates/blocks/specializations.html:52
-msgid ""
-"Example of free text explaining the specialization and certifications below "
-"in several paragraphs."
-msgstr ""
-
-#: legal/templates/dashboard/dashboard.html:11
+#: legal/templates/dashboard/dashboard.html:12
 msgid "Welcome to Lexa"
 msgstr "Bienvenue sur Lexa"
 
-#: legal/templates/dashboard/dashboard.html:12
+#: legal/templates/dashboard/dashboard.html:13
 msgid ""
 "Lexa is specially designed to translate legal content with unmatched legal "
 "precision"
@@ -457,19 +278,19 @@ msgstr ""
 "précision juridique inégalée"
 
 # Dashboard card titles
-#: legal/templates/dashboard/dashboard.html:18
+#: legal/templates/dashboard/dashboard.html:19
 msgid "CHARACTERS TRANSLATED"
 msgstr "CARACTÈRES TRADUITS"
 
-#: legal/templates/dashboard/dashboard.html:19
+#: legal/templates/dashboard/dashboard.html:20
 msgid "WORDS TRANSLATED"
 msgstr "MOTS TRADUITS"
 
-#: legal/templates/dashboard/dashboard.html:20
+#: legal/templates/dashboard/dashboard.html:21
 msgid "DOCUMENTS TRANSLATED"
 msgstr "DOCUMENTS TRADUITS"
 
-#: legal/templates/dashboard/dashboard.html:21
+#: legal/templates/dashboard/dashboard.html:22
 msgid "ADDED GLOSSARIES"
 msgstr "GLOSSAIRES AJOUTÉS"
 
@@ -491,6 +312,10 @@ msgstr "Gérer mon équipe"
 msgid "My profile"
 msgstr "Mon profil"
 
+#: legal/templates/dashboard/dashboard_quick_actions.html:21
+msgid "Add a glossary"
+msgstr "Ajouter un glossaire"
+
 # ######################################
 # ########################### STEP 5 ###
 #: legal/templates/dashboard/dashboard_recent_translations.html:4
@@ -498,99 +323,123 @@ msgid "Recent translations"
 msgstr "Traductions récentes"
 
 #: legal/templates/dashboard/dashboard_recent_translations.html:10
-#: legal/templates/project_history.html:25
-#: legal/templates/project_history_2.html:42
-#: legal/templates/project_history_2.html:85
-#: legal/templates/project_history_2.html:162
+#: legal/templates/project_history/project_history.html:24
 #: legal/templates/translate/document_translate/document_translate.html:9
-#: legal/templates/translate/document_translate/document_translate_2.html:25
-#: legal/templates/translate/document_translate/step_traduction/step_4.html:8
+#: legal/templates/translate/document_translate/step_traduction/step_traduction.html:8
 msgid "Document"
 msgstr "Document"
 
-#: legal/templates/dashboard/dashboard_recent_translations.html:11
-#: legal/templates/project_history_2.html:103
-#: legal/templates/translate/document_translate/step_traduction/step_4.html:9
+#: legal/templates/dashboard/dashboard_recent_translations.html:12
+#: legal/templates/project_history/project_history.html:31
+#, fuzzy
+#| msgid "Change email"
+msgid "User email"
+msgstr "Changer d'e-mail"
+
+#: legal/templates/dashboard/dashboard_recent_translations.html:14
+#: legal/templates/translate/document_translate/step_traduction/step_traduction.html:9
 #, fuzzy
 #| msgid "Languages"
 msgid "Language"
 msgstr "Langue"
 
-#: legal/templates/dashboard/dashboard_recent_translations.html:12
-#: legal/templates/project_history.html:33
-#: legal/templates/project_history_2.html:50
-#: legal/templates/project_history_2.html:112
-#: legal/templates/translate/document_translate/step_traduction/step_4.html:10
+#: legal/templates/dashboard/dashboard_recent_translations.html:15
+#: legal/templates/project_history/project_history.html:44
+#: legal/templates/translate/document_translate/step_traduction/step_traduction.html:10
 msgid "Status"
 msgstr "Statut"
 
+#: legal/templates/dashboard/dashboard_recent_translations.html:47
+#: legal/templates/dashboard/dashboard_recent_translations.html:51
+#: legal/templates/project_history/project_history.html:95
+msgid "Download"
+msgstr "Télécharger"
+
 # ######################################
 # ########################### STEP 5 ###
-#: legal/templates/dashboard/dashboard_recent_translations.html:47
+#: legal/templates/dashboard/dashboard_recent_translations.html:63
+#: legal/templates/project_history/project_history.html:115
 msgid "No translations found"
 msgstr "Aucune traduction trouvée"
 
-#: legal/templates/dashboard/dashboard_recent_translations.html:48
+#: legal/templates/dashboard/dashboard_recent_translations.html:64
+#: legal/templates/project_history/project_history.html:116
 msgid "Start by translating your first document or text."
 msgstr "Commencez par traduire votre premier document ou texte."
 
-#: legal/templates/header/header.html:18
-msgid "Search"
-msgstr "Recherche"
+#: legal/templates/expert_review_accept.html:5
+msgid "Acceptation du devis"
+msgstr ""
 
-#: legal/templates/my_team/my_team.html:15
+#: legal/templates/expert_review_accept.html:21
+msgid "Devis accepté"
+msgstr ""
+
+#: legal/templates/expert_review_accept.html:24
+msgid "Votre révision experte est en cours d\\"
+msgstr ""
+
+#: legal/templates/expert_review_accept.html:30
+#: legal/templates/expert_review_accept.html:53
+msgid "Revenir au dashboard"
+msgstr ""
+
+#: legal/templates/expert_review_accept.html:44
+msgid "Erreur"
+msgstr ""
+
+#: legal/templates/my_team/my_team.html:11
 msgid "My Team"
 msgstr "Mon Équipe"
 
-#: legal/templates/my_team/my_team.html:16
+#: legal/templates/my_team/my_team.html:12
 msgid ""
 "Create, manage, and delete users from your account, learn more about users."
 msgstr ""
 "Créez, gérez et supprimez des utilisateurs de votre compte, en savoir plus "
 "sur les utilisateurs."
 
-#: legal/templates/my_team/my_team.html:20
+#: legal/templates/my_team/my_team.html:16
 msgid "NUMBER OF USERS"
 msgstr "NOMBRE D'UTILISATEURS"
 
-#: legal/templates/my_team/my_team.html:21
+#: legal/templates/my_team/my_team.html:17
 msgid "NUMBER OF ACTIVE USERS"
 msgstr "NOMBRE D'UTILISATEURS ACTIFS"
 
-#: legal/templates/my_team/my_team.html:34
-#: legal/templates/my_team/my_team.html:36
-#: legal/templates/my_team/my_team.html:39
-#: legal/templates/my_team/my_team.html:41
+#: legal/templates/my_team/my_team.html:30
+#: legal/templates/my_team/my_team.html:32
+#: legal/templates/my_team/my_team.html:35
+#: legal/templates/my_team/my_team.html:37
 msgid "Manage licences and billings"
 msgstr "Gérer les licences et la facturation"
 
 #: legal/templates/my_team/my_team_edit_user.html:11
-#: legal/templates/my_team/my_team_users.html:104
+#: legal/templates/my_team/my_team_users.html:138
 msgid "Edit user"
 msgstr "Modifier l'utilisateur"
 
 # ########################################
 # ################################################ PROJECT HISTORY #################################################
 #: legal/templates/my_team/my_team_edit_user.html:32
-#: legal/templates/project_history_2.html:94
 msgid "Username"
 msgstr "Utilisateur"
 
-#: legal/templates/my_team/my_team_edit_user.html:55
+#: legal/templates/my_team/my_team_edit_user.html:53
 #, fuzzy
 #| msgid "Option"
 msgid "Optional"
 msgstr "Option"
 
-#: legal/templates/my_team/my_team_edit_user.html:68
+#: legal/templates/my_team/my_team_edit_user.html:66
 msgid "Administrator"
 msgstr "Administrateur"
 
-#: legal/templates/my_team/my_team_edit_user.html:76
+#: legal/templates/my_team/my_team_edit_user.html:74
 msgid "An invitation email will be sent to the new email address."
 msgstr "Un email d'invitation sera envoyé à la nouvelle adresse email."
 
-#: legal/templates/my_team/my_team_edit_user.html:84
+#: legal/templates/my_team/my_team_edit_user.html:82
 msgid ""
 "No invitation email will be sent because this user has no active "
 "subscription."
@@ -598,7 +447,7 @@ msgstr ""
 "Aucun email d'invitation ne sera envoyé car cet utilisateur n'a pas de "
 "licence active."
 
-#: legal/templates/my_team/my_team_edit_user.html:103
+#: legal/templates/my_team/my_team_edit_user.html:99
 msgid "Save changes"
 msgstr ""
 
@@ -611,186 +460,155 @@ msgid "Licence"
 msgstr ""
 
 #: legal/templates/my_team/my_team_users.html:22
-msgid "Role"
-msgstr "Rôle"
-
-#: legal/templates/my_team/my_team_users.html:46
-msgid "(Unassigned account)"
-msgstr "(Compte non attribué)"
-
-#: legal/templates/my_team/my_team_users.html:71
-msgid "(Inactive)"
-msgstr "(Inactif)"
-
-#: legal/templates/my_team/my_team_users.html:76
-#: legal/templates/project_history.html:94
-#: legal/templates/project_history_2.html:53
-#: legal/templates/project_history_2.html:210
-msgid "Error"
-msgstr "Erreur"
-
-#: legal/templates/my_team/my_team_users.html:85
-msgid "Buyer"
-msgstr "Acheteur"
-
-#: legal/templates/my_team/my_team_users.html:89
-msgid "Admin"
-msgstr "Admin"
-
-#: legal/templates/my_team/my_team_users.html:93
-#: legal/templates/project_history.html:20
-#: stats/templates/usage_history.html:25 stats/templates/usage_history.html:232
-msgid "User"
-msgstr "Utilisateur"
-
-#: legal/templates/my_team/my_team_users.html:20
 msgid "Usage"
 msgstr "Usage"
 
-#: legal/templates/my_team/my_team_users.html:92
+#: legal/templates/my_team/my_team_users.html:28
+msgid "Role"
+msgstr "Rôle"
+
+#: legal/templates/my_team/my_team_users.html:52
+msgid "(Unassigned account)"
+msgstr "(Compte non attribué)"
+
+#: legal/templates/my_team/my_team_users.html:77
+msgid "(Inactive)"
+msgstr "(Inactif)"
+
+#: legal/templates/my_team/my_team_users.html:82
+msgid "Error"
+msgstr "Erreur"
+
+#: legal/templates/my_team/my_team_users.html:93
 msgid "Symbols"
 msgstr "Caractères"
 
-#: legal/templates/my_team/my_team_users.html:106
+#: legal/templates/my_team/my_team_users.html:100
+msgid "Words"
+msgstr "Mots"
+
+#: legal/templates/my_team/my_team_users.html:107
 msgid "Files"
 msgstr "Fichiers"
 
-#: legal/templates/my_team/my_team_users.html:100
+#: legal/templates/my_team/my_team_users.html:119
+msgid "Buyer"
+msgstr "Acheteur"
+
+#: legal/templates/my_team/my_team_users.html:123
+msgid "Admin"
+msgstr "Admin"
+
+#: legal/templates/my_team/my_team_users.html:127
+msgid "User"
+msgstr "Utilisateur"
+
+#: legal/templates/my_team/my_team_users.html:134
 msgid "Cannot edit buyer"
 msgstr ""
 
-#: legal/templates/my_team/my_team_users.html:114
+#: legal/templates/my_team/my_team_users.html:148
 msgid "No team members found"
 msgstr ""
 
-#: legal/templates/my_team/my_team_users.html:115
+#: legal/templates/my_team/my_team_users.html:149
 #, fuzzy
 #| msgid "There are currently no statistic to display."
 msgid "There are currently no users in your team."
 msgstr "Il n'y a actuellement aucun statistique à afficher"
 
-#: legal/templates/profile_details/profile_details.html:11
+#: legal/templates/profile_details/profile_details.html:15
 msgid "Profile Details"
 msgstr "Détail du profil"
 
-#: legal/templates/profile_details/profile_details.html:14
+#: legal/templates/profile_details/profile_details.html:18
 msgid "Manage your account information and security settings."
 msgstr "Gérez les informations de votre compte et les paramètres de sécurité."
 
-#: legal/templates/profile_details/profile_details.html:22
+#: legal/templates/profile_details/profile_details.html:26
 msgid "Information"
 msgstr "Information"
 
 # #############
-#: legal/templates/profile_details/profile_details.html:25
+#: legal/templates/profile_details/profile_details.html:29
 msgid "Security"
 msgstr "Sécurité"
 
-#: legal/templates/profile_details/profile_information.html:34
+#: legal/templates/profile_details/profile_information.html:32
 msgid "Update Information"
 msgstr "Mettre à jour les informations"
 
-#: legal/templates/profile_details/profile_information_modal.html:9
+#: legal/templates/profile_details/profile_information_modal.html:7
 msgid "Your data has been successfully changed"
 msgstr "Vos données ont été modifiées avec succès."
 
-#: legal/templates/profile_details/profile_information_modal.html:14
+#: legal/templates/profile_details/profile_information_modal.html:9
 msgid "Okay"
 msgstr "D'accord"
 
 # change password
-#: legal/templates/profile_details/profile_security.html:12
+#: legal/templates/profile_details/profile_security.html:10
 #: templates/registration/login.html:37 templates/registration/login.html:39
 msgid "Password"
 msgstr "Mot de passe"
 
-#: legal/templates/profile_details/profile_security.html:15
+#: legal/templates/profile_details/profile_security.html:13
 msgid "Change your password."
 msgstr "Modifier le mot de passe"
 
-#: legal/templates/profile_details/profile_security.html:24
+#: legal/templates/profile_details/profile_security.html:19
 #, fuzzy
 #| msgid "Change your password."
 msgid "Change Password"
 msgstr "Modifier le mot de passe"
 
-#: legal/templates/project_history.html:8
-#: legal/templates/project_history_2.html:11
+#: legal/templates/profile_details/profile_security.html:28
+#: legal/templates/profile_details/profile_security.html:37
+msgid "Logout"
+msgstr "Déconnexion"
+
+#: legal/templates/profile_details/profile_security.html:31
+msgid "Sign out of your account."
+msgstr "Déconnectez-vous de votre compte."
+
+#: legal/templates/project_history/project_history.html:12
 msgid "History"
 msgstr ""
 
-#: legal/templates/project_history.html:9
-#: legal/templates/project_history_2.html:14
+#: legal/templates/project_history/project_history.html:13
 msgid "Find all your translation history"
 msgstr "Retrouvez tout votre historique de traduction"
 
-#: legal/templates/project_history.html:29
+#: legal/templates/project_history/project_history.html:38
 #: legal/templates/translate/document_translate/document_translate.html:10
-#: legal/templates/translate/document_translate/document_translate_2.html:48
 msgid "Languages"
 msgstr "Langues"
 
-# ######################################
-# ########################### STEP 5 ###
-#: legal/templates/project_history.html:80
-#: legal/templates/project_history_2.html:51
-#: legal/templates/project_history_2.html:196
+#: legal/templates/project_history/project_history.html:105
 #, fuzzy
-#| msgid "New translation"
-msgid "Needs attention"
-msgstr "Nouveau document"
+#| msgid "Expert revision"
+msgid "Expert review"
+msgstr "Révision d'un expert"
 
-#: legal/templates/project_history.html:87
-#: legal/templates/project_history_2.html:52
-#: legal/templates/project_history_2.html:203
-msgid "In progress"
-msgstr ""
+#: legal/templates/project_history/project_history.html:136
+msgid "Prev"
+msgstr "Précédent"
 
-#: legal/templates/project_history.html:101
-#: legal/templates/project_history_2.html:54
-#: legal/templates/project_history_2.html:217
+#: legal/templates/project_history/project_history.html:142
 #: legal/templates/translate/document_translate/document_translate.html:50
-msgid "Completed"
-msgstr "Terminé"
-
-#: legal/templates/project_history.html:123
-msgid "Translated"
-msgstr "Translated"
-
-#: legal/templates/project_history.html:128
-msgid "Post-edited"
-msgstr "Proofread"
+msgid "Next"
+msgstr "Suivant"
 
 # ######################################
 # ########################### STEP 6 ###
-#: legal/templates/project_history.html:199
-#: legal/templates/project_history_2.html:316
-#: legal/templates/translate/document_translate/step_5.html:29
-#: legal/templates/translate/document_translate/step_5.html:54
+#: legal/templates/project_history/project_history_expert_review.html:11
+#: legal/templates/project_history/project_history_expert_review.html:30
 #: legal/templates/translate/document_translate/step_traduction/step_traduction_modal_review.html:13
 #: legal/templates/translate/document_translate/step_traduction/step_traduction_modal_review.html:34
 msgid "Quote for revision"
 msgstr "Demande de devis"
 
-#: legal/templates/project_history.html:200
-#: legal/templates/project_history_2.html:318
-#: legal/templates/translate/document_translate/step_5.html:55
-#: legal/templates/translate/document_translate/step_traduction/step_traduction_modal_review.html:35
-msgid ""
-"We can not provide an automatic quote for this language pair. Please ask"
-msgstr ""
-"Le devis automatique n'est pas disponible pour cette paire de langue. "
-"Veuillez contacter"
-
-#: legal/templates/project_history.html:200
-#: legal/templates/project_history_2.html:320
-#: legal/templates/translate/document_translate/step_5.html:55
-#: legal/templates/translate/document_translate/step_traduction/step_traduction_modal_review.html:35
-msgid "to receive a quote in less than 30 minutes."
-msgstr "pour un devis personnalisé."
-
-#: legal/templates/project_history.html:202
-#: legal/templates/translate/document_translate/step_5.html:30
+#: legal/templates/project_history/project_history_expert_review.html:12
 #: legal/templates/translate/document_translate/step_traduction/step_traduction_modal_review.html:14
 msgid ""
 "By choosing the options below, you agree that you are sending a request for "
@@ -799,144 +617,11 @@ msgstr ""
 "En cliquant, vous recevrez un devis pour la relecture de votre document, "
 "réalisée par un jurilinguiste expert dans votre domaine de droit."
 
-#: legal/templates/project_history.html:208
-#: legal/templates/project_history_2.html:327
+#: legal/templates/project_history/project_history_expert_review.html:19
 msgid "Expert revision"
 msgstr "Recevoir un devis"
 
-#: legal/templates/project_history.html:217
-msgid "Post-editing by professional editors"
-msgstr ""
-
-#: legal/templates/project_history_2.html:32
-#, fuzzy
-#| msgid "Choose the document."
-msgid "Search for text or document..."
-msgstr "Choisissez le document."
-
-#: legal/templates/project_history_2.html:41
-msgid "Type"
-msgstr "Type"
-
-#: legal/templates/project_history_2.html:43
-#: legal/templates/project_history_2.html:160
-msgid "Text"
-msgstr "Texte"
-
-#: legal/templates/project_history_2.html:160
-msgid "page"
-msgstr "page"
-
-#: legal/templates/project_history_2.html:162
-msgid "pages"
-msgstr "pages"
-
-#: legal/templates/project_history_2.html:175
-msgid "Unknown"
-msgstr "Inconnu"
-
-#: legal/templates/project_history_2.html:238
-msgid "Download"
-msgstr "Télécharger"
-
-#: legal/templates/project_history_2.html:246
-#, fuzzy
-#| msgid "Expert revision"
-msgid "Expert review"
-msgstr "Révision d'un expert"
-
-#: legal/templates/project_history_2.html:260
-#: stats/templates/usage_history.html:306
-msgid "No data available"
-msgstr "Aucune donnée disponible"
-
-#: legal/templates/project_history_2.html:261
-msgid "There are currently no projects to display."
-msgstr "Il n'y a actuellement aucun projets à afficher"
-
-#: legal/templates/project_history_2.html:324
-#, fuzzy
-#| msgid ""
-#| "By choosing the options below, you agree that you are sending a request "
-#| "for Quote  of the selected service to Legal230"
-msgid ""
-"By choosing the options below, you agree that you are sending a request for "
-"Quote of the selected service to Legal230"
-msgstr ""
-"En cliquant, vous recevrez un devis pour la relecture de votre document, "
-"réalisée par un jurilinguiste expert dans votre domaine de droit."
-
-#: legal/templates/sidebar/sidbar.html:31
-msgid "Dashboard"
-msgstr ""
-
-# ####################################
-# ######################## SIDEBAR ###
-#: legal/templates/sidebar/sidbar.html:34
-#: legal/templates/translate/document_translate/document_translate.html:12
-#: legal/templates/translate/document_translate/document_translate_2.html:92
-#: legal/templates/translate/translate.html:8
-msgid "Translation"
-msgstr "Traduction"
-
-#: legal/templates/sidebar/sidbar.html:37
-msgid "Glossaries"
-msgstr "Lexiques"
-
-#: legal/templates/sidebar/sidbar.html:40
-msgid "Project history"
-msgstr "Historique"
-
-#: legal/templates/sidebar/sidbar.html:43
-msgid "Writing"
-msgstr "Personnaliser"
-
-#: legal/templates/sidebar/sidbar.html:49
-msgid "Support"
-msgstr "Support"
-
-#: legal/templates/translate/document_translate/document_translate.html:11
-#: legal/templates/translate/document_translate/document_translate_2.html:71
-msgid "Domain and Glossary"
-msgstr "Domaine et Glossaire"
-
-#: legal/templates/translate/document_translate/document_translate_2.html:111
-#: legal/templates/translate/document_translate/step_document/step_1.html:14
-msgid "Drag and drop your document(s) here"
-msgstr "Glissez-déposez vos documents ici"
-
-#: legal/templates/translate/document_translate/document_translate_2.html:116
-#: legal/templates/translate/document_translate/step_document/step_1.html:18
-msgid "Supported formats: .txt, .docx, .xlsx, .pptx, .pdf"
-msgstr "Formats pris en charge: .txt, .docx, .xlsx, .pptx, .pdf"
-
-#: legal/templates/translate/document_translate/document_translate_2.html:129
-#: legal/templates/translate/document_translate/step_document/step_1.html:27
-msgid "Import a document"
-msgstr "Importer un document (max 50 MB)"
-
-#: legal/templates/translate/document_translate/document_translate_2.html:148
-#: legal/templates/translate/document_translate/step_document/step_1.html:40
-#: legal/templates/translate/document_translate/step_language/step_2.html:28
-msgid "Warning"
-msgstr "Attention"
-
-#: legal/templates/translate/document_translate/document_translate_2.html:151
-msgid ""
-"The quality of your document affects the translation result. Scanned or "
-"poorly readable PDFs do not allow for a quality output."
-msgstr ""
-
-#: legal/templates/translate/document_translate/step_5.html:4
-msgid "Review"
-msgstr "Traduction"
-
-#: legal/templates/translate/document_translate/step_5.html:37
-#: legal/templates/translate/document_translate/step_traduction/step_traduction_modal_review.html:21
-msgid "Expert revision in popup"
-msgstr "Recevoir un devis"
-
-#: legal/templates/translate/document_translate/step_5.html:46
+#: legal/templates/project_history/project_history_expert_review.html:23
 #: legal/templates/translate/document_translate/step_traduction/step_traduction_modal_review.html:26
 msgid ""
 "Click the button to see options for improving the quality of the translated "
@@ -944,46 +629,104 @@ msgid ""
 msgstr ""
 "Cliquez sur ce bouton pour afficher les options de relecture disponibles."
 
-#: legal/templates/translate/document_translate/step_document/step_1.html:43
+#: legal/templates/project_history/project_history_expert_review.html:32
+#: legal/templates/translate/document_translate/step_traduction/step_traduction_modal_review.html:35
+msgid ""
+"We can not provide an automatic quote for this language pair. Please ask"
+msgstr ""
+"Le devis automatique n'est pas disponible pour cette paire de langue. "
+"Veuillez contacter"
+
+#: legal/templates/project_history/project_history_expert_review.html:34
+#: legal/templates/translate/document_translate/step_traduction/step_traduction_modal_review.html:35
+msgid "to receive a quote in less than 30 minutes."
+msgstr "pour un devis personnalisé."
+
+#: legal/templates/sidebar/sidbar.html:22
+msgid "Dashboard"
+msgstr ""
+
+# ####################################
+# ######################## SIDEBAR ###
+#: legal/templates/sidebar/sidbar.html:25
+#: legal/templates/translate/document_translate/document_translate.html:12
+#: legal/templates/translate/translate.html:31
+msgid "Translation"
+msgstr "Traduction"
+
+#: legal/templates/sidebar/sidbar.html:28
+msgid "Glossaries"
+msgstr "Lexiques"
+
+#: legal/templates/sidebar/sidbar.html:31
+msgid "Project history"
+msgstr "Historique"
+
+#: legal/templates/sidebar/sidbar.html:34
+msgid "Writing"
+msgstr "Personnaliser"
+
+#: legal/templates/sidebar/sidbar.html:39
+msgid "Support"
+msgstr "Support"
+
+#: legal/templates/translate/document_translate/document_translate.html:11
+msgid "Domain and Glossary"
+msgstr "Domaine et Glossaire"
+
+#: legal/templates/translate/document_translate/document_translate.html:38
+msgid "Previous"
+msgstr "Précédent"
+
+#: legal/templates/translate/document_translate/document_translate.html:49
+msgid "Completed"
+msgstr "Terminé"
+
+#: legal/templates/translate/document_translate/step_document/step_document.html:14
+msgid "Drag and drop your document(s) here"
+msgstr "Glissez-déposez vos documents ici"
+
+#: legal/templates/translate/document_translate/step_document/step_document.html:18
+msgid "Supported formats: .txt, .docx, .xlsx, .pptx, .pdf"
+msgstr "Formats pris en charge: .txt, .docx, .xlsx, .pptx, .pdf"
+
+#: legal/templates/translate/document_translate/step_document/step_document.html:27
+msgid "Import a document"
+msgstr "Importer un document (max 50 MB)"
+
+#: legal/templates/translate/document_translate/step_document/step_document.html:40
+#: legal/templates/translate/document_translate/step_language/step_language.html:28
+msgid "Warning"
+msgstr "Attention"
+
+#: legal/templates/translate/document_translate/step_document/step_document.html:43
 msgid "PDF Warning document translation"
 msgstr ""
 "La qualité de votre document influence le résultat de la traduction. Les PDF "
 "scannés ou difficilement lisibles ne permettent pas d’obtenir un rendu de "
 "qualité."
 
-#: legal/templates/translate/document_translate/step_domain/step_3.html:7
+#: legal/templates/translate/document_translate/step_domain/step_domain.html:7
 msgid "Select domain"
 msgstr "Sélectionner un domaine"
 
-#: legal/templates/translate/document_translate/step_domain/step_3.html:14
+#: legal/templates/translate/document_translate/step_domain/step_domain.html:14
 msgid "Select subdomain"
 msgstr "Sélectionner un sous-domaine"
-
-#: legal/templates/translate/document_translate/step_domain/step_3.html:23
-msgid "Select a glossary"
-msgstr "Sélectionner un glossaire"
 
 #: legal/templates/translate/document_translate/step_domain/step_domain.html:23
 msgid "Select or not, one or more glossaries"
 msgstr "Sélectionner ou non, un ou plusieurs glossaires"
 
-#: legal/templates/translate/document_translate/step_domain/step_3.html:32
-msgid "Standard"
-msgstr "Standard"
+#: legal/templates/translate/document_translate/step_language/step_language.html:9
+msgid "Source language"
+msgstr "Langue source"
 
-#: legal/templates/translate/document_translate/step_domain/step_3.html:38
-msgid "My glossaries"
-msgstr "Mes glossaires"
+#: legal/templates/translate/document_translate/step_language/step_language.html:15
+msgid "Target language"
+msgstr "Langue cible"
 
-#: legal/templates/translate/document_translate/step_domain/step_3.html:44
-msgid "No glossary"
-msgstr "Aucun glossaire"
-
-#: legal/templates/translate/document_translate/step_domain/step_3.html:59
-msgid "You have chosen to use no glossary"
-msgstr "Vous avez choisi de n'utiliser aucun glossaire"
-
-#: legal/templates/translate/document_translate/step_language/step_2.html:31
+#: legal/templates/translate/document_translate/step_language/step_language.html:31
 msgid ""
 "Your documents contain different languages. You can only translate documents "
 "that are in the same language."
@@ -996,103 +739,66 @@ msgstr ""
 msgid "Search for a language..."
 msgstr "Rechercher une langue..."
 
-#: legal/templates/translate/text_translate/text_translate.html:16
+#: legal/templates/translate/document_translate/step_traduction/step_traduction_modal_review.html:21
+msgid "Expert revision in popup"
+msgstr "Recevoir un devis"
+
+#: legal/templates/translate/text_translate/text_translate.html:30
 msgid "Detect language"
 msgstr "Détecter la langue"
 
-#: legal/templates/translate/text_translate/text_translate.html:33
+#: legal/templates/translate/text_translate/text_translate.html:34
 msgid "Language detection"
 msgstr "Détection de la langue"
 
-#: legal/templates/translate/text_translate/text_translate.html:34
-msgid "Detecting language..."
-msgstr "Détection de la langue en cours..."
-
-#: legal/templates/translate/text_translate/text_translate.html:35
+#: legal/templates/translate/text_translate/text_translate.html:39
 msgid "Language detected"
 msgstr "Langue détectée"
 
-#: legal/templates/translate/text_translate/text_translate.html:36
+#: legal/templates/translate/text_translate/text_translate.html:40
 msgid "Language detection error"
 msgstr "Erreur lors de détection de langue"
 
-#: legal/templates/translate/text_translate/text_translate.html:80
-#: writing/templates/writing.html:138
+#: legal/templates/translate/text_translate/text_translate.html:48
+msgid "Copy target language to source"
+msgstr "Copier la langue cible vers la source"
+
+#: legal/templates/translate/text_translate/text_translate.html:66
 msgid "Translate"
 msgstr "Traduire"
 
 # ############################################################################################
-#: legal/templates/translate/text_translate/text_translate.html:96
-#: writing/templates/gpt_text_translate.html:55
+#: legal/templates/translate/text_translate/text_translate.html:112
 msgid "Copied"
 msgstr "Copié"
 
+#: legal/templates/translate/text_translate/text_translate.html:123
+msgid "Custom translation instructions"
+msgstr "Instructions de traduction personnalisées"
+
+#: legal/templates/translate/text_translate/text_translate.html:129
+msgid "e.g., Use formal legal tone, Preserve Latin terms, etc."
+msgstr ""
+"Ex. : Utiliser un ton juridique formel, Conserver les termes latins, etc."
+
+#: legal/templates/translate/text_translate/text_translate.html:138
+msgid "Translation quality feedback"
+msgstr "Retour sur la qualité de la traduction"
+
 # ###################################
 # ######################################### TEXT TRANSLATE ####################################################
-#: legal/templates/translate/translate.html:9
+#: legal/templates/translate/translate.html:32
 msgid "Instantly translate your texts and documents into multiple languages"
 msgstr ""
 "Traduisez instantanément vos textes et documents dans plusieurs langues"
 
-#: legal/templates/translate/translate.html:14
+#: legal/templates/translate/translate.html:37
 msgid "Text translate"
 msgstr "Traduire un texte"
 
-#: legal/templates/translate/translate.html:18
+#: legal/templates/translate/translate.html:40
 msgid "Document translate"
 msgstr "Traduire un document"
-
-# ##########################################
-# ########################################### USAGE #############################################
-#: stats/templates/usage_history.html:16
-msgid "Filter"
-msgstr "Filtre"
-
-#: stats/templates/usage_history.html:57 stats/templates/usage_history.html:238
-msgid "Group"
-msgstr "Groupe"
-
-#: stats/templates/usage_history.html:120
-msgid "Clear"
-msgstr "Effacer"
-
-#: stats/templates/usage_history.html:121
-msgid "Apply"
-msgstr "Appliquer"
-
-#: stats/templates/usage_history.html:250
-msgid "Words"
-msgstr "Mots"
-
-#: stats/templates/usage_history.html:255
-msgid "Tokens"
-msgstr "Entrants tokens"
-
-#: stats/templates/usage_history.html:260
-msgid "Out tokens"
-msgstr "Sortir tokens"
-
-#: stats/templates/usage_history.html:265
-msgid "Date"
-msgstr "Date"
-
-#: stats/templates/usage_history.html:307
-msgid "There are currently no statistic to display."
-msgstr "Il n'y a actuellement aucun statistique à afficher"
-
-#: stats/templates/usage_history.html:321
-#: stats/templates/usage_history.html:362
-msgid "total characters"
-msgstr "caractères"
-
-#: stats/templates/usage_history.html:326
-#: stats/templates/usage_history.html:367
-msgid "total tokens"
-msgstr "tokens"
-
-#: stats/templates/usage_history.html:358
-msgid "total words"
-msgstr "mots"
 
 #: subscriptions/permissions.py:19
 msgid ""
@@ -1103,16 +809,63 @@ msgstr ""
 "Veuillez contacter l’administrateur de votre groupe."
 
 #: templates/admin/glossaries/batch_upload.html:4
+#: templates/admin/glossaries/check_consistency.html:4
+#: templates/admin/glossaries/check_consistency_results.html:4
+#: templates/admin/glossaries/compare_csv.html:4
 msgid "Django site admin"
 msgstr ""
 
-#: templates/admin/glossaries/batch_upload.html:102
+#: templates/admin/glossaries/batch_upload.html:89
+#: templates/admin/glossaries/check_consistency.html:8
+#: templates/admin/glossaries/check_consistency_results.html:53
+#: templates/admin/glossaries/compare_csv.html:89
 msgid "Home"
 msgstr ""
 
-#: templates/registration/login.html:5 templates/registration/login.html:51
+#: templates/registration/forgot_password.html:4
+#: templates/registration/forgot_password.html:9
+msgid "Reset your password"
+msgstr "Réinitialiser votre mot de passe"
+
+#: templates/registration/forgot_password.html:12
+msgid ""
+"Don't worry, we've got your back! Just enter your email address and we'll "
+"send you a link to reset your password."
+msgstr ""
+"Ne vous inquiétez pas, nous sommes là pour vous ! Entrez simplement votre "
+"adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot "
+"de passe."
+
+#: templates/registration/forgot_password.html:26
+msgid "Submit"
+msgstr "Soumettre"
+
+#: templates/registration/forgot_password.html:29
+msgid "Return to"
+msgstr "Retour à"
+
+#: templates/registration/forgot_password.html:30
+#: templates/registration/login.html:5 templates/registration/login.html:60
 msgid "Log in"
 msgstr ""
+
+#: templates/registration/forgot_password.html:35
+msgid "Reset link sent"
+msgstr "Lien de réinitialisation envoyé"
+
+#: templates/registration/forgot_password.html:38
+msgid "Check your inbox"
+msgstr "Vérifiez votre boîte de réception"
+
+#: templates/registration/forgot_password.html:38
+msgid "for instructions on how to reset your password."
+msgstr ""
+"pour obtenir des instructions sur la façon de réinitialiser votre mot de "
+"passe."
+
+#: templates/registration/forgot_password.html:40
+msgid "Change email"
+msgstr "Changer d'e-mail"
 
 # #######
 # delete account
@@ -1131,150 +884,279 @@ msgstr ""
 "votre méthode préférée (plus besoin de saisir votre e-mail), tout en gardant "
 "l’accès classique disponible."
 
-#: templates/registration/login.html:48
+#: templates/registration/login.html:57
 msgid "I forgot my password"
 msgstr "J'ai oublié mon mot de passe"
 
+#: templates/registration/reset_password.html:4
+#: templates/registration/reset_password.html:9
+#: templates/registration/reset_password.html:15
+#: templates/registration/reset_password.html:24
+msgid "Set a new password"
+msgstr "Définir un nouveau mot de passe"
+
 # ################
 # ##################### ERRORS #########################
-#: users/views.py:102
+#: users/views.py:88
 msgid "Username and email are required."
 msgstr "Le nom d'utilisateur et l'adresse électronique sont requis."
 
-#: users/views.py:105
+#: users/views.py:91
 msgid "This username is already used."
 msgstr "Ce nom d'utilisateur est déjà utilisé."
 
-#: users/views.py:108
+#: users/views.py:94
 msgid "This email is already used."
 msgstr "Cet email est déjà utilisé."
 
-#: writing/templates/gpt_text_translate.html:73
-msgid "Process"
-msgstr "Appliquer"
+#: users/views.py:235
+msgid "An unknown error occurred."
+msgstr ""
 
-#: writing/templates/writing.html:5 writing/templates/writing.html:9
-#: writing/templates/writing_2.html:4 writing/templates/writing_2.html:13
+#: writing/templates/writing.html:5 writing/templates/writing.html:17
 msgid "Writing Tools"
 msgstr "Personnaliser"
 
-#: writing/templates/writing.html:10 writing/templates/writing_2.html:16
-msgid "Improve your text with writing tools."
-msgstr "Améliorez votre texte avec nos outils d'écriture."
-
-#: writing/templates/writing.html:101 writing/templates/writing_2.html:96
-#, fuzzy
-#| msgid "No data available"
-msgid "No writing prompts available"
-msgstr "Aucune donnée disponible"
-
-#: writing/templates/writing.html:102 writing/templates/writing_2.html:97
-#, fuzzy
-#| msgid "There are currently no projects to display."
-msgid "There are currently no writing prompts configured."
-msgstr "Il n'y a actuellement aucun projets à afficher"
-
-#: writing/templates/writing.html:121
-msgid ""
-"To translate PDF, Word (.docx), PowerPoint (.pptx) files, drop them directly "
-"into our document translation interface...."
-msgstr ""
-"Pour traduire des fichiers PDF, Word (.docx) et PowerPoint (.pptx), déposez-les "
-"directement dans notre interface de traduction de documents…"
-
-#: writing/templates/writing.html:158 writing/templates/writing_2.html:161
-msgid "Your results will appear here"
-msgstr "Vos résultats s'afficheront ici"
-
-#: writing/templates/writing.html:204 writing/templates/writing_2.html:277
+#: writing/templates/writing.html:12
 #, fuzzy
 #| msgid "Process"
 msgid "Processing..."
 msgstr "Appliquer"
 
-#: writing/templates/writing.html:205 writing/templates/writing_2.html:271
+#: writing/templates/writing.html:13
 msgid "Please select a prompt and enter some text."
 msgstr ""
 
-#: writing/templates/writing.html:206 writing/templates/writing_2.html:299
-#: writing/templates/writing_2.html:304
+#: writing/templates/writing.html:14
 msgid "An error occurred while processing your text."
 msgstr ""
 
-#: writing/templates/writing.html:207 writing/templates/writing_2.html:142
-#: writing/templates/writing_2.html:309
-#, fuzzy
-#| msgid "Process"
-msgid "Process Text"
+#: writing/templates/writing.html:15 writing/templates/writing.html:91
+msgid "Apply"
 msgstr "Appliquer"
 
 # ############################################################################################
-#: writing/templates/writing.html:208 writing/templates/writing_2.html:320
+#: writing/templates/writing.html:16
 #, fuzzy
 #| msgid "Copied"
 msgid "Copied!"
 msgstr "Copié"
 
-#: writing/templates/writing_2.html:111
-msgid "Select an action"
+#: writing/templates/writing.html:18
+msgid "Improve your text with writing tools."
+msgstr "Améliorez votre texte avec nos outils d'écriture."
+
+#: writing/templates/writing.html:58
+#, fuzzy
+#| msgid "No data available"
+msgid "No writing prompts available"
+msgstr "Aucune donnée disponible"
+
+#: writing/templates/writing.html:59
+#, fuzzy
+#| msgid "There are currently no projects to display."
+msgid "There are currently no writing prompts configured."
+msgstr "Il n'y a actuellement aucun projets à afficher"
+
+#: writing/templates/writing.html:77
+msgid ""
+"To translate PDF, Word (.docx), PowerPoint (.pptx) files, drop them directly "
+"into our document translation interface...."
 msgstr ""
+"Pour traduire des fichiers PDF, Word (.docx) et PowerPoint (.pptx), déposez-"
+"les directement dans notre interface de traduction de documents…"
 
-#: writing/templates/writing_2.html:114
-msgid "Choose a writing action from the left panel to get started"
-msgstr ""
+#: writing/templates/writing.html:107
+msgid "Your results will appear here"
+msgstr "Vos résultats s'afficheront ici"
 
-#: writing/templates/writing_2.html:125
-msgid "Enter your text:"
-msgstr ""
+#, fuzzy
+#~| msgid "Target language"
+#~ msgid "Original languages"
+#~ msgstr "Langue cible"
 
-#: writing/templates/writing_2.html:130
-msgid "Paste or type your text here..."
-msgstr ""
+#, fuzzy
+#~| msgid "Target language"
+#~ msgid "Traduction languages"
+#~ msgstr "Langue cible"
 
-#: writing/templates/writing_2.html:153
-msgid "Result"
-msgstr ""
+#, fuzzy
+#~| msgid "No glossary"
+#~ msgid "Search for a glossary"
+#~ msgstr "Aucun glossaire"
 
-#: writing/templates/writing_2.html:177
-msgid "Copy Result"
-msgstr "Copier le résultat"
+#, fuzzy
+#~| msgid "Glossaries"
+#~ msgid "Glossary name"
+#~ msgstr "glossaires"
 
-#: glossaries/templates/glossaries.html:148
-msgid "File size exceeds 5MB limit."
-msgstr "La taille du fichier dépasse la limite de 5 Mo."
+#, fuzzy
+#~| msgid "Target language"
+#~ msgid "Original language"
+#~ msgstr "Langue cible"
 
-#: glossaries/templates/glossaries.html:153
-msgid "Source and target languages must be different"
-msgstr "Les langues source et cible doivent être différentes"
+#~ msgid "Translation language"
+#~ msgstr "Langues de traduction"
 
-#: legal/templates/profile_details/profile_security.html:28
-msgid "Logout"
-msgstr "Déconnexion"
+# ##########################################
+# ################################################# DOCUMENT TRANSLATE #####################################################
+#, fuzzy
+#~| msgid "Following"
+#~ msgid "Showing"
+#~ msgstr "Suivant"
 
-#: legal/templates/profile_details/profile_security.html:31
-msgid "Sign out of your account."
-msgstr "Déconnectez-vous de votre compte."
+#, fuzzy
+#~| msgid "Select target language"
+#~ msgid "Select source language"
+#~ msgstr "Sélectionnez votre langue cible"
 
-#: legal/templates/translate/text_translate/text_translate.html:123
-msgid "Custom translation instructions"
-msgstr "Instructions de traduction personnalisées"
+#~ msgid "Select target language"
+#~ msgstr "Sélectionnez votre langue cible"
 
-#: legal/templates/translate/text_translate/text_translate.html:129
-msgid "e.g., Use formal legal tone, Preserve Latin terms, etc."
-msgstr "Ex. : Utiliser un ton juridique formel, Conserver les termes latins, etc."
+#, fuzzy
+#~| msgid "Important"
+#~ msgid "Import"
+#~ msgstr "Attention"
 
-#: legal/templates/translate/text_translate/text_translate.html:138
-msgid "Translation quality feedback"
-msgstr "Retour sur la qualité de la traduction"
+#, fuzzy
+#~| msgid "Select target language"
+#~ msgid "Please select both source and target languages"
+#~ msgstr "Sélectionnez votre langue cible"
 
-#: legal/templates/translate/text_translate/text_translate.html:48
-msgid "Copy target language to source"
-msgstr "Copier la langue cible vers la source"
+#~ msgid "Source and target languages cannot be the same"
+#~ msgstr "Les langues source et cible ne sont pas les mêmes"
 
-#: writing/templates/writing.html
-msgid "This feature will be back soon"
-msgstr "Cette fonctionnalité reviendra bientôt"
+#~ msgid "Invalid source language"
+#~ msgstr "Langue source non valide"
 
-#: writing/templates/writing.html
-msgid "We are currently working on improving this feature. It will be available again soon."
-msgstr "Nous travaillons actuellement à l'amélioration de cette fonctionnalité. Elle sera à nouveau disponible bientôt."
+#~ msgid "Invalid target language"
+#~ msgstr "Langue cible non valide"
+
+#, fuzzy
+#~| msgid "Characters"
+#~ msgid "Contracts"
+#~ msgstr "Caractères"
+
+#~ msgid "Search"
+#~ msgstr "Recherche"
+
+# ######################################
+# ########################### STEP 5 ###
+#, fuzzy
+#~| msgid "New translation"
+#~ msgid "Needs attention"
+#~ msgstr "Nouveau document"
+
+#~ msgid "Translated"
+#~ msgstr "Translated"
+
+#~ msgid "Post-edited"
+#~ msgstr "Proofread"
+
+#, fuzzy
+#~| msgid "Choose the document."
+#~ msgid "Search for text or document..."
+#~ msgstr "Choisissez le document."
+
+#~ msgid "Type"
+#~ msgstr "Type"
+
+#~ msgid "Text"
+#~ msgstr "Texte"
+
+#~ msgid "page"
+#~ msgstr "page"
+
+#~ msgid "pages"
+#~ msgstr "pages"
+
+#~ msgid "Unknown"
+#~ msgstr "Inconnu"
+
+#~ msgid "No data available"
+#~ msgstr "Aucune donnée disponible"
+
+#~ msgid "There are currently no projects to display."
+#~ msgstr "Il n'y a actuellement aucun projets à afficher"
+
+#, fuzzy
+#~| msgid ""
+#~| "By choosing the options below, you agree that you are sending a request "
+#~| "for Quote  of the selected service to Legal230"
+#~ msgid ""
+#~ "By choosing the options below, you agree that you are sending a request "
+#~ "for Quote of the selected service to Legal230"
+#~ msgstr ""
+#~ "En cliquant, vous recevrez un devis pour la relecture de votre document, "
+#~ "réalisée par un jurilinguiste expert dans votre domaine de droit."
+
+#~ msgid "Review"
+#~ msgstr "Traduction"
+
+#~ msgid "Select a glossary"
+#~ msgstr "Sélectionner un glossaire"
+
+#~ msgid "Standard"
+#~ msgstr "Standard"
+
+#~ msgid "No glossary"
+#~ msgstr "Aucun glossaire"
+
+#~ msgid "You have chosen to use no glossary"
+#~ msgstr "Vous avez choisi de n'utiliser aucun glossaire"
+
+#~ msgid "Detecting language..."
+#~ msgstr "Détection de la langue en cours..."
+
+# ##########################################
+# ########################################### USAGE #############################################
+#~ msgid "Filter"
+#~ msgstr "Filtre"
+
+#~ msgid "Group"
+#~ msgstr "Groupe"
+
+#~ msgid "Clear"
+#~ msgstr "Effacer"
+
+#~ msgid "Tokens"
+#~ msgstr "Entrants tokens"
+
+#~ msgid "Out tokens"
+#~ msgstr "Sortir tokens"
+
+#~ msgid "Date"
+#~ msgstr "Date"
+
+#~ msgid "There are currently no statistic to display."
+#~ msgstr "Il n'y a actuellement aucun statistique à afficher"
+
+#~ msgid "total characters"
+#~ msgstr "caractères"
+
+#~ msgid "total tokens"
+#~ msgstr "tokens"
+
+#~ msgid "total words"
+#~ msgstr "mots"
+
+#~ msgid "Process"
+#~ msgstr "Appliquer"
+
+#, fuzzy
+#~| msgid "Process"
+#~ msgid "Process Text"
+#~ msgstr "Appliquer"
+
+#~ msgid "Copy Result"
+#~ msgstr "Copier le résultat"
+
+#~ msgid "This feature will be back soon"
+#~ msgstr "Cette fonctionnalité reviendra bientôt"
+
+#~ msgid ""
+#~ "We are currently working on improving this feature. It will be available "
+#~ "again soon."
+#~ msgstr ""
+#~ "Nous travaillons actuellement à l'amélioration de cette fonctionnalité. "
+#~ "Elle sera à nouveau disponible bientôt."
