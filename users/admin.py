@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.utils import timezone
 from django.utils.html import format_html
 from django.urls import reverse
 from .models import User
@@ -81,9 +82,10 @@ class CustomUserAdmin(UserDisplayMixin, UserAdmin):
     readonly_fields = ['uuid']
 
     def formatted_date_joined(self, obj):
-        """Display date_joined in DD/MM/YYYY format"""
+        """Display date_joined in DD/MM/YYYY format (local time)"""
         if obj.date_joined:
-            return obj.date_joined.strftime('%d/%m/%Y')
+            local_time = timezone.localtime(obj.date_joined)
+            return local_time.strftime('%d/%m/%Y')
         return '-'
     formatted_date_joined.short_description = 'Date Joined'
     formatted_date_joined.admin_order_field = 'date_joined'

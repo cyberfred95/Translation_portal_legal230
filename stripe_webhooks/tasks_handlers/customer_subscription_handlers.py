@@ -165,6 +165,19 @@ def handle_customer_subscription_created(payload: dict) -> HttpResponse:
         )
         if error_response:
             return error_response
+    elif subscription_type.product_type == SubscriptionType.ProductChoices.API:
+        error_response = send_email(
+            buyer.email,
+            EmailType.API_CREATED,
+            buyer.language,
+            {
+            "lexa_username": buyer.username,
+            "lexa_email": buyer.email,
+            "lexa_apikey": userSubscriptions[0].api_key
+            }
+        )
+        if error_response:
+            return error_response
     else:
         error_response = send_email(
             buyer.email,

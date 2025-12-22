@@ -145,7 +145,7 @@ LANGUAGES = (
     ('en', _('English')),
     ('fr', _('French')),
 )
-TIME_ZONE = 'Etc/GMT-3'
+TIME_ZONE = 'Europe/Paris'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
