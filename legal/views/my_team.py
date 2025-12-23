@@ -94,7 +94,7 @@ class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, BaseTemplateView):
             if license_info['status'] == 'no_subscription':
                 continue
             is_admin = self.check_admin_status(user)
-            is_buyer = (not is_admin) and self.check_buyer_status(user)
+            is_buyer = self.check_buyer_status(user)
             usage = self._get_user_usage(user)
             member_data = {
                 'id': user.id,
