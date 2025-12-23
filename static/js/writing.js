@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Récupération des data-attributes du root
+    // ============================================================================
+    // Configuration et constantes
+    // ============================================================================
     const root = document.getElementById('writing-root');
     const urlProcess = root?.dataset.urlProcess;
     const trans = {
@@ -7,19 +9,21 @@ document.addEventListener('DOMContentLoaded', function() {
         select_a_prompt: root?.dataset.transSelectAPrompt || 'Please select a prompt and enter some text.',
         error_occured: root?.dataset.transErrorOccured || 'An error occurred while processing your text.',
         process_text: root?.dataset.transProcessText || 'Apply',
-        copied: root?.dataset.transCopied || 'Copied!'
+        copied: root?.dataset.transCopied || 'Copied!',
+        text_too_short: root?.dataset.transTextTooShort || 'Your text is too short to be processed.'
     };
 
-    // Prompt data (construit depuis le DOM)
-    // Utilise les radios existants pour reconstruire un mapping minimal id->meta
-    const promptData = {};
-    document.querySelectorAll('input[name="selected_prompt"]').forEach(radio => {
-        const row = radio.closest('[data-prompt-row]');
-        if (!row) return;
-        // On peut enrichir si besoin en lisant des data-attributes sur row
-        promptData[radio.value] = promptData[radio.value] || {};
-    });
-    // Handle prompt selection
+    // Constantes de validation
+    const VALIDATION = {
+        MIN_WORDS: 8,
+        MIN_CHARS: 32,
+        CHAR_LIMIT: 2000,
+        TEXTAREA_MIN_HEIGHT: 400
+    };
+
+    // ============================================================================
+    // Éléments DOM
+    // ============================================================================
     const promptRows = document.querySelectorAll('[data-prompt-row]');
     const processBtn = document.getElementById('process-btn');
     const inputText = document.getElementById('input-text');
@@ -27,95 +31,262 @@ document.addEventListener('DOMContentLoaded', function() {
     const noResults = document.getElementById('no-results');
     const resultText = document.getElementById('result-text');
     const copyBtn = document.getElementById('copy-btn');
-    const promptMeta = document.getElementById('prompt-meta');
-
-    promptRows.forEach(row => {
-        row.addEventListener('click', function() {
-            // Remove selected state from all rows
-            promptRows.forEach(r => {
-                r.classList.remove('bg-blue-50');
-                r.style.backgroundColor = '';
-            });
-
-            // Add selected state to clicked row
-            this.classList.add('bg-blue-50');
-            this.style.backgroundColor = '#eff6ff';
-
-            // Update radio button
-            const radio = this.querySelector('input[type="radio"]');
-            if (radio) {
-                radio.checked = true;
-
-
-                // Show prompt details
-                const promptId = radio.value;
-                const prompt = promptData[promptId];
-
-                if (prompt) {
-                    // Enable text input
-                    inputText.disabled = false;
-
-                    // Check if we can enable process button
-                    checkProcessButton();
-                }
-            }
-        });
-    });
-
-    // Check if process button should be enabled
-    function checkProcessButton() {
-        const hasText = inputText.value.trim().length > 0;
-        const hasSelectedPrompt = document.querySelector('input[name="selected_prompt"]:checked');
-
-        processBtn.disabled = !(hasText && hasSelectedPrompt);
-    }
-
-    const CHAR_LIMIT = 2000;
     const charCountEl = document.getElementById('char-count');
 
+    // ============================================================================
+    // Fonctions utilitaires
+    // ============================================================================
+    
+    /**
+     * Récupère le token CSRF depuis le DOM
+     * @returns {string|null} Token CSRF ou null si non trouvé
+     */
+    function getCSRFToken() {
+        const tokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
+        return tokenElement ? tokenElement.value : null;
+    }
+
+    /**
+     * Calcule le nombre de mots dans le texte
+     * @param {string} text - Texte à analyser
+     * @returns {number} Nombre de mots
+     */
+    function getWordCount(text) {
+        if (!text || text.length === 0) return 0;
+        return text.split(/\s+/).filter(word => word.length > 0).length;
+    }
+
+    /**
+     * Vérifie si le texte respecte les critères de validation
+     * @param {string} text - Texte à valider
+     * @returns {Object} Résultat de la validation avec détails
+     */
+    function validateText(text) {
+        const wordCount = getWordCount(text);
+        const charCount = text.length;
+        
+        return {
+            isValid: wordCount >= VALIDATION.MIN_WORDS && charCount >= VALIDATION.MIN_CHARS,
+            hasEnoughWords: wordCount >= VALIDATION.MIN_WORDS,
+            hasEnoughChars: charCount >= VALIDATION.MIN_CHARS,
+            wordCount,
+            charCount
+        };
+    }
+
+    /**
+     * Met à jour le tooltip du bouton selon l'état de validation
+     * @param {boolean} isValid - Indique si le texte est valide
+     * @param {boolean} hasSelectedPrompt - Indique si un prompt est sélectionné
+     */
+    function updateButtonTooltip(isValid, hasSelectedPrompt) {
+        if (!isValid && hasSelectedPrompt) {
+            processBtn.title = trans.text_too_short;
+        } else {
+            processBtn.title = '';
+        }
+    }
+
+    /**
+     * Met à jour l'état et le tooltip du bouton de traitement
+     */
+    function checkProcessButton() {
+        const text = inputText.value.trim();
+        const hasText = text.length > 0;
+        const hasSelectedPrompt = document.querySelector('input[name="selected_prompt"]:checked') !== null;
+        const validation = validateText(text);
+        
+        const isValid = hasText && hasSelectedPrompt && validation.isValid;
+        processBtn.disabled = !isValid;
+        updateButtonTooltip(validation.isValid, hasSelectedPrompt);
+    }
+
+    /**
+     * Calcule le nombre de caractères dans le texte (sans les retours à la ligne)
+     * @returns {number} Nombre de caractères
+     */
     function getInputCharCount() {
         return inputText.value.replace(/\n/g, '').length;
     }
 
+    /**
+     * Met à jour l'affichage du compteur de caractères
+     */
     function updateCharCount() {
-        const count = Math.min(getInputCharCount(), CHAR_LIMIT);
+        const count = Math.min(getInputCharCount(), VALIDATION.CHAR_LIMIT);
         if (charCountEl) {
-            charCountEl.textContent = `${count} / ${CHAR_LIMIT}`;
+            charCountEl.textContent = `${count} / ${VALIDATION.CHAR_LIMIT}`;
         }
     }
 
+    /**
+     * Ajuste dynamiquement la hauteur du textarea
+     */
     function resizeInputArea() {
-        // Ajuster dynamiquement la hauteur du textarea, min 400px
         if (!inputText) return;
         inputText.style.height = 'auto';
-        const minHeight = 400; // comme text-translate
-        const nextHeight = Math.max(inputText.scrollHeight, minHeight);
+        const nextHeight = Math.max(inputText.scrollHeight, VALIDATION.TEXTAREA_MIN_HEIGHT);
         inputText.style.height = `${nextHeight}px`;
     }
 
-    // Listen for text input changes
-    inputText.addEventListener('input', function(e){
-        // Tronquer à la limite de caractères, comme text-translate
+    /**
+     * Tronque le texte à la limite de caractères autorisée
+     */
+    function truncateTextIfNeeded() {
         const current = getInputCharCount();
-        if (current > CHAR_LIMIT) {
-            const over = current - CHAR_LIMIT;
+        if (current > VALIDATION.CHAR_LIMIT) {
+            const over = current - VALIDATION.CHAR_LIMIT;
             const start = inputText.selectionStart || inputText.value.length;
-            // Supprimer l'excédent en partant avant le curseur
             const deleteIndex = Math.max(0, start - over);
             inputText.value = inputText.value.slice(0, deleteIndex) + inputText.value.slice(deleteIndex + over);
         }
+    }
+
+    // ============================================================================
+    // Fonctions de gestion de l'interface
+    // ============================================================================
+    
+    /**
+     * Réinitialise l'état visuel de toutes les lignes de prompt
+     */
+    function resetPromptRowsSelection() {
+        promptRows.forEach(row => {
+            row.classList.remove('bg-blue-50');
+            row.style.backgroundColor = '';
+        });
+    }
+
+    /**
+     * Sélectionne visuellement une ligne de prompt
+     * @param {HTMLElement} row - Ligne à sélectionner
+     */
+    function selectPromptRow(row) {
+        row.classList.add('bg-blue-50');
+        row.style.backgroundColor = '#eff6ff';
+    }
+
+    /**
+     * Gère la sélection d'un prompt
+     * @param {HTMLElement} row - Ligne de prompt cliquée
+     */
+    function handlePromptSelection(row) {
+        resetPromptRowsSelection();
+        selectPromptRow(row);
+        
+        const radio = row.querySelector('input[type="radio"]');
+        if (radio) {
+            radio.checked = true;
+            inputText.disabled = false;
+            checkProcessButton();
+        }
+    }
+
+    /**
+     * Affiche les résultats dans l'interface
+     * @param {string|Array} result - Résultat à afficher
+     */
+    function displayResults(result) {
+        resultText.textContent = Array.isArray(result) ? result.join('\n') : result;
+        noResults.classList.add('hidden');
+        resultsArea.classList.remove('hidden');
+    }
+
+    /**
+     * Réinitialise l'état du bouton de traitement
+     */
+    function resetProcessButton() {
+        processBtn.disabled = false;
+        processBtn.textContent = trans.process_text;
+        checkProcessButton();
+    }
+
+    /**
+     * Met le bouton en état de chargement
+     */
+    function setProcessButtonLoading() {
+        processBtn.disabled = true;
+        processBtn.textContent = trans.processing;
+    }
+
+    /**
+     * Traite la réponse de l'API
+     * @param {Object} data - Données reçues de l'API
+     */
+    function handleAPIResponse(data) {
+        if (data.result) {
+            displayResults(data.result);
+        } else if (data.detail) {
+            alert(data.detail);
+        } else {
+            alert(trans.error_occured);
+        }
+    }
+
+    /**
+     * Envoie une requête de traitement à l'API
+     * @param {string} promptId - ID du prompt sélectionné
+     * @param {string} text - Texte à traiter
+     */
+    function processText(promptId, text) {
+        const csrfToken = getCSRFToken();
+        if (!csrfToken) {
+            alert(trans.error_occured);
+            return;
+        }
+
+        fetch(urlProcess, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                prompt: promptId,
+                text: text
+            })
+        })
+            .then(response => response.json())
+            .then(data => handleAPIResponse(data))
+            .catch(error => {
+                console.error('Error:', error);
+                alert(trans.error_occured);
+            })
+            .finally(() => resetProcessButton());
+    }
+
+    // ============================================================================
+    // Gestionnaires d'événements
+    // ============================================================================
+    
+    /**
+     * Gère la sélection d'un prompt
+     */
+    promptRows.forEach(row => {
+        row.addEventListener('click', function() {
+            handlePromptSelection(this);
+        });
+    });
+
+    /**
+     * Gère les changements dans le champ de texte
+     */
+    inputText.addEventListener('input', function() {
+        truncateTextIfNeeded();
         updateCharCount();
         resizeInputArea();
         checkProcessButton();
     });
 
-    // Initialiser l'affichage du compteur et l'état du bouton
-    updateCharCount();
-    resizeInputArea();
-    checkProcessButton();
+    /**
+     * Gère le clic sur le bouton de traitement
+     */
+    processBtn.addEventListener('click', function(e) {
+        if (processBtn.disabled) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
 
-    // Handle process button click
-    processBtn.addEventListener('click', function() {
         const selectedPrompt = document.querySelector('input[name="selected_prompt"]:checked');
         const text = inputText.value.trim();
 
@@ -124,53 +295,22 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Show loading state
-        processBtn.disabled = true;
-        processBtn.textContent = trans.processing;
+        const validation = validateText(text);
+        if (!validation.isValid) {
+            alert(trans.text_too_short);
+            return;
+        }
 
-        // Make API call
-        fetch(urlProcess, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            },
-            body: JSON.stringify({
-                prompt: selectedPrompt.value,
-                text: text
-            })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.result) {
-                    // Show results
-                    resultText.textContent = Array.isArray(data.result) ? data.result.join('\n') : data.result;
-                    noResults.classList.add('hidden');
-                    resultsArea.classList.remove('hidden');
-                } else if (data.detail) {
-                    // Show error from API
-                    alert(data.detail);
-                } else {
-                    alert(trans.error_occured);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert(trans.error_occured);
-            })
-            .finally(() => {
-                // Reset button state
-                processBtn.disabled = false;
-                processBtn.textContent = trans.process_text;
-                checkProcessButton();
-            });
+        setProcessButtonLoading();
+        processText(selectedPrompt.value, text);
     });
 
-    // Handle copy button click
+    /**
+     * Gère le clic sur le bouton de copie
+     */
     if (copyBtn) {
         copyBtn.addEventListener('click', function() {
             navigator.clipboard.writeText(resultText.textContent).then(() => {
-                // Show feedback
                 const originalText = copyBtn.textContent;
                 copyBtn.textContent = trans.copied;
                 setTimeout(() => {
@@ -179,4 +319,11 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    // ============================================================================
+    // Initialisation
+    // ============================================================================
+    updateCharCount();
+    resizeInputArea();
+    checkProcessButton();
 });
