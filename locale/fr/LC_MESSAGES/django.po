@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-23 15:47+0100\n"
+"POT-Creation-Date: 2025-12-23 16:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -538,6 +538,45 @@ msgstr "Information"
 msgid "Security"
 msgstr "Sécurité"
 
+# ######################################
+# ########################### STEP 5 ###
+#: legal/templates/profile_details/profile_details.html:66
+msgid "Delete all translations"
+msgstr "Supprimer toutes les traductions"
+
+#: legal/templates/profile_details/profile_details.html:67
+msgid ""
+"Are you sure you want to delete all your translations? All associated files "
+"will be permanently deleted. This action cannot be undone."
+msgstr ""
+"Êtes-vous sûr de vouloir supprimer toutes vos traductions ? Tous les "
+"fichiers associés seront définitivement supprimés. Cette action est "
+"irréversible."
+
+#: legal/templates/profile_details/profile_details.html:68
+#: legal/templates/project_history/project_history.html:169
+msgid "No"
+msgstr "Non"
+
+#: legal/templates/profile_details/profile_details.html:69
+#: legal/templates/project_history/project_history.html:170
+msgid "Yes"
+msgstr "Oui"
+
+#: legal/templates/profile_details/profile_details.html:70
+msgid "All translations deleted successfully"
+msgstr "Toutes les traductions ont été supprimées avec succès"
+
+#: legal/templates/profile_details/profile_details.html:71
+msgid "Error deleting translations. Please try again."
+msgstr "Erreur lors de la suppression des traductions. Veuillez réessayer."
+
+# ######################################
+# ########################### STEP 5 ###
+#: legal/templates/profile_details/profile_details.html:72
+msgid "Deleting..."
+msgstr "Suppression..."
+
 #: legal/templates/profile_details/profile_information.html:32
 msgid "Update Information"
 msgstr "Mettre à jour les informations"
@@ -575,6 +614,21 @@ msgstr "Déconnexion"
 msgid "Sign out of your account."
 msgstr "Déconnectez-vous de votre compte."
 
+# ######################################
+# ########################### STEP 5 ###
+#: legal/templates/profile_details/profile_security.html:46
+msgid "Deletion"
+msgstr "Suppression"
+
+#: legal/templates/profile_details/profile_security.html:49
+msgid "Delete your data"
+msgstr "Supprimer vos données"
+
+#: legal/templates/profile_details/profile_security.html:55
+#: legal/templates/project_history/project_history.html:94
+msgid "Delete"
+msgstr "Supprimer"
+
 #: legal/templates/project_history/project_history.html:12
 msgid "History"
 msgstr ""
@@ -587,10 +641,6 @@ msgstr "Retrouvez tout votre historique de traduction"
 #: legal/templates/translate/document_translate/document_translate.html:10
 msgid "Languages"
 msgstr "Langues"
-
-#: legal/templates/project_history/project_history.html:94
-msgid "Delete"
-msgstr ""
 
 #: legal/templates/project_history/project_history.html:111
 #, fuzzy
@@ -620,14 +670,6 @@ msgid ""
 msgstr ""
 "Êtes-vous sûr de vouloir supprimer cette traduction ? Les fichiers associés "
 "seront définitivement supprimés."
-
-#: legal/templates/project_history/project_history.html:169
-msgid "No"
-msgstr "Non"
-
-#: legal/templates/project_history/project_history.html:170
-msgid "Yes"
-msgstr "Oui"
 
 #: legal/templates/project_history/project_history.html:171
 msgid "Error deleting translation. Please try again."
