@@ -2,6 +2,97 @@
  * Project History JavaScript
  * Gère les interactions de la page project history
  */
+
+// =============================================================================
+// Helper Functions
+// =============================================================================
+
+/**
+ * Get localized message based on current language
+ */
+function getLocalizedMessage(messages) {
+  const lang = window.language_code || 'fr';
+  return messages[lang] || messages.en || messages.fr;
+}
+
+/**
+ * Show error notification or fallback alert
+ */
+function showError(status, detail) {
+  const errorMessage = getLocalizedMessage({
+    fr: 'Erreur lors de la suppression. Veuillez réessayer.',
+    en: 'Error deleting translation. Please try again.'
+  });
+  
+  if (typeof errorNotification === 'function') {
+    errorNotification(status || 500, detail || errorMessage);
+  } else {
+    alert(errorMessage);
+  }
+}
+
+/**
+ * Set button loading state
+ */
+function setButtonLoading(button, isLoading) {
+  if (isLoading) {
+    button.disabled = true;
+    button.dataset.originalContent = button.innerHTML;
+    button.innerHTML = '<i class="ph ph-spinner icon-16 ph-spin"></i>';
+  } else {
+    button.disabled = false;
+    if (button.dataset.originalContent) {
+      button.innerHTML = button.dataset.originalContent;
+      delete button.dataset.originalContent;
+    }
+  }
+}
+
+/**
+ * Delete a translation document
+ */
+function deleteTranslation(documentId, button) {
+  const confirmMessage = getLocalizedMessage({
+    fr: 'Êtes-vous sûr de vouloir supprimer cette traduction ? Les fichiers associés seront définitivement supprimés.',
+    en: 'Are you sure you want to delete this translation? Associated files will be permanently deleted.'
+  });
+  
+  if (!confirm(confirmMessage)) {
+    return;
+  }
+
+  setButtonLoading(button, true);
+
+  const deleteUrl = `${window.lara_api_url}/api/lara/documents/${documentId}/delete`;
+  const params = new URLSearchParams({ user_uuid: window.user_uuid });
+
+  fetch(`${deleteUrl}?${params}`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+  })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => Promise.reject(err));
+      }
+      return response.json();
+    })
+    .then(() => {
+      window.location.reload();
+    })
+    .catch(error => {
+      setButtonLoading(button, false);
+      showError(error?.status, error?.detail || error?.message);
+    });
+}
+
+// =============================================================================
+// Main Initialization
+// =============================================================================
+
 document.addEventListener('DOMContentLoaded', function () {
   const root = document.querySelector('.project-history-page');
   if (!root) return;
@@ -188,6 +279,15 @@ document.addEventListener('DOMContentLoaded', function () {
     if (fileUrl) {
       window.location.href = fileUrl;
     }
+  });
+
+  // Gestion de la suppression d'une traduction
+  root.addEventListener('click', function (e) {
+    const deleteBtn = e.target.closest('.delete-translation');
+    if (!deleteBtn) return;
+
+    e.preventDefault();
+    deleteTranslation(deleteBtn.dataset.id, deleteBtn);
   });
 
   // S'assure que les statuts restent synchronis 9s si la pagination met  0 jour le tableau dynamiquement
