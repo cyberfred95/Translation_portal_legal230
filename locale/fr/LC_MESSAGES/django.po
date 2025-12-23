@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-22 16:48+0100\n"
+"POT-Creation-Date: 2025-12-23 11:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -415,7 +415,7 @@ msgid "Manage licences and billings"
 msgstr "Gérer les licences et la facturation"
 
 #: legal/templates/my_team/my_team_edit_user.html:11
-#: legal/templates/my_team/my_team_users.html:138
+#: legal/templates/my_team/my_team_users.html:134
 msgid "Edit user"
 msgstr "Modifier l'utilisateur"
 
@@ -503,8 +503,12 @@ msgstr "Admin"
 msgid "User"
 msgstr "Utilisateur"
 
-#: legal/templates/my_team/my_team_users.html:134
+#: legal/templates/my_team/my_team_users.html:138
 msgid "Cannot edit buyer"
+msgstr ""
+
+#: legal/templates/my_team/my_team_users.html:138
+msgid "Cannot edit API or Word Add-in subscription"
 msgstr ""
 
 #: legal/templates/my_team/my_team_users.html:148
@@ -897,23 +901,23 @@ msgstr "Définir un nouveau mot de passe"
 
 # ################
 # ##################### ERRORS #########################
-#: users/views.py:88
+#: users/views.py:90
 msgid "Username and email are required."
 msgstr "Le nom d'utilisateur et l'adresse électronique sont requis."
 
-#: users/views.py:91
+#: users/views.py:93
 msgid "This username is already used."
 msgstr "Ce nom d'utilisateur est déjà utilisé."
 
-#: users/views.py:94
+#: users/views.py:96
 msgid "This email is already used."
 msgstr "Cet email est déjà utilisé."
 
-#: users/views.py:235
+#: users/views.py:237
 msgid "An unknown error occurred."
 msgstr ""
 
-#: writing/templates/writing.html:5 writing/templates/writing.html:17
+#: writing/templates/writing.html:5 writing/templates/writing.html:18
 msgid "Writing Tools"
 msgstr "Personnaliser"
 
@@ -931,7 +935,7 @@ msgstr ""
 msgid "An error occurred while processing your text."
 msgstr ""
 
-#: writing/templates/writing.html:15 writing/templates/writing.html:91
+#: writing/templates/writing.html:15 writing/templates/writing.html:92
 msgid "Apply"
 msgstr "Appliquer"
 
@@ -942,27 +946,27 @@ msgstr "Appliquer"
 msgid "Copied!"
 msgstr "Copié"
 
-#: writing/templates/writing.html:16
+#: writing/templates/writing.html:17
 msgid "Your text is too short to be processed."
 msgstr "Votre texte est trop court pour être traité."
 
-#: writing/templates/writing.html:18
+#: writing/templates/writing.html:19
 msgid "Improve your text with writing tools."
 msgstr "Améliorez votre texte avec nos outils d'écriture."
 
-#: writing/templates/writing.html:58
+#: writing/templates/writing.html:59
 #, fuzzy
 #| msgid "No data available"
 msgid "No writing prompts available"
 msgstr "Aucune donnée disponible"
 
-#: writing/templates/writing.html:59
+#: writing/templates/writing.html:60
 #, fuzzy
 #| msgid "There are currently no projects to display."
 msgid "There are currently no writing prompts configured."
 msgstr "Il n'y a actuellement aucun projets à afficher"
 
-#: writing/templates/writing.html:77
+#: writing/templates/writing.html:78
 msgid ""
 "To translate PDF, Word (.docx), PowerPoint (.pptx) files, drop them directly "
 "into our document translation interface...."
@@ -970,9 +974,10 @@ msgstr ""
 "Pour traduire des fichiers PDF, Word (.docx) et PowerPoint (.pptx), déposez-"
 "les directement dans notre interface de traduction de documents…"
 
-#: writing/templates/writing.html:107
+#: writing/templates/writing.html:108
 msgid "Your results will appear here"
 msgstr "Vos résultats s'afficheront ici"
+
 
 #, fuzzy
 #~| msgid "Target language"
@@ -1128,9 +1133,6 @@ msgstr "Vos résultats s'afficheront ici"
 
 #~ msgid "Out tokens"
 #~ msgstr "Sortir tokens"
-
-#~ msgid "Date"
-#~ msgstr "Date"
 
 #~ msgid "There are currently no statistic to display."
 #~ msgstr "Il n'y a actuellement aucun statistique à afficher"

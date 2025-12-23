@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import time
+import traceback
 from datetime import datetime
 from decimal import Decimal
 from io import BytesIO
@@ -58,6 +59,7 @@ from typing import Optional
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from quoting.constants import COMPANY_INFO
 from quoting.helpers import get_price_by_language_pair
 from quoting.mail_helpers import generate_quote_pdf, send_quote_email
 from quoting.services.quote import FormQuoteService
@@ -739,6 +741,38 @@ def _update_document_status_in_lara(project_id: str, new_status: str) -> None:
         raise
 
 
+def _calculate_quote_price(words_count: int, quote_price: LanguageQuote) -> float:
+    """
+    Calculate total quote price with minimum amount application.
+    
+    Args:
+        words_count: Number of words to translate
+        quote_price: LanguageQuote object with price per word
+        
+    Returns:
+        float: Total price (at least MINIMUM_QUOTE_AMOUNT)
+    """
+    return max(
+        words_count * quote_price.price,
+        settings.MINIMUM_QUOTE_AMOUNT
+    )
+
+
+def _get_quote_number(user: User) -> str:
+    """
+    Generate quote number for the user's group.
+    
+    Args:
+        user: Django User object
+        
+    Returns:
+        str: Quote number in format YYYY/MM/NNNN
+    """
+    if user.group:
+        return user.group.generate_quoting_number()
+    return f"{now().strftime('%Y/%m')}/0"
+
+
 def _build_quote_context(
     doc_data: dict,
     quote_price: LanguageQuote,
@@ -748,55 +782,62 @@ def _build_quote_context(
     request
 ) -> dict:
     """
-    Construit le contexte pour le template PDF de devis.
+    Build context for the quote PDF template.
     
     Args:
-        doc_data: Données du document depuis lara-django
-        quote_price: Objet LanguageQuote avec les prix
-        words_count: Nombre de mots à traduire
-        project_id: UUID du document
-        user: Utilisateur Django
-        request: Objet request Django pour générer les URLs
+        doc_data: Document data from lara-django
+        quote_price: LanguageQuote object with prices
+        words_count: Number of words to translate
+        project_id: Document UUID
+        user: Django User
+        request: Django request object to generate URLs
         
     Returns:
-        dict: Variables de contexte pour le template
+        dict: Context variables for the template
     """
     source_lang = doc_data.get('source_language', '')
     target_lang = doc_data.get('target_language', '')
     
-    # Calcul du prix total avec application du minimum
-    total_price = max(
-        words_count * quote_price.price,
-        settings.MINIMUM_QUOTE_AMOUNT
-    )
-    
+    # Calculate pricing
+    total_price = _calculate_quote_price(words_count, quote_price)
     working_days = FormQuoteService.get_working_days(words_count, quote_price)
+    
+    # User and company information
     company_name = user.group.name if user.group else "Administrator"
-    quote_number = (
-        user.group.generate_quoting_number()
-        if user.group
-        else f"{now().strftime('%Y/%m')}/0"
-    )
+    quote_number = _get_quote_number(user)
     sender_email = settings.SENDER_EMAIL
     
+    # Build context
     return {
-        "email": sender_email,
+        # User information
         "username": user.username,
         "user_email": user.email,
+        "email": sender_email,
+        "seller_email": sender_email,
+        
+        # Quote information
         "company": company_name,
         "contract_name": company_name,
+        "quote_number": quote_number,
         "language_pair": f"{source_lang.upper()} -> {target_lang.upper()}",
         "file_name": doc_data.get('filename', 'document'),
+        
+        # Pricing
         "word_price": quote_price.price,
         "words_count": words_count,
         "working_days": working_days,
         "total_price": total_price,
+        
+        # Dates
         "created_at": now(),
-        "seller_email": sender_email,
-        "quote_number": quote_number,
+        
+        # URLs
         "accept_expert_revision_file_absolute_url": request.build_absolute_uri(
             f"/expert-review/accept/{project_id}"
-        )
+        ),
+        
+        # Company information (from constants)
+        **COMPANY_INFO
     }
 
 
@@ -845,91 +886,217 @@ class FileExpertRevisionView(APIView):
     """
     permission_classes = (SubscribedPermission, IsAuthenticated)
 
-    def post(self, request):
+    def _validate_request(self, request) -> tuple[str, Response | None]:
         """
-        Traite une demande de révision experte.
+        Validate request data.
         
         Args:
-            request.data contient:
-                - project_id: UUID du document dans lara-django
-                - file_url: URL du fichier traduit (optionnel)
+            request: Django request object
+            
+        Returns:
+            tuple: (project_id, error_response or None)
         """
         project_id = request.data.get('project_id')
-        
         if not project_id:
-            return Response(
+            return None, Response(
                 {"detail": "project_id is required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        return project_id, None
+    
+    def _fetch_and_validate_document(self, project_id: str) -> tuple[dict, LanguageQuote, Response | None]:
+        """
+        Fetch document data and validate quote availability.
+        
+        Args:
+            project_id: Document UUID
+            
+        Returns:
+            tuple: (doc_data, quote_price, error_response or None)
+        """
+        doc_data = _fetch_document_from_lara(project_id)
+        source_lang = doc_data.get('source_language', '')
+        target_lang = doc_data.get('target_language', '')
+        
+        quote_price = get_price_by_language_pair(source_lang, target_lang)
+        if not quote_price:
+            return None, None, Response(
+                {"detail": f"No quote available for language pair: {source_lang} -> {target_lang}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        return doc_data, quote_price, None
+    
+    def _get_user_language(self, user) -> str:
+        """
+        Get user's account language or default.
+        
+        Args:
+            user: Django User object
+            
+        Returns:
+            Language code
+        """
+        return user.language or settings.LANGUAGE_CODE
+    
+    def _handle_non_critical_errors(self, operation_name: str, error: Exception):
+        """
+        Log non-critical errors that don't stop the process.
+        
+        Args:
+            operation_name: Name of the operation that failed
+            error: Exception that occurred
+        """
+        logger.warning(f"Non-critical error in {operation_name}: {str(error)}")
+    
+    def post(self, request):
+        """
+        Process expert revision request.
+        
+        Args:
+            request.data contains:
+                - project_id: UUID of the document in lara-django
+                - file_url: URL of the translated file (optional)
+        """
+        # Validate request
+        project_id, error_response = self._validate_request(request)
+        if error_response:
+            return error_response
         
         try:
-            # Récupérer les données du document
-            doc_data = _fetch_document_from_lara(project_id)
+            # Fetch and validate document
+            doc_data, quote_price, error_response = self._fetch_and_validate_document(project_id)
+            if error_response:
+                return error_response
+            
             source_lang = doc_data.get('source_language', '')
             target_lang = doc_data.get('target_language', '')
-            
-            # Vérifier qu'un devis existe pour cette paire de langues
-            quote_price = get_price_by_language_pair(source_lang, target_lang)
-            if not quote_price:
-                return Response(
-                    {"detail": "No quote available for this language pair"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            # Récupérer le nombre de mots
             words_count = doc_data.get('words_count', 0) or 0
+            
             if words_count == 0:
                 logger.warning(f"Document {project_id} has no words_count, defaulting to 0")
             
-            # Construire le contexte pour le PDF
-            context_variables = _build_quote_context(
-                doc_data, quote_price, words_count, project_id, request.user, request
+            # Build context for PDF
+            try:
+                context_variables = _build_quote_context(
+                    doc_data, quote_price, words_count, project_id, request.user, request
+                )
+            except Exception as e:
+                logger.error(f"Error building quote context: {str(e)}", exc_info=True)
+                return Response(
+                    {"detail": f"Error building quote context: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+            
+            # Update status in lara-django (non-critical)
+            try:
+                _update_document_status_in_lara(project_id, "quote_requested")
+            except Exception as e:
+                self._handle_non_critical_errors("LARA status update", e)
+            
+            # Generate PDF with user's account language
+            user_account_language = self._get_user_language(request.user)
+            logger.info(
+                f"PDF generation for user {request.user.id}: "
+                f"account_language={user_account_language}, "
+                f"session_language={request.LANGUAGE_CODE}"
             )
             
-            # Mettre à jour le statut dans lara-django
-            _update_document_status_in_lara(project_id, "quote_requested")
+            try:
+                pdf_bytes, filename = generate_quote_pdf(
+                    context_variables,
+                    language=user_account_language
+                )
+            except Exception as e:
+                logger.error(
+                    f"Error generating PDF for project {project_id}: {str(e)}",
+                    exc_info=True
+                )
+                return Response(
+                    {
+                        "detail": f"Error generating PDF: {str(e)}",
+                        "error_type": type(e).__name__
+                    },
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
             
-            # Générer le PDF
-            pdf_bytes, filename = generate_quote_pdf(context_variables)
+            # Send email with PDF (non-critical)
+            try:
+                send_quote_email(
+                    request.user.id,
+                    request,
+                    context_variables,
+                    pdf_bytes,
+                    filename
+                )
+            except Exception as e:
+                self._handle_non_critical_errors("quote email sending", e)
             
-            # Envoyer l'email avec le PDF
-            send_quote_email(
-                request.user.id,
-                request,
-                context_variables,
-                pdf_bytes,
-                filename
-            )
-            
-            # Créer l'enregistrement QuotePDF après l'envoi de l'email
-            _create_quote_pdf_record(
-                user=request.user,
-                pdf_bytes=pdf_bytes,
-                filename=filename,
-                context_variables=context_variables,
-                language_quote=quote_price,
-                source_language=source_lang,
-                target_language=target_lang
-            )
+            # Create QuotePDF record (non-critical)
+            try:
+                _create_quote_pdf_record(
+                    user=request.user,
+                    pdf_bytes=pdf_bytes,
+                    filename=filename,
+                    context_variables=context_variables,
+                    language_quote=quote_price,
+                    source_language=source_lang,
+                    target_language=target_lang
+                )
+            except Exception as e:
+                self._handle_non_critical_errors("quote PDF record creation", e)
             
             logger.info(f"Quote request sent for document {project_id} - User: {request.user.id}")
             return Response({"detail": "Quote request sent successfully"})
             
         except ValueError as e:
             error_msg = str(e)
-            logger.error(f"Validation error in expert revision request: {error_msg}")
-            status_code = status.HTTP_404_NOT_FOUND if "not found" in error_msg.lower() else status.HTTP_500_INTERNAL_SERVER_ERROR
-            return Response({"detail": error_msg}, status=status_code)
-        except requests.RequestException as e:
-            logger.error(f"Error communicating with LARA API: {str(e)}")
+            logger.error(f"Validation error in expert revision request: {error_msg}", exc_info=True)
+            status_code = status.HTTP_404_NOT_FOUND if "not found" in error_msg.lower() else status.HTTP_400_BAD_REQUEST
             return Response(
-                {"detail": f"Error communicating with translation service: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"detail": error_msg, "error_type": "ValidationError"},
+                status=status_code
+            )
+        except requests.RequestException as e:
+            error_msg = str(e)
+            logger.error(
+                f"Error communicating with LARA API: {error_msg}",
+                exc_info=True,
+                extra={'project_id': project_id}
+            )
+            return Response(
+                {
+                    "detail": f"Error communicating with translation service: {error_msg}",
+                    "error_type": type(e).__name__
+                },
+                status=status.HTTP_502_BAD_GATEWAY
             )
         except Exception as e:
-            logger.error(f"Unexpected error in expert revision request: {str(e)}", exc_info=True)
+            error_msg = str(e)
+            error_type = type(e).__name__
+            error_traceback = traceback.format_exc()
+            
+            logger.error(
+                f"Unexpected error in expert revision request for project {project_id}: {error_msg}",
+                exc_info=True,
+                extra={
+                    'project_id': project_id,
+                    'user_id': request.user.id if request.user.is_authenticated else None,
+                    'error_type': error_type,
+                    'traceback': error_traceback
+                }
+            )
+            
+            response_data = {
+                "detail": f"An unexpected error occurred: {error_msg}",
+                "error_type": error_type
+            }
+            
+            if settings.DEBUG:
+                response_data["traceback"] = error_traceback
+            
             return Response(
-                {"detail": "An unexpected error occurred"},
+                response_data,
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
