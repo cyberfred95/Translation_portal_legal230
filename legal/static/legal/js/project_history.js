@@ -8,21 +8,10 @@
 // =============================================================================
 
 /**
- * Get localized message based on current language
- */
-function getLocalizedMessage(messages) {
-  const lang = window.language_code || 'fr';
-  return messages[lang] || messages.en || messages.fr;
-}
-
-/**
  * Show error notification or fallback alert
  */
 function showError(status, detail) {
-  const errorMessage = getLocalizedMessage({
-    fr: 'Erreur lors de la suppression. Veuillez réessayer.',
-    en: 'Error deleting translation. Please try again.'
-  });
+  const errorMessage = window.deleteConfirmationMessages?.error || 'Error deleting translation. Please try again.';
   
   if (typeof errorNotification === 'function') {
     errorNotification(status || 500, detail || errorMessage);
@@ -49,18 +38,97 @@ function setButtonLoading(button, isLoading) {
 }
 
 /**
- * Delete a translation document
+ * Create and return delete confirmation dialog elements
  */
-function deleteTranslation(documentId, button) {
-  const confirmMessage = getLocalizedMessage({
-    fr: 'Êtes-vous sûr de vouloir supprimer cette traduction ? Les fichiers associés seront définitivement supprimés.',
-    en: 'Are you sure you want to delete this translation? Associated files will be permanently deleted.'
-  });
-  
-  if (!confirm(confirmMessage)) {
+function createDeleteDialog(msg) {
+  const overlay = document.createElement('div');
+  overlay.className = 'delete-confirmation-dialog-overlay';
+
+  const dialog = document.createElement('div');
+  dialog.className = 'delete-confirmation-dialog';
+
+  const title = document.createElement('div');
+  title.className = 'delete-confirmation-dialog-title';
+  title.textContent = msg.title;
+
+  const message = document.createElement('div');
+  message.className = 'delete-confirmation-dialog-message';
+  message.textContent = msg.message;
+
+  const buttons = document.createElement('div');
+  buttons.className = 'delete-confirmation-dialog-buttons';
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'delete-confirmation-dialog-button delete-confirmation-dialog-button-cancel';
+  cancelBtn.textContent = msg.cancel;
+  cancelBtn.type = 'button';
+
+  const confirmBtn = document.createElement('button');
+  confirmBtn.className = 'delete-confirmation-dialog-button delete-confirmation-dialog-button-confirm';
+  confirmBtn.textContent = msg.confirm;
+  confirmBtn.type = 'button';
+
+  buttons.appendChild(cancelBtn);
+  buttons.appendChild(confirmBtn);
+  dialog.appendChild(title);
+  dialog.appendChild(message);
+  dialog.appendChild(buttons);
+
+  return { overlay, dialog, cancelBtn, confirmBtn };
+}
+
+/**
+ * Show delete confirmation dialog
+ */
+function showDeleteConfirmation(documentId, button) {
+  // Prevent duplicate dialogs
+  if (document.querySelector('.delete-confirmation-dialog')) {
     return;
   }
 
+  // Use translated messages from Django i18n
+  const msg = window.deleteConfirmationMessages || {
+    title: 'Delete translation',
+    message: 'Are you sure you want to delete this translation? Associated files will be permanently deleted.',
+    cancel: 'No',
+    confirm: 'Yes'
+  };
+
+  // Create dialog elements
+  const { overlay, dialog, cancelBtn, confirmBtn } = createDeleteDialog(msg);
+
+  // Add to DOM
+  document.body.appendChild(overlay);
+  document.body.appendChild(dialog);
+
+  // Close function
+  const closeDialog = () => {
+    overlay.remove();
+    dialog.remove();
+    document.removeEventListener('keydown', escapeHandler);
+  };
+
+  // Escape key handler
+  const escapeHandler = (e) => {
+    if (e.key === 'Escape') {
+      closeDialog();
+    }
+  };
+
+  // Event handlers
+  cancelBtn.addEventListener('click', closeDialog);
+  overlay.addEventListener('click', closeDialog);
+  confirmBtn.addEventListener('click', () => {
+    closeDialog();
+    deleteTranslation(documentId, button);
+  });
+  document.addEventListener('keydown', escapeHandler);
+}
+
+/**
+ * Delete a translation document via API
+ */
+function deleteTranslation(documentId, button) {
   setButtonLoading(button, true);
 
   const deleteUrl = `${window.lara_api_url}/api/lara/documents/${documentId}/delete`;
@@ -287,7 +355,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!deleteBtn) return;
 
     e.preventDefault();
-    deleteTranslation(deleteBtn.dataset.id, deleteBtn);
+    if (deleteBtn.disabled) return;
+    
+    showDeleteConfirmation(deleteBtn.dataset.id, deleteBtn);
   });
 
   // S'assure que les statuts restent synchronis 9s si la pagination met  0 jour le tableau dynamiquement

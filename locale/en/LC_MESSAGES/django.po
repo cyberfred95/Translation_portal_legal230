@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-23 11:16+0100\n"
+"POT-Creation-Date: 2025-12-23 15:47+0100\n"
 "PO-Revision-Date: 2024-07-03 17:56+0300\n"
 "Last-Translator:   <vjxzebra@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -355,19 +355,19 @@ msgstr "Status"
 
 #: legal/templates/dashboard/dashboard_recent_translations.html:47
 #: legal/templates/dashboard/dashboard_recent_translations.html:51
-#: legal/templates/project_history/project_history.html:95
+#: legal/templates/project_history/project_history.html:101
 msgid "Download"
 msgstr "Download"
 
 # ######################################
 # ########################### STEP 5 ###
 #: legal/templates/dashboard/dashboard_recent_translations.html:63
-#: legal/templates/project_history/project_history.html:115
+#: legal/templates/project_history/project_history.html:121
 msgid "No translations found"
 msgstr "No translations found"
 
 #: legal/templates/dashboard/dashboard_recent_translations.html:64
-#: legal/templates/project_history/project_history.html:116
+#: legal/templates/project_history/project_history.html:122
 msgid "Start by translating your first document or text."
 msgstr "Start by translating your first document or text."
 
@@ -587,20 +587,50 @@ msgstr ""
 msgid "Languages"
 msgstr "Languages"
 
-#: legal/templates/project_history/project_history.html:105
+#: legal/templates/project_history/project_history.html:94
+msgid "Delete"
+msgstr ""
+
+#: legal/templates/project_history/project_history.html:111
 #, fuzzy
 #| msgid "Expert revision"
 msgid "Expert review"
 msgstr "Expert review"
 
-#: legal/templates/project_history/project_history.html:136
+#: legal/templates/project_history/project_history.html:142
 msgid "Prev"
 msgstr "Prev"
 
-#: legal/templates/project_history/project_history.html:142
+#: legal/templates/project_history/project_history.html:148
 #: legal/templates/translate/document_translate/document_translate.html:50
 msgid "Next"
 msgstr "Next"
+
+# ######################################
+# ########################### STEP 5 ###
+#: legal/templates/project_history/project_history.html:167
+msgid "Delete translation"
+msgstr "Delete translation"
+
+#: legal/templates/project_history/project_history.html:168
+msgid ""
+"Are you sure you want to delete this translation? Associated files will be "
+"permanently deleted."
+msgstr ""
+"Are you sure you want to delete this translation? Associated files will be "
+"permanently deleted."
+
+#: legal/templates/project_history/project_history.html:169
+msgid "No"
+msgstr "No"
+
+#: legal/templates/project_history/project_history.html:170
+msgid "Yes"
+msgstr "Yes"
+
+#: legal/templates/project_history/project_history.html:171
+msgid "Error deleting translation. Please try again."
+msgstr "Error deleting translation. Please try again."
 
 # ######################################
 # ########################### STEP 6 ###
@@ -966,8 +996,6 @@ msgstr ""
 #: writing/templates/writing.html:108
 msgid "Your results will appear here"
 msgstr ""
-
-#, python-format
 
 #, fuzzy
 #~| msgid "No glossary"
