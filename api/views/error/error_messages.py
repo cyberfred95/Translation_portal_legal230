@@ -12,7 +12,7 @@ from api.settings import (
     MAX_DOMAIN_NAME_LENGTH,
     MAX_ACTION_LENGTH,
     MAX_GLOSSARY_NAME_LENGTH,
-    MAX_FILE_SIZE,
+    MAX_TOTAL_FILE_SIZE,
     MAX_GLOSSARY_FILE_SIZE,
     MAX_FILES_COUNT,
     MAX_DOMAIN_ID,
@@ -41,10 +41,8 @@ DOCUMENT_FILE_REQUIRED = "'document' (at least one file) is required for action 
 FILE_BASE64_REQUIRED = "'file' (base64 string) is required"
 FILE_UPLOAD_REQUIRED = "'file' (file) is required"
 FILE_INVALID_BASE64 = "'file' is not valid base64"
-FILE_TOO_LARGE = f"File is too large. Maximum size is {MAX_FILE_SIZE // (1024*1024)}MB"
 FILE_TOO_LARGE_GLOSSARY = f"File is too large. Maximum size is {MAX_GLOSSARY_FILE_SIZE // (1024*1024)}MB"
-FILE_TOO_LARGE_WITH_NAME = f"File {{filename}} is too large. Maximum size is {MAX_FILE_SIZE // (1024*1024)}MB"
-FILE_TOO_LARGE_WITH_INDEX = f"File {{index}} is too large. Maximum size is {MAX_FILE_SIZE // (1024*1024)}MB"
+TOTAL_FILES_TOO_LARGE = f"Total file size exceeds the maximum allowed size of {MAX_TOTAL_FILE_SIZE // (1024*1024)}MB"
 FILE_INVALID_TYPE_CSV_XLSX = "'file' must be a CSV or XLSX file (base64)"
 FILE_INVALID_TYPE_CSV_XLSX_UPLOAD = "'file' must be a CSV or XLSX file"
 FILE_INVALID_TYPE_DOCUMENTS = "Element {index} in 'document' is not a valid TXT, DOCX, XLSX, PPTX or PDF file"
