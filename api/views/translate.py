@@ -20,7 +20,7 @@ from ..settings import (
     MAX_LANGUAGE_CODE_LENGTH,
     MAX_DOMAIN_NAME_LENGTH,
     MAX_ACTION_LENGTH,
-    MAX_FILE_SIZE,
+    MAX_TOTAL_FILE_SIZE,
     MAX_FILES_COUNT,
     ALLOWED_FILE_EXTENSIONS,
     ALLOWED_FILE_SIGNATURES,
@@ -36,8 +36,7 @@ from .error.error_messages import (
     TEXT_TOO_LONG,
     DOCUMENT_ARRAY_REQUIRED,
     DOCUMENT_FILE_REQUIRED,
-    FILE_TOO_LARGE_WITH_INDEX,
-    FILE_TOO_LARGE_WITH_NAME,
+    TOTAL_FILES_TOO_LARGE,
     FILE_INVALID_TYPE_DOCUMENTS,
     FILE_INVALID_TYPE_WITH_NAME,
     ELEMENT_INVALID_BASE64,
@@ -103,14 +102,14 @@ def validate_translate_post_request(request, data):
             if len(document) > MAX_FILES_COUNT:
                 return error_message(MAX_FILES_EXCEEDED)
 
+            total_size = 0
             for idx, file_b64 in enumerate(document):
                 try:
                     file_content = base64.b64decode(file_b64)
                 except Exception:
                     return error_message(ELEMENT_INVALID_BASE64.format(index=idx))
 
-                if len(file_content) > MAX_FILE_SIZE:
-                    return error_message(FILE_TOO_LARGE_WITH_INDEX.format(index=idx))
+                total_size += len(file_content)
 
                 valid = False
                 for ext, sigs in ALLOWED_FILE_SIGNATURES.items():
@@ -123,6 +122,9 @@ def validate_translate_post_request(request, data):
 
                 if not valid:
                     return error_message(FILE_INVALID_TYPE_DOCUMENTS.format(index=idx))
+
+            if total_size > MAX_TOTAL_FILE_SIZE:
+                return error_message(TOTAL_FILES_TOO_LARGE)
         else:
             files = request.FILES.getlist("document[]") or []
             if not files:
@@ -131,11 +133,14 @@ def validate_translate_post_request(request, data):
             if len(files) > MAX_FILES_COUNT:
                 return error_message(MAX_FILES_EXCEEDED)
 
+            total_size = 0
             for idx, f in enumerate(files):
                 if not f.name.lower().endswith(ALLOWED_FILE_EXTENSIONS):
                     return error_message(FILE_INVALID_TYPE_WITH_NAME.format(filename=f.name))
-                if f.size > MAX_FILE_SIZE:
-                    return error_message(FILE_TOO_LARGE_WITH_NAME.format(filename=f.name))
+                total_size += f.size
+
+            if total_size > MAX_TOTAL_FILE_SIZE:
+                return error_message(TOTAL_FILES_TOO_LARGE)
 
     return None
 

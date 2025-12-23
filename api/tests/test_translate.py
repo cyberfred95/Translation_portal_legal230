@@ -15,12 +15,12 @@ from django.contrib.auth import get_user_model
 from django.test import RequestFactory, TestCase
 from django.utils import timezone
 
-from api.settings import MAX_FILE_SIZE, MAX_FILES_COUNT, MAX_TEXT_LENGTH
+from api.settings import MAX_TOTAL_FILE_SIZE, MAX_FILES_COUNT, MAX_TEXT_LENGTH
 from api.views.error.error import error_message
 from api.views.error.error_messages import (
     DOCUMENT_ARRAY_REQUIRED,
     FIELD_REQUIRED,
-    FILE_TOO_LARGE_WITH_INDEX,
+    TOTAL_FILES_TOO_LARGE,
     INVALID_API_KEY,
     MAX_FILES_EXCEEDED,
     TEXT_TOO_LONG,
@@ -412,19 +412,18 @@ class TranslateAPITestCase(TestCase):
 
         self.assertEqual(response.status_code, 400)
 
-    def test_file_extension_validation(self):
-        """Test file extension validation.
+    def test_total_file_size_validation(self):
+        """Test total file size validation.
 
-        Tests with a file that exceeds the maximum allowed size.
-        This is the only reliable way to make the validation fail because
-        TXT files (signature b'') accept any content.
-        51 MB > MAX_FILE_SIZE (50 MB)
+        Tests with files that exceed the maximum allowed total size.
+        The limit is on the total of all files combined, not per file.
+        51 MB > MAX_TOTAL_FILE_SIZE (50 MB)
         """
         mock_request = Mock()
         mock_request.content_type = JSON_CONTENT_TYPE
 
-        # MAX_FILE_SIZE + 1MB
-        large_content = b'A' * (MAX_FILE_SIZE + (1 * 1024 * 1024))
+        # MAX_TOTAL_FILE_SIZE + 1MB
+        large_content = b'A' * (MAX_TOTAL_FILE_SIZE + (1 * 1024 * 1024))
         large_base64 = base64.b64encode(large_content).decode()
 
         data = {
@@ -437,8 +436,32 @@ class TranslateAPITestCase(TestCase):
         result = validate_translate_post_request(mock_request, data)
 
         self.assertIsNotNone(result)
-        self.assertEqual(result['detail'],
-                         FILE_TOO_LARGE_WITH_INDEX.format(index=0))
+        self.assertEqual(result['detail'], TOTAL_FILES_TOO_LARGE)
+
+    def test_total_file_size_validation_multiple_files(self):
+        """Test total file size validation with multiple files.
+
+        Tests that multiple smaller files that together exceed the limit
+        are correctly rejected.
+        """
+        mock_request = Mock()
+        mock_request.content_type = JSON_CONTENT_TYPE
+
+        # Create 3 files of 20MB each = 60MB total > 50MB limit
+        file_content = b'A' * (20 * 1024 * 1024)
+        file_base64 = base64.b64encode(file_content).decode()
+
+        data = {
+            'action': FILE_TRANSLATE_ACTION,
+            'source_language': ENGLISH_LANG_CODE,
+            'target_language': FRENCH_LANG_CODE,
+            'document': [file_base64, file_base64, file_base64]
+        }
+
+        result = validate_translate_post_request(mock_request, data)
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result['detail'], TOTAL_FILES_TOO_LARGE)
 
     def test_empty_filename_validation(self):
         """Test with empty or invalid document.

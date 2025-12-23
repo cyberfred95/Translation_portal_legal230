@@ -364,6 +364,7 @@ $(document).ready(function () {
 
     const allowedTypes = ['.txt', '.pdf', '.docx', '.xlsx', '.pptx'];
     const MAX_CSV_FILENAME_LENGTH = 128;
+    const MAX_TOTAL_FILE_SIZE = 50 * 1024 * 1024; // 50MB maximum total for all files
 
     const fileInput = $('<input>', {
         type: 'file',
@@ -447,9 +448,29 @@ $(document).ready(function () {
         // Filtrer les fichiers déjà présents (par nom et taille)
         var newFiles = filteredFiles.filter(function (file) {
             return !selectedFiles.some(function (selectedFile) {
-                return selectedFile.name === file.name && selectedFile.size === file.size;
+                return selectedFile.name === file.name && selectedFile.rawSize === file.size;
             });
         });
+
+        // Calculer la taille totale actuelle des fichiers sélectionnés
+        var currentTotalSize = selectedFiles.reduce(function (total, file) {
+            return total + (file.rawSize || 0);
+        }, 0);
+
+        // Calculer la taille totale avec les nouveaux fichiers
+        var newFilesTotalSize = newFiles.reduce(function (total, file) {
+            return total + file.size;
+        }, 0);
+
+        // Vérifier si la taille totale dépasse la limite
+        if (currentTotalSize + newFilesTotalSize > MAX_TOTAL_FILE_SIZE) {
+            var maxSizeMB = (MAX_TOTAL_FILE_SIZE / 1024 / 1024).toFixed(0);
+            alert(getTranslation(
+                'Total file size exceeds the maximum allowed size of ' + maxSizeMB + ' MB.',
+                'La taille totale des fichiers dépasse la limite autorisée de ' + maxSizeMB + ' Mo.'
+            ));
+            return;
+        }
 
         // Construire les objets fichiers enrichis
         var enrichedFiles = $.map(newFiles, function (file, index) {
@@ -463,11 +484,12 @@ $(document).ready(function () {
                 // Afficher en MB
                 fileSize = sizeInMB.toFixed(1) + ' MB';
             }
-            
+
             return {
                 id: 'file-' + Date.now() + '-' + index,
                 name: file.name,
                 size: fileSize,
+                rawSize: file.size,  // Taille brute en bytes pour calcul du total
                 timeAgo: '1 minute ago',
                 type: getFileType(file.name),
                 file: file

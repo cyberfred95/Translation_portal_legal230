@@ -57,7 +57,7 @@ components:
           description: Maximum 10 fichiers par requête
           items:
             type: string
-            description: Fichier encodé en base64 (max 50MB par fichier)
+            description: Fichier encodé en base64 (taille totale max 50MB)
         source_language:
           type: string
           maxLength: 10
@@ -386,7 +386,7 @@ paths:
                       maxItems: 10
                       items:
                         type: string
-                        description: Fichier encodé en base64 (formats supportés TXT, DOCX, XLSX, PPTX, PDF - max 50MB par fichier)
+                        description: Fichier encodé en base64 (formats supportés TXT, DOCX, XLSX, PPTX, PDF - taille totale max 50MB)
                     source_language:
                       type: string
                       maxLength: 10
@@ -411,7 +411,7 @@ paths:
                   items:
                     type: string
                     format: binary
-                    description: Fichiers TXT, DOCX, XLSX, PPTX ou PDF (maximum 10 fichiers, 50MB par fichier)
+                    description: Fichiers TXT, DOCX, XLSX, PPTX ou PDF (maximum 10 fichiers, taille totale max 50MB)
                 source_language:
                   type: string
                   maxLength: 10

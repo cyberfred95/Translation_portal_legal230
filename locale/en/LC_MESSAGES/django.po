@@ -695,7 +695,7 @@ msgstr ""
 
 #: legal/templates/translate/document_translate/step_document/step_document.html:27
 msgid "Import a document"
-msgstr "Import a document (max 50 MB)"
+msgstr "Import document(s) (Total size max 50 MB)"
 
 #: legal/templates/translate/document_translate/step_document/step_document.html:40
 #: legal/templates/translate/document_translate/step_language/step_language.html:28

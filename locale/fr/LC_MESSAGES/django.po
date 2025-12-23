@@ -696,7 +696,7 @@ msgstr "Formats pris en charge: .txt, .docx, .xlsx, .pptx, .pdf"
 
 #: legal/templates/translate/document_translate/step_document/step_document.html:27
 msgid "Import a document"
-msgstr "Importer un document (max 50 MB)"
+msgstr "Importer document(s) (Taille totale max 50 Mo)"
 
 #: legal/templates/translate/document_translate/step_document/step_document.html:40
 #: legal/templates/translate/document_translate/step_language/step_language.html:28
