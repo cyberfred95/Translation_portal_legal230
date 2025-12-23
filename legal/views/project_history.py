@@ -26,9 +26,9 @@ class ProjectsHistoryView(BaseTemplateView):
             "page_size": PAGINATION_PAGE_SIZE,
             "page": page if page is not None else 1,
         }
-        # Si l'utilisateur n'est pas staff, filtrer par son user_token
+        # Si l'utilisateur n'est pas staff, filtrer par son user_uuid
         if not user.is_staff:
-            params["user_token"] = str(user.uuid)
+            params["user_uuid"] = str(user.uuid)
 
         try:
             response = requests.get(
@@ -62,6 +62,8 @@ class ProjectsHistoryView(BaseTemplateView):
             context['projects'] = {"results": []}
         
         context['show_user_email'] = user.is_staff
+        context['lara_api_url'] = settings.LARA_API_URL
+        context['user_uuid'] = str(user.uuid) if hasattr(user, 'uuid') else None
 
         return context
 

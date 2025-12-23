@@ -149,5 +149,79 @@
 .profile-details-page .modal-body.center { align-items: center; }
 .profile-details-page .modal-title { font-size: 20px; font-weight: 600; color: #111827; }
 
+/* Delete confirmation dialog */
+.delete-confirmation-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+  min-width: 320px;
+  max-width: 400px;
+}
+
+.delete-confirmation-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1999;
+}
+
+.delete-confirmation-dialog-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.delete-confirmation-dialog-message {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.delete-confirmation-dialog-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.delete-confirmation-dialog-button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 150ms ease;
+}
+
+.delete-confirmation-dialog-button-cancel {
+  background: #ffffff;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.delete-confirmation-dialog-button-cancel:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.delete-confirmation-dialog-button-confirm {
+  background: #dc3545;
+  color: #ffffff;
+  border-color: #dc3545;
+}
+
+.delete-confirmation-dialog-button-confirm:hover {
+  background: #c82333;
+  border-color: #bd2130;
+}
+
 
 

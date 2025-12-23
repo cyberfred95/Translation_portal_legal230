@@ -2,6 +2,165 @@
  * Project History JavaScript
  * Gère les interactions de la page project history
  */
+
+// =============================================================================
+// Helper Functions
+// =============================================================================
+
+/**
+ * Show error notification or fallback alert
+ */
+function showError(status, detail) {
+  const errorMessage = window.deleteConfirmationMessages?.error || 'Error deleting translation. Please try again.';
+  
+  if (typeof errorNotification === 'function') {
+    errorNotification(status || 500, detail || errorMessage);
+  } else {
+    alert(errorMessage);
+  }
+}
+
+/**
+ * Set button loading state
+ */
+function setButtonLoading(button, isLoading) {
+  if (isLoading) {
+    button.disabled = true;
+    button.dataset.originalContent = button.innerHTML;
+    button.innerHTML = '<i class="ph ph-spinner icon-16 ph-spin"></i>';
+  } else {
+    button.disabled = false;
+    if (button.dataset.originalContent) {
+      button.innerHTML = button.dataset.originalContent;
+      delete button.dataset.originalContent;
+    }
+  }
+}
+
+/**
+ * Create and return delete confirmation dialog elements
+ */
+function createDeleteDialog(msg) {
+  const overlay = document.createElement('div');
+  overlay.className = 'delete-confirmation-dialog-overlay';
+
+  const dialog = document.createElement('div');
+  dialog.className = 'delete-confirmation-dialog';
+
+  const title = document.createElement('div');
+  title.className = 'delete-confirmation-dialog-title';
+  title.textContent = msg.title;
+
+  const message = document.createElement('div');
+  message.className = 'delete-confirmation-dialog-message';
+  message.textContent = msg.message;
+
+  const buttons = document.createElement('div');
+  buttons.className = 'delete-confirmation-dialog-buttons';
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'delete-confirmation-dialog-button delete-confirmation-dialog-button-cancel';
+  cancelBtn.textContent = msg.cancel;
+  cancelBtn.type = 'button';
+
+  const confirmBtn = document.createElement('button');
+  confirmBtn.className = 'delete-confirmation-dialog-button delete-confirmation-dialog-button-confirm';
+  confirmBtn.textContent = msg.confirm;
+  confirmBtn.type = 'button';
+
+  buttons.appendChild(cancelBtn);
+  buttons.appendChild(confirmBtn);
+  dialog.appendChild(title);
+  dialog.appendChild(message);
+  dialog.appendChild(buttons);
+
+  return { overlay, dialog, cancelBtn, confirmBtn };
+}
+
+/**
+ * Show delete confirmation dialog
+ */
+function showDeleteConfirmation(documentId, button) {
+  // Prevent duplicate dialogs
+  if (document.querySelector('.delete-confirmation-dialog')) {
+    return;
+  }
+
+  // Use translated messages from Django i18n
+  const msg = window.deleteConfirmationMessages || {
+    title: 'Delete translation',
+    message: 'Are you sure you want to delete this translation? Associated files will be permanently deleted.',
+    cancel: 'No',
+    confirm: 'Yes'
+  };
+
+  // Create dialog elements
+  const { overlay, dialog, cancelBtn, confirmBtn } = createDeleteDialog(msg);
+
+  // Add to DOM
+  document.body.appendChild(overlay);
+  document.body.appendChild(dialog);
+
+  // Close function
+  const closeDialog = () => {
+    overlay.remove();
+    dialog.remove();
+    document.removeEventListener('keydown', escapeHandler);
+  };
+
+  // Escape key handler
+  const escapeHandler = (e) => {
+    if (e.key === 'Escape') {
+      closeDialog();
+    }
+  };
+
+  // Event handlers
+  cancelBtn.addEventListener('click', closeDialog);
+  overlay.addEventListener('click', closeDialog);
+  confirmBtn.addEventListener('click', () => {
+    closeDialog();
+    deleteTranslation(documentId, button);
+  });
+  document.addEventListener('keydown', escapeHandler);
+}
+
+/**
+ * Delete a translation document via API
+ */
+function deleteTranslation(documentId, button) {
+  setButtonLoading(button, true);
+
+  const deleteUrl = `${window.lara_api_url}/api/lara/documents/${documentId}/delete`;
+  const params = new URLSearchParams({ user_uuid: window.user_uuid });
+
+  fetch(`${deleteUrl}?${params}`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+  })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => Promise.reject(err));
+      }
+      return response.json();
+    })
+    .then(() => {
+      window.location.reload();
+    })
+    .catch(error => {
+      setButtonLoading(button, false);
+      showError(error?.status, error?.detail || error?.message);
+    });
+}
+
+// =============================================================================
+// Main Initialization
+// =============================================================================
+
 document.addEventListener('DOMContentLoaded', function () {
   const root = document.querySelector('.project-history-page');
   if (!root) return;
@@ -188,6 +347,17 @@ document.addEventListener('DOMContentLoaded', function () {
     if (fileUrl) {
       window.location.href = fileUrl;
     }
+  });
+
+  // Gestion de la suppression d'une traduction
+  root.addEventListener('click', function (e) {
+    const deleteBtn = e.target.closest('.delete-translation');
+    if (!deleteBtn) return;
+
+    e.preventDefault();
+    if (deleteBtn.disabled) return;
+    
+    showDeleteConfirmation(deleteBtn.dataset.id, deleteBtn);
   });
 
   // S'assure que les statuts restent synchronis 9s si la pagination met  0 jour le tableau dynamiquement
