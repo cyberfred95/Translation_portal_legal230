@@ -933,6 +933,10 @@ msgstr "Apply"
 msgid "Copied!"
 msgstr "Copied"
 
+#: writing/templates/writing.html:16
+msgid "Your text is too short to be processed."
+msgstr "Your text is too short to be processed."
+
 #: writing/templates/writing.html:18
 msgid "Improve your text with writing tools."
 msgstr ""

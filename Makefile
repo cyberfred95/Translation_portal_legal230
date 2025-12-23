@@ -17,7 +17,7 @@ DOCKER_COMPOSE_LEXA := docker-compose -f docker-compose.prod.yaml
 .DEFAULT_GOAL := help
 
 help:
-	@echo "Usage: make [lara-bridge|lexa|all] [restart|build|static]"
+	@echo "Usage: make [lara-bridge|lexa|all] [restart|build|static|compile-messages|compile messages]"
 	@echo ""
 	@echo "Exemples:"
 	@echo "  make lara-bridge restart"
@@ -25,6 +25,8 @@ help:
 	@echo "  make lexa restart"
 	@echo "  make lexa build"
 	@echo "  make lexa static"
+	@echo "  make lexa compile-messages"
+	@echo "  make lexa compile messages"
 	@echo "  make all restart"
 	@echo "  make all build"
 	@echo "  make all static"
@@ -43,7 +45,8 @@ lexa:
 		echo "Action requise. Exemple: make lexa restart"; \
 		exit 1; \
 	fi
-	@case "$(ACTION)" in \
+	@ACTION_JOINED=$$(echo "$(ACTION)" | tr ' ' '-'); \
+	case "$$ACTION_JOINED" in \
 		restart) \
 			echo "[lexa] Redémarrage du service runserver..."; \
 			cd $(LEGAL_DIR) && $(DOCKER_COMPOSE_LEXA) restart runserver ;; \
@@ -53,6 +56,11 @@ lexa:
 		static) \
 			echo "[lexa] Collecte des fichiers statiques..."; \
 			cd $(LEGAL_DIR) && $(DOCKER_COMPOSE_LEXA) exec runserver python manage.py collectstatic --noinput ;; \
+		compile-messages|compilemessages) \
+			echo "[lexa] Compilation des messages de traduction..."; \
+			cd $(LEGAL_DIR) && python3 manage.py compilemessages && \
+			echo "[lexa] Redémarrage du service après compilation..."; \
+			$(MAKE) lexa ACTION=restart ;; \
 		*) \
 			echo "Action '$(ACTION)' non supportée pour lexa" ;; \
 	esac
