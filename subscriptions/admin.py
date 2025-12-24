@@ -32,8 +32,8 @@ def get_active_status_values():
     Return the list of status values considered active (displayed in green).
     """
     active_statuses = []
-    for choice in UserSubscription.UserSubscriptionChoices:
-        value = getattr(choice, 'value', choice)
+    # TextChoices.choices returns a list of tuples (value, label)
+    for value, label in UserSubscription.UserSubscriptionChoices.choices:
         if is_user_subscription_active(value):
             active_statuses.append(value)
     return active_statuses
