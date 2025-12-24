@@ -350,22 +350,19 @@ $(document).ready(function () {
             if (state.isTranslating) return false;
 
             const textContent = editors.source.getText().trim();
-            const deltaContent = editors.source.getContents(); // Get Quill Delta format
-            const deltaJson = JSON.stringify(deltaContent);
-            const htmlContent = editors.source.root.innerHTML; // Get HTML for fallback method
+            const htmlContent = editors.source.root.innerHTML.trim();
             const currentCount = textContent.replace(/\n/g, '').length;
-            const isEmpty = !textContent || textContent.length === 0;
+            const isEmptyHtml = !htmlContent || htmlContent === '<p><br></p>' || htmlContent === '<p></p>';
 
-            if (currentCount > CHAR_LIMIT || !textContent || isEmpty) {
+            if (currentCount > CHAR_LIMIT || !textContent || isEmptyHtml) {
                 return false;
             }
 
             state.isTranslating = true;
             $els.translateBtn.prop('disabled', true);
 
-            $('#text').val(deltaJson); // Send Delta JSON
+            $('#text').val(htmlContent);
             const formData = new FormData(this);
-            formData.append('html_content', htmlContent); // Also send HTML for fallback method
 
             generateSkeleton();
             hideQualityFeedback(); // LARA: Masquer le retour qualité précédent
