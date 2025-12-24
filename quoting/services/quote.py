@@ -7,17 +7,6 @@ Note: Certaines fonctionnalités utilisant CloudStorage ont été temporairement
 """
 import math
 from typing import Optional
-<<<<<<< HEAD
-from urllib.parse import urlencode, urlparse
-from django.conf import settings
-from preferences import preferences
-from legal.helpers import get_project_file, get_text_from_file
-from quoting.helpers import get_price_by_language_pair
-from quoting.mail_helpers import send_quote_email
-import requests
-from django.urls import reverse
-=======
->>>>>>> e95a584c700b9c65a2309686a175e0fd4f949ef0
 from django.utils.timezone import now
 
 from quoting.models import LanguageQuote
