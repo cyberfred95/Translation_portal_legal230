@@ -9,7 +9,7 @@ LEGAL_DIR := /home/ubuntu/legal230-latest
 ACTION := $(filter-out lara-bridge lexa all,$(MAKECMDGOALS))
 
 # Configuration Docker Compose pour lexa
-DOCKER_COMPOSE_LEXA := docker-compose -f docker-compose.prod.yaml
+DOCKER_COMPOSE_LEXA := docker-compose
 
 # ============================================================================
 # Cible par défaut
