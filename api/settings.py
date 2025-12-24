@@ -21,7 +21,7 @@ MAX_API_KEY_LENGTH = 36  # Maximum API key length
 MAX_GLOSSARY_NAME_LENGTH = 128  # Glossary name length
 
 # File size limits
-MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB maximum per file
+MAX_TOTAL_FILE_SIZE = 50 * 1024 * 1024  # 50MB maximum total for all files
 MAX_GLOSSARY_FILE_SIZE = 10 * 1024 * 1024  # 10MB maximum for glossaries
 MAX_FILES_COUNT = 10  # Maximum 10 files per request
 

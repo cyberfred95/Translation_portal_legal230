@@ -33,11 +33,18 @@ class TranslateView(BaseTemplateView):
         return Language.objects.order_by('name').all()
 
     def post(self, request):
+        import logging
+        logger = logging.getLogger(__name__)
+        action = request.POST.get('action')
+        logger.info(f"TranslateView.post called with action: {action}")
+        
         if not request.user.is_staff and not request.user.group:
             return JsonResponse({"detail": "You have to be staff or to be in group"}, status=400)
         if request.POST.get('action') == 'text_translate':
+            logger.info("Calling text_translation function (LARA)")
             return text_translation(request)
         elif request.POST.get('action') == 'file_translate':
+            logger.info("Calling file_translate function")
             return file_translate(request)
         return JsonResponse({})
 

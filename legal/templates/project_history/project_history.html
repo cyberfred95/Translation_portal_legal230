@@ -89,6 +89,12 @@
                         </td>
                         <td class="table-actions">
                             <button 
+                                class="delete-translation" 
+                                data-id="{{ project.id }}"
+                                title="{% trans 'Delete' %}">
+                                <i class="ph ph-trash icon-16"></i>
+                            </button>
+                            <button 
                                 class="download-file" 
                                 data-translated-file="{{ project.translated_file }}" 
                                 data-reviewed-file="{% if project.reviewed_file %}{{ project.reviewed_file }}{% endif %}"
@@ -152,8 +158,18 @@
 <script>
     // Variables Django injectées dans le contexte global
     window.expert_revision_file_url = "{% url 'expert_revision_file' %}";
-    window.single_project = "{% url 'single_project' %}";
     window.language_code = "{{ request.LANGUAGE_CODE }}";
+    window.lara_api_url = "{{ lara_api_url }}";
+    window.user_uuid = "{{ user_uuid }}";
+    
+    // Messages traduits pour project_history.js
+    window.deleteConfirmationMessages = {
+        title: "{% trans 'Delete translation' %}",
+        message: "{% trans 'Are you sure you want to delete this translation? Associated files will be permanently deleted.' %}",
+        cancel: "{% trans 'No' %}",
+        confirm: "{% trans 'Yes' %}",
+        error: "{% trans 'Error deleting translation. Please try again.' %}"
+    };
 </script>
 {% endblock %}
 

@@ -18,6 +18,8 @@ services:
       - DOCKER=true
     env_file:
       - .env
+    networks:
+      - lexamt-network
 
   dockerize:
     image: jwilder/dockerize
@@ -25,6 +27,8 @@ services:
     command: dockerize -wait tcp://postgres:5432 -timeout 10s
     depends_on:
       - postgres
+    networks:
+      - lexamt-network
 
   celery:
     <<: *django
@@ -37,6 +41,8 @@ services:
       - dockerize
       - redis
     restart: unless-stopped
+    networks:
+      - lexamt-network
 
   celery_beat:
     <<: *django
@@ -49,6 +55,8 @@ services:
       - dockerize
       - redis
     restart: unless-stopped
+    networks:
+      - lexamt-network
 
   runserver:
     <<: *django
@@ -60,6 +68,8 @@ services:
       - celery
       - redis
     restart: unless-stopped
+    networks:
+      - lexamt-network
 
   postgres:
     image: postgres:16.1
@@ -70,10 +80,18 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     restart: unless-stopped
+    networks:
+      - lexamt-network
 
   redis:
     image: redis:6
     restart: unless-stopped
+    networks:
+      - lexamt-network
+
+networks:
+  lexamt-network:
+    external: true
 
 volumes:
   postgres_data:

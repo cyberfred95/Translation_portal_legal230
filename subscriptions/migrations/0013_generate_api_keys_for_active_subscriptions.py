@@ -1,10 +1,7 @@
 # Generated manually for generating API keys for active subscriptions
 
-import uuid
-import requests
 from django.db import migrations, models
 from django.utils.timezone import now
-from django.conf import settings
 from subscriptions.permissions import is_user_subscription_active
 
 
@@ -43,52 +40,23 @@ def generate_api_keys_for_active_subscriptions(apps, schema_editor):
     
     print(f"Subscriptions to update: {len(subscriptions_to_update)}")
     
-    # Function to create API key (same logic as in the model)
-    def create_api_key(subscription_id):
-        try:
-            if not hasattr(settings, 'CUSTOM_MT_CONSOLE_URL') or not hasattr(settings, 'CLOUDSTORAGE_API_KEY'):
-                return None
-            
-            if not settings.CUSTOM_MT_CONSOLE_URL or not settings.CLOUDSTORAGE_API_KEY:
-                return None
-            
-            url = settings.CUSTOM_MT_CONSOLE_URL.rstrip('/') + "/cabinet_api/create_api_key/"
-            data = {"label": str(subscription_id)}
-            headers = {
-                "token": settings.CLOUDSTORAGE_API_KEY,
-                "Content-Type": "application/json"
-            }
-            
-            response = requests.post(url, json=data, headers=headers, timeout=30)
-            
-            if response.status_code == 200:
-                result = response.json()
-                return result.get('api_key')
-            else:
-                return None
-        except Exception:
-            return None
+    # Generate API keys using local service
+    from subscriptions.services.api_key_generator import APIKeyService
     
-    # Generate API keys manually
     updated_count = 0
     for subscription in subscriptions_to_update:
         print(f"Generating API key for subscription ID: {subscription.id}")
         old_api_key = subscription.api_key
         
-        # Generate API key
-        generated_key = create_api_key(subscription.id)
-        if generated_key:
-            subscription.api_key = generated_key
-        else:
-            # Fallback to UUID
-            subscription.api_key = str(uuid.uuid4())
-        
-        # Save the subscription
-        subscription.save()
-        
-        print(f"  -> Old API key: {old_api_key}")
-        print(f"  -> New API key: {subscription.api_key}")
-        updated_count += 1
+        try:
+            subscription.api_key = APIKeyService.create_api_key_for_subscription(subscription)
+            subscription.save()
+            print(f"  -> Old API key: {old_api_key}")
+            print(f"  -> New API key: {subscription.api_key}")
+            updated_count += 1
+        except Exception as e:
+            print(f"  -> Error generating API key: {e}")
+            # Skip this subscription if key generation fails
     
     print(f"Generated API keys for {updated_count} active subscriptions")
 

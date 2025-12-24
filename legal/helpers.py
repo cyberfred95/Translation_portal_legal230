@@ -14,30 +14,6 @@ from domains.models import Domain
 from stats.calculator import StatsProcessor
 
 
-def get_translate_data(request, for_statistic=False):
-    translate_data = {
-        'source_language': request.POST.get('source_language'),
-        'target_language': request.POST.get('target_language'),
-    }
-    domain = Domain.objects.filter(
-        french_name=request.POST.get('domain_name')).first()
-    if not domain:
-        domain = Domain.objects.filter(
-            name=request.POST.get('domain_name')).first()
-
-    if not domain and preferences.DefaultTranslation.enabled:
-        if for_statistic:
-            translate_data['domain_name'] = preferences.DefaultTranslation.name
-        else:
-            translate_data[
-                'template_name'] = f"Custom.MT Default Template {request.POST.get('source_language')} {request.POST.get('target_language')}"
-    else:
-        lang_code = getattr(request, 'LANGUAGE_CODE', 'en')
-        translate_data['domain_name'] = domain.name if lang_code == 'fr' else request.POST.get('domain_name')
-
-    return translate_data
-
-
 def lowercase_file_extension(file: InMemoryUploadedFile) -> InMemoryUploadedFile:
     # Split the file name and extension
     name, ext = os.path.splitext(file.name)
@@ -52,19 +28,60 @@ def get_word_count(segment):
     return result
 
 
-def get_text_from_file(file: InMemoryUploadedFile, api_key):
+def _convert_pdf_if_needed(file: InMemoryUploadedFile) -> InMemoryUploadedFile:
+    """
+    Convertit un PDF en DOCX si nécessaire.
+    
+    Args:
+        file: Fichier en mémoire à vérifier
+        
+    Returns:
+        InMemoryUploadedFile: Fichier DOCX converti si PDF, sinon fichier original
+    """
+    from legal.services.adobe_pdf import AdobePDFService
+    
+    file_extension = os.path.splitext(file.name)[1].lower()
+    
+    if file_extension == '.pdf':
+        adobe_service = AdobePDFService()
+        return adobe_service.convert_pdf_to_docx(file)
+    
+    return file
+
+
+def get_text_from_file(file: InMemoryUploadedFile):
+    """
+    Extrait le texte d'un fichier et retourne le fichier converti si nécessaire.
+    
+    Si le fichier est un PDF, il sera converti en DOCX et le DOCX sera retourné
+    à la place du PDF original. Le nom du fichier est automatiquement mis à jour
+    avec l'extension .docx.
+    
+    Args:
+        file: Fichier en mémoire à traiter
+        
+    Returns:
+        tuple: (formated_texts, full_texts, processed_file)
+            - formated_texts: Liste de mots formatés
+            - full_texts: Liste de textes complets
+            - processed_file: Fichier traité (DOCX si PDF original, sinon fichier original)
+    """
+    processed_file = _convert_pdf_if_needed(file)
+    
     try:
-        texts = StatsProcessor(api_key).get_texts(file=file)
+        texts = StatsProcessor().get_texts(file=processed_file)
     except UnicodeEncodeError:
         raise ValueError({"detail": "Invalid characters in file name"})
+    except ImportError as e:
+        raise ValueError({"detail": str(e)})
 
     formated_texts = [
         word
         for text in texts['texts']
         for word in re.sub(r'<[^>]*>', '', text['text']).split()
     ]
-    file.seek(0)
-    return formated_texts, [text['text'] for text in texts['texts']]
+    processed_file.seek(0)
+    return formated_texts, [text['text'] for text in texts['texts']], processed_file
 
 
 def get_project_file(file_url) -> InMemoryUploadedFile:
@@ -145,9 +162,15 @@ def process_projects(projects_data, user, email_map=None):
         list: Liste de projets enrichis avec les données nécessaires
     """
     for project in projects_data:
-        # Extraction du nom de fichier depuis l'URL
-        file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
-        project['source_file_name'] = unquote(file_name)
+        # Extraction du nom de fichier - utiliser source_file_name si disponible (Lara API)
+        # sinon fallback sur extraction depuis l'URL
+        if project.get('source_file_name'):
+            pass  # Déjà défini par Lara API
+        elif project.get('source_file'):
+            file_name = urlparse(project['source_file']).path.lstrip('/').split('/')[-1]
+            project['source_file_name'] = unquote(file_name)
+        else:
+            project['source_file_name'] = 'Unknown'
         
         # Parsing de la date de création
         project['created_at'] = datetime.fromisoformat(
@@ -162,7 +185,8 @@ def process_projects(projects_data, user, email_map=None):
         
         # Ajout de l'email utilisateur si staff et email_map fourni
         if user.is_staff and email_map:
-            token = project.get('user_custom_mt_token')
+            # Support both LARA API (user_uuid) and legacy format (user_custom_mt_token)
+            token = project.get('user_uuid') or project.get('user_custom_mt_token')
             project['user_email'] = email_map.get(str(token)) if token else None
     
     return projects_data
@@ -171,17 +195,36 @@ def process_projects(projects_data, user, email_map=None):
 def extract_user_tokens_from_projects(projects_data):
     """
     Extrait les tokens utilisateurs uniques depuis une liste de projets.
-    
+
     Args:
         projects_data: Liste de dictionnaires de projets
-        
+
     Returns:
         list: Liste de tokens utilisateurs uniques (UUID strings)
     """
+    # Support both LARA API (user_uuid) and Custom.MT (user_custom_mt_token)
     return list({
-        project.get('user_custom_mt_token')
+        project.get('user_uuid') or project.get('user_custom_mt_token')
         for project in projects_data
-        if project.get('user_custom_mt_token')
+        if project.get('user_uuid') or project.get('user_custom_mt_token')
     })
+
+
+def extract_language_codes_from_project(project: dict) -> tuple[str, str]:
+    """
+    Extrait les codes de langue depuis un dictionnaire de projet LARA.
+    
+    Supporte les formats 'source'/'target' et 'source_language'/'target_language'
+    pour compatibilité avec différentes versions de l'API.
+    
+    Args:
+        project: Dictionnaire de projet depuis l'API LARA
+        
+    Returns:
+        Tuple (source_language, target_language)
+    """
+    source_lang = project.get('source') or project.get('source_language', '')
+    target_lang = project.get('target') or project.get('target_language', '')
+    return source_lang, target_lang
 
 

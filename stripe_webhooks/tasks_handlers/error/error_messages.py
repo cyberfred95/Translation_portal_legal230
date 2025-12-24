@@ -71,6 +71,10 @@ ERROR_MESSAGES_TEMPLATE: dict[str, dict[str, str | int]] = {
         "message": "Stripe product id in payload item data not found",
         "code": CODE_BAD_REQUEST
     },
+    "not_found_subscription_item_id": {
+        "message": "Subscription item id in payload item data not found",
+        "code": CODE_BAD_REQUEST
+    },
 
     # Database lookup errors
     "not_found_user_by_stripe_customer_id": {

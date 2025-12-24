@@ -235,6 +235,12 @@ def get_item_data_quantity(item_data: dict) -> tuple[HttpResponse | None, int | 
         or None and validated quantity on success.
     """
     quantity = item_data.get('quantity')
+
+    # Metered subscriptions may omit quantity; default to 1 for billing logic
+    usage_type = item_data.get('plan', {}).get('usage_type')
+    if quantity is None and usage_type == 'metered':
+        quantity = 1
+
     if quantity is None:
         return error_message("not_found_quantity"), None
 
@@ -260,6 +266,13 @@ def get_item_data_current_period_start(item_data: dict) -> tuple[HttpResponse | 
     if dateTime_date is None:
         return error_message("not_found_current_period_start"), None
     return None, dateTime_date
+
+
+def get_item_data_subscription_item_id(item_data: dict) -> tuple[HttpResponse | None, str | None]:
+    subscription_item_id = item_data.get('id')
+    if not subscription_item_id:
+        return error_message("not_found_subscription_item_id"), None
+    return None, subscription_item_id
 
 
 def get_item_data_current_period_end(item_data: dict) -> tuple[HttpResponse | None, datetime | None]:

@@ -4,8 +4,6 @@ from django.utils.translation import gettext_lazy as _
 from legal.constants import LANGUAGES
 
 
-# Create your models here.
-
 class Prompt(models.Model):
     prompt = models.TextField()
     variables = models.JSONField(default=dict, blank=True, null=True)

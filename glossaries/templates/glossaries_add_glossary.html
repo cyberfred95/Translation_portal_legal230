@@ -24,46 +24,6 @@
         <!-- Form -->
         <form class="flex flex-col items-center gap-7.5">
             
-            <!-- Language Selection -->
-            <div class="flex w-full justify-between gap-4">
-                <div class="flex flex-col gap-2.5 flex-1">
-                    <label for="source_language">{% trans 'Source language' %}</label>
-                    <select id="source_language"
-                            class="glossary-language-source glossary-language-select" 
-                            name="source_language"
-                            required>
-                        <option value="" disabled selected>{% trans 'Source language' %}</option>
-                        {% for translate_language in translate_languages %}
-                            <option value="{{ translate_language.abbreviation|lower }}">
-                                {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                                    {{ translate_language.french_name }}
-                                {% else %}
-                                    {{ translate_language.name }}
-                                {% endif %}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="flex flex-col gap-2.5 flex-1">
-                    <label for="target_language">{% trans 'Target language' %}</label>
-                    <select id="target_language"
-                            class="glossary-language-target glossary-language-select" 
-                            name="target_language"
-                            required>
-                        <option value="" disabled selected>{% trans 'Target language' %}</option>
-                        {% for translate_language in translate_languages %}
-                            <option value="{{ translate_language.abbreviation|lower }}">
-                                {% if request.LANGUAGE_CODE == 'fr' and translate_language.french_name %}
-                                    {{ translate_language.french_name }}
-                                {% else %}
-                                    {{ translate_language.name }}
-                                {% endif %}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-            
             <!-- File Upload Section -->
             <div class="glossary-container bg-gray-25 w-full py-5 rounded-md">
                 <div id="uploadButtons" class="flex flex-col gap-2.5 items-center">

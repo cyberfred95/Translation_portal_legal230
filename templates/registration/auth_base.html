@@ -1,0 +1,17 @@
+{% extends "public_base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}Legal230 - {% block page_title %}{% endblock %}{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+    {% block auth_form %}{% endblock %}
+</div>
+{% endblock %}
+
+{% block body_end %}
+<script src="{% static 'js/authorization.js' %}"></script>
+<script src="{% static 'js/get-cookie.js' %}"></script>
+{% endblock %}
+

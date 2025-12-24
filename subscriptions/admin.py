@@ -1,20 +1,30 @@
+import stripe
 from django.contrib import admin
-from django.urls import reverse, path
+from django.contrib import messages
+from django.db import models
+from django.http import JsonResponse
+from django.shortcuts import redirect
+from django.urls import path, reverse
+from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.shortcuts import redirect
-from django.contrib import messages
-from django.http import JsonResponse
-from django.db import models
-from .models import SubscriptionType, UserSubscription, CountHistory
+from .models import SubscriptionType, UserSubscription, CountHistory, CountMetered
 from .tasks import process_daily_subscription_renewals
 from .permissions import is_user_subscription_active
+from .stripe_utils import (
+    StripeCheckoutConfigurationError,
+    create_metered_checkout_session,
+    list_active_stripe_prices,
+)
 from legal.admin.utils import create_clickable_link
 
 
 # Constants for translated fields (used in multiple admin classes)
-TRANSLATED_FIELDS = ('translated_symbols_count',
-                     'translated_words_count', 'translated_files_count')
+TRANSLATED_FIELDS = (
+    'translated_symbols_count',
+    'translated_words_count',
+    'translated_files_count',
+)
 
 
 def get_active_status_values():
@@ -53,8 +63,11 @@ class CountHistoryAdmin(admin.ModelAdmin):
     list_filter = ('subscription_type', 'start_date')
 
     def formatted_start_date(self, obj):
-        """Format start_date to display month/year (day)"""
-        return obj.start_date.strftime('%m/%y (%d)') if obj.start_date else '-'
+        """Format start_date to display month/year (day) (local time)"""
+        if obj.start_date:
+            local_time = timezone.localtime(obj.start_date)
+            return local_time.strftime('%m/%y (%d)')
+        return '-'
     formatted_start_date.short_description = 'Start Date'
     formatted_start_date.admin_order_field = 'start_date'
 
@@ -93,6 +106,27 @@ class CountHistoryAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+
+@admin.register(CountMetered)
+class CountMeteredAdmin(admin.ModelAdmin):
+    list_display = (
+        'date',
+        'user_subscription',
+        'reported',
+        'stripe_usage_record_id',
+        'daily_translated_symbols_count',
+        'daily_translated_words_count',
+        'daily_translated_files_count',
+    )
+    list_filter = ('date', 'reported')
+    search_fields = ('user_subscription__user__email', 'stripe_usage_record_id')
+    autocomplete_fields = ('user_subscription',)
+    readonly_fields = (
+        'daily_translated_symbols_count',
+        'daily_translated_words_count',
+        'daily_translated_files_count',
+    )
 
 
 class ActiveWithoutStripeFilter(admin.SimpleListFilter):
@@ -142,7 +176,7 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
         'subscription', 'start_date', 'end_date'
     )
     search_fields = (
-        'stripe_subscription_id', 'user__email', 'user__username'
+        'stripe_subscription_id', 'stripe_subscription_item_id', 'user__email', 'user__username'
     )
     ordering = ('-start_date',)
 
@@ -159,6 +193,9 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
             status__in=active_statuses,
             stripe_subscription_id__isnull=True,
         ).count()
+        extra_context["api_subscription_types"] = SubscriptionType.objects.filter(
+            product_type=SubscriptionType.ProductChoices.API
+        ).order_by("name")
         return super().changelist_view(request, extra_context=extra_context)
 
     def get_urls(self):
@@ -167,6 +204,16 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
         custom_urls = [
             path('manual-renewal/', self.admin_site.admin_view(self.manual_renewal_view),
                  name='subscriptions_usersubscription_manual_renewal'),
+            path(
+                'api-prices/',
+                self.admin_site.admin_view(self.api_prices_view),
+                name='subscriptions_usersubscription_api_prices',
+            ),
+            path(
+                'api-checkout/',
+                self.admin_site.admin_view(self.checkout_session_view),
+                name='subscriptions_usersubscription_checkout_session',
+            ),
         ]
         return custom_urls + urls
 
@@ -191,9 +238,49 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
 
         return redirect('admin:subscriptions_usersubscription_changelist')
 
+    def api_prices_view(self, request):
+        """Return the Stripe price IDs for a given product."""
+        product_id = request.GET.get('product_id')
+        if not product_id:
+            return JsonResponse({'error': 'product_id requis'}, status=400)
+
+        try:
+            prices = list_active_stripe_prices(product_id)
+        except stripe.error.StripeError as exc:
+            return JsonResponse({'error': str(exc)}, status=502)
+        except Exception as exc:  # pragma: no cover - defensive
+            return JsonResponse({'error': str(exc)}, status=500)
+
+        return JsonResponse({'prices': prices})
+
+    def checkout_session_view(self, request):
+        """Create a Stripe Checkout session and redirect the admin to Stripe."""
+        if request.method != 'POST':
+            messages.error(request, "Méthode non autorisée.")
+            return redirect('admin:subscriptions_usersubscription_changelist')
+
+        price_id = request.POST.get('price_id')
+        if not price_id:
+            messages.error(request, "Veuillez sélectionner un Price ID.")
+            return redirect('admin:subscriptions_usersubscription_changelist')
+
+        # Check if SERPA (payment method collection) is required
+        with_serpa = request.POST.get('with_serpa', 'true').lower() == 'true'
+
+        try:
+            session = create_metered_checkout_session(price_id, with_serpa=with_serpa)
+        except StripeCheckoutConfigurationError as exc:
+            messages.error(request, str(exc))
+            return redirect('admin:subscriptions_usersubscription_changelist')
+        except stripe.error.StripeError as exc:
+            messages.error(request, f"Erreur Stripe : {exc}")
+            return redirect('admin:subscriptions_usersubscription_changelist')
+
+        return redirect(session.url)
+
     fieldsets = (
         (None, {
-            'fields': ('user', 'subscription', 'status', 'stripe_subscription_id', 'api_key')
+            'fields': ('user', 'subscription', 'status', 'stripe_subscription_id', 'stripe_subscription_item_id', 'api_key')
         }),
         ('Allowed Limits', {
             'fields': (
@@ -286,17 +373,19 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
     colored_status.admin_order_field = 'status'
 
     def formatted_start_date(self, obj):
-        """Display start_date in DD/MM/YYYY format"""
+        """Display start_date in DD/MM/YYYY format (local time)"""
         if obj.start_date:
-            return obj.start_date.strftime('%d/%m/%Y')
+            local_time = timezone.localtime(obj.start_date)
+            return local_time.strftime('%d/%m/%Y')
         return '-'
     formatted_start_date.short_description = 'Start Date'
     formatted_start_date.admin_order_field = 'start_date'
 
     def formatted_end_date(self, obj):
-        """Display end_date in DD/MM/YYYY format"""
+        """Display end_date in DD/MM/YYYY format (local time)"""
         if obj.end_date:
-            return obj.end_date.strftime('%d/%m/%Y')
+            local_time = timezone.localtime(obj.end_date)
+            return local_time.strftime('%d/%m/%Y')
         return '-'
     formatted_end_date.short_description = 'End Date'
     formatted_end_date.admin_order_field = 'end_date'

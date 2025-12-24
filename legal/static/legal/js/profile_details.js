@@ -136,6 +136,181 @@ document.addEventListener('DOMContentLoaded', function () {
       handleLogout(e);
     }
   }, true);
+
+  // =============================================================================
+  // Delete All Translations Functionality
+  // =============================================================================
+
+  /**
+   * Creates a confirmation dialog for deleting all translations
+   * @param {Object} msg - Messages object with title, message, cancel, confirm
+   * @returns {Object} Dialog elements (overlay, dialog, cancelBtn, confirmBtn)
+   */
+  function createDeleteConfirmationDialog(msg) {
+    const overlay = document.createElement('div');
+    overlay.className = 'delete-confirmation-dialog-overlay';
+
+    const dialog = document.createElement('div');
+    dialog.className = 'delete-confirmation-dialog';
+
+    const title = document.createElement('div');
+    title.className = 'delete-confirmation-dialog-title';
+    title.textContent = msg.title;
+
+    const message = document.createElement('div');
+    message.className = 'delete-confirmation-dialog-message';
+    message.textContent = msg.message;
+
+    const buttons = document.createElement('div');
+    buttons.className = 'delete-confirmation-dialog-buttons';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'delete-confirmation-dialog-button delete-confirmation-dialog-button-cancel';
+    cancelBtn.textContent = msg.cancel;
+    cancelBtn.type = 'button';
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'delete-confirmation-dialog-button delete-confirmation-dialog-button-confirm';
+    confirmBtn.textContent = msg.confirm;
+    confirmBtn.type = 'button';
+
+    buttons.appendChild(cancelBtn);
+    buttons.appendChild(confirmBtn);
+    dialog.appendChild(title);
+    dialog.appendChild(message);
+    dialog.appendChild(buttons);
+
+    return { overlay, dialog, cancelBtn, confirmBtn };
+  }
+
+  /**
+   * Sets up and shows the delete confirmation dialog
+   * @param {Function} onConfirm - Callback when user confirms deletion
+   */
+  function showDeleteConfirmationDialog(onConfirm) {
+    // Prevent duplicate dialogs
+    if (document.querySelector('.delete-confirmation-dialog')) {
+      return;
+    }
+
+    const msg = window.deleteAllConfirmationMessages || {
+      title: 'Delete all translations',
+      message: 'Are you sure you want to delete all your translations? All associated files will be permanently deleted.',
+      cancel: 'No',
+      confirm: 'Yes'
+    };
+
+    const { overlay, dialog, cancelBtn, confirmBtn } = createDeleteConfirmationDialog(msg);
+
+    document.body.appendChild(overlay);
+    document.body.appendChild(dialog);
+
+    const closeDialog = () => {
+      overlay.remove();
+      dialog.remove();
+      document.removeEventListener('keydown', escapeHandler);
+    };
+
+    const escapeHandler = (e) => {
+      if (e.key === 'Escape') {
+        closeDialog();
+      }
+    };
+
+    cancelBtn.addEventListener('click', closeDialog);
+    overlay.addEventListener('click', closeDialog);
+    confirmBtn.addEventListener('click', () => {
+      closeDialog();
+      onConfirm();
+    });
+    document.addEventListener('keydown', escapeHandler);
+  }
+
+  /**
+   * Sets button to loading state
+   * @param {HTMLElement} button - Button element
+   * @param {string} loadingText - Text to display while loading
+   * @returns {string} Original button HTML content
+   */
+  function setButtonLoading(button, loadingText) {
+    const originalContent = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = `<i class="ph ph-spinner icon-24 ph-spin"></i><span class="btn-label">${loadingText}</span>`;
+    return originalContent;
+  }
+
+  /**
+   * Restores button from loading state
+   * @param {HTMLElement} button - Button element
+   * @param {string} originalContent - Original button HTML content
+   */
+  function restoreButton(button, originalContent) {
+    button.disabled = false;
+    button.innerHTML = originalContent;
+  }
+
+  /**
+   * Shows error notification or fallback alert
+   * @param {Object} error - Error object
+   * @param {string} defaultMessage - Default error message
+   */
+  function showError(error, defaultMessage) {
+    const errorMsg = error?.detail || error?.message || defaultMessage;
+    if (typeof errorNotification === 'function') {
+      errorNotification(error?.status || 500, errorMsg);
+    } else {
+      alert(errorMsg);
+    }
+  }
+
+  /**
+   * Deletes all user translations via API
+   */
+  function deleteAllTranslations() {
+    const button = root.querySelector('#delete-all-translations-btn');
+    if (!button || !window.user_uuid || !window.lara_api_url) {
+      return;
+    }
+
+    const deletingText = window.deleteAllConfirmationMessages?.deleting || 'Deleting...';
+    const originalContent = setButtonLoading(button, deletingText);
+
+    const deleteUrl = `${window.lara_api_url}/api/lara/documents/user/${window.user_uuid}/delete-all`;
+    const params = new URLSearchParams({ user_uuid: window.user_uuid });
+
+    fetch(`${deleteUrl}?${params}`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+      })
+      .then(() => {
+        // Reload page immediately after successful deletion
+        window.location.reload();
+      })
+      .catch(error => {
+        restoreButton(button, originalContent);
+        const errorMsg = window.deleteAllConfirmationMessages?.error || 'Error deleting translations. Please try again.';
+        showError(error, errorMsg);
+      });
+  }
+
+  // Attach delete all handler
+  root.addEventListener('click', function(e) {
+    const deleteBtn = e.target.closest('#delete-all-translations-btn');
+    if (deleteBtn && !deleteBtn.disabled) {
+      e.preventDefault();
+      showDeleteConfirmationDialog(deleteAllTranslations);
+    }
+  });
 });
 
 

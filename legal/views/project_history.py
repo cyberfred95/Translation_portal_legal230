@@ -3,12 +3,12 @@ import requests
 
 from legal.views_all import BaseTemplateView, PAGINATION_PAGE_SIZE
 from legal.credentials import languages
-from subscriptions.utils import get_user_api_key
 from quoting.helpers import get_price_by_language_pair
 from legal.helpers import (
     get_user_emails_map,
     process_projects,
-    extract_user_tokens_from_projects
+    extract_user_tokens_from_projects,
+    extract_language_codes_from_project
 )
 
 
@@ -20,30 +20,21 @@ class ProjectsHistoryView(BaseTemplateView):
         user = self.request.user
         page = self.request.GET.get('page')
         context['languages'] = languages
+
+        # Paramètres pour l'API Django Lara
         params = {
             "page_size": PAGINATION_PAGE_SIZE,
-            "page": page,
-            "user_custom_mt_token": user.uuid if not user.is_staff else None
+            "page": page if page is not None else 1,
         }
-        try:
-            user_api_key = get_user_api_key(user)
-        except ValueError:
-            # En cas d'absence de subscription, on ne peut pas afficher les projets
-            context['projects'] = {"results": []}
-            context['show_user_email'] = user.is_staff
-            return context
-        headers = {
-            "token": user_api_key
-        }
-
-        if page is not None:
-            params["page"] = int(page)
+        # Si l'utilisateur n'est pas staff, filtrer par son user_uuid
+        if not user.is_staff:
+            params["user_uuid"] = str(user.uuid)
 
         try:
             response = requests.get(
-                settings.CLOUDSTORAGE_API_URL, 
-                params=params, 
-                headers=headers
+                f"{settings.LARA_API_URL}/api/lara/documents",
+                params=params,
+                timeout=10
             ).json()
             
             if 'results' in response and response['results']:
@@ -58,9 +49,10 @@ class ProjectsHistoryView(BaseTemplateView):
                 
                 # Ajout des propriétés spécifiques à project_history
                 for project in response['results']:
+                    source_lang, target_lang = extract_language_codes_from_project(project)
                     project['display_popup'] = not bool(get_price_by_language_pair(
-                        source_language=project['source_language'],
-                        target_language=project['target_language']
+                        source_language=source_lang,
+                        target_language=target_lang
                     ))
                 
                 context['projects'] = response
@@ -70,6 +62,8 @@ class ProjectsHistoryView(BaseTemplateView):
             context['projects'] = {"results": []}
         
         context['show_user_email'] = user.is_staff
+        context['lara_api_url'] = settings.LARA_API_URL
+        context['user_uuid'] = str(user.uuid) if hasattr(user, 'uuid') else None
 
         return context
 

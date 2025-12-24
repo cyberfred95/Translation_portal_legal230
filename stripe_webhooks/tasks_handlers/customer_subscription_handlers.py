@@ -24,6 +24,7 @@ from .getter.get_payload import (
     get_item_data_current_period_end,
     get_item_data_current_period_start,
     get_item_data_product_id,
+    get_item_data_subscription_item_id,
     get_item_data_quantity,
     get_payload_cancel_at,
     get_payload_customer_id,
@@ -92,6 +93,10 @@ def handle_customer_subscription_created(payload: dict) -> HttpResponse:
     )
     if error_response:
         return error_response
+    error_response, subscription_item_id = get_item_data_subscription_item_id(item_data)
+    if error_response:
+        return error_response
+
 
     error_response, payload_status = get_payload_status(payload)
     if error_response:
@@ -103,6 +108,7 @@ def handle_customer_subscription_created(payload: dict) -> HttpResponse:
         stripe_customer_id=buyer.stripe_customer_id,
         subscription_type=subscription_type,
         stripe_subscription_id=stripe_subscription_id,
+        stripe_subscription_item_id=subscription_item_id,
         start_time=start_time,
         end_time=end_time,
         status=status,
@@ -155,6 +161,19 @@ def handle_customer_subscription_created(payload: dict) -> HttpResponse:
             "lexa_username": buyer.username,
             "lexa_email": buyer.email,
             "lexa_password": random_password
+            }
+        )
+        if error_response:
+            return error_response
+    elif subscription_type.product_type == SubscriptionType.ProductChoices.API:
+        error_response = send_email(
+            buyer.email,
+            EmailType.API_CREATED,
+            buyer.language,
+            {
+            "lexa_username": buyer.username,
+            "lexa_email": buyer.email,
+            "lexa_apikey": userSubscriptions[0].api_key
             }
         )
         if error_response:
@@ -224,6 +243,10 @@ def handle_customer_subscription_updated(payload: dict) -> HttpResponse:
     if error_response:
         return error_response
 
+    error_response, subscription_item_id = get_item_data_subscription_item_id(item_data)
+    if error_response:
+        return error_response
+
     error_response, end_time = get_payload_cancel_at(payload)
     if error_response:
         if error_response.exception is not None:
@@ -263,7 +286,8 @@ def handle_customer_subscription_updated(payload: dict) -> HttpResponse:
         active_user_subscription_list,
         {
             "end_date": end_time,
-            "status": status
+            "status": status,
+            "stripe_subscription_item_id": subscription_item_id,
         }
     )
     if error_response:
@@ -277,6 +301,7 @@ def handle_customer_subscription_updated(payload: dict) -> HttpResponse:
             buyer=buyer,
             subscription_type=subscription_type,
             stripe_subscription_id=stripe_subscription_id,
+            stripe_subscription_item_id=subscription_item_id,
             start_time=start_time,
             end_time=end_time,
             status=status,

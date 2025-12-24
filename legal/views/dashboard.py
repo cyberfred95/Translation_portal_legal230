@@ -2,7 +2,6 @@ from django.conf import settings
 from legal.views_all import BaseTemplateView
 import requests
 
-from subscriptions.utils import get_user_api_key
 from legal.helpers import (
     get_user_emails_map,
     process_projects,
@@ -17,18 +16,6 @@ class DashboardView(BaseTemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         page = self.request.GET.get('page', 1)
-
-        params = {
-            "page_size": 5,
-            "page": page,
-            "user_custom_mt_token": user.uuid if not user.is_staff else None
-        }
-        try:
-            user_api_key = get_user_api_key(user)
-        except ValueError:
-            context['projects'] = {"results": []}
-            return context
-        headers = {"token": user_api_key}
 
         translated_words_count = 0
         translated_symbols_count = 0
@@ -85,11 +72,19 @@ class DashboardView(BaseTemplateView):
         except Exception:
             context['is_group_admin'] = False
 
+        # Récupération des projets depuis Django Lara
+        params = {
+            "page_size": 5,
+            "page": 1,
+        }
+        if not user.is_staff:
+            params["user_uuid"] = str(user.uuid)
+
         try:
             response = requests.get(
-                settings.CLOUDSTORAGE_API_URL,
+                f"{settings.LARA_API_URL}/api/lara/documents",
                 params=params,
-                headers=headers
+                timeout=10
             ).json()
 
             if 'results' in response and response['results']:
@@ -101,10 +96,10 @@ class DashboardView(BaseTemplateView):
 
                 # Traitement des projets
                 process_projects(response['results'], user, email_map)
-                
+
                 # Ajout du status_mapped pour compatibilité
                 for project in response['results']:
-                    project['status_mapped'] = project['status']
+                    project['status_mapped'] = project.get('status', '')
 
                 context['projects'] = response
             else:
@@ -113,5 +108,4 @@ class DashboardView(BaseTemplateView):
             context['projects'] = {"results": []}
 
         return context
-
 
