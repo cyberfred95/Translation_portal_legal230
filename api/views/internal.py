@@ -88,6 +88,7 @@ class InternalUserSerializer(serializers.ModelSerializer):
             'customer_id',
             'language',
             'is_active',
+            'is_staff',
             'subscription_type',
             'subscription_product_type',
         ]
