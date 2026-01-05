@@ -67,7 +67,11 @@
                             <span class="lang-label" style="color:#181932;font-size:1rem;font-weight:500;">{{ glossary.target_language }}</span>
                         </td>
                         <td style="padding: 1rem 2rem; vertical-align: middle; text-align: center; color:#181932; font-size:1rem;">
-                            {{ glossary.created_at|date:"d/m/Y" }}
+                            {% if glossary.created_at %}
+                                {{ glossary.created_at|date:"d/m/Y" }}
+                            {% else %}
+                                -
+                            {% endif %}
                         </td>
                         <td style="padding: 1rem 2rem; vertical-align: middle; text-align: center;">
                             <div class="table-actions">

@@ -13,6 +13,27 @@ from django.db.models.functions import Lower
 from django.core.paginator import Paginator
 from django.views.generic import TemplateView
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import Group
+from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404
+
+from rest_framework import status, serializers
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+from domains.models import Domain
+from languages.models import Language
+from subscriptions.permissions import SubscribedPermission
+from users.models import User
+from .models import Glossary
+from .processor import GlossaryProcessor
+from .serializers import GlossarySerializer
+from .paginators import APIViewPagination, TemplateViewPagination
+from .utils import format_glossary_for_frontend
 
 logger = logging.getLogger(__name__)
 
@@ -27,30 +48,6 @@ class BaseTemplateView(TemplateView):
         context['SENDER_EMAIL'] = settings.SENDER_EMAIL
         context['QUOTE_CC_EMAIL'] = settings.QUOTE_CC_EMAIL
         return context
-from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.models import Group
-from django.db.models import Count, Q
-from django.shortcuts import get_object_or_404
-
-from rest_framework import status
-from rest_framework.generics import RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import serializers
-
-from domains.models import Domain
-from languages.models import Language
-from subscriptions.permissions import SubscribedPermission
-from users.models import User
-from .models import Glossary
-from .processor import GlossaryProcessor
-from .serializers import GlossarySerializer
-from .paginators import APIViewPagination, TemplateViewPagination
-
-
-# Create your views here.
 
 class UserGlossariesView(BaseTemplateView):
     template_name = 'glossaries.html'
@@ -71,41 +68,25 @@ class UserGlossariesView(BaseTemplateView):
         Fetch personal glossaries from Lara-django API (read-only).
         Only fetches glossaries with UUID != '*' (personal glossaries).
         """
-        from django.conf import settings
-        import requests
-        
         user_uuid = str(self.request.user.uuid) if hasattr(self.request.user, 'uuid') else None
         
         if not user_uuid:
-            # If user has no UUID, return empty list
             return []
         
         try:
-            # Fetch personal glossaries from Lara-django
             lara_url = f"{settings.LARA_API_URL}/api/lara/glossaries-list/search/"
             response = requests.get(
                 lara_url,
-                params={
-                    'uuid': user_uuid,
-                },
+                params={'uuid': user_uuid},
                 timeout=10
             )
             
             if response.status_code == 200:
                 data = response.json()
-                # Transform to format expected by frontend
-                formatted_glossaries = []
-                for g in data.get('glossaries', []):
-                    # Use user_glossary_name if available, otherwise name
-                    display_name = g.get('user_glossary_name') or g.get('name', '')
-                    formatted_glossaries.append({
-                        'id': g.get('glossary_id', ''),
-                        'name': display_name,
-                        'source_language': g.get('source_language', ''),
-                        'target_language': g.get('target_languages', '').split(',')[0] if g.get('target_languages') else '',
-                        'created_at': g.get('generated_at', ''),
-                    })
-                return formatted_glossaries
+                return [
+                    format_glossary_for_frontend(g)
+                    for g in data.get('glossaries', [])
+                ]
             else:
                 logger.error(f"Failed to fetch glossaries from Lara-django: {response.status_code}")
                 return []
@@ -341,13 +322,10 @@ class AddGlossaryView(APIView):
                     )
                 
                 # Transform to format expected by frontend
-                return Response({
-                    'id': lara_data.get('glossary_id', ''),
-                    'name': lara_data.get('user_glossary_name', lara_data.get('name', '')),
-                    'source_language': lara_data.get('source_language', ''),
-                    'target_language': lara_data.get('target_languages', '').split(',')[0] if lara_data.get('target_languages') else '',
-                    'created_at': lara_data.get('generated_at', ''),
-                }, status=status.HTTP_201_CREATED)
+                return Response(
+                    format_glossary_for_frontend(lara_data),
+                    status=status.HTTP_201_CREATED
+                )
             else:
                 # Handle error response
                 error_detail = self._extract_error_message(response)
