@@ -182,6 +182,83 @@ document.addEventListener('DOMContentLoaded', function () {
   const modalRevision = root.querySelector('#modal-revision');
   const closeRevision = root.querySelector('#close-revision');
 
+  // ============================================================================
+  // GESTION DE LA MODALE DE RÉVISION EXPERTE
+  // ============================================================================
+
+  /**
+   * Ferme la modale de révision experte
+   */
+  function closeRevisionModal() {
+    if (!modalRevision) return;
+    
+    modalRevision.classList.add('hidden');
+    if (closeRevision) {
+      closeRevision.classList.add('hidden');
+    }
+    modalRevision.querySelectorAll('.show-modal-true, .show-modal-false').forEach(el => {
+      el.classList.add('hidden');
+    });
+  }
+
+  /**
+   * Ouvre la modale de révision experte avec les données du projet
+   * @param {string} translatedFile - URL du fichier traduit
+   * @param {string} id - ID du projet
+   * @param {string} display - Indicateur d'affichage ('true' ou 'false')
+   */
+  function openRevisionModal(translatedFile, id, display) {
+    if (!modalRevision) return;
+
+    const modalBtn = modalRevision.querySelector('.expert-revision');
+    if (modalBtn) {
+      modalBtn.dataset.translatedFile = translatedFile;
+      modalBtn.dataset.id = id;
+    }
+
+    const showTrue = modalRevision.querySelector('.show-modal-true');
+    const showFalse = modalRevision.querySelector('.show-modal-false');
+    
+    if (display === 'false' || display === 'False') {
+      showTrue?.classList.remove('hidden');
+      showFalse?.classList.add('hidden');
+    } else {
+      showTrue?.classList.add('hidden');
+      showFalse?.classList.remove('hidden');
+    }
+
+    modalRevision.classList.remove('hidden');
+    if (closeRevision) {
+      closeRevision.classList.remove('hidden');
+    }
+  }
+
+  /**
+   * Met à jour le statut du projet dans le tableau après demande de devis
+   * @param {string} projectId - ID du projet
+   */
+  function updateProjectStatusAfterQuoteRequest(projectId) {
+    const projectRow = root.querySelector(`button.expert-revision[data-id="${projectId}"]`)?.closest('tr');
+    if (!projectRow) return;
+
+    const statusNode = projectRow.querySelector('.status');
+    if (statusNode) {
+      const newStatus = 'Sent to post-editing, not accepted yet';
+      statusNode.textContent = newStatus;
+      statusNode.setAttribute('data-status', newStatus);
+      
+      if (typeof window.applyStatusMapping === 'function') {
+        window.applyStatusMapping(projectRow);
+      }
+    }
+    
+    const expertBtn = projectRow.querySelector('.expert-revision');
+    if (expertBtn) {
+      expertBtn.disabled = true;
+      expertBtn.classList.add('disabled');
+    }
+  }
+
   // Gestion du clic sur le bouton expert-revision dans le tableau
   root.addEventListener('click', function (e) {
     const expertBtn = e.target.closest('.expert-revision');
@@ -192,50 +269,20 @@ document.addEventListener('DOMContentLoaded', function () {
       const id = expertBtn.dataset.id;
       const display = expertBtn.dataset.display;
 
-      // Transfert des données au bouton dans la modale
-      const modalBtn = modalRevision.querySelector('.expert-revision');
-      if (modalBtn) {
-        modalBtn.dataset.translatedFile = translatedFile;
-        modalBtn.dataset.id = id;
-      }
-
-      // Affichage de la modale selon data-display
-      const showTrue = modalRevision.querySelector('.show-modal-true');
-      const showFalse = modalRevision.querySelector('.show-modal-false');
-      
-      if (display === 'false' || display === 'False') {
-        showTrue.classList.remove('hidden');
-        showFalse.classList.add('hidden');
-      } else {
-        showTrue.classList.add('hidden');
-        showFalse.classList.remove('hidden');
-      }
-
-      modalRevision.classList.remove('hidden');
-      if (closeRevision) closeRevision.classList.remove('hidden');
+      openRevisionModal(translatedFile, id, display);
     }
   });
 
   // Fermeture de la modale
   if (closeRevision) {
-    closeRevision.addEventListener('click', function () {
-      modalRevision.classList.add('hidden');
-      closeRevision.classList.add('hidden');
-      modalRevision.querySelectorAll('.show-modal-true, .show-modal-false').forEach(el => {
-        el.classList.add('hidden');
-      });
-    });
+    closeRevision.addEventListener('click', closeRevisionModal);
   }
 
   // Fermeture au clic sur l'overlay
   if (modalRevision) {
     modalRevision.addEventListener('click', function (e) {
       if (e.target === modalRevision) {
-        modalRevision.classList.add('hidden');
-        if (closeRevision) closeRevision.classList.add('hidden');
-        modalRevision.querySelectorAll('.show-modal-true, .show-modal-false').forEach(el => {
-          el.classList.add('hidden');
-        });
+        closeRevisionModal();
       }
     });
   }
@@ -291,39 +338,9 @@ document.addEventListener('DOMContentLoaded', function () {
           return response.json();
         })
         .then(() => {
-          // Trouver la ligne du tableau correspondant au projet
-          const projectRow = root.querySelector(`button.expert-revision[data-id="${id}"]`)?.closest('tr');
+          updateProjectStatusAfterQuoteRequest(id);
+          closeRevisionModal();
           
-          if (projectRow) {
-            // Mettre à jour le statut dans le badge
-            const statusNode = projectRow.querySelector('.status');
-            if (statusNode) {
-              const newStatus = 'Sent to post-editing, not accepted yet';
-              statusNode.textContent = newStatus;
-              statusNode.setAttribute('data-status', newStatus);
-              
-              // Réappliquer le mapping de statut pour mettre à jour le badge visuellement
-              if (typeof window.applyStatusMapping === 'function') {
-                window.applyStatusMapping(projectRow);
-              }
-            }
-            
-            // Désactiver le bouton expert-revision
-            const expertBtn = projectRow.querySelector('.expert-revision');
-            if (expertBtn) {
-              expertBtn.disabled = true;
-              expertBtn.classList.add('disabled');
-            }
-          }
-          
-          // Fermer la modale après succès
-          modalRevision.classList.add('hidden');
-          if (closeRevision) closeRevision.classList.add('hidden');
-          modalRevision.querySelectorAll('.show-modal-true, .show-modal-false').forEach(el => {
-            el.classList.add('hidden');
-          });
-          
-          // Afficher un toast de succès
           if (window.Toast && window.expertRevisionMessages?.quoteRequestSuccess) {
             window.Toast.success(window.expertRevisionMessages.quoteRequestSuccess);
           }
