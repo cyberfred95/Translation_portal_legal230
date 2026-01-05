@@ -9,7 +9,7 @@ LEGAL_DIR := /home/ubuntu/legal230-latest
 ACTION := $(filter-out lara-bridge lexa all,$(MAKECMDGOALS))
 
 # Configuration Docker Compose pour lexa
-DOCKER_COMPOSE_LEXA := docker-compose -f docker-compose.prod.yaml
+DOCKER_COMPOSE_LEXA := docker-compose
 
 # ============================================================================
 # Cible par défaut
@@ -17,7 +17,7 @@ DOCKER_COMPOSE_LEXA := docker-compose -f docker-compose.prod.yaml
 .DEFAULT_GOAL := help
 
 help:
-	@echo "Usage: make [lara-bridge|lexa|all] [restart|build|static|compile-messages|compile messages]"
+	@echo "Usage: make [lara-bridge|lexa|all] [restart|build|static|makemigrations|migrate|compile-messages|compile messages]"
 	@echo ""
 	@echo "Exemples:"
 	@echo "  make lara-bridge restart"
@@ -25,6 +25,8 @@ help:
 	@echo "  make lexa restart"
 	@echo "  make lexa build"
 	@echo "  make lexa static"
+	@echo "  make lexa makemigrations"
+	@echo "  make lexa migrate"
 	@echo "  make lexa compile-messages"
 	@echo "  make lexa compile messages"
 	@echo "  make all restart"
@@ -56,6 +58,12 @@ lexa:
 		static) \
 			echo "[lexa] Collecte des fichiers statiques..."; \
 			cd $(LEGAL_DIR) && $(DOCKER_COMPOSE_LEXA) exec runserver python manage.py collectstatic --noinput ;; \
+		makemigrations) \
+			echo "[lexa] Création des migrations..."; \
+			cd $(LEGAL_DIR) && $(DOCKER_COMPOSE_LEXA) exec runserver python manage.py makemigrations ;; \
+		migrate) \
+			echo "[lexa] Application des migrations..."; \
+			cd $(LEGAL_DIR) && $(DOCKER_COMPOSE_LEXA) exec runserver python manage.py migrate ;; \
 		compile-messages|compilemessages) \
 			echo "[lexa] Compilation des messages de traduction..."; \
 			cd $(LEGAL_DIR) && python3 manage.py compilemessages && \

@@ -78,7 +78,7 @@ class DashboardView(BaseTemplateView):
             "page": 1,
         }
         if not user.is_staff:
-            params["user_token"] = str(user.uuid)
+            params["user_uuid"] = str(user.uuid)
 
         try:
             response = requests.get(

@@ -56,6 +56,21 @@
 {% block extra_js %}
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <script src="{% static 'legal/js/profile_details.js' %}"></script>
+<script>
+    // Variables Django injectées dans le contexte global
+    window.lara_api_url = "{{ lara_api_url }}";
+    window.user_uuid = "{{ user_uuid }}";
+    
+    // Messages traduits pour la suppression
+    window.deleteAllConfirmationMessages = {
+        title: "{% trans 'Delete all translations' %}",
+        message: "{% trans 'Are you sure you want to delete all your translations? All associated files will be permanently deleted. This action cannot be undone.' %}",
+        cancel: "{% trans 'No' %}",
+        confirm: "{% trans 'Yes' %}",
+        error: "{% trans 'Error deleting translations. Please try again.' %}",
+        deleting: "{% trans 'Deleting...' %}"
+    };
+</script>
 {% endblock %}
 
 {% endblock %}
