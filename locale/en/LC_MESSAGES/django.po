@@ -140,7 +140,15 @@ msgstr ""
 
 #: glossaries/templates/glossaries.html:131
 msgid "Glossary added successfully!"
-msgstr ""
+msgstr "Glossary added successfully!"
+
+#: glossaries/templates/glossaries.html
+msgid "Glossary deleted successfully!"
+msgstr "Glossary deleted successfully!"
+
+#: glossaries/templates/glossaries.html
+msgid "An error occurred while deleting the glossary."
+msgstr "An error occurred while deleting the glossary."
 
 #: glossaries/templates/glossaries.html:132
 msgid "Source and target languages must be different"

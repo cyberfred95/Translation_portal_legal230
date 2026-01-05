@@ -92,9 +92,20 @@ $(document).ready(function () {
                 $deleteButton.closest('.glossary-row').fadeOut(300, function() {
                     $(this).remove();
                 });
+                
+                // Afficher un toast de succès
+                if (window.Toast && window.glossaryMessages?.deletedSuccess) {
+                    window.Toast.success(window.glossaryMessages.deletedSuccess);
+                }
             },
             error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
+                // Afficher un toast d'erreur
+                const errorMessage = error?.responseJSON?.detail || window.glossaryMessages?.deleteError || 'An error occurred while deleting the glossary.';
+                if (window.Toast) {
+                    window.Toast.error(errorMessage);
+                } else {
+                    errorNotification(error?.status, error?.responseJSON?.detail);
+                }
             },
         });
     });
@@ -189,7 +200,20 @@ $(document).ready(function () {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
             success: function () {
-                window.location.reload();
+                // Fermer la modal
+                $modal.addClass('hidden');
+                $closeIcon.addClass('hidden');
+                resetUploadArea();
+                
+                // Afficher un toast de succès
+                if (window.Toast && window.glossaryMessages?.addedSuccess) {
+                    window.Toast.success(window.glossaryMessages.addedSuccess);
+                }
+                
+                // Recharger la page après un court délai pour afficher le nouveau glossaire
+                setTimeout(function() {
+                    window.location.reload();
+                }, 500);
             },
             error: function (error) {
                 // Retirer le spinner et réactiver le bouton en cas d'erreur
@@ -197,9 +221,13 @@ $(document).ready(function () {
                        .removeClass('cursor-not-allowed opacity-75')
                        .find('svg.animate-spin').remove();
                 
-                // Afficher le message d'erreur dans le warning
+                // Afficher le message d'erreur dans le warning ET dans un toast
                 const errorMessage = error?.responseJSON?.detail || window.glossaryMessages?.errorOccurred || 'An error occurred while adding the glossary.';
                 window.showGlossaryWarning(errorMessage);
+                
+                if (window.Toast) {
+                    window.Toast.error(errorMessage);
+                }
             },
         });
     });
