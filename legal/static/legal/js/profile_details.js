@@ -1,317 +1,432 @@
-document.addEventListener('DOMContentLoaded', function () {
-  const root = document.querySelector('.profile-details-page');
-  if (!root) return;
+/**
+ * Gestion de la page Profile Details
+ * 
+ * Fonctionnalités :
+ * - Navigation par onglets (Information / Security)
+ * - Mise à jour des données utilisateur
+ * - Déconnexion
+ * - Suppression de toutes les traductions
+ */
 
-  const changeDataUrl = root.getAttribute('data-change-url') || '';
+(function() {
+  'use strict';
 
-  const tabButtons = {
-    info: root.querySelector('#profile-information'),
-    security: root.querySelector('#profile-security'),
-  };
-  const tabContents = {
-    info: root.querySelector('#profile-information-content'),
-    security: root.querySelector('#profile-security-content'),
-  };
-
-  function showTab(tab) {
-    if (!tabButtons.info || !tabButtons.security) return;
-    if (!tabContents.info || !tabContents.security) return;
-
-    const isInfo = tab === 'info';
-    tabContents.info.classList.toggle('hidden', !isInfo);
-    tabContents.security.classList.toggle('hidden', isInfo);
-
-    // Active state on buttons
-    tabButtons.info.classList.toggle('is-active', isInfo);
-    tabButtons.security.classList.toggle('is-active', !isInfo);
-    tabButtons.info.setAttribute('aria-selected', String(isInfo));
-    tabButtons.security.setAttribute('aria-selected', String(!isInfo));
+  // Protection contre l'initialisation multiple
+  if (window.profileDetailsInitialized) {
+    return;
   }
+  window.profileDetailsInitialized = true;
 
-  if (tabButtons.info) {
-    tabButtons.info.addEventListener('click', () => showTab('info'));
-  }
-  if (tabButtons.security) {
-    tabButtons.security.addEventListener('click', () => showTab('security'));
-  }
+  document.addEventListener('DOMContentLoaded', function () {
+    const root = document.querySelector('.profile-details-page');
+    if (!root || root._profileDetailsInitialized) {
+      return;
+    }
+    root._profileDetailsInitialized = true;
 
-  // Expose URL if other scripts need it later
-  window.profileDetails = window.profileDetails || {};
-  window.profileDetails.changeDataUrl = changeDataUrl;
+    const changeDataUrl = root.getAttribute('data-change-url') || '';
 
-  // Set initial tab state (Information visible by default)
-  showTab('info');
+    // ============================================================================
+    // GESTION DES ONGLETS
+    // ============================================================================
 
-  // Handle form submission as PUT to changeDataUrl
-  const form = root.querySelector('form[name="change-user-data"]');
-  if (form && changeDataUrl) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(form);
+    const TabManager = {
+      buttons: {
+        info: root.querySelector('#profile-information'),
+        security: root.querySelector('#profile-security'),
+      },
+      contents: {
+        info: root.querySelector('#profile-information-content'),
+        security: root.querySelector('#profile-security-content'),
+      },
 
-      // Extract CSRF token
-      const csrfToken = formData.get('csrfmiddlewaretoken') || '';
+      show(tab) {
+        const isInfo = tab === 'info';
+        const { buttons, contents } = this;
 
-      try {
-        const response = await fetch(changeDataUrl, {
-          method: 'PUT',
-          headers: {
-            'X-CSRFToken': csrfToken,
-          },
-          body: formData,
-          credentials: 'same-origin',
-        });
-
-        if (!response.ok) {
+        if (!buttons.info || !buttons.security || !contents.info || !contents.security) {
           return;
         }
 
-        // Show success modal
-        const modal = root.querySelector('#success-update-user-data');
-        if (modal) modal.classList.remove('hidden');
-      } catch (err) {
-        // Silent error handling
-      }
-    });
-  }
+        contents.info.classList.toggle('hidden', !isInfo);
+        contents.security.classList.toggle('hidden', isInfo);
 
-  // Close success modal on button click or overlay click
-  const modal = root.querySelector('#success-update-user-data');
-  const modalBtn = root.querySelector('#success-update-btn');
-  if (modalBtn && modal) {
-    modalBtn.addEventListener('click', () => {
-      modal.classList.add('hidden');
-    });
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.classList.add('hidden');
-      }
-    });
-  }
-
-  // Logout functionality
-  function handleLogout(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Try to get CSRF token from cookie first
-    let csrfToken = getCookie('csrftoken');
-    
-    // If not found in cookie, try to get it from the form's hidden input
-    if (!csrfToken) {
-      const csrfInput = root.querySelector('[name=csrfmiddlewaretoken]');
-      if (csrfInput) {
-        csrfToken = csrfInput.value;
-      }
-    }
-    
-    if (!csrfToken) {
-      return;
-    }
-
-    // Get current language prefix from URL (e.g., /fr/ or /en/)
-    const currentPath = window.location.pathname;
-    const langPrefix = currentPath.split('/')[1] || '';
-    const logoutUrl = langPrefix ? `/${langPrefix}/accounts/logout/` : '/accounts/logout/';
-
-    // Create form and submit to logout URL
-    const logoutForm = document.createElement('form');
-    logoutForm.method = 'POST';
-    logoutForm.action = logoutUrl;
-    
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = 'csrfmiddlewaretoken';
-    csrfInput.value = csrfToken;
-    logoutForm.appendChild(csrfInput);
-    
-    document.body.appendChild(logoutForm);
-    logoutForm.submit();
-  }
-
-  // Attach logout handler using event delegation
-  root.addEventListener('click', function(e) {
-    const logoutBtn = e.target.closest('#logout-btn');
-    if (logoutBtn) {
-      handleLogout(e);
-    }
-  }, true);
-
-  // =============================================================================
-  // Delete All Translations Functionality
-  // =============================================================================
-
-  /**
-   * Creates a confirmation dialog for deleting all translations
-   * @param {Object} msg - Messages object with title, message, cancel, confirm
-   * @returns {Object} Dialog elements (overlay, dialog, cancelBtn, confirmBtn)
-   */
-  function createDeleteConfirmationDialog(msg) {
-    const overlay = document.createElement('div');
-    overlay.className = 'delete-confirmation-dialog-overlay';
-
-    const dialog = document.createElement('div');
-    dialog.className = 'delete-confirmation-dialog';
-
-    const title = document.createElement('div');
-    title.className = 'delete-confirmation-dialog-title';
-    title.textContent = msg.title;
-
-    const message = document.createElement('div');
-    message.className = 'delete-confirmation-dialog-message';
-    message.textContent = msg.message;
-
-    const buttons = document.createElement('div');
-    buttons.className = 'delete-confirmation-dialog-buttons';
-
-    const cancelBtn = document.createElement('button');
-    cancelBtn.className = 'delete-confirmation-dialog-button delete-confirmation-dialog-button-cancel';
-    cancelBtn.textContent = msg.cancel;
-    cancelBtn.type = 'button';
-
-    const confirmBtn = document.createElement('button');
-    confirmBtn.className = 'delete-confirmation-dialog-button delete-confirmation-dialog-button-confirm';
-    confirmBtn.textContent = msg.confirm;
-    confirmBtn.type = 'button';
-
-    buttons.appendChild(cancelBtn);
-    buttons.appendChild(confirmBtn);
-    dialog.appendChild(title);
-    dialog.appendChild(message);
-    dialog.appendChild(buttons);
-
-    return { overlay, dialog, cancelBtn, confirmBtn };
-  }
-
-  /**
-   * Sets up and shows the delete confirmation dialog
-   * @param {Function} onConfirm - Callback when user confirms deletion
-   */
-  function showDeleteConfirmationDialog(onConfirm) {
-    // Prevent duplicate dialogs
-    if (document.querySelector('.delete-confirmation-dialog')) {
-      return;
-    }
-
-    const msg = window.deleteAllConfirmationMessages || {
-      title: 'Delete all translations',
-      message: 'Are you sure you want to delete all your translations? All associated files will be permanently deleted.',
-      cancel: 'No',
-      confirm: 'Yes'
-    };
-
-    const { overlay, dialog, cancelBtn, confirmBtn } = createDeleteConfirmationDialog(msg);
-
-    document.body.appendChild(overlay);
-    document.body.appendChild(dialog);
-
-    const closeDialog = () => {
-      overlay.remove();
-      dialog.remove();
-      document.removeEventListener('keydown', escapeHandler);
-    };
-
-    const escapeHandler = (e) => {
-      if (e.key === 'Escape') {
-        closeDialog();
-      }
-    };
-
-    cancelBtn.addEventListener('click', closeDialog);
-    overlay.addEventListener('click', closeDialog);
-    confirmBtn.addEventListener('click', () => {
-      closeDialog();
-      onConfirm();
-    });
-    document.addEventListener('keydown', escapeHandler);
-  }
-
-  /**
-   * Sets button to loading state
-   * @param {HTMLElement} button - Button element
-   * @param {string} loadingText - Text to display while loading
-   * @returns {string} Original button HTML content
-   */
-  function setButtonLoading(button, loadingText) {
-    const originalContent = button.innerHTML;
-    button.disabled = true;
-    button.innerHTML = `<i class="ph ph-spinner icon-24 ph-spin"></i><span class="btn-label">${loadingText}</span>`;
-    return originalContent;
-  }
-
-  /**
-   * Restores button from loading state
-   * @param {HTMLElement} button - Button element
-   * @param {string} originalContent - Original button HTML content
-   */
-  function restoreButton(button, originalContent) {
-    button.disabled = false;
-    button.innerHTML = originalContent;
-  }
-
-  /**
-   * Shows error notification or fallback alert
-   * @param {Object} error - Error object
-   * @param {string} defaultMessage - Default error message
-   */
-  function showError(error, defaultMessage) {
-    const errorMsg = error?.detail || error?.message || defaultMessage;
-    if (typeof errorNotification === 'function') {
-      errorNotification(error?.status || 500, errorMsg);
-    } else {
-      alert(errorMsg);
-    }
-  }
-
-  /**
-   * Deletes all user translations via API
-   */
-  function deleteAllTranslations() {
-    const button = root.querySelector('#delete-all-translations-btn');
-    if (!button || !window.user_uuid || !window.lara_api_url) {
-      return;
-    }
-
-    const deletingText = window.deleteAllConfirmationMessages?.deleting || 'Deleting...';
-    const originalContent = setButtonLoading(button, deletingText);
-
-    const deleteUrl = `${window.lara_api_url}/api/lara/documents/user/${window.user_uuid}/delete-all`;
-    const params = new URLSearchParams({ user_uuid: window.user_uuid });
-
-    fetch(`${deleteUrl}?${params}`, {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': getCookie('csrftoken'),
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        buttons.info.classList.toggle('is-active', isInfo);
+        buttons.security.classList.toggle('is-active', !isInfo);
+        buttons.info.setAttribute('aria-selected', String(isInfo));
+        buttons.security.setAttribute('aria-selected', String(!isInfo));
       },
-    })
-      .then(response => {
-        if (!response.ok) {
-          return response.json().then(err => Promise.reject(err));
+
+      init() {
+        if (this.buttons.info) {
+          this.buttons.info.addEventListener('click', () => this.show('info'));
         }
-        return response.json();
-      })
-      .then(() => {
-        // Reload page immediately after successful deletion
-        window.location.reload();
-      })
-      .catch(error => {
-        restoreButton(button, originalContent);
-        const errorMsg = window.deleteAllConfirmationMessages?.error || 'Error deleting translations. Please try again.';
-        showError(error, errorMsg);
-      });
-  }
+        if (this.buttons.security) {
+          this.buttons.security.addEventListener('click', () => this.show('security'));
+        }
+        this.show('info');
+      }
+    };
 
-  // Attach delete all handler
-  root.addEventListener('click', function(e) {
-    const deleteBtn = e.target.closest('#delete-all-translations-btn');
-    if (deleteBtn && !deleteBtn.disabled) {
-      e.preventDefault();
-      showDeleteConfirmationDialog(deleteAllTranslations);
+    // ============================================================================
+    // MISE À JOUR DES DONNÉES UTILISATEUR
+    // ============================================================================
+
+    /**
+     * Désactive le bouton de soumission pendant le traitement
+     * @param {HTMLElement} button - Bouton à désactiver
+     * @returns {Object} État original du bouton
+     */
+    function disableSubmitButton(button) {
+      if (!button) return null;
+      
+      return {
+        element: button,
+        text: button.innerHTML,
+        disabled: button.disabled
+      };
     }
+
+    /**
+     * Réactive le bouton de soumission
+     * @param {Object} buttonState - État original du bouton
+     */
+    function enableSubmitButton(buttonState) {
+      if (!buttonState || !buttonState.element) return;
+      
+      buttonState.element.disabled = buttonState.disabled;
+      buttonState.element.innerHTML = buttonState.text;
+    }
+
+    /**
+     * Traite la réponse de la requête de mise à jour
+     * @param {Response} response - Réponse HTTP
+     * @returns {Promise<void>}
+     */
+    async function handleUpdateResponse(response) {
+      if (response.ok) {
+        if (window.Toast && typeof window.Toast.success === 'function') {
+          const message = window.profileUpdateMessages?.success;
+          if (message) {
+            window.Toast.success(message);
+          }
+        }
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.detail || errorData.message || window.profileUpdateMessages?.error;
+        
+        if (window.Toast && typeof window.Toast.error === 'function' && errorMessage) {
+          window.Toast.error(errorMessage);
+        }
+      }
+    }
+
+    /**
+     * Gère la soumission du formulaire de modification des données
+     */
+    function handleUserDataUpdate() {
+      const form = root.querySelector('form[name="change-user-data"]');
+      if (!form || !changeDataUrl) return;
+
+      // Supprimer l'ancien écouteur s'il existe
+      if (form._submitHandler) {
+        form.removeEventListener('submit', form._submitHandler);
+      }
+
+      const submitHandler = async (e) => {
+        if (form._isSubmitting) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          return false;
+        }
+        
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+        
+        form._isSubmitting = true;
+
+        const submitButton = form.querySelector('button[type="submit"]');
+        const buttonState = disableSubmitButton(submitButton);
+        
+        if (submitButton && window.profileUpdateMessages?.updating) {
+          submitButton.disabled = true;
+          submitButton.innerHTML = `<span>${window.profileUpdateMessages.updating}</span>`;
+        }
+
+        const formData = new FormData(form);
+        const csrfToken = formData.get('csrfmiddlewaretoken') || '';
+
+        try {
+          const response = await fetch(changeDataUrl, {
+            method: 'PUT',
+            headers: { 'X-CSRFToken': csrfToken },
+            body: formData,
+            credentials: 'same-origin',
+          });
+
+          await handleUpdateResponse(response);
+        } catch (err) {
+          if (window.Toast && window.profileUpdateMessages?.errorData) {
+            window.Toast.error(window.profileUpdateMessages.errorData);
+          }
+        } finally {
+          form._isSubmitting = false;
+          enableSubmitButton(buttonState);
+        }
+      };
+
+      form._submitHandler = submitHandler;
+      form.addEventListener('submit', submitHandler, { once: false, passive: false });
+    }
+
+    // ============================================================================
+    // GESTION DE LA DÉCONNEXION
+    // ============================================================================
+
+    /**
+     * Récupère le token CSRF depuis le cookie ou le formulaire
+     * @returns {string|null} Token CSRF
+     */
+    function getCSRFToken() {
+      let token = getCookie('csrftoken');
+      if (!token) {
+        const csrfInput = root.querySelector('[name=csrfmiddlewaretoken]');
+        token = csrfInput ? csrfInput.value : null;
+      }
+      return token;
+    }
+
+    /**
+     * Construit l'URL de déconnexion basée sur le préfixe de langue
+     * @returns {string} URL de déconnexion
+     */
+    function getLogoutUrl() {
+      const langPrefix = window.location.pathname.split('/')[1] || '';
+      return langPrefix ? `/${langPrefix}/accounts/logout/` : '/accounts/logout/';
+    }
+
+    /**
+     * Crée et soumet le formulaire de déconnexion
+     * @param {string} csrfToken - Token CSRF
+     */
+    function submitLogoutForm(csrfToken) {
+      const logoutForm = document.createElement('form');
+      logoutForm.method = 'POST';
+      logoutForm.action = getLogoutUrl();
+
+      const csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = 'csrfmiddlewaretoken';
+      csrfInput.value = csrfToken;
+      logoutForm.appendChild(csrfInput);
+
+      document.body.appendChild(logoutForm);
+      logoutForm.submit();
+    }
+
+    /**
+     * Gère la déconnexion de l'utilisateur
+     * @param {Event} e - Événement de clic
+     */
+    function handleLogout(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const csrfToken = getCSRFToken();
+      if (csrfToken) {
+        submitLogoutForm(csrfToken);
+      }
+    }
+
+    // ============================================================================
+    // GESTION DE LA SUPPRESSION DES TRADUCTIONS
+    // ============================================================================
+
+    /**
+     * Crée un élément de dialogue
+     * @param {string} tag - Tag HTML
+     * @param {string} className - Classe CSS
+     * @param {string} textContent - Contenu texte
+     * @returns {HTMLElement} Élément créé
+     */
+    function createDialogElement(tag, className, textContent = '') {
+      const element = document.createElement(tag);
+      element.className = className;
+      if (textContent) {
+        element.textContent = textContent;
+      }
+      return element;
+    }
+
+    /**
+     * Crée le dialogue de confirmation de suppression
+     * @param {Object} messages - Messages traduits
+     * @returns {Object} Éléments du dialogue
+     */
+    function createDeleteConfirmationDialog(messages) {
+      const overlay = createDialogElement('div', 'delete-confirmation-dialog-overlay');
+      const dialog = createDialogElement('div', 'delete-confirmation-dialog');
+      const title = createDialogElement('div', 'delete-confirmation-dialog-title', messages.title);
+      const message = createDialogElement('div', 'delete-confirmation-dialog-message', messages.message);
+      const buttons = createDialogElement('div', 'delete-confirmation-dialog-buttons');
+
+      const cancelBtn = createDialogElement('button', 'delete-confirmation-dialog-button delete-confirmation-dialog-button-cancel', messages.cancel);
+      cancelBtn.type = 'button';
+
+      const confirmBtn = createDialogElement('button', 'delete-confirmation-dialog-button delete-confirmation-dialog-button-confirm', messages.confirm);
+      confirmBtn.type = 'button';
+
+      buttons.appendChild(cancelBtn);
+      buttons.appendChild(confirmBtn);
+      dialog.appendChild(title);
+      dialog.appendChild(message);
+      dialog.appendChild(buttons);
+
+      return { overlay, dialog, cancelBtn, confirmBtn };
+    }
+
+    /**
+     * Affiche le dialogue de confirmation de suppression
+     * @param {Function} onConfirm - Callback de confirmation
+     */
+    function showDeleteConfirmationDialog(onConfirm) {
+      if (document.querySelector('.delete-confirmation-dialog') || !window.deleteAllConfirmationMessages) {
+        return;
+      }
+
+      const { overlay, dialog, cancelBtn, confirmBtn } = 
+        createDeleteConfirmationDialog(window.deleteAllConfirmationMessages);
+
+      document.body.appendChild(overlay);
+      document.body.appendChild(dialog);
+
+      const closeDialog = () => {
+        overlay.remove();
+        dialog.remove();
+        document.removeEventListener('keydown', handleEscape);
+      };
+
+      const handleEscape = (e) => {
+        if (e.key === 'Escape') closeDialog();
+      };
+
+      cancelBtn.addEventListener('click', closeDialog);
+      overlay.addEventListener('click', closeDialog);
+      confirmBtn.addEventListener('click', () => {
+        closeDialog();
+        onConfirm();
+      });
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    /**
+     * Met un bouton en état de chargement
+     * @param {HTMLElement} button - Bouton à modifier
+     * @param {string} loadingText - Texte de chargement
+     * @returns {string} Contenu original
+     */
+    function setButtonLoading(button, loadingText) {
+      const originalContent = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = `<i class="ph ph-spinner icon-24 ph-spin"></i><span class="btn-label">${loadingText}</span>`;
+      return originalContent;
+    }
+
+    /**
+     * Restaure un bouton depuis l'état de chargement
+     * @param {HTMLElement} button - Bouton à restaurer
+     * @param {string} originalContent - Contenu original
+     */
+    function restoreButton(button, originalContent) {
+      button.disabled = false;
+      button.innerHTML = originalContent;
+    }
+
+    /**
+     * Affiche une erreur
+     * @param {Object} error - Objet d'erreur
+     * @param {string} message - Message d'erreur
+     */
+    function showError(error, message) {
+      const errorMsg = error?.detail || error?.message || message;
+      if (typeof errorNotification === 'function') {
+        errorNotification(error?.status || 500, errorMsg);
+      } else if (window.Toast) {
+        window.Toast.error(errorMsg);
+      }
+    }
+
+    /**
+     * Supprime toutes les traductions de l'utilisateur
+     */
+    function deleteAllTranslations() {
+      const button = root.querySelector('#delete-all-translations-btn');
+      if (!button || !window.user_uuid || !window.lara_api_url || !window.deleteAllConfirmationMessages?.deleting) {
+        return;
+      }
+
+      const originalContent = setButtonLoading(button, window.deleteAllConfirmationMessages.deleting);
+      const deleteUrl = `${window.lara_api_url}/api/lara/documents/user/${window.user_uuid}/delete-all`;
+      const params = new URLSearchParams({ user_uuid: window.user_uuid });
+
+      fetch(`${deleteUrl}?${params}`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => Promise.reject(err));
+          }
+          return response.json();
+        })
+        .then(() => {
+          window.location.reload();
+        })
+        .catch(error => {
+          restoreButton(button, originalContent);
+          const errorMsg = window.deleteAllConfirmationMessages?.error;
+          if (errorMsg) {
+            showError(error, errorMsg);
+          }
+        });
+    }
+
+    // ============================================================================
+    // GESTION DES ÉVÉNEMENTS
+    // ============================================================================
+
+    /**
+     * Gère les clics sur les éléments interactifs
+     * @param {Event} e - Événement de clic
+     */
+    function handleClick(e) {
+      const logoutBtn = e.target.closest('#logout-btn');
+      if (logoutBtn) {
+        handleLogout(e);
+        return;
+      }
+
+      const deleteBtn = e.target.closest('#delete-all-translations-btn');
+      if (deleteBtn && !deleteBtn.disabled) {
+        e.preventDefault();
+        showDeleteConfirmationDialog(deleteAllTranslations);
+      }
+    }
+
+    // ============================================================================
+    // INITIALISATION
+    // ============================================================================
+
+    window.profileDetails = window.profileDetails || {};
+    window.profileDetails.changeDataUrl = changeDataUrl;
+
+    TabManager.init();
+    handleUserDataUpdate();
+    root.addEventListener('click', handleClick, true);
   });
-});
-
-
-
+})();

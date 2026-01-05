@@ -34,6 +34,7 @@
     <link href="{% static 'css/base.css' %}" rel="stylesheet" />
     <link href="{% static 'legal/css/header.css' %}" rel="stylesheet" />
     <link href="{% static 'legal/css/sidebar.css' %}" rel="stylesheet" />
+    <link href="{% static 'legal/css/toast.css' %}" rel="stylesheet" />
 
     {% block extra_css %}{% endblock %}
 
@@ -355,6 +356,7 @@
 <script src="{% static 'js/get-cookie.js' %}"></script>
 <script src="{% static 'js/index.js' %}"></script>
 <script src="{% static 'js/response-error.js' %}"></script>
+<script src="{% static 'legal/js/toast.js' %}"></script>
 <script src="{% static 'legal/js/header.js' %}"></script>
 <script src="{% static 'legal/js/sidebar.js' %}"></script>
 <script src="{% static 'js/base.js' %}"></script>
@@ -362,6 +364,11 @@
 <script>
     var language_code = "{{ request.LANGUAGE_CODE }}"
     var invite_user_url = "{% url 'invite-user'%}"
+    
+    // Messages traduits pour le système de toast
+    window.toastMessages = {
+        close: "{% trans 'Close' %}"
+    };
 </script>
 
 {% block extra_js %} {% endblock %}

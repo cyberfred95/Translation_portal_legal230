@@ -1,0 +1,275 @@
+/* ============================================================================
+   VARIABLES CSS
+   ============================================================================ */
+
+:root {
+  --toast-container-z-index: 10000;
+  --toast-container-gap: 12px;
+  --toast-container-padding: 20px;
+  --toast-container-padding-mobile: 10px;
+  
+  --toast-border-radius: 12px;
+  --toast-border-width: 4px;
+  --toast-padding: 16px 20px;
+  --toast-gap: 12px;
+  --toast-min-width: 300px;
+  --toast-max-width: 600px;
+  --toast-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  
+  --toast-animation-duration: 0.3s;
+  
+  --toast-icon-size: 24px;
+  --toast-icon-font-size: 20px;
+  
+  --toast-title-font-size: 14px;
+  --toast-title-font-weight: 400;
+  --toast-title-color: #111827;
+  --toast-title-line-height: 1.4;
+  
+  --toast-message-font-size: 13px;
+  --toast-message-font-weight: 400;
+  --toast-message-color: #6b7280;
+  --toast-message-line-height: 1.4;
+  --toast-content-gap: 4px;
+  
+  --toast-close-size: 24px;
+  --toast-close-padding: 4px;
+  --toast-close-color: #9ca3af;
+  --toast-close-color-hover: #374151;
+  --toast-close-focus-outline: 2px solid #3b82f6;
+  --toast-close-focus-radius: 4px;
+  
+  --toast-progress-height: 3px;
+  --toast-progress-bg: rgba(0, 0, 0, 0.1);
+  
+  /* Couleurs par type */
+  --toast-success-color: #22c55e;
+  --toast-error-color: #ef4444;
+  --toast-warning-color: #f59e0b;
+  --toast-info-color: #3b82f6;
+}
+
+/* ============================================================================
+   CONTENEUR
+   ============================================================================ */
+
+.toast-container {
+  position: fixed;
+  bottom: var(--toast-container-padding);
+  right: var(--toast-container-padding);
+  z-index: var(--toast-container-z-index);
+  display: flex;
+  flex-direction: column;
+  gap: var(--toast-container-gap);
+  pointer-events: none;
+  max-width: var(--toast-max-width);
+}
+
+/* ============================================================================
+   TOAST PRINCIPAL
+   ============================================================================ */
+
+.toast {
+  position: relative;
+  background: #ffffff;
+  border-radius: var(--toast-border-radius);
+  box-shadow: var(--toast-shadow);
+  padding: var(--toast-padding);
+  display: flex;
+  align-items: center;
+  gap: var(--toast-gap);
+  min-width: var(--toast-min-width);
+  max-width: var(--toast-max-width);
+  pointer-events: auto;
+  animation: toastSlideIn var(--toast-animation-duration) ease-out;
+  border-left: var(--toast-border-width) solid;
+}
+
+/* ============================================================================
+   ANIMATIONS
+   ============================================================================ */
+
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(calc(100% + var(--toast-container-padding)));
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(calc(100% + var(--toast-container-padding)));
+    opacity: 0;
+  }
+}
+
+.toast.toast-exiting {
+  animation: toastSlideOut var(--toast-animation-duration) ease-in forwards;
+}
+
+/* ============================================================================
+   TYPES DE TOAST
+   ============================================================================ */
+
+.toast.toast-success {
+  border-left-color: var(--toast-success-color);
+}
+
+.toast.toast-error {
+  border-left-color: var(--toast-error-color);
+}
+
+.toast.toast-warning {
+  border-left-color: var(--toast-warning-color);
+}
+
+.toast.toast-info {
+  border-left-color: var(--toast-info-color);
+}
+
+/* ============================================================================
+   ICÔNE
+   ============================================================================ */
+
+.toast-icon {
+  flex-shrink: 0;
+  width: var(--toast-icon-size);
+  height: var(--toast-icon-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--toast-icon-font-size);
+}
+
+.toast-success .toast-icon {
+  color: var(--toast-success-color);
+}
+
+.toast-error .toast-icon {
+  color: var(--toast-error-color);
+}
+
+.toast-warning .toast-icon {
+  color: var(--toast-warning-color);
+}
+
+.toast-info .toast-icon {
+  color: var(--toast-info-color);
+}
+
+/* ============================================================================
+   CONTENU
+   ============================================================================ */
+
+.toast-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--toast-content-gap);
+}
+
+.toast-title {
+  font-size: var(--toast-title-font-size);
+  font-weight: var(--toast-title-font-weight);
+  color: var(--toast-title-color);
+  line-height: var(--toast-title-line-height);
+}
+
+.toast-message {
+  font-size: var(--toast-message-font-size);
+  font-weight: var(--toast-message-font-weight);
+  color: var(--toast-message-color);
+  line-height: var(--toast-message-line-height);
+}
+
+/* ============================================================================
+   BOUTON DE FERMETURE
+   ============================================================================ */
+
+.toast-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--toast-close-padding);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--toast-close-color);
+  transition: color 0.2s ease;
+  width: var(--toast-close-size);
+  height: var(--toast-close-size);
+}
+
+.toast-close:hover {
+  color: var(--toast-close-color-hover);
+}
+
+.toast-close:focus {
+  outline: var(--toast-close-focus-outline);
+  outline-offset: 2px;
+  border-radius: var(--toast-close-focus-radius);
+}
+
+/* ============================================================================
+   BARRE DE PROGRESSION
+   ============================================================================ */
+
+.toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: var(--toast-progress-height);
+  background: var(--toast-progress-bg);
+  border-radius: 0 0 var(--toast-border-radius) var(--toast-border-radius);
+  overflow: hidden;
+}
+
+.toast-progress-bar {
+  height: 100%;
+  background: currentColor;
+  transition: width linear;
+  border-radius: 0 0 var(--toast-border-radius) var(--toast-border-radius);
+}
+
+.toast-success .toast-progress-bar {
+  background: var(--toast-success-color);
+}
+
+.toast-error .toast-progress-bar {
+  background: var(--toast-error-color);
+}
+
+.toast-warning .toast-progress-bar {
+  background: var(--toast-warning-color);
+}
+
+.toast-info .toast-progress-bar {
+  background: var(--toast-info-color);
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 640px) {
+  .toast-container {
+    bottom: var(--toast-container-padding-mobile);
+    right: var(--toast-container-padding-mobile);
+    left: var(--toast-container-padding-mobile);
+    max-width: none;
+  }
+
+  .toast {
+    min-width: auto;
+    max-width: none;
+  }
+}

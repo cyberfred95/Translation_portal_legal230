@@ -147,8 +147,9 @@ msgid "Source and target languages must be different"
 msgstr "Source and target languages must be different"
 
 #: glossaries/templates/glossaries_add_glossary.html:19
+#: legal/templates/base.html:370
 msgid "Close"
-msgstr ""
+msgstr "Close"
 
 #: glossaries/templates/glossaries_add_glossary.html:34
 msgid "Upload file"
@@ -581,8 +582,21 @@ msgid "Update Information"
 msgstr ""
 
 #: legal/templates/profile_details/profile_information_modal.html:7
+#: legal/templates/profile_details/profile_details.html:68
 msgid "Your data has been successfully changed"
 msgstr "Your data has been successfully changed"
+
+#: legal/templates/profile_details/profile_details.html:69
+msgid "Updating..."
+msgstr "Updating..."
+
+#: legal/templates/profile_details/profile_details.html:70
+msgid "An error occurred while updating."
+msgstr "An error occurred while updating."
+
+#: legal/templates/profile_details/profile_details.html:71
+msgid "An error occurred while updating your data."
+msgstr "An error occurred while updating your data."
 
 #: legal/templates/profile_details/profile_information_modal.html:9
 msgid "Okay"

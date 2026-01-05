@@ -44,13 +44,6 @@
             </div>
         </div>
     </div>
-
-
-
-    <!-- Success Update Modal -->
-    {% include 'profile_details/profile_information_modal.html' %}
-
-
 </div>
 
 {% block extra_js %}
@@ -69,6 +62,14 @@
         confirm: "{% trans 'Yes' %}",
         error: "{% trans 'Error deleting translations. Please try again.' %}",
         deleting: "{% trans 'Deleting...' %}"
+    };
+    
+    // Messages traduits pour la mise à jour
+    window.profileUpdateMessages = {
+        success: "{% trans 'Your data has been successfully changed' %}",
+        updating: "{% trans 'Updating...' %}",
+        error: "{% trans 'An error occurred while updating.' %}",
+        errorData: "{% trans 'An error occurred while updating your data.' %}"
     };
 </script>
 {% endblock %}
