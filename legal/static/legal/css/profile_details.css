@@ -142,13 +142,6 @@
 .profile-details-page .section-title { font-size: 16px; font-weight: 400; color: #181932; line-height: 24px; letter-spacing: -0.176px; }
 .profile-details-page .section-desc { font-size: 14px; font-weight: 400; color: #5A5A78; line-height: 24px; letter-spacing: -0.084px; }
 
-/* Modal */
-.profile-details-page .modal-overlay { position: fixed; inset: 0; background: rgba(107,114,128,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-.profile-details-page .modal-card { position: relative; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 800px; margin: 0 16px; }
-.profile-details-page .modal-body { padding: 28px; display: flex; flex-direction: column; gap: 24px; }
-.profile-details-page .modal-body.center { align-items: center; }
-.profile-details-page .modal-title { font-size: 20px; font-weight: 600; color: #111827; }
-
 /* Delete confirmation dialog */
 .delete-confirmation-dialog {
   position: fixed;

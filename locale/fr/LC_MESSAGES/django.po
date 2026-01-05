@@ -137,15 +137,24 @@ msgstr ""
 
 #: glossaries/templates/glossaries.html:131
 msgid "Glossary added successfully!"
-msgstr ""
+msgstr "Glossaire ajouté avec succès !"
+
+#: glossaries/templates/glossaries.html
+msgid "Glossary deleted successfully!"
+msgstr "Glossaire supprimé avec succès !"
+
+#: glossaries/templates/glossaries.html
+msgid "An error occurred while deleting the glossary."
+msgstr "Une erreur est survenue lors de la suppression du glossaire."
 
 #: glossaries/templates/glossaries.html:132
 msgid "Source and target languages must be different"
 msgstr "Les langues source et cible doivent être différentes"
 
 #: glossaries/templates/glossaries_add_glossary.html:19
+#: legal/templates/base.html:370
 msgid "Close"
-msgstr ""
+msgstr "Fermer"
 
 #: glossaries/templates/glossaries_add_glossary.html:34
 msgid "Upload file"
@@ -582,8 +591,21 @@ msgid "Update Information"
 msgstr "Mettre à jour les informations"
 
 #: legal/templates/profile_details/profile_information_modal.html:7
+#: legal/templates/profile_details/profile_details.html:68
 msgid "Your data has been successfully changed"
 msgstr "Vos données ont été modifiées avec succès."
+
+#: legal/templates/profile_details/profile_details.html:69
+msgid "Updating..."
+msgstr "Mise à jour..."
+
+#: legal/templates/profile_details/profile_details.html:70
+msgid "An error occurred while updating."
+msgstr "Une erreur est survenue lors de la modification."
+
+#: legal/templates/profile_details/profile_details.html:71
+msgid "An error occurred while updating your data."
+msgstr "Une erreur est survenue lors de la modification des données."
 
 #: legal/templates/profile_details/profile_information_modal.html:9
 msgid "Okay"
@@ -717,6 +739,16 @@ msgstr ""
 #: legal/templates/translate/document_translate/step_traduction/step_traduction_modal_review.html:35
 msgid "to receive a quote in less than 30 minutes."
 msgstr "pour un devis personnalisé."
+
+#: legal/templates/project_history/project_history.html
+#: legal/templates/translate/translate.html
+msgid "Quote request sent successfully! You will receive an email with the quote shortly."
+msgstr "Demande de devis envoyée avec succès ! Vous recevrez un email avec le devis sous peu."
+
+#: legal/templates/project_history/project_history.html
+#: legal/templates/translate/translate.html
+msgid "An error occurred while requesting the quote. Please try again."
+msgstr "Une erreur est survenue lors de la demande de devis. Veuillez réessayer."
 
 #: legal/templates/sidebar/sidbar.html:22
 msgid "Dashboard"

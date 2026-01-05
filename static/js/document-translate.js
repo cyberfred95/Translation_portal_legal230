@@ -1670,47 +1670,80 @@ $(document).ready(function () {
         }
     });
 
+    /**
+     * Met à jour le statut du projet dans le tableau après demande de devis
+     * @param {string} projectId - ID du projet
+     */
+    function updateProjectStatusAfterQuoteRequest(projectId) {
+      const projectRow = $(`button[data-id="${projectId}"]`).closest('tr');
+      if (!projectRow.length) return;
+
+      const statusNode = projectRow.find('td:eq(2) .status');
+      if (statusNode.length) {
+        const newStatus = 'Sent to post-editing, not accepted yet';
+        statusNode.text(newStatus);
+        applyStatusMetadata(statusNode, newStatus, null);
+
+        if (typeof window.applyStatusMapping === 'function') {
+          window.applyStatusMapping(projectRow[0]);
+        }
+      }
+
+      projectRow.find('.expert-revision')
+                .prop('disabled', true)
+                .addClass('disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225');
+    }
+
+    /**
+     * Gère la demande de devis pour la révision experte
+     * @param {string} translatedFile - URL du fichier traduit
+     * @param {string} projectId - ID du projet
+     */
+    function handleExpertRevisionRequest(translatedFile, projectId) {
+      const formData = new FormData();
+      formData.append('file_url', translatedFile);
+      formData.append('project_id', projectId);
+
+      $.ajax({
+        type: 'POST',
+        url: expert_revision_file_url,
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': getCookie('csrftoken'),
+          'Accept': 'application/json',
+        },
+        dataType: 'json',
+        success: function () {
+          updateProjectStatusAfterQuoteRequest(projectId);
+
+          if (window.Toast && window.expertRevisionMessages?.quoteRequestSuccess) {
+            window.Toast.success(window.expertRevisionMessages.quoteRequestSuccess);
+          }
+
+          $modalRevision.addClass('hidden');
+          $closeRevision.addClass('hidden');
+        },
+        error: function (error) {
+          const errorMessage = error?.responseJSON?.detail || window.expertRevisionMessages?.quoteRequestError || 'An error occurred while requesting the quote.';
+          if (window.Toast) {
+            window.Toast.error(errorMessage);
+          } else if (typeof handleAjaxError === 'function') {
+            handleAjaxError(error);
+          }
+        }
+      });
+    }
+
     $modalRevision.on('click', '.expert-revision', function () {
-        const translatedFile = $(this).data('translated-file');
-        const id = $(this).data('id');
+      const translatedFile = $(this).data('translated-file');
+      const id = $(this).data('id');
 
-        let formData = new FormData();
-        formData.append('file_url', translatedFile);
-        formData.append('project_id', id);
-
-        $.ajax({
-            type: 'POST',
-            url: expert_revision_file_url,
-            data: formData,
-            processData: false,
-            contentType: false,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Accept': 'application/json',
-            },
-            dataType: 'json',
-            success: function () {
-                const projectRow = $(`button[data-id="${id}"]`).closest('tr');
-                
-                // Mettre à jour le badge de statut et réappliquer le mapping partagé
-                const statusNode = projectRow.find('td:eq(2) .status');
-                const newStatus = 'Sent to post-editing, not accepted yet';
-                statusNode.text(newStatus);
-                applyStatusMetadata(statusNode, newStatus, null);
-
-                if (typeof window.applyStatusMapping === 'function' && projectRow.length) {
-                    window.applyStatusMapping(projectRow[0]);
-                }
-                
-                // Désactiver le bouton de révision
-                projectRow.find('.expert-revision').prop('disabled', true).addClass('disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225');
-
-                $modalRevision.addClass('hidden');
-                $closeRevision.addClass('hidden');
-            },
-            error: handleAjaxError
-        });
+      if (translatedFile && id) {
+        handleExpertRevisionRequest(translatedFile, id);
+      }
     });
 
     /**
