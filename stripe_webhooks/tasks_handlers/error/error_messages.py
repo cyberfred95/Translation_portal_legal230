@@ -138,7 +138,7 @@ ERROR_MESSAGES_TEMPLATE: dict[str, dict[str, str | int]] = {
 
     # General system errors
     "exception": {
-        "message": "An exception occurred in function '{function_name}'",
+        "message": "An exception occurred in function '{function_name}': {exception_type} - {exception_message}",
         "code": CODE_INTERNAL_ERROR
     },
 }
