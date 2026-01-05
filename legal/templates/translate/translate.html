@@ -58,6 +58,13 @@
 {% block extra_js %}
 <script src="{% static 'legal/js/translate/text_translate/text_translate.js' %}"></script>
 <script src="{% static 'legal/js/translate/translate.js' %}"></script>
+<script>
+    // Messages traduits pour la demande de devis
+    window.expertRevisionMessages = {
+        quoteRequestSuccess: "{% trans 'Quote request sent successfully! You will receive an email with the quote shortly.' %}",
+        quoteRequestError: "{% trans 'An error occurred while requesting the quote. Please try again.' %}"
+    };
+</script>
 {% endblock %}
 
 {% endblock %}

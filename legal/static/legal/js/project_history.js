@@ -161,9 +161,19 @@ function deleteTranslation(documentId, button) {
 // Main Initialization
 // =============================================================================
 
+// Protection contre les doubles initialisations
+if (window.projectHistoryInitialized) {
+  // Le script a déjà été initialisé, ne pas réinitialiser
+} else {
+  window.projectHistoryInitialized = true;
+
 document.addEventListener('DOMContentLoaded', function () {
   const root = document.querySelector('.project-history-page');
   if (!root) return;
+
+  // Protection contre les doubles initialisations sur le même élément
+  if (root._projectHistoryInitialized) return;
+  root._projectHistoryInitialized = true;
 
   if (typeof window.applyStatusMapping === 'function') {
     window.applyStatusMapping(root);
@@ -232,12 +242,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Gestion du clic sur le bouton expert-revision dans la modale
   if (modalRevision) {
-    modalRevision.addEventListener('click', function (e) {
+    // Supprimer l'ancien écouteur s'il existe
+    if (modalRevision._expertRevisionHandler) {
+      modalRevision.removeEventListener('click', modalRevision._expertRevisionHandler);
+    }
+
+    modalRevision._expertRevisionHandler = function (e) {
       const modalBtn = e.target.closest('.expert-revision');
       if (!modalBtn || modalBtn.closest('table')) return;
 
+      // Empêcher la propagation pour éviter les déclenchements multiples
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      // Protection contre les doubles soumissions
+      if (modalBtn._isSubmitting) {
+        e.preventDefault();
+        return false;
+      }
+
       const translatedFile = modalBtn.dataset.translatedFile;
       const id = modalBtn.dataset.id;
+
+      if (!translatedFile || !id) {
+        return;
+      }
+
+      // Marquer comme en cours de soumission
+      modalBtn._isSubmitting = true;
+      modalBtn.disabled = true;
 
       const formData = new FormData();
       formData.append('file_url', translatedFile);
@@ -258,20 +291,59 @@ document.addEventListener('DOMContentLoaded', function () {
           return response.json();
         })
         .then(() => {
-          window.location.reload();
+          // Trouver la ligne du tableau correspondant au projet
+          const projectRow = root.querySelector(`button.expert-revision[data-id="${id}"]`)?.closest('tr');
+          
+          if (projectRow) {
+            // Mettre à jour le statut dans le badge
+            const statusNode = projectRow.querySelector('.status');
+            if (statusNode) {
+              const newStatus = 'Sent to post-editing, not accepted yet';
+              statusNode.textContent = newStatus;
+              statusNode.setAttribute('data-status', newStatus);
+              
+              // Réappliquer le mapping de statut pour mettre à jour le badge visuellement
+              if (typeof window.applyStatusMapping === 'function') {
+                window.applyStatusMapping(projectRow);
+              }
+            }
+            
+            // Désactiver le bouton expert-revision
+            const expertBtn = projectRow.querySelector('.expert-revision');
+            if (expertBtn) {
+              expertBtn.disabled = true;
+              expertBtn.classList.add('disabled');
+            }
+          }
+          
+          // Fermer la modale après succès
+          modalRevision.classList.add('hidden');
+          if (closeRevision) closeRevision.classList.add('hidden');
+          modalRevision.querySelectorAll('.show-modal-true, .show-modal-false').forEach(el => {
+            el.classList.add('hidden');
+          });
+          
+          // Afficher un toast de succès
+          if (window.Toast && window.expertRevisionMessages?.quoteRequestSuccess) {
+            window.Toast.success(window.expertRevisionMessages.quoteRequestSuccess);
+          }
         })
         .catch(error => {
-          if (typeof errorNotification === 'function') {
+          // Réactiver le bouton en cas d'erreur
+          modalBtn._isSubmitting = false;
+          modalBtn.disabled = false;
+
+          // Afficher un toast d'erreur
+          const errorMessage = error?.detail || error?.responseJSON?.detail || window.expertRevisionMessages?.quoteRequestError || 'An error occurred while requesting the quote.';
+          if (window.Toast) {
+            window.Toast.error(errorMessage);
+          } else if (typeof errorNotification === 'function') {
             errorNotification(error?.status, error?.detail || error?.responseJSON?.detail);
           }
         });
+    };
 
-      modalRevision.classList.add('hidden');
-      if (closeRevision) closeRevision.classList.add('hidden');
-      modalRevision.querySelectorAll('.show-modal-true, .show-modal-false').forEach(el => {
-        el.classList.add('hidden');
-      });
-    });
+    modalRevision.addEventListener('click', modalRevision._expertRevisionHandler);
   }
 
   // Gestion du téléchargement de fichiers avec mini-menu si 2 fichiers
@@ -365,4 +437,6 @@ document.addEventListener('DOMContentLoaded', function () {
     applyStatuses(root);
   });
 });
+
+} // Fin de la protection contre les doubles initialisations
 

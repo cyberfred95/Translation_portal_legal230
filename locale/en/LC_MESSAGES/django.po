@@ -738,6 +738,16 @@ msgstr ""
 msgid "to receive a quote in less than 30 minutes."
 msgstr "to receive a quote in less than 30 minutes."
 
+#: legal/templates/project_history/project_history.html
+#: legal/templates/translate/translate.html
+msgid "Quote request sent successfully! You will receive an email with the quote shortly."
+msgstr "Quote request sent successfully! You will receive an email with the quote shortly."
+
+#: legal/templates/project_history/project_history.html
+#: legal/templates/translate/translate.html
+msgid "An error occurred while requesting the quote. Please try again."
+msgstr "An error occurred while requesting the quote. Please try again."
+
 #: legal/templates/sidebar/sidbar.html:22
 msgid "Dashboard"
 msgstr ""

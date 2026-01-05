@@ -1706,10 +1706,23 @@ $(document).ready(function () {
                 // Désactiver le bouton de révision
                 projectRow.find('.expert-revision').prop('disabled', true).addClass('disabled:pointer-events-none disabled:text-gray-225 disabled:border-gray-225');
 
+                // Afficher un toast de succès
+                if (window.Toast && window.expertRevisionMessages?.quoteRequestSuccess) {
+                    window.Toast.success(window.expertRevisionMessages.quoteRequestSuccess);
+                }
+
                 $modalRevision.addClass('hidden');
                 $closeRevision.addClass('hidden');
             },
-            error: handleAjaxError
+            error: function (error) {
+                // Afficher un toast d'erreur
+                const errorMessage = error?.responseJSON?.detail || window.expertRevisionMessages?.quoteRequestError || 'An error occurred while requesting the quote.';
+                if (window.Toast) {
+                    window.Toast.error(errorMessage);
+                } else if (typeof handleAjaxError === 'function') {
+                    handleAjaxError(error);
+                }
+            }
         });
     });
 

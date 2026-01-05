@@ -164,6 +164,86 @@ $(document).ready(function () {
         }
     });
 
+    // Fonction pour formater la date au format dd/mm/yyyy
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        
+        try {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        } catch (e) {
+            return dateString;
+        }
+    }
+
+    // Fonction pour créer une ligne de tableau pour un glossaire
+    function createGlossaryRow(glossary) {
+        const glossaryId = glossary.id || glossary.glossary_id || '';
+        const glossaryName = glossary.name || '';
+        const sourceLang = glossary.source_language || '';
+        const targetLang = glossary.target_language || (glossary.target_languages ? glossary.target_languages.split(',')[0] : '');
+        const createdAt = formatDate(glossary.created_at);
+        const deleteUrl = `/fr/glossaries/${glossaryId}/`;
+
+        return `
+            <tr class="border-b border-gray-100 hover:bg-gray-50 glossary-row">
+                <td style="padding: 1rem 2rem; vertical-align: middle;">
+                    <span class="doc-title" style="color:#181932;font-size:1rem;font-weight:500;">${glossaryName}</span>
+                </td>
+                <td style="padding: 1rem; vertical-align: middle; text-align: center;">
+                    <span class="lang-label" style="color:#181932;font-size:1rem;font-weight:500;">${sourceLang}</span>
+                </td>
+                <td style="padding: 1rem; vertical-align: middle; text-align: center;">
+                    <span class="lang-label" style="color:#181932;font-size:1rem;font-weight:500;">${targetLang}</span>
+                </td>
+                <td style="padding: 1rem 2rem; vertical-align: middle; text-align: center; color:#181932; font-size:1rem;">
+                    ${createdAt}
+                </td>
+                <td style="padding: 1rem 2rem; vertical-align: middle; text-align: center;">
+                    <div class="table-actions">
+                        <button type="button" 
+                                class="delete-project"
+                                data-delete-url="${deleteUrl}"
+                                style="background: none; border: none; cursor: pointer; position: relative;">
+                            <i class="ph ph-trash" style="font-size: 16px; color: #DC2626;"></i>
+                            <div class="tooltip invisible opacity-0 transition-opacity duration-300 absolute z-10 w-auto py-2 px-2 bg-white text-black rounded-md bottom-14 left-1/2 transform -translate-x-1/2 translate-y-full shadow-lg" style="font-size: 11px;">
+                                <div class="flex items-center gap-1.5">
+                                    <i class="ph-fill ph-check-circle allow-delete" style="font-size: 14px; color: #00BBA7;"></i>
+                                    <i class="ph-fill ph-x-circle cancel-delete" style="font-size: 14px; color: #FD625E;"></i>
+                                </div>
+                                <div class="absolute w-3 h-3 bg-white transform rotate-45 left-1/2 -translate-x-1/2 -bottom-1.5 shadow-lg"></div>
+                            </div>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+
+    // Fonction pour ajouter un glossaire à la liste
+    function addGlossaryToList(glossary) {
+        const $tbody = $('table tbody');
+        const $emptyRow = $tbody.find('tr:has(td[colspan="5"])');
+        
+        // Si le tableau est vide, supprimer la ligne "No glossaries found"
+        if ($emptyRow.length > 0) {
+            $emptyRow.remove();
+        }
+        
+        // Créer la nouvelle ligne
+        const $newRow = $(createGlossaryRow(glossary));
+        
+        // Ajouter la ligne en haut du tableau avec une animation
+        $newRow.hide();
+        $tbody.prepend($newRow);
+        $newRow.fadeIn(300);
+    }
+
     $(document).on('click', '.create-glossary', function (e) {
         e.preventDefault();
 
@@ -199,7 +279,7 @@ $(document).ready(function () {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': getCookie('csrftoken'),
             },
-            success: function () {
+            success: function (response) {
                 // Fermer la modal
                 $modal.addClass('hidden');
                 $closeIcon.addClass('hidden');
@@ -210,10 +290,10 @@ $(document).ready(function () {
                     window.Toast.success(window.glossaryMessages.addedSuccess);
                 }
                 
-                // Recharger la page après un court délai pour afficher le nouveau glossaire
-                setTimeout(function() {
-                    window.location.reload();
-                }, 500);
+                // Ajouter le nouveau glossaire à la liste sans recharger la page
+                if (response) {
+                    addGlossaryToList(response);
+                }
             },
             error: function (error) {
                 // Retirer le spinner et réactiver le bouton en cas d'erreur
