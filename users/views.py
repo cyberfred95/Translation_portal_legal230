@@ -86,31 +86,50 @@ class SingleAccountView(RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
 
     def validate(self, attrs):
-        if not attrs['username'] or not attrs['email']:
-            raise serializers.ValidationError({"detail": _("Username and email are required.")})
-        if (User.objects.filter(username=attrs['username']).exists()
-                and self.request.user.username != attrs['username']):
-            raise serializers.ValidationError({"detail": _("This username is already used.")})
-        if (User.objects.filter(email=attrs['email']).exists()
-                and self.request.user.email != attrs['email']):
-            raise serializers.ValidationError({"detail": _("This email is already used.")})
+        """Valide les données utilisateur. Ne valide que les champs présents dans attrs."""
+        from .services.user_update import UserUpdateService
+        
+        errors = UserUpdateService.validate_fields(attrs, self.request.user)
+        
+        if errors:
+            error_message = _("; ").join(errors.values())
+            raise serializers.ValidationError({"detail": error_message})
+        
         return attrs
 
     def put(self, request, *args, **kwargs):
-        self.validate(request.data)
-        user = request.user
-        user.username = request.data['username']
-        user.email = request.data['email']
-        user.first_name = request.data.get('first_name', user.first_name)
-        user.last_name = request.data.get('last_name', user.last_name)
+        """Met à jour les champs de l'utilisateur fournis dans la requête."""
+        from .services.user_update import UserUpdateService
         
-        # Mettre à jour la langue de préférence de l'utilisateur
-        if 'language' in request.data:
-            user.language = request.data['language']
-            # Mettre à jour aussi la langue de session pour l'interface actuelle
-            from django.utils import translation
-            translation.activate(request.data['language'])
-            request.session[translation.LANGUAGE_SESSION_KEY] = request.data['language']
+        user = request.user
+        data = request.data
+        
+        # Valider les champs
+        validation_errors = UserUpdateService.validate_fields(data, user)
+        if validation_errors:
+            return Response(
+                {"detail": _("; ").join(validation_errors.values())},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Mettre à jour les champs simples
+        UserUpdateService.update_simple_fields(user, data)
+        
+        # Mettre à jour la langue si fournie
+        if 'language' in data:
+            UserUpdateService.update_language(user, data['language'], request)
+        
+        # Mettre à jour la période de rétention si fournie
+        if 'retention_period' in data:
+            valid_choices = User.get_valid_retention_periods()
+            error = UserUpdateService.update_retention_period(
+                user, data['retention_period'], valid_choices
+            )
+            if error:
+                return Response(
+                    {"detail": _(error)},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         
         user.save()
         return Response(UserSerializer(user).data, status=status.HTTP_200_OK)

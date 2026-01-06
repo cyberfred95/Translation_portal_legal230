@@ -649,6 +649,54 @@ msgstr "Delete your data"
 msgid "Delete"
 msgstr "Delete"
 
+#: legal/templates/profile_details/profile_security.html
+msgid "Retention Period"
+msgstr "Retention Period"
+
+#: legal/templates/profile_details/profile_security.html
+msgid "Choose how long your translations are kept before automatic deletion."
+msgstr "Choose how long your translations are kept before automatic deletion."
+
+#: legal/templates/profile_details/profile_security.html
+msgid "1 day"
+msgstr "1 day"
+
+#: legal/templates/profile_details/profile_security.html
+msgid "7 days"
+msgstr "7 days"
+
+#: legal/templates/profile_details/profile_security.html
+msgid "30 days"
+msgstr "30 days"
+
+#: legal/templates/profile_details/profile_security.html
+msgid "1 year"
+msgstr "1 year"
+
+#: legal/templates/profile_details/profile_security.html
+msgid "2 years"
+msgstr "2 years"
+
+#: legal/templates/profile_details/profile_security.html
+msgid "3 years"
+msgstr "3 years"
+
+#: legal/templates/profile_details/profile_security.html
+msgid "5 years"
+msgstr "5 years"
+
+#: legal/templates/profile_details/profile_details.html
+msgid "Retention period updated successfully"
+msgstr "Retention period updated successfully"
+
+#: legal/templates/profile_details/profile_details.html
+msgid "Error updating retention period. Please try again."
+msgstr "Error updating retention period. Please try again."
+
+#: legal/templates/profile_details/profile_details.html
+msgid "Network error. Please check your connection and try again."
+msgstr "Network error. Please check your connection and try again."
+
 #: legal/templates/project_history/project_history.html:12
 msgid "History"
 msgstr ""

@@ -185,6 +185,20 @@
     // ============================================================================
 
     /**
+     * Récupère la valeur d'un cookie
+     * @param {string} name - Nom du cookie
+     * @returns {string|null} Valeur du cookie ou null
+     */
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) {
+        return parts.pop().split(';').shift();
+      }
+      return null;
+    }
+
+    /**
      * Récupère le token CSRF depuis le cookie ou le formulaire
      * @returns {string|null} Token CSRF
      */
@@ -400,6 +414,119 @@
     // GESTION DES ÉVÉNEMENTS
     // ============================================================================
 
+    // ============================================================================
+    // GESTION DE LA PÉRIODE DE RÉTENTION
+    // ============================================================================
+
+    /**
+     * Envoie une requête PUT pour mettre à jour la période de rétention
+     * @param {string} csrfToken - Token CSRF
+     * @param {number} retentionPeriod - Nouvelle période de rétention
+     * @returns {Promise<Response>}
+     */
+    async function _sendRetentionPeriodUpdate(csrfToken, retentionPeriod) {
+      return fetch(changeDataUrl, {
+        method: 'PUT',
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          retention_period: parseInt(retentionPeriod, 10),
+        }),
+        credentials: 'same-origin',
+      });
+    }
+
+    /**
+     * Met à jour la période de rétention de l'utilisateur
+     * @param {number} retentionPeriod - Nouvelle période de rétention en jours
+     */
+    async function updateRetentionPeriod(retentionPeriod) {
+      if (!changeDataUrl) {
+        return;
+      }
+
+      const select = root.querySelector('#retention-period-select');
+      if (!select) {
+        return;
+      }
+
+      const originalValue = select.value;
+      select.disabled = true;
+
+      try {
+        const csrfToken = getCSRFToken();
+        if (!csrfToken) {
+          throw new Error('CSRF token not found');
+        }
+
+        const response = await _sendRetentionPeriodUpdate(csrfToken, retentionPeriod);
+
+        if (response.ok) {
+          _showSuccessMessage(window.retentionPeriodMessages?.success);
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          const errorMessage = errorData.detail || errorData.message || window.retentionPeriodMessages?.error;
+          select.value = originalValue;
+          _showErrorMessage(errorMessage);
+        }
+      } catch (error) {
+        select.value = originalValue;
+        _showErrorMessage(window.retentionPeriodMessages?.errorNetwork);
+      } finally {
+        select.disabled = false;
+      }
+    }
+
+    /**
+     * Affiche un message de succès
+     * @param {string} message - Message à afficher
+     */
+    function _showSuccessMessage(message) {
+      if (window.Toast && typeof window.Toast.success === 'function' && message) {
+        window.Toast.success(message);
+      }
+    }
+
+    /**
+     * Affiche un message d'erreur
+     * @param {string} message - Message à afficher
+     */
+    function _showErrorMessage(message) {
+      if (window.Toast && typeof window.Toast.error === 'function' && message) {
+        window.Toast.error(message);
+      }
+    }
+
+    /**
+     * Initialise la gestion de la période de rétention
+     */
+    function initRetentionPeriod() {
+      const select = root.querySelector('#retention-period-select');
+      if (!select) {
+        return;
+      }
+
+      let previousValue = select.value;
+
+      select.addEventListener('change', (e) => {
+        const newValue = e.target.value;
+        
+        // Vérifier si la valeur a vraiment changé
+        if (newValue === previousValue) {
+          return;
+        }
+
+        // Mettre à jour immédiatement pour un feedback visuel
+        previousValue = newValue;
+        
+        // Mettre à jour via l'API
+        updateRetentionPeriod(newValue);
+      });
+    }
+
     /**
      * Gère les clics sur les éléments interactifs
      * @param {Event} e - Événement de clic
@@ -427,6 +554,7 @@
 
     TabManager.init();
     handleUserDataUpdate();
+    initRetentionPeriod();
     root.addEventListener('click', handleClick, true);
   });
 })();

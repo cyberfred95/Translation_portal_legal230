@@ -27,5 +27,10 @@ app.conf.beat_schedule = {
         'task': "subscriptions.tasks.report_daily_metered_usage",
         "schedule": crontab(minute='5', hour='0'),
         "args": (),
+    },
+    'cleanup_expired_documents': {
+        'task': "users.tasks.cleanup_expired_documents",
+        "schedule": crontab(minute='0', hour='0'),
+        "args": (),
     }
 }
