@@ -226,6 +226,7 @@ CACHES = {
 
 CELERY_BROKER_URL = os.environ.get("CELERY_REDIS", "redis://redis:6379")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_REDIS", "redis://redis:6379")
+CELERY_BROKER_TRANSPORT = "redis"  # Force Redis transport
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
@@ -266,6 +267,11 @@ LOGGING = {
         'glossaries': {
             'handlers': ['console'],
             'level': 'DEBUG',
+            'propagate': False,
+        },
+        'users': {
+            'handlers': ['console'],
+            'level': 'INFO',
             'propagate': False,
         },
     },

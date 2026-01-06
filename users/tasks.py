@@ -2,6 +2,7 @@
 Tâches Celery pour la gestion des utilisateurs.
 """
 import logging
+from typing import Tuple
 from celery import shared_task
 from .models import UserGroup, User
 from .services.document_cleanup import (
@@ -21,16 +22,17 @@ def reset_quote_number():
         user_group.save()
 
 
-def _process_user_documents(user) -> tuple:
+def _delete_expired_documents_for_user(user_uuid: str, retention_days: int) -> Tuple[int, int]:
     """
-    Traite les documents expirés pour un utilisateur.
+    Supprime tous les documents expirés pour un utilisateur.
     
+    Args:
+        user_uuid: UUID de l'utilisateur
+        retention_days: Nombre de jours de rétention
+        
     Returns:
         Tuple (deleted_count, error_count)
     """
-    user_uuid = str(user.uuid)
-    retention_days = user.retention_period
-    
     expired_documents = get_all_expired_documents(user_uuid, retention_days)
     
     if not expired_documents:
@@ -46,13 +48,51 @@ def _process_user_documents(user) -> tuple:
         else:
             error_count += 1
     
-    if expired_documents:
-        logger.info(
-            f"User {user_uuid}: {deleted_count}/{len(expired_documents)} documents deleted, "
-            f"retention_period={retention_days} days"
-        )
-    
     return deleted_count, error_count
+
+
+def _process_user_documents(user) -> Tuple[int, int]:
+    """
+    Traite les documents expirés pour un utilisateur.
+    
+    Returns:
+        Tuple (deleted_count, error_count)
+    """
+    user_uuid = str(user.uuid)
+    retention_days = user.retention_period
+    return _delete_expired_documents_for_user(user_uuid, retention_days)
+
+
+@shared_task
+def cleanup_user_expired_documents(user_id: int):
+    """
+    Tâche Celery pour supprimer les documents expirés d'un utilisateur spécifique.
+    
+    Args:
+        user_id: ID de l'utilisateur
+        
+    Returns:
+        dict: Statistiques (documents_deleted, errors)
+    """
+    try:
+        user = User.objects.get(id=user_id, is_active=True)
+    except User.DoesNotExist:
+        logger.warning(f"User {user_id} not found or inactive")
+        return {'documents_deleted': 0, 'errors': 0}
+    
+    try:
+        deleted, errors = _process_user_documents(user)
+        if deleted > 0:
+            logger.info(
+                f"User {user.id}: {deleted} documents deleted, {errors} errors"
+            )
+        return {'documents_deleted': deleted, 'errors': errors}
+    except Exception as e:
+        logger.error(
+            f"Error in cleanup_user_expired_documents for user {user.id}: {e}",
+            exc_info=True
+        )
+        return {'documents_deleted': 0, 'errors': 1}
 
 
 @shared_task

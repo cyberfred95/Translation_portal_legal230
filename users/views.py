@@ -85,11 +85,16 @@ class SingleAccountView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
 
+    @staticmethod
+    def _get_update_service():
+        """Retourne le service de mise à jour (import lazy pour éviter les imports circulaires)."""
+        from .services.user_update import UserUpdateService
+        return UserUpdateService
+
     def validate(self, attrs):
         """Valide les données utilisateur. Ne valide que les champs présents dans attrs."""
-        from .services.user_update import UserUpdateService
-        
-        errors = UserUpdateService.validate_fields(attrs, self.request.user)
+        update_service = self._get_update_service()
+        errors = update_service.validate_fields(attrs, self.request.user)
         
         if errors:
             error_message = _("; ").join(errors.values())
@@ -99,40 +104,33 @@ class SingleAccountView(RetrieveUpdateDestroyAPIView):
 
     def put(self, request, *args, **kwargs):
         """Met à jour les champs de l'utilisateur fournis dans la requête."""
-        from .services.user_update import UserUpdateService
-        
+        update_service = self._get_update_service()
         user = request.user
         data = request.data
         
         # Valider les champs
-        validation_errors = UserUpdateService.validate_fields(data, user)
+        validation_errors = update_service.validate_fields(data, user)
         if validation_errors:
-            return Response(
-                {"detail": _("; ").join(validation_errors.values())},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return self._error_response(_("; ").join(validation_errors.values()))
         
-        # Mettre à jour les champs simples
-        UserUpdateService.update_simple_fields(user, data)
-        
-        # Mettre à jour la langue si fournie
-        if 'language' in data:
-            UserUpdateService.update_language(user, data['language'], request)
-        
-        # Mettre à jour la période de rétention si fournie
-        if 'retention_period' in data:
-            valid_choices = User.get_valid_retention_periods()
-            error = UserUpdateService.update_retention_period(
-                user, data['retention_period'], valid_choices
-            )
-            if error:
-                return Response(
-                    {"detail": _(error)},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+        # Mettre à jour l'utilisateur
+        error, period_reduced = update_service.update_user(user, data, request)
+        if error:
+            return self._error_response(_(error))
         
         user.save()
+        
+        # Déclencher le nettoyage si la période a été réduite
+        update_service.trigger_cleanup_if_needed(user, period_reduced)
+        
         return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+    
+    def _error_response(self, message: str) -> Response:
+        """Retourne une réponse d'erreur standardisée."""
+        return Response(
+            {"detail": message},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     def get_object(self):
         return self.request.user

@@ -14,6 +14,13 @@ app = Celery("legal")
 #   should have a `CELERY_` prefix.
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
+# Force Redis as broker transport explicitly
+# This ensures Celery uses Redis instead of trying to auto-detect AMQP
+app.conf.update(
+    broker_transport='redis',
+    broker_transport_options={'visibility_timeout': 3600}
+)
+
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
 

@@ -51,9 +51,27 @@ def parse_creation_date(date_str: str) -> Optional[datetime]:
 
 def _to_date(dt: datetime) -> Any:
     """Convertit un datetime en date."""
-    if hasattr(dt, 'date'):
-        return dt.date()
-    return dt
+    return dt.date() if hasattr(dt, 'date') else dt
+
+
+def _has_next_page(data: dict, current_page: int, page_size: int = PAGE_SIZE) -> bool:
+    """
+    Vérifie s'il y a une page suivante dans les résultats paginés.
+    
+    Args:
+        data: Données de réponse de l'API contenant 'count'
+        current_page: Numéro de page actuel
+        page_size: Taille de la page
+        
+    Returns:
+        True s'il y a une page suivante, False sinon
+    """
+    total_count = data.get('count', 0)
+    if total_count == 0:
+        return False
+    
+    total_pages = (total_count + page_size - 1) // page_size
+    return current_page < total_pages
 
 
 def is_document_expired(created_at_str: str, retention_days: int, today: Optional = None) -> bool:
@@ -80,7 +98,17 @@ def is_document_expired(created_at_str: str, retention_days: int, today: Optiona
     return expiration_date < today
 
 
-def fetch_user_documents(user_uuid: str, page: int = 1, page_size: int = PAGE_SIZE) -> Tuple[dict, Optional[str]]:
+def _build_documents_url() -> str:
+    """Construit l'URL de l'endpoint documents."""
+    return f"{settings.LARA_API_URL}/api/lara/documents"
+
+
+def _build_document_delete_url(document_id: str) -> str:
+    """Construit l'URL de l'endpoint de suppression d'un document."""
+    return f"{settings.LARA_API_URL}/api/lara/documents/{document_id}/delete"
+
+
+def fetch_user_documents(user_uuid: str, page: int = 1, page_size: int = PAGE_SIZE) -> Tuple[Optional[dict], Optional[str]]:
     """
     Récupère une page de documents pour un utilisateur.
     
@@ -94,7 +122,7 @@ def fetch_user_documents(user_uuid: str, page: int = 1, page_size: int = PAGE_SI
     """
     try:
         response = requests.get(
-            f"{settings.LARA_API_URL}/api/lara/documents",
+            _build_documents_url(),
             params={
                 "user_uuid": user_uuid,
                 "page": page,
@@ -116,6 +144,33 @@ def fetch_user_documents(user_uuid: str, page: int = 1, page_size: int = PAGE_SI
         return None, error_msg
 
 
+def _extract_expired_document_ids(results: List[dict], retention_days: int, today) -> List[str]:
+    """
+    Extrait les IDs des documents expirés d'une liste de résultats.
+    
+    Args:
+        results: Liste de documents depuis l'API
+        retention_days: Nombre de jours de rétention
+        today: Date de référence
+        
+    Returns:
+        Liste des IDs des documents expirés
+    """
+    expired_documents = []
+    
+    for doc in results:
+        document_id = doc.get('id')
+        created_at_str = doc.get('created_at')
+        
+        if not document_id or not created_at_str:
+            continue
+        
+        if is_document_expired(created_at_str, retention_days, today):
+            expired_documents.append(document_id)
+    
+    return expired_documents
+
+
 def get_all_expired_documents(user_uuid: str, retention_days: int) -> List[str]:
     """
     Récupère tous les documents expirés pour un utilisateur.
@@ -134,30 +189,18 @@ def get_all_expired_documents(user_uuid: str, retention_days: int) -> List[str]:
     while True:
         data, error = fetch_user_documents(user_uuid, page, PAGE_SIZE)
         
-        if error:
+        if error or not data:
             break
         
         results = data.get('results', [])
         if not results:
             break
         
-        # Vérifier chaque document
-        for doc in results:
-            document_id = doc.get('id')
-            created_at_str = doc.get('created_at')
-            
-            if not document_id or not created_at_str:
-                continue
-            
-            if is_document_expired(created_at_str, retention_days, today):
-                expired_documents.append(document_id)
+        # Extraire les documents expirés de cette page
+        expired_documents.extend(_extract_expired_document_ids(results, retention_days, today))
         
         # Vérifier s'il y a une page suivante
-        current_page = data.get('current_page', page)
-        total_count = data.get('count', 0)
-        total_pages = (total_count + PAGE_SIZE - 1) // PAGE_SIZE
-        
-        if current_page >= total_pages:
+        if not _has_next_page(data, page):
             break
         
         page += 1
@@ -178,13 +221,12 @@ def delete_document(document_id: str, user_uuid: str) -> Tuple[bool, Optional[st
     """
     try:
         response = requests.post(
-            f"{settings.LARA_API_URL}/api/lara/documents/{document_id}/delete",
+            _build_document_delete_url(document_id),
             params={"user_uuid": user_uuid},
             timeout=REQUEST_TIMEOUT
         )
         
         if response.status_code in [200, 201]:
-            logger.info(f"Deleted expired document {document_id} for user {user_uuid}")
             return True, None
         else:
             error_msg = f"HTTP {response.status_code}"

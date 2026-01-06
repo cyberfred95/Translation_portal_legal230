@@ -481,13 +481,27 @@
     }
 
     /**
+     * Affiche un message toast
+     * @param {string} message - Message à afficher
+     * @param {string} type - Type de message ('success' ou 'error')
+     */
+    function _showToastMessage(message, type) {
+      if (!window.Toast || !message) {
+        return;
+      }
+      
+      const method = type === 'success' ? 'success' : 'error';
+      if (typeof window.Toast[method] === 'function') {
+        window.Toast[method](message);
+      }
+    }
+
+    /**
      * Affiche un message de succès
      * @param {string} message - Message à afficher
      */
     function _showSuccessMessage(message) {
-      if (window.Toast && typeof window.Toast.success === 'function' && message) {
-        window.Toast.success(message);
-      }
+      _showToastMessage(message, 'success');
     }
 
     /**
@@ -495,9 +509,7 @@
      * @param {string} message - Message à afficher
      */
     function _showErrorMessage(message) {
-      if (window.Toast && typeof window.Toast.error === 'function' && message) {
-        window.Toast.error(message);
-      }
+      _showToastMessage(message, 'error');
     }
 
     /**
