@@ -39,6 +39,7 @@ help:
 	@echo "  make lexa migrate"
 	@echo "  make lexa compile-messages"
 	@echo "  make lexa down"
+	@echo "  make lexa restart-celery"
 	@echo "  make all restart"
 	@echo "  make all build"
 	@echo "  make all static"
@@ -85,6 +86,9 @@ lexa:
 			down) \
 				echo "[lexa] Arrêt et suppression des conteneurs..."; \
 				cd $(LEGAL_DIR) && $(DOCKER_COMPOSE_LEXA) down ;; \
+			restart-celery) \
+				echo "[lexa] Redémarrage des services celery..."; \
+				cd $(LEGAL_DIR) && $(DOCKER_COMPOSE_LEXA) restart celery celery_beat ;; \
 			*) \
 				echo "Action '$(ACTION)' non supportée pour lexa"; \
 				exit 1 ;; \

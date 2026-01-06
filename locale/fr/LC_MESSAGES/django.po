@@ -651,6 +651,54 @@ msgstr "Supprimer vos données"
 msgid "Delete"
 msgstr "Supprimer"
 
+#: legal/templates/profile_details/profile_security.html
+msgid "Retention Period"
+msgstr "Période de rétention"
+
+#: legal/templates/profile_details/profile_security.html
+msgid "Choose how long your translations are kept before automatic deletion."
+msgstr "Choisissez la durée de conservation de vos traductions avant suppression automatique."
+
+#: legal/templates/profile_details/profile_security.html
+msgid "1 day"
+msgstr "1 jour"
+
+#: legal/templates/profile_details/profile_security.html
+msgid "7 days"
+msgstr "7 jours"
+
+#: legal/templates/profile_details/profile_security.html
+msgid "30 days"
+msgstr "30 jours"
+
+#: legal/templates/profile_details/profile_security.html
+msgid "1 year"
+msgstr "1 an"
+
+#: legal/templates/profile_details/profile_security.html
+msgid "2 years"
+msgstr "2 ans"
+
+#: legal/templates/profile_details/profile_security.html
+msgid "3 years"
+msgstr "3 ans"
+
+#: legal/templates/profile_details/profile_security.html
+msgid "5 years"
+msgstr "5 ans"
+
+#: legal/templates/profile_details/profile_details.html
+msgid "Retention period updated successfully"
+msgstr "Période de rétention mise à jour avec succès"
+
+#: legal/templates/profile_details/profile_details.html
+msgid "Error updating retention period. Please try again."
+msgstr "Erreur lors de la mise à jour de la période de rétention. Veuillez réessayer."
+
+#: legal/templates/profile_details/profile_details.html
+msgid "Network error. Please check your connection and try again."
+msgstr "Erreur réseau. Veuillez vérifier votre connexion et réessayer."
+
 #: legal/templates/project_history/project_history.html:12
 msgid "History"
 msgstr ""

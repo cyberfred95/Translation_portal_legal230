@@ -85,35 +85,52 @@ class SingleAccountView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
 
+    @staticmethod
+    def _get_update_service():
+        """Retourne le service de mise à jour (import lazy pour éviter les imports circulaires)."""
+        from .services.user_update import UserUpdateService
+        return UserUpdateService
+
     def validate(self, attrs):
-        if not attrs['username'] or not attrs['email']:
-            raise serializers.ValidationError({"detail": _("Username and email are required.")})
-        if (User.objects.filter(username=attrs['username']).exists()
-                and self.request.user.username != attrs['username']):
-            raise serializers.ValidationError({"detail": _("This username is already used.")})
-        if (User.objects.filter(email=attrs['email']).exists()
-                and self.request.user.email != attrs['email']):
-            raise serializers.ValidationError({"detail": _("This email is already used.")})
+        """Valide les données utilisateur. Ne valide que les champs présents dans attrs."""
+        update_service = self._get_update_service()
+        errors = update_service.validate_fields(attrs, self.request.user)
+        
+        if errors:
+            error_message = _("; ").join(errors.values())
+            raise serializers.ValidationError({"detail": error_message})
+        
         return attrs
 
     def put(self, request, *args, **kwargs):
-        self.validate(request.data)
+        """Met à jour les champs de l'utilisateur fournis dans la requête."""
+        update_service = self._get_update_service()
         user = request.user
-        user.username = request.data['username']
-        user.email = request.data['email']
-        user.first_name = request.data.get('first_name', user.first_name)
-        user.last_name = request.data.get('last_name', user.last_name)
+        data = request.data
         
-        # Mettre à jour la langue de préférence de l'utilisateur
-        if 'language' in request.data:
-            user.language = request.data['language']
-            # Mettre à jour aussi la langue de session pour l'interface actuelle
-            from django.utils import translation
-            translation.activate(request.data['language'])
-            request.session[translation.LANGUAGE_SESSION_KEY] = request.data['language']
+        # Valider les champs
+        validation_errors = update_service.validate_fields(data, user)
+        if validation_errors:
+            return self._error_response(_("; ").join(validation_errors.values()))
+        
+        # Mettre à jour l'utilisateur
+        error, period_reduced = update_service.update_user(user, data, request)
+        if error:
+            return self._error_response(_(error))
         
         user.save()
+        
+        # Déclencher le nettoyage si la période a été réduite
+        update_service.trigger_cleanup_if_needed(user, period_reduced)
+        
         return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+    
+    def _error_response(self, message: str) -> Response:
+        """Retourne une réponse d'erreur standardisée."""
+        return Response(
+            {"detail": message},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     def get_object(self):
         return self.request.user

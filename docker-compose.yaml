@@ -63,6 +63,14 @@ services:
     command: [ "bash", "./docker/django/start-dev.sh" ]
     ports:
       - 8099:8099
+    environment:
+      - POSTGRES_USER=legal
+      - DJANGO_PG_PASSWOR=datasvitend
+      - DJANGO_PG_HOST=postgres
+      - USE_DOCKER=yes
+      - DJANGO_SETTINGS_MODULE=legal.settings_dev
+      - DOCKER=true
+      - CELERY_REDIS=redis://redis:6379
     depends_on:
       - dockerize
       - celery
