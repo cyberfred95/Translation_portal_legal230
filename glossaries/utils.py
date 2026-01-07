@@ -51,3 +51,4 @@ def format_glossary_for_frontend(glossary_data: dict) -> dict:
         'created_at': parse_iso_datetime(glossary_data.get('generated_at')),
     }
 
+
