@@ -12,7 +12,6 @@ from pprint import pprint
 from urllib.parse import urlparse, unquote, urlencode
 
 import django
-import langdetect
 import openpyxl
 import requests
 from django.conf import settings
@@ -45,12 +44,14 @@ from users.models import User, UserGroup
 
 from .credentials import languages
 from .helpers import (
+    detect_language_from_text,
     extract_language_codes_from_project,
     get_project_file,
     get_text_from_file,
+    prepare_text_for_language_detection,
+    rename_file,
     get_word_count,
     lowercase_file_extension,
-    rename_file,
 )
 
 import csv
@@ -1245,62 +1246,45 @@ class LanguageDetectView(APIView):
     permission_classes = (SubscribedPermission, IsAuthenticated)
 
     def post(self, request):
+        """
+        Détecte la langue des documents.
+        
+        Note: La détection de langue ne consomme pas de quota de traduction.
+        Seule la vérification de subscription active est effectuée (via SubscribedPermission).
+        Les quotas sont uniquement vérifiés lors de la traduction effective des documents.
+        """
         files = request.FILES.getlist('document[]', [])
         words_count = 0
         symbols_count = 0
         result = []
+        
         for file in files:
             file = lowercase_file_extension(file)
-
-            try:
-                get_user_api_key(request.user)  # Vérification de subscription active
-            except ValueError:
-                return JsonResponse({"detail": "No active subscription found"}, status=status.HTTP_403_FORBIDDEN)
+            
             text_for_detection, words_count, symbols_count = self.get_text_for_detection(
                 file=file,
                 words_count=words_count,
                 symbols_count=symbols_count
             )
-            is_allowed, _, _ = translation_allowed(
-                request,
-                files_count=len(files),
-                words_count=words_count,
-                symbols_count=symbols_count
-            )
-            if is_allowed:
 
-                try:
-                    tmp_language = langdetect.detect(text_for_detection)
-                    language = Language.objects.filter(abbreviation__iexact=tmp_language.upper()).values_list(
-                        'abbreviation', flat=True).first()
-                except langdetect.LangDetectException:
-                    language = Language.objects.values_list(
-                        'abbreviation', flat=True).first()
-                if not language:
-                    language = Language.objects.all().values_list(
-                        'abbreviation', flat=True).first()
+            try:
+                language = detect_language_from_text(text_for_detection)
+            except Exception:
+                # Fallback si la détection échoue (langdetect.LangDetectException ou autre)
+                language = Language.objects.values_list(
+                    'abbreviation', flat=True
+                ).first() or 'UNKNOWN'
+                language = language.upper()
 
-                result.append(
-                    {
-                        "file_name": f'{file.name}',
-                        "abbreviation": language.upper()
-                    }
-                )
-            else:
-                return JsonResponse({"detail": "You are not allowed to translate such amount of data"},
-                                    status=status.HTTP_400_BAD_REQUEST)
+            result.append({
+                "file_name": file.name,
+                "abbreviation": language
+            })
+        
+        # Stocker les compteurs pour la traduction future (mais ne pas vérifier les quotas ici)
         cache.set(f"{request.user.uuid}", {"words_count": words_count, "symbols_count": symbols_count},
                   timeout=CACHE_TTL)
         return JsonResponse({'languages': result}, status=status.HTTP_200_OK)
-
-    @staticmethod
-    def rename_file(file: InMemoryUploadedFile, file_name: str = None):
-        if not file_name:
-            file_extension = os.path.splitext(file.name)[1]
-            file.name = f'file{file_extension}'
-        else:
-            file.name = file_name
-        return file
 
     def get_text_for_detection(self, file, words_count, symbols_count):
         """
@@ -1314,54 +1298,56 @@ class LanguageDetectView(APIView):
         Returns:
             tuple: (text_for_detection, words_count, symbols_count)
         """
-        file_name = file.name
-        file = self.rename_file(file)
+        file = rename_file(file)
         formated_texts, full_text, processed_file = get_text_from_file(file)
         words_count += len(formated_texts)
         symbols_count += sum(len(word) for word in full_text)
         text_for_detection = ' '.join(
-            formated_texts[:self.WORDS_COUNT_FOR_DETECTION])
-        # Le fichier traité n'est pas utilisé pour la détection de langue,
-        # seulement pour l'extraction de texte
+            formated_texts[:self.WORDS_COUNT_FOR_DETECTION]
+        )
         return text_for_detection, words_count, symbols_count
 
 
 class DetectTextLanguageView(APIView):
+    """
+    Vue pour détecter la langue d'un texte.
+    
+    Note: La détection de langue ne consomme pas de quota de traduction.
+    Seule la vérification de subscription active est effectuée (via SubscribedPermission).
+    """
     WORDS_COUNT_FOR_DETECTION = 500
     permission_classes = (SubscribedPermission, IsAuthenticated)
 
-    @staticmethod
-    def text_string_to_array(text):
-        text = re.sub(r'<[^>]*>', '', text)
-        text = text.split()
-        return text
-
     def post(self, request):
-
+        """
+        Détecte la langue d'un texte.
+        
+        Args:
+            request: Requête contenant 'text' dans request.data
+            
+        Returns:
+            Response: JSON avec la langue détectée {"language": "FR"}
+        """
         text = request.data.get('text')
-        text_for_detection = self.get_text_for_detection(text)
-        symbols_count = len(text_for_detection)
-        texts = self.text_string_to_array(text)
-        is_allowed, _, _ = translation_allowed(request, words_count=len(texts), symbols_count=symbols_count)
-        if is_allowed:
-            try:
-                tmp_language = langdetect.detect(text_for_detection)
-                language = Language.objects.filter(abbreviation__iexact=tmp_language.upper()).values_list(
-                    'abbreviation', flat=True).first()
-                if not language:
-                    language = Language.objects.all().values_list(
-                        'abbreviation', flat=True).first()
-            except langdetect.LangDetectException:
-                return Response({"detail": "Source text should not be blank"}, status=status.HTTP_400_BAD_REQUEST)
-            return Response({"language": language.upper()})
-        return Response({"detail": "You are not allowed to translate such amount of data"},
-                        status=status.HTTP_400_BAD_REQUEST)
-
-    def get_text_for_detection(self, text):
-        text = self.text_string_to_array(text)
-
-        text_for_detection = ' '.join(text[:self.WORDS_COUNT_FOR_DETECTION])
-        return text_for_detection
+        if not text:
+            return Response(
+                {"detail": "Source text should not be blank"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        text_for_detection = prepare_text_for_language_detection(
+            text, max_words=self.WORDS_COUNT_FOR_DETECTION
+        )
+        
+        try:
+            language = detect_language_from_text(text_for_detection)
+            return Response({"language": language})
+        except Exception:
+            # Exception levée par detect_language_from_text (langdetect.LangDetectException ou autre)
+            return Response(
+                {"detail": "Source text should not be blank"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 
