@@ -67,17 +67,15 @@
     }
 
     /**
-     * Affiche un message d'erreur via Toast ou errorNotification
+     * Affiche un message d'erreur via Toast
      * @param {Object} error - Objet d'erreur AJAX
      * @param {string} defaultMessage - Message par défaut
      */
     function handleAjaxError(error, defaultMessage) {
-      const errorMessage = error?.responseJSON?.detail || defaultMessage;
-      
-      if (window.Toast) {
-        window.Toast.error(errorMessage);
+      if (window.AppBase && window.AppBase.showError) {
+        window.AppBase.showError(error, defaultMessage);
       } else {
-        errorNotification(error?.status, error?.responseJSON?.detail);
+        console.error('Error:', error?.responseJSON?.detail || error?.message || defaultMessage || 'Something went wrong');
       }
     }
 
@@ -394,7 +392,7 @@
           window.location.reload();
         },
         error: function (error) {
-          errorNotification(error?.status, error?.responseJSON?.detail);
+          handleAjaxError(error);
         },
       });
     }

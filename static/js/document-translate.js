@@ -931,9 +931,15 @@ $(document).ready(function () {
 
     /**
      * Standard error handler for AJAX calls
+     * @param {Object} error - Objet d'erreur AJAX
+     * @param {string} defaultMessage - Message par défaut (optionnel)
      */
-    function handleAjaxError(error) {
-        errorNotification(error?.status, error?.responseJSON?.detail);
+    function handleAjaxError(error, defaultMessage) {
+        if (window.AppBase && window.AppBase.showError) {
+            window.AppBase.showError(error, defaultMessage);
+        } else {
+            console.error('Error:', error?.responseJSON?.detail || error?.message || defaultMessage || 'Something went wrong');
+        }
     }
 
     /**
@@ -1727,12 +1733,8 @@ $(document).ready(function () {
           $closeRevision.addClass('hidden');
         },
         error: function (error) {
-          const errorMessage = error?.responseJSON?.detail || window.expertRevisionMessages?.quoteRequestError || 'An error occurred while requesting the quote.';
-          if (window.Toast) {
-            window.Toast.error(errorMessage);
-          } else if (typeof handleAjaxError === 'function') {
-            handleAjaxError(error);
-          }
+          const defaultMessage = window.expertRevisionMessages?.quoteRequestError || 'An error occurred while requesting the quote.';
+          handleAjaxError(error, defaultMessage);
         }
       });
     }

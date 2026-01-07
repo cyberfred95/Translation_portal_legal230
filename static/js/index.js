@@ -12,10 +12,6 @@ $(document).ready(function () {
         }
     });
 
-    $(".glossary-language-source").attr("data-placeholder", language_code === 'en'? "Select subscription type": "Sélectionner dans la liste");
-
-    $(".glossary-language-source").select2();
-
     $('.glossary-language-select').select2().each(function () {
         var $select = $(this);
         $select.data('select2').$container.addClass('glossary');
@@ -53,43 +49,6 @@ $(document).ready(function () {
         if (!$(e.target).closest('.profile-container').length) {
             $('#dropdown').addClass('hidden');
         }
-    });
-
-    $('#open-invite-modal').on('click', function (event) {
-        event.stopPropagation();
-        $('#invite-modal').removeClass('hidden');
-    });
-
-    $(document).on('click', function () {
-        $('#invite-modal').addClass('hidden');
-    });
-
-    $('.modal-content').on('click', function (event) {
-        event.stopPropagation();
-    });
-
-    $('form[name="invite"]').on('submit', function (e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-        $.ajax({
-            url: invite_user_url,
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-            success: function () {
-                $('#invite-modal').addClass('hidden');
-            },
-            error: function (error) {
-                $('#invite-modal').addClass('hidden');
-                errorNotification(error?.status, error?.responseJSON?.detail);
-            }
-        });
     });
 });
 

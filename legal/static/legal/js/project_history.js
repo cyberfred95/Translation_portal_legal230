@@ -8,15 +8,23 @@
 // =============================================================================
 
 /**
- * Show error notification or fallback alert
+ * Show error notification using AppBase
+ * @param {number} status - Code de statut HTTP (non utilisé, conservé pour compatibilité)
+ * @param {string} detail - Message d'erreur détaillé
+ */
+/**
+ * Show error notification using AppBase
+ * @param {number} status - Code de statut HTTP (non utilisé, conservé pour compatibilité)
+ * @param {string|Object} detail - Message d'erreur détaillé ou objet d'erreur
  */
 function showError(status, detail) {
-  const errorMessage = window.deleteConfirmationMessages?.error || 'Error deleting translation. Please try again.';
+  const defaultMessage = window.deleteConfirmationMessages?.error || 'Error deleting translation. Please try again.';
+  const errorMessage = typeof detail === 'string' ? detail : (detail?.detail || detail?.message || defaultMessage);
   
-  if (typeof errorNotification === 'function') {
-    errorNotification(status || 500, detail || errorMessage);
+  if (window.AppBase && window.AppBase.showError) {
+    window.AppBase.showError(errorMessage);
   } else {
-    alert(errorMessage);
+    console.error('Error:', errorMessage);
   }
 }
 
@@ -354,8 +362,13 @@ document.addEventListener('DOMContentLoaded', function () {
           const errorMessage = error?.detail || error?.responseJSON?.detail || window.expertRevisionMessages?.quoteRequestError || 'An error occurred while requesting the quote.';
           if (window.Toast) {
             window.Toast.error(errorMessage);
-          } else if (typeof errorNotification === 'function') {
-            errorNotification(error?.status, error?.detail || error?.responseJSON?.detail);
+          } else {
+            const errorMessage = error?.detail || error?.responseJSON?.detail || 'An error occurred';
+            if (window.Toast) {
+              window.Toast.error(errorMessage);
+            } else {
+              console.error('Error:', errorMessage);
+            }
           }
         });
     };

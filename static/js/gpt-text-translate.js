@@ -86,7 +86,11 @@ $(document).ready(function () {
                 $('#expert-revision').removeClass('hidden');
             },
             error: function (error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
+                if (window.AppBase && window.AppBase.showError) {
+                    window.AppBase.showError(error);
+                } else {
+                    console.error('Error:', error?.responseJSON?.detail || error?.message || 'Something went wrong');
+                }
             },
             complete: function () {
                 stopLoading();

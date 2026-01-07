@@ -280,7 +280,11 @@ $(document).ready(function () {
                 populateDomains(response);
             },
             error(error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
+                if (window.AppBase && window.AppBase.showError) {
+                    window.AppBase.showError(error);
+                } else {
+                    console.error('Error:', error?.responseJSON?.detail || error?.message || 'Something went wrong');
+                }
             },
             complete() {
                 $('#glossary-spinner').addClass('hidden');
@@ -386,7 +390,11 @@ $(document).ready(function () {
                     }
                 },
                 error(error) {
-                    errorNotification(error?.status, error?.responseJSON?.detail);
+                    if (window.AppBase && window.AppBase.showError) {
+                        window.AppBase.showError(error);
+                    } else {
+                        console.error('Error:', error?.responseJSON?.detail || error?.message || 'Something went wrong');
+                    }
                     showTranslationResult();
                 },
                 complete() {
@@ -735,7 +743,11 @@ $(document).ready(function () {
                 }
             },
             error(error) {
-                errorNotification(error?.status, error?.responseJSON?.detail);
+                if (window.AppBase && window.AppBase.showError) {
+                    window.AppBase.showError(error);
+                } else {
+                    console.error('Error:', error?.responseJSON?.detail || error?.message || 'Something went wrong');
+                }
                 const errorMessage = detectStatusMessages.error || detectStatusFallbacks.en.error;
                 showTextDetectStatus(errorMessage, 'error', true);
             },

@@ -358,16 +358,22 @@
     }
 
     /**
-     * Affiche une erreur
-     * @param {Object} error - Objet d'erreur
-     * @param {string} message - Message d'erreur
+     * Affiche une erreur en utilisant AppBase si disponible, sinon fallback local
+     * @param {Object|string} error - Objet d'erreur ou message d'erreur
+     * @param {string} message - Message d'erreur par défaut (si error est un objet)
      */
     function showError(error, message) {
-      const errorMsg = error?.detail || error?.message || message;
-      if (typeof errorNotification === 'function') {
-        errorNotification(error?.status || 500, errorMsg);
-      } else if (window.Toast) {
-        window.Toast.error(errorMsg);
+      if (window.AppBase && window.AppBase.showError) {
+        window.AppBase.showError(error, message);
+      } else {
+        const errorMsg = typeof error === 'string' 
+          ? error 
+          : (error?.detail || error?.message || message || 'An error occurred');
+        if (window.Toast) {
+          window.Toast.error(errorMsg);
+        } else {
+          console.error('Error:', errorMsg);
+        }
       }
     }
 
