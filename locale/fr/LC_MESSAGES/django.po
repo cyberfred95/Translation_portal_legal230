@@ -1349,6 +1349,18 @@ msgstr "Vos résultats s'afficheront ici"
 #~ msgid "total words"
 #~ msgstr "mots"
 
+#: legal/templates/common/subscription_tag.html
+msgid "Subscription Error"
+msgstr "Erreur d'abonnement"
+
+#: legal/templates/common/subscription_tag.html
+msgid "No active subscription"
+msgstr "Aucun abonnement actif"
+
+#: legal/templates/common/subscription_tag.html
+msgid "If you think this is an error, please contact an administrator"
+msgstr "Si vous pensez que c'est une erreur, veuillez contacter un administrateur"
+
 #~ msgid "Process"
 #~ msgstr "Appliquer"
 

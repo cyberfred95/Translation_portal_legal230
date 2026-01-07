@@ -5,6 +5,7 @@ Ce module fournit des fonctions utilitaires pour :
 - Vérifier les quotas de traduction
 - Incrémenter les compteurs de traduction
 - Gérer l'usage quotidien pour les abonnements API
+- Récupérer et formater les informations d'abonnement pour l'affichage
 """
 import logging
 from typing import Tuple, Optional, Dict, List, TYPE_CHECKING
@@ -316,3 +317,104 @@ def add_translations(
 
     if _is_api_subscription(subscription):
         _increment_daily_metered_usage(subscription, words_count, symbols_count, files_count)
+
+
+# ============================================================================
+# Fonctions utilitaires pour l'affichage des abonnements
+# ============================================================================
+
+# Constantes pour les statuts d'affichage
+SUBSCRIPTION_STATUS_ACTIVE = 'active'
+SUBSCRIPTION_STATUS_NO_SUBSCRIPTION = 'no_subscription'
+SUBSCRIPTION_STATUS_ERROR = 'error'
+
+
+def get_active_user_subscriptions(user) -> List[UserSubscription]:
+    """
+    Récupère tous les abonnements actifs d'un utilisateur.
+    
+    Un abonnement est considéré actif si :
+    - Son statut est actif (via is_user_subscription_active)
+    - La date actuelle est dans l'intervalle [start_date, end_date]
+    
+    Args:
+        user: L'utilisateur dont on veut récupérer les abonnements
+        
+    Returns:
+        List[UserSubscription]: Liste des abonnements actifs, triée par date de début (plus récent en premier)
+    """
+    from subscriptions.permissions import is_user_subscription_active
+    
+    current_time = now()
+    all_subscriptions = UserSubscription.objects.filter(
+        user=user
+    ).select_related('subscription')
+    
+    active_subscriptions = [
+        sub for sub in all_subscriptions
+        if is_user_subscription_active(sub.status)
+        and current_time >= sub.start_date
+        and current_time <= sub.end_date
+    ]
+    
+    # Trier par date de début (plus récent en premier) pour cohérence
+    active_subscriptions.sort(key=lambda s: s.start_date, reverse=True)
+    
+    return active_subscriptions
+
+
+def _build_subscription_error_message(subscription_names: List[str]) -> str:
+    """
+    Construit le message d'erreur pour plusieurs abonnements actifs.
+    
+    Args:
+        subscription_names: Liste des noms d'abonnements
+        
+    Returns:
+        str: Message d'erreur formaté
+    """
+    return f'Multiple active subscriptions found: {", ".join(subscription_names)}'
+
+
+def format_subscription_info_for_display(user) -> Dict[str, Optional[str]]:
+    """
+    Formate les informations d'abonnement d'un utilisateur pour l'affichage dans les templates.
+    
+    Args:
+        user: L'utilisateur dont on veut formater les informations d'abonnement
+        
+    Returns:
+        dict: {
+            'status': 'active' | 'no_subscription' | 'error',
+            'name': str | None (nom de l'abonnement),
+            'product_type': str | None (type de produit),
+            'error_details': str | None (détails de l'erreur si status == 'error' ou 'no_subscription')
+        }
+    """
+    active_subscriptions = get_active_user_subscriptions(user)
+    
+    if not active_subscriptions:
+        return {
+            'status': SUBSCRIPTION_STATUS_NO_SUBSCRIPTION,
+            'name': None,
+            'product_type': None,
+            'error_details': 'No active subscription found.'
+        }
+    
+    if len(active_subscriptions) == 1:
+        subscription = active_subscriptions[0]
+        return {
+            'status': SUBSCRIPTION_STATUS_ACTIVE,
+            'name': subscription.subscription.name,
+            'product_type': subscription.subscription.product_type,
+            'error_details': None
+        }
+    
+    # Plusieurs abonnements actifs - c'est une erreur
+    subscription_names = [sub.subscription.name for sub in active_subscriptions]
+    return {
+        'status': SUBSCRIPTION_STATUS_ERROR,
+        'name': None,
+        'product_type': None,
+        'error_details': _build_subscription_error_message(subscription_names)
+    }

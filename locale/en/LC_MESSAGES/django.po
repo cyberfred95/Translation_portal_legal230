@@ -1148,6 +1148,18 @@ msgstr "Your text is too short to be processed."
 msgid "Improve your text with writing tools."
 msgstr ""
 
+#: legal/templates/common/subscription_tag.html
+msgid "Subscription Error"
+msgstr "Subscription Error"
+
+#: legal/templates/common/subscription_tag.html
+msgid "No active subscription"
+msgstr "No active subscription"
+
+#: legal/templates/common/subscription_tag.html
+msgid "If you think this is an error, please contact an administrator"
+msgstr "If you think this is an error, please contact an administrator"
+
 #: writing/templates/writing.html:59
 #, fuzzy
 #| msgid "No data available"

@@ -164,6 +164,28 @@
 /* Text */
 .my-team-page .user-name { font-size: 0.95rem; font-weight: 400; color: #111827; }
 .my-team-page .user-email { font-size: 0.8rem; color: #6B7280; }
+/* ============================================
+   Subscription Tag dans My Team
+   Styles spécifiques pour le contexte de la table
+   ============================================ */
+.myteam-td .subscription-tag,
+.myteam-subscription-tag {
+  padding: 0.25rem 0.5rem;
+  gap: var(--mt-gap-sm);
+  min-width: 0;
+}
+
+.myteam-subscription-tag .subscription-tag-text,
+.myteam-td .subscription-tag-text {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 24px;
+  color: #181932;
+  min-width: 0;
+}
+
+/* Classes legacy conservées pour compatibilité (non utilisées mais gardées au cas où) */
 .my-team-page .license-text { font-family: 'Poppins', sans-serif; font-weight: 400; font-size: 14px; line-height: 24px; color: #181932; }
 .my-team-page .inactive-text { font-family: 'Poppins', sans-serif; font-weight: 400; font-size: 14px; line-height: 24px; color: #9CA3AF; font-style: italic; }
 .my-team-page .error-text { font-family: 'Poppins', sans-serif; font-weight: 400; font-size: 14px; line-height: 24px; color: #DC2626; }

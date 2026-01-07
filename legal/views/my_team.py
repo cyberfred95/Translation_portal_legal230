@@ -6,10 +6,9 @@ from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect
 
-from django.utils.timezone import now
 from users.models import User
 from subscriptions.models import SubscriptionType, UserSubscription
-from subscriptions.permissions import is_user_subscription_active
+from subscriptions.helpers import get_active_user_subscriptions, format_subscription_info_for_display
 
 from emails.models import EmailType
 from emails.send_email import send_email
@@ -183,28 +182,13 @@ class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, BaseTemplateView):
         return bool(user.stripe_customer_id)
 
     def get_user_license(self, user):
-        """Retourne les informations de licence de l'utilisateur."""
-        active_subscriptions = self._get_active_subscriptions(user)
+        """
+        Retourne les informations de licence de l'utilisateur.
         
-        if not active_subscriptions:
-            return {
-                'status': 'no_subscription',
-                'name': 'No subscription',
-                'product_type': None
-            }
-        elif len(active_subscriptions) == 1:
-            subscription = active_subscriptions[0]
-            return {
-                'status': 'active',
-                'name': subscription.subscription.name,
-                'product_type': subscription.subscription.product_type
-            }
-        else:
-            return {
-                'status': 'error',
-                'name': 'Error: Multiple subscriptions',
-                'product_type': None
-            }
+        Utilise la fonction utilitaire centralisée pour garantir la cohérence
+        avec l'affichage dans le header.
+        """
+        return format_subscription_info_for_display(user)
 
     def is_user_editable(self, user, is_buyer, license_info):
         """Détermine si un utilisateur peut être édité."""
@@ -227,19 +211,12 @@ class MyTeamView(LoginRequiredMixin, UserPassesTestMixin, BaseTemplateView):
         return User.objects.none()
 
     def _get_active_subscriptions(self, user):
-        """Retourne la liste des abonnements actifs d'un utilisateur."""
-        current_time = now()
-        all_subscriptions = UserSubscription.objects.filter(
-            user=user
-        ).select_related('subscription')
+        """
+        Retourne la liste des abonnements actifs d'un utilisateur.
         
-        active_subscriptions = [
-            sub for sub in all_subscriptions
-            if is_user_subscription_active(sub.status)
-            and current_time >= sub.start_date
-            and current_time <= sub.end_date
-        ]
-        return active_subscriptions
+        Utilise la fonction utilitaire centralisée pour garantir la cohérence.
+        """
+        return get_active_user_subscriptions(user)
 
     def _get_active_subscription(self, user):
         """Retourne le premier abonnement actif d'un utilisateur ou None."""

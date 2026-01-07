@@ -55,34 +55,7 @@
                     </div>
                 </td>
                 <td class="myteam-td">
-                    <div class="my-flex-row my-ellipsis">
-                        {% if member.license.status == 'active' %}
-                            {% if 'API' in member.license.name %}
-                                <i class="ph-fill ph-code icon-20 color-violet no-shrink"></i>
-                            {% elif 'Premium' in member.license.name %}
-                                <i class="ph-fill ph-crown icon-20 color-amber no-shrink"></i>
-                            {% elif 'Standard' in member.license.name %}
-                                <i class="ph-fill ph-star icon-20 color-blue no-shrink"></i>
-                            {% elif 'Essentiel' in member.license.name or 'Essential' in member.license.name %}
-                                <i class="ph-fill ph-check-circle icon-20 color-green no-shrink"></i>
-                            {% else %}
-                                <i class="ph-fill ph-certificate icon-20 icon-muted no-shrink"></i>
-                            {% endif %}
-                            <span class="license-text my-ellipsis">
-                                {{ member.license.name }}
-                            </span>
-                        {% elif member.license.status == 'no_subscription' %}
-                            <span class="spacer-20 no-shrink"></span>
-                            <span class="inactive-text my-ellipsis">
-                                {% trans '(Inactive)' %}
-                            </span>
-                        {% elif member.license.status == 'error' %}
-                            <i class="ph-fill ph-warning icon-20 color-red no-shrink"></i>
-                            <span class="error-text my-ellipsis">
-                                {% trans 'Error' %}
-                            </span>
-                        {% endif %}
-                    </div>
+                    {% include 'common/subscription_tag.html' with subscription_info=member.license tag_class='myteam-subscription-tag' icon_size_class='icon-20' %}
                 </td>
                 <td class="myteam-td">
                     <div class="usage-bars" 

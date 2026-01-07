@@ -36,9 +36,9 @@ from glossaries.models import Glossary
 from glossaries.processor import GlossaryProcessor
 from languages.models import Language
 from quoting.models import LanguageQuote, QuotePDF
-from subscriptions.helpers import add_translations, translation_allowed
+from subscriptions.helpers import add_translations, translation_allowed, format_subscription_info_for_display
 from subscriptions.models import SubscriptionType, UserSubscription
-from subscriptions.permissions import SubscribedPermission, is_user_subscription_active
+from subscriptions.permissions import SubscribedPermission
 from subscriptions.utils import get_user_api_key
 from stripe_webhooks.tasks_handlers.helper.stripe_session import get_stripe_customer_session_url
 from users.models import User, UserGroup
@@ -76,6 +76,11 @@ class BaseTemplateView(TemplateView):
         context['SUPPORT_EMAIL'] = settings.SUPPORT_EMAIL
         context['SENDER_EMAIL'] = settings.SENDER_EMAIL
         context['QUOTE_CC_EMAIL'] = settings.QUOTE_CC_EMAIL
+        
+        # Ajouter les informations d'abonnement de l'utilisateur actuel
+        if self.request.user.is_authenticated:
+            context['user_subscription_info'] = format_subscription_info_for_display(self.request.user)
+        
         return context
 
 

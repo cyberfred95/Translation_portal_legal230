@@ -143,3 +143,22 @@
   line-height: 1.5rem;
   letter-spacing: -0.084px;
 }
+
+/* ============================================
+   Subscription Tag dans le header
+   ============================================ */
+.header-subscription-tag-wrapper {
+  display: flex;
+  align-items: center;
+  margin-right: 0.5rem;
+  height: 2.5rem;
+}
+
+.header-subscription-tag {
+  /* Hérite des styles de base de subscription-tag */
+}
+
+.header-subscription-tag .subscription-tag-text {
+  color: var(--header-text-primary);
+  max-width: 200px;
+}

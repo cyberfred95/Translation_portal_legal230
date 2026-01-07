@@ -1,0 +1,45 @@
+{% load i18n %}
+{% comment %}
+Template réutilisable pour afficher un tag d'abonnement.
+Utilisation: {% include 'common/subscription_tag.html' with subscription_info=user_subscription_info %}
+
+Variables:
+- subscription_info: dict avec 'status', 'name', 'product_type', 'error_details'
+- tag_class: classe CSS optionnelle pour personnaliser l'affichage (par défaut: 'subscription-tag')
+- icon_size_class: classe CSS pour la taille de l'icône (par défaut: 'subscription-tag-icon')
+{% endcomment %}
+
+{% if subscription_info %}
+    {% if subscription_info.status == 'active' %}
+        {% comment %}Tag actif : pas de tooltip{% endcomment %}
+        <div class="subscription-tag {% if tag_class %}{{ tag_class }}{% endif %}">
+            {% if 'API' in subscription_info.name %}
+                <i class="ph-fill ph-code {% if icon_size_class %}{{ icon_size_class }}{% else %}subscription-tag-icon{% endif %} color-violet no-shrink"></i>
+            {% elif 'Premium' in subscription_info.name %}
+                <i class="ph-fill ph-crown {% if icon_size_class %}{{ icon_size_class }}{% else %}subscription-tag-icon{% endif %} color-amber no-shrink"></i>
+            {% elif 'Standard' in subscription_info.name %}
+                <i class="ph-fill ph-star {% if icon_size_class %}{{ icon_size_class }}{% else %}subscription-tag-icon{% endif %} color-blue no-shrink"></i>
+            {% elif 'Essentiel' in subscription_info.name or 'Essential' in subscription_info.name %}
+                <i class="ph-fill ph-check-circle {% if icon_size_class %}{{ icon_size_class }}{% else %}subscription-tag-icon{% endif %} color-green no-shrink"></i>
+            {% else %}
+                <i class="ph-fill ph-certificate {% if icon_size_class %}{{ icon_size_class }}{% else %}subscription-tag-icon{% endif %} icon-muted no-shrink"></i>
+            {% endif %}
+            <span class="subscription-tag-text">{{ subscription_info.name }}</span>
+        </div>
+    {% elif subscription_info.status == 'error' %}
+        {% comment %}Tag d'erreur : avec tooltip{% endcomment %}
+        <div class="subscription-tag subscription-tag-error has-tooltip {% if tag_class %}{{ tag_class }}{% endif %}" 
+             data-tooltip="{% trans 'Subscription Error' %}: {{ subscription_info.error_details }} {% trans 'If you think this is an error, please contact an administrator' %}">
+            <i class="ph-fill ph-warning {% if icon_size_class %}{{ icon_size_class }}{% else %}subscription-tag-icon{% endif %} color-red no-shrink"></i>
+            <span class="subscription-tag-text">{% trans 'Subscription Error' %}</span>
+        </div>
+    {% else %}
+        {% comment %}Pas d'abonnement actif : avec tooltip{% endcomment %}
+        <div class="subscription-tag subscription-tag-inactive has-tooltip {% if tag_class %}{{ tag_class }}{% endif %}" 
+             data-tooltip="{% trans 'No active subscription' %}: {{ subscription_info.error_details|default:'' }} {% trans 'If you think this is an error, please contact an administrator' %}">
+            <i class="ph-fill ph-warning {% if icon_size_class %}{{ icon_size_class }}{% else %}subscription-tag-icon{% endif %} color-red no-shrink"></i>
+            <span class="subscription-tag-text">{% trans 'Subscription Error' %}</span>
+        </div>
+    {% endif %}
+{% endif %}
+
