@@ -2,7 +2,7 @@
 {% load i18n %}
 
 <!-- Document Translation Wizard -->
-<div class="flex p-4 flex-col items-start gap-0 self-stretch rounded-lg bg-white">
+<div class="flex p-4 flex-col items-start gap-0 self-stretch rounded-lg bg-white {% if user_subscription_info and user_subscription_info.status != 'active' %}subscription-error-container{% endif %}">
     
     <!-- Progress Indicator -->
     <div class="flex items-start self-stretch">
@@ -53,6 +53,8 @@
             <i class="ph ph-arrow-right nextStep" style="font-size: 24px; color: white;"></i>
         </button>
     </div>
+
+    {% include 'common/subscription_error_overlay.html' %}
 </div>
 
 <script src="{% static 'js/utils/status-utils.js' %}"></script>

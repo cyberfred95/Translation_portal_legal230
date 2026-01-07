@@ -1,23 +1,11 @@
-from django.views.generic import TemplateView
 from django.conf import settings
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from legal.views_all import BaseTemplateView
 from subscriptions.permissions import SubscribedPermission
-
-
-class BaseTemplateView(TemplateView):
-    """
-    Base TemplateView that adds environment variables to context
-    """
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['SUPPORT_EMAIL'] = settings.SUPPORT_EMAIL
-        context['SENDER_EMAIL'] = settings.SENDER_EMAIL
-        context['QUOTE_CC_EMAIL'] = settings.QUOTE_CC_EMAIL
-        return context
 
 
 class WritingView(BaseTemplateView):
