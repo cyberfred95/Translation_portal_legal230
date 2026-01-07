@@ -10,69 +10,116 @@ from legal.helpers import (
 
 
 class DashboardView(BaseTemplateView):
+    """
+    Vue pour afficher le tableau de bord utilisateur.
+    
+    Affiche les statistiques de traduction, les glossaires et les projets récents.
+    """
     template_name = "dashboard/dashboard.html"
 
     def get_context_data(self, **kwargs):
+        """Construit le contexte pour le template du dashboard."""
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        page = self.request.GET.get('page', 1)
 
-        translated_words_count = 0
-        translated_symbols_count = 0
-        translated_files_count = 0
-        try:
-            user_subscription = user.subscriptions.first()
-            if user_subscription:
-                translated_words_count = user_subscription.translated_words_count
-                translated_symbols_count = user_subscription.translated_symbols_count
-                translated_files_count = user_subscription.translated_files_count
-                # Exposer les plafonds depuis le type d'abonnement si disponible (source de vérité)
-                sub_type = getattr(user_subscription, 'subscription', None)
-                if sub_type:
-                    context['max_symbols_count'] = getattr(sub_type, 'max_symbols_count', -1)
-                    context['max_words_count'] = getattr(sub_type, 'max_words_count', -1)
-                    context['max_files_count'] = getattr(sub_type, 'max_files_count', -1)
-                    context['max_glossaries_count'] = getattr(sub_type, 'custom_glossaries_count', -1)
-                else:
-                    # fallback sur les champs copiés dans UserSubscription
-                    context['max_symbols_count'] = getattr(user_subscription, 'max_symbols_count', -1)
-                    context['max_words_count'] = getattr(user_subscription, 'max_words_count', -1)
-                    context['max_files_count'] = getattr(user_subscription, 'max_files_count', -1)
-                    context['max_glossaries_count'] = getattr(user_subscription, 'custom_glossaries_count', -1)
-        except Exception:
-            translated_words_count = 0
-            translated_symbols_count = 0
-            translated_files_count = 0
-            context['max_symbols_count'] = -1
-            context['max_words_count'] = -1
-            context['max_files_count'] = -1
-            context['max_glossaries_count'] = -1
-
-        context['translated_words_count'] = translated_words_count
-        context['translated_symbols_count'] = translated_symbols_count
-        context['translated_files_count'] = translated_files_count
+        # Statistiques d'abonnement et quotas
+        self._add_subscription_stats(context, user)
+        
+        # Compteur de glossaires
+        context['user_glossaries_count'] = self._get_user_glossaries_count(user)
+        
+        # Permissions d'administration de groupe
+        context['is_group_admin'] = self._is_user_group_admin(user)
         context['show_user_email'] = user.is_staff
 
-        glossaries_count = 0
+        # Projets récents depuis l'API LARA
+        context['projects'] = self._get_recent_projects(user)
+
+        return context
+
+    def _add_subscription_stats(self, context, user):
+        """
+        Ajoute les statistiques d'abonnement au contexte.
+        
+        Args:
+            context: Dictionnaire de contexte Django
+            user: Utilisateur Django
+        """
+        default_values = {
+            'translated_words_count': 0,
+            'translated_symbols_count': 0,
+            'translated_files_count': 0,
+            'max_symbols_count': -1,
+            'max_words_count': -1,
+            'max_files_count': -1,
+            'max_glossaries_count': -1,
+        }
+        context.update(default_values)
+
+        try:
+            user_subscription = user.subscriptions.select_related('subscription').first()
+            if user_subscription:
+                # Compteurs de traduction consommés
+                context['translated_words_count'] = user_subscription.translated_words_count
+                context['translated_symbols_count'] = user_subscription.translated_symbols_count
+                context['translated_files_count'] = user_subscription.translated_files_count
+                
+                # Limites maximales de l'abonnement
+                context['max_symbols_count'] = user_subscription.max_symbols_count
+                context['max_words_count'] = user_subscription.max_words_count
+                context['max_files_count'] = user_subscription.max_files_count
+                context['max_glossaries_count'] = user_subscription.custom_glossaries_count
+        except Exception:
+            pass  # Valeurs par défaut déjà définies
+
+    def _get_user_glossaries_count(self, user):
+        """
+        Récupère le nombre de glossaires de l'utilisateur.
+        
+        Args:
+            user: Utilisateur Django
+            
+        Returns:
+            int: Nombre de glossaires
+        """
         try:
             from glossaries.models import Glossary
-            glossaries_count = Glossary.objects.filter(user=user).count()
+            return Glossary.objects.filter(user=user).count()
         except Exception:
-            glossaries_count = 0
-        context['user_glossaries_count'] = glossaries_count
+            return 0
 
+    def _is_user_group_admin(self, user):
+        """
+        Vérifie si l'utilisateur est administrateur de son groupe.
+        
+        Args:
+            user: Utilisateur Django
+            
+        Returns:
+            bool: True si l'utilisateur est admin de groupe ou staff
+        """
         try:
-            is_group_admin = False
-            user_group = getattr(user, 'group', None)
             if user.is_staff or user.is_superuser:
-                is_group_admin = True
-            elif user_group:
-                is_group_admin = user_group.admin.filter(id=user.id).exists()
-            context['is_group_admin'] = is_group_admin
+                return True
+            
+            user_group = getattr(user, 'group', None)
+            if user_group:
+                return user_group.admin.filter(id=user.id).exists()
+            
+            return False
         except Exception:
-            context['is_group_admin'] = False
+            return False
 
-        # Récupération des projets depuis Django Lara
+    def _get_recent_projects(self, user):
+        """
+        Récupère les projets récents depuis l'API LARA.
+        
+        Args:
+            user: Utilisateur Django
+            
+        Returns:
+            dict: Dictionnaire avec 'results' contenant la liste des projets
+        """
         params = {
             "page_size": 5,
             "page": 1,
@@ -101,11 +148,9 @@ class DashboardView(BaseTemplateView):
                 for project in response['results']:
                     project['status_mapped'] = project.get('status', '')
 
-                context['projects'] = response
+                return response
             else:
-                context['projects'] = {"results": []}
+                return {"results": []}
         except Exception:
-            context['projects'] = {"results": []}
-
-        return context
+            return {"results": []}
 

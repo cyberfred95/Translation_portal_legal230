@@ -209,6 +209,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
+     * Affiche une erreur via le système Toast ou console
+     * Utilise AppBase.showError si disponible, sinon fallback local
+     * @param {string|Object} error - Message d'erreur ou objet d'erreur
+     */
+    function showError(error) {
+        const errorMessage = typeof error === 'string' ? error : (error?.detail || error?.message || trans.error_occured);
+        if (window.AppBase && window.AppBase.showError) {
+            window.AppBase.showError(errorMessage);
+        } else if (window.Toast && window.Toast.error) {
+            window.Toast.error(errorMessage);
+        } else {
+            console.error('Error:', errorMessage);
+            alert(errorMessage);
+        }
+    }
+
+    /**
      * Traite la réponse de l'API
      * @param {Object} data - Données reçues de l'API
      */
@@ -216,9 +233,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (data.result) {
             displayResults(data.result);
         } else if (data.detail) {
-            alert(data.detail);
+            showError(data.detail);
         } else {
-            alert(trans.error_occured);
+            showError(trans.error_occured);
         }
     }
 
@@ -230,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function processText(promptId, text) {
         const csrfToken = getCSRFToken();
         if (!csrfToken) {
-            alert(trans.error_occured);
+            showError(trans.error_occured);
             return;
         }
 
@@ -245,11 +262,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 text: text
             })
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        return Promise.reject(errorData);
+                    }).catch(() => {
+                        return Promise.reject({ detail: `HTTP ${response.status}: ${response.statusText}` });
+                    });
+                }
+                return response.json();
+            })
             .then(data => handleAPIResponse(data))
             .catch(error => {
                 console.error('Error:', error);
-                alert(trans.error_occured);
+                showError(error);
             })
             .finally(() => resetProcessButton());
     }
@@ -291,13 +317,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const text = inputText.value.trim();
 
         if (!selectedPrompt || !text) {
-            alert(trans.select_a_prompt);
+            showError(trans.select_a_prompt);
             return;
         }
 
         const validation = validateText(text);
         if (!validation.isValid) {
-            alert(trans.text_too_short);
+            showError(trans.text_too_short);
             return;
         }
 

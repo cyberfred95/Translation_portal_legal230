@@ -228,3 +228,53 @@ def extract_language_codes_from_project(project: dict) -> tuple[str, str]:
     return source_lang, target_lang
 
 
+def detect_language_from_text(text: str) -> str:
+    """
+    Détecte la langue d'un texte et retourne le code de langue correspondant.
+    
+    Utilise langdetect pour détecter la langue, puis cherche la correspondance
+    dans la base de données Language. Si aucune correspondance n'est trouvée,
+    retourne la première langue disponible comme fallback.
+    
+    Args:
+        text: Texte à analyser pour la détection de langue
+        
+    Returns:
+        str: Code de langue en majuscules (ex: 'FR', 'EN')
+        
+    Raises:
+        langdetect.LangDetectException: Si le texte ne peut pas être analysé
+    """
+    import langdetect
+    from languages.models import Language
+    
+    tmp_language = langdetect.detect(text)
+    language = Language.objects.filter(
+        abbreviation__iexact=tmp_language.upper()
+    ).values_list('abbreviation', flat=True).first()
+    
+    if not language:
+        language = Language.objects.values_list('abbreviation', flat=True).first()
+    
+    return language.upper() if language else 'UNKNOWN'
+
+
+def prepare_text_for_language_detection(text: str, max_words: int = 500) -> str:
+    """
+    Prépare un texte pour la détection de langue en nettoyant et limitant le nombre de mots.
+    
+    Args:
+        text: Texte brut à préparer
+        max_words: Nombre maximum de mots à utiliser pour la détection
+        
+    Returns:
+        str: Texte préparé pour la détection
+    """
+    # Supprimer les balises HTML
+    text = re.sub(r'<[^>]*>', '', text)
+    # Convertir en liste de mots
+    words = text.split()
+    # Limiter le nombre de mots
+    return ' '.join(words[:max_words])
+
+

@@ -3,6 +3,13 @@
 
 <header class="header-wrapper">
     <div class="header-actions">
+        <!-- Subscription Tag -->
+        {% if user_subscription_info %}
+        <div class="header-subscription-tag-wrapper">
+            {% include 'common/subscription_tag.html' with subscription_info=user_subscription_info tag_class='header-subscription-tag' no_tooltip=True %}
+        </div>
+        {% endif %}
+
         <!-- Language switcher -->
         <div class="header-lang-switcher">
             <div class="header-lang-inner">

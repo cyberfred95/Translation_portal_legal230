@@ -13,8 +13,8 @@
   <div class="dash-subtitle">{% trans 'Lexa is specially designed to translate legal content with unmatched legal precision' %}</div>
 
   <p class="dashboard-intro" data-style="intro"></p>
-  <div class="dashboard-top">
-    <div class="dashboard-main-col">
+    <div class="dashboard-top">
+    <div class="dashboard-main-col {% if user_subscription_info and user_subscription_info.status != 'active' %}subscription-error-container{% endif %}">
       <div class="dashboard-cards-grid">
         {% trans 'CHARACTERS TRANSLATED' as characters_title %}
         {% trans 'WORDS TRANSLATED' as words_title %}
@@ -26,6 +26,7 @@
         {% include 'dashboard/dashboard_data_card.html' with title=glossaries_title value=user_glossaries_count|default:0 bg_color='#f0fdfa' numerator=user_glossaries_count denominator=max_glossaries_count color_class='color-teal' %}
       </div>
       
+      {% include 'common/subscription_error_overlay.html' %}
     </div>
     {% include 'dashboard/dashboard_quick_actions.html' %}
   </div>

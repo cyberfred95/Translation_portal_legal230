@@ -436,7 +436,7 @@ $(document).ready(function () {
             var ext = '.' + file.name.split('.').pop().toLowerCase();
             if (ext === '.csv' && file.name.length > MAX_CSV_FILENAME_LENGTH) {
                 // Message UI clair, sans déclencher d'upload inutile
-                alert(getTranslation(
+                showMessage(getTranslation(
                     'The CSV filename must not exceed 128 characters.',
                     'Le nom du fichier CSV ne doit pas dépasser 128 caractères.'
                 ));
@@ -465,7 +465,7 @@ $(document).ready(function () {
         // Vérifier si la taille totale dépasse la limite
         if (currentTotalSize + newFilesTotalSize > MAX_TOTAL_FILE_SIZE) {
             var maxSizeMB = (MAX_TOTAL_FILE_SIZE / 1024 / 1024).toFixed(0);
-            alert(getTranslation(
+            showMessage(getTranslation(
                 'Total file size exceeds the maximum allowed size of ' + maxSizeMB + ' MB.',
                 'La taille totale des fichiers dépasse la limite autorisée de ' + maxSizeMB + ' Mo.'
             ));
@@ -910,12 +910,15 @@ $(document).ready(function () {
     // ============= UTILITY FUNCTIONS =============
     
     /**
-     * Get translation based on current language code
+     * Get translation helper - uses AppBase if available, otherwise local fallback
      * @param {string} enText - English text
      * @param {string} frText - French text
      * @returns {string} Translated text
      */
     function getTranslation(enText, frText) {
+        if (window.AppBase && window.AppBase.getTranslation) {
+            return window.AppBase.getTranslation(enText, frText);
+        }
         return language_code === 'en' ? enText : frText;
     }
 
@@ -930,10 +933,34 @@ $(document).ready(function () {
     }
 
     /**
-     * Standard error handler for AJAX calls
+     * Affiche un message d'erreur ou d'information via Toast
+     * Utilise AppBase.showError si disponible
+     * @param {string} message - Message à afficher
      */
-    function handleAjaxError(error) {
-        errorNotification(error?.status, error?.responseJSON?.detail);
+    function showMessage(message) {
+        if (window.AppBase && window.AppBase.showError) {
+            window.AppBase.showError(message);
+        } else if (window.Toast && window.Toast.error) {
+            window.Toast.error(message);
+        } else {
+            console.error('Message:', message);
+            alert(message);
+        }
+    }
+
+    /**
+     * Standard error handler for AJAX calls
+     * Utilise AppBase.showError si disponible
+     * @param {Object} error - Objet d'erreur AJAX
+     * @param {string} defaultMessage - Message par défaut (optionnel)
+     */
+    function handleAjaxError(error, defaultMessage) {
+        if (window.AppBase && window.AppBase.showError) {
+            window.AppBase.showError(error, defaultMessage);
+        } else {
+            const fallbackMessage = defaultMessage || getTranslation('Something went wrong', 'Quelque chose s\'est mal passé.');
+            console.error('Error:', error?.responseJSON?.detail || error?.message || fallbackMessage);
+        }
     }
 
     /**
@@ -1366,7 +1393,7 @@ $(document).ready(function () {
         // Sécurité : limiter la longueur du nom de fichier CSV côté front
         var ext = '.' + file.name.split('.').pop().toLowerCase();
         if (ext === '.csv' && file.name.length > MAX_CSV_FILENAME_LENGTH) {
-            alert(getTranslation(
+            showMessage(getTranslation(
                 'The CSV filename must not exceed 128 characters.',
                 'Le nom du fichier CSV ne doit pas dépasser 128 caractères.'
             ));
@@ -1378,7 +1405,11 @@ $(document).ready(function () {
         if (file.size <= maxFileSize) {
             showUploadedFile(file.name);
         } else {
-            alert('File size exceeds 5MB limit.');
+            const maxSizeMB = (maxFileSize / 1024 / 1024).toFixed(0);
+            showMessage(getTranslation(
+                'File size exceeds ' + maxSizeMB + 'MB limit.',
+                'La taille du fichier dépasse la limite de ' + maxSizeMB + ' Mo.'
+            ));
             $('.glossary-file').val('');
         }
     }
@@ -1727,12 +1758,8 @@ $(document).ready(function () {
           $closeRevision.addClass('hidden');
         },
         error: function (error) {
-          const errorMessage = error?.responseJSON?.detail || window.expertRevisionMessages?.quoteRequestError || 'An error occurred while requesting the quote.';
-          if (window.Toast) {
-            window.Toast.error(errorMessage);
-          } else if (typeof handleAjaxError === 'function') {
-            handleAjaxError(error);
-          }
+          const defaultMessage = window.expertRevisionMessages?.quoteRequestError || 'An error occurred while requesting the quote.';
+          handleAjaxError(error, defaultMessage);
         }
       });
     }

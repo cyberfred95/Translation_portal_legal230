@@ -1,5 +1,4 @@
 import base64
-import re
 from urllib.parse import urlencode
 
 from django.conf import settings
@@ -19,9 +18,6 @@ from emails.models import EmailType
 from emails.send_email import send_email
 from glossaries.models import Glossary
 from legal.helpers import password_valid
-from legal.views_all import PAGINATION_PAGE_SIZE
-from subscriptions.models import SubscriptionType, UserSubscription
-from subscriptions.permissions import SubscribedPermission
 
 from .models import UserGroup, User
 from .serializers import (
@@ -140,93 +136,6 @@ class SingleAccountView(RetrieveUpdateDestroyAPIView):
             return super().delete(request, *args, **kwargs)
         else:
             return Response({"detail": "Invalid password"}, status=status.HTTP_403_FORBIDDEN)
-
-
-class InviteUserAPIView(APIView):
-    permission_classes = (SubscribedPermission,)
-
-    @staticmethod
-    def is_email_valid(email: str) -> bool:
-        """Validate email format using regex pattern."""
-        pattern = r'^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$'
-        return bool(re.match(pattern, email))
-
-    def _normalize_emails(self, emails_input) -> list:
-        """Normalize emails input: convert string to list and remove duplicates."""
-        if isinstance(emails_input, str):
-            emails = emails_input.split(',')
-        else:
-            emails = emails_input or []
-        return list(set(email.strip() for email in emails if email.strip()))
-
-    def _validate_request_data(self, request):
-        """Validate request data and return (error_response, emails_list, subscription_type_id).
-        
-        Returns:
-            tuple: (error_response or None, emails_list, subscription_type_id or None)
-        """
-        emails = self._normalize_emails(request.data.get('emails', []))
-        if not emails:
-            return Response({"detail": "Emails list should not be empty"}, status=status.HTTP_400_BAD_REQUEST), None, None
-
-        subscription_type_id = request.data.get('subscription_type_id')
-        if not subscription_type_id:
-            return Response({"detail": "Subscription type is required"}, status=status.HTTP_400_BAD_REQUEST), None, None
-
-        try:
-            subscription_type_id = int(subscription_type_id)
-            if not SubscriptionType.objects.filter(id=subscription_type_id).exists():
-                return Response({"detail": "Invalid subscription type"}, status=status.HTTP_400_BAD_REQUEST), None, None
-        except (ValueError, TypeError):
-            return Response({"detail": "Invalid subscription type"}, status=status.HTTP_400_BAD_REQUEST), None, None
-
-        return None, emails, subscription_type_id
-
-    def _send_invitation_email(self, email: str, group_id: int, subscription_type_id: int, language: str):
-        """Send invitation email to user."""
-        send_email(
-            email,
-            EmailType.USER_MANAGEMENT_INVITATION,
-            language,
-            {
-                "lexa_username": "name",
-                "lexa_email": email,
-            }
-        )
-
-    def post(self, request):
-        """Handle user invitation request."""
-        if not (request.user.group and request.user in request.user.group.admin.all()):
-            return Response(
-                {"detail": "You have to be group admin to provide this action"},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
-        error_response, emails, subscription_type_id = self._validate_request_data(request)
-        if error_response:
-            return error_response
-
-        valid_emails_sent = 0
-        for email in emails:
-            if self.is_email_valid(email):
-                self._send_invitation_email(
-                    email,
-                    request.user.group.id,
-                    subscription_type_id,
-                    request.user.language or 'en'
-                )
-                valid_emails_sent += 1
-
-        if valid_emails_sent == 0:
-            return Response(
-                {"detail": "No valid email addresses provided"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        return Response(
-            {"message": "Invitation has been successfully sent"},
-            status=status.HTTP_200_OK
-        )
 
 
 class LoginView(BaseTemplateView):

@@ -67,17 +67,25 @@
     }
 
     /**
-     * Affiche un message d'erreur via Toast ou errorNotification
+     * Affiche un message d'erreur via Toast
      * @param {Object} error - Objet d'erreur AJAX
      * @param {string} defaultMessage - Message par défaut
      */
+    /**
+     * Standard error handler for AJAX calls
+     * Utilise AppBase.showError si disponible
+     * @param {Object} error - Objet d'erreur AJAX
+     * @param {string} defaultMessage - Message par défaut (optionnel)
+     */
     function handleAjaxError(error, defaultMessage) {
-      const errorMessage = error?.responseJSON?.detail || defaultMessage;
-      
-      if (window.Toast) {
-        window.Toast.error(errorMessage);
+      if (window.AppBase && window.AppBase.showError) {
+        window.AppBase.showError(error, defaultMessage);
       } else {
-        errorNotification(error?.status, error?.responseJSON?.detail);
+        const getTranslation = window.AppBase && window.AppBase.getTranslation
+          ? window.AppBase.getTranslation
+          : (en, fr) => (language_code === 'fr' ? fr : en);
+        const fallbackMessage = defaultMessage || getTranslation('Something went wrong', 'Quelque chose s\'est mal passé.');
+        console.error('Error:', error?.responseJSON?.detail || error?.message || fallbackMessage);
       }
     }
 
@@ -394,7 +402,7 @@
           window.location.reload();
         },
         error: function (error) {
-          errorNotification(error?.status, error?.responseJSON?.detail);
+          handleAjaxError(error);
         },
       });
     }

@@ -17,7 +17,10 @@
 /* Placeholder: nous porterons progressivement les styles ici en remplaçant Tailwind/inline */
 
 /* Colonne principale (remplace style inline flex:2) */
-.dashboard-page .dashboard-main-col { flex: 2; }
+.dashboard-page .dashboard-main-col { 
+  flex: 2; 
+  position: relative;
+}
 
 /* Titre et sous-titre (remplace text-2xl/font-*) */
 .dashboard-page .dash-title { font-size: 24px; font-weight: 600; margin-bottom: 8px; color: #111827; }
@@ -264,4 +267,11 @@
 .dashboard-page .empty-icon { font-size: 48px; opacity: 0.5; }
 .dashboard-page .empty-title { font-weight: 600; }
 .dashboard-page .empty-subtitle { font-size: 0.875rem; }
+
+/* ============================================
+   Styles spécifiques pour dashboard
+   ============================================ */
+.dashboard-page .subscription-error-container {
+  border-radius: 12px;
+}
 

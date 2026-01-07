@@ -2,7 +2,7 @@
 {% load i18n %}
 
 <div class="text-translate-form-wrapper">
-    <form name="text-translate" class="text-translate-form">
+    <form name="text-translate" class="text-translate-form {% if user_subscription_info and user_subscription_info.status != 'active' %}subscription-error-container{% endif %}">
         <textarea id="text" name="text" class="hidden-textarea"></textarea>
         <input type="hidden" name="action" value="text_translate">
         {% csrf_token %}
@@ -141,6 +141,8 @@
                 <span id="quality-comments-text"></span>
             </div>
         </div>
+
+        {% include 'common/subscription_error_overlay.html' %}
 
     </form>
 </div>

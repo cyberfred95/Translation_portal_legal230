@@ -1,0 +1,113 @@
+/* ============================================
+   Subscription Tag - Styles communs partagés
+   Utilisé dans le header et my-team
+   ============================================ */
+
+/* Variables pour les styles du tag */
+:root {
+  --subscription-tag-bg: #f8fafc;
+  --subscription-tag-border: #e5e7eb;
+  --subscription-tag-error-orange: #c2410c;
+  --subscription-tag-tooltip-bg: #ffffff;
+  --subscription-tag-tooltip-border: #E5E7EB;
+  --subscription-tag-tooltip-text: #111827;
+  --subscription-tag-z-index: 1000;
+}
+
+/* Styles de base pour le tag */
+.subscription-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  background: var(--subscription-tag-bg);
+  border: 1px solid var(--subscription-tag-border);
+  cursor: default;
+}
+
+/* Icône du tag */
+.subscription-tag-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* Texte du tag */
+.subscription-tag-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+
+/* États d'erreur */
+.subscription-tag-error .subscription-tag-text,
+.subscription-tag-inactive .subscription-tag-text {
+  color: var(--subscription-tag-error-orange);
+}
+
+/* Icônes d'erreur dans les tags d'abonnement */
+.subscription-tag-error .ph-warning,
+.subscription-tag-inactive .ph-warning {
+  color: var(--subscription-tag-error-orange);
+}
+
+/* Styles pour les tooltips (affichés uniquement en cas d'erreur) */
+.subscription-tag.has-tooltip {
+  position: relative;
+}
+
+.subscription-tag.has-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 8px);
+  transform: translateX(-50%);
+  background: var(--subscription-tag-tooltip-bg);
+  color: var(--subscription-tag-tooltip-text);
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 8px 12px;
+  border-radius: 8px;
+  white-space: normal;
+  max-width: 300px;
+  word-wrap: break-word;
+  border: 1px solid var(--subscription-tag-tooltip-border);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+  z-index: var(--subscription-tag-z-index);
+}
+
+.subscription-tag.has-tooltip::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 2px);
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-bottom-color: var(--subscription-tag-tooltip-bg);
+  opacity: 0;
+  transition: opacity 150ms ease;
+  z-index: var(--subscription-tag-z-index);
+}
+
+.subscription-tag.has-tooltip:hover::after,
+.subscription-tag.has-tooltip:focus-visible::after,
+.subscription-tag.has-tooltip:hover::before,
+.subscription-tag.has-tooltip:focus-visible::before {
+  opacity: 1;
+}
+
+/* Utilitaires de couleur pour les icônes */
+.color-violet { color: #7c3aed; }
+.color-amber { color: #d97706; }
+.color-blue { color: #3b82f6; }
+.color-green { color: #16a34a; }
+.color-red { color: #dc2626; }
+.icon-muted { color: #9ca3af; }
+

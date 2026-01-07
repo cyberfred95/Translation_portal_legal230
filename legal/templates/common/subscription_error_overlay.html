@@ -1,0 +1,33 @@
+{% load i18n %}
+{% comment %}
+Template réutilisable pour afficher un overlay d'erreur d'abonnement avec flou.
+
+Utilisation: {% include 'common/subscription_error_overlay.html' %}
+
+Variables requises dans le contexte:
+- user_subscription_info: dict avec 'status', 'error_details'
+
+Le conteneur parent doit avoir:
+- position: relative
+- La classe CSS: subscription-error-container
+{% endcomment %}
+
+{% if user_subscription_info and user_subscription_info.status != 'active' %}
+<div class="subscription-error-overlay">
+    <div class="subscription-error-message">
+        <i class="ph-fill ph-warning icon-48"></i>
+        <h3 class="subscription-error-title">{% trans 'Subscription Error' %}</h3>
+        <p class="subscription-error-details">
+            {% if user_subscription_info.status == 'no_subscription' %}
+                {% trans 'No active subscription' %}
+            {% elif user_subscription_info.status == 'error' %}
+                {{ user_subscription_info.error_details }}
+            {% endif %}
+        </p>
+        <p class="subscription-error-help">
+            {% trans 'If you think this is an error, please contact an administrator' %}
+        </p>
+    </div>
+</div>
+{% endif %}
+
