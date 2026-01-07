@@ -25,7 +25,12 @@ class DetectTextLanguageView(APIView):
         text_for_detection = self.get_text_for_detection(text)
         symbols_count = len(text_for_detection)
         texts = self.text_string_to_array(text)
-        if translation_allowed(request, words_count=len(texts), symbols_count=symbols_count):
+        is_allowed, error_code, error_message = translation_allowed(
+            request,
+            words_count=len(texts),
+            symbols_count=symbols_count
+        )
+        if is_allowed:
             try:
                 tmp_language = langdetect.detect(text_for_detection)
                 language = Language.objects.filter(abbreviation__iexact=tmp_language.upper()).values_list(
@@ -36,8 +41,10 @@ class DetectTextLanguageView(APIView):
             except langdetect.LangDetectException:
                 return Response({"detail": "Source text should not be blank"}, status=status.HTTP_400_BAD_REQUEST)
             return Response({"language": language.upper()})
-        return Response({"detail": "You are not allowed to translate such amount of data"},
-                        status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"detail": str(error_message) if error_message else "Translation not allowed"},
+            status=status.HTTP_403_FORBIDDEN
+        )
 
     def get_text_for_detection(self, text):
         text = self.text_string_to_array(text)

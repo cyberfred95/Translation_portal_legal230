@@ -302,11 +302,19 @@ def text_translation(request):
     
     logger.info(f"LARA_TRANSLATION_START - User: {user_id} ({user_uuid}) - Text length: {len(text)} chars - Words: {words_count} - Source: {request.POST.get('source_language')} -> Target: {request.POST.get('target_language')} - Domain: {request.POST.get('domain_name')}")
 
-    if not translation_allowed(request=request, words_count=words_count, symbols_count=symbols_count):
-        logger.warning(f"LARA_TRANSLATION_DENIED - User: {user_id} - Translation not allowed - Words: {words_count} - Symbols: {symbols_count}")
+    is_allowed, error_code, error_message = translation_allowed(
+        request=request,
+        words_count=words_count,
+        symbols_count=symbols_count
+    )
+    if not is_allowed:
+        logger.warning(
+            f"LARA_TRANSLATION_DENIED - User: {user_id} - Error: {error_code} - "
+            f"Words: {words_count} - Symbols: {symbols_count}"
+        )
         return JsonResponse(
-            {"detail": "You are not allowed to translate such amount of data"},
-            status=status.HTTP_400_BAD_REQUEST
+            {"detail": str(error_message) if error_message else "Translation not allowed"},
+            status=status.HTTP_403_FORBIDDEN
         )
 
     source_language = request.POST.get('source_language')
@@ -477,8 +485,17 @@ def file_translate(request):
             'symbols_count': file_symbols_count
         })
 
-    if not translation_allowed(request, words_count=total_words_count, files_count=len(files), symbols_count=total_symbols_count):
-        return JsonResponse({"detail": "You are out of translation for now"}, status=status.HTTP_400_BAD_REQUEST)
+    is_allowed, error_code, error_message = translation_allowed(
+        request,
+        words_count=total_words_count,
+        files_count=len(files),
+        symbols_count=total_symbols_count
+    )
+    if not is_allowed:
+        return JsonResponse(
+            {"detail": str(error_message) if error_message else "Translation not allowed"},
+            status=status.HTTP_403_FORBIDDEN
+        )
 
     source_language = request.POST.get('source_language')
     target_language = request.POST.get('target_language')
@@ -1239,8 +1256,13 @@ class LanguageDetectView(APIView):
                 words_count=words_count,
                 symbols_count=symbols_count
             )
-            if translation_allowed(request, files_count=len(files), words_count=words_count,
-                                   symbols_count=symbols_count):
+            is_allowed, _, _ = translation_allowed(
+                request,
+                files_count=len(files),
+                words_count=words_count,
+                symbols_count=symbols_count
+            )
+            if is_allowed:
 
                 try:
                     tmp_language = langdetect.detect(text_for_detection)
@@ -1315,7 +1337,8 @@ class DetectTextLanguageView(APIView):
         text_for_detection = self.get_text_for_detection(text)
         symbols_count = len(text_for_detection)
         texts = self.text_string_to_array(text)
-        if translation_allowed(request, words_count=len(texts), symbols_count=symbols_count):
+        is_allowed, _, _ = translation_allowed(request, words_count=len(texts), symbols_count=symbols_count)
+        if is_allowed:
             try:
                 tmp_language = langdetect.detect(text_for_detection)
                 language = Language.objects.filter(abbreviation__iexact=tmp_language.upper()).values_list(

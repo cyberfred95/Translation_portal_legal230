@@ -961,8 +961,60 @@ msgid ""
 "You are not allowed to perform this action, please contact your group "
 "administrator"
 msgstr ""
-"Vous n’avez pas l’autorisation nécessaire pour effectuer cette action. "
-"Veuillez contacter l’administrateur de votre groupe."
+"Vous n'avez pas l'autorisation nécessaire pour effectuer cette action. "
+"Veuillez contacter l'administrateur de votre groupe."
+
+#: subscriptions/permissions.py
+msgid "You do not have an active subscription. Please contact your group administrator."
+msgstr "Vous n'avez pas d'abonnement actif. Veuillez contacter l'administrateur de votre groupe."
+
+#: subscriptions/permissions.py
+msgid "Your subscription is not active (status: {status}). Please contact your group administrator."
+msgstr "Votre abonnement n'est pas actif (statut : {status}). Veuillez contacter l'administrateur de votre groupe."
+
+#: subscriptions/permissions.py
+msgid "Your subscription has expired on {end_date}. Please renew your subscription."
+msgstr "Votre abonnement a expiré le {end_date}. Veuillez renouveler votre abonnement."
+
+#: subscriptions/permissions.py
+msgid "Your subscription will start on {start_date}."
+msgstr "Votre abonnement commencera le {start_date}."
+
+#: subscriptions/permissions.py
+msgid "You must belong to a group to use this feature. Please contact your group administrator."
+msgstr "Vous devez appartenir à un groupe pour utiliser cette fonctionnalité. Veuillez contacter l'administrateur de votre groupe."
+
+#: subscriptions/permissions.py
+msgid "You do not have a subscription. Please contact your group administrator."
+msgstr "Vous n'avez pas d'abonnement. Veuillez contacter l'administrateur de votre groupe."
+
+#: subscriptions/permissions.py
+msgid "Your subscription does not include access to writing features. Please upgrade your subscription."
+msgstr "Votre abonnement n'inclut pas l'accès aux fonctionnalités d'écriture. Veuillez mettre à niveau votre abonnement."
+
+#: subscriptions/permissions.py
+msgid "Staff user has full access."
+msgstr "L'utilisateur staff a un accès complet."
+
+#: subscriptions/permissions.py
+msgid "User has valid subscription permissions."
+msgstr "L'utilisateur a des permissions d'abonnement valides."
+
+#: subscriptions/permissions.py
+msgid "Subscription is valid."
+msgstr "L'abonnement est valide."
+
+#: subscriptions/helpers.py
+msgid "You have exceeded your file translation quota. You have used {used}/{max} files. Please upgrade your subscription or contact your group administrator."
+msgstr "Vous avez dépassé votre quota de traduction de fichiers. Vous avez utilisé {used}/{max} fichiers. Veuillez mettre à niveau votre abonnement ou contacter l'administrateur de votre groupe."
+
+#: subscriptions/helpers.py
+msgid "You have exceeded your word translation quota. You have used {used}/{max} words. Please upgrade your subscription or contact your group administrator."
+msgstr "Vous avez dépassé votre quota de traduction de mots. Vous avez utilisé {used}/{max} mots. Veuillez mettre à niveau votre abonnement ou contacter l'administrateur de votre groupe."
+
+#: subscriptions/helpers.py
+msgid "You have exceeded your character translation quota. You have used {used}/{max} characters. Please upgrade your subscription or contact your group administrator."
+msgstr "Vous avez dépassé votre quota de traduction de caractères. Vous avez utilisé {used}/{max} caractères. Veuillez mettre à niveau votre abonnement ou contacter l'administrateur de votre groupe."
 
 #: templates/admin/glossaries/batch_upload.html:4
 #: templates/admin/glossaries/check_consistency.html:4

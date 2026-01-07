@@ -79,9 +79,14 @@ class WritingProcessAPIView(APIView):
         symbols_count = len(text)
 
         # Check quota BEFORE processing
-        if not translation_allowed(request, words_count=words_count, symbols_count=symbols_count):
+        is_allowed, error_code, error_message = translation_allowed(
+            request,
+            words_count=words_count,
+            symbols_count=symbols_count
+        )
+        if not is_allowed:
             return Response(
-                {"detail": "You have exceeded your usage quota"},
+                {"detail": str(error_message) if error_message else "Translation not allowed"},
                 status=status.HTTP_403_FORBIDDEN
             )
 
