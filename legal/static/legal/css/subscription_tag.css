@@ -7,7 +7,7 @@
 :root {
   --subscription-tag-bg: #f8fafc;
   --subscription-tag-border: #e5e7eb;
-  --subscription-tag-error-text: #dc2626;
+  --subscription-tag-error-orange: #c2410c;
   --subscription-tag-tooltip-bg: #ffffff;
   --subscription-tag-tooltip-border: #E5E7EB;
   --subscription-tag-tooltip-text: #111827;
@@ -46,7 +46,13 @@
 /* États d'erreur */
 .subscription-tag-error .subscription-tag-text,
 .subscription-tag-inactive .subscription-tag-text {
-  color: var(--subscription-tag-error-text);
+  color: var(--subscription-tag-error-orange);
+}
+
+/* Icônes d'erreur dans les tags d'abonnement */
+.subscription-tag-error .ph-warning,
+.subscription-tag-inactive .ph-warning {
+  color: var(--subscription-tag-error-orange);
 }
 
 /* Styles pour les tooltips (affichés uniquement en cas d'erreur) */

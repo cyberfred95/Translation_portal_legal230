@@ -154,9 +154,6 @@
   height: 2.5rem;
 }
 
-.header-subscription-tag {
-  /* Hérite des styles de base de subscription-tag */
-}
 
 .header-subscription-tag .subscription-tag-text {
   color: var(--header-text-primary);

@@ -371,9 +371,43 @@ def _build_subscription_error_message(subscription_names: List[str]) -> str:
         subscription_names: Liste des noms d'abonnements
         
     Returns:
-        str: Message d'erreur formaté
+        str: Message d'erreur formaté et traduit
     """
-    return f'Multiple active subscriptions found: {", ".join(subscription_names)}'
+    names = ", ".join(subscription_names)
+    return _("Multiple active subscriptions found: {subscription_names}").format(
+        subscription_names=names
+    )
+
+
+def _format_no_subscription_response() -> Dict[str, Optional[str]]:
+    """Retourne la réponse formatée pour aucun abonnement."""
+    return {
+        'status': SUBSCRIPTION_STATUS_NO_SUBSCRIPTION,
+        'name': None,
+        'product_type': None,
+        'error_details': _("No active subscription found.")
+    }
+
+
+def _format_active_subscription_response(subscription: UserSubscription) -> Dict[str, Optional[str]]:
+    """Retourne la réponse formatée pour un abonnement actif."""
+    return {
+        'status': SUBSCRIPTION_STATUS_ACTIVE,
+        'name': subscription.subscription.name,
+        'product_type': subscription.subscription.product_type,
+        'error_details': None
+    }
+
+
+def _format_multiple_subscriptions_error_response(active_subscriptions: List[UserSubscription]) -> Dict[str, Optional[str]]:
+    """Retourne la réponse formatée pour plusieurs abonnements actifs (erreur)."""
+    subscription_names = [sub.subscription.name for sub in active_subscriptions]
+    return {
+        'status': SUBSCRIPTION_STATUS_ERROR,
+        'name': None,
+        'product_type': None,
+        'error_details': _build_subscription_error_message(subscription_names)
+    }
 
 
 def format_subscription_info_for_display(user) -> Dict[str, Optional[str]]:
@@ -394,27 +428,10 @@ def format_subscription_info_for_display(user) -> Dict[str, Optional[str]]:
     active_subscriptions = get_active_user_subscriptions(user)
     
     if not active_subscriptions:
-        return {
-            'status': SUBSCRIPTION_STATUS_NO_SUBSCRIPTION,
-            'name': None,
-            'product_type': None,
-            'error_details': 'No active subscription found.'
-        }
+        return _format_no_subscription_response()
     
     if len(active_subscriptions) == 1:
-        subscription = active_subscriptions[0]
-        return {
-            'status': SUBSCRIPTION_STATUS_ACTIVE,
-            'name': subscription.subscription.name,
-            'product_type': subscription.subscription.product_type,
-            'error_details': None
-        }
+        return _format_active_subscription_response(active_subscriptions[0])
     
     # Plusieurs abonnements actifs - c'est une erreur
-    subscription_names = [sub.subscription.name for sub in active_subscriptions]
-    return {
-        'status': SUBSCRIPTION_STATUS_ERROR,
-        'name': None,
-        'product_type': None,
-        'error_details': _build_subscription_error_message(subscription_names)
-    }
+    return _format_multiple_subscriptions_error_response(active_subscriptions)

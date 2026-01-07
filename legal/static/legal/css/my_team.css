@@ -185,10 +185,6 @@
   min-width: 0;
 }
 
-/* Classes legacy conservées pour compatibilité (non utilisées mais gardées au cas où) */
-.my-team-page .license-text { font-family: 'Poppins', sans-serif; font-weight: 400; font-size: 14px; line-height: 24px; color: #181932; }
-.my-team-page .inactive-text { font-family: 'Poppins', sans-serif; font-weight: 400; font-size: 14px; line-height: 24px; color: #9CA3AF; font-style: italic; }
-.my-team-page .error-text { font-family: 'Poppins', sans-serif; font-weight: 400; font-size: 14px; line-height: 24px; color: #DC2626; }
 
 /* Icon buttons */
 .my-team-page .btn-icon { background: none; border: none; cursor: pointer; }
