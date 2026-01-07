@@ -26,6 +26,16 @@ class SubscriptionPermissionError(Enum):
     SUCCESS = "success"
 
 
+# Constantes
+_DATE_FORMAT = "%Y-%m-%d"
+_ACTIVE_SUBSCRIPTION_STATES = {
+    UserSubscription.UserSubscriptionChoices.INCOMPLETE,
+    UserSubscription.UserSubscriptionChoices.ACTIVE,
+    UserSubscription.UserSubscriptionChoices.TRIALING,
+    UserSubscription.UserSubscriptionChoices.PAST_DUE,
+}
+
+
 def is_user_subscription_active(status: UserSubscription.UserSubscriptionChoices) -> bool:
     """
     Vérifie si un statut d'abonnement est considéré comme actif.
@@ -36,13 +46,7 @@ def is_user_subscription_active(status: UserSubscription.UserSubscriptionChoices
     Returns:
         True si le statut est actif, False sinon
     """
-    active_states = {
-        UserSubscription.UserSubscriptionChoices.INCOMPLETE,
-        UserSubscription.UserSubscriptionChoices.ACTIVE,
-        UserSubscription.UserSubscriptionChoices.TRIALING,
-        UserSubscription.UserSubscriptionChoices.PAST_DUE,
-    }
-    return status in active_states
+    return status in _ACTIVE_SUBSCRIPTION_STATES
 
 
 def _check_subscription_status(subscription: UserSubscription) -> Tuple[bool, SubscriptionPermissionError, str]:
@@ -63,7 +67,7 @@ def _check_subscription_status(subscription: UserSubscription) -> Tuple[bool, Su
                 status=subscription.get_status_display()
             )
         )
-    return (True, SubscriptionPermissionError.SUCCESS, _("Subscription status is valid."))
+    return (True, SubscriptionPermissionError.SUCCESS, "")
 
 
 def _check_subscription_dates(subscription: UserSubscription) -> Tuple[bool, SubscriptionPermissionError, str]:
@@ -83,7 +87,7 @@ def _check_subscription_dates(subscription: UserSubscription) -> Tuple[bool, Sub
             False,
             SubscriptionPermissionError.EXPIRED,
             _("Your subscription has expired on {end_date}. Please renew your subscription.").format(
-                end_date=subscription.end_date.strftime("%Y-%m-%d")
+                end_date=subscription.end_date.strftime(_DATE_FORMAT)
             )
         )
     
@@ -92,11 +96,11 @@ def _check_subscription_dates(subscription: UserSubscription) -> Tuple[bool, Sub
             False,
             SubscriptionPermissionError.NOT_STARTED,
             _("Your subscription will start on {start_date}.").format(
-                start_date=subscription.start_date.strftime("%Y-%m-%d")
+                start_date=subscription.start_date.strftime(_DATE_FORMAT)
             )
         )
     
-    return (True, SubscriptionPermissionError.SUCCESS, _("Subscription dates are valid."))
+    return (True, SubscriptionPermissionError.SUCCESS, "")
 
 
 def validate_subscription(
@@ -122,18 +126,16 @@ def validate_subscription(
             _("You do not have an active subscription. Please contact your group administrator.")
         )
     
-    # Vérification du statut
     is_valid, error_code, error_message = _check_subscription_status(subscription)
     if not is_valid:
         return (False, error_code, error_message)
     
-    # Vérification des dates si demandée
     if check_dates:
         is_valid, error_code, error_message = _check_subscription_dates(subscription)
         if not is_valid:
             return (False, error_code, error_message)
     
-    return (True, SubscriptionPermissionError.SUCCESS, _("Subscription is valid."))
+    return (True, SubscriptionPermissionError.SUCCESS, "")
 
 
 def _check_user_group(user, require_group: bool) -> Tuple[bool, Optional[SubscriptionPermissionError], Optional[str]]:
@@ -176,7 +178,7 @@ def _check_writing_access(subscription: UserSubscription) -> Tuple[bool, Subscri
             SubscriptionPermissionError.NO_WRITING_ACCESS,
             _("Your subscription does not include access to writing features. Please upgrade your subscription.")
         )
-    return (True, SubscriptionPermissionError.SUCCESS, _("Writing access granted."))
+    return (True, SubscriptionPermissionError.SUCCESS, "")
 
 
 def check_user_subscription_permission(
@@ -199,22 +201,15 @@ def check_user_subscription_permission(
         - (True, SubscriptionPermissionError.SUCCESS, message) si autorisé
         - (False, error_code, message_i18n) si non autorisé
     """
-    # Les staffs ont toujours accès
-    if user.is_staff:
-        return (True, SubscriptionPermissionError.SUCCESS, _("Staff user has full access."))
-    
-    # Vérification du groupe
     is_valid, error_code, error_message = _check_user_group(user, require_group)
     if not is_valid:
         return (False, error_code, error_message)
     
-    # Récupération et validation de l'abonnement
     subscription = user.subscriptions.first()
     is_valid, error_code, error_message = validate_subscription(subscription, check_dates=check_dates)
     if not is_valid:
         return (False, error_code, error_message)
     
-    # Vérification de l'accès à l'écriture si requis
     if require_writing_access:
         is_valid, error_code, error_message = _check_writing_access(subscription)
         if not is_valid:
@@ -227,11 +222,13 @@ class SubscribedPermission(permissions.BasePermission):
     """
     Permission DRF pour vérifier qu'un utilisateur a un abonnement valide.
     
-    Les utilisateurs staff sont toujours autorisés.
-    Les autres utilisateurs doivent avoir :
+    Tous les utilisateurs (y compris staff) doivent avoir :
     - Un groupe
     - Une souscription valide (statut actif, dates valides)
     - Optionnellement, l'accès à l'écriture (si requires_writing_access=True sur la vue)
+    
+    Note: Les utilisateurs staff ne bénéficient plus d'un passe-droit automatique
+    et doivent respecter les mêmes règles d'abonnement que les autres utilisateurs.
     """
     message = gettext_lazy(
         "You are not allowed to perform this action, please contact your group administrator"
