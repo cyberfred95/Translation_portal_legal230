@@ -25,16 +25,149 @@
     const FADE_ANIMATION_DURATION = 300;
 
     // ============================================================================
-    // VARIABLES
+    // VARIABLES ET SÉLECTEURS
     // ============================================================================
     
     let file = null;
+    let currentEditUrl = null;
+    
+    // Sélecteurs jQuery mis en cache
     const $modal = $('#modal');
     const $closeIcon = $('#closeIcon');
     const $editModal = $('#edit-modal');
     const $editForm = $editModal.find('form');
     const $editInput = $editForm.find('input[type="text"]');
-    let currentEditUrl = null;
+    const $addForm = $modal.find('form');
+    const $continueButton = $('.create-glossary');
+    const $glossaryFileInput = $('.glossary-file');
+
+    // ============================================================================
+    // FONCTIONS UTILITAIRES
+    // ============================================================================
+
+    /**
+     * Vérifie si un bouton est désactivé
+     * @param {jQuery} $button - Bouton jQuery à vérifier
+     * @returns {boolean} True si le bouton est désactivé
+     */
+    function isButtonDisabled($button) {
+      return $button.prop('disabled') || $button.hasClass('cursor-not-allowed');
+    }
+
+    /**
+     * Obtient les en-têtes AJAX avec le token CSRF
+     * @param {Object} additionalHeaders - En-têtes supplémentaires optionnels
+     * @returns {Object} Objet contenant les en-têtes
+     */
+    function getAjaxHeaders(additionalHeaders = {}) {
+      return {
+        'X-CSRFToken': getCookie('csrftoken'),
+        ...additionalHeaders
+      };
+    }
+
+    /**
+     * Affiche un message d'erreur via Toast ou errorNotification
+     * @param {Object} error - Objet d'erreur AJAX
+     * @param {string} defaultMessage - Message par défaut
+     */
+    function handleAjaxError(error, defaultMessage) {
+      const errorMessage = error?.responseJSON?.detail || defaultMessage;
+      
+      if (window.Toast) {
+        window.Toast.error(errorMessage);
+      } else {
+        errorNotification(error?.status, error?.responseJSON?.detail);
+      }
+    }
+
+    /**
+     * Affiche un message de succès via Toast si disponible
+     * @param {string} message - Message de succès
+     */
+    function showSuccessMessage(message) {
+      if (window.Toast && message) {
+        window.Toast.success(message);
+      }
+    }
+
+    // ============================================================================
+    // GESTION DES WARNINGS
+    // ============================================================================
+
+    /**
+     * Affiche un message d'avertissement dans la modale
+     * @param {string} message - Message à afficher
+     */
+    function showWarning(message) {
+      $('#glossary-warning-text').text(message);
+      $('#glossary-warning').removeClass('hidden');
+    }
+
+    /**
+     * Cache le message d'avertissement
+     */
+    function hideWarning() {
+      $('#glossary-warning').addClass('hidden');
+      $('#glossary-warning-text').text('');
+    }
+
+    // Exposer les fonctions globalement
+    window.showGlossaryWarning = showWarning;
+    window.hideGlossaryWarning = hideWarning;
+
+    // ============================================================================
+    // GESTION DES BOUTONS (LOADING, VALIDATION)
+    // ============================================================================
+
+    /**
+     * Active l'état de chargement du bouton
+     * @param {jQuery} $button - Bouton jQuery
+     */
+    function setButtonLoading($button) {
+      $button.prop('disabled', true).addClass('cursor-not-allowed opacity-75');
+      const spinner = '<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="margin-right: 0.5rem;"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+      $button.prepend(spinner);
+    }
+
+    /**
+     * Désactive l'état de chargement du bouton
+     * @param {jQuery} $button - Bouton jQuery
+     */
+    function removeButtonLoading($button) {
+      $button.prop('disabled', false)
+             .removeClass('cursor-not-allowed opacity-75')
+             .find('svg.animate-spin').remove();
+    }
+
+    /**
+     * Valide le formulaire d'ajout de glossaire et met à jour l'état du bouton
+     */
+    function validateGlossaryForm() {
+      const hasFile = $glossaryFileInput[0]?.files.length > 0;
+      
+      hideWarning();
+      
+      if (hasFile) {
+        $continueButton.prop('disabled', false)
+                      .removeClass('bg-gray-400 cursor-not-allowed')
+                      .addClass('bg-green-800 hover:bg-green-600 cursor-pointer');
+      } else {
+        $continueButton.prop('disabled', true)
+                      .removeClass('bg-green-800 hover:bg-green-600 cursor-pointer')
+                      .addClass('bg-gray-400 cursor-not-allowed');
+      }
+    }
+
+    /**
+     * Réinitialise complètement l'état du formulaire d'ajout
+     */
+    function resetAddFormState() {
+      resetUploadArea();
+      hideWarning();
+      validateGlossaryForm();
+      removeButtonLoading($continueButton);
+    }
 
     // ============================================================================
     // GESTION DE LA MODALE D'AJOUT
@@ -46,6 +179,7 @@
     function openAddModal() {
       $modal.removeClass('hidden');
       $closeIcon.removeClass('hidden');
+      validateGlossaryForm();
     }
 
     /**
@@ -54,19 +188,8 @@
     function closeAddModal() {
       $modal.addClass('hidden');
       $closeIcon.addClass('hidden');
-      resetUploadArea();
-      hideWarning();
-      validateGlossaryForm();
+      resetAddFormState();
     }
-
-    $('#openModal').on('click', openAddModal);
-    $('#closeModal, #closeIcon').on('click', closeAddModal);
-
-    $(window).on('click', function (event) {
-      if (event.target === $modal[0]) {
-        closeAddModal();
-      }
-    });
 
     // ============================================================================
     // GESTION DU FICHIER
@@ -88,36 +211,105 @@
     function resetUploadArea() {
       $('#uploadButton').removeClass('hidden');
       $('#fileInfo').addClass('hidden');
-      $('.glossary-file').val('');
+      $glossaryFileInput.val('');
       file = null;
     }
 
     // Exposer la fonction globalement
     window.resetGlossaryUploadArea = resetUploadArea;
 
-    $('#uploadButton').on('click', function () {
-      $('.glossary-file').click();
-    });
-
-    $('.glossary-file').on('change', function (e) {
-      file = e.target.files[0];
-      if (file) {
-        if (file.size <= MAX_FILE_SIZE) {
-          showUploadedFile(file.name);
-        } else {
-          showWarning(window.glossaryMessages?.fileTooBig || 'File size exceeds 5MB limit.');
-          $(this).val('');
-          file = null;
-        }
+    /**
+     * Valide et traite le fichier sélectionné
+     * @param {File} selectedFile - Fichier sélectionné
+     */
+    function handleFileSelection(selectedFile) {
+      if (!selectedFile) {
+        validateGlossaryForm();
+        return;
       }
+
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        showWarning(window.glossaryMessages?.fileTooBig || 'File size exceeds 5MB limit.');
+        $glossaryFileInput.val('');
+        file = null;
+      } else {
+        file = selectedFile;
+        showUploadedFile(selectedFile.name);
+      }
+      
       validateGlossaryForm();
-    });
+    }
 
-    $(document).on('click', '.remove-file', function () {
-      resetUploadArea();
-      setTimeout(validateGlossaryForm, 100);
-    });
+    // ============================================================================
+    // GESTION DE L'AJOUT DE GLOSSAIRE
+    // ============================================================================
 
+    /**
+     * Gère la création d'un nouveau glossaire
+     */
+    function handleCreateGlossary() {
+      hideWarning();
+
+      if (!file) {
+        showWarning(window.glossaryMessages?.pleaseSelectFile || 'Please select a file to upload');
+        return;
+      }
+
+      setButtonLoading($continueButton);
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      $.ajax({
+        url: add_glossary,
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: getAjaxHeaders({
+          'X-Requested-With': 'XMLHttpRequest'
+        }),
+        success: function (response) {
+          closeAddModal();
+          showSuccessMessage(window.glossaryMessages?.addedSuccess);
+          
+          if (response) {
+            addGlossaryToList(response);
+          }
+        },
+        error: function (error) {
+          removeButtonLoading($continueButton);
+          const errorMessage = error?.responseJSON?.detail || window.glossaryMessages?.errorOccurred || 'An error occurred while adding the glossary.';
+          showWarning(errorMessage);
+          handleAjaxError(error, errorMessage);
+        },
+      });
+    }
+
+    /**
+     * Empêche la soumission du formulaire si le bouton est désactivé
+     */
+    function preventFormSubmissionIfDisabled(e) {
+      if (isButtonDisabled($continueButton)) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    }
+
+    /**
+     * Empêche le clic sur le bouton s'il est désactivé
+     */
+    function preventClickIfDisabled(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      if (isButtonDisabled($(this))) {
+        return false;
+      }
+      
+      handleCreateGlossary();
+    }
 
     // ============================================================================
     // GESTION DE LA SUPPRESSION
@@ -134,56 +326,29 @@
         type: 'DELETE',
         processData: false,
         contentType: false,
-        headers: {
-          'X-CSRFToken': getCookie('csrftoken')
-        },
+        headers: getAjaxHeaders(),
         success: function () {
           $row.fadeOut(FADE_ANIMATION_DURATION, function() {
             $(this).remove();
           });
-          
-          if (window.Toast && window.glossaryMessages?.deletedSuccess) {
-            window.Toast.success(window.glossaryMessages.deletedSuccess);
-          }
+          showSuccessMessage(window.glossaryMessages?.deletedSuccess);
         },
         error: function (error) {
           const errorMessage = error?.responseJSON?.detail || window.glossaryMessages?.deleteError || 'An error occurred while deleting the glossary.';
-          if (window.Toast) {
-            window.Toast.error(errorMessage);
-          } else {
-            errorNotification(error?.status, error?.responseJSON?.detail);
-          }
+          handleAjaxError(error, errorMessage);
         },
       });
     }
 
-    $(document).on('click', '.delete-project', function () {
+    /**
+     * Gère l'affichage/masquage des tooltips de suppression
+     */
+    function handleDeleteTooltip($deleteButton, show) {
       $('.tooltip').addClass('opacity-0 invisible').removeClass('opacity-100 visible');
-      $(this).find('.tooltip').removeClass('opacity-0 invisible').addClass('opacity-100 visible');
-    });
-
-    $(document).on('click', function (e) {
-      if (!$(e.target).closest('.delete-project').length) {
-        $('.tooltip').addClass('opacity-0 invisible').removeClass('opacity-100 visible');
+      if (show) {
+        $deleteButton.find('.tooltip').removeClass('opacity-0 invisible').addClass('opacity-100 visible');
       }
-    });
-
-    $(document).on('click', '.allow-delete', function () {
-      const $deleteButton = $(this).closest('.delete-project');
-      const deleteUrl = $deleteButton.data('delete-url');
-      const $row = $deleteButton.closest('.glossary-row');
-
-      if (deleteUrl && $row.length) {
-        deleteGlossary(deleteUrl, $row);
-      }
-    });
-
-    $(document).on('click', '.cancel-delete', function (e) {
-      e.stopPropagation();
-      $(this).closest('.tooltip').addClass('opacity-0 invisible').removeClass('opacity-100 visible');
-    });
-  });
-})();
+    }
 
     // ============================================================================
     // GESTION DE L'ÉDITION
@@ -207,21 +372,10 @@
       $editModal.removeClass('flex').addClass('hidden');
     }
 
-    $('.edit-glossary').on('click', function () {
-      const glossaryName = $(this).closest('td').find('span').text().trim();
-      const editUrl = $(this).data('edit-url');
-      openEditModal(glossaryName, editUrl);
-    });
-
-    $('#close-edit-modal').on('click', closeEditModal);
-
-    $(window).on('click', function (e) {
-      if ($(e.target).is($editModal)) {
-        closeEditModal();
-      }
-    });
-
-    $editForm.on('submit', function (e) {
+    /**
+     * Gère la soumission du formulaire d'édition
+     */
+    function handleEditSubmit(e) {
       e.preventDefault();
 
       const newName = $editInput.val();
@@ -234,9 +388,7 @@
         data: formData,
         processData: false,
         contentType: false,
-        headers: {
-          'X-CSRFToken': getCookie('csrftoken')
-        },
+        headers: getAjaxHeaders(),
         success: function () {
           closeEditModal();
           window.location.reload();
@@ -245,7 +397,7 @@
           errorNotification(error?.status, error?.responseJSON?.detail);
         },
       });
-    });
+    }
 
     // ============================================================================
     // GESTION DE LA LISTE DES GLOSSAIRES
@@ -339,131 +491,77 @@
     }
 
     // ============================================================================
-    // GESTION DE L'AJOUT DE GLOSSAIRE
+    // INITIALISATION DES GESTIONNAIRES D'ÉVÉNEMENTS
     // ============================================================================
 
-    /**
-     * Active l'état de chargement du bouton
-     * @param {jQuery} $button - Bouton jQuery
-     */
-    function setButtonLoading($button) {
-      $button.prop('disabled', true).addClass('cursor-not-allowed opacity-75');
-      const spinner = '<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="margin-right: 0.5rem;"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
-      $button.prepend(spinner);
-    }
-
-    /**
-     * Désactive l'état de chargement du bouton
-     * @param {jQuery} $button - Bouton jQuery
-     */
-    function removeButtonLoading($button) {
-      $button.prop('disabled', false)
-             .removeClass('cursor-not-allowed opacity-75')
-             .find('svg.animate-spin').remove();
-    }
-
-    /**
-     * Gère la création d'un nouveau glossaire
-     */
-    function handleCreateGlossary() {
-      hideWarning();
-
-      if (!file) {
-        showWarning(window.glossaryMessages?.pleaseSelectFile || 'Please select a file to upload');
-        return;
+    // Modale d'ajout
+    $('#openModal').on('click', openAddModal);
+    $('#closeModal, #closeIcon').on('click', closeAddModal);
+    $(window).on('click', function (event) {
+      if (event.target === $modal[0]) {
+        closeAddModal();
       }
-
-      const $button = $('.create-glossary');
-      setButtonLoading($button);
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      $.ajax({
-        url: add_glossary,
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRFToken': getCookie('csrftoken'),
-        },
-        success: function (response) {
-          closeAddModal();
-          
-          if (window.Toast && window.glossaryMessages?.addedSuccess) {
-            window.Toast.success(window.glossaryMessages.addedSuccess);
-          }
-          
-          if (response) {
-            addGlossaryToList(response);
-          }
-        },
-        error: function (error) {
-          removeButtonLoading($button);
-          
-          const errorMessage = error?.responseJSON?.detail || window.glossaryMessages?.errorOccurred || 'An error occurred while adding the glossary.';
-          showWarning(errorMessage);
-          
-          if (window.Toast) {
-            window.Toast.error(errorMessage);
-          }
-        },
-      });
-    }
-
-    $(document).on('click', '.create-glossary', function (e) {
-      e.preventDefault();
-      handleCreateGlossary();
     });
 
-    // ============================================================================
-    // GESTION DES WARNINGS
-    // ============================================================================
+    // Gestion du fichier
+    $('#uploadButton').on('click', function () {
+      $glossaryFileInput.click();
+    });
 
-    /**
-     * Affiche un message d'avertissement dans la modale
-     * @param {string} message - Message à afficher
-     */
-    function showWarning(message) {
-      $('#glossary-warning-text').text(message);
-      $('#glossary-warning').removeClass('hidden');
-    }
+    $glossaryFileInput.on('change', function (e) {
+      handleFileSelection(e.target.files[0]);
+    });
 
-    /**
-     * Cache le message d'avertissement
-     */
-    function hideWarning() {
-      $('#glossary-warning').addClass('hidden');
-      $('#glossary-warning-text').text('');
-    }
+    $(document).on('click', '.remove-file', function () {
+      resetUploadArea();
+      validateGlossaryForm();
+    });
 
-    // Exposer les fonctions globalement
-    window.showGlossaryWarning = showWarning;
-    window.hideGlossaryWarning = hideWarning;
-    
-    // ============================================================================
-    // VALIDATION DU FORMULAIRE
-    // ============================================================================
+    // Formulaire d'ajout
+    $addForm.on('submit', preventFormSubmissionIfDisabled);
+    $(document).on('click', '.create-glossary', preventClickIfDisabled);
 
-    /**
-     * Valide le formulaire d'ajout de glossaire
-     */
-    function validateGlossaryForm() {
-      const hasFile = $('.glossary-file')[0]?.files.length > 0;
-      const $continueButton = $('#continueButton');
-      
-      hideWarning();
-      
-      if (hasFile) {
-        $continueButton.prop('disabled', false)
-                      .removeClass('bg-gray-400 cursor-not-allowed')
-                      .addClass('bg-green-800 hover:bg-green-600 cursor-pointer');
-      } else {
-        $continueButton.prop('disabled', true)
-                      .removeClass('bg-green-800 hover:bg-green-600 cursor-pointer')
-                      .addClass('bg-gray-400 cursor-not-allowed');
+    // Suppression
+    $(document).on('click', '.delete-project', function () {
+      handleDeleteTooltip($(this), true);
+    });
+
+    $(document).on('click', function (e) {
+      if (!$(e.target).closest('.delete-project').length) {
+        handleDeleteTooltip(null, false);
       }
-    }
-});
+    });
+
+    $(document).on('click', '.allow-delete', function () {
+      const $deleteButton = $(this).closest('.delete-project');
+      const deleteUrl = $deleteButton.data('delete-url');
+      const $row = $deleteButton.closest('.glossary-row');
+
+      if (deleteUrl && $row.length) {
+        deleteGlossary(deleteUrl, $row);
+      }
+    });
+
+    $(document).on('click', '.cancel-delete', function (e) {
+      e.stopPropagation();
+      $(this).closest('.tooltip').addClass('opacity-0 invisible').removeClass('opacity-100 visible');
+    });
+
+    // Édition
+    $('.edit-glossary').on('click', function () {
+      const glossaryName = $(this).closest('td').find('span').text().trim();
+      const editUrl = $(this).data('edit-url');
+      openEditModal(glossaryName, editUrl);
+    });
+
+    $('#close-edit-modal').on('click', closeEditModal);
+
+    $(window).on('click', function (e) {
+      if ($(e.target).is($editModal)) {
+        closeEditModal();
+      }
+    });
+
+    $editForm.on('submit', handleEditSubmit);
+  });
+})();
