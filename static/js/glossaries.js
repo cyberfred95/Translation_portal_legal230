@@ -71,11 +71,21 @@
      * @param {Object} error - Objet d'erreur AJAX
      * @param {string} defaultMessage - Message par défaut
      */
+    /**
+     * Standard error handler for AJAX calls
+     * Utilise AppBase.showError si disponible
+     * @param {Object} error - Objet d'erreur AJAX
+     * @param {string} defaultMessage - Message par défaut (optionnel)
+     */
     function handleAjaxError(error, defaultMessage) {
       if (window.AppBase && window.AppBase.showError) {
         window.AppBase.showError(error, defaultMessage);
       } else {
-        console.error('Error:', error?.responseJSON?.detail || error?.message || defaultMessage || 'Something went wrong');
+        const getTranslation = window.AppBase && window.AppBase.getTranslation
+          ? window.AppBase.getTranslation
+          : (en, fr) => (language_code === 'fr' ? fr : en);
+        const fallbackMessage = defaultMessage || getTranslation('Something went wrong', 'Quelque chose s\'est mal passé.');
+        console.error('Error:', error?.responseJSON?.detail || error?.message || fallbackMessage);
       }
     }
 

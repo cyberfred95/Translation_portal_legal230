@@ -89,7 +89,12 @@ $(document).ready(function () {
                 if (window.AppBase && window.AppBase.showError) {
                     window.AppBase.showError(error);
                 } else {
-                    console.error('Error:', error?.responseJSON?.detail || error?.message || 'Something went wrong');
+                    const getTranslation = window.AppBase && window.AppBase.getTranslation
+                        ? window.AppBase.getTranslation
+                        : (en, fr) => (language_code === 'fr' ? fr : en);
+                    const errorMessage = error?.responseJSON?.detail || error?.message;
+                    const fallbackMessage = getTranslation('Something went wrong', 'Quelque chose s\'est mal passé.');
+                    console.error('Error:', errorMessage || fallbackMessage);
                 }
             },
             complete: function () {

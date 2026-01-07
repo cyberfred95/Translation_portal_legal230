@@ -48,6 +48,36 @@ $(document).ready(function () {
     let lastAutoDetectedText = '';
     let isTextLanguageDetectionInProgress = false;
     let textDetectionTriggered = false;
+
+    /**
+     * Get translation helper - uses AppBase if available, otherwise local fallback
+     * @param {string} enText - English text
+     * @param {string} frText - French text
+     * @returns {string} Translated text
+     */
+    function getTranslation(enText, frText) {
+        if (window.AppBase && window.AppBase.getTranslation) {
+            return window.AppBase.getTranslation(enText, frText);
+        }
+        const lang = window.language_code || language_code || 'en';
+        return lang === 'fr' ? frText : enText;
+    }
+
+    /**
+     * Affiche une erreur via AppBase.showError si disponible, sinon console
+     * @param {Object|string} error - Objet d'erreur ou message d'erreur
+     */
+    function showError(error) {
+        if (window.AppBase && window.AppBase.showError) {
+            window.AppBase.showError(error);
+        } else {
+            const errorMessage = typeof error === 'string' 
+                ? error 
+                : (error?.responseJSON?.detail || error?.message || getTranslation('Something went wrong', 'Quelque chose s\'est mal passé.'));
+            console.error('Error:', errorMessage);
+        }
+    }
+
     const detectStatusFallbacks = {
         en: {
             detecting: 'Detecting language...',
@@ -90,7 +120,7 @@ $(document).ready(function () {
     function initQuillEditors() {
         const source = new Quill('#source-text', {
             theme: 'snow',
-            placeholder: language_code === 'en' ? 'Add your text here' : 'Ajoutez votre texte ici',
+            placeholder: getTranslation('Add your text here', 'Ajoutez votre texte ici'),
             modules: { toolbar: false }
         });
 
@@ -109,9 +139,9 @@ $(document).ready(function () {
 
     function initPlaceholders() {
         const placeholders = {
-            '.source-language': language_code === 'en' ? 'Source language' : 'Langue source',
-            '.target-language': language_code === 'en' ? 'Target language' : 'Langue cible',
-            '.domain-select': language_code === 'en' ? 'Glossary' : 'Glossaire',
+            '.source-language': getTranslation('Source language', 'Langue source'),
+            '.target-language': getTranslation('Target language', 'Langue cible'),
+            '.domain-select': getTranslation('Glossary', 'Glossaire'),
         };
 
         Object.entries(placeholders).forEach(([selector, text]) => {
@@ -279,13 +309,7 @@ $(document).ready(function () {
             success(response) {
                 populateDomains(response);
             },
-            error(error) {
-                if (window.AppBase && window.AppBase.showError) {
-                    window.AppBase.showError(error);
-                } else {
-                    console.error('Error:', error?.responseJSON?.detail || error?.message || 'Something went wrong');
-                }
-            },
+            error: showError,
             complete() {
                 $('#glossary-spinner').addClass('hidden');
             }
@@ -390,11 +414,7 @@ $(document).ready(function () {
                     }
                 },
                 error(error) {
-                    if (window.AppBase && window.AppBase.showError) {
-                        window.AppBase.showError(error);
-                    } else {
-                        console.error('Error:', error?.responseJSON?.detail || error?.message || 'Something went wrong');
-                    }
+                    showError(error);
                     showTranslationResult();
                 },
                 complete() {
@@ -478,9 +498,18 @@ $(document).ready(function () {
 
                 navigator.clipboard.write(data).then(showTooltip).catch((error) => {
                     console.error('Erreur de copie : ', error);
+                    const errorMessage = getTranslation(
+                        'Error copying to clipboard.',
+                        'Erreur lors de la copie dans le presse-papiers.'
+                    );
+                    showError(errorMessage);
                 });
             } else {
-                alert('Votre navigateur ne supporte pas Clipboard API. Merci de le mettre à jour.');
+                const errorMessage = getTranslation(
+                    'Your browser does not support Clipboard API. Please update it.',
+                    'Votre navigateur ne supporte pas Clipboard API. Merci de le mettre à jour.'
+                );
+                showError(errorMessage);
             }
         });
     }
@@ -743,11 +772,7 @@ $(document).ready(function () {
                 }
             },
             error(error) {
-                if (window.AppBase && window.AppBase.showError) {
-                    window.AppBase.showError(error);
-                } else {
-                    console.error('Error:', error?.responseJSON?.detail || error?.message || 'Something went wrong');
-                }
+                showError(error);
                 const errorMessage = detectStatusMessages.error || detectStatusFallbacks.en.error;
                 showTextDetectStatus(errorMessage, 'error', true);
             },

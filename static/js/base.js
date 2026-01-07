@@ -8,6 +8,18 @@
   };
 
   /**
+   * Get translation based on current language code
+   * Utility function available globally for consistent i18n
+   * @param {string} enText - English text
+   * @param {string} frText - French text
+   * @returns {string} Translated text
+   */
+  AppBase.getTranslation = function (enText, frText) {
+    const lang = window.language_code || 'en';
+    return lang === 'fr' ? frText : enText;
+  };
+
+  /**
    * Extrait le message d'erreur d'un objet d'erreur AJAX
    * @param {Object} error - Objet d'erreur AJAX
    * @param {string} defaultMessage - Message par défaut si aucun message n'est trouvé
@@ -27,10 +39,10 @@
       return defaultMessage;
     }
     // Message par défaut selon la langue
-    const lang = window.language_code || 'en';
-    return lang === 'fr' 
-      ? 'Quelque chose s\'est mal passé.' 
-      : 'Something went wrong';
+    return AppBase.getTranslation(
+      'Something went wrong',
+      'Quelque chose s\'est mal passé.'
+    );
   };
 
   /**

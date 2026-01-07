@@ -358,7 +358,7 @@
     }
 
     /**
-     * Affiche une erreur en utilisant AppBase si disponible, sinon fallback local
+     * Affiche une erreur via AppBase.showError si disponible, sinon fallback local
      * @param {Object|string} error - Objet d'erreur ou message d'erreur
      * @param {string} message - Message d'erreur par défaut (si error est un objet)
      */
@@ -369,7 +369,7 @@
         const errorMsg = typeof error === 'string' 
           ? error 
           : (error?.detail || error?.message || message || 'An error occurred');
-        if (window.Toast) {
+        if (window.Toast && window.Toast.error) {
           window.Toast.error(errorMsg);
         } else {
           console.error('Error:', errorMsg);
