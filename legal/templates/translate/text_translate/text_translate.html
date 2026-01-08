@@ -42,6 +42,18 @@
                             <span class="text-detect-label"></span>
                         </div>
                     </div>
+                    <div class="text-detect-btn-wrapper">
+                        <button type="button"
+                                id="instructions-modal-btn"
+                                class="text-translate-force-btn instructions-btn-with-indicator"
+                                aria-label="{% trans 'Translation instructions' %}">
+                            <i class="ph ph-note-pencil"></i>
+                            <span id="instructions-indicator" class="instructions-indicator"></span>
+                        </button>
+                        <div class="text-detect-tooltip">
+                            <span>{% trans 'Custom instructions' %}</span>
+                        </div>
+                    </div>
                     <button type="button"
                             id="sync-target-to-source"
                             class="text-translate-force-btn"
@@ -117,21 +129,6 @@
             </div>
         </div>
 
-        <!-- Zone instructions personnalisées (pleine largeur sous les éditeurs) -->
-        <div class="text-translate-instructions-row">
-            <label for="translation-instructions" class="text-translate-field-label">
-                {% trans 'Custom translation instructions' %}
-            </label>
-            <textarea
-                id="translation-instructions"
-                name="instructions"
-                class="text-translate-instructions-textarea"
-                placeholder="{% trans 'e.g., Use formal legal tone, Preserve Latin terms, etc.' %}"
-                rows="2"
-                maxlength="1000"
-            ></textarea>
-        </div>
-
         <!-- Zone retour qualité (pleine largeur, lecture seule) -->
         <div id="quality-feedback-row" class="text-translate-quality-row hidden">
             <label class="text-translate-field-label">
@@ -145,4 +142,32 @@
         {% include 'common/subscription_error_overlay.html' %}
 
     </form>
+</div>
+
+<!-- Modal pour les instructions de traduction -->
+<div id="instructions-modal" class="instructions-modal-overlay hidden">
+    <div class="instructions-modal-card">
+        <button type="button" id="close-instructions-modal" class="instructions-modal-close">
+            <i class="ph ph-x"></i>
+        </button>
+        <div class="instructions-modal-body">
+            <div class="instructions-modal-title">{% trans 'Custom translation instructions' %}</div>
+            <textarea
+                id="translation-instructions"
+                name="instructions"
+                class="text-translate-instructions-textarea"
+                placeholder="{% trans 'e.g., Use formal legal tone, Preserve Latin terms, etc.' %}"
+                rows="4"
+                maxlength="2000"
+            ></textarea>
+            <div class="instructions-modal-actions">
+                <button type="button" id="cancel-instructions" class="instructions-modal-btn instructions-modal-btn-cancel">
+                    {% trans 'Cancel' %}
+                </button>
+                <button type="button" id="save-instructions" class="instructions-modal-btn instructions-modal-btn-save">
+                    {% trans 'Save' %}
+                </button>
+            </div>
+        </div>
+    </div>
 </div>

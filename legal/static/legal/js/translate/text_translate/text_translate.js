@@ -36,13 +36,43 @@ $(document).ready(function () {
         translatedText: $('#translated-text'),
         tooltip: $('#tooltip'),
         syncBtn: $('#sync-target-to-source'),
-        // LARA: Nouveaux champs pour instructions et retour qualité
         instructionsField: $('#translation-instructions'),
         qualityFeedbackRow: $('#quality-feedback-row'),
         qualityCommentsText: $('#quality-comments-text'),
+        // Instructions modal elements
+        instructionsModalBtn: $('#instructions-modal-btn'),
+        instructionsModal: $('#instructions-modal'),
+        closeInstructionsModal: $('#close-instructions-modal'),
+        cancelInstructionsBtn: $('#cancel-instructions'),
+        saveInstructionsBtn: $('#save-instructions'),
+        instructionsIndicator: $('#instructions-indicator'),
     };
 
     const MIN_DETECTION_WORD_COUNT = 9;
+    
+    // Instructions configuration
+    const INSTRUCTIONS_CONFIG = {
+        MAX_LENGTH: 2000,
+        MESSAGES: {
+            saving: { en: 'Saving...', fr: 'Enregistrement...' },
+            saved: { en: 'Instructions saved successfully.', fr: 'Instructions enregistrées avec succès.' },
+            tooLong: { en: 'Instructions cannot exceed 2000 characters.', fr: 'Les instructions ne peuvent pas dépasser 2000 caractères.' }
+        }
+    };
+    
+    /**
+     * Obtient un message traduit depuis la configuration des instructions
+     * @param {string} key - Clé du message (saving, saved, tooLong)
+     * @returns {string} Message traduit
+     */
+    function getInstructionsMessage(key) {
+        const message = INSTRUCTIONS_CONFIG.MESSAGES[key];
+        if (!message) return '';
+        return getTranslation(message.en, message.fr);
+    }
+    
+    // Instructions modal state
+    let originalInstructionsValue = '';
 
     let detectStatusTimeout = null;
     let lastAutoDetectedText = '';
@@ -61,6 +91,17 @@ $(document).ready(function () {
         }
         const lang = window.language_code || language_code || 'en';
         return lang === 'fr' ? frText : enText;
+    }
+
+    /**
+     * Retourne les en-têtes AJAX standardisés
+     * @returns {Object} En-têtes pour les requêtes AJAX
+     */
+    function getAjaxHeaders() {
+        return {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': getCookie('csrftoken'),
+        };
     }
 
     /**
@@ -115,6 +156,14 @@ $(document).ready(function () {
     initPasteLimiter();
     initModalToggles();
     bindEditorEvents();
+    bindInstructionsModal();
+    // Initialiser l'indicateur à gris (pas d'instructions) au démarrage
+    updateInstructionsIndicator();
+    // Charger les instructions sauvegardées au démarrage pour initialiser originalInstructionsValue
+    loadSavedInstructions((savedValue) => {
+        originalInstructionsValue = savedValue || '';
+        updateInstructionsIndicator();
+    });
     refreshInitialUiState();
 
     function initQuillEditors() {
@@ -391,6 +440,9 @@ $(document).ready(function () {
 
             $('#text').val(htmlContent);
             const formData = new FormData(this);
+            
+            // Ajouter les instructions sauvegardées (valeur réelle dans User, pas celle du textarea)
+            formData.append('instructions', originalInstructionsValue || '');
 
             generateSkeleton();
             hideQualityFeedback(); // LARA: Masquer le retour qualité précédent
@@ -477,8 +529,8 @@ $(document).ready(function () {
         $els.clearButtons.on('click', () => {
             editors.source.deleteText(0, editors.source.getLength());
             editors.translated.deleteText(0, editors.translated.getLength());
-            $els.instructionsField.val(''); // LARA: Vider les instructions
-            hideQualityFeedback();           // LARA: Masquer le retour qualité
+            setInstructionsValue('');
+            hideQualityFeedback();
             resizeTextAreas();
             validateTranslateButton();
         });
@@ -936,6 +988,197 @@ $(document).ready(function () {
         $('#btn-copy').toggleClass('hidden', !hasTranslatedInit);
         updateCharCount();
         validateTranslateButton();
+    }
+
+    // ============================================
+    // Instructions Modal Management
+    // ============================================
+    
+    /**
+     * Obtient la valeur actuelle des instructions depuis le champ
+     * @returns {string} Valeur des instructions
+     */
+    function getInstructionsValue() {
+        return $els.instructionsField.val() || '';
+    }
+
+    /**
+     * Définit la valeur des instructions dans le champ
+     * @param {string} value - Valeur à définir
+     */
+    function setInstructionsValue(value) {
+        $els.instructionsField.val(value || '');
+    }
+
+    /**
+     * Initialise les événements de la modal des instructions
+     */
+    function bindInstructionsModal() {
+        $els.instructionsModalBtn.on('click', openInstructionsModal);
+        $els.closeInstructionsModal.on('click', handleModalClose);
+        $els.cancelInstructionsBtn.on('click', handleModalClose);
+        $els.saveInstructionsBtn.on('click', handleSaveInstructions);
+        
+        // Fermer la modal en cliquant sur l'overlay
+        $els.instructionsModal.on('click', function(event) {
+            if (event.target === this) {
+                handleModalClose(event);
+            }
+        });
+    }
+
+    /**
+     * Ouvre la modal et charge les instructions sauvegardées
+     */
+    function openInstructionsModal() {
+        loadSavedInstructions((savedValue) => {
+            originalInstructionsValue = savedValue || '';
+            $els.instructionsModal.removeClass('hidden');
+        });
+    }
+
+    /**
+     * Ferme la modal et restaure la valeur originale
+     */
+    function closeInstructionsModal() {
+        setInstructionsValue(originalInstructionsValue);
+        $els.instructionsModal.addClass('hidden');
+    }
+
+    /**
+     * Gère la fermeture de la modal (avec prévention du comportement par défaut)
+     */
+    function handleModalClose(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        closeInstructionsModal();
+    }
+
+    /**
+     * Charge les instructions sauvegardées depuis le serveur
+     * @param {Function} callback - Fonction appelée après le chargement avec la valeur chargée
+     */
+    function loadSavedInstructions(callback) {
+        $.ajax({
+            url: get_saved_instructions || '/users/get-saved-instructions/',
+            type: 'GET',
+            headers: getAjaxHeaders(),
+            success(response) {
+                const savedValue = (response.saved_instructions || '').trim();
+                setInstructionsValue(savedValue);
+                if (callback) callback(savedValue);
+            },
+            error() {
+                setInstructionsValue('');
+                if (callback) callback('');
+            }
+        });
+    }
+
+    /**
+     * Valide la longueur des instructions
+     * @param {string} instructions - Instructions à valider
+     * @returns {boolean} True si valide, False sinon
+     */
+    function validateInstructionsLength(instructions) {
+        if (instructions.length > INSTRUCTIONS_CONFIG.MAX_LENGTH) {
+            showError(getInstructionsMessage('tooLong'));
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Valide et sauvegarde les instructions
+     */
+    function handleSaveInstructions(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const instructions = getInstructionsValue().trim();
+        
+        if (!validateInstructionsLength(instructions)) {
+            return;
+        }
+
+        saveInstructions(instructions);
+    }
+
+    /**
+     * Gère l'état du bouton de sauvegarde (loading/normal)
+     * @param {boolean} isLoading - True pour activer l'état loading
+     * @param {string} [loadingText] - Texte à afficher pendant le chargement (optionnel)
+     */
+    function setSaveButtonState(isLoading, loadingText) {
+        const $btn = $els.saveInstructionsBtn;
+        if (isLoading) {
+            $btn.data('original-text', $btn.text())
+                .prop('disabled', true);
+            if (loadingText) {
+                $btn.text(loadingText);
+            }
+        } else {
+            const originalText = $btn.data('original-text') || getTranslation('Save', 'Enregistrer');
+            $btn.prop('disabled', false)
+                .text(originalText);
+        }
+    }
+
+    /**
+     * Gère le succès de la sauvegarde des instructions
+     * @param {string} instructions - Instructions sauvegardées
+     */
+    function handleSaveSuccess(instructions) {
+        originalInstructionsValue = instructions;
+        updateInstructionsIndicator();
+        closeInstructionsModal();
+        showSuccessMessage(getInstructionsMessage('saved'));
+    }
+
+    /**
+     * Envoie la requête de sauvegarde des instructions
+     * @param {string} instructions - Instructions à sauvegarder
+     */
+    function saveInstructions(instructions) {
+        setSaveButtonState(true, getInstructionsMessage('saving'));
+
+        $.ajax({
+            url: save_instructions || '/users/save-instructions/',
+            type: 'POST',
+            data: { saved_instructions: instructions },
+            headers: getAjaxHeaders(),
+            success: () => handleSaveSuccess(instructions),
+            error: showError,
+            complete: () => setSaveButtonState(false)
+        });
+    }
+
+    /**
+     * Affiche un message de succès via Toast si disponible
+     * @param {string} message - Message à afficher
+     */
+    function showSuccessMessage(message) {
+        if (window.Toast && window.Toast.success) {
+            window.Toast.success(message);
+        }
+    }
+
+    /**
+     * Vérifie si des instructions sont sauvegardées
+     * @returns {boolean} True si des instructions existent
+     */
+    function hasSavedInstructions() {
+        return Boolean(originalInstructionsValue && originalInstructionsValue.trim().length > 0);
+    }
+
+    /**
+     * Met à jour l'indicateur visuel selon l'état des instructions
+     */
+    function updateInstructionsIndicator() {
+        const hasInstructions = hasSavedInstructions();
+        $els.instructionsIndicator.toggleClass('has-instructions', hasInstructions);
     }
 });
 

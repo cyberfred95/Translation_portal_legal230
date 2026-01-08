@@ -932,6 +932,10 @@ msgstr "Copié"
 msgid "Custom translation instructions"
 msgstr "Instructions de traduction personnalisées"
 
+#: legal/templates/translate/text_translate/text_translate.html:53
+msgid "Custom instructions"
+msgstr "Instructions personnalisées"
+
 #: legal/templates/translate/text_translate/text_translate.html:129
 msgid "e.g., Use formal legal tone, Preserve Latin terms, etc."
 msgstr ""

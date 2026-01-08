@@ -389,13 +389,45 @@
 .text-translate-detect-btn:hover,
 .text-translate-detect-btn:focus-visible {
   background: #f3f4f6;
-  border-color: #16a34a;
-  color: #166534;
+  border-color: var(--text-translate-primary-color, #111827);
+  color: var(--text-translate-primary-color, #111827);
 }
 
 .text-translate-detect-btn .ph {
   font-size: 1rem;
   line-height: 1;
+}
+
+/* Instructions button indicator */
+.instructions-btn-with-indicator {
+  position: relative;
+}
+
+.instructions-indicator {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: #9ca3af;
+  border: 1px solid #ffffff;
+  z-index: 10;
+  transition: background-color 0.2s ease;
+}
+
+.instructions-indicator.has-instructions {
+  background-color: #166534;
+}
+
+/* Pastille grise plus claire au hover */
+.instructions-btn-with-indicator:hover .instructions-indicator:not(.has-instructions) {
+  background-color: #d1d5db;
+}
+
+/* Pastille verte plus foncée au hover */
+.instructions-btn-with-indicator:hover .instructions-indicator.has-instructions {
+  background-color: #14532d;
 }
 
 .text-translate-submit-btn {
@@ -608,14 +640,6 @@
   }
 }
 
-/* ============================================
-   Instructions Row (pleine largeur sous les éditeurs)
-   ============================================ */
-.text-translate-instructions-row {
-  margin-top: 1.5rem;
-  width: 100%;
-}
-
 .text-translate-field-label {
   display: block;
   font-family: 'Poppins', sans-serif;
@@ -678,6 +702,127 @@
   content: attr(data-placeholder);
   color: #9ca3af;
   font-style: italic;
+}
+
+/* ============================================
+   Modal Instructions
+   ============================================ */
+.instructions-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(107, 114, 128, 0.5);
+  overflow-y: auto;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.instructions-modal-overlay.hidden {
+  display: none;
+}
+
+.instructions-modal-card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px;
+  margin: 0 1rem;
+}
+
+.instructions-modal-close {
+  position: absolute;
+  top: -1.125rem;
+  right: -1.125rem;
+  margin-right: -1rem;
+  margin-top: -1rem;
+  z-index: 10;
+  padding: 0.5rem;
+  color: #ffffff;
+  background: #6b7280;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+}
+
+.instructions-modal-close:hover {
+  background: #4b5563;
+  color: #d1d5db;
+}
+
+.instructions-modal-close i {
+  font-size: 20px;
+}
+
+.instructions-modal-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.instructions-modal-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.instructions-modal-body .text-translate-instructions-textarea {
+  min-height: 8rem;
+  max-height: 15rem;
+}
+
+.instructions-modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.instructions-modal-btn {
+  border-radius: 9999px;
+  padding: 0.75rem 1.625rem;
+  font-size: 0.875rem;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.instructions-modal-btn-cancel {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.instructions-modal-btn-cancel:hover {
+  background: #e5e7eb;
+}
+
+.instructions-modal-btn-save {
+  background: #166534;
+  color: #ffffff;
+}
+
+.instructions-modal-btn-save:hover:not(:disabled) {
+  background: #15803d;
+}
+
+.instructions-modal-btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ============================================
