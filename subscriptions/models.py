@@ -95,6 +95,12 @@ class UserSubscription(models.Model):
     translated_words_count = models.IntegerField(default=0)
     translated_files_count = models.IntegerField(default=0)
 
+    technical_maximum_symbol_removed = models.BooleanField(
+        default=False,
+        verbose_name="Technical Maximum Symbol Removed",
+        help_text="If True, ignore the technical maximum symbols limit check"
+    )
+
     access_to_writing = models.BooleanField(
         default=False, verbose_name="Access to Writing")
     access_to_official_glossaries = models.BooleanField(

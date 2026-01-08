@@ -236,6 +236,7 @@ def reset_userSubscription_counts(
 
     This function sets translated_symbols_count, translated_words_count, and translated_files_count to zero
     for the provided UserSubscription and saves the changes.
+    Also resets the technical_maximum_symbol_removed flag to False.
 
     Args:
         user_subscription (UserSubscription): The subscription whose counters will be reset.
@@ -248,7 +249,13 @@ def reset_userSubscription_counts(
         user_subscription.translated_symbols_count = 0
         user_subscription.translated_words_count = 0
         user_subscription.translated_files_count = 0
-        user_subscription.save()
+        user_subscription.technical_maximum_symbol_removed = False
+        user_subscription.save(update_fields=[
+            'translated_symbols_count',
+            'translated_words_count',
+            'translated_files_count',
+            'technical_maximum_symbol_removed'
+        ])
         return None, user_subscription
 
     except Exception as error:

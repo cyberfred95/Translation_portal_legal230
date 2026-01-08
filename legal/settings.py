@@ -249,6 +249,11 @@ CELERY_BEAT_SCHEDULE = {
 STRIPE_METER_EVENT_NAME = os.environ.get('STRIPE_METER_EVENT_NAME', 'apinbchar_standard')
 
 # ============================================================================
+# Technical Limits
+# ============================================================================
+TECHNICAL_MAXIMUM_SYMBOLS_AMOUNT = int(os.environ.get('TECHNICAL_MAXIMUM_SYMBOLS_AMOUNT'))
+
+# ============================================================================
 # Logging
 # ============================================================================
 LOGGING = {

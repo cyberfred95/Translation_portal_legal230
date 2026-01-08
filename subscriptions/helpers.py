@@ -2,7 +2,7 @@
 Helper functions pour la gestion des abonnements et des traductions.
 
 Ce module fournit des fonctions utilitaires pour :
-- Vérifier les quotas de traduction
+- Vérifier les quotas de traduction (standards et limites techniques)
 - Incrémenter les compteurs de traduction
 - Gérer l'usage quotidien pour les abonnements API
 - Récupérer et formater les informations d'abonnement pour l'affichage
@@ -13,6 +13,7 @@ from typing import Tuple, Optional, Dict, List, TYPE_CHECKING
 if TYPE_CHECKING:
     from subscriptions.models import CountMetered
 
+from django.conf import settings
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
 
@@ -37,6 +38,46 @@ _QUOTA_LABELS: Dict[str, str] = {
     QUOTA_TYPE_WORDS: _("word"),
     QUOTA_TYPE_CHARACTERS: _("character")
 }
+
+
+def _check_technical_symbol_limit(
+    subscription: UserSubscription,
+    symbols_count: int
+) -> Tuple[bool, Optional[SubscriptionPermissionError], Optional[str]]:
+    """
+    Vérifie si la limite technique de symboles est respectée.
+    
+    Cette vérification est ignorée si technical_maximum_symbol_removed est True.
+    
+    Args:
+        subscription: La UserSubscription à vérifier
+        symbols_count: Nombre de symboles à traduire
+        
+    Returns:
+        Tuple[bool, Optional[SubscriptionPermissionError], Optional[str]]:
+        - (True, None, None) si la limite est respectée ou ignorée
+        - (False, error_code, error_message) si la limite est dépassée
+    """
+    # Ignorer la vérification si le flag est activé
+    if subscription.technical_maximum_symbol_removed:
+        return (True, None, None)
+    
+    # Ignorer si aucun symbole à vérifier
+    if symbols_count <= 0:
+        return (True, None, None)
+    
+    technical_limit = settings.TECHNICAL_MAXIMUM_SYMBOLS_AMOUNT
+    total_symbols = subscription.translated_symbols_count + symbols_count
+    
+    if total_symbols > technical_limit:
+        return (
+            False,
+            SubscriptionPermissionError.QUOTA_SYMBOLS_EXCEEDED,
+            _("The technical maximum limit has been reached. "
+              "Please contact support for assistance.")
+        )
+    
+    return (True, None, None)
 
 
 def _check_quota_limit(
@@ -89,6 +130,10 @@ def _check_all_quotas(
     """
     Vérifie tous les quotas de traduction pour une souscription.
     
+    Effectue les vérifications dans l'ordre suivant :
+    1. Limite technique pour les symboles (si applicable)
+    2. Quotas standards (fichiers, mots, symboles)
+    
     Args:
         subscription: La UserSubscription à vérifier
         words_count: Nombre de mots à traduire
@@ -98,6 +143,14 @@ def _check_all_quotas(
     Returns:
         Tuple[bool, Optional[SubscriptionPermissionError], Optional[str]]: Résultat
     """
+    # Vérification de la limite technique pour les symboles (en premier)
+    is_allowed, error_code, error_message = _check_technical_symbol_limit(
+        subscription, symbols_count
+    )
+    if not is_allowed:
+        return (False, error_code, error_message)
+    
+    # Vérification des quotas standards
     quota_checks: List[Tuple[Optional[int], int, int, str, SubscriptionPermissionError]] = [
         (files_count, subscription.translated_files_count, subscription.max_files_count,
          QUOTA_TYPE_FILES, SubscriptionPermissionError.QUOTA_FILES_EXCEEDED),
