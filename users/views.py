@@ -229,3 +229,38 @@ class ResetPasswordView(BaseTemplateView):
             serializer.save()
             return redirect(reverse('login'))
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SaveInstructionsView(APIView):
+    """Vue pour sauvegarder les instructions de traduction personnalisées de l'utilisateur."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        """Sauvegarde les instructions de traduction de l'utilisateur."""
+        saved_instructions = request.POST.get('saved_instructions', '').strip()
+        
+        if len(saved_instructions) > User.MAX_INSTRUCTIONS_LENGTH:
+            return JsonResponse(
+                {"detail": _("Instructions cannot exceed 2000 characters.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        request.user.saved_instructions = saved_instructions
+        request.user.save()
+        
+        return JsonResponse(
+            {"message": _("Instructions saved successfully.")},
+            status=status.HTTP_200_OK
+        )
+
+
+class GetSavedInstructionsView(APIView):
+    """Vue pour récupérer les instructions de traduction sauvegardées de l'utilisateur."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """Récupère les instructions de traduction sauvegardées de l'utilisateur."""
+        return JsonResponse(
+            {"saved_instructions": request.user.saved_instructions or ""},
+            status=status.HTTP_200_OK
+        )

@@ -61,6 +61,17 @@ class User(AbstractUser):
         help_text="Nombre de jours avant suppression automatique des traductions"
     )
     
+    # Constantes pour les instructions de traduction
+    MAX_INSTRUCTIONS_LENGTH = 2000
+    
+    saved_instructions = models.CharField(
+        max_length=MAX_INSTRUCTIONS_LENGTH,
+        blank=True,
+        null=True,
+        verbose_name="Instructions sauvegardées",
+        help_text="Instructions personnalisées de traduction sauvegardées par l'utilisateur"
+    )
+    
     @classmethod
     def get_valid_retention_periods(cls):
         """Retourne la liste des valeurs valides pour retention_period."""

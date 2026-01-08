@@ -20,6 +20,8 @@
      data-api-lara-glossary-search="{% url 'api_lara_glossary_search' %}"
      data-expert-revision-file-url="{% url 'expert_revision_file' %}"
      data-add-glossary="{% url 'add_glossary' %}"
+     data-save-instructions="{% url 'save_instructions' %}"
+     data-get-saved-instructions="{% url 'get_saved_instructions' %}"
      data-language-code="{{ request.LANGUAGE_CODE }}"
      data-access-to-default-glossaries="{{ access_to_default_glossaries|yesno:'true,false' }}"
      data-languages='[

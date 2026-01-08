@@ -12,6 +12,8 @@
   window.api_list_glossaries = el.dataset.apiListGlossaries;
   window.expert_revision_file_url = el.dataset.expertRevisionFileUrl;
   window.add_glossary = el.dataset.addGlossary;
+  window.save_instructions = el.dataset.saveInstructions;
+  window.get_saved_instructions = el.dataset.getSavedInstructions;
   window.language_code = el.dataset.languageCode;
   try { window.languages = JSON.parse(el.dataset.languages || '[]'); } catch (e) { window.languages = []; }
   window.access_to_default_glossaries = (el.dataset.accessToDefaultGlossaries === 'true');
