@@ -291,6 +291,9 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
         ('Translated Statistics', {
             'fields': TRANSLATED_FIELDS
         }),
+        ('Technical Limits', {
+            'fields': ('technical_maximum_symbol_removed',)
+        }),
         ('Access Permissions', {
             'fields': (
                 'access_to_writing', 'access_to_official_glossaries',
