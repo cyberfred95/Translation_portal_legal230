@@ -1,25 +1,34 @@
+"""
+Glossary model for Lexa project.
+
+This model serves as a cache/metadata store for glossaries that are
+actually stored and managed in lara-bridge. Synchronization with LARA
+is handled automatically via Django signals (see signals.py).
+"""
 import os
-import csv
-import zipfile
-import tempfile
-import logging
-from django.core.files.base import ContentFile
 from django.db import models
+from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
 
 from languages.models import Language
 from users.models import User, UserGroup
-from django.core.validators import FileExtensionValidator
 from domains.models import Domain
-from django.core.exceptions import ValidationError
-
-logger = logging.getLogger(__name__)
 
 
 class Glossary(models.Model):
+    """
+    Glossary model - metadata cache for LARA-managed glossaries.
+    
+    The actual glossary files and data are stored in lara-bridge.
+    This model maintains local metadata for synchronization purposes.
+    """
     name = models.CharField(max_length=255, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     group = models.ForeignKey(UserGroup, on_delete=models.SET_NULL, blank=True, null=True)
-    file = models.FileField(upload_to='glossaries/', validators=[FileExtensionValidator(['csv', 'xlsx'])])
+    file = models.FileField(
+        upload_to='glossaries/',
+        validators=[FileExtensionValidator(['csv', 'xlsx'])]
+    )
     glossary_id = models.CharField(max_length=255, blank=True, null=True)
     source_language = models.ForeignKey(
         Language,
@@ -31,67 +40,115 @@ class Glossary(models.Model):
         on_delete=models.CASCADE,
         related_name='target_language_glossaries'
     )
-    created_at = models.DateTimeField(auto_now=True)  # Updated on each save to track last modification
+    created_at = models.DateTimeField(
+        auto_now=True,
+        help_text="Updated on each save to track last modification"
+    )
     domain = models.ForeignKey(
-        Domain, on_delete=models.SET_NULL, blank=True, null=True, related_name='glossaries')
+        Domain,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='glossaries'
+    )
 
     class Meta:
         verbose_name = 'Glossary'
         verbose_name_plural = 'Glossaries'
 
     def clean(self):
+        """Validate glossary instance before saving."""
+        self._validate_user_group_exclusivity()
+        self._validate_owner_required()
+        
+        if self.pk:
+            self._validate_default_glossary_uniqueness()
+        
+        self._validate_glossary_uniqueness()
+        super().clean()
+
+    def _validate_user_group_exclusivity(self):
+        """Ensure user and group are mutually exclusive."""
         if self.user and self.group:
             raise ValidationError(
-                "You cannot select both a user and a group at the same time.")
+                "You cannot select both a user and a group at the same time."
+            )
 
-        if self.pk:
+    def _validate_owner_required(self):
+        """Ensure glossary has at least one owner (domain, user, or group)."""
+        if not self.domain and not self.user and not self.group:
+            raise ValidationError(
+                "You have to choose domain or user or group"
+            )
 
-            existing_default_glossaries = Glossary.objects.filter(
+    def _validate_default_glossary_uniqueness(self):
+        """Validate uniqueness for default glossaries (no user/group)."""
+        if not self.group and not self.user:
+            if not self.domain:
+                raise ValidationError(
+                    "You must choose a domain for default glossary."
+                )
+            
+            existing = Glossary.objects.filter(
                 domain=self.domain,
                 source_language=self.source_language,
                 target_language=self.target_language,
                 group__isnull=True,
                 user__isnull=True
-            )
-            if not self.group and not self.user:
-                existing_default_glossaries = existing_default_glossaries.exclude(
-                    pk=self.pk)
+            ).exclude(pk=self.pk)
+            
+            if existing.exists():
+                raise ValidationError(
+                    "A default glossary for this language pair and domain already exists."
+                )
 
-                if existing_default_glossaries.exists():
-                    raise ValidationError(
-                        "A default glossary for this language pair and domain already exists.")
-
-                if not self.domain:
-                    raise ValidationError("You must choose a domain for default glossary.")
-
-        if not self.domain and not self.user and not self.group:
-            raise ValidationError("You have to choose domain or user or group")
-
-        existing_glossary_filters = {
+    def _validate_glossary_uniqueness(self):
+        """Validate uniqueness for user/group-specific glossaries."""
+        filters = {
             'domain': self.domain,
             'source_language': self.source_language,
             'target_language': self.target_language
         }
-
+        
         if self.user:
-            if Glossary.objects.filter(**existing_glossary_filters, user=self.user).exclude(pk=self.pk).exists():
+            existing = Glossary.objects.filter(
+                **filters,
+                user=self.user
+            ).exclude(pk=self.pk)
+            
+            if existing.exists():
                 raise ValidationError(
-                    "A glossary for this language pair and domain and user already exists")
+                    "A glossary for this language pair and domain and user already exists"
+                )
+        
         elif self.group:
-            if Glossary.objects.filter(**existing_glossary_filters, group=self.group).exclude(pk=self.pk).exists():
+            existing = Glossary.objects.filter(
+                **filters,
+                group=self.group
+            ).exclude(pk=self.pk)
+            
+            if existing.exists():
                 raise ValidationError(
-                    "A glossary for this language pair and domain and user already exists")
-
-        super().clean()
+                    "A glossary for this language pair and domain and group already exists"
+                )
 
     def save(self, *args, **kwargs):
-
+        """Save glossary instance, auto-generating name from file if needed."""
         if not self.name and self.file:
             self.name = os.path.splitext(os.path.basename(self.file.name))[0]
+        
+        super().save(*args, **kwargs)
 
-        super(Glossary, self).save(*args, **kwargs)
-
-    def to_json(self, request):
+    def to_json(self, request=None):
+        """
+        Convert glossary instance to JSON format.
+        
+        Args:
+            request: Django request object (unused, kept for API compatibility)
+        
+        Returns:
+            dict: Glossary data in JSON format
+        """
         return {
             "id": self.id,
             "name": self.name,
@@ -100,372 +157,3 @@ class Glossary(models.Model):
             "created_at": self.created_at,
         }
 
-    @staticmethod
-    def glossaries_batch(csv_file_path, zip_file_path=None, base_directory=None, progress_callback=None):
-        """
-        Batch load glossaries from a CSV file.
-
-        Args:
-            csv_file_path: Path to the CSV file containing glossary information
-            zip_file_path: Path to the ZIP file containing glossary files (optional)
-            base_directory: Base directory where glossary files are located (optional, ignored if zip_file_path is provided)
-            progress_callback: Optional callback function called with progress updates (callable)
-
-        Returns:
-            dict: Summary of the batch operation with success/error counts
-        """
-        results = {
-            'created': 0,
-            'updated': 0,
-            'errors': [],
-            'total_rows': 0
-        }
-
-        # Helper function to send progress updates
-        def send_progress(message, row_num=None):
-            if progress_callback:
-                progress_callback(message, row_num, results['created'], results['total_rows'])
-
-        # Send initial message
-        send_progress("Starting glossary processing...")
-
-        # Verify CSV file exists
-        if not os.path.exists(csv_file_path):
-            error_msg = f"CSV file not found: {csv_file_path}"
-            logger.error(error_msg)
-            results['errors'].append(error_msg)
-            return results
-
-        # Verify ZIP file exists if provided
-        if zip_file_path and not os.path.exists(zip_file_path):
-            error_msg = f"ZIP file not found: {zip_file_path}"
-            logger.error(error_msg)
-            results['errors'].append(error_msg)
-            return results
-
-        temp_dir = None
-        try:
-            # Extract ZIP file if provided
-            if zip_file_path:
-                temp_dir = tempfile.mkdtemp()
-
-                try:
-                    with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
-                        # List contents of ZIP file
-                        zip_contents = zip_ref.namelist()
-
-                        zip_ref.extractall(temp_dir)
-
-                        # Verify extraction was successful
-                        if not os.path.exists(temp_dir):
-                            error_msg = f"Temp directory not created: {temp_dir}"
-                            logger.error(error_msg)
-                            results['errors'].append(error_msg)
-                            return results
-
-                        # List extracted files recursively
-                        extracted_files = []
-                        for root, dirs, files in os.walk(temp_dir):
-                            for file in files:
-                                full_path = os.path.join(root, file)
-                                relative_path = os.path.relpath(
-                                    full_path, temp_dir)
-                                extracted_files.append(relative_path)
-
-                        if not extracted_files:
-                            error_msg = "No files were extracted from ZIP"
-                            logger.error(error_msg)
-                            results['errors'].append(error_msg)
-                            return results
-
-                except zipfile.BadZipFile as e:
-                    error_msg = f"Invalid ZIP file: {str(e)}"
-                    logger.error(error_msg)
-                    results['errors'].append(error_msg)
-                    return results
-
-                working_directory = temp_dir
-            else:
-                working_directory = base_directory
-
-            with open(csv_file_path, 'r', encoding='utf-8-sig') as csvfile:
-                csvfile.seek(0)
-                reader = csv.DictReader(csvfile)
-
-                # Verify CSV structure
-                expected_columns = {
-                    'file', 'source_language', 'target_language', 'domain'}
-                actual_columns = set(
-                    reader.fieldnames) if reader.fieldnames else set()
-
-                if not expected_columns.issubset(actual_columns):
-                    error_msg = f"Invalid CSV structure. Expected columns: {expected_columns}, Found: {actual_columns}"
-                    logger.error(error_msg)
-                    results['errors'].append(error_msg)
-                    return results
-
-                # Count total rows first
-                csvfile.seek(0)
-                total_csv_rows = sum(1 for _ in csv.DictReader(csvfile))
-
-                # Update results with total from the start
-                results['expected_total'] = total_csv_rows
-
-                # Send initial progress with total
-                if progress_callback:
-                    progress_callback(f"Preparation: {total_csv_rows} glossaries to process", 0, 0, total_csv_rows)
-
-                # Reset to start of file for actual processing
-                csvfile.seek(0)
-                reader = csv.DictReader(csvfile)
-
-                # Start at 2 to account for header
-                for row_num, row in enumerate(reader, start=2):
-                    results['total_rows'] += 1
-
-                    # Send progress update every 100 rows
-                    if results['total_rows'] % 100 == 0:
-                        if progress_callback:
-                            progress_callback(f"Processing glossary row {results['total_rows']}", results['total_rows'], results['created'], total_csv_rows)
-
-                    try:
-                        # Get file path and normalize it (convert Windows paths to Unix)
-                        file_path = row['file'].strip()
-                        original_file_path = file_path
-
-                        # Convert Windows backslashes to forward slashes
-                        file_path = file_path.replace('\\', '/')
-
-                        # Extract just the filename for searching
-                        filename_only = os.path.basename(file_path)
-
-                        found_file_path = None
-
-                        if working_directory:
-                            # First, try the direct path
-                            direct_path = os.path.join(
-                                working_directory, file_path)
-
-                            if os.path.exists(direct_path):
-                                found_file_path = direct_path
-                            else:
-                                # Try just the filename in the root of working directory
-                                root_path = os.path.join(
-                                    working_directory, filename_only)
-
-                                if os.path.exists(root_path):
-                                    found_file_path = root_path
-                                else:
-                                    # Search recursively for the file
-                                    for root, dirs, files in os.walk(working_directory):
-                                        if filename_only in files:
-                                            found_file_path = os.path.join(
-                                                root, filename_only)
-                                            break
-
-                                        # Also try case-insensitive search
-                                        for file in files:
-                                            if file.lower() == filename_only.lower():
-                                                found_file_path = os.path.join(
-                                                    root, file)
-                                                break
-                                        if found_file_path:
-                                            break
-
-                        # Verify file exists
-                        if not found_file_path or not os.path.exists(found_file_path):
-                            error_msg = f"Row {row_num} (File: {original_file_path}) - File not found in ZIP (searched for: {filename_only})"
-                            logger.warning(error_msg)
-                            results['errors'].append(error_msg)
-                            continue
-
-                        # Get or create domain
-                        domain_name = row['domain'].strip()
-                        domain, created = Domain.objects.get_or_create(
-                            name=domain_name)
-
-                        # Get languages
-                        source_lang_code = row['source_language'].strip()
-                        target_lang_code = row['target_language'].strip()
-
-                        try:
-                            # Try to find language by abbreviation first, then by name
-                            source_language = None
-                            try:
-                                source_language = Language.objects.get(
-                                    abbreviation=source_lang_code)
-                            except Language.DoesNotExist:
-                                try:
-                                    source_language = Language.objects.get(
-                                        name=source_lang_code)
-                                except Language.DoesNotExist:
-                                    # Try case-insensitive search
-                                    source_language = Language.objects.filter(
-                                        abbreviation__iexact=source_lang_code
-                                    ).first()
-                                    if not source_language:
-                                        source_language = Language.objects.filter(
-                                            name__iexact=source_lang_code
-                                        ).first()
-
-                            if not source_language:
-                                raise Language.DoesNotExist()
-
-                        except Language.DoesNotExist:
-                            error_msg = f"Row {row_num} (File: {row['file']}) - Source language '{source_lang_code}' not found"
-                            logger.error(error_msg)
-                            results['errors'].append(error_msg)
-                            continue
-
-                        try:
-                            # Try to find language by abbreviation first, then by name
-                            target_language = None
-                            try:
-                                target_language = Language.objects.get(
-                                    abbreviation=target_lang_code)
-                            except Language.DoesNotExist:
-                                try:
-                                    target_language = Language.objects.get(
-                                        name=target_lang_code)
-                                except Language.DoesNotExist:
-                                    # Try case-insensitive search
-                                    target_language = Language.objects.filter(
-                                        abbreviation__iexact=target_lang_code
-                                    ).first()
-                                    if not target_language:
-                                        target_language = Language.objects.filter(
-                                            name__iexact=target_lang_code
-                                        ).first()
-
-                            if not target_language:
-                                raise Language.DoesNotExist()
-
-                        except Language.DoesNotExist:
-                            error_msg = f"Row {row_num} (File: {row['file']}) - Target language '{target_lang_code}' not found"
-                            logger.error(error_msg)
-                            results['errors'].append(error_msg)
-                            continue
-
-                        # Check if glossary already exists (default glossary without user/group)
-                        existing_glossary = Glossary.objects.filter(
-                            domain=domain,
-                            source_language=source_language,
-                            target_language=target_language,
-                            user__isnull=True,
-                            group__isnull=True
-                        ).first()
-
-                        # Read file content and create ContentFile to avoid path issues
-                        file_name = os.path.basename(found_file_path)
-
-                        with open(found_file_path, 'rb') as f:
-                            file_content = f.read()
-                            # Use ContentFile which doesn't depend on file path
-                            django_file = ContentFile(
-                                file_content, name=file_name)
-
-                            if existing_glossary:
-                                # Update existing glossary
-                                # Update the file and name
-                                existing_glossary.file = django_file
-                                existing_glossary.name = os.path.splitext(file_name)[0]
-
-                                # Save and let the post_save signal handle API update
-                                existing_glossary.save()
-
-                                results['updated'] += 1
-                            else:
-                                # Create new glossary
-                                glossary = Glossary(
-                                    domain=domain,
-                                    source_language=source_language,
-                                    target_language=target_language,
-                                    file=django_file,
-                                    name=os.path.splitext(file_name)[0]
-                                )
-
-                                # Save and let the post_save signal handle API creation and update
-                                glossary.save()
-
-                                results['created'] += 1
-
-                    except ValidationError as e:
-                        # Handle Django validation errors (from glossary file validation)
-                        filename_info = f"File: {row.get('file', 'unknown')}"
-
-                        # Extract validation error messages
-                        if hasattr(e, 'messages'):
-                            validation_messages = ', '.join(e.messages)
-                        elif hasattr(e, 'message'):
-                            validation_messages = e.message
-                        else:
-                            validation_messages = str(e)
-
-                        error_msg = f"Row {row_num} ({filename_info}) - Validation error: {validation_messages}"
-                        logger.error(error_msg, exc_info=True)
-                        results['errors'].append(error_msg)
-
-                    except Exception as e:
-                        # Extract more meaningful error messages
-                        error_detail = str(e)
-
-                        # Get the filename being processed
-                        filename_info = f"File: {row.get('file', 'unknown')}"
-
-                        # Check if it's a validation error embedded in the exception message
-                        if "ValidationError" in error_detail or "Source column is blank" in error_detail or "Target column is blank" in error_detail:
-                            # Extract the validation error message
-                            import re
-                            match = re.search(r"\['([^']+)'\]", error_detail)
-                            if match:
-                                validation_msg = match.group(1)
-                                error_msg = f"Row {row_num} ({filename_info}) - Validation error: {validation_msg}"
-                            else:
-                                error_msg = f"Row {row_num} ({filename_info}) - Validation error: {error_detail}"
-                        # Check if it's a JSON error from the API
-                        elif 'glossary_id' in error_detail and 'Input should be a valid string' in error_detail:
-                            error_msg = f"Row {row_num} ({filename_info}) - Glossary API failed - check that the glossary service is accessible and the file is valid"
-                        elif "The 'file' attribute has no file associated with it" in error_detail:
-                            error_msg = f"Row {row_num} ({filename_info}) - The glossary file could not be processed correctly"
-                        else:
-                            error_msg = f"Row {row_num} ({filename_info}) - {error_detail}"
-
-                        logger.error(error_msg, exc_info=True)
-                        results['errors'].append(error_msg)
-
-                # Send final progress message with total
-                total_expected = results.get('expected_total', results['total_rows'])
-                total_processed = results['created'] + results['updated']
-                message_parts = []
-                if results['created'] > 0:
-                    message_parts.append(f"{results['created']} created")
-                if results['updated'] > 0:
-                    message_parts.append(f"{results['updated']} updated")
-
-                summary = ", ".join(message_parts) if message_parts else "none processed"
-                final_message = f"Processing complete: {summary} out of {results['total_rows']} rows"
-
-                if progress_callback:
-                    progress_callback(
-                        final_message,
-                        results['total_rows'],
-                        total_processed,
-                        total_expected
-                    )
-
-        except Exception as e:
-            error_msg = f"Error processing files: {str(e)}"
-            logger.error(error_msg, exc_info=True)
-            results['errors'].append(error_msg)
-            send_progress(f"Error during processing: {str(e)}")
-        finally:
-            # Clean up temporary directory
-            if temp_dir and os.path.exists(temp_dir):
-                try:
-                    import shutil
-                    shutil.rmtree(temp_dir)
-                except Exception as cleanup_error:
-                    logger.error(
-                        f"Error cleaning up temporary directory: {cleanup_error}")
-
-        return results
