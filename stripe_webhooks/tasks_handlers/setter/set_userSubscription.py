@@ -6,6 +6,7 @@ user subscriptions in the Stripe webhook system.
 """
 
 from datetime import datetime
+from typing import Any
 
 from django.db import transaction
 
@@ -69,7 +70,7 @@ def create_userSubscriptions(
                         return error_response, None
                     user.save()
 
-                user_subscription = UserSubscription.objects.create(
+                UserSubscription.objects.create(
                     user=user,
                     subscription=subscription_type,
                     stripe_subscription_id=stripe_subscription_id,
@@ -78,7 +79,6 @@ def create_userSubscriptions(
                     end_date=end_time,
                     status=status
                 )
-                user_subscription.save()
 
     except Exception as error:
         return exception_error(error), None
@@ -88,68 +88,157 @@ def create_userSubscriptions(
     )
 
 
+def _update_subscription_type_and_limits(
+    user_subscription: UserSubscription,
+    new_subscription_type: SubscriptionType,
+    changed_fields: set[str]
+) -> bool:
+    """
+    Update subscription type and copy limits from the new SubscriptionType.
+
+    Args:
+        user_subscription: The subscription to update.
+        new_subscription_type: The new SubscriptionType to apply.
+        changed_fields: Set to track which fields were changed.
+
+    Returns:
+        bool: True if subscription type was changed, False otherwise.
+    """
+    if user_subscription.subscription == new_subscription_type:
+        return False
+
+    user_subscription.subscription = new_subscription_type
+    user_subscription.max_symbols_count = new_subscription_type.max_symbols_count
+    user_subscription.max_words_count = new_subscription_type.max_words_count
+    user_subscription.max_files_count = new_subscription_type.max_files_count
+    user_subscription.custom_glossaries_count = new_subscription_type.custom_glossaries_count
+
+    changed_fields.add('subscription')
+    changed_fields.add('limits')
+    return True
+
+
+def _add_field_if_changed(
+    field_name: str,
+    old_value: Any,
+    new_value: Any,
+    changed_fields: set[str]
+) -> bool:
+    """
+    Add field name to changed_fields set if values differ.
+
+    Args:
+        field_name: Name of the field being checked.
+        old_value: Current value.
+        new_value: New value to compare.
+        changed_fields: Set to track changed fields.
+
+    Returns:
+        bool: True if values differ, False otherwise.
+    """
+    if old_value != new_value:
+        changed_fields.add(field_name)
+        return True
+    return False
+
+
 def set_new_userSubscription_list_values(
     userSubscription_list: list[UserSubscription],
     new_values: dict
-) -> tuple[HttpResponse | None, list[EmailType], bool]:
+) -> tuple[HttpResponse | None, list[EmailType], bool, list[str]]:
     """
     Update a list of user subscriptions with new values.
 
-    This function updates subscription end dates, statuses, and Stripe item IDs
-    for multiple subscriptions. It tracks which email types should be sent based on
-    status changes and whether any changes were made.
+    This function updates subscription end dates, statuses, Stripe item IDs,
+    and subscription types for multiple subscriptions. It tracks which email types
+    should be sent based on status changes and whether any changes were made.
+    
+    When the subscription type changes, it automatically updates the limits
+    (max_symbols_count, max_words_count, max_files_count, custom_glossaries_count)
+    from the new SubscriptionType.
 
     Args:
-        userSubscription_list (list[UserSubscription]): List of subscriptions
-                                                        to update.
-        new_values (dict): Dictionary containing new values to apply.
-                          Can include 'end_date', 'status', and 'stripe_subscription_item_id'.
+        userSubscription_list: List of subscriptions to update.
+        new_values: Dictionary containing new values to apply.
+                   Can include 'end_date', 'status', 'stripe_subscription_item_id',
+                   and 'subscription' (SubscriptionType). When 'subscription' is
+                   provided and different, limits are automatically copied from
+                   the new SubscriptionType.
 
     Returns:
-        tuple[HttpResponse | None, list[EmailType], bool]: Error response,
-        list of email types to send, and boolean indicating if changes were made.
+        tuple containing:
+        - Error response (None if success)
+        - List of email types to send
+        - Boolean indicating if changes were made
+        - List of changed field names
     """
     email_types: list[EmailType] = []
+    changed_fields: set[str] = set()
 
     try:
         global_changed = False
         for user_subscription in userSubscription_list:
-            changed = False
+            subscription_changed = False
+
+            # Update subscription type if provided and different
+            if 'subscription' in new_values:
+                if _update_subscription_type_and_limits(
+                    user_subscription,
+                    new_values['subscription'],
+                    changed_fields
+                ):
+                    subscription_changed = True
 
             # Update end date if provided
             if 'end_date' in new_values:
                 new_end = new_values['end_date'].astimezone(
                     user_subscription.end_date.tzinfo
                 )
-                if new_end != user_subscription.end_date:
-                    user_subscription.end_date = new_values['end_date']
-                    changed = True
+                if _add_field_if_changed(
+                    'end_date',
+                    user_subscription.end_date,
+                    new_end,
+                    changed_fields
+                ):
+                    user_subscription.end_date = new_end
+                    subscription_changed = True
 
             # Update status if provided and different
-            if ('status' in new_values and
-                    new_values['status'] != user_subscription.status):
-                user_subscription.status = new_values['status']
-                changed = True
+            if 'status' in new_values:
+                if _add_field_if_changed(
+                    'status',
+                    user_subscription.status,
+                    new_values['status'],
+                    changed_fields
+                ):
+                    user_subscription.status = new_values['status']
+                    subscription_changed = True
 
-            if ('stripe_subscription_item_id' in new_values and
-                    new_values['stripe_subscription_item_id'] != user_subscription.stripe_subscription_item_id):
-                user_subscription.stripe_subscription_item_id = new_values['stripe_subscription_item_id']
-                changed = True
+            # Update stripe subscription item ID if provided and different
+            if 'stripe_subscription_item_id' in new_values:
+                if _add_field_if_changed(
+                    'stripe_subscription_item_id',
+                    user_subscription.stripe_subscription_item_id,
+                    new_values['stripe_subscription_item_id'],
+                    changed_fields
+                ):
+                    user_subscription.stripe_subscription_item_id = new_values['stripe_subscription_item_id']
+                    subscription_changed = True
 
-            if changed:
+            if subscription_changed:
                 user_subscription.save()
                 global_changed = True
 
-            # Deactivate user if subscription becomes inactive
+            # Track email types for inactive subscriptions
             if not is_user_subscription_active(user_subscription.status):
                 user_subscription.user.is_active = False
                 if EmailType.SUBSCRIPTION_UPDATED_INACTIVE not in email_types:
                     email_types.append(EmailType.SUBSCRIPTION_UPDATED_INACTIVE)
 
     except Exception as error:
-        return exception_error(error), [], False
+        return exception_error(error), [], False, []
 
-    return None, email_types, global_changed
+    return None, email_types, global_changed, sorted(changed_fields)
 
 
 def deactivate_userSubscription(

@@ -11,8 +11,9 @@ import string
 from emails.models import EmailType
 from emails.send_email import send_email
 from subscriptions.models import SubscriptionType, UserSubscription
+from users.models import User
 
-from .error.error import HttpResponse, success_message
+from .error.error import HttpResponse, exception_error, success_message
 from .getter.get_data import (
     get_buyer_from_userSubscription_list,
     get_subscriptionType_by_stripe_product_id,
@@ -40,6 +41,151 @@ from .setter.set_userSubscription import (
     deactivate_userSubscriptions,
     set_new_userSubscription_list_values,
 )
+
+
+def _send_admin_notification_email(
+    admin: User,
+    buyer: User,
+    email_type: EmailType,
+    subscription_type: SubscriptionType,
+    additional_params: dict | None = None
+) -> HttpResponse | None:
+    """
+    Send notification email to an admin user.
+
+    Args:
+        admin: The admin user to notify.
+        buyer: The buyer user (for Stripe session link).
+        email_type: Type of email to send.
+        subscription_type: The subscription type.
+        additional_params: Additional parameters for email template.
+
+    Returns:
+        Error response if sending fails, None otherwise.
+    """
+    error_response, session_link = get_stripe_customer_session_url(
+        buyer.stripe_customer_id
+    )
+    if error_response:
+        return error_response
+
+    params = {
+        "lexa_company_name": admin.group.name,
+        "lexa_username": admin.username,
+        "stripe_subscription_type": subscription_type.name,
+        "stripe_session_link": session_link
+    }
+    if additional_params:
+        params.update(additional_params)
+
+    return send_email(
+        admin.email,
+        email_type,
+        admin.language,
+        params
+    )
+
+
+def _send_inactive_subscription_notifications(
+    active_user_subscription_list: list[UserSubscription],
+    group_admins: list[User],
+    subscription_type: SubscriptionType,
+    buyer: User
+) -> HttpResponse | None:
+    """
+    Send notifications when subscriptions become inactive.
+
+    Args:
+        active_user_subscription_list: List of active subscriptions.
+        group_admins: List of admin users in the group.
+        subscription_type: The subscription type.
+        buyer: The buyer user.
+
+    Returns:
+        Error response if sending fails, None otherwise.
+    """
+    # Notify regular users about subscription becoming inactive
+    for user_subscription in active_user_subscription_list:
+        user = user_subscription.user
+        if user not in group_admins:
+            error_response = send_email(
+                user.email,
+                EmailType.SUBSCRIPTION_UPDATED_INACTIVE,
+                user.language,
+                {
+                    "lexa_username": user.username,
+                    "stripe_subscription_type": subscription_type.name,
+                }
+            )
+            if error_response:
+                return error_response
+
+    # Notify admins about subscription becoming inactive
+    for admin in group_admins:
+        error_response = _send_admin_notification_email(
+            admin,
+            buyer,
+            EmailType.SUBSCRIPTION_UPDATED_INACTIVE_ADMIN,
+            subscription_type
+        )
+        if error_response:
+            return error_response
+
+    return None
+
+
+def _send_quantity_change_notifications(
+    group_admins: list[User],
+    buyer: User,
+    subscription_type: SubscriptionType,
+    quantity: int
+) -> HttpResponse | None:
+    """
+    Send notifications when subscription quantity changes.
+
+    Args:
+        group_admins: List of admin users in the group.
+        buyer: The buyer user.
+        subscription_type: The subscription type.
+        quantity: The new quantity.
+
+    Returns:
+        Error response if sending fails, None otherwise.
+    """
+    for admin in group_admins:
+        error_response = _send_admin_notification_email(
+            admin,
+            buyer,
+            EmailType.SUBSCRIPTION_UPDATED_QUANTITY_ADMIN,
+            subscription_type,
+            {"quantity": quantity}
+        )
+        if error_response:
+            return error_response
+
+    return None
+
+
+def _format_changed_fields_message(
+    changed_fields: list[str],
+    old_quantity: int,
+    new_quantity: int
+) -> str:
+    """
+    Format changed fields for success message.
+
+    Args:
+        changed_fields: List of changed field names.
+        old_quantity: Previous quantity.
+        new_quantity: New quantity.
+
+    Returns:
+        Formatted string describing changes.
+    """
+    fields_str = ", ".join(changed_fields) if changed_fields else "unknown changes"
+    if old_quantity != new_quantity:
+        fields_str += f", quantity ({old_quantity} → {new_quantity})"
+    return fields_str
 
 
 def handle_customer_subscription_created(payload: dict) -> HttpResponse:
@@ -279,20 +425,22 @@ def handle_customer_subscription_updated(payload: dict) -> HttpResponse:
 
     status = string_to_UserSubscriptionChoices(payload_status)
     old_quantity = len(active_user_subscription_list)
-    group_admins = buyer.group.admin.all()
+    group_admins = list(buyer.group.admin.all())
 
     # Update existing subscriptions with new values
-    error_response, emailType_list, did_changed = set_new_userSubscription_list_values(
+    error_response, emailType_list, did_changed, changed_fields = set_new_userSubscription_list_values(
         active_user_subscription_list,
         {
             "end_date": end_time,
             "status": status,
             "stripe_subscription_item_id": subscription_item_id,
+            "subscription": subscription_type,
         }
     )
     if error_response:
         return error_response
 
+    # Handle quantity changes
     if quantity > old_quantity:
         # Need to create additional subscriptions
         did_changed = True
@@ -311,7 +459,7 @@ def handle_customer_subscription_updated(payload: dict) -> HttpResponse:
         if error_response:
             return error_response
 
-    if quantity < old_quantity:
+    elif quantity < old_quantity:
         # Need to deactivate excess subscriptions
         did_changed = True
         deactivated_user_subscription_list = sorted(
@@ -326,88 +474,52 @@ def handle_customer_subscription_updated(payload: dict) -> HttpResponse:
         if error_response:
             return error_response
 
+    # Track quantity change for email notifications
     if quantity != old_quantity:
         emailType_list.append(EmailType.SUBSCRIPTION_UPDATED_QUANTITY_ADMIN)
 
-    group_admins = buyer.group.admin.all()
-
-    # Handle subscription inactive notifications
+    # Send email notifications
     if EmailType.SUBSCRIPTION_UPDATED_INACTIVE in emailType_list:
-        # Notify regular users about subscription becoming inactive
-        for user_subscription in active_user_subscription_list:
-            user = user_subscription.user
-            if user not in group_admins:
-                error_response = send_email(
-                    user.email,
-                    EmailType.SUBSCRIPTION_UPDATED_INACTIVE,
-                    user.language,
-                    {
-                        "lexa_username": user.username,
-                        "stripe_subscription_type": subscription_type.name,
-                    }
-                )
-                if error_response:
-                    return error_response
+        error_response = _send_inactive_subscription_notifications(
+            active_user_subscription_list,
+            group_admins,
+            subscription_type,
+            buyer
+        )
+        if error_response:
+            return error_response
 
-        # Notify admins about subscription becoming inactive
-        for admin in group_admins:
-            error_response, session_link = get_stripe_customer_session_url(
-                buyer.stripe_customer_id
-            )
-            if error_response:
-                return error_response
-
-            error_response = send_email(
-                admin.email,
-                EmailType.SUBSCRIPTION_UPDATED_INACTIVE_ADMIN,
-                admin.language,
-                {
-                    "lexa_company_name": admin.group.name,
-                    "lexa_username": admin.username,
-                    "stripe_subscription_type": subscription_type.name,
-                    "stripe_session_link": session_link
-                }
-            )
-            if error_response:
-                return error_response
-
-    # Handle quantity change notifications
     if EmailType.SUBSCRIPTION_UPDATED_QUANTITY_ADMIN in emailType_list:
-        for admin in group_admins:
-            error_response, session_link = get_stripe_customer_session_url(
-                buyer.stripe_customer_id
-            )
-            if error_response:
-                return error_response
+        error_response = _send_quantity_change_notifications(
+            group_admins,
+            buyer,
+            subscription_type,
+            quantity
+        )
+        if error_response:
+            return error_response
 
-            error_response = send_email(
-                admin.email,
-                EmailType.SUBSCRIPTION_UPDATED_QUANTITY_ADMIN,
-                admin.language,
-                {
-                    "lexa_company_name": admin.group.name,
-                    "lexa_username": admin.username,
-                    "stripe_subscription_type": subscription_type.name,
-                    "quantity": quantity,
-                    "stripe_session_link": session_link
-                }
-            )
-            if error_response:
-                return error_response
-
+    # Return success response
     if not did_changed:
         return success_message(
             "customer_subscription_identical",
             stripe_subscription_id=stripe_subscription_id
         )
-    else:
-        return success_message(
-            "customer_subscription_updated",
-            quantity=quantity,
-            stripe_subscription_id=stripe_subscription_id,
-            status=status,
-            payload_status=payload_status
-        )
+
+    changed_fields_str = _format_changed_fields_message(
+        changed_fields,
+        old_quantity,
+        quantity
+    )
+
+    return success_message(
+        "customer_subscription_updated",
+        quantity=quantity,
+        stripe_subscription_id=stripe_subscription_id,
+        status=status,
+        payload_status=payload_status,
+        changed_fields=changed_fields_str
+    )
 
 
 def handle_customer_subscription_deleted(payload: dict) -> HttpResponse:

@@ -44,7 +44,7 @@ SUCCESS_MESSAGES_TEMPLATE: dict[str, dict[str, str | int]] = {
     },
     "customer_subscription_updated": {
         "message": "({quantity}) UserSubscription stripe id '{stripe_subscription_id}' "
-        "updated with status {status} ({payload_status})",
+        "updated: status={status} ({payload_status}), changed_fields=[{changed_fields}]",
         "code": CODE_OK
     },
     "customer_subscription_identical": {
