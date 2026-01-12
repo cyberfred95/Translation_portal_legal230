@@ -396,12 +396,16 @@ class SetUserSubscriptionTestCase(TestCase):
             'stripe_subscription_item_id': "si_updated",
         }
 
-        error, email_types, changed = set_new_userSubscription_list_values(
+        error, email_types, changed, changed_fields = set_new_userSubscription_list_values(
             [subscription], new_values
         )
 
         self.assertIsNone(error)
         self.assertTrue(changed)
+        self.assertIsInstance(changed_fields, list)
+        self.assertIn('end_date', changed_fields)
+        self.assertIn('status', changed_fields)
+        self.assertIn('stripe_subscription_item_id', changed_fields)
         subscription.refresh_from_db()
         self.assertEqual(subscription.status, SUBSCRIPTION_STATUS_CANCELED)
         self.assertEqual(subscription.stripe_subscription_item_id, "si_updated")
