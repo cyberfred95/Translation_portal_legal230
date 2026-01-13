@@ -94,3 +94,12 @@
   border-radius: 12px;
 }
 
+/* Le bouton utilise maintenant les classes dashboard-btn btn-green */
+/* Styles supplémentaires pour le bouton dans l'overlay si nécessaire */
+.subscription-error-message .dashboard-btn {
+  margin-top: 1rem;
+  justify-content: center;
+  width: auto;
+  min-width: 200px;
+}
+

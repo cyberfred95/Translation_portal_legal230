@@ -17,16 +17,21 @@ Le conteneur parent doit avoir:
     <div class="subscription-error-message">
         <i class="ph-fill ph-warning icon-48"></i>
         <h3 class="subscription-error-title">{% trans 'Subscription Error' %}</h3>
-        <p class="subscription-error-details">
             {% if user_subscription_info.status == 'no_subscription' %}
-                {% trans 'No active subscription' %}
+            <button id="subscription-pricing-button" class="dashboard-btn btn-green">
+                {% trans 'View pricing plans' %}
+            </button>
+            <p class="subscription-error-help">
+                {% trans 'If you think this is an error, please contact an administrator' %}
+            </p>
             {% elif user_subscription_info.status == 'error' %}
+            <p class="subscription-error-details">
                 {{ user_subscription_info.error_details }}
-            {% endif %}
         </p>
         <p class="subscription-error-help">
             {% trans 'If you think this is an error, please contact an administrator' %}
         </p>
+        {% endif %}
     </div>
 </div>
 {% endif %}

@@ -312,6 +312,7 @@ STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY')
 STRIPE_PORTAL_RETURN_URL = "https://portail.lexamt.fr/fr/profile-details/"
 STRIPE_CHECKOUT_SUCCESS_URL = "https://portail.lexamt.fr"
 STRIPE_CHECKOUT_CANCEL_URL = "https://portail.lexamt.fr"
+TARIFS_PAGE_URL = os.environ.get('TARIFS_PAGE_URL')
 
 # Active Trail Configuration
 ACTIVE_TRAIL_SENDING_PROFILE_ID = int(
