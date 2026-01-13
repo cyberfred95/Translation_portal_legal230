@@ -8,6 +8,8 @@ including creation, updates, deletions, and trial end notifications for subscrip
 import random
 import string
 
+import stripe
+
 from emails.models import EmailType
 from emails.send_email import send_email
 from subscriptions.models import SubscriptionType, UserSubscription
@@ -314,6 +316,38 @@ def _send_incomplete_subscription_notifications(
     return None
 
 
+def _configure_subscription_cancellation_at_period_end(
+    subscription_type: SubscriptionType,
+    stripe_subscription_id: str
+) -> HttpResponse | None:
+    """
+    Configure Stripe subscription to cancel at period end if required.
+
+    If the subscription type has block_after_first_month enabled, this function
+    configures the Stripe subscription to automatically cancel at the end of
+    the current billing period.
+
+    Args:
+        subscription_type: The subscription type to check for cancellation setting.
+        stripe_subscription_id: The Stripe subscription ID to modify.
+
+    Returns:
+        Error response if Stripe API call fails, None otherwise.
+    """
+    if not subscription_type.block_after_first_month:
+        return None
+
+    try:
+        stripe.Subscription.modify(
+            stripe_subscription_id,
+            cancel_at_period_end=True
+        )
+    except stripe.error.StripeError as error:
+        return exception_error(error)
+
+    return None
+
+
 def handle_customer_subscription_created(payload: dict) -> HttpResponse:
     """
     Handle customer subscription created webhook event.
@@ -365,10 +399,10 @@ def handle_customer_subscription_created(payload: dict) -> HttpResponse:
     )
     if error_response:
         return error_response
+
     error_response, subscription_item_id = get_item_data_subscription_item_id(item_data)
     if error_response:
         return error_response
-
 
     error_response, payload_status = get_payload_status(payload)
     if error_response:
@@ -391,6 +425,14 @@ def handle_customer_subscription_created(payload: dict) -> HttpResponse:
         buyer=buyer,
         is_buying=True,
         quantity=quantity
+    )
+    if error_response:
+        return error_response
+
+    # Configure subscription cancellation at period end if required
+    error_response = _configure_subscription_cancellation_at_period_end(
+        subscription_type,
+        stripe_subscription_id
     )
     if error_response:
         return error_response
