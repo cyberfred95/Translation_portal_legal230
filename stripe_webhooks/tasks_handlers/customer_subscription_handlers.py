@@ -9,6 +9,7 @@ import random
 import string
 
 import stripe
+from django.conf import settings
 
 from emails.models import EmailType
 from emails.send_email import send_email
@@ -332,15 +333,22 @@ def _configure_subscription_cancellation_at_period_end(
         stripe_subscription_id: The Stripe subscription ID to modify.
 
     Returns:
-        Error response if Stripe API call fails, None otherwise.
+        Error response if Stripe API call fails or API key is not configured, None otherwise.
     """
     if not subscription_type.block_after_first_month:
         return None
 
+    api_key = settings.STRIPE_API_KEY
+    if not api_key:
+        return exception_error(
+            ValueError("STRIPE_API_KEY is not configured")
+        )
+
     try:
         stripe.Subscription.modify(
             stripe_subscription_id,
-            cancel_at_period_end=True
+            cancel_at_period_end=True,
+            api_key=api_key
         )
     except stripe.error.StripeError as error:
         return exception_error(error)
