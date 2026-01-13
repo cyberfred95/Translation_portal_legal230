@@ -45,6 +45,8 @@ class SubscriptionType(models.Model):
         default=False, verbose_name="Access to Official Glossaries")
     access_to_sso = models.BooleanField(
         default=False, verbose_name="Possible access by SSO authentication logic")
+    block_after_first_month = models.BooleanField(
+        default=False, verbose_name="Block After First Month")
 
     def __str__(self):
         return self.name

@@ -438,11 +438,31 @@ class SubscriptionTypeAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
     inlines = [UserSubscriptionInline]
+    
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'stripe_product_id', 'product_type', 'price')
+        }),
+        ('Limits', {
+            'fields': (
+                'max_symbols_count', 'max_words_count',
+                'max_files_count', 'custom_glossaries_count'
+            )
+        }),
+        ('Access Permissions', {
+            'fields': (
+                'access_to_writing', 'access_to_official_glossaries',
+                'access_to_sso', 'block_after_first_month'
+            )
+        }),
+    )
 
     def stripe(self, obj):
         """Display Stripe logo if Stripe Product ID exists"""
         if obj.stripe_product_id:
-            return mark_safe(f'<i class="ph ph-stripe-logo" style="color: #635bff; font-size: 1.5em;" title="{obj.stripe_product_id}"></i>')
+            # Display in green if block_after_first_month is True, otherwise use default color
+            color = "#00ff00" if obj.block_after_first_month else "#635bff"
+            return mark_safe(f'<i class="ph ph-stripe-logo" style="color: {color}; font-size: 1.5em;" title="{obj.stripe_product_id}"></i>')
         return "-"
     stripe.short_description = 'STRIPE'
     stripe.admin_order_field = 'stripe_product_id'
