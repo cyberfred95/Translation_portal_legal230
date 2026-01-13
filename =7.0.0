@@ -1,0 +1,17 @@
+Defaulting to user installation because normal site-packages is not writeable
+Requirement already satisfied: stripe in /home/pbernier/.local/lib/python3.10/site-packages (14.0.1)
+Collecting stripe
+  Downloading stripe-14.1.0-py3-none-any.whl (2.1 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 34.3 MB/s eta 0:00:00
+Requirement already satisfied: requests>=2.20 in /home/pbernier/.local/lib/python3.10/site-packages (from stripe) (2.27.1)
+Requirement already satisfied: typing_extensions>=4.5.0 in /home/pbernier/.local/lib/python3.10/site-packages (from stripe) (4.14.1)
+Requirement already satisfied: idna<4,>=2.5 in /usr/lib/python3/dist-packages (from requests>=2.20->stripe) (3.3)
+Requirement already satisfied: charset-normalizer~=2.0.0 in /home/pbernier/.local/lib/python3.10/site-packages (from requests>=2.20->stripe) (2.0.12)
+Requirement already satisfied: urllib3<1.27,>=1.21.1 in /home/pbernier/.local/lib/python3.10/site-packages (from requests>=2.20->stripe) (1.25.11)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/lib/python3/dist-packages (from requests>=2.20->stripe) (2020.6.20)
+Installing collected packages: stripe
+  Attempting uninstall: stripe
+    Found existing installation: stripe 14.0.1
+    Uninstalling stripe-14.0.1:
+      Successfully uninstalled stripe-14.0.1
+Successfully installed stripe-14.1.0

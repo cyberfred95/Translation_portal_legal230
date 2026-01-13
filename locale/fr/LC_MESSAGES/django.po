@@ -1365,6 +1365,10 @@ msgstr "Aucun abonnement actif"
 msgid "If you think this is an error, please contact an administrator"
 msgstr "Si vous pensez que c'est une erreur, veuillez contacter un administrateur"
 
+#: legal/templates/common/subscription_error_overlay.html
+msgid "View pricing plans"
+msgstr "Voir les tarifs"
+
 #~ msgid "Process"
 #~ msgstr "Appliquer"
 

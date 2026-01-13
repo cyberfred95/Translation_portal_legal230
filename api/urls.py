@@ -14,7 +14,7 @@ from .views.domain import DomainListAPIView, DomainDefaultGlossariesAPIView
 from .views.glossary import GlossaryAPIView, GlossaryExistAPIView
 from .views.language import LanguageAPIView
 from .views.translate import TranslateAPIView
-from .views.stripe import StripePortalSessionView
+from .views.stripe import StripePortalSessionView, StripePricingPageUrlView
 from .views.internal import (
     InternalDomainGroupsView,
     InternalUsersView,
@@ -75,6 +75,11 @@ urlpatterns = [
         API_VERSION + 'stripe-portal-session/',
         StripePortalSessionView.as_view(),
         name='api-stripe-portal-session'
+    ),
+    path(
+        API_VERSION + 'stripe-pricing-page-url/',
+        StripePricingPageUrlView.as_view(),
+        name='api-stripe-pricing-page-url'
     ),
 
     # ==========================================================================

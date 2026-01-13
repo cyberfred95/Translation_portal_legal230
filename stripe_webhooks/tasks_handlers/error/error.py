@@ -142,7 +142,23 @@ def _extract_exception_details(exception: Exception) -> tuple[str, str]:
         tuple[str, str]: A tuple containing (exception_type, exception_message).
     """
     exception_type = type(exception).__name__
-    exception_message = str(exception) or "No error message available"
+    
+    # Try to get a meaningful message from the exception
+    exception_message = str(exception) if str(exception) else None
+    
+    # For AttributeError, try to get more details
+    if exception_type == "AttributeError" and not exception_message:
+        if hasattr(exception, 'name'):
+            exception_message = f"Attribute '{exception.name}' not found"
+        elif hasattr(exception, 'args') and exception.args:
+            exception_message = f"Attribute error: {exception.args[0]}"
+        else:
+            exception_message = "Attribute not found (check if the API/feature is available)"
+    
+    # Fallback if still no message
+    if not exception_message:
+        exception_message = f"{exception_type} occurred but no message available"
+    
     return exception_type, exception_message
 
 

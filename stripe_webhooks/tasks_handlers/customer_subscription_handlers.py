@@ -70,7 +70,7 @@ def _send_admin_notification_email(
         return error_response
 
     params = {
-        "lexa_company_name": admin.group.name,
+        "lexa_company_name": buyer.group.name,
         "lexa_username": admin.username,
         "stripe_subscription_type": subscription_type.name,
         "stripe_session_link": session_link
@@ -188,6 +188,132 @@ def _format_changed_fields_message(
     return fields_str
 
 
+def _has_existing_subscriptions(user: User, exclude_subscription_id: str) -> bool:
+    """
+    Check if a user has existing subscriptions, excluding a specific one.
+
+    Args:
+        user: The user to check.
+        exclude_subscription_id: Stripe subscription ID to exclude from the check.
+
+    Returns:
+        True if user has other subscriptions, False otherwise.
+    """
+    return UserSubscription.objects.filter(
+        user=user
+    ).exclude(
+        stripe_subscription_id=exclude_subscription_id
+    ).exists()
+
+
+def _generate_and_set_password(user: User) -> tuple[HttpResponse | None, str | None]:
+    """
+    Generate a random password and set it for the user.
+
+    Args:
+        user: The user to set the password for.
+
+    Returns:
+        tuple[HttpResponse | None, str | None]: Error response and password,
+        or None and password on success.
+    """
+    try:
+        random_password = ''.join(
+            random.choice(string.ascii_letters + string.digits)
+            for _ in range(8)
+        )
+        user.set_password(random_password)
+        user.save()
+        return None, random_password
+    except Exception as error:
+        return exception_error(error), None
+
+
+def _send_lexa_user_creation_email(
+    user: User,
+    password: str
+) -> HttpResponse | None:
+    """
+    Send user creation email for LEXA subscription type.
+
+    Args:
+        user: The user to send the email to.
+        password: The generated password.
+
+    Returns:
+        Error response if sending fails, None otherwise.
+    """
+    return send_email(
+        user.email,
+        EmailType.USER_CREATED,
+        user.language,
+        {
+            "lexa_username": user.username,
+            "lexa_email": user.email,
+            "lexa_password": password
+        }
+    )
+
+
+def _send_subscription_creation_email(
+    user: User,
+    subscription_type: SubscriptionType,
+    api_key: str
+) -> HttpResponse | None:
+    """
+    Send subscription creation email based on product type.
+
+    Args:
+        user: The user to send the email to.
+        subscription_type: The subscription type.
+        api_key: The API key for API/ADDIN subscriptions.
+
+    Returns:
+        Error response if sending fails, None otherwise.
+    """
+    if subscription_type.product_type == SubscriptionType.ProductChoices.API:
+        email_type = EmailType.API_CREATED
+    else:  # ADDIN
+        email_type = EmailType.ADDIN_CREATED
+
+    return send_email(
+        user.email,
+        email_type,
+        user.language,
+        {
+            "lexa_username": user.username,
+            "lexa_email": user.email,
+            "lexa_apikey": api_key
+        }
+    )
+
+
+def _send_incomplete_subscription_notifications(
+    buyer: User,
+    subscription_type: SubscriptionType
+) -> HttpResponse | None:
+    """
+    Send notifications to admins when subscription status is INCOMPLETE.
+
+    Args:
+        buyer: The buyer user.
+        subscription_type: The subscription type.
+
+    Returns:
+        Error response if sending fails, None otherwise.
+    """
+    for admin in buyer.group.admin.all():
+        error_response = _send_admin_notification_email(
+            admin,
+            buyer,
+            EmailType.SUBSCRIPTION_NEED_PAYMENT_ADMIN,
+            subscription_type
+        )
+        if error_response:
+            return error_response
+    return None
+
+
 def handle_customer_subscription_created(payload: dict) -> HttpResponse:
     """
     Handle customer subscription created webhook event.
@@ -250,6 +376,10 @@ def handle_customer_subscription_created(payload: dict) -> HttpResponse:
 
     status = string_to_UserSubscriptionChoices(payload_status)
 
+    # Check if user has existing subscriptions (excluding the one being created)
+    is_new_user = not _has_existing_subscriptions(buyer, stripe_subscription_id)
+
+    # Create user subscriptions
     error_response, userSubscriptions = create_userSubscriptions(
         stripe_customer_id=buyer.stripe_customer_id,
         subscription_type=subscription_type,
@@ -265,75 +395,35 @@ def handle_customer_subscription_created(payload: dict) -> HttpResponse:
     if error_response:
         return error_response
 
-
-
+    # Send notifications for incomplete subscriptions
     if status == UserSubscription.UserSubscriptionChoices.INCOMPLETE:
-        for admin in buyer.group.admin.all():
-            error_response, session_link = get_stripe_customer_session_url(
-                buyer.stripe_customer_id
-            )
-            if error_response:
-                return error_response
+        error_response = _send_incomplete_subscription_notifications(
+            buyer,
+            subscription_type
+        )
+        if error_response:
+            return error_response
 
-            error_response = send_email(
-                admin.email,
-                EmailType.SUBSCRIPTION_NEED_PAYMENT_ADMIN,
-                admin.language,
-                {
-                    "lexa_company_name": buyer.group.name,
-                    "stripe_subscription_type": subscription_type.name,
-                    "stripe_session_link": session_link
-                }
-            )
-            if error_response:
-                return error_response
-
+    # Handle subscription creation emails based on product type
     if subscription_type.product_type == SubscriptionType.ProductChoices.LEXA:
-        try:
-            random_password = ''.join(
-                random.choice(string.ascii_letters + string.digits)
-                for _ in range(8)
-            )
-            buyer.set_password(random_password)
-            buyer.save()
-        except Exception as error:
-            return exception_error(error)
+        # Only reset password and send email for new users
+        if is_new_user:
+            error_response, password = _generate_and_set_password(buyer)
+            if error_response:
+                return error_response
 
-        error_response = send_email(
-            buyer.email,
-            EmailType.USER_CREATED,
-            buyer.language,
-            {
-            "lexa_username": buyer.username,
-            "lexa_email": buyer.email,
-            "lexa_password": random_password
-            }
-        )
-        if error_response:
-            return error_response
-    elif subscription_type.product_type == SubscriptionType.ProductChoices.API:
-        error_response = send_email(
-            buyer.email,
-            EmailType.API_CREATED,
-            buyer.language,
-            {
-            "lexa_username": buyer.username,
-            "lexa_email": buyer.email,
-            "lexa_apikey": userSubscriptions[0].api_key
-            }
-        )
-        if error_response:
-            return error_response
-    else:
-        error_response = send_email(
-            buyer.email,
-            EmailType.ADDIN_CREATED,
-            buyer.language,
-            {
-            "lexa_username": buyer.username,
-            "lexa_email": buyer.email,
-            "lexa_apikey": userSubscriptions[0].api_key
-            }
+            error_response = _send_lexa_user_creation_email(buyer, password)
+            if error_response:
+                return error_response
+    elif subscription_type.product_type in (
+        SubscriptionType.ProductChoices.API,
+        SubscriptionType.ProductChoices.ADDIN
+    ):
+        # Always send creation email for API and ADDIN subscriptions
+        error_response = _send_subscription_creation_email(
+            buyer,
+            subscription_type,
+            userSubscriptions[0].api_key
         )
         if error_response:
             return error_response
