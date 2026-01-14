@@ -794,7 +794,15 @@ def handle_customer_subscription_trials_will_end(payload: dict) -> HttpResponse:
                 "stripe_subscription_type": user_subscription.subscription.name,
             }
 
-            if user not in buyer.group.admin.all():
+            # Check if subscription type has block_after_first_month enabled
+            if user_subscription.subscription.block_after_first_month:
+                error_response = send_email(
+                    user.email,
+                    EmailType.SUBSCRIPTION_BASIC_WILL_END,
+                    user.language,
+                    param
+                )
+            elif user not in buyer.group.admin.all():
                 error_response = send_email(
                     user.email,
                     EmailType.SUBSCRIPTION_TRIALS_WILL_END,
