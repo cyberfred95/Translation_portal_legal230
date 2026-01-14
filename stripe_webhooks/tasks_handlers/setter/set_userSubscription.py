@@ -28,6 +28,7 @@ def create_userSubscriptions(
     end_time: datetime,
     status: str,
     buyer: User,
+    interval: str,
     is_buying: bool = False,
     quantity: int = 1
 ) -> tuple[HttpResponse | None, list[UserSubscription] | None]:
@@ -46,6 +47,7 @@ def create_userSubscriptions(
         end_time (datetime): The subscription end date.
         status (str): The subscription status.
         buyer (User): The user who purchased the subscription.
+        interval (str): The billing interval (day, week, month, or year).
         is_buying (bool, optional): Whether the buyer gets the first subscription.
                                    Defaults to False.
         quantity (int, optional): Number of subscriptions to create. Defaults to 1.
@@ -77,7 +79,8 @@ def create_userSubscriptions(
                     stripe_subscription_item_id=stripe_subscription_item_id,
                     start_date=start_time,
                     end_date=end_time,
-                    status=status
+                    status=status,
+                    interval=interval
                 )
 
     except Exception as error:
@@ -142,6 +145,31 @@ def _add_field_if_changed(
     return False
 
 
+def _update_simple_field(
+    user_subscription: UserSubscription,
+    field_name: str,
+    new_value: Any,
+    changed_fields: set[str]
+) -> bool:
+    """
+    Update a simple field on user_subscription if the value has changed.
+
+    Args:
+        user_subscription: The subscription to update.
+        field_name: Name of the field to update.
+        new_value: New value to set.
+        changed_fields: Set to track changed fields.
+
+    Returns:
+        bool: True if field was updated, False otherwise.
+    """
+    old_value = getattr(user_subscription, field_name)
+    if _add_field_if_changed(field_name, old_value, new_value, changed_fields):
+        setattr(user_subscription, field_name, new_value)
+        return True
+    return False
+
+
 def set_new_userSubscription_list_values(
     userSubscription_list: list[UserSubscription],
     new_values: dict
@@ -161,9 +189,9 @@ def set_new_userSubscription_list_values(
         userSubscription_list: List of subscriptions to update.
         new_values: Dictionary containing new values to apply.
                    Can include 'end_date', 'status', 'stripe_subscription_item_id',
-                   and 'subscription' (SubscriptionType). When 'subscription' is
-                   provided and different, limits are automatically copied from
-                   the new SubscriptionType.
+                   'interval', and 'subscription' (SubscriptionType).
+                   When 'subscription' is provided and different, limits are
+                   automatically copied from the new SubscriptionType.
 
     Returns:
         tuple containing:
@@ -205,24 +233,32 @@ def set_new_userSubscription_list_values(
 
             # Update status if provided and different
             if 'status' in new_values:
-                if _add_field_if_changed(
+                if _update_simple_field(
+                    user_subscription,
                     'status',
-                    user_subscription.status,
                     new_values['status'],
                     changed_fields
                 ):
-                    user_subscription.status = new_values['status']
                     subscription_changed = True
 
             # Update stripe subscription item ID if provided and different
             if 'stripe_subscription_item_id' in new_values:
-                if _add_field_if_changed(
+                if _update_simple_field(
+                    user_subscription,
                     'stripe_subscription_item_id',
-                    user_subscription.stripe_subscription_item_id,
                     new_values['stripe_subscription_item_id'],
                     changed_fields
                 ):
-                    user_subscription.stripe_subscription_item_id = new_values['stripe_subscription_item_id']
+                    subscription_changed = True
+
+            # Update interval if provided and different
+            if 'interval' in new_values:
+                if _update_simple_field(
+                    user_subscription,
+                    'interval',
+                    new_values['interval'],
+                    changed_fields
+                ):
                     subscription_changed = True
 
             if subscription_changed:

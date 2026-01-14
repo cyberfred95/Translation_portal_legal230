@@ -64,6 +64,12 @@ class UserSubscription(models.Model):
         TERMINATED = 'TERMINATED', 'Terminated'
         UNKNOWN = 'UNKNOWN', 'Unknown'
 
+    class IntervalChoices(models.TextChoices):
+        DAY = 'day', 'Day'
+        WEEK = 'week', 'Week'
+        MONTH = 'month', 'Month'
+        YEAR = 'year', 'Year'
+
     user = models.ForeignKey(
         get_user_model(), on_delete=models.CASCADE, related_name='subscriptions')
     subscription = models.ForeignKey(
@@ -85,7 +91,12 @@ class UserSubscription(models.Model):
         null=True,
         help_text="API key for this subscription. If not provided, will be automatically generated"
     )
-
+    interval = models.CharField(
+        max_length=10,
+        choices=IntervalChoices.choices,
+        verbose_name="Billing Interval",
+        help_text="Billing interval for this subscription (day, week, month, or year)"
+    )
 
     max_symbols_count = models.IntegerField(default=-1)
     max_files_count = models.IntegerField(default=0)

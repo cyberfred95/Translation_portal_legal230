@@ -75,6 +75,14 @@ ERROR_MESSAGES_TEMPLATE: dict[str, dict[str, str | int]] = {
         "message": "Subscription item id in payload item data not found",
         "code": CODE_BAD_REQUEST
     },
+    "not_found_interval": {
+        "message": "Interval in payload item data not found",
+        "code": CODE_BAD_REQUEST
+    },
+    "invalid_interval": {
+        "message": "Invalid interval '{interval}' in payload item data, must be one of: day, week, month, year",
+        "code": CODE_BAD_REQUEST
+    },
 
     # Database lookup errors
     "not_found_user_by_stripe_customer_id": {

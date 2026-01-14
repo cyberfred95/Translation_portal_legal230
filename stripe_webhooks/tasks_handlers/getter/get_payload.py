@@ -10,8 +10,14 @@ from datetime import datetime
 
 from django.conf import settings
 
+from subscriptions.models import UserSubscription
+
 from ..error.error import HttpResponse, error_message
 from ..helper.convertor import int_to_DateTimeField
+
+# Valid interval values from UserSubscription.IntervalChoices enum
+# Cached as a set for O(1) lookup performance
+_VALID_INTERVALS = {choice[0] for choice in UserSubscription.IntervalChoices.choices}
 
 
 def get_payload_status(payload: dict) -> tuple[HttpResponse | None, str | None]:
@@ -291,3 +297,53 @@ def get_item_data_current_period_end(item_data: dict) -> tuple[HttpResponse | No
     if dateTime_date is None:
         return error_message("not_found_current_period_end"), None
     return None, dateTime_date
+
+
+def _extract_interval_from_item_data(item_data: dict) -> str | None:
+    """
+    Extract interval value from item data, checking multiple possible locations.
+
+    Checks plan.interval first, then falls back to price.recurring.interval.
+
+    Args:
+        item_data (dict): The item data from payload.
+
+    Returns:
+        str | None: The interval value if found, None otherwise.
+    """
+    # Try plan.interval first (most common location)
+    interval = item_data.get('plan', {}).get('interval')
+    
+    # Fallback to price.recurring.interval if not found in plan
+    if not interval:
+        interval = item_data.get('price', {}).get('recurring', {}).get('interval')
+    
+    return interval
+
+
+def get_item_data_interval(item_data: dict) -> tuple[HttpResponse | None, str | None]:
+    """
+    Extract and validate interval from item data (plan or price).
+
+    This function extracts the billing interval from the item data by checking
+    both plan.interval and price.recurring.interval, then validates it against
+    the UserSubscription.IntervalChoices enum.
+
+    Args:
+        item_data (dict): The item data from payload.
+
+    Returns:
+        tuple[HttpResponse | None, str | None]: Error response and interval,
+        or None and interval on success. Valid values come from
+        UserSubscription.IntervalChoices (day, week, month, year).
+    """
+    interval = _extract_interval_from_item_data(item_data)
+    
+    if not interval:
+        return error_message("not_found_interval"), None
+    
+    # Validate against enum values using cached set for O(1) lookup
+    if interval not in _VALID_INTERVALS:
+        return error_message("invalid_interval", interval=interval), None
+    
+    return None, interval

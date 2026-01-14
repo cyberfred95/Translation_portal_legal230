@@ -27,6 +27,7 @@ from .getter.get_data import (
 from .getter.get_payload import (
     get_item_data_current_period_end,
     get_item_data_current_period_start,
+    get_item_data_interval,
     get_item_data_product_id,
     get_item_data_subscription_item_id,
     get_item_data_quantity,
@@ -412,6 +413,10 @@ def handle_customer_subscription_created(payload: dict) -> HttpResponse:
     if error_response:
         return error_response
 
+    error_response, interval = get_item_data_interval(item_data)
+    if error_response:
+        return error_response
+
     error_response, payload_status = get_payload_status(payload)
     if error_response:
         return error_response
@@ -431,6 +436,7 @@ def handle_customer_subscription_created(payload: dict) -> HttpResponse:
         end_time=end_time,
         status=status,
         buyer=buyer,
+        interval=interval,
         is_buying=True,
         quantity=quantity
     )
@@ -533,6 +539,10 @@ def handle_customer_subscription_updated(payload: dict) -> HttpResponse:
     if error_response:
         return error_response
 
+    error_response, interval = get_item_data_interval(item_data)
+    if error_response:
+        return error_response
+
     error_response, end_time = get_payload_cancel_at(payload)
     if error_response:
         if error_response.exception is not None:
@@ -575,6 +585,7 @@ def handle_customer_subscription_updated(payload: dict) -> HttpResponse:
             "status": status,
             "stripe_subscription_item_id": subscription_item_id,
             "subscription": subscription_type,
+            "interval": interval,
         }
     )
     if error_response:
@@ -593,6 +604,7 @@ def handle_customer_subscription_updated(payload: dict) -> HttpResponse:
             start_time=start_time,
             end_time=end_time,
             status=status,
+            interval=interval,
             is_buying=False,
             quantity=quantity - old_quantity
         )
