@@ -64,6 +64,10 @@ class UserSubscription(models.Model):
         TERMINATED = 'TERMINATED', 'Terminated'
         UNKNOWN = 'UNKNOWN', 'Unknown'
 
+    class IntervalChoices(models.TextChoices):
+        MONTH = 'month', 'Month'
+        YEAR = 'year', 'Year'
+
     user = models.ForeignKey(
         get_user_model(), on_delete=models.CASCADE, related_name='subscriptions')
     subscription = models.ForeignKey(
@@ -85,7 +89,17 @@ class UserSubscription(models.Model):
         null=True,
         help_text="API key for this subscription. If not provided, will be automatically generated"
     )
-
+    interval = models.CharField(
+        max_length=10,
+        choices=IntervalChoices.choices,
+        verbose_name="Billing Interval",
+        help_text="Billing interval for this subscription (month or year)"
+    )
+    cycles_done = models.IntegerField(
+        default=0,
+        verbose_name="Cycles Done",
+        help_text="Number of monthly cycles completed for annual Stripe subscriptions (0-11). Always 0 for monthly subscriptions."
+    )
 
     max_symbols_count = models.IntegerField(default=-1)
     max_files_count = models.IntegerField(default=0)
