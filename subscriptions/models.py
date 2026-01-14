@@ -65,8 +65,6 @@ class UserSubscription(models.Model):
         UNKNOWN = 'UNKNOWN', 'Unknown'
 
     class IntervalChoices(models.TextChoices):
-        DAY = 'day', 'Day'
-        WEEK = 'week', 'Week'
         MONTH = 'month', 'Month'
         YEAR = 'year', 'Year'
 
@@ -95,7 +93,7 @@ class UserSubscription(models.Model):
         max_length=10,
         choices=IntervalChoices.choices,
         verbose_name="Billing Interval",
-        help_text="Billing interval for this subscription (day, week, month, or year)"
+        help_text="Billing interval for this subscription (month or year)"
     )
 
     max_symbols_count = models.IntegerField(default=-1)

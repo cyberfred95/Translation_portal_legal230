@@ -30,6 +30,11 @@ app.conf.beat_schedule = {
         "schedule": crontab(minute='0', hour='0'),
         "args": (),
     },
+    'process_monthly_renewals_for_stripe_annual': {
+        'task': "subscriptions.tasks.process_monthly_renewals_for_stripe_annual",
+        "schedule": crontab(minute='0', hour='0'),
+        "args": (),
+    },
     'report_daily_metered_usage': {
         'task': "subscriptions.tasks.report_daily_metered_usage",
         "schedule": crontab(minute='5', hour='0'),

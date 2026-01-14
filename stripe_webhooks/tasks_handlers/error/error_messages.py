@@ -80,7 +80,7 @@ ERROR_MESSAGES_TEMPLATE: dict[str, dict[str, str | int]] = {
         "code": CODE_BAD_REQUEST
     },
     "invalid_interval": {
-        "message": "Invalid interval '{interval}' in payload item data, must be one of: day, week, month, year",
+        "message": "Invalid interval '{interval}' in payload item data, must be one of: month, year",
         "code": CODE_BAD_REQUEST
     },
 

@@ -335,7 +335,7 @@ def get_item_data_interval(item_data: dict) -> tuple[HttpResponse | None, str | 
     Returns:
         tuple[HttpResponse | None, str | None]: Error response and interval,
         or None and interval on success. Valid values come from
-        UserSubscription.IntervalChoices (day, week, month, year).
+        UserSubscription.IntervalChoices (month, year).
     """
     interval = _extract_interval_from_item_data(item_data)
     
