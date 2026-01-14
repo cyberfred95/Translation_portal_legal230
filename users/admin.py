@@ -6,6 +6,7 @@ from django.urls import reverse
 from .models import User
 from .models import UserGroup
 from stripe_webhooks.tasks_handlers.helper.stripe_session import get_stripe_customer_session_url
+from subscriptions.permissions import is_user_subscription_active
 from legal.admin.utils import create_clickable_link
 
 
@@ -110,16 +111,20 @@ class CustomUserAdmin(UserDisplayMixin, UserAdmin):
     user_group.admin_order_field = 'group'
 
     def user_subscription(self, obj):
-        """Display user subscription with different states"""
-        subscriptions = obj.subscriptions.all()
-        count = subscriptions.count()
+        """Display user subscription with different states (only active subscriptions)"""
+        all_subscriptions = obj.subscriptions.all()
+        active_subscriptions = [
+            sub for sub in all_subscriptions
+            if is_user_subscription_active(sub.status)
+        ]
+        count = len(active_subscriptions)
         
         if count == 0:
             return format_html(
                 '<span style="color: orange; font-weight: bold;">no subscription</span>'
             )
         elif count == 1:
-            subscription = subscriptions.first()
+            subscription = active_subscriptions[0]
             subscription_name = subscription.subscription.name
             url = reverse('admin:subscriptions_usersubscription_change', args=[subscription.pk])
             return format_html(
