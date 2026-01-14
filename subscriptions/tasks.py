@@ -20,6 +20,11 @@ from .services.metered_usage import report_metered_usage_to_stripe
 
 logger = logging.getLogger(__name__)
 
+# Constants for annual subscription monthly renewals
+# Annual subscriptions have 12 monthly cycles (0-11)
+# Celery handles cycles 0-10, Stripe handles cycle 11 (12th month)
+MAX_MONTHLY_CYCLES_FOR_CELERY = 11
+
 
 def add_one_month_safely(date_value: datetime) -> datetime:
     """
@@ -58,19 +63,46 @@ def get_monthly_subscriptions_to_renew(current_date) -> list[UserSubscription]:
     ]
 
 
-def get_stripe_annual_subscriptions_to_renew_monthly(current_date) -> list[UserSubscription]:
+def _calculate_monthly_renewal_date(
+    start_date: datetime,
+    cycles_done: int
+) -> datetime:
+    """
+    Calculate the next monthly renewal date for an annual subscription.
+
+    The renewal date is calculated as: start_date + (cycles_done + 1) months
+    - cycles_done=0 -> renewal at start_date + 1 month
+    - cycles_done=1 -> renewal at start_date + 2 months
+    - etc.
+
+    Args:
+        start_date: The subscription start date.
+        cycles_done: Number of cycles already completed (0-10).
+
+    Returns:
+        datetime: The calculated renewal date.
+    """
+    renewal_date = start_date
+    for _ in range(cycles_done + 1):
+        renewal_date = add_one_month_safely(renewal_date)
+    return renewal_date
+
+
+def get_stripe_annual_subscriptions_to_renew_monthly(
+    current_date
+) -> list[UserSubscription]:
     """
     Retourne les abonnements annuels Stripe qui doivent être renouvelés mensuellement.
     
     Un abonnement annuel doit être renouvelé si :
     - Il est actif
     - cycles_done < 11 (pas le dernier cycle, géré par Stripe)
-    - La date calculée (start_date + cycles_done mois) correspond à aujourd'hui
+    - La date calculée (start_date + (cycles_done + 1) mois) correspond à aujourd'hui
     """
     stripe_annual_subscriptions = UserSubscription.objects.filter(
         stripe_subscription_id__isnull=False,
         interval=UserSubscription.IntervalChoices.YEAR,
-        cycles_done__lt=11  # Exclure le dernier cycle (géré par Stripe)
+        cycles_done__lt=MAX_MONTHLY_CYCLES_FOR_CELERY  # Exclure le dernier cycle (géré par Stripe)
     )
     
     subscriptions_to_renew = []
@@ -78,12 +110,11 @@ def get_stripe_annual_subscriptions_to_renew_monthly(current_date) -> list[UserS
         if not is_user_subscription_active(subscription.status):
             continue
         
-        # Calculer la date de renouvellement : start_date + cycles_done mois
-        renewal_date = subscription.start_date
-        for _ in range(subscription.cycles_done):
-            renewal_date = add_one_month_safely(renewal_date)
+        renewal_date = _calculate_monthly_renewal_date(
+            subscription.start_date,
+            subscription.cycles_done
+        )
         
-        # Vérifier si la date de renouvellement correspond à aujourd'hui
         if renewal_date.date() == current_date:
             subscriptions_to_renew.append(subscription)
     
@@ -206,12 +237,14 @@ def process_monthly_renewals_for_stripe_annual():
     Daily task to process monthly counter resets for annual Stripe subscriptions.
 
     This function:
-    1. Finds active annual Stripe subscriptions with cycles_done < 11
-    2. Calculates the renewal date (start_date + cycles_done months)
+    1. Finds active annual Stripe subscriptions with cycles_done < MAX_MONTHLY_CYCLES_FOR_CELERY
+    2. Calculates the renewal date (start_date + (cycles_done + 1) months)
     3. If the renewal date matches today, resets counters and increments cycles_done
     4. Does NOT modify end_date (managed by Stripe webhooks)
 
     Executed daily at midnight.
+    
+    Note: The last cycle (12th month) is handled by Stripe webhook invoice.payment.succeeded
     """
     current_date = timezone.now().date()
     subscriptions_to_renew = get_stripe_annual_subscriptions_to_renew_monthly(current_date)

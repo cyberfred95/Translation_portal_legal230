@@ -278,34 +278,59 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
 
         return redirect(session.url)
 
-    fieldsets = (
-        (None, {
-            'fields': ('user', 'subscription', 'status', 'stripe_subscription_id', 'stripe_subscription_item_id', 'api_key', 'interval')
-        }),
-        ('Allowed Limits', {
-            'fields': (
-                'max_symbols_count', 'max_words_count',
-                'max_files_count', 'custom_glossaries_count'
-            )
-        }),
-        ('Translated Statistics', {
-            'fields': TRANSLATED_FIELDS
-        }),
-        ('Technical Limits', {
-            'fields': ('technical_maximum_symbol_removed',)
-        }),
-        ('Access Permissions', {
-            'fields': (
-                'access_to_writing', 'access_to_official_glossaries',
-                'access_to_sso'
-            )
-        }),
-        ('Dates', {
-            'fields': ('start_date', 'end_date')
-        }),
-    )
+    readonly_fields = TRANSLATED_FIELDS + ('interval', 'cycles_done')
 
-    readonly_fields = TRANSLATED_FIELDS
+    def _build_base_fieldsets(self):
+        """Build the base fieldsets structure."""
+        return (
+            (None, {
+                'fields': ('user', 'subscription', 'status', 'stripe_subscription_id', 
+                          'stripe_subscription_item_id', 'api_key', 'interval')
+            }),
+            ('Allowed Limits', {
+                'fields': (
+                    'max_symbols_count', 'max_words_count',
+                    'max_files_count', 'custom_glossaries_count'
+                )
+            }),
+            ('Translated Statistics', {
+                'fields': TRANSLATED_FIELDS
+            }),
+            ('Technical Limits', {
+                'fields': ('technical_maximum_symbol_removed',)
+            }),
+            ('Access Permissions', {
+                'fields': (
+                    'access_to_writing', 'access_to_official_glossaries',
+                    'access_to_sso'
+                )
+            }),
+            ('Dates', {
+                'fields': ('start_date', 'end_date')
+            }),
+        )
+
+    def get_fieldsets(self, request, obj=None):
+        """
+        Return fieldsets with conditional cycles_done field for annual subscriptions.
+        
+        The cycles_done field is only displayed for annual subscriptions (interval='year').
+        """
+        fieldsets = list(self._build_base_fieldsets())
+        
+        # Add cycles_done field only for annual subscriptions
+        if obj and obj.interval == UserSubscription.IntervalChoices.YEAR:
+            # Modify the first fieldset to include cycles_done after interval
+            first_fieldset_title, first_fieldset_dict = fieldsets[0]
+            base_fields = list(first_fieldset_dict['fields'])
+            
+            # Insert cycles_done after interval
+            interval_index = base_fields.index('interval')
+            base_fields.insert(interval_index + 1, 'cycles_done')
+            
+            fieldsets[0] = (first_fieldset_title, {'fields': tuple(base_fields)})
+        
+        return fieldsets
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         """Filter available users to exclude those who already have a subscription."""
@@ -385,11 +410,26 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
     formatted_start_date.admin_order_field = 'start_date'
 
     def formatted_end_date(self, obj):
-        """Display end_date in DD/MM/YYYY format (local time)"""
-        if obj.end_date:
-            local_time = timezone.localtime(obj.end_date)
-            return local_time.strftime('%d/%m/%Y')
-        return '-'
+        """
+        Display end_date in DD/MM/YYYY format (local time) with interval indicator.
+        
+        Adds (M) for monthly subscriptions and (Y) for annual subscriptions.
+        """
+        if not obj.end_date:
+            return '-'
+        
+        local_time = timezone.localtime(obj.end_date)
+        date_str = local_time.strftime('%d/%m/%Y')
+        
+        # Map interval to indicator suffix
+        interval_indicators = {
+            UserSubscription.IntervalChoices.MONTH: ' (M)',
+            UserSubscription.IntervalChoices.YEAR: ' (Y)',
+        }
+        
+        indicator = interval_indicators.get(obj.interval, '')
+        return f"{date_str}{indicator}"
+    
     formatted_end_date.short_description = 'End Date'
     formatted_end_date.admin_order_field = 'end_date'
 
