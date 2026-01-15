@@ -1,10 +1,9 @@
 import stripe
 from django.contrib import admin
 from django.contrib import messages
-from django.db import models
 from django.http import JsonResponse
 from django.shortcuts import redirect
-from django.urls import path, reverse
+from django.urls import path
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -331,42 +330,6 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
             fieldsets[0] = (first_fieldset_title, {'fields': tuple(base_fields)})
         
         return fieldsets
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        """Filter available users to exclude those who already have a subscription."""
-        if db_field.name == "user":
-            # Get users who already have a subscription
-            users_with_subscription = UserSubscription.objects.filter(
-                user__isnull=False
-            ).values_list('user_id', flat=True)
-
-            # Check if we're editing an existing subscription
-            current_user_id = None
-            if hasattr(request, 'resolver_match') and request.resolver_match:
-                if 'object_id' in request.resolver_match.kwargs:
-                    try:
-                        current_subscription = UserSubscription.objects.get(
-                            pk=request.resolver_match.kwargs['object_id']
-                        )
-                        if current_subscription.user:
-                            current_user_id = current_subscription.user.id
-                    except UserSubscription.DoesNotExist:
-                        pass
-
-            # Filter out users with subscriptions, but include the current user if editing
-            if current_user_id:
-                # For edit page: exclude other users with subscriptions, but include current user
-                kwargs["queryset"] = db_field.related_model.objects.filter(
-                    models.Q(id=current_user_id) | ~models.Q(
-                        id__in=users_with_subscription)
-                )
-            else:
-                # For add page: exclude all users with subscriptions
-                kwargs["queryset"] = db_field.related_model.objects.exclude(
-                    id__in=users_with_subscription
-                )
-
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def clickable_user(self, obj):
         """Create a clickable link to the User admin page"""
