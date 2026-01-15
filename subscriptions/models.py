@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.timezone import now
 
@@ -127,8 +126,7 @@ class UserSubscription(models.Model):
 
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    
-    
+
     def __str__(self):
         return str(self.user)
 
@@ -172,16 +170,6 @@ class UserSubscription(models.Model):
         self._initialize_from_subscription_type()
         self._generate_api_key_if_needed(*args, **kwargs)
         self._ensure_today_metered_exists()
-
-    def clean(self):
-        """
-        Valide que l'utilisateur n'a qu'une seule souscription.
-        
-        Raises:
-            ValidationError: Si l'utilisateur a déjà une autre souscription.
-        """
-        if self.user.subscriptions.all().exclude(id=self.id).exists():
-            raise ValidationError("Subscription for this user already exists")
 
     def get_today_count_metered(self):
         """
