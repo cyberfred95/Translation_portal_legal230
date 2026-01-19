@@ -1,0 +1,48 @@
+{% extends "admin/index.html" %}
+{% load i18n static %}
+
+{% block content %}
+{{ block.super }}
+
+<!-- Health Check Button - positioned without affecting layout -->
+<div id="health-check-button-container">
+    <a href="{% url 'admin:monitoring_run_health_checks' %}" 
+       class="health-check-btn">
+        🔍 Run Health Checks
+    </a>
+</div>
+
+<style>
+    #health-check-button-container {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        z-index: 9999;
+    }
+    
+    .health-check-btn {
+        display: inline-block;
+        background: #417690;
+        color: #ffffff !important;
+        padding: 8px 20px;
+        text-decoration: none;
+        font-weight: 600;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+        font-size: 13px;
+    }
+    
+    .health-check-btn:hover {
+        background: #205067;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        transform: translateY(-1px);
+        color: #ffffff !important;
+        text-decoration: none;
+    }
+    
+    .health-check-btn:active {
+        transform: translateY(0);
+    }
+</style>
+{% endblock %}

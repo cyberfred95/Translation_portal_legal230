@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     'quoting.apps.QuotingConfig',
     'stripe_webhooks',
     'emails',
+    'monitoring.apps.MonitoringConfig',
 ]
 
 STATICFILES_FINDERS = (

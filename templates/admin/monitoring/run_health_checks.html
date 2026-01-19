@@ -1,0 +1,63 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Run Health Checks{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 40px auto; padding: 20px;">
+    <h1 style="margin-bottom: 30px;">🔍 Run System Health Checks</h1>
+    
+    <div style="background: #f8f9fa; border-left: 4px solid #17a2b8; padding: 20px; margin-bottom: 30px;">
+        <h3 style="margin-top: 0;">What will be tested?</h3>
+        <ul style="line-height: 1.8;">
+            <li><strong>Infrastructure:</strong> Redis, PostgreSQL, Celery</li>
+            <li><strong>External APIs:</strong> OpenAI, Stripe, Active Trail, Adobe</li>
+            <li><strong>Translation Services:</strong> LARA Bridge (text, document, glossary)</li>
+            <li><strong>Docker Containers:</strong> Lexa and LARA services</li>
+        </ul>
+        <p style="margin-bottom: 0;">
+            <em>Note: Currently only Redis and PostgreSQL checks are implemented. More checks will be added progressively.</em>
+        </p>
+    </div>
+    
+    <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; margin-bottom: 30px;">
+        <strong>⚠️ Warning:</strong> This will run all health checks immediately. 
+        Some checks may take a few seconds to complete.
+    </div>
+    
+    <form method="post" style="text-align: center;">
+        {% csrf_token %}
+        
+        <button type="submit" 
+                style="background: #28a745; color: white; border: none; padding: 15px 40px; 
+                       font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer;
+                       box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+            🚀 Run All Health Checks
+        </button>
+        
+        <a href="{% url 'admin:monitoring_healthcheckrun_changelist' %}" 
+           style="display: inline-block; margin-left: 20px; padding: 15px 40px; 
+                  text-decoration: none; color: #666; border: 1px solid #ccc; 
+                  border-radius: 5px;">
+            Cancel
+        </a>
+    </form>
+    
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #dee2e6; color: #666;">
+        <p><strong>Tip:</strong> You can view past health check results in the 
+        <a href="{% url 'admin:monitoring_healthcheckresult_changelist' %}">Health Check Results</a> section.</p>
+    </div>
+</div>
+
+<style>
+    button[type="submit"]:hover {
+        background: #218838 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    button[type="submit"]:active {
+        transform: translateY(0);
+    }
+</style>
+{% endblock %}
