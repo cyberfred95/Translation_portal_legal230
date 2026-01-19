@@ -245,33 +245,38 @@ class StripeHealthCheck(BaseExternalAPIHealthCheck):
 
 
 class ActiveTrailHealthCheck(BaseExternalAPIHealthCheck):
-    """Check Active Trail API connectivity and authentication."""
+    """
+    Check Active Trail API by sending a real test email.
+    
+    Sends an email to the health-check user using a random template.
+    """
     
     def __init__(self):
         super().__init__()
         self.service_name = 'Active Trail'
     
     def _check(self) -> HealthCheckResult:
-        """Test Active Trail API connectivity (override to include URL)."""
+        """Test Active Trail by sending a real email."""
         # Verify API key is configured
         api_key_error = self._verify_api_key_configured()
         if api_key_error:
             return api_key_error
         
-        api_key = self._get_api_key()
-        api_url = self._get_api_url()
+        # Get health-check user
+        test_user_error = self._verify_test_user_configured()
+        if test_user_error:
+            return test_user_error
         
-        # Test API connection
+        # Test by sending real email
         try:
-            result = self._test_api_connection_with_url(api_key, api_url)
+            result = self._send_test_email()
             
             if result['success']:
                 return self._create_success_result(
-                    message="Active Trail API is accessible",
+                    message="Active Trail email sent successfully",
                     details={
                         'configured': True,
-                        'api_key_prefix': self._mask_api_key(api_key),
-                        'api_url': api_url,
+                        'api_key_prefix': self._mask_api_key(self._get_api_key()),
                         **result.get('details', {})
                     }
                 )
@@ -283,73 +288,124 @@ class ActiveTrailHealthCheck(BaseExternalAPIHealthCheck):
                 
         except Exception as e:
             return self._create_error_result(
-                message=f"Active Trail API check failed: {str(e)}",
+                message=f"Active Trail email test failed: {str(e)}",
                 error=e
             )
+    
+    def _verify_test_user_configured(self) -> Optional[HealthCheckResult]:
+        """Verify health-check user is configured."""
+        test_user_email = getattr(settings, 'HEALTH_CHECK_USER_EMAIL', None)
+        if not test_user_email:
+            return self._create_error_result(
+                message="HEALTH_CHECK_USER_EMAIL not configured in .env",
+                details={'configured': False}
+            )
+        return None
     
     def _get_api_key_setting_name(self) -> str:
         """Get Active Trail API key setting name."""
         return 'ACTIVE_TRAIL_API_KEY'
     
-    def _get_api_url(self) -> str:
-        """Get Active Trail API URL from settings."""
-        return getattr(
-            settings,
-            'ACTIVE_TRAIL_SEND_EMAIL_REQUEST_URL',
-            'https://webapi.mymarketing.co.il/api/OperationalMessage/Message'
-        )
-    
     def _test_api_connection(self, api_key: str) -> Dict[str, Any]:
-        """Test Active Trail API (delegates to URL-specific method)."""
-        return self._test_api_connection_with_url(api_key, self._get_api_url())
+        """Test Active Trail API by sending email."""
+        return self._send_test_email()
     
-    def _test_api_connection_with_url(self, api_key: str, api_url: str) -> Dict[str, Any]:
+    def _send_test_email(self) -> Dict[str, Any]:
         """
-        Test Active Trail API endpoint accessibility.
+        Send a real test email via Active Trail.
         
-        Note: We only test if the endpoint is reachable, not sending actual emails.
+        Selects a random template and sends to HEALTH_CHECK_USER_EMAIL.
         """
         try:
-            import requests
+            import random
+            from emails.models import EmailSettings, EmailType
+            from emails.send_email import send_email
             
-            headers = {
-                "Authorization": api_key,
-                "Content-Type": "application/json"
-            }
+            # Get random template
+            random_template = self._get_random_template()
+            if isinstance(random_template, dict):  # Error response
+                return random_template
             
-            try:
-                response = requests.head(
-                    api_url,
-                    headers=headers,
-                    timeout=API_REQUEST_TIMEOUT_SECONDS
-                )
-                
-                # Active Trail returns various status codes
-                # We consider it successful if we get any response (endpoint is up)
-                return {
-                    'success': True,
-                    'details': {
-                        'endpoint_reachable': True,
-                        'status_code': response.status_code
-                    }
-                }
-                
-            except requests.exceptions.Timeout:
-                return self._create_request_error_result("Request timeout", 'Timeout')
-            except requests.exceptions.ConnectionError as e:
-                return self._create_request_error_result(f"Cannot connect: {str(e)}", 'ConnectionError')
-            except requests.exceptions.RequestException as e:
-                return self._create_request_error_result(f"Request error: {str(e)}", type(e).__name__)
-                
+            # Get EmailType
+            email_type = self._get_email_type(random_template)
+            if isinstance(email_type, dict):  # Error response
+                return email_type
+            
+            # Send email
+            test_user_email = getattr(settings, 'HEALTH_CHECK_USER_EMAIL', None)
+            test_data = self._get_test_email_data()
+            
+            error_response = send_email(
+                email=test_user_email,
+                email_type=email_type,
+                language=random_template.language,
+                dict_pairs=test_data
+            )
+            
+            if error_response:
+                return self._create_email_error_result(random_template, error_response)
+            
+            return self._create_email_success_result(random_template, test_user_email)
+            
         except ImportError as e:
-            return self._create_request_error_result(f"Requests library not installed: {str(e)}", 'ImportError')
+            return {'success': False, 'error': f'Email module not available: {str(e)}', 
+                    'details': {'error_type': 'ImportError'}}
         except Exception as e:
-            return self._create_request_error_result(f"Unexpected error: {str(e)}", type(e).__name__)
+            return {'success': False, 'error': f'Unexpected error: {str(e)}', 
+                    'details': {'error_type': type(e).__name__}}
     
-    def _create_request_error_result(self, error_message: str, error_type: str) -> Dict[str, Any]:
-        """Create standardized error result for request errors."""
+    def _get_random_template(self):
+        """Get a random email template from database."""
+        import random
+        from emails.models import EmailSettings
+        
+        templates = list(EmailSettings.objects.all())
+        if not templates:
+            return {'success': False, 'error': 'No email templates configured', 
+                    'details': {'templates_count': 0}}
+        return random.choice(templates)
+    
+    def _get_email_type(self, template):
+        """Get EmailType enum from template."""
+        from emails.models import EmailType
+        
+        try:
+            return EmailType[template.email_type]
+        except (KeyError, AttributeError):
+            return {'success': False, 'error': f'Invalid email type: {template.email_type}',
+                    'details': {'email_type': template.email_type}}
+    
+    def _get_test_email_data(self) -> Dict[str, str]:
+        """Get generic test data for email template variables."""
+        return {
+            'user_name': 'Health Check Test',
+            'test_message': 'Automated health check test email',
+            'timestamp': 'Health check automated test'
+        }
+    
+    def _create_email_error_result(self, template, error_response) -> Dict[str, Any]:
+        """Create error result for failed email sending."""
         return {
             'success': False,
-            'error': error_message,
-            'details': {'error_type': error_type}
+            'error': f'Failed to send email: {str(error_response)}',
+            'details': {
+                'template_id': template.template_id,
+                'email_type': template.email_type,
+                'language': template.language
+            }
+        }
+    
+    def _create_email_success_result(self, template, recipient: str) -> Dict[str, Any]:
+        """Create success result for sent email."""
+        return {
+            'success': True,
+            'details': {
+                'email_sent': True,
+                'recipient': recipient,
+                'template_id': template.template_id,
+                'email_type': template.email_type,
+                'subject': template.subject,
+                'language': template.language,
+                'note': 'Real email sent to health-check user'
+            }
         }
