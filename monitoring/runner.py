@@ -10,6 +10,11 @@ from .checks.base import HealthCheckResult as CheckResult, HealthCheckStatus
 from .checks.infrastructure import RedisHealthCheck, PostgreSQLHealthCheck
 from .checks.celery_checks import CeleryWorkersHealthCheck, CeleryTaskExecutionHealthCheck
 from .checks.external_apis import OpenAIHealthCheck, StripeHealthCheck, ActiveTrailHealthCheck
+from .checks.translation import (
+    LaraTextTranslationHealthCheck,
+    LaraDocumentTranslationHealthCheck,
+    LaraGlossaryHealthCheck
+)
 from .models import HealthCheckResult, HealthCheckRun
 
 logger = logging.getLogger(__name__)
@@ -53,14 +58,13 @@ def get_all_health_checks() -> List:
         StripeHealthCheck(),
         ActiveTrailHealthCheck(),
         
+        # Translation checks (LARA Bridge)
+        LaraTextTranslationHealthCheck(),
+        LaraDocumentTranslationHealthCheck(),
+        LaraGlossaryHealthCheck(),
+        
         # TODO: Add more checks as they are implemented
         # AdobeHealthCheck(),
-        
-        # Translation checks
-        # LaraHealthCheck(),
-        # LaraTextTranslationCheck(),
-        # LaraDocumentTranslationCheck(),
-        # LaraGlossaryCheck(),
         
         # Docker checks
         # DockerLexaHealthCheck(),

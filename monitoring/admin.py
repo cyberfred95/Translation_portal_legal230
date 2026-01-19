@@ -124,16 +124,20 @@ class HealthCheckRunAdmin(admin.ModelAdmin):
     def status_summary(self, obj):
         """Display summary with color coding."""
         if obj.failed_checks > 0:
-            status = 'error'
+            color = STATUS_COLORS['error']
             text = 'FAILURES'
         elif obj.warning_checks > 0:
-            status = 'warning'
+            color = STATUS_COLORS['warning']
             text = 'WARNINGS'
         else:
-            status = 'success'
+            color = STATUS_COLORS['success']
             text = 'ALL PASSED'
         
-        return format_colored_status(status.replace('error', 'red').replace('warning', 'orange').replace('success', 'green'))
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{}</span>',
+            color,
+            text
+        )
     status_summary.short_description = 'Summary'
     
     def has_add_permission(self, request):

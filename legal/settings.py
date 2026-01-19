@@ -297,6 +297,9 @@ LARA_API_URL = os.environ.get('LARA_API_URL')
 LARA_ACCESS_KEY_ID = os.environ.get('LARA_ACCESS_KEY_ID')
 LARA_ACCESS_KEY_SECRET = os.environ.get('LARA_ACCESS_KEY_SECRET')
 
+# Health Check Configuration
+HEALTH_CHECK_USER_EMAIL = os.environ.get('HEALTH_CHECK_USER_EMAIL')
+
 # Cloud Storage API Configuration - DÉSACTIVÉ
 # CLOUDSTORAGE_API_URL = os.environ.get('CLOUDSTORAGE_API_URL')
 # CLOUDSTORAGE_API_KEY = os.environ.get('CLOUDSTORAGE_API_KEY')
