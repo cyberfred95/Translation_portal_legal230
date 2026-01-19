@@ -109,6 +109,25 @@ class BaseLaraHealthCheck(BaseHealthCheck):
             return config_error
         return self._verify_test_user()
     
+    def _handle_test_result(self, result: Dict[str, Any], success_msg: str) -> HealthCheckResult:
+        """
+        Process a test result dictionary and return appropriate HealthCheckResult.
+        
+        Args:
+            result: Dictionary with 'success' key and optional 'error', 'details'
+            success_msg: Message to use if successful
+        
+        Returns:
+            HealthCheckResult
+        """
+        return self._create_success_result(
+            message=success_msg,
+            details=result['details']
+        ) if result['success'] else self._create_error_result(
+            message=result['error'],
+            details=result.get('details')
+        )
+    
     def _handle_request_errors(self, error_context: str) -> Dict[str, Any]:
         """
         Create standardized error response for common request exceptions.
@@ -176,13 +195,7 @@ class LaraTextTranslationHealthCheck(BaseLaraHealthCheck):
         
         try:
             result = self._test_text_translation(test_user)
-            return self._create_success_result(
-                message="LARA text translation is working",
-                details=result['details']
-            ) if result['success'] else self._create_error_result(
-                message=result['error'],
-                details=result.get('details')
-            )
+            return self._handle_test_result(result, "LARA text translation is working")
         except Exception as e:
             return self._create_error_result(
                 message=f"LARA text translation check failed: {str(e)}",
@@ -502,10 +515,10 @@ class LaraDocumentTranslationHealthCheck(BaseLaraHealthCheck):
 
 class LaraGlossaryHealthCheck(BaseLaraHealthCheck):
     """
-    Check LARA glossary endpoint accessibility.
+    Check LARA personal glossary creation.
     
-    Note: Full glossary creation requires CSV file upload.
-    This check verifies the endpoint is accessible without creating actual glossaries.
+    Creates a real personal glossary using the same endpoint as the UI.
+    Personal glossaries don't require a name (auto-generated).
     """
     
     def __init__(self):
@@ -513,58 +526,141 @@ class LaraGlossaryHealthCheck(BaseLaraHealthCheck):
         self.service_name = 'LARA Glossary'
     
     def _check(self) -> HealthCheckResult:
-        """Test LARA glossary endpoint accessibility."""
+        """Test LARA personal glossary creation and deletion."""
         prereq_error = self._verify_prerequisites()
         if prereq_error:
             return prereq_error
         
+        test_user = self._get_test_user()
+        glossary_id = None
+        
         try:
-            result = self._test_glossary_endpoint()
+            # Create personal glossary
+            create_result = self._create_personal_glossary(test_user)
+            if not create_result['success']:
+                return self._create_error_result(
+                    message=f"Failed to create glossary: {create_result['error']}",
+                    details=create_result.get('details')
+                )
+            
+            glossary_id = create_result['glossary_id']
+            creation_time = create_result['execution_time_ms']
+            
+            # Delete glossary
+            self._delete_glossary(glossary_id)
+            
             return self._create_success_result(
-                message="LARA glossary endpoint is accessible",
-                details=result['details']
-            ) if result['success'] else self._create_error_result(
-                message=result['error'],
-                details=result.get('details')
+                message="LARA personal glossary creation successful",
+                details={
+                    'creation_time_ms': creation_time,
+                    'glossary_id': glossary_id,
+                    'glossary_name': create_result.get('glossary_name'),
+                    'note': 'Personal glossary (auto-named, no user_glossary_name required)'
+                }
             )
+            
         except Exception as e:
+            # Cleanup: try to delete glossary if it was created
+            if glossary_id:
+                try:
+                    self._delete_glossary(glossary_id)
+                except:
+                    pass
+            
             return self._create_error_result(
                 message=f"LARA glossary check failed: {str(e)}",
                 error=e
             )
     
-    def _test_glossary_endpoint(self) -> Dict[str, Any]:
+    def _create_personal_glossary(self, user: User) -> Dict[str, Any]:
         """
-        Test glossary endpoint accessibility.
+        Create a personal glossary (same as UI).
         
-        Note: Glossary creation requires CSV file upload (multipart/form-data).
-        We test with HEAD request to check endpoint accessibility.
+        Uses /create-from-lexa/ endpoint which auto-generates the name.
+        No user_glossary_name required!
+        
+        Args:
+            user: User to use for the test
         
         Returns:
-            Dictionary with success status and details
+            Dictionary with success status, glossary_id, and execution time
         """
-        config = self._get_lara_config()
+        from io import BytesIO
         
-        # Test with HEAD request to check endpoint
-        url = f"{config['api_url']}/api/lara/glossaries-list/create/"
-        headers = {'Content-Type': 'application/json'}
+        config = self._get_lara_config()
+        # Use the personal glossary endpoint (from Lexa)
+        url = f"{config['api_url']}/api/lara/glossaries-list/create-from-lexa/"
+        
+        # Create a simple test CSV
+        csv_content = "En,fr\nHealth,Santé"
+        csv_file = BytesIO(csv_content.encode('utf-8'))
+        
+        # Prepare multipart form data and headers
+        files = {'glossary_file': ('health_check.csv', csv_file, 'text/csv')}
+        data = {
+            'accessKeyId': config['access_key_id'],
+            'accessKeySecret': config['access_key_secret']
+        }
+        headers = {
+            'X-User-UUID': str(user.uuid)  # User UUID from health-check user
+        }
         
         try:
-            response = requests.head(
+            start_time = time.time()
+            response = requests.post(
                 url,
+                files=files,
+                data=data,
                 headers=headers,
-                timeout=LARA_REQUEST_TIMEOUT_SECONDS
+                timeout=60  # Personal glossary creation can take time
             )
+            execution_time = int((time.time() - start_time) * 1000)
             
-            # Any response (including 400/405) means endpoint is accessible
-            return {
-                'success': True,
-                'details': {
-                    'endpoint_accessible': True,
-                    'status_code': response.status_code,
-                    'note': 'Full glossary test requires CSV file upload'
+            if response.status_code in [200, 201]:
+                data = response.json()
+                glossary_id = data.get('id') or data.get('glossary_id')
+                
+                if glossary_id:
+                    return {
+                        'success': True,
+                        'glossary_id': glossary_id,
+                        'glossary_name': data.get('name', 'N/A'),
+                        'execution_time_ms': execution_time
+                    }
+                else:
+                    return {
+                        'success': False,
+                        'error': "No glossary ID in response",
+                        'details': {'response': data}
+                    }
+            else:
+                return {
+                    'success': False,
+                    'error': f"Creation failed with status {response.status_code}",
+                    'details': {
+                        'status_code': response.status_code,
+                        'response': response.text[:200]
+                    }
                 }
-            }
-            
+                
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError, Exception):
-            return self._handle_request_errors("Glossary endpoint check")
+            return self._handle_request_errors("Personal glossary creation")
+    
+    def _delete_glossary(self, glossary_id: str) -> Dict[str, Any]:
+        """
+        Delete a glossary.
+        
+        Args:
+            glossary_id: ID of the glossary to delete
+        
+        Returns:
+            Dictionary with success status
+        """
+        config = self._get_lara_config()
+        url = f"{config['api_url']}/api/lara/glossaries-list/{glossary_id}/delete/"
+        
+        try:
+            response = requests.delete(url, timeout=LARA_REQUEST_TIMEOUT_SECONDS)
+            return {'success': response.status_code in [200, 204]}
+        except Exception:
+            return {'success': False}

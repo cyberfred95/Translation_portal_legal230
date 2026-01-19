@@ -132,6 +132,14 @@ class BaseExternalAPIHealthCheck(BaseHealthCheck):
         """
         raise NotImplementedError("Subclasses must implement _get_api_key_setting_name()")
     
+    def _create_api_error_result(self, message: str, error: Exception, error_type: str = None) -> Dict[str, Any]:
+        """Create standardized error result for API calls."""
+        return {
+            'success': False,
+            'error': f"{message}: {str(error)}",
+            'details': {'error_type': error_type or type(error).__name__}
+        }
+    
     @abstractmethod
     def _test_api_connection(self, api_key: str) -> Dict[str, Any]:
         """
@@ -189,15 +197,7 @@ class OpenAIHealthCheck(BaseExternalAPIHealthCheck):
         except ImportError as e:
             return self._create_api_error_result("OpenAI library not installed", e, 'ImportError')
         except Exception as e:
-            return self._create_api_error_result("Unexpected error", e, type(e).__name__)
-    
-    def _create_api_error_result(self, message: str, error: Exception, error_type: str) -> Dict[str, Any]:
-        """Create standardized error result for API calls."""
-        return {
-            'success': False,
-            'error': f"{message}: {str(error)}",
-            'details': {'error_type': error_type}
-        }
+            return self._create_api_error_result("Unexpected error", e)
 
 
 class StripeHealthCheck(BaseExternalAPIHealthCheck):
@@ -242,14 +242,6 @@ class StripeHealthCheck(BaseExternalAPIHealthCheck):
             return self._create_api_error_result("Stripe library not installed", e)
         except Exception as e:
             return self._create_api_error_result("Unexpected error", e)
-    
-    def _create_api_error_result(self, message: str, error: Exception) -> Dict[str, Any]:
-        """Create standardized error result for API calls."""
-        return {
-            'success': False,
-            'error': f"{message}: {str(error)}",
-            'details': {'error_type': type(error).__name__}
-        }
 
 
 class ActiveTrailHealthCheck(BaseExternalAPIHealthCheck):
@@ -308,8 +300,8 @@ class ActiveTrailHealthCheck(BaseExternalAPIHealthCheck):
         )
     
     def _test_api_connection(self, api_key: str) -> Dict[str, Any]:
-        """Not used for Active Trail (uses _test_api_connection_with_url instead)."""
-        return {'success': False, 'error': 'Use _test_api_connection_with_url'}
+        """Test Active Trail API (delegates to URL-specific method)."""
+        return self._test_api_connection_with_url(api_key, self._get_api_url())
     
     def _test_api_connection_with_url(self, api_key: str, api_url: str) -> Dict[str, Any]:
         """
