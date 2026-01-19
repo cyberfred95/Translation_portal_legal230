@@ -8,6 +8,7 @@ from dataclasses import dataclass
 
 from .checks.base import HealthCheckResult as CheckResult, HealthCheckStatus
 from .checks.infrastructure import RedisHealthCheck, PostgreSQLHealthCheck
+from .checks.celery_checks import CeleryWorkersHealthCheck, CeleryTaskExecutionHealthCheck
 from .models import HealthCheckResult, HealthCheckRun
 
 logger = logging.getLogger(__name__)
@@ -43,6 +44,8 @@ def get_all_health_checks() -> List:
         # Infrastructure checks
         RedisHealthCheck(),
         PostgreSQLHealthCheck(),
+        CeleryWorkersHealthCheck(),
+        CeleryTaskExecutionHealthCheck(),
         
         # TODO: Add more checks as they are implemented
         # External API checks

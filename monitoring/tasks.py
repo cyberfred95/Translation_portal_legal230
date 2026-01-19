@@ -1,5 +1,5 @@
 """
-Celery tasks for scheduled health checks.
+Celery tasks for scheduled health checks and test tasks.
 """
 from celery import shared_task
 import logging
@@ -36,3 +36,21 @@ def run_scheduled_health_checks():
     except Exception as e:
         logger.error(f"Error running scheduled health checks: {e}", exc_info=True)
         raise
+
+
+@shared_task(name='monitoring.health_check_test_task')
+def health_check_test_task(test_value: str) -> str:
+    """
+    Simple test task for health check verification.
+    
+    This task is used by CeleryTaskExecutionHealthCheck to verify
+    that workers can execute tasks successfully.
+    
+    Args:
+        test_value: A test string value
+    
+    Returns:
+        String indicating task completed successfully
+    """
+    logger.info(f"Health check test task executed with value: {test_value}")
+    return f"{test_value}_ok"

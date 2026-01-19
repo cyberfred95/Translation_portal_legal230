@@ -26,3 +26,10 @@ REDIS_TEST_EXPIRY_SECONDS = 10
 # Database health check constants
 DB_TEST_QUERY = "SELECT 1"
 DB_SIZE_QUERY = "SELECT pg_database_size(current_database()) / (1024 * 1024) as size_mb"
+
+# Celery health check constants
+CELERY_TASK_TIMEOUT_SECONDS = 5
+CELERY_TASK_EXPIRES_SECONDS = 10
+CELERY_TEST_TASK_INPUT = 'health_check'
+CELERY_TEST_TASK_EXPECTED_OUTPUT = 'health_check_ok'
+CELERY_PING_EXPECTED_RESPONSE = 'pong'
