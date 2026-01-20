@@ -238,23 +238,114 @@ class HealthCheckRunAdmin(admin.ModelAdmin):
         ]
         return custom_urls + urls
     
-    def run_health_checks_view(self, request):
-        """View to manually trigger all health checks."""
-        if request.method == 'POST':
-            run_result = run_all_health_checks(trigger='manual')
-            message, level = format_run_result_message(run_result)
-            
-            # Display appropriate message
-            if level == 'error':
-                messages.error(request, message)
-            elif level == 'warning':
-                messages.warning(request, message)
-            else:
-                messages.success(request, message)
-            
-            return redirect('admin:monitoring_healthcheckrun_changelist')
+    # Health Check Execution Methods
+    
+    def _create_sse_event(self, event_type: str, data: dict) -> str:
+        """
+        Create a Server-Sent Event formatted string.
         
-        # GET request - show confirmation page
+        Args:
+            event_type: Type of event ('start', 'running', 'progress', 'complete')
+            data: Event data dictionary
+            
+        Returns:
+            SSE formatted string
+        """
+        import json
+        event_data = {'type': event_type, **data}
+        return f"data: {json.dumps(event_data)}\n\n"
+    
+    def _update_check_stats(self, stats: dict, result_status: str) -> None:
+        """Update check statistics based on result status."""
+        if result_status == 'success':
+            stats['successful'] += 1
+        elif result_status == 'error':
+            stats['failed'] += 1
+        else:
+            stats['warnings'] += 1
+        stats['completed'] += 1
+    
+    def _stream_health_checks(self):
+        """
+        Generator that streams health check results as SSE events.
+        
+        Yields:
+            SSE formatted strings for each check execution
+        """
+        from .runner import get_all_health_checks, run_single_health_check
+        
+        health_checks = get_all_health_checks()
+        total = len(health_checks)
+        stats = {'completed': 0, 'successful': 0, 'failed': 0, 'warnings': 0}
+        
+        # Initial event
+        yield self._create_sse_event('start', {'total': total})
+        
+        # Execute and stream each check
+        for check in health_checks:
+            # Notify which check is running
+            yield self._create_sse_event('running', {'service_name': check.service_name})
+            
+            # Execute check
+            result = run_single_health_check(check)
+            self._update_check_stats(stats, result.status.value)
+            
+            # Send progress with result
+            yield self._create_sse_event('progress', {
+                'completed': stats['completed'],
+                'total': total,
+                'check': result.to_dict(),
+                'stats': {k: v for k, v in stats.items() if k != 'completed'}
+            })
+        
+        # Completion event
+        yield self._create_sse_event('complete', {})
+    
+    def _handle_streaming_request(self):
+        """Handle SSE streaming request."""
+        from django.http import StreamingHttpResponse
+        
+        response = StreamingHttpResponse(
+            self._stream_health_checks(),
+            content_type='text/event-stream'
+        )
+        response['Cache-Control'] = 'no-cache'
+        response['X-Accel-Buffering'] = 'no'
+        return response
+    
+    def _handle_traditional_post(self):
+        """Handle traditional form submission."""
+        run_result = run_all_health_checks(trigger='manual')
+        message, level = format_run_result_message(run_result)
+        
+        message_methods = {
+            'error': messages.error,
+            'warning': messages.warning,
+            'success': messages.success
+        }
+        message_methods[level](self.request, message)
+        
+        return redirect('admin:monitoring_healthcheckrun_changelist')
+    
+    def run_health_checks_view(self, request):
+        """
+        View to manually trigger all health checks.
+        
+        Supports:
+        - Server-Sent Events (SSE) for real-time streaming
+        - Traditional form submission as fallback
+        """
+        self.request = request
+        
+        if request.method == 'POST':
+            # SSE streaming request
+            if request.headers.get('Accept') == 'text/event-stream':
+                return self._handle_streaming_request()
+            # Traditional form submission
+            else:
+                return self._handle_traditional_post()
+        
+        # GET request - show page
         return render(request, 'admin/monitoring/run_health_checks.html', {
             'title': 'Run Health Checks',
             'opts': self.model._meta,
