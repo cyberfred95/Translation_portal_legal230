@@ -1,0 +1,7 @@
+/* Custom CSS for monitoring admin interface */
+
+/* Simple tooltip styling for service names */
+.field-service_name_with_tooltip span[title] {
+    cursor: help;
+    border-bottom: 1px dotted #999;
+}

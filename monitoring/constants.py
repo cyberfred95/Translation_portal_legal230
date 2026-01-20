@@ -9,6 +9,57 @@ STATUS_COLORS = {
     'error': 'red',
 }
 
+# User-friendly descriptions for each health check service
+SERVICE_DESCRIPTIONS = {
+    # Infrastructure
+    'Redis': {
+        'short': 'Cache & messaging',
+        'long': 'Redis is our in-memory data store used for caching frequently accessed data and managing background task queues. It helps make the application faster by storing temporary data in memory rather than constantly querying the database.'
+    },
+    'PostgreSQL': {
+        'short': 'Main database',
+        'long': 'PostgreSQL is our primary database where all application data is permanently stored (users, documents, translations, etc.). This check ensures the database is accessible and responding properly to queries.'
+    },
+    
+    # Celery
+    'Celery Workers': {
+        'short': 'Background task workers',
+        'long': 'Celery workers are background processes that handle time-consuming tasks asynchronously (like sending emails, processing documents, etc.) without blocking the main application. This check verifies that workers are active and responsive.'
+    },
+    'Celery Task Execution': {
+        'short': 'Task processing',
+        'long': 'This verifies that Celery workers can actually execute tasks successfully. It runs a simple test task to ensure the entire task execution pipeline (from submission to completion) is working properly.'
+    },
+    
+    # External APIs
+    'OpenAI': {
+        'short': 'AI translation engine',
+        'long': 'OpenAI provides the AI-powered translation capabilities used in the application. This check verifies that our API key is valid and that we can successfully communicate with OpenAI\'s services for text translation and processing.'
+    },
+    'Stripe': {
+        'short': 'Payment processing',
+        'long': 'Stripe handles all payment processing and subscription management for the application. This check ensures our Stripe integration is working correctly and that we can access account and billing information.'
+    },
+    'Active Trail': {
+        'short': 'Email delivery',
+        'long': 'Active Trail is our email service provider that sends automated emails to users (notifications, confirmations, etc.). This check sends a real test email to verify the email delivery system is functioning properly.'
+    },
+    
+    # Translation (LARA Bridge)
+    'LARA Text Translation': {
+        'short': 'Text translation API',
+        'long': 'LARA Bridge provides real-time text translation services. This check verifies that we can successfully send text to LARA and receive accurate translations back, ensuring the core translation functionality is operational.'
+    },
+    'LARA Document Translation': {
+        'short': 'Document translation',
+        'long': 'This tests LARA\'s ability to translate entire documents (PDFs, Word files, etc.). It uploads a test document, waits for translation to complete, and then cleans up. This ensures the full document processing pipeline is working.'
+    },
+    'LARA Glossary': {
+        'short': 'Custom terminology',
+        'long': 'LARA glossaries allow users to define custom terminology and translations for specialized terms. This check creates a test glossary, verifies it was created successfully, and then removes it to ensure the glossary management system is functioning.'
+    },
+}
+
 # Health check categories
 class HealthCheckCategory:
     """Health check category constants."""

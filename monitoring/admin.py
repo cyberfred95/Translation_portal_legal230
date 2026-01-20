@@ -9,7 +9,7 @@ from django.utils.html import format_html
 
 from .models import HealthCheckResult, HealthCheckRun
 from .runner import run_all_health_checks
-from .constants import STATUS_COLORS
+from .constants import STATUS_COLORS, SERVICE_DESCRIPTIONS
 
 
 def format_colored_status(status: str) -> str:
@@ -63,10 +63,22 @@ def format_run_result_message(run_result: dict) -> tuple[str, str]:
 
 
 class HealthCheckResultAdmin(admin.ModelAdmin):
-    """Admin interface for health check results."""
+    """
+    Admin interface for health check results.
+    
+    Features:
+    - Service name tooltips with short descriptions
+    - Full service descriptions on detail pages
+    - Color-coded status display
+    """
+    
+    class Media:
+        css = {
+            'all': ('monitoring/css/admin_custom.css',)
+        }
     
     list_display = [
-        'service_name',
+        'service_name_with_tooltip',
         'status',
         'category',
         'timestamp',
@@ -85,6 +97,76 @@ class HealthCheckResultAdmin(admin.ModelAdmin):
         'execution_time_ms'
     ]
     date_hierarchy = 'timestamp'
+    
+    # Helper methods
+    
+    def _get_service_descriptions(self, service_name: str) -> tuple[str, str]:
+        """
+        Get short and long descriptions for a service.
+        
+        Args:
+            service_name: Name of the service
+            
+        Returns:
+            Tuple of (short_description, long_description)
+        """
+        descriptions = SERVICE_DESCRIPTIONS.get(service_name, {})
+        return (
+            descriptions.get('short', service_name),
+            descriptions.get('long', '')
+        )
+    
+    def _build_service_description_html(self, service_name: str, long_description: str) -> str:
+        """
+        Build HTML for service description display.
+        
+        Args:
+            service_name: Name of the service
+            long_description: Long description text
+            
+        Returns:
+            HTML string for description
+        """
+        if not long_description:
+            return ''
+        
+        return f'<strong>What is "{service_name}"?</strong><br><span style="color: #666;">{long_description}</span>'
+    
+    # Admin methods
+    
+    def get_fieldsets(self, request, obj=None):
+        """Build dynamic fieldsets with service description."""
+        description_html = ''
+        
+        if obj:
+            _, long_desc = self._get_service_descriptions(obj.service_name)
+            description_html = self._build_service_description_html(obj.service_name, long_desc)
+        
+        return (
+            (None, {
+                'description': description_html,
+                'fields': (),
+            }),
+            ('Check Results', {
+                'fields': ('service_name', 'category', 'status', 'message', 'timestamp', 'execution_time_ms'),
+            }),
+            ('Technical Details', {
+                'fields': ('details',),
+                'classes': ('collapse',),
+            }),
+        )
+    
+    def service_name_with_tooltip(self, obj):
+        """Display service name with short description tooltip."""
+        short_desc, _ = self._get_service_descriptions(obj.service_name)
+        
+        return format_html(
+            '<span title="{}" style="cursor: help; border-bottom: 1px dotted #999;">{}</span>',
+            short_desc,
+            obj.service_name
+        )
+    service_name_with_tooltip.short_description = 'Service Name'
+    service_name_with_tooltip.admin_order_field = 'service_name'
     
     def colored_status(self, obj):
         """Display status with color coding."""
