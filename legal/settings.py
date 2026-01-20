@@ -241,6 +241,10 @@ CELERY_BEAT_SCHEDULE = {
     'report_daily_metered_usage': {
         'task': 'subscriptions.tasks.report_daily_metered_usage',
         'schedule': crontab(minute="5", hour="0")
+    },
+    'run_daily_health_checks': {
+        'task': 'monitoring.run_scheduled_health_checks',
+        'schedule': crontab(minute="0", hour="22")
     }
 }
 

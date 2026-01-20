@@ -44,5 +44,10 @@ app.conf.beat_schedule = {
         'task': "users.tasks.cleanup_expired_documents",
         "schedule": crontab(minute='0', hour='0'),
         "args": (),
+    },
+    'run_daily_health_checks': {
+        'task': "monitoring.run_scheduled_health_checks",
+        "schedule": crontab(minute='0', hour='22'),
+        "args": (),
     }
 }
