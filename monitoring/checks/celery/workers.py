@@ -1,39 +1,15 @@
 """
-Health checks for Celery workers and task processing.
+Celery workers health check.
 """
 import logging
 from typing import Dict, Any, List
-from celery import current_app
 from celery.app.control import Inspect
-from celery.exceptions import TimeoutError as CeleryTimeoutError
 
-from .base import BaseHealthCheck, HealthCheckResult
-from ..constants import (
-    HealthCheckCategory,
-    CELERY_TASK_TIMEOUT_SECONDS,
-    CELERY_TASK_EXPIRES_SECONDS,
-    CELERY_TEST_TASK_INPUT,
-    CELERY_TEST_TASK_EXPECTED_OUTPUT,
-    CELERY_PING_EXPECTED_RESPONSE
-)
+from .base import BaseCeleryHealthCheck
+from ..base import HealthCheckResult
+from ...constants import CELERY_PING_EXPECTED_RESPONSE
 
 logger = logging.getLogger(__name__)
-
-
-class BaseCeleryHealthCheck(BaseHealthCheck):
-    """
-    Base class for Celery health checks.
-    
-    Provides shared functionality for accessing Celery inspector.
-    """
-    
-    def __init__(self):
-        super().__init__()
-        self.category = HealthCheckCategory.INFRASTRUCTURE
-    
-    def _get_inspector(self) -> Inspect:
-        """Get Celery inspector instance."""
-        return current_app.control.inspect()
 
 
 class CeleryWorkersHealthCheck(BaseCeleryHealthCheck):
@@ -203,88 +179,3 @@ class CeleryWorkersHealthCheck(BaseCeleryHealthCheck):
         except Exception as e:
             logger.warning(f"Failed to get registered tasks: {e}")
             return []
-
-
-class CeleryTaskExecutionHealthCheck(BaseCeleryHealthCheck):
-    """
-    Check Celery task execution capability.
-    
-    Verifies that workers can actually execute a simple test task.
-    """
-    
-    def __init__(self):
-        super().__init__()
-        self.service_name = 'Celery Task Execution'
-    
-    def _check(self) -> HealthCheckResult:
-        """Test Celery task execution."""
-        try:
-            task_result = self._execute_test_task()
-            
-            if task_result['success']:
-                return self._create_success_result(
-                    message="Celery workers can execute tasks successfully",
-                    details=task_result['details']
-                )
-            else:
-                return self._create_error_result(
-                    message=task_result['error'],
-                    details=task_result.get('details')
-                )
-                
-        except ImportError as e:
-            return self._create_error_result(
-                message="Test task not found",
-                error=e
-            )
-        except Exception as e:
-            return self._create_error_result(
-                message=f"Task execution check failed: {str(e)}",
-                error=e
-            )
-    
-    def _execute_test_task(self) -> Dict[str, Any]:
-        """
-        Execute a test task and return the result.
-        
-        Returns:
-            Dictionary with success status, error message, and details
-        """
-        from ..tasks import health_check_test_task
-        
-        # Execute test task asynchronously
-        async_result = health_check_test_task.apply_async(
-            args=[CELERY_TEST_TASK_INPUT],
-            expires=CELERY_TASK_EXPIRES_SECONDS
-        )
-        
-        # Wait for result with timeout
-        try:
-            task_output = async_result.get(timeout=CELERY_TASK_TIMEOUT_SECONDS)
-            
-            if task_output == CELERY_TEST_TASK_EXPECTED_OUTPUT:
-                return {
-                    'success': True,
-                    'details': {
-                        'task_id': async_result.id,
-                        'task_result': task_output,
-                        'task_state': async_result.state
-                    }
-                }
-            else:
-                return {
-                    'success': False,
-                    'error': f"Task returned unexpected result: {task_output}",
-                    'details': {
-                        'task_id': async_result.id,
-                        'expected': CELERY_TEST_TASK_EXPECTED_OUTPUT,
-                        'got': task_output
-                    }
-                }
-                
-        except (TimeoutError, CeleryTimeoutError):
-            return {
-                'success': False,
-                'error': f"Task execution timed out after {CELERY_TASK_TIMEOUT_SECONDS} seconds",
-                'details': {'task_id': async_result.id}
-            }

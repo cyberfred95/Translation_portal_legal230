@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 from .checks.base import HealthCheckResult as CheckResult, HealthCheckStatus
 from .checks.infrastructure import RedisHealthCheck, PostgreSQLHealthCheck
-from .checks.celery_checks import CeleryWorkersHealthCheck, CeleryTaskExecutionHealthCheck
+from .checks.celery import CeleryWorkersHealthCheck, CeleryTaskExecutionHealthCheck
 from .checks.external_apis import OpenAIHealthCheck, StripeHealthCheck, ActiveTrailHealthCheck
 from .checks.translation import (
     LaraTextTranslationHealthCheck,
