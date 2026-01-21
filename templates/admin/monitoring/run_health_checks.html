@@ -1,0 +1,569 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Run Health Checks{% endblock %}
+
+{% block extrastyle %}
+<style>
+    .health-check-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .info-box {
+        background: #f8f9fa;
+        border-left: 3px solid #6c757d;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        border-radius: 3px;
+        font-size: 14px;
+    }
+
+    .info-box h3 {
+        margin-top: 0;
+        font-size: 16px;
+        color: #495057;
+    }
+
+    .warning-box {
+        background: #fff9e6;
+        border-left: 3px solid #856404;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        border-radius: 3px;
+        font-size: 14px;
+        color: #856404;
+    }
+
+    .action-buttons {
+        text-align: center;
+        margin: 30px 0;
+    }
+
+    .btn-primary {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        font-size: 15px;
+        font-weight: 500;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        background: #5a6268;
+    }
+
+    .btn-primary:disabled {
+        background: #adb5bd;
+        cursor: not-allowed;
+    }
+
+    .btn-secondary {
+        display: inline-block;
+        margin-left: 15px;
+        padding: 12px 30px;
+        text-decoration: none;
+        color: #6c757d;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 15px;
+    }
+
+    /* Progress Screen */
+    .progress-screen {
+        display: none;
+    }
+
+    .progress-screen.active {
+        display: block;
+    }
+
+    .progress-header {
+        margin-bottom: 25px;
+    }
+
+    .progress-header h2 {
+        font-size: 20px;
+        color: #495057;
+        margin: 0 0 8px 0;
+    }
+
+    .progress-text {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .progress-bar-container {
+        background: #e9ecef;
+        border-radius: 4px;
+        height: 8px;
+        margin: 20px 0;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        background: #6c757d;
+        height: 100%;
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+
+    .progress-stats {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        margin: 25px 0;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 4px;
+    }
+
+    .stat-item {
+        text-align: center;
+        flex: 1;
+    }
+
+    .stat-number {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 11px;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .checks-list {
+        margin-top: 25px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+    }
+
+    .check-item {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 15px;
+        opacity: 0;
+        animation: fadeIn 0.2s ease forwards;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .check-item.running {
+        border-color: #6c757d;
+        background: #f8f9fa;
+        box-shadow: 0 0 0 2px rgba(108, 117, 125, 0.1);
+    }
+
+    .check-item.running::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #6c757d 0%, #6c757d 50%, transparent 50%, transparent 100%);
+        background-size: 200% 100%;
+        animation: loading 1s linear infinite;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: 0 0; }
+    }
+
+    .check-status {
+        font-size: 20px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .check-status-icon {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 14px;
+    }
+
+    .check-status-icon.success {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .check-status-icon.warning {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .check-status-icon.error {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .check-status-icon.running {
+        background: #e9ecef;
+        color: #6c757d;
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .check-time {
+        font-size: 11px;
+        color: #adb5bd;
+    }
+
+    .check-name {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 6px;
+        color: #212529;
+    }
+
+    .check-message {
+        font-size: 12px;
+        color: #6c757d;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .action-buttons-bottom {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .btn-view-runs {
+        background: #417690 !important;
+        color: white !important;
+        padding: 10px 25px;
+        border-radius: 4px;
+        text-decoration: none !important;
+        display: inline-block;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background 0.2s;
+        border: none;
+    }
+
+    .btn-view-runs:hover {
+        background: #366577 !important;
+        color: white !important;
+        text-decoration: none !important;
+    }
+    
+    .btn-view-runs:visited {
+        color: white !important;
+    }
+
+    .btn-run-again {
+        background: #f8f9fa;
+        color: #417690;
+        padding: 10px 25px;
+        border: 1px solid #417690;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        margin-left: 10px;
+        transition: all 0.2s;
+    }
+
+    .btn-run-again:hover {
+        background: white;
+        color: #366577;
+        border-color: #366577;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="health-check-container">
+    <!-- Initial Screen -->
+    <div id="initial-screen">
+        <h1 style="margin-bottom: 25px; font-size: 24px; color: #212529;">Run System Health Checks</h1>
+        <div class="info-box">
+            <h3>What will be tested?</h3>
+            <ul style="line-height: 1.6; margin: 10px 0;">
+                <li>Infrastructure: Redis, PostgreSQL</li>
+                <li>Background Tasks: Celery Workers, Task Execution</li>
+                <li>External APIs: OpenAI, Stripe, Active Trail</li>
+                <li>Translation Services: LARA Bridge</li>
+            </ul>
+        </div>
+        
+        <div class="warning-box">
+            <strong>Note:</strong> Tests will run one by one. This typically takes 15-20 seconds.
+        </div>
+        
+        <div class="action-buttons">
+            <button type="button" id="run-checks-btn" class="btn-primary">
+                Run All Health Checks
+            </button>
+            
+            <a href="{% url 'admin:monitoring_healthcheckrun_changelist' %}" class="btn-secondary">
+                Cancel
+            </a>
+        </div>
+    </div>
+
+    <!-- Progress Screen -->
+    <div id="progress-screen" class="progress-screen">
+        <div class="progress-header">
+            <h1 style="font-size: 24px; color: #212529; margin: 0 0 8px 0;">Running Health Checks</h1>
+            <p class="progress-text" id="progress-text">Starting...</p>
+        </div>
+
+        <div class="progress-bar-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+
+        <div class="progress-stats">
+            <div class="stat-item">
+                <div id="stat-completed" class="stat-number" style="color: #6c757d;">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-item">
+                <div id="stat-success" class="stat-number" style="color: #28a745;">0</div>
+                <div class="stat-label">Success</div>
+            </div>
+            <div class="stat-item">
+                <div id="stat-warnings" class="stat-number" style="color: #ffc107;">0</div>
+                <div class="stat-label">Warnings</div>
+            </div>
+            <div class="stat-item">
+                <div id="stat-failed" class="stat-number" style="color: #dc3545;">0</div>
+                <div class="stat-label">Failed</div>
+            </div>
+        </div>
+
+        <div class="checks-list" id="checks-list"></div>
+
+        <div class="action-buttons-bottom" id="action-buttons" style="display: none;">
+            <a href="{% url 'admin:monitoring_healthcheckrun_changelist' %}" class="btn-view-runs">
+                View All Runs
+            </a>
+            <button type="button" id="run-again-btn" class="btn-run-again">
+                Run Again
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configuration
+    const CONFIG = {
+        STATUS_ICONS: { success: '✓', warning: '!', error: '✗', running: '○' },
+        SCROLL_THRESHOLD: 6
+    };
+    
+    // DOM Elements
+    const elements = {
+        runBtn: document.getElementById('run-checks-btn'),
+        runAgainBtn: document.getElementById('run-again-btn'),
+        initialScreen: document.getElementById('initial-screen'),
+        progressScreen: document.getElementById('progress-screen'),
+        checksList: document.getElementById('checks-list'),
+        progressBar: document.getElementById('progress-bar'),
+        progressText: document.getElementById('progress-text'),
+        actionButtons: document.getElementById('action-buttons')
+    };
+    
+    // State
+    let currentCheckItem = null;
+    
+    // UI Management
+    const UI = {
+        showScreen(screen) {
+            elements.initialScreen.style.display = screen === 'initial' ? 'block' : 'none';
+            elements.progressScreen.classList.toggle('active', screen === 'progress');
+        },
+        
+        resetUI() {
+            elements.checksList.innerHTML = '';
+            elements.actionButtons.style.display = 'none';
+            currentCheckItem = null;
+        },
+        
+        updateProgress(completed, total) {
+            const percentage = Math.round((completed / total) * 100);
+            elements.progressBar.style.width = percentage + '%';
+            elements.progressText.textContent = `${completed} of ${total} checks completed`;
+        },
+        
+        updateStats(stats) {
+            document.getElementById('stat-completed').textContent = stats.completed || 0;
+            document.getElementById('stat-success').textContent = stats.successful || 0;
+            document.getElementById('stat-warnings').textContent = stats.warnings || 0;
+            document.getElementById('stat-failed').textContent = stats.failed || 0;
+        },
+        
+        showFinalSummary() {
+            elements.actionButtons.style.display = 'block';
+        }
+    };
+    
+    // Check Card Management
+    const CheckCard = {
+        getStatusInfo(status) {
+            return {
+                icon: CONFIG.STATUS_ICONS[status] || CONFIG.STATUS_ICONS.running,
+                class: status || 'running'
+            };
+        },
+        
+        buildHTML(check, isRunning) {
+            const { icon, class: statusClass } = this.getStatusInfo(check.status || 'running');
+            return `
+                <div class="check-status">
+                    <div class="check-status-icon ${statusClass}">${icon}</div>
+                    <div class="check-time">${check.execution_time_ms || 0}ms</div>
+                </div>
+                <div class="check-name">${check.service_name}</div>
+                <div class="check-message">${check.message || (isRunning ? 'Running...' : '')}</div>
+            `;
+        },
+        
+        create(check, isRunning = false) {
+            if (currentCheckItem) {
+                currentCheckItem.classList.remove('running');
+            }
+            
+            const item = document.createElement('div');
+            item.className = 'check-item' + (isRunning ? ' running' : '');
+            item.id = 'check-' + check.service_name.replace(/\s+/g, '-');
+            item.innerHTML = this.buildHTML(check, isRunning);
+            
+            elements.checksList.appendChild(item);
+            
+            if (isRunning) currentCheckItem = item;
+            if (elements.checksList.children.length > CONFIG.SCROLL_THRESHOLD) {
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            
+            return item;
+        },
+        
+        update(itemId, check) {
+            const item = document.getElementById(itemId);
+            if (!item) return;
+            
+            item.classList.remove('running');
+            item.innerHTML = this.buildHTML(check, false);
+        }
+    };
+    
+    // Stream Handler
+    async function handleStream() {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        let totalChecks = 0;
+        let stats = { completed: 0, successful: 0, warnings: 0, failed: 0 };
+        
+        const response = await fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Accept': 'text/event-stream',
+                'X-CSRFToken': csrftoken,
+            },
+        });
+        
+        if (!response.ok) throw new Error('Failed to start checks');
+        
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n\n');
+            buffer = lines.pop();
+            
+            for (const line of lines) {
+                if (!line.startsWith('data: ')) continue;
+                
+                try {
+                    const data = JSON.parse(line.substring(6));
+                    
+                    switch (data.type) {
+                        case 'start':
+                            totalChecks = data.total;
+                            UI.updateProgress(0, totalChecks);
+                            break;
+                        
+                        case 'running':
+                            CheckCard.create({ service_name: data.service_name }, true);
+                            break;
+                        
+                        case 'progress':
+                            stats = { ...data.stats, completed: data.completed };
+                            const itemId = 'check-' + data.check.service_name.replace(/\s+/g, '-');
+                            CheckCard.update(itemId, data.check);
+                            UI.updateProgress(data.completed, data.total);
+                            UI.updateStats(stats);
+                            break;
+                        
+                        case 'complete':
+                            if (currentCheckItem) currentCheckItem.classList.remove('running');
+                            UI.showFinalSummary();
+                            break;
+                    }
+                } catch (e) {
+                    console.error('Parse error:', e);
+                }
+            }
+        }
+    }
+    
+    // Main execution function
+    async function runHealthChecks() {
+        UI.showScreen('progress');
+        UI.resetUI();
+        
+        try {
+            await handleStream();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+            UI.showScreen('initial');
+        }
+    }
+    
+    // Event listeners
+    elements.runBtn.addEventListener('click', runHealthChecks);
+    elements.runAgainBtn.addEventListener('click', () => UI.showScreen('initial'));
+});
+</script>
+
+{% csrf_token %}
+{% endblock %}
