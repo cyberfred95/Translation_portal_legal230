@@ -22,6 +22,7 @@ class HealthCheckResult(models.Model):
         ('translation', 'Translation'),
         ('database', 'Database'),
         ('docker', 'Docker'),
+        ('document_processing', 'Document Processing'),
     ]
     
     timestamp = models.DateTimeField(default=timezone.now, db_index=True)
