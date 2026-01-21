@@ -56,9 +56,13 @@ class CeleryTaskExecutionHealthCheck(BaseCeleryHealthCheck):
         """
         Execute a test task and return the result.
         
+        Uses polling instead of .get() to avoid issues when called from within a task.
+        
         Returns:
             Dictionary with success status, error message, and details
         """
+        import time
+        from celery.result import AsyncResult
         from ...tasks import health_check_test_task
         
         # Execute test task asynchronously
@@ -67,33 +71,52 @@ class CeleryTaskExecutionHealthCheck(BaseCeleryHealthCheck):
             expires=CELERY_TASK_EXPIRES_SECONDS
         )
         
-        # Wait for result with timeout
-        try:
-            task_output = async_result.get(timeout=CELERY_TASK_TIMEOUT_SECONDS)
+        # Poll for result instead of using .get() (which is forbidden within tasks)
+        start_time = time.time()
+        poll_interval = 0.5  # Check every 0.5 seconds
+        
+        while (time.time() - start_time) < CELERY_TASK_TIMEOUT_SECONDS:
+            # Check if task is ready
+            if async_result.ready():
+                try:
+                    # Get result without blocking
+                    task_output = async_result.result
+                    
+                    if task_output == CELERY_TEST_TASK_EXPECTED_OUTPUT:
+                        return {
+                            'success': True,
+                            'details': {
+                                'task_id': async_result.id,
+                                'task_result': task_output,
+                                'task_state': async_result.state
+                            }
+                        }
+                    else:
+                        return {
+                            'success': False,
+                            'error': f"Task returned unexpected result: {task_output}",
+                            'details': {
+                                'task_id': async_result.id,
+                                'expected': CELERY_TEST_TASK_EXPECTED_OUTPUT,
+                                'got': task_output
+                            }
+                        }
+                except Exception as e:
+                    return {
+                        'success': False,
+                        'error': f"Task failed with exception: {str(e)}",
+                        'details': {
+                            'task_id': async_result.id,
+                            'exception_type': type(e).__name__
+                        }
+                    }
             
-            if task_output == CELERY_TEST_TASK_EXPECTED_OUTPUT:
-                return {
-                    'success': True,
-                    'details': {
-                        'task_id': async_result.id,
-                        'task_result': task_output,
-                        'task_state': async_result.state
-                    }
-                }
-            else:
-                return {
-                    'success': False,
-                    'error': f"Task returned unexpected result: {task_output}",
-                    'details': {
-                        'task_id': async_result.id,
-                        'expected': CELERY_TEST_TASK_EXPECTED_OUTPUT,
-                        'got': task_output
-                    }
-                }
-                
-        except (TimeoutError, CeleryTimeoutError):
-            return {
-                'success': False,
-                'error': f"Task execution timed out after {CELERY_TASK_TIMEOUT_SECONDS} seconds",
-                'details': {'task_id': async_result.id}
-            }
+            # Wait before next check
+            time.sleep(poll_interval)
+        
+        # Timeout
+        return {
+            'success': False,
+            'error': f"Task execution timed out after {CELERY_TASK_TIMEOUT_SECONDS} seconds",
+            'details': {'task_id': async_result.id, 'state': async_result.state}
+        }
