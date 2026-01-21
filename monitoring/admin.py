@@ -272,11 +272,14 @@ class HealthCheckRunAdmin(admin.ModelAdmin):
         Yields:
             SSE formatted strings for each check execution
         """
-        from .runner import get_all_health_checks, run_single_health_check
+        import time
+        from .runner import get_all_health_checks, run_single_health_check, save_health_check_results, RunSummary
         
         health_checks = get_all_health_checks()
         total = len(health_checks)
         stats = {'completed': 0, 'successful': 0, 'failed': 0, 'warnings': 0}
+        results = []  # Store results for DB save
+        start_time = time.time()
         
         # Initial event
         yield self._create_sse_event('start', {'total': total})
@@ -288,6 +291,7 @@ class HealthCheckRunAdmin(admin.ModelAdmin):
             
             # Execute check
             result = run_single_health_check(check)
+            results.append(result)  # Store for DB save
             self._update_check_stats(stats, result.status.value)
             
             # Send progress with result
@@ -297,6 +301,16 @@ class HealthCheckRunAdmin(admin.ModelAdmin):
                 'check': result.to_dict(),
                 'stats': {k: v for k, v in stats.items() if k != 'completed'}
             })
+        
+        # Save results to database
+        summary = RunSummary.from_results(results)
+        total_execution_time_ms = int((time.time() - start_time) * 1000)
+        save_health_check_results(
+            results=results,
+            summary=summary,
+            total_execution_time_ms=total_execution_time_ms,
+            trigger='manual'
+        )
         
         # Completion event
         yield self._create_sse_event('complete', {})

@@ -58,6 +58,20 @@ SERVICE_DESCRIPTIONS = {
         'short': 'Custom terminology',
         'long': 'LARA glossaries allow users to define custom terminology and translations for specialized terms. This check creates a test glossary, verifies it was created successfully, and then removes it to ensure the glossary management system is functioning.'
     },
+    
+    # Document Processing
+    'WeasyPrint PDF Generation': {
+        'short': 'PDF creation',
+        'long': 'WeasyPrint converts HTML templates into PDF documents (like quotes and reports). This check generates a test PDF from HTML to verify that the PDF generation engine is working correctly and all required system dependencies (fonts, libraries) are available.'
+    },
+    'Adobe PDF Services': {
+        'short': 'PDF to DOCX conversion',
+        'long': 'Adobe PDF Services converts PDF documents to DOCX format for editing. This check verifies that our Adobe API credentials are valid, OAuth authentication works, and that we can successfully connect to Adobe\'s PDF Services API.'
+    },
+    'Document Libraries (docx/pptx)': {
+        'short': 'Word/PowerPoint processing',
+        'long': 'python-docx and python-pptx are libraries used to extract text from Word and PowerPoint documents. This check verifies that both libraries are installed correctly and can perform basic operations like creating empty documents.'
+    },
 }
 
 # Health check categories
@@ -68,6 +82,7 @@ class HealthCheckCategory:
     TRANSLATION = 'translation'
     DATABASE = 'database'
     DOCKER = 'docker'
+    DOCUMENT_PROCESSING = 'document_processing'
 
 # Redis health check constants
 REDIS_TEST_KEY = 'health_check_test'

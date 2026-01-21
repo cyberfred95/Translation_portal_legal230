@@ -10,6 +10,11 @@ from .translation import (
     LaraDocumentTranslationHealthCheck,
     LaraGlossaryHealthCheck
 )
+from .document_processing import (
+    WeasyPrintHealthCheck,
+    AdobePDFServicesHealthCheck,
+    DocumentLibrariesHealthCheck
+)
 
 __all__ = [
     'HealthCheckStatus',
@@ -25,4 +30,7 @@ __all__ = [
     'LaraTextTranslationHealthCheck',
     'LaraDocumentTranslationHealthCheck',
     'LaraGlossaryHealthCheck',
+    'WeasyPrintHealthCheck',
+    'AdobePDFServicesHealthCheck',
+    'DocumentLibrariesHealthCheck',
 ]

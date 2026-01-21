@@ -15,6 +15,11 @@ from .checks.translation import (
     LaraDocumentTranslationHealthCheck,
     LaraGlossaryHealthCheck
 )
+from .checks.document_processing import (
+    WeasyPrintHealthCheck,
+    AdobePDFServicesHealthCheck,
+    DocumentLibrariesHealthCheck
+)
 from .models import HealthCheckResult, HealthCheckRun
 
 logger = logging.getLogger(__name__)
@@ -63,12 +68,10 @@ def get_all_health_checks() -> List:
         LaraDocumentTranslationHealthCheck(),
         LaraGlossaryHealthCheck(),
         
-        # TODO: Add more checks as they are implemented
-        # AdobeHealthCheck(),
-        
-        # Docker checks
-        # DockerLexaHealthCheck(),
-        # DockerLaraHealthCheck(),
+        # Document processing checks
+        WeasyPrintHealthCheck(),
+        AdobePDFServicesHealthCheck(),
+        DocumentLibrariesHealthCheck(),
     ]
 
 

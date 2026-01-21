@@ -41,11 +41,21 @@ class BaseHealthCheck:
     Base class for all health checks.
     
     Provides common functionality like timing, error handling, and result creation.
+    
+    Subclasses should define:
+    - service_name: str - Name of the service being checked
+    - category: str - Category of the health check
     """
     
+    # Default values (should be overridden by subclasses)
+    service_name: str = "Unknown Service"
+    category: str = "uncategorized"
+    
     def __init__(self):
-        self.service_name = self.__class__.__name__.replace('HealthCheck', '')
-        self.category = 'infrastructure'
+        # Only set service_name if not already defined by subclass
+        if not hasattr(self.__class__, 'service_name') or self.__class__.service_name == BaseHealthCheck.service_name:
+            self.service_name = self.__class__.__name__.replace('HealthCheck', '')
+        # Category should be defined by subclass, don't override it here
     
     def run(self) -> HealthCheckResult:
         """
