@@ -307,7 +307,7 @@ export function initializeUIEvents() {
 // Fonctions de callback pour les boutons
 
 function onSaveApiKey() {
-  const apiKey = document.getElementById("api-key").value;
+  const apiKey = document.getElementById("api-key").value.trim();
   const successMessage = document.getElementById("api-key-success");
   const errorMessage = document.getElementById("api-key-error");
   const previousApiKey = getApiKey();
@@ -335,7 +335,7 @@ function onSaveApiKey() {
 }
 
 async function onTestApiKey() {
-  const apiKey = getApiKey();
+  const apiKey = (getApiKey() || '').trim();
   const i18n = getI18n();
 
   if (!apiKey) {
@@ -376,7 +376,7 @@ function swapLanguages() {
 
 // Fonction principale : insère la traduction sans remplacer le texte sélectionné
 async function insertTranslationWithoutReplace() {
-  const apiKey = getApiKey();
+  const apiKey = (getApiKey() || '').trim();
   const sourceLang = document.getElementById("source-lang").value;
   const targetLang = document.getElementById("target-lang").value;
   const domain = document.getElementById("domain").value;
@@ -523,7 +523,7 @@ export function updateReplaceBtnState() {
  * Gère le clic sur le bouton "Gérer mon abonnement Stripe"
  */
 async function onManageSubscription() {
-  const apiKey = getApiKey();
+  const apiKey = (getApiKey() || '').trim();
   const stripeBtn = document.getElementById("stripe-subscription-btn");
   const stripeError = document.getElementById("stripe-error");
   const i18n = getI18n();
@@ -565,7 +565,7 @@ async function onManageSubscription() {
  * Met à jour la visibilité du bouton d'abonnement Stripe
  */
 async function updateSubscriptionButtonVisibility() {
-  const apiKey = getApiKey();
+  const apiKey = (getApiKey() || '').trim();
   const section = document.getElementById("subscription-section");
 
   if (!section) return;

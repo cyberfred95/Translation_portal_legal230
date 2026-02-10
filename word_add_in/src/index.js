@@ -53,7 +53,7 @@ async function initializeApp() {
 
 // Fonction utilitaire pour charger langues et domaines au démarrage
 async function chargerLanguesEtDomaines() {
-  const apiKey = getApiKey();
+  const apiKey = (getApiKey() || '').trim();
   if (!apiKey) return;
   const mainContent = document.getElementById("main-content");
   const noApiMessage = document.getElementById("no-api-message");
