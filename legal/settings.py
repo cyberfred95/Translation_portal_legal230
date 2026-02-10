@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     'quoting.apps.QuotingConfig',
     'stripe_webhooks',
     'emails',
+    'monitoring.apps.MonitoringConfig',
 ]
 
 STATICFILES_FINDERS = (
@@ -240,6 +241,10 @@ CELERY_BEAT_SCHEDULE = {
     'report_daily_metered_usage': {
         'task': 'subscriptions.tasks.report_daily_metered_usage',
         'schedule': crontab(minute="5", hour="0")
+    },
+    'run_daily_health_checks': {
+        'task': 'monitoring.run_scheduled_health_checks',
+        'schedule': crontab(minute="0", hour="22")
     }
 }
 
@@ -295,6 +300,9 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 LARA_API_URL = os.environ.get('LARA_API_URL')
 LARA_ACCESS_KEY_ID = os.environ.get('LARA_ACCESS_KEY_ID')
 LARA_ACCESS_KEY_SECRET = os.environ.get('LARA_ACCESS_KEY_SECRET')
+
+# Health Check Configuration
+HEALTH_CHECK_USER_EMAIL = os.environ.get('HEALTH_CHECK_USER_EMAIL')
 
 # Cloud Storage API Configuration - DÉSACTIVÉ
 # CLOUDSTORAGE_API_URL = os.environ.get('CLOUDSTORAGE_API_URL')

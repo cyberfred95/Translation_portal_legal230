@@ -164,6 +164,48 @@ class NoStripeCustomerFilter(admin.SimpleListFilter):
         return queryset
 
 
+def synchronize_limits_from_subscription_type(modeladmin, request, queryset):
+    """
+    Action admin pour synchroniser les limites (Max symbols count, Max words count,
+    Max files count, Custom Glossaries Count) depuis le SubscriptionType vers le UserSubscription.
+    """
+    updated_count = 0
+    errors = []
+    
+    for user_subscription in queryset:
+        if not user_subscription.subscription:
+            errors.append(f"UserSubscription {user_subscription.id} n'a pas de SubscriptionType associé")
+            continue
+        
+        subscription_type = user_subscription.subscription
+        
+        # Synchroniser les 4 champs depuis le SubscriptionType
+        user_subscription.max_symbols_count = subscription_type.max_symbols_count
+        user_subscription.max_words_count = subscription_type.max_words_count
+        user_subscription.max_files_count = subscription_type.max_files_count
+        user_subscription.custom_glossaries_count = subscription_type.custom_glossaries_count
+        
+        try:
+            user_subscription.save()
+            updated_count += 1
+        except Exception as e:
+            errors.append(f"Erreur lors de la mise à jour de UserSubscription {user_subscription.id}: {str(e)}")
+    
+    # Afficher les messages de résultat
+    if updated_count > 0:
+        messages.success(
+            request,
+            f"{updated_count} souscription(s) utilisateur synchronisée(s) avec succès."
+        )
+    
+    if errors:
+        for error in errors:
+            messages.error(request, error)
+
+
+synchronize_limits_from_subscription_type.short_description = "Synchroniser les limites depuis le Subscription Type"
+
+
 @admin.register(UserSubscription)
 class UserSubscriptionAdmin(admin.ModelAdmin):
     list_display = (
@@ -178,6 +220,7 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
         'stripe_subscription_id', 'stripe_subscription_item_id', 'user__email', 'user__username'
     )
     ordering = ('-start_date',)
+    actions = [synchronize_limits_from_subscription_type]
 
     change_list_template = "admin/subscriptions/usersubscription/change_list.html"
 
