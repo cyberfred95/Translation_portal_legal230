@@ -1,10 +1,9 @@
 """
 Celery tasks for scheduled health checks and test tasks.
 """
-from celery import shared_task
 import logging
 
-from .runner import run_all_health_checks
+from celery import shared_task
 
 logger = logging.getLogger(__name__)
 
@@ -13,11 +12,13 @@ logger = logging.getLogger(__name__)
 def run_scheduled_health_checks():
     """
     Celery task to run all health checks on a schedule.
-    
+
     This task should be configured in Celery Beat schedule to run daily.
     """
+    from .runner import run_all_health_checks
+
     logger.info("Starting scheduled health check run")
-    
+
     try:
         result = run_all_health_checks(trigger='scheduled')
         

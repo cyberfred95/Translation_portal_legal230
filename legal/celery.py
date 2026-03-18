@@ -22,6 +22,7 @@ app.conf.update(
 )
 
 # Load task modules from all registered Django app configs.
+# Discovers monitoring.health_check_test_task via Django INSTALLED_APPS.
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {

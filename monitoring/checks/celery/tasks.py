@@ -1,8 +1,7 @@
 """
 Celery task execution health check.
 """
-from typing import Dict, Any
-from celery.exceptions import TimeoutError as CeleryTimeoutError
+from typing import Any, Dict
 
 from .base import BaseCeleryHealthCheck
 from ..base import HealthCheckResult
@@ -98,7 +97,7 @@ class CeleryTaskExecutionHealthCheck(BaseCeleryHealthCheck):
                             'details': {
                                 'task_id': async_result.id,
                                 'expected': CELERY_TEST_TASK_EXPECTED_OUTPUT,
-                                'got': task_output
+                                'got': str(task_output)  # Celery may return exception objects
                             }
                         }
                 except Exception as e:

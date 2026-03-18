@@ -3,10 +3,10 @@ LARA document translation health check.
 """
 import time
 import requests
-from typing import Dict, Any
+from typing import Any, Dict
 from io import BytesIO
 
-from .base import BaseLaraHealthCheck, User
+from .base import BaseLaraHealthCheck
 from ..base import HealthCheckResult
 from ...constants import LARA_REQUEST_TIMEOUT_SECONDS
 
@@ -85,7 +85,7 @@ class LaraDocumentTranslationHealthCheck(BaseLaraHealthCheck):
                 error=e
             )
     
-    def _upload_test_document(self, user: User) -> Dict[str, Any]:
+    def _upload_test_document(self, user: Any) -> Dict[str, Any]:
         """
         Upload a test document for translation.
         

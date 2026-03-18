@@ -4,7 +4,9 @@ Base classes and utilities for health checks.
 import time
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
+from ..utils import sanitize_for_json
 
 
 class HealthCheckStatus(Enum):
@@ -24,14 +26,14 @@ class HealthCheckResult:
     details: Optional[Dict[str, Any]] = None
     execution_time_ms: Optional[int] = None
     
-    def to_dict(self) -> dict:
-        """Convert result to dictionary format."""
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert result to dictionary format. Ensures JSON-serializable output."""
         return {
             'service_name': self.service_name,
             'status': self.status.value,
             'message': self.message,
             'category': self.category,
-            'details': self.details,
+            'details': sanitize_for_json(self.details) if self.details else None,
             'execution_time_ms': self.execution_time_ms,
         }
 

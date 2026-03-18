@@ -3,9 +3,9 @@ LARA text translation health check.
 """
 import time
 import requests
-from typing import Dict, Any
+from typing import Any, Dict
 
-from .base import BaseLaraHealthCheck, User
+from .base import BaseLaraHealthCheck
 from ..base import HealthCheckResult
 from ...constants import (
     LARA_TEST_TEXT_SOURCE,
@@ -43,7 +43,7 @@ class LaraTextTranslationHealthCheck(BaseLaraHealthCheck):
                 error=e
             )
     
-    def _test_text_translation(self, user: User) -> Dict[str, Any]:
+    def _test_text_translation(self, user: Any) -> Dict[str, Any]:
         """
         Test text translation through LARA API.
         

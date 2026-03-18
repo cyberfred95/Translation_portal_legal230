@@ -2,9 +2,9 @@
 Base class for LARA Bridge health checks.
 """
 import logging
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
 from django.conf import settings
-from django.contrib.auth import get_user_model
 
 from ..base import BaseHealthCheck, HealthCheckResult
 from ...constants import (
@@ -13,7 +13,6 @@ from ...constants import (
 )
 
 logger = logging.getLogger(__name__)
-User = get_user_model()
 
 
 class BaseLaraHealthCheck(BaseHealthCheck):
@@ -58,22 +57,25 @@ class BaseLaraHealthCheck(BaseHealthCheck):
         
         return None
     
-    def _get_test_user(self) -> Optional[User]:
+    def _get_test_user(self) -> Optional[Any]:
         """
         Get test user for health checks.
-        
+
         Uses user configured in HEALTH_CHECK_USER_EMAIL setting.
         Returns None if not configured - no fallback.
-        
+
         Returns:
             User instance or None if not configured/found
         """
+        from django.contrib.auth import get_user_model
+
+        User = get_user_model()
         test_user_email = getattr(settings, 'HEALTH_CHECK_USER_EMAIL', None)
-        
+
         if not test_user_email:
             logger.warning("HEALTH_CHECK_USER_EMAIL not configured in .env")
             return None
-        
+
         try:
             return User.objects.get(email=test_user_email)
         except User.DoesNotExist:

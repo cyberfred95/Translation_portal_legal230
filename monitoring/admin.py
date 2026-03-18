@@ -1,10 +1,14 @@
 """
 Admin interface for monitoring system.
 """
+import json
+import time
+
 from django.contrib import admin
-from django.urls import path
-from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.http import StreamingHttpResponse
+from django.shortcuts import render, redirect
+from django.urls import path
 from django.utils.html import format_html
 
 from .models import HealthCheckResult, HealthCheckRun
@@ -12,21 +16,24 @@ from .runner import run_all_health_checks
 from .constants import STATUS_COLORS, SERVICE_DESCRIPTIONS
 
 
-def format_colored_status(status: str) -> str:
+def format_colored_status(status) -> str:
     """
     Format status with color coding for admin display.
-    
+
     Args:
         status: Status string ('success', 'warning', 'error')
-    
+
     Returns:
         HTML formatted status string
     """
-    color = STATUS_COLORS.get(status, 'gray')
+    if status is None:
+        status = ''
+    status_str = str(status)
+    color = STATUS_COLORS.get(status_str, 'gray')
     return format_html(
         '<span style="color: {}; font-weight: bold;">{}</span>',
         color,
-        status.upper()
+        status_str.upper() if status_str else '-'
     )
 
 
@@ -110,7 +117,11 @@ class HealthCheckResultAdmin(admin.ModelAdmin):
         Returns:
             Tuple of (short_description, long_description)
         """
+        if not service_name:
+            return ('', '')
         descriptions = SERVICE_DESCRIPTIONS.get(service_name, {})
+        if not isinstance(descriptions, dict):
+            return (str(service_name), '')
         return (
             descriptions.get('short', service_name),
             descriptions.get('long', '')
@@ -137,10 +148,11 @@ class HealthCheckResultAdmin(admin.ModelAdmin):
     def get_fieldsets(self, request, obj=None):
         """Build dynamic fieldsets with service description."""
         description_html = ''
-        
+
         if obj:
-            _, long_desc = self._get_service_descriptions(obj.service_name)
-            description_html = self._build_service_description_html(obj.service_name, long_desc)
+            service_name = getattr(obj, 'service_name', None) or ''
+            _, long_desc = self._get_service_descriptions(service_name)
+            description_html = self._build_service_description_html(service_name, long_desc)
         
         return (
             (None, {
@@ -158,20 +170,26 @@ class HealthCheckResultAdmin(admin.ModelAdmin):
     
     def service_name_with_tooltip(self, obj):
         """Display service name with short description tooltip."""
-        short_desc, _ = self._get_service_descriptions(obj.service_name)
-        
+        if obj is None:
+            return '-'
+        service_name = getattr(obj, 'service_name', None) or ''
+        short_desc, _ = self._get_service_descriptions(service_name)
         return format_html(
             '<span title="{}" style="cursor: help; border-bottom: 1px dotted #999;">{}</span>',
             short_desc,
-            obj.service_name
+            service_name
         )
     service_name_with_tooltip.short_description = 'Service Name'
     service_name_with_tooltip.admin_order_field = 'service_name'
     
     def colored_status(self, obj):
         """Display status with color coding."""
-        return format_colored_status(obj.status)
+        if obj is None:
+            return '-'
+        status = getattr(obj, 'status', None) or ''
+        return format_colored_status(status)
     colored_status.short_description = 'Status'
+    colored_status.admin_order_field = 'status'
     
     def has_add_permission(self, request):
         """Disable manual addition of health check results."""
@@ -238,23 +256,24 @@ class HealthCheckRunAdmin(admin.ModelAdmin):
         ]
         return custom_urls + urls
     
-    # Health Check Execution Methods
-    
+    # SSE streaming helpers
+
     def _create_sse_event(self, event_type: str, data: dict) -> str:
-        """
-        Create a Server-Sent Event formatted string.
-        
-        Args:
-            event_type: Type of event ('start', 'running', 'progress', 'complete')
-            data: Event data dictionary
-            
-        Returns:
-            SSE formatted string
-        """
-        import json
-        event_data = {'type': event_type, **data}
-        return f"data: {json.dumps(event_data)}\n\n"
-    
+        """Format event data as Server-Sent Event string."""
+        payload = {'type': event_type, **data}
+        return f"data: {json.dumps(payload)}\n\n"
+
+    def _build_progress_payload(
+        self, stats: dict, total: int, result
+    ) -> dict:
+        """Build payload for progress SSE event. Excludes 'completed' from stats."""
+        return {
+            'completed': stats['completed'],
+            'total': total,
+            'check': result.to_dict(),
+            'stats': {k: v for k, v in stats.items() if k != 'completed'},
+        }
+
     def _update_check_stats(self, stats: dict, result_status: str) -> None:
         """Update check statistics based on result status."""
         if result_status == 'success':
@@ -266,14 +285,13 @@ class HealthCheckRunAdmin(admin.ModelAdmin):
         stats['completed'] += 1
     
     def _stream_health_checks(self):
-        """
-        Generator that streams health check results as SSE events.
-        
-        Yields:
-            SSE formatted strings for each check execution
-        """
-        import time
-        from .runner import get_all_health_checks, run_single_health_check, save_health_check_results, RunSummary
+        """Stream health check results as SSE events."""
+        from .runner import (
+            get_all_health_checks,
+            run_single_health_check,
+            save_health_check_results,
+            RunSummary,
+        )
         
         health_checks = get_all_health_checks()
         total = len(health_checks)
@@ -293,14 +311,10 @@ class HealthCheckRunAdmin(admin.ModelAdmin):
             result = run_single_health_check(check)
             results.append(result)  # Store for DB save
             self._update_check_stats(stats, result.status.value)
-            
-            # Send progress with result
-            yield self._create_sse_event('progress', {
-                'completed': stats['completed'],
-                'total': total,
-                'check': result.to_dict(),
-                'stats': {k: v for k, v in stats.items() if k != 'completed'}
-            })
+            yield self._create_sse_event(
+                'progress',
+                self._build_progress_payload(stats, total, result)
+            )
         
         # Save results to database
         summary = RunSummary.from_results(results)
@@ -317,8 +331,6 @@ class HealthCheckRunAdmin(admin.ModelAdmin):
     
     def _handle_streaming_request(self):
         """Handle SSE streaming request."""
-        from django.http import StreamingHttpResponse
-        
         response = StreamingHttpResponse(
             self._stream_health_checks(),
             content_type='text/event-stream'

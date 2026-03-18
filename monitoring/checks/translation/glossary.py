@@ -3,10 +3,10 @@ LARA glossary health check.
 """
 import time
 import requests
-from typing import Dict, Any
+from typing import Any, Dict
 from io import BytesIO
 
-from .base import BaseLaraHealthCheck, User
+from .base import BaseLaraHealthCheck
 from ..base import HealthCheckResult
 from ...constants import LARA_REQUEST_TIMEOUT_SECONDS
 
@@ -70,7 +70,7 @@ class LaraGlossaryHealthCheck(BaseLaraHealthCheck):
                 error=e
             )
     
-    def _create_personal_glossary(self, user: User) -> Dict[str, Any]:
+    def _create_personal_glossary(self, user: Any) -> Dict[str, Any]:
         """
         Create a personal glossary (same as UI).
         

@@ -21,6 +21,7 @@ from .checks.document_processing import (
     DocumentLibrariesHealthCheck
 )
 from .models import HealthCheckResult, HealthCheckRun
+from .utils import sanitize_for_json
 
 logger = logging.getLogger(__name__)
 
@@ -134,14 +135,14 @@ def save_health_check_results(
         total_execution_time_ms=total_execution_time_ms
     )
     
-    # Save individual results
+    # Save individual results (sanitize details for JSONField)
     for result in results:
         HealthCheckResult.objects.create(
             category=result.category,
             service_name=result.service_name,
             status=result.status.value,
             message=result.message,
-            details=result.details,
+            details=sanitize_for_json(result.details) if result.details else None,
             execution_time_ms=result.execution_time_ms
         )
     
