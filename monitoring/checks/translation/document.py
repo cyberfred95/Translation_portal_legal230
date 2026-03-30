@@ -110,7 +110,7 @@ class LaraDocumentTranslationHealthCheck(BaseLaraHealthCheck):
             'accessKeySecret': config['access_key_secret'],
             'source': 'en',
             'target': 'fr',
-            'userToken': str(user.id)
+            'userToken': str(user.uuid)
         }
         
         try:

@@ -65,7 +65,7 @@ class LaraTextTranslationHealthCheck(BaseLaraHealthCheck):
             'text': LARA_TEST_TEXT_SOURCE,
             'source': LARA_TEST_TEXT_SOURCE_LANGUAGE,
             'target': LARA_TEST_TEXT_TARGET_LANGUAGE,
-            'userToken': str(user.id)
+            'userToken': str(user.uuid)
         }
         
         try:

@@ -132,20 +132,32 @@ def rename_file(file: InMemoryUploadedFile, file_name: str = None):
 def get_user_emails_map(user_tokens):
     """
     Récupère un dictionnaire mapping UUID -> email pour une liste de tokens utilisateurs.
-    
+
     Args:
         user_tokens: Liste de UUID (strings) des utilisateurs
-        
+
     Returns:
         dict: Dictionnaire {uuid: email} pour les utilisateurs trouvés
     """
     if not user_tokens:
         return {}
-    
+
+    import uuid as uuid_module
+    valid_tokens = []
+    for token in user_tokens:
+        try:
+            uuid_module.UUID(str(token))
+            valid_tokens.append(token)
+        except (ValueError, AttributeError):
+            pass
+
+    if not valid_tokens:
+        return {}
+
     UserModel = get_user_model()
     return {
         str(user_obj['uuid']): user_obj['email']
-        for user_obj in UserModel.objects.filter(uuid__in=user_tokens).values('uuid', 'email')
+        for user_obj in UserModel.objects.filter(uuid__in=valid_tokens).values('uuid', 'email')
     }
 
 
