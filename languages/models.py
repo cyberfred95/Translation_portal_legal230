@@ -3,8 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Language(models.Model):
-    name = models.CharField(verbose_name=_("Name"), max_length=255, blank=True)
-    abbreviation = models.CharField(verbose_name=_("Abbreviation"), max_length=1024, blank=True, null=True)
+    name = models.CharField(verbose_name=_("Language Name"), max_length=255, blank=True)
+    abbreviation = models.CharField(verbose_name=_("Abbreviation"), max_length=1024, blank=True, null=True, help_text=_("L'abbreviation de la langue doit être celle du code ISO 639-1"))
     french_name = models.CharField(verbose_name=_("Name in French"), blank=True, null=True, max_length=255)
 
     class Meta:
