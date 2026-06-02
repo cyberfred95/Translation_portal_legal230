@@ -2,7 +2,68 @@ openapi: 3.0.3
 info:
   title: Lexamt API
   version: '1.0'
-  description: API de traduction et gestion de glossaires Lexamt
+  description: |
+    ## API de traduction Lexamt
+
+    Cette API permet aux partenaires et intégrateurs d'accéder aux services de traduction
+    Lexamt directement depuis leurs applications, en utilisant la clé API fournie avec
+    leur abonnement.
+
+    ### Authentification
+
+    Toutes les requêtes nécessitent un header `Authorization` au format Bearer :
+
+    ```
+    Authorization: Bearer <votre_cle_api>
+    ```
+
+    La clé API est liée à un abonnement actif. Si la souscription expire ou est résiliée,
+    la clé API cesse de fonctionner.
+
+    ### Limites de souscription (quotas)
+
+    Les quotas dépendent du plan d'abonnement souscrit. Chaque plan définit des limites
+    pour une **période de facturation** (mois ou année) :
+
+    | Quota | Description |
+    |-------|-------------|
+    | **Mots** (`max_words_count`) | Nombre maximum de mots traduits par période |
+    | **Caractères** (`max_symbols_count`) | Nombre maximum de caractères traduits par période |
+    | **Fichiers** (`max_files_count`) | Nombre maximum de fichiers traduits par période |
+    | **Glossaires** (`custom_glossaries_count`) | Nombre maximum de glossaires personnalisés pouvant être créés |
+
+    Une valeur de **-1** signifie que le quota est illimité.
+
+    Lorsqu'un quota de souscription est dépassé, l'API renvoie une réponse **`403 Forbidden`**
+    avec un message précisant le quota atteint, par exemple :
+
+    ```json
+    {
+      "detail": "You have exceeded your words translation quota. You have used 5000/5000 words. Please upgrade your subscription."
+    }
+    ```
+
+    ### Limites techniques par requête
+
+    Ces limites s'appliquent indépendamment du plan d'abonnement :
+
+    | Paramètre | Limite |
+    |-----------|--------|
+    | Texte à traduire (`text_translate`) | 2 000 caractères maximum |
+    | Nombre de fichiers par requête (`file_translate`) | 10 fichiers maximum |
+    | Taille totale des fichiers par requête | 50 MB maximum |
+    | Taille d'un fichier glossaire | 10 MB maximum |
+    | Formats de documents acceptés | TXT, DOCX, XLSX, PPTX, PDF |
+    | Formats de glossaire acceptés | CSV, XLSX |
+    | Code de langue | 10 caractères maximum (ex. `en`, `fr`) |
+
+    ### Format des erreurs
+
+    Toutes les erreurs retournent un objet JSON de la forme :
+
+    ```json
+    { "detail": "Message d'erreur explicatif" }
+    ```
 
 servers:
   - url: https://portail.lexamt.fr
@@ -12,13 +73,132 @@ components:
     BearerAuth:
       type: http
       scheme: bearer
-      description: Clé API au format Bearer (Bearer <votre_cle_api>)
+      description: |
+        Clé API au format `Bearer <votre_cle_api>`.
+        La clé API est disponible dans votre espace abonné.
+
   schemas:
     Error:
       type: object
       properties:
         detail:
           type: string
+          description: Message d'erreur explicatif
+      example:
+        detail: "Message d'erreur"
+
+    AuthError400:
+      type: object
+      properties:
+        detail:
+          type: string
+      description: |
+        Erreur d'authentification. Messages possibles :
+        - `"Authorization header is required"`
+        - `"Authorization header must be in format: Bearer <api_key>"`
+        - `"API key is required after Bearer"`
+        - `"API key too long. Maximum 36 characters"`
+        - `"Invalid API key"`
+        - `"No user found with an active subscription for this API Key"`
+        - `"Cannot find any API Product, please contact support"`
+      example:
+        detail: "No user found with an active subscription for this API Key"
+
+    QuotaError403:
+      type: object
+      properties:
+        detail:
+          type: string
+      description: |
+        Quota de souscription dépassé ou abonnement inactif. Messages possibles :
+        - `"No active subscription found"`
+        - `"You have exceeded your words translation quota. You have used {used}/{max} words. Please upgrade your subscription."`
+        - `"You have exceeded your symbols translation quota. You have used {used}/{max} symbols. Please upgrade your subscription."`
+        - `"You have exceeded your files translation quota. You have used {used}/{max} files. Please upgrade your subscription."`
+      example:
+        detail: "You have exceeded your words translation quota. You have used 5000/5000 words. Please upgrade your subscription."
+
+    Domain:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifiant unique du domaine
+        domain_group:
+          type: string
+          nullable: true
+          description: Groupe auquel appartient le domaine (peut être null)
+        name:
+          type: string
+          description: Nom du domaine
+      example:
+        id: 1
+        domain_group: "Juridique"
+        name: "Droit commercial"
+
+    Language:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nom complet de la langue
+        language_code:
+          type: string
+          description: Code ISO 639-1 de la langue (ex. `en`, `fr`)
+      example:
+        name: "English"
+        language_code: "en"
+
+    GlossaryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifiant unique du glossaire
+        name:
+          type: string
+          description: Nom du glossaire
+        source_language:
+          type: string
+          description: Code de langue source
+        target_language:
+          type: string
+          description: Code de langue cible
+        file_url:
+          type: string
+          format: uri
+          description: URL de téléchargement du fichier glossaire
+        file_size:
+          type: string
+          description: Taille du fichier (ex. "12.5 KB")
+        created_at:
+          type: string
+          format: date-time
+          description: Date et heure de création
+      example:
+        id: 42
+        name: "Termes juridiques FR-EN"
+        source_language: "fr"
+        target_language: "en"
+        file_url: "https://portail.lexamt.fr/media/glossaries/termes_juridiques.csv"
+        file_size: "8.3 KB"
+        created_at: "2024-03-15T10:30:00Z"
+
+    GlossaryRequest:
+      type: object
+      required: [name, file]
+      properties:
+        name:
+          type: string
+          maxLength: 128
+          description: Nom du glossaire (128 caractères maximum)
+        file:
+          type: string
+          description: Fichier CSV ou XLSX encodé en base64 (10 MB maximum)
+      example:
+        name: "Termes juridiques FR-EN"
+        file: "base64encodedcontent..."
+
     TranslateTextRequest:
       type: object
       required: [action, text, source_language, target_language]
@@ -26,23 +206,39 @@ components:
         action:
           type: string
           enum: [text_translate]
-          maxLength: 32
+          description: Doit être `text_translate`
         text:
           type: string
           maxLength: 2000
-          description: Texte à traduire (maximum 2000 caractères)
+          description: Texte à traduire (2 000 caractères maximum)
         source_language:
           type: string
           maxLength: 10
-          description: Code de langue source (ex en, fr)
+          description: Code de langue source (ex. `fr`, `en`)
         target_language:
           type: string
           maxLength: 10
-          description: Code de langue cible (ex en, fr)
+          description: Code de langue cible (ex. `en`, `de`). Doit être différent de `source_language`
         domain_name:
           type: string
           maxLength: 128
-          description: Nom du domaine optionnel
+          description: Nom du domaine de traduction (optionnel, ex. `Droit commercial`)
+      example:
+        action: "text_translate"
+        text: "Le contrat prend effet à la date de signature."
+        source_language: "fr"
+        target_language: "en"
+        domain_name: "Droit commercial"
+
+    TranslateTextResponse:
+      type: object
+      properties:
+        translated_text:
+          type: string
+          description: Texte traduit
+      example:
+        translated_text: "The contract takes effect on the date of signature."
+
     TranslateFileRequest:
       type: object
       required: [action, document, source_language, target_language]
@@ -50,107 +246,65 @@ components:
         action:
           type: string
           enum: [file_translate]
-          maxLength: 32
+          description: Doit être `file_translate`
         document:
           type: array
           maxItems: 10
-          description: Maximum 10 fichiers par requête
+          description: |
+            Liste de fichiers à traduire.
+            - En JSON : tableau de chaînes base64
+            - En multipart/form-data : fichiers binaires (clé `document[]`)
+            - Maximum 10 fichiers, 50 MB au total
           items:
             type: string
-            description: Fichier encodé en base64 (taille totale max 50MB)
+            description: "Fichier encodé en base64 (formats acceptés : TXT, DOCX, XLSX, PPTX, PDF)"
         source_language:
           type: string
           maxLength: 10
+          description: Code de langue source
         target_language:
           type: string
           maxLength: 10
+          description: Code de langue cible. Doit être différent de `source_language`
         domain_name:
           type: string
           maxLength: 128
-    TranslateTextResponse:
+          description: Nom du domaine de traduction (optionnel)
+      example:
+        action: "file_translate"
+        document: ["base64encodedfile1...", "base64encodedfile2..."]
+        source_language: "fr"
+        target_language: "en"
+
+    TranslateFileResponseItem:
       type: object
       properties:
-        translated_text:
+        project_id:
           type: string
-    TranslateFileResponse:
-      type: array
-      items:
-        type: object
-        properties:
-          project_id:
-            type: string
-          status:
-            type: string
-          translated_file_url:
-            type: string
-    GlossaryResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
+          description: Identifiant du projet de traduction
+        status:
           type: string
-        source_language:
+          description: Statut du projet (ex. `Translated`)
+        translated_file_url:
           type: string
-        target_language:
-          type: string
-        created_at:
-          type: string
-          format: date-time
-    Domain:
-      type: object
-      properties:
-        id:
-          type: integer
-        domain_group:
-          type: string
-          nullable: true
-        name:
-          type: string
-    DefaultGlossary:
-      type: object
-      properties:
-        id:
-          type: integer
-        file_url:
-          type: string
-          format: uri
-        name:
-          type: string
-        source_language:
-          type: string
-        target_language:
-          type: string
-        file_size:
-          type: string
-        created_at:
-          type: string
-          format: date-time
-    GlossaryRequest:
-      type: object
-      required: [name, source_language, target_language, file]
-      properties:
-        name:
-          type: string
-          maxLength: 128
-          description: Nom du glossaire (maximum 128 caractères)
-        source_language:
-          type: string
-          maxLength: 10
-        target_language:
-          type: string
-          maxLength: 10
-        file:
-          type: string
-          description: Fichier CSV ou XLSX encodé en base64 (maximum 10MB)
+          description: URL de téléchargement du fichier traduit
+      example:
+        project_id: "proj_abc123"
+        status: "Translated"
+        translated_file_url: "https://portail.lexamt.fr/media/projects/contrat_translated.docx"
 
 security:
   - BearerAuth: []
 
 paths:
+
   /api/v1/domains/:
     get:
       summary: Liste des domaines disponibles
+      description: |
+        Retourne la liste de tous les domaines de traduction disponibles.
+        Les domaines peuvent être utilisés comme paramètre `domain_name` dans les
+        requêtes de traduction pour améliorer la qualité du résultat.
       security:
         - BearerAuth: []
       responses:
@@ -163,15 +317,21 @@ paths:
                 items:
                   $ref: '#/components/schemas/Domain'
         '400':
-          description: Erreur de validation (API Key invalide)
+          description: |
+            Erreur d'authentification. Voir le schéma `AuthError400` pour la liste
+            des messages possibles.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/AuthError400'
 
   /api/v1/domain/{id_domain}/glossaries/:
     get:
-      summary: Liste des glossaires par défaut pour un domaine
+      summary: Glossaires par défaut d'un domaine
+      description: |
+        Retourne les glossaires officiels associés à un domaine. Ces glossaires sont
+        gérés par Lexamt et disponibles selon les droits de l'abonnement.
+        Les résultats peuvent être filtrés par langue source et/ou cible.
       security:
         - BearerAuth: []
       parameters:
@@ -182,134 +342,42 @@ paths:
             type: integer
             minimum: 0
             maximum: 2147483647
-            description: ID du domaine (entier PostgreSQL valide)
+          description: Identifiant du domaine (obtenu via `GET /api/v1/domains/`)
         - in: query
           name: source_language
           required: false
           schema:
             type: string
             maxLength: 10
+          description: Filtrer par langue source (ex. `fr`)
         - in: query
           name: target_language
           required: false
           schema:
             type: string
             maxLength: 10
+          description: Filtrer par langue cible (ex. `en`)
       responses:
         '200':
-          description: Liste des glossaires pour le domaine
+          description: Liste des glossaires du domaine
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DefaultGlossary'
+                  $ref: '#/components/schemas/GlossaryResponse'
         '400':
-          description: Erreur de validation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /api/v1/glossary/:
-    post:
-      summary: Ajouter un glossaire utilisateur
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              required: [name, source_language, target_language, file]
-              properties:
-                name:
-                  type: string
-                  maxLength: 128
-                source_language:
-                  type: string
-                  maxLength: 10
-                target_language:
-                  type: string
-                  maxLength: 10
-                file:
-                  type: string
-                  format: binary
-                  description: Fichier CSV ou XLSX (maximum 10MB)
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GlossaryRequest'
-      responses:
-        '200':
-          description: Glossaire ajouté
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GlossaryResponse'
-        '400':
-          description: Erreur de validation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /api/v1/glossary/{id_glossary}/:
-    delete:
-      summary: Supprimer un glossaire utilisateur
-      security:
-        - BearerAuth: []
-      parameters:
-        - in: path
-          name: id_glossary
-          required: true
-          schema:
-            type: integer
-            minimum: 0
-            maximum: 2147483647
-            description: ID du glossaire (entier PostgreSQL valide)
-      responses:
-        '204':
-          description: Glossaire supprimé
-        '400':
-          description: Erreur de validation (ID invalide)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Glossaire non trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    get:
-      summary: Récupérer un glossaire utilisateur
-      security:
-        - BearerAuth: []
-      parameters:
-        - in: path
-          name: id_glossary
-          required: true
-          schema:
-            type: integer
-            minimum: 0
-            maximum: 2147483647
-      responses:
-        '200':
-          description: Glossaire trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GlossaryResponse'
-        '400':
-          description: Erreur de validation (ID invalide)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Glossaire non trouvé
+          description: |
+            Erreur d'authentification ou de validation. Messages possibles (en plus des
+            erreurs d'authentification) :
+            - `"'source_language' (string) is required if provided"` — langue fournie mais invalide
+            - `"'source_language' must be less than 10 characters"`
+            - `"'target_language' (string) is required if provided"`
+            - `"'target_language' must be less than 10 characters"`
+            - `"'id_domain' must be an integer"`
+            - `"'id_domain' must be between 0 and 2147483647"`
+            - `"Source language '{code}' not found."`
+            - `"Target language '{code}' not found"`
           content:
             application/json:
               schema:
@@ -318,27 +386,174 @@ paths:
   /api/v1/glossaries/:
     get:
       summary: Liste des glossaires de l'utilisateur
+      description: |
+        Retourne tous les glossaires personnalisés créés par l'utilisateur authentifié.
       security:
         - BearerAuth: []
       responses:
         '200':
-          description: Liste des glossaires
+          description: Liste des glossaires de l'utilisateur
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DefaultGlossary'
-        '401':
-          description: Non authentifié
+                  $ref: '#/components/schemas/GlossaryResponse'
+        '400':
+          description: Erreur d'authentification. Voir le schéma `AuthError400`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthError400'
+
+  /api/v1/glossary/:
+    post:
+      summary: Créer un glossaire utilisateur
+      description: |
+        Crée un nouveau glossaire personnalisé. Le fichier peut être envoyé :
+        - En **JSON** : fichier encodé en base64 dans le champ `file`
+        - En **multipart/form-data** : fichier binaire dans le champ `file`
+
+        Les langues source et cible sont détectées automatiquement depuis le contenu
+        du fichier CSV/XLSX.
+
+        > **Note** : le nombre de glossaires créables est limité par le quota
+        `custom_glossaries_count` de l'abonnement.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                name:
+                  type: string
+                  maxLength: 128
+                  description: Nom du glossaire (optionnel, 128 caractères maximum)
+                file:
+                  type: string
+                  format: binary
+                  description: Fichier CSV ou XLSX (10 MB maximum)
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlossaryRequest'
+      responses:
+        '200':
+          description: Glossaire créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GlossaryResponse'
+        '400':
+          description: |
+            Erreur d'authentification ou de validation. Messages possibles (en plus des
+            erreurs d'authentification) :
+            - `"'name' (string) is required"` — le champ name est invalide
+            - `"'name' must be less than 128 characters"`
+            - `"'file' (base64 string) is required"` — en JSON, le champ file est absent
+            - `"'file' (file) is required"` — en multipart, aucun fichier reçu
+            - `"'file' is not valid base64"`
+            - `"File is too large. Maximum size is 10MB"`
+            - `"'file' must be a CSV or XLSX file (base64)"` — en JSON
+            - `"'file' must be a CSV or XLSX file"` — en multipart
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /api/v1/glossary/{id_glossary}/:
+    get:
+      summary: Récupérer un glossaire utilisateur
+      description: Retourne les détails d'un glossaire personnalisé appartenant à l'utilisateur.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id_glossary
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 2147483647
+          description: Identifiant du glossaire
+      responses:
+        '200':
+          description: Glossaire trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GlossaryResponse'
+        '400':
+          description: |
+            Erreur d'authentification ou de validation. Messages possibles (en plus des
+            erreurs d'authentification) :
+            - `"'id_glossary' must be an integer"`
+            - `"'id_glossary' must be between 0 and 2147483647"`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Glossaire introuvable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                detail: "No user glossary found with this ID"
+
+    delete:
+      summary: Supprimer un glossaire utilisateur
+      description: Supprime définitivement un glossaire personnalisé appartenant à l'utilisateur.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id_glossary
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 2147483647
+          description: Identifiant du glossaire à supprimer
+      responses:
+        '204':
+          description: Glossaire supprimé avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+              example:
+                detail: "Glossary deleted successfully"
+        '400':
+          description: |
+            Erreur d'authentification ou de validation. Messages possibles (en plus des
+            erreurs d'authentification) :
+            - `"'id_glossary' must be an integer"`
+            - `"'id_glossary' must be between 0 and 2147483647"`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Glossaire introuvable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                detail: "No user glossary found with this ID"
+
   /api/v1/languages/:
     get:
       summary: Liste des langues disponibles
+      description: Retourne la liste de toutes les langues supportées par la plateforme.
       security:
         - BearerAuth: []
       responses:
@@ -349,22 +564,30 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    language_code:
-                      type: string
-        '401':
-          description: Non authentifié
+                  $ref: '#/components/schemas/Language'
+        '400':
+          description: Erreur d'authentification. Voir le schéma `AuthError400`.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/AuthError400'
 
   /api/v1/translate/:
     post:
-      summary: Traduction de texte ou de fichier
+      summary: Traduire un texte ou des fichiers
+      description: |
+        Point d'entrée unique pour la traduction. Le comportement dépend du champ `action` :
+
+        - **`text_translate`** : traduit un texte brut (max 2 000 caractères)
+        - **`file_translate`** : traduit un ou plusieurs fichiers (TXT, DOCX, XLSX, PPTX, PDF)
+
+        Pour `file_translate`, les fichiers peuvent être envoyés :
+        - En **JSON** : tableau de chaînes base64 dans le champ `document`
+        - En **multipart/form-data** : fichiers binaires avec la clé `document[]`
+
+        > **Important** : cette opération consomme les quotas de mots, caractères et fichiers
+        de l'abonnement. Une erreur `403` est retournée si un quota est dépassé avant
+        d'effectuer la traduction.
       security:
         - BearerAuth: []
       requestBody:
@@ -374,44 +597,37 @@ paths:
             schema:
               oneOf:
                 - $ref: '#/components/schemas/TranslateTextRequest'
-                - type: object
-                  required: [action, document, source_language, target_language]
-                  properties:
-                    action:
-                      type: string
-                      enum: [file_translate]
-                      maxLength: 32
-                    document:
-                      type: array
-                      maxItems: 10
-                      items:
-                        type: string
-                        description: Fichier encodé en base64 (formats supportés TXT, DOCX, XLSX, PPTX, PDF - taille totale max 50MB)
-                    source_language:
-                      type: string
-                      maxLength: 10
-                    target_language:
-                      type: string
-                      maxLength: 10
-                    domain_name:
-                      type: string
-                      maxLength: 128
+                - $ref: '#/components/schemas/TranslateFileRequest'
+            examples:
+              text:
+                summary: Traduction de texte
+                value:
+                  action: "text_translate"
+                  text: "Le contrat prend effet à la date de signature."
+                  source_language: "fr"
+                  target_language: "en"
+                  domain_name: "Droit commercial"
+              file:
+                summary: Traduction de fichier (base64)
+                value:
+                  action: "file_translate"
+                  document: ["base64encodedfile..."]
+                  source_language: "fr"
+                  target_language: "en"
           multipart/form-data:
             schema:
               type: object
-              required: [action, document, source_language, target_language]
+              required: [action, source_language, target_language]
               properties:
                 action:
                   type: string
                   enum: [file_translate]
-                  maxLength: 32
                 document:
                   type: array
-                  maxItems: 10
                   items:
                     type: string
                     format: binary
-                    description: Fichiers TXT, DOCX, XLSX, PPTX ou PDF (maximum 10 fichiers, taille totale max 50MB)
+                  description: Fichiers à traduire (clé `document[]`, max 10 fichiers, 50 MB total)
                 source_language:
                   type: string
                   maxLength: 10
@@ -421,9 +637,6 @@ paths:
                 domain_name:
                   type: string
                   maxLength: 128
-                glossary:
-                  type: string
-                  format: binary
       responses:
         '200':
           description: Traduction réussie
@@ -432,10 +645,42 @@ paths:
               schema:
                 oneOf:
                   - $ref: '#/components/schemas/TranslateTextResponse'
-                  - $ref: '#/components/schemas/TranslateFileResponse'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/TranslateFileResponseItem'
         '400':
-          description: Erreur de validation
+          description: |
+            Erreur d'authentification ou de validation. Messages possibles (en plus des
+            erreurs d'authentification) :
+            - `"'action' (string) is required"`
+            - `"'action' must be less than 32 characters"`
+            - `"'source_language' (string) is required"`
+            - `"'target_language' (string) is required"`
+            - `"'source_language' must be less than 10 characters"`
+            - `"'target_language' must be less than 10 characters"`
+            - `"Source and target languages cannot be the same"`
+            - `"'domain_name' (string) is required if provided"` — fourni mais vide
+            - `"'domain_name' must be less than 128 characters"`
+            - `"'text' (string) is required for action 'text_translate'"`
+            - `"'text' must be less than 2000 characters"`
+            - `"'document' (array of base64 string) is required for action 'file_translate'"` — en JSON
+            - `"'document' (at least one file) is required for action 'file_translate'"` — en multipart
+            - `"Maximum 10 files allowed"`
+            - `"Total file size exceeds the maximum allowed size of 50MB"`
+            - `"Element {index} in 'document' is not valid base64"`
+            - `"Element {index} in 'document' is not a valid TXT, DOCX, XLSX, PPTX or PDF file"`
+            - `"File {filename} is not a TXT, DOCX, XLSX, PPTX or PDF file"`
+            - `"Unknown action: {action}"`
+            - `"Invalid JSON"`
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '403':
+          description: |
+            Quota de souscription dépassé ou abonnement inactif.
+            Voir le schéma `QuotaError403` pour la liste des messages possibles.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaError403'

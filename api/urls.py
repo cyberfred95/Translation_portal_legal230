@@ -15,6 +15,7 @@ from .views.glossary import GlossaryAPIView, GlossaryExistAPIView
 from .views.language import LanguageAPIView
 from .views.translate import TranslateAPIView
 from .views.stripe import StripePortalSessionView, StripePricingPageUrlView
+from .views.swagger import SwaggerUIView, SwaggerYAMLView
 from .views.internal import (
     InternalDomainGroupsView,
     InternalUsersView,
@@ -27,6 +28,10 @@ from .views.internal import (
 API_VERSION = 'v1/'
 
 urlpatterns = [
+    # Documentation
+    path(API_VERSION + 'docs/', SwaggerUIView.as_view(), name='api-swagger-ui'),
+    path(API_VERSION + 'swagger.yaml', SwaggerYAMLView.as_view(), name='api-swagger-yaml'),
+
     # Domain endpoints
     path(
         API_VERSION + 'domains/',
