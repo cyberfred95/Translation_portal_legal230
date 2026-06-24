@@ -16,7 +16,7 @@ from .tasks_handlers.customer_handlers import CUSTOMER_EVENT_HANDLERS
 from .tasks_handlers.customer_subscription_handlers import CUSTOMER_SUBSCRIPTION_EVENT_HANDLERS
 from .tasks_handlers.customer_tax_id_handlers import CUSTOMER_TAX_ID_EVENT_HANDLERS
 from .tasks_handlers.invoice_payment_succeeded import INVOICE_EVENT_HANDLERS
-from .tasks_handlers.error.error import HttpResponse, error_message, exception_error
+from .tasks_handlers.error.error import HttpResponse, error_message, exception_error, success_message
 
 # Combine all event handlers into a single registry
 EVENT_HANDLERS = {
@@ -56,10 +56,12 @@ def handle_event(event: dict) -> HttpResponse:
     created_at = event.get('created', None)
     event_id = event.get('id', '')
 
-    # Clean up any existing event record with the same ID
+    # Idempotency: if this event was already processed successfully, skip it
     try:
         existing_event = StripeEvent.objects.filter(event_id=event_id).first()
         if existing_event:
+            if existing_event.code_response and existing_event.code_response < 500:
+                return success_message("event_already_processed", event_id=event_id)
             existing_event.delete()
     except Exception as error:
         return exception_error(error)

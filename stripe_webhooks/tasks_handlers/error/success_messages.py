@@ -102,4 +102,10 @@ SUCCESS_MESSAGES_TEMPLATE: dict[str, dict[str, str | int]] = {
         "message": "Invoice payment succeeded, all userSubscriptions with the stripe_id '{stripe_subscription_id}' has been reset, creating {countHistory_count} countHistory records",
         "code": CODE_CREATED
     },
+
+    # Idempotency messages
+    "event_already_processed": {
+        "message": "Event '{event_id}' already processed successfully, skipping",
+        "code": CODE_OK
+    },
 }

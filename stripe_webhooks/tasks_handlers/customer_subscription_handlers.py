@@ -473,9 +473,9 @@ def handle_customer_subscription_created(payload: dict) -> HttpResponse:
                 return error_response
     elif subscription_type.product_type in (
         SubscriptionType.ProductChoices.API,
-        SubscriptionType.ProductChoices.ADDIN
+        SubscriptionType.ProductChoices.WORD_ADD_IN
     ):
-        # Always send creation email for API and ADDIN subscriptions
+        # Always send creation email for API and WORD_ADD_IN subscriptions
         error_response = _send_subscription_creation_email(
             buyer,
             subscription_type,
